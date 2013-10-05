@@ -8,9 +8,9 @@ set(tests
 #    bind_cdecl_mf_test
     bind_const_test
     bind_cv_test
-#!    bind_dm2_test
-#!    bind_dm3_test
-#!    bind_dm_test
+    bind_dm2_test
+    bind_dm3_test
+    bind_dm_test
 #    bind_eq2_test
 #    bind_eq3_test
 #    bind_eq_test

@@ -12,572 +12,6 @@ namespace hpx { namespace util
 {
     namespace detail
     {
-        template <
-            typename R
-          , typename T0
-          , typename Arg0
-        >
-        struct bound_function1
-        {
-            typedef R result_type;
-            typedef R(*function_pointer_type)(T0);
-            function_pointer_type f;
-            bound_function1(
-                    bound_function1 const & other)
-                : f(other.f)
-                , arg0(other.arg0)
-            {}
-            bound_function1(
-                    BOOST_RV_REF(bound_function1) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0))
-            {}
-            template <typename A0>
-            bound_function1(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); }
-            typename decay<Arg0>::type arg0;
-        private:
-            BOOST_COPYABLE_AND_MOVABLE(bound_function1);
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename T0
-              , typename Arg0
-            >
-            struct eval<Env,
-                detail::bound_function1<
-                    R
-                  , T0
-                  , Arg0
-                >
-            >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename T0
-          , typename Arg0
-        >
-        R
-        eval(
-            Env & env
-          , detail::bound_function1<
-                R
-              , T0
-              , Arg0
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_function1<
-                        R
-                      , T0
-                      , Arg0
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
-    template <
-        typename R
-      , typename T0
-      , typename A0
-    >
-    detail::bound_function1<
-        R
-      , T0
-      , typename util::remove_reference<A0>::type
-    >
-    bind(
-        R(*f)(T0)
-      , BOOST_FWD_REF(A0) a0
-    )
-    {
-        return
-            detail::bound_function1<
-                R
-              , T0
-              , typename util::remove_reference<A0>::type
-            >
-            (f, boost::forward<A0>( a0 ));
-    }
-}}
-namespace hpx { namespace util
-{
-    namespace detail
-    {
-        template <
-            typename R
-          , typename C
-          , 
-           typename Arg0
-        >
-        struct bound_member_function1
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                );
-            function_pointer_type f;
-            template <typename A0>
-            bound_member_function1(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0))
-            {}
-            bound_member_function1(
-                    bound_member_function1 const & other)
-                : f(other.f)
-                , arg0(other.arg0)
-            {}
-            bound_member_function1(BOOST_RV_REF(
-                    bound_member_function1) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        ();
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        ();
-            }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                ();
-    }
-            typename decay<Arg0>::type arg0;
-        };
-        template <
-            typename R
-          , typename C
-          , 
-           typename Arg0
-        >
-        struct bound_member_function1<
-            R
-          , C const
-          , 
-           Arg0
-        >
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                ) const;
-            function_pointer_type f;
-            template <typename A0>
-            bound_member_function1(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0))
-            {}
-            bound_member_function1(
-                    bound_member_function1 const & other)
-                : f(other.f)
-                , arg0(other.arg0)
-            {}
-            bound_member_function1(
-                    BOOST_RV_REF(bound_member_function1) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        ();
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        ();
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (); }
-            typename decay<Arg0>::type arg0;
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename C
-              , 
-              
-                  typename Arg0
-            >
-            struct eval<Env,
-                detail::bound_member_function1<
-                    R
-                  , C
-                  , 
-                   Arg0
-                >
-            >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename C
-          , 
-          
-              typename Arg0
-        >
-        R
-        eval(
-            Env & env
-          , detail::bound_member_function1<
-                R
-              , C
-              , 
-               Arg0
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_member_function1<
-                        R
-                      , C
-                      , 
-                        
-                        Arg0
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
-    template <
-        typename R
-      , typename C
-      , 
-       typename A0
-    >
-    detail::bound_member_function1<
-        R
-      , C
-      , 
-      
-        typename util::remove_reference<A0>::type
-    >
-    bind(
-        R(C::*f)()
-      , BOOST_FWD_REF(A0) a0
-    )
-    {
-        return
-            detail::bound_member_function1<
-                R
-              , C
-              , 
-                
-                typename util::remove_reference<A0>::type
-            >
-            (f, boost::forward<A0>( a0 ));
-    }
-    template <
-        typename R
-      , typename C
-      , 
-       typename A0
-    >
-    detail::bound_member_function1<
-        R
-      , C const
-      , 
-      
-        typename util::remove_reference<A0>::type
-    >
-    bind(
-        R(C::*f)() const
-      , BOOST_FWD_REF(A0) a0
-    )
-    {
-        return
-            detail::bound_member_function1<
-                R
-              , C const
-              , 
-              
-                  typename util::remove_reference<A0>::type
-            >
-            (f, boost::forward<A0>( a0 ));
-    }
-}}
-namespace hpx { namespace util
-{
-    namespace detail
-    {
         namespace result_of
         {
             template <
@@ -593,7 +27,7 @@ namespace hpx { namespace util
                 >::type
             >
             struct bound_functor1;
-            template < typename F , typename A0 , typename Arg0 > struct bound_functor1< F(A0) , Arg0 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 > struct bound_functor1< F(A0 , A1) , Arg0 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 > struct bound_functor1< F(A0 , A1 , A2) , Arg0 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 > struct bound_functor1< F(A0 , A1 , A2 , A3) , Arg0 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 > struct bound_functor1< F(A0 , A1 , A2 , A3 , A4) , Arg0 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 > struct bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 > struct bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type ) >::type type; };
+            template < typename F , typename A0 , typename Arg0 > struct bound_functor1< F(A0) , Arg0 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 > struct bound_functor1< F(A0 , A1) , Arg0 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 > struct bound_functor1< F(A0 , A1 , A2) , Arg0 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 > struct bound_functor1< F(A0 , A1 , A2 , A3) , Arg0 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 > struct bound_functor1< F(A0 , A1 , A2 , A3 , A4) , Arg0 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 > struct bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 > struct bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type ) >::type type; };
             template <
                 typename F
               , typename Arg0
@@ -603,7 +37,7 @@ namespace hpx { namespace util
               , Arg0, boost::mpl::false_>
             {
                 typedef
-                    typename boost::result_of<
+                    typename util::invoke_result_of<
                         typename boost::remove_reference<
                             typename detail::result_of::eval<
                                 hpx::util::tuple<>
@@ -688,7 +122,7 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor1<
@@ -699,9 +133,9 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0));
             }
-            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor1< F(A0), Arg0, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor1< F(A0 , A1), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor1< F(A0 , A1 , A2), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor1< F(A0 , A1 , A2 , A3), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0)); }
+            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor1< F(A0), Arg0, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor1< F(A0 , A1), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor1< F(A0 , A1 , A2), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor1< F(A0 , A1 , A2 , A3), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor1< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0)); }
             typename decay<Arg0>::type arg0;
         };
         namespace result_of
@@ -790,34 +224,6 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     template <
-        typename R
-      , typename T0
-      , typename Arg0
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_function1<
-            R
-          , T0
-          , Arg0
-        >
-    > : boost::mpl::true_
-    {};
-    template <
-        typename R
-      , typename C
-      , 
-       typename Arg0
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_member_function1<
-            R
-          , C
-          , 
-           Arg0
-        >
-    > : boost::mpl::true_
-    {};
-    template <
         typename F
       , typename Arg0
     >
@@ -877,568 +283,109 @@ namespace boost { namespace serialization
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename T0 , typename T1
-          , typename Arg0 , typename Arg1
-        >
-        struct bound_function2
-        {
-            typedef R result_type;
-            typedef R(*function_pointer_type)(T0 , T1);
-            function_pointer_type f;
-            bound_function2(
-                    bound_function2 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1)
-            {}
-            bound_function2(
-                    BOOST_RV_REF(bound_function2) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1))
-            {}
-            template <typename A0 , typename A1>
-            bound_function2(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1;
-        private:
-            BOOST_COPYABLE_AND_MOVABLE(bound_function2);
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename T0 , typename T1
-              , typename Arg0 , typename Arg1
-            >
-            struct eval<Env,
-                detail::bound_function2<
-                    R
-                  , T0 , T1
-                  , Arg0 , Arg1
-                >
-            >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename T0 , typename T1
-          , typename Arg0 , typename Arg1
-        >
-        R
-        eval(
-            Env & env
-          , detail::bound_function2<
-                R
-              , T0 , T1
-              , Arg0 , Arg1
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_function2<
-                        R
-                      , T0 , T1
-                      , Arg0 , Arg1
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
     template <
         typename R
-      , typename T0 , typename T1
-      , typename A0 , typename A1
+      , typename T0
+      , typename A0
     >
-    detail::bound_function2<
-        R
-      , T0 , T1
-      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
+    detail::bound_functor1<
+        R(*)(T0)
+      , typename util::remove_reference<A0>::type
     >
     bind(
-        R(*f)(T0 , T1)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
+        R(*f)(T0)
+      , BOOST_FWD_REF(A0) a0
     )
     {
         return
-            detail::bound_function2<
-                R
-              , T0 , T1
-              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
+            detail::bound_functor1<
+                R(*)(T0)
+              , typename util::remove_reference<A0>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
+            (f, boost::forward<A0>( a0 ));
     }
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename C
-          , typename T0
-          , typename Arg0 , typename Arg1
+    template <
+        typename R
+      , typename C
+      , 
+       typename A0
+    >
+    detail::bound_functor1<
+        detail::mem_fn<
+            R(C::*)()
         >
-        struct bound_member_function2
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0);
-            function_pointer_type f;
-            template <typename A0 , typename A1>
-            bound_member_function2(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1))
-            {}
-            bound_member_function2(
-                    bound_member_function2 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1)
-            {}
-            bound_member_function2(BOOST_RV_REF(
-                    bound_member_function2) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1));
-            }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
+        , typename util::remove_reference<A0>::type
+    >
+    bind(
+        R(C::*f)()
+      , BOOST_FWD_REF(A0) a0
+    )
     {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
         return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1));
-    }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1;
-        };
-        template <
-            typename R
-          , typename C
-          , typename T0
-          , typename Arg0 , typename Arg1
-        >
-        struct bound_member_function2<
-            R
-          , C const
-          , T0
-          , Arg0 , Arg1
-        >
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0) const;
-            function_pointer_type f;
-            template <typename A0 , typename A1>
-            bound_member_function2(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1))
-            {}
-            bound_member_function2(
-                    bound_member_function2 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1)
-            {}
-            bound_member_function2(
-                    BOOST_RV_REF(bound_member_function2) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1;
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename C
-              , typename T0
-              ,
-                  typename Arg0 , typename Arg1
-            >
-            struct eval<Env,
-                detail::bound_member_function2<
-                    R
-                  , C
-                  , T0
-                  , Arg0 , Arg1
+            detail::bound_functor1<
+                detail::mem_fn<
+                    R(C::*)()
                 >
+                , typename util::remove_reference<A0>::type
             >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename C
-          , typename T0
-          ,
-              typename Arg0 , typename Arg1
+            (util::mem_fn(f), boost::forward<A0>( a0 ));
+    }
+    template <
+        typename R
+      , typename C
+      , 
+       typename A0
+    >
+    detail::bound_functor1<
+        detail::mem_fn<
+            R(C::*)() const
         >
-        R
-        eval(
-            Env & env
-          , detail::bound_member_function2<
-                R
-              , C
-              , T0
-              , Arg0 , Arg1
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_member_function2<
-                        R
-                      , C
-                      , T0
-                        ,
-                        Arg0 , Arg1
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0
-      , typename A0 , typename A1
-    >
-    detail::bound_member_function2<
-        R
-      , C
-      , T0
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
+        , typename util::remove_reference<A0>::type
     >
     bind(
-        R(C::*f)(T0)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
+        R(C::*f)() const
+      , BOOST_FWD_REF(A0) a0
     )
     {
         return
-            detail::bound_member_function2<
-                R
-              , C
-              , T0
-                ,
-                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
+            detail::bound_functor1<
+                detail::mem_fn<
+                    R(C::*)() const
+                >
+                , typename util::remove_reference<A0>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
+            (util::mem_fn(f), boost::forward<A0>( a0 ));
     }
+}}
+namespace hpx { namespace util
+{
     template <
         typename R
       , typename C
-      , typename T0
-      , typename A0 , typename A1
+      , typename A0
     >
-    detail::bound_member_function2<
-        R
-      , C const
-      , T0
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
+    detail::bound_functor1<
+        detail::mem_fn<
+            R C::*
+        >
+        , typename util::remove_reference<A0>::type
     >
     bind(
-        R(C::*f)(T0) const
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
+        R C::*f
+      , BOOST_FWD_REF(A0) a0
     )
     {
         return
-            detail::bound_member_function2<
-                R
-              , C const
-              , T0
-              ,
-                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
+            detail::bound_functor1<
+                detail::mem_fn<
+                    R C::*
+                >
+                , typename util::remove_reference<A0>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
+            (util::mem_fn(f), boost::forward<A0>( a0 ));
     }
 }}
 namespace hpx { namespace util
@@ -1460,7 +407,7 @@ namespace hpx { namespace util
                 >::type
             >
             struct bound_functor2;
-            template < typename F , typename A0 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1 , A2) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type ) >::type type; };
+            template < typename F , typename A0 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1 , A2) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 > struct bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type ) >::type type; };
             template <
                 typename F
               , typename Arg0 , typename Arg1
@@ -1470,7 +417,7 @@ namespace hpx { namespace util
               , Arg0 , Arg1, boost::mpl::false_>
             {
                 typedef
-                    typename boost::result_of<
+                    typename util::invoke_result_of<
                         typename boost::remove_reference<
                             typename detail::result_of::eval<
                                 hpx::util::tuple<>
@@ -1555,7 +502,7 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor2<
@@ -1566,9 +513,9 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1));
             }
-            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor2< F(A0), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor2< F(A0 , A1), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor2< F(A0 , A1 , A2), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor2< F(A0 , A1 , A2 , A3), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); }
+            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor2< F(A0), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor2< F(A0 , A1), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor2< F(A0 , A1 , A2), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor2< F(A0 , A1 , A2 , A3), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor2< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1)); }
             typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1;
         };
         namespace result_of
@@ -1657,34 +604,6 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     template <
-        typename R
-      , typename T0 , typename T1
-      , typename Arg0 , typename Arg1
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_function2<
-            R
-          , T0 , T1
-          , Arg0 , Arg1
-        >
-    > : boost::mpl::true_
-    {};
-    template <
-        typename R
-      , typename C
-      , typename T0
-      , typename Arg0 , typename Arg1
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_member_function2<
-            R
-          , C
-          , T0
-          , Arg0 , Arg1
-        >
-    > : boost::mpl::true_
-    {};
-    template <
         typename F
       , typename Arg0 , typename Arg1
     >
@@ -1744,568 +663,81 @@ namespace boost { namespace serialization
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename T0 , typename T1 , typename T2
-          , typename Arg0 , typename Arg1 , typename Arg2
-        >
-        struct bound_function3
-        {
-            typedef R result_type;
-            typedef R(*function_pointer_type)(T0 , T1 , T2);
-            function_pointer_type f;
-            bound_function3(
-                    bound_function3 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2)
-            {}
-            bound_function3(
-                    BOOST_RV_REF(bound_function3) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2))
-            {}
-            template <typename A0 , typename A1 , typename A2>
-            bound_function3(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2;
-        private:
-            BOOST_COPYABLE_AND_MOVABLE(bound_function3);
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename T0 , typename T1 , typename T2
-              , typename Arg0 , typename Arg1 , typename Arg2
-            >
-            struct eval<Env,
-                detail::bound_function3<
-                    R
-                  , T0 , T1 , T2
-                  , Arg0 , Arg1 , Arg2
-                >
-            >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename T0 , typename T1 , typename T2
-          , typename Arg0 , typename Arg1 , typename Arg2
-        >
-        R
-        eval(
-            Env & env
-          , detail::bound_function3<
-                R
-              , T0 , T1 , T2
-              , Arg0 , Arg1 , Arg2
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_function3<
-                        R
-                      , T0 , T1 , T2
-                      , Arg0 , Arg1 , Arg2
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
     template <
         typename R
-      , typename T0 , typename T1 , typename T2
-      , typename A0 , typename A1 , typename A2
+      , typename T0 , typename T1
+      , typename A0 , typename A1
     >
-    detail::bound_function3<
-        R
-      , T0 , T1 , T2
-      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
+    detail::bound_functor2<
+        R(*)(T0 , T1)
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
     >
     bind(
-        R(*f)(T0 , T1 , T2)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
+        R(*f)(T0 , T1)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
     )
     {
         return
-            detail::bound_function3<
-                R
-              , T0 , T1 , T2
-              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
+            detail::bound_functor2<
+                R(*)(T0 , T1)
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
+            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
     }
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1
-          , typename Arg0 , typename Arg1 , typename Arg2
+    template <
+        typename R
+      , typename C
+      , typename T0
+      , typename A0 , typename A1
+    >
+    detail::bound_functor2<
+        detail::mem_fn<
+            R(C::*)(T0)
         >
-        struct bound_member_function3
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1);
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2>
-            bound_member_function3(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2))
-            {}
-            bound_member_function3(
-                    bound_member_function3 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2)
-            {}
-            bound_member_function3(BOOST_RV_REF(
-                    bound_member_function3) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-            }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
+    >
+    bind(
+        R(C::*f)(T0)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
+    )
     {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
         return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-    }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2;
-        };
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1
-          , typename Arg0 , typename Arg1 , typename Arg2
-        >
-        struct bound_member_function3<
-            R
-          , C const
-          , T0 , T1
-          , Arg0 , Arg1 , Arg2
-        >
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1) const;
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2>
-            bound_member_function3(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2))
-            {}
-            bound_member_function3(
-                    bound_member_function3 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2)
-            {}
-            bound_member_function3(
-                    BOOST_RV_REF(bound_member_function3) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2;
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename C
-              , typename T0 , typename T1
-              ,
-                  typename Arg0 , typename Arg1 , typename Arg2
-            >
-            struct eval<Env,
-                detail::bound_member_function3<
-                    R
-                  , C
-                  , T0 , T1
-                  , Arg0 , Arg1 , Arg2
+            detail::bound_functor2<
+                detail::mem_fn<
+                    R(C::*)(T0)
                 >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
             >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename C
-          , typename T0 , typename T1
-          ,
-              typename Arg0 , typename Arg1 , typename Arg2
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
+    }
+    template <
+        typename R
+      , typename C
+      , typename T0
+      , typename A0 , typename A1
+    >
+    detail::bound_functor2<
+        detail::mem_fn<
+            R(C::*)(T0) const
         >
-        R
-        eval(
-            Env & env
-          , detail::bound_member_function3<
-                R
-              , C
-              , T0 , T1
-              , Arg0 , Arg1 , Arg2
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_member_function3<
-                        R
-                      , C
-                      , T0 , T1
-                        ,
-                        Arg0 , Arg1 , Arg2
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1
-      , typename A0 , typename A1 , typename A2
-    >
-    detail::bound_member_function3<
-        R
-      , C
-      , T0 , T1
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
     >
     bind(
-        R(C::*f)(T0 , T1)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
+        R(C::*f)(T0) const
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
     )
     {
         return
-            detail::bound_member_function3<
-                R
-              , C
-              , T0 , T1
-                ,
-                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
+            detail::bound_functor2<
+                detail::mem_fn<
+                    R(C::*)(T0) const
+                >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1
-      , typename A0 , typename A1 , typename A2
-    >
-    detail::bound_member_function3<
-        R
-      , C const
-      , T0 , T1
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
-    >
-    bind(
-        R(C::*f)(T0 , T1) const
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
-    )
-    {
-        return
-            detail::bound_member_function3<
-                R
-              , C const
-              , T0 , T1
-              ,
-                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
-            >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
     }
 }}
 namespace hpx { namespace util
@@ -2327,7 +759,7 @@ namespace hpx { namespace util
                 >::type
             >
             struct bound_functor3;
-            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type ) >::type type; };
+            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 > struct bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type ) >::type type; };
             template <
                 typename F
               , typename Arg0 , typename Arg1 , typename Arg2
@@ -2337,7 +769,7 @@ namespace hpx { namespace util
               , Arg0 , Arg1 , Arg2, boost::mpl::false_>
             {
                 typedef
-                    typename boost::result_of<
+                    typename util::invoke_result_of<
                         typename boost::remove_reference<
                             typename detail::result_of::eval<
                                 hpx::util::tuple<>
@@ -2422,7 +854,7 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor3<
@@ -2433,9 +865,9 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2));
             }
-            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor3< F(A0), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor3< F(A0 , A1), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor3< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor3< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); }
+            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor3< F(A0), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor3< F(A0 , A1), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor3< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor3< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor3< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2)); }
             typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2;
         };
         namespace result_of
@@ -2524,34 +956,6 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     template <
-        typename R
-      , typename T0 , typename T1 , typename T2
-      , typename Arg0 , typename Arg1 , typename Arg2
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_function3<
-            R
-          , T0 , T1 , T2
-          , Arg0 , Arg1 , Arg2
-        >
-    > : boost::mpl::true_
-    {};
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1
-      , typename Arg0 , typename Arg1 , typename Arg2
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_member_function3<
-            R
-          , C
-          , T0 , T1
-          , Arg0 , Arg1 , Arg2
-        >
-    > : boost::mpl::true_
-    {};
-    template <
         typename F
       , typename Arg0 , typename Arg1 , typename Arg2
     >
@@ -2611,568 +1015,81 @@ namespace boost { namespace serialization
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename T0 , typename T1 , typename T2 , typename T3
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
-        >
-        struct bound_function4
-        {
-            typedef R result_type;
-            typedef R(*function_pointer_type)(T0 , T1 , T2 , T3);
-            function_pointer_type f;
-            bound_function4(
-                    bound_function4 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3)
-            {}
-            bound_function4(
-                    BOOST_RV_REF(bound_function4) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3))
-            {}
-            template <typename A0 , typename A1 , typename A2 , typename A3>
-            bound_function4(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3;
-        private:
-            BOOST_COPYABLE_AND_MOVABLE(bound_function4);
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename T0 , typename T1 , typename T2 , typename T3
-              , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
-            >
-            struct eval<Env,
-                detail::bound_function4<
-                    R
-                  , T0 , T1 , T2 , T3
-                  , Arg0 , Arg1 , Arg2 , Arg3
-                >
-            >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename T0 , typename T1 , typename T2 , typename T3
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
-        >
-        R
-        eval(
-            Env & env
-          , detail::bound_function4<
-                R
-              , T0 , T1 , T2 , T3
-              , Arg0 , Arg1 , Arg2 , Arg3
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_function4<
-                        R
-                      , T0 , T1 , T2 , T3
-                      , Arg0 , Arg1 , Arg2 , Arg3
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
     template <
         typename R
-      , typename T0 , typename T1 , typename T2 , typename T3
-      , typename A0 , typename A1 , typename A2 , typename A3
+      , typename T0 , typename T1 , typename T2
+      , typename A0 , typename A1 , typename A2
     >
-    detail::bound_function4<
-        R
-      , T0 , T1 , T2 , T3
-      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
+    detail::bound_functor3<
+        R(*)(T0 , T1 , T2)
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
     >
     bind(
-        R(*f)(T0 , T1 , T2 , T3)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
+        R(*f)(T0 , T1 , T2)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
     )
     {
         return
-            detail::bound_function4<
-                R
-              , T0 , T1 , T2 , T3
-              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
+            detail::bound_functor3<
+                R(*)(T0 , T1 , T2)
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
+            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
     }
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1
+      , typename A0 , typename A1 , typename A2
+    >
+    detail::bound_functor3<
+        detail::mem_fn<
+            R(C::*)(T0 , T1)
         >
-        struct bound_member_function4
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1 , T2);
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2 , typename A3>
-            bound_member_function4(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3))
-            {}
-            bound_member_function4(
-                    bound_member_function4 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3)
-            {}
-            bound_member_function4(BOOST_RV_REF(
-                    bound_member_function4) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-            }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
+    >
+    bind(
+        R(C::*f)(T0 , T1)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
+    )
     {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
         return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-    }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3;
-        };
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
-        >
-        struct bound_member_function4<
-            R
-          , C const
-          , T0 , T1 , T2
-          , Arg0 , Arg1 , Arg2 , Arg3
-        >
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1 , T2) const;
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2 , typename A3>
-            bound_member_function4(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3))
-            {}
-            bound_member_function4(
-                    bound_member_function4 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3)
-            {}
-            bound_member_function4(
-                    BOOST_RV_REF(bound_member_function4) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3;
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename C
-              , typename T0 , typename T1 , typename T2
-              ,
-                  typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
-            >
-            struct eval<Env,
-                detail::bound_member_function4<
-                    R
-                  , C
-                  , T0 , T1 , T2
-                  , Arg0 , Arg1 , Arg2 , Arg3
+            detail::bound_functor3<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1)
                 >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
             >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2
-          ,
-              typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
+    }
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1
+      , typename A0 , typename A1 , typename A2
+    >
+    detail::bound_functor3<
+        detail::mem_fn<
+            R(C::*)(T0 , T1) const
         >
-        R
-        eval(
-            Env & env
-          , detail::bound_member_function4<
-                R
-              , C
-              , T0 , T1 , T2
-              , Arg0 , Arg1 , Arg2 , Arg3
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_member_function4<
-                        R
-                      , C
-                      , T0 , T1 , T2
-                        ,
-                        Arg0 , Arg1 , Arg2 , Arg3
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2
-      , typename A0 , typename A1 , typename A2 , typename A3
-    >
-    detail::bound_member_function4<
-        R
-      , C
-      , T0 , T1 , T2
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
     >
     bind(
-        R(C::*f)(T0 , T1 , T2)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
+        R(C::*f)(T0 , T1) const
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
     )
     {
         return
-            detail::bound_member_function4<
-                R
-              , C
-              , T0 , T1 , T2
-                ,
-                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
+            detail::bound_functor3<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1) const
+                >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2
-      , typename A0 , typename A1 , typename A2 , typename A3
-    >
-    detail::bound_member_function4<
-        R
-      , C const
-      , T0 , T1 , T2
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
-    >
-    bind(
-        R(C::*f)(T0 , T1 , T2) const
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
-    )
-    {
-        return
-            detail::bound_member_function4<
-                R
-              , C const
-              , T0 , T1 , T2
-              ,
-                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
-            >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
     }
 }}
 namespace hpx { namespace util
@@ -3194,7 +1111,7 @@ namespace hpx { namespace util
                 >::type
             >
             struct bound_functor4;
-            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg3>::type >::type ) >::type type; };
+            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg3>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 > struct bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , Arg3 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg3>::type >::type ) >::type type; };
             template <
                 typename F
               , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
@@ -3204,7 +1121,7 @@ namespace hpx { namespace util
               , Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>
             {
                 typedef
-                    typename boost::result_of<
+                    typename util::invoke_result_of<
                         typename boost::remove_reference<
                             typename detail::result_of::eval<
                                 hpx::util::tuple<>
@@ -3289,7 +1206,7 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor4<
@@ -3300,9 +1217,9 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3));
             }
-            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor4< F(A0), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor4< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor4< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor4< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); }
+            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor4< F(A0), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor4< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor4< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor4< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor4< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3)); }
             typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3;
         };
         namespace result_of
@@ -3391,34 +1308,6 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     template <
-        typename R
-      , typename T0 , typename T1 , typename T2 , typename T3
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_function4<
-            R
-          , T0 , T1 , T2 , T3
-          , Arg0 , Arg1 , Arg2 , Arg3
-        >
-    > : boost::mpl::true_
-    {};
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_member_function4<
-            R
-          , C
-          , T0 , T1 , T2
-          , Arg0 , Arg1 , Arg2 , Arg3
-        >
-    > : boost::mpl::true_
-    {};
-    template <
         typename F
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
     >
@@ -3478,568 +1367,81 @@ namespace boost { namespace serialization
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
-        >
-        struct bound_function5
-        {
-            typedef R result_type;
-            typedef R(*function_pointer_type)(T0 , T1 , T2 , T3 , T4);
-            function_pointer_type f;
-            bound_function5(
-                    bound_function5 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4)
-            {}
-            bound_function5(
-                    BOOST_RV_REF(bound_function5) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4))
-            {}
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-            bound_function5(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4;
-        private:
-            BOOST_COPYABLE_AND_MOVABLE(bound_function5);
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-              , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
-            >
-            struct eval<Env,
-                detail::bound_function5<
-                    R
-                  , T0 , T1 , T2 , T3 , T4
-                  , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
-                >
-            >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
-        >
-        R
-        eval(
-            Env & env
-          , detail::bound_function5<
-                R
-              , T0 , T1 , T2 , T3 , T4
-              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_function5<
-                        R
-                      , T0 , T1 , T2 , T3 , T4
-                      , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
     template <
         typename R
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+      , typename T0 , typename T1 , typename T2 , typename T3
+      , typename A0 , typename A1 , typename A2 , typename A3
     >
-    detail::bound_function5<
-        R
-      , T0 , T1 , T2 , T3 , T4
-      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
+    detail::bound_functor4<
+        R(*)(T0 , T1 , T2 , T3)
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
     >
     bind(
-        R(*f)(T0 , T1 , T2 , T3 , T4)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
+        R(*f)(T0 , T1 , T2 , T3)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
     )
     {
         return
-            detail::bound_function5<
-                R
-              , T0 , T1 , T2 , T3 , T4
-              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
+            detail::bound_functor4<
+                R(*)(T0 , T1 , T2 , T3)
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
+            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
     }
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2
+      , typename A0 , typename A1 , typename A2 , typename A3
+    >
+    detail::bound_functor4<
+        detail::mem_fn<
+            R(C::*)(T0 , T1 , T2)
         >
-        struct bound_member_function5
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1 , T2 , T3);
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-            bound_member_function5(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4))
-            {}
-            bound_member_function5(
-                    bound_member_function5 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4)
-            {}
-            bound_member_function5(BOOST_RV_REF(
-                    bound_member_function5) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-            }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
+    >
+    bind(
+        R(C::*f)(T0 , T1 , T2)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
+    )
     {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
         return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-    }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4;
-        };
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
-        >
-        struct bound_member_function5<
-            R
-          , C const
-          , T0 , T1 , T2 , T3
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
-        >
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1 , T2 , T3) const;
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-            bound_member_function5(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4))
-            {}
-            bound_member_function5(
-                    bound_member_function5 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4)
-            {}
-            bound_member_function5(
-                    BOOST_RV_REF(bound_member_function5) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4;
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename C
-              , typename T0 , typename T1 , typename T2 , typename T3
-              ,
-                  typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
-            >
-            struct eval<Env,
-                detail::bound_member_function5<
-                    R
-                  , C
-                  , T0 , T1 , T2 , T3
-                  , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
+            detail::bound_functor4<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1 , T2)
                 >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
             >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3
-          ,
-              typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
+    }
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2
+      , typename A0 , typename A1 , typename A2 , typename A3
+    >
+    detail::bound_functor4<
+        detail::mem_fn<
+            R(C::*)(T0 , T1 , T2) const
         >
-        R
-        eval(
-            Env & env
-          , detail::bound_member_function5<
-                R
-              , C
-              , T0 , T1 , T2 , T3
-              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_member_function5<
-                        R
-                      , C
-                      , T0 , T1 , T2 , T3
-                        ,
-                        Arg0 , Arg1 , Arg2 , Arg3 , Arg4
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
-    >
-    detail::bound_member_function5<
-        R
-      , C
-      , T0 , T1 , T2 , T3
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
     >
     bind(
-        R(C::*f)(T0 , T1 , T2 , T3)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
+        R(C::*f)(T0 , T1 , T2) const
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
     )
     {
         return
-            detail::bound_member_function5<
-                R
-              , C
-              , T0 , T1 , T2 , T3
-                ,
-                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
+            detail::bound_functor4<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1 , T2) const
+                >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
-    >
-    detail::bound_member_function5<
-        R
-      , C const
-      , T0 , T1 , T2 , T3
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
-    >
-    bind(
-        R(C::*f)(T0 , T1 , T2 , T3) const
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
-    )
-    {
-        return
-            detail::bound_member_function5<
-                R
-              , C const
-              , T0 , T1 , T2 , T3
-              ,
-                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
-            >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
     }
 }}
 namespace hpx { namespace util
@@ -4061,7 +1463,7 @@ namespace hpx { namespace util
                 >::type
             >
             struct bound_functor5;
-            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg4>::type >::type ) >::type type; };
+            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg4>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 > struct bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg4>::type >::type ) >::type type; };
             template <
                 typename F
               , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
@@ -4071,7 +1473,7 @@ namespace hpx { namespace util
               , Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>
             {
                 typedef
-                    typename boost::result_of<
+                    typename util::invoke_result_of<
                         typename boost::remove_reference<
                             typename detail::result_of::eval<
                                 hpx::util::tuple<>
@@ -4156,7 +1558,7 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor5<
@@ -4167,9 +1569,9 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4));
             }
-            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor5< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor5< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor5< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor5< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); }
+            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor5< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor5< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor5< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor5< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor5< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4)); }
             typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4;
         };
         namespace result_of
@@ -4258,34 +1660,6 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     template <
-        typename R
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_function5<
-            R
-          , T0 , T1 , T2 , T3 , T4
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
-        >
-    > : boost::mpl::true_
-    {};
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_member_function5<
-            R
-          , C
-          , T0 , T1 , T2 , T3
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4
-        >
-    > : boost::mpl::true_
-    {};
-    template <
         typename F
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
     >
@@ -4345,568 +1719,81 @@ namespace boost { namespace serialization
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
-        >
-        struct bound_function6
-        {
-            typedef R result_type;
-            typedef R(*function_pointer_type)(T0 , T1 , T2 , T3 , T4 , T5);
-            function_pointer_type f;
-            bound_function6(
-                    bound_function6 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4) , arg5(other.arg5)
-            {}
-            bound_function6(
-                    BOOST_RV_REF(bound_function6) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5))
-            {}
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-            bound_function6(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5;
-        private:
-            BOOST_COPYABLE_AND_MOVABLE(bound_function6);
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-              , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
-            >
-            struct eval<Env,
-                detail::bound_function6<
-                    R
-                  , T0 , T1 , T2 , T3 , T4 , T5
-                  , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
-                >
-            >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
-        >
-        R
-        eval(
-            Env & env
-          , detail::bound_function6<
-                R
-              , T0 , T1 , T2 , T3 , T4 , T5
-              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_function6<
-                        R
-                      , T0 , T1 , T2 , T3 , T4 , T5
-                      , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
     template <
         typename R
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    detail::bound_function6<
-        R
-      , T0 , T1 , T2 , T3 , T4 , T5
-      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
+    detail::bound_functor5<
+        R(*)(T0 , T1 , T2 , T3 , T4)
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
     >
     bind(
-        R(*f)(T0 , T1 , T2 , T3 , T4 , T5)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
+        R(*f)(T0 , T1 , T2 , T3 , T4)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
     )
     {
         return
-            detail::bound_function6<
-                R
-              , T0 , T1 , T2 , T3 , T4 , T5
-              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
+            detail::bound_functor5<
+                R(*)(T0 , T1 , T2 , T3 , T4)
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
+            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
     }
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+    >
+    detail::bound_functor5<
+        detail::mem_fn<
+            R(C::*)(T0 , T1 , T2 , T3)
         >
-        struct bound_member_function6
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1 , T2 , T3 , T4);
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-            bound_member_function6(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5))
-            {}
-            bound_member_function6(
-                    bound_member_function6 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4) , arg5(other.arg5)
-            {}
-            bound_member_function6(BOOST_RV_REF(
-                    bound_member_function6) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-            }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
+    >
+    bind(
+        R(C::*f)(T0 , T1 , T2 , T3)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
+    )
     {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
         return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-    }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5;
-        };
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
-        >
-        struct bound_member_function6<
-            R
-          , C const
-          , T0 , T1 , T2 , T3 , T4
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
-        >
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1 , T2 , T3 , T4) const;
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-            bound_member_function6(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5))
-            {}
-            bound_member_function6(
-                    bound_member_function6 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4) , arg5(other.arg5)
-            {}
-            bound_member_function6(
-                    BOOST_RV_REF(bound_member_function6) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5;
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename C
-              , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-              ,
-                  typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
-            >
-            struct eval<Env,
-                detail::bound_member_function6<
-                    R
-                  , C
-                  , T0 , T1 , T2 , T3 , T4
-                  , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
+            detail::bound_functor5<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1 , T2 , T3)
                 >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
             >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-          ,
-              typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
+    }
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
+    >
+    detail::bound_functor5<
+        detail::mem_fn<
+            R(C::*)(T0 , T1 , T2 , T3) const
         >
-        R
-        eval(
-            Env & env
-          , detail::bound_member_function6<
-                R
-              , C
-              , T0 , T1 , T2 , T3 , T4
-              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_member_function6<
-                        R
-                      , C
-                      , T0 , T1 , T2 , T3 , T4
-                        ,
-                        Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
-    >
-    detail::bound_member_function6<
-        R
-      , C
-      , T0 , T1 , T2 , T3 , T4
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
     >
     bind(
-        R(C::*f)(T0 , T1 , T2 , T3 , T4)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
+        R(C::*f)(T0 , T1 , T2 , T3) const
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
     )
     {
         return
-            detail::bound_member_function6<
-                R
-              , C
-              , T0 , T1 , T2 , T3 , T4
-                ,
-                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
+            detail::bound_functor5<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1 , T2 , T3) const
+                >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
-    >
-    detail::bound_member_function6<
-        R
-      , C const
-      , T0 , T1 , T2 , T3 , T4
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
-    >
-    bind(
-        R(C::*f)(T0 , T1 , T2 , T3 , T4) const
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
-    )
-    {
-        return
-            detail::bound_member_function6<
-                R
-              , C const
-              , T0 , T1 , T2 , T3 , T4
-              ,
-                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
-            >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
     }
 }}
 namespace hpx { namespace util
@@ -4928,7 +1815,7 @@ namespace hpx { namespace util
                 >::type
             >
             struct bound_functor6;
-            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg5>::type >::type ) >::type type; };
+            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg5>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 > struct bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg5>::type >::type ) >::type type; };
             template <
                 typename F
               , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
@@ -4938,7 +1825,7 @@ namespace hpx { namespace util
               , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>
             {
                 typedef
-                    typename boost::result_of<
+                    typename util::invoke_result_of<
                         typename boost::remove_reference<
                             typename detail::result_of::eval<
                                 hpx::util::tuple<>
@@ -5023,7 +1910,7 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor6<
@@ -5034,9 +1921,9 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5));
             }
-            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor6< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor6< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor6< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor6< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); }
+            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor6< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor6< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor6< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor6< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor6< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5)); }
             typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5;
         };
         namespace result_of
@@ -5125,34 +2012,6 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     template <
-        typename R
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_function6<
-            R
-          , T0 , T1 , T2 , T3 , T4 , T5
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
-        >
-    > : boost::mpl::true_
-    {};
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_member_function6<
-            R
-          , C
-          , T0 , T1 , T2 , T3 , T4
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5
-        >
-    > : boost::mpl::true_
-    {};
-    template <
         typename F
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5
     >
@@ -5212,568 +2071,81 @@ namespace boost { namespace serialization
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
-        >
-        struct bound_function7
-        {
-            typedef R result_type;
-            typedef R(*function_pointer_type)(T0 , T1 , T2 , T3 , T4 , T5 , T6);
-            function_pointer_type f;
-            bound_function7(
-                    bound_function7 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4) , arg5(other.arg5) , arg6(other.arg6)
-            {}
-            bound_function7(
-                    BOOST_RV_REF(bound_function7) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6))
-            {}
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-            bound_function7(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5; typename decay<Arg6>::type arg6;
-        private:
-            BOOST_COPYABLE_AND_MOVABLE(bound_function7);
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-              , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
-            >
-            struct eval<Env,
-                detail::bound_function7<
-                    R
-                  , T0 , T1 , T2 , T3 , T4 , T5 , T6
-                  , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
-                >
-            >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
-        >
-        R
-        eval(
-            Env & env
-          , detail::bound_function7<
-                R
-              , T0 , T1 , T2 , T3 , T4 , T5 , T6
-              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_function7<
-                        R
-                      , T0 , T1 , T2 , T3 , T4 , T5 , T6
-                      , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
     template <
         typename R
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
-    detail::bound_function7<
-        R
-      , T0 , T1 , T2 , T3 , T4 , T5 , T6
-      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
+    detail::bound_functor6<
+        R(*)(T0 , T1 , T2 , T3 , T4 , T5)
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
     >
     bind(
-        R(*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
+        R(*f)(T0 , T1 , T2 , T3 , T4 , T5)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
     )
     {
         return
-            detail::bound_function7<
-                R
-              , T0 , T1 , T2 , T3 , T4 , T5 , T6
-              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
+            detail::bound_functor6<
+                R(*)(T0 , T1 , T2 , T3 , T4 , T5)
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
+            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
     }
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+    >
+    detail::bound_functor6<
+        detail::mem_fn<
+            R(C::*)(T0 , T1 , T2 , T3 , T4)
         >
-        struct bound_member_function7
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1 , T2 , T3 , T4 , T5);
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-            bound_member_function7(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6))
-            {}
-            bound_member_function7(
-                    bound_member_function7 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4) , arg5(other.arg5) , arg6(other.arg6)
-            {}
-            bound_member_function7(BOOST_RV_REF(
-                    bound_member_function7) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-            }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
+    >
+    bind(
+        R(C::*f)(T0 , T1 , T2 , T3 , T4)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
+    )
     {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
         return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-    }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5; typename decay<Arg6>::type arg6;
-        };
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
-        >
-        struct bound_member_function7<
-            R
-          , C const
-          , T0 , T1 , T2 , T3 , T4 , T5
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
-        >
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1 , T2 , T3 , T4 , T5) const;
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-            bound_member_function7(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6))
-            {}
-            bound_member_function7(
-                    bound_member_function7 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4) , arg5(other.arg5) , arg6(other.arg6)
-            {}
-            bound_member_function7(
-                    BOOST_RV_REF(bound_member_function7) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5; typename decay<Arg6>::type arg6;
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename C
-              , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-              ,
-                  typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
-            >
-            struct eval<Env,
-                detail::bound_member_function7<
-                    R
-                  , C
-                  , T0 , T1 , T2 , T3 , T4 , T5
-                  , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
+            detail::bound_functor6<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1 , T2 , T3 , T4)
                 >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
             >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-          ,
-              typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
+    }
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
+    >
+    detail::bound_functor6<
+        detail::mem_fn<
+            R(C::*)(T0 , T1 , T2 , T3 , T4) const
         >
-        R
-        eval(
-            Env & env
-          , detail::bound_member_function7<
-                R
-              , C
-              , T0 , T1 , T2 , T3 , T4 , T5
-              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_member_function7<
-                        R
-                      , C
-                      , T0 , T1 , T2 , T3 , T4 , T5
-                        ,
-                        Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
-    >
-    detail::bound_member_function7<
-        R
-      , C
-      , T0 , T1 , T2 , T3 , T4 , T5
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
     >
     bind(
-        R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
+        R(C::*f)(T0 , T1 , T2 , T3 , T4) const
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
     )
     {
         return
-            detail::bound_member_function7<
-                R
-              , C
-              , T0 , T1 , T2 , T3 , T4 , T5
-                ,
-                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
+            detail::bound_functor6<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1 , T2 , T3 , T4) const
+                >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
-    >
-    detail::bound_member_function7<
-        R
-      , C const
-      , T0 , T1 , T2 , T3 , T4 , T5
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
-    >
-    bind(
-        R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5) const
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
-    )
-    {
-        return
-            detail::bound_member_function7<
-                R
-              , C const
-              , T0 , T1 , T2 , T3 , T4 , T5
-              ,
-                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
-            >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
     }
 }}
 namespace hpx { namespace util
@@ -5795,7 +2167,7 @@ namespace hpx { namespace util
                 >::type
             >
             struct bound_functor7;
-            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg6>::type >::type ) >::type type; };
+            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg6>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 > struct bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg6>::type >::type ) >::type type; };
             template <
                 typename F
               , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
@@ -5805,7 +2177,7 @@ namespace hpx { namespace util
               , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>
             {
                 typedef
-                    typename boost::result_of<
+                    typename util::invoke_result_of<
                         typename boost::remove_reference<
                             typename detail::result_of::eval<
                                 hpx::util::tuple<>
@@ -5890,7 +2262,7 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor7<
@@ -5901,9 +2273,9 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6));
             }
-            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor7< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor7< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor7< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor7< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); }
+            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor7< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor7< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor7< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor7< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor7< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6)); }
             typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5; typename decay<Arg6>::type arg6;
         };
         namespace result_of
@@ -5992,34 +2364,6 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     template <
-        typename R
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_function7<
-            R
-          , T0 , T1 , T2 , T3 , T4 , T5 , T6
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
-        >
-    > : boost::mpl::true_
-    {};
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_member_function7<
-            R
-          , C
-          , T0 , T1 , T2 , T3 , T4 , T5
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6
-        >
-    > : boost::mpl::true_
-    {};
-    template <
         typename F
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6
     >
@@ -6079,568 +2423,81 @@ namespace boost { namespace serialization
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
-        >
-        struct bound_function8
-        {
-            typedef R result_type;
-            typedef R(*function_pointer_type)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7);
-            function_pointer_type f;
-            bound_function8(
-                    bound_function8 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4) , arg5(other.arg5) , arg6(other.arg6) , arg7(other.arg7)
-            {}
-            bound_function8(
-                    BOOST_RV_REF(bound_function8) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6)) , arg7(boost::move(other.arg7))
-            {}
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-            bound_function8(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return f(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5; typename decay<Arg6>::type arg6; typename decay<Arg7>::type arg7;
-        private:
-            BOOST_COPYABLE_AND_MOVABLE(bound_function8);
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7
-              , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
-            >
-            struct eval<Env,
-                detail::bound_function8<
-                    R
-                  , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
-                  , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
-                >
-            >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
-        >
-        R
-        eval(
-            Env & env
-          , detail::bound_function8<
-                R
-              , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
-              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_function8<
-                        R
-                      , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
-                      , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
     template <
         typename R
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
-    detail::bound_function8<
-        R
-      , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
-      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
+    detail::bound_functor7<
+        R(*)(T0 , T1 , T2 , T3 , T4 , T5 , T6)
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
     >
     bind(
-        R(*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
+        R(*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
     )
     {
         return
-            detail::bound_function8<
-                R
-              , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
-              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
+            detail::bound_functor7<
+                R(*)(T0 , T1 , T2 , T3 , T4 , T5 , T6)
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
+            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
     }
 }}
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+    >
+    detail::bound_functor7<
+        detail::mem_fn<
+            R(C::*)(T0 , T1 , T2 , T3 , T4 , T5)
         >
-        struct bound_member_function8
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1 , T2 , T3 , T4 , T5 , T6);
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-            bound_member_function8(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7))
-            {}
-            bound_member_function8(
-                    bound_member_function8 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4) , arg5(other.arg5) , arg6(other.arg6) , arg7(other.arg7)
-            {}
-            bound_member_function8(BOOST_RV_REF(
-                    bound_member_function8) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6)) , arg7(boost::move(other.arg7))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-            }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0)
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
+    >
+    bind(
+        R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
+    )
     {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
         return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-    template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7) const
-    {
-        using detail::get_pointer;
-        typedef
-            hpx::util::tuple<
-                typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type , typename detail::env_value_type<A7>::type
-            >
-            env_type;
-        env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-        return
-            (get_pointer(detail::eval(env, arg0))->*f)
-                (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-    }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5; typename decay<Arg6>::type arg6; typename decay<Arg7>::type arg7;
-        };
-        template <
-            typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-          , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
-        >
-        struct bound_member_function8<
-            R
-          , C const
-          , T0 , T1 , T2 , T3 , T4 , T5 , T6
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
-        >
-        {
-            typedef R result_type;
-            typedef R(C::*function_pointer_type)(
-                T0 , T1 , T2 , T3 , T4 , T5 , T6) const;
-            function_pointer_type f;
-            template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-            bound_member_function8(
-                function_pointer_type f
-              , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
-            )
-                : f(f)
-                , arg0(boost::forward<A0>(a0)) , arg1(boost::forward<A1>(a1)) , arg2(boost::forward<A2>(a2)) , arg3(boost::forward<A3>(a3)) , arg4(boost::forward<A4>(a4)) , arg5(boost::forward<A5>(a5)) , arg6(boost::forward<A6>(a6)) , arg7(boost::forward<A7>(a7))
-            {}
-            bound_member_function8(
-                    bound_member_function8 const & other)
-                : f(other.f)
-                , arg0(other.arg0) , arg1(other.arg1) , arg2(other.arg2) , arg3(other.arg3) , arg4(other.arg4) , arg5(other.arg5) , arg6(other.arg6) , arg7(other.arg7)
-            {}
-            bound_member_function8(
-                    BOOST_RV_REF(bound_member_function8) other)
-                : f(boost::move(other.f))
-                , arg0(boost::move(other.arg0)) , arg1(boost::move(other.arg1)) , arg2(boost::move(other.arg2)) , arg3(boost::move(other.arg3)) , arg4(boost::move(other.arg4)) , arg5(boost::move(other.arg5)) , arg6(boost::move(other.arg6)) , arg7(boost::move(other.arg7))
-            {}
-            BOOST_FORCEINLINE R operator()() const
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-            }
-            BOOST_FORCEINLINE R operator()()
-            {
-                using detail::get_pointer;
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return
-                    (get_pointer(detail::eval(env, arg0))->*f)
-                        (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
-            }
-            template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE result_type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { using detail::get_pointer; typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return (get_pointer(detail::eval(env, arg0))->*f) (::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); }
-            typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5; typename decay<Arg6>::type arg6; typename decay<Arg7>::type arg7;
-        };
-        namespace result_of
-        {
-            template <
-                typename Env
-              , typename R
-              , typename C
-              , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-              ,
-                  typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
-            >
-            struct eval<Env,
-                detail::bound_member_function8<
-                    R
-                  , C
-                  , T0 , T1 , T2 , T3 , T4 , T5 , T6
-                  , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
+            detail::bound_functor7<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1 , T2 , T3 , T4 , T5)
                 >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
             >
-            {
-                typedef R type;
-            };
-        }
-        template <
-            typename Env
-          , typename R
-          , typename C
-          , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-          ,
-              typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
+    }
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
+    >
+    detail::bound_functor7<
+        detail::mem_fn<
+            R(C::*)(T0 , T1 , T2 , T3 , T4 , T5) const
         >
-        R
-        eval(
-            Env & env
-          , detail::bound_member_function8<
-                R
-              , C
-              , T0 , T1 , T2 , T3 , T4 , T5 , T6
-              , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    detail::bound_member_function8<
-                        R
-                      , C
-                      , T0 , T1 , T2 , T3 , T4 , T5 , T6
-                        ,
-                        Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
-    >
-    detail::bound_member_function8<
-        R
-      , C
-      , T0 , T1 , T2 , T3 , T4 , T5 , T6
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
     >
     bind(
-        R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6)
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
+        R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5) const
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6
     )
     {
         return
-            detail::bound_member_function8<
-                R
-              , C
-              , T0 , T1 , T2 , T3 , T4 , T5 , T6
-                ,
-                typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
+            detail::bound_functor7<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1 , T2 , T3 , T4 , T5) const
+                >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
             >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
-    }
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
-    >
-    detail::bound_member_function8<
-        R
-      , C const
-      , T0 , T1 , T2 , T3 , T4 , T5 , T6
-      ,
-        typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
-    >
-    bind(
-        R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
-    )
-    {
-        return
-            detail::bound_member_function8<
-                R
-              , C const
-              , T0 , T1 , T2 , T3 , T4 , T5 , T6
-              ,
-                  typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
-            >
-            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
     }
 }}
 namespace hpx { namespace util
@@ -6662,7 +2519,7 @@ namespace hpx { namespace util
                 >::type
             >
             struct bound_functor8;
-            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename boost::result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg7>::type >::type ) >::type type; };
+            template < typename F , typename A0 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1 , A2) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1 , A2 , A3) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1 , A2 , A3 , A4) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type >)) , typename decay<Arg7>::type >::type ) >::type type; }; template < typename F , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 > struct bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5 , A6) , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , boost::mpl::false_ > { typedef typename util::invoke_result_of< typename boost::remove_reference< typename detail::result_of::eval< hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > , F >::type >::type( typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg0>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg1>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg2>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg3>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg4>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg5>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg6>::type >::type , typename detail::result_of::eval< HPX_UTIL_STRIP( (hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type >)) , typename decay<Arg7>::type >::type ) >::type type; };
             template <
                 typename F
               , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
@@ -6672,7 +2529,7 @@ namespace hpx { namespace util
               , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>
             {
                 typedef
-                    typename boost::result_of<
+                    typename util::invoke_result_of<
                         typename boost::remove_reference<
                             typename detail::result_of::eval<
                                 hpx::util::tuple<>
@@ -6757,7 +2614,7 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
             }
             BOOST_FORCEINLINE
             typename result_of::bound_functor8<
@@ -6768,9 +2625,9 @@ namespace hpx { namespace util
             {
                 typedef hpx::util::tuple<> env_type;
                 env_type env;
-                return eval(env, f)(::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
+                return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7));
             }
-            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor8< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor8< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor8< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor8< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return eval(env, f) (::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); }
+            template <typename This, typename A0> struct result<This(A0)> { typedef typename result_of::bound_functor8< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type > env_type; env_type env(boost::forward<A0>( a0 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1> struct result<This(A0 , A1)> { typedef typename result_of::bound_functor8< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1 , typename A2> struct result<This(A0 , A1 , A2)> { typedef typename result_of::bound_functor8< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3> struct result<This(A0 , A1 , A2 , A3)> { typedef typename result_of::bound_functor8< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4> struct result<This(A0 , A1 , A2 , A3 , A4)> { typedef typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> struct result<This(A0 , A1 , A2 , A3 , A4 , A5)> { typedef typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename This, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> struct result<This(A0 , A1 , A2 , A3 , A4 , A5 , A6)> { typedef typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type type; }; template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) const { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); } template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6> BOOST_FORCEINLINE typename result_of::bound_functor8< F(A0 , A1 , A2 , A3 , A4 , A5 , A6), Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7, boost::mpl::false_>::type operator()(BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6) { typedef hpx::util::tuple< typename detail::env_value_type<A0>::type , typename detail::env_value_type<A1>::type , typename detail::env_value_type<A2>::type , typename detail::env_value_type<A3>::type , typename detail::env_value_type<A4>::type , typename detail::env_value_type<A5>::type , typename detail::env_value_type<A6>::type > env_type; env_type env(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )); return util::invoke(f, ::hpx::util::detail::eval(env, arg0) , ::hpx::util::detail::eval(env, arg1) , ::hpx::util::detail::eval(env, arg2) , ::hpx::util::detail::eval(env, arg3) , ::hpx::util::detail::eval(env, arg4) , ::hpx::util::detail::eval(env, arg5) , ::hpx::util::detail::eval(env, arg6) , ::hpx::util::detail::eval(env, arg7)); }
             typename decay<Arg0>::type arg0; typename decay<Arg1>::type arg1; typename decay<Arg2>::type arg2; typename decay<Arg3>::type arg3; typename decay<Arg4>::type arg4; typename decay<Arg5>::type arg5; typename decay<Arg6>::type arg6; typename decay<Arg7>::type arg7;
         };
         namespace result_of
@@ -6859,34 +2716,6 @@ namespace hpx { namespace util
 namespace hpx { namespace traits
 {
     template <
-        typename R
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_function8<
-            R
-          , T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
-        >
-    > : boost::mpl::true_
-    {};
-    template <
-        typename R
-      , typename C
-      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
-      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
-    >
-    struct is_bind_expression<
-        hpx::util::detail::bound_member_function8<
-            R
-          , C
-          , T0 , T1 , T2 , T3 , T4 , T5 , T6
-          , Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7
-        >
-    > : boost::mpl::true_
-    {};
-    template <
         typename F
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7
     >
@@ -6942,5 +2771,84 @@ namespace boost { namespace serialization
     {
         ar & bound.f;
         ar & bound.arg0; ar & bound.arg1; ar & bound.arg2; ar & bound.arg3; ar & bound.arg4; ar & bound.arg5; ar & bound.arg6; ar & bound.arg7;
+    }
+}}
+namespace hpx { namespace util
+{
+    template <
+        typename R
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+    >
+    detail::bound_functor8<
+        R(*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7)
+      , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
+    >
+    bind(
+        R(*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
+    )
+    {
+        return
+            detail::bound_functor8<
+                R(*)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7)
+              , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
+            >
+            (f, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
+    }
+}}
+namespace hpx { namespace util
+{
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+    >
+    detail::bound_functor8<
+        detail::mem_fn<
+            R(C::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6)
+        >
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
+    >
+    bind(
+        R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6)
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
+    )
+    {
+        return
+            detail::bound_functor8<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6)
+                >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
+            >
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
+    }
+    template <
+        typename R
+      , typename C
+      , typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
+    >
+    detail::bound_functor8<
+        detail::mem_fn<
+            R(C::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const
+        >
+        , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
+    >
+    bind(
+        R(C::*f)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const
+      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7
+    )
+    {
+        return
+            detail::bound_functor8<
+                detail::mem_fn<
+                    R(C::*)(T0 , T1 , T2 , T3 , T4 , T5 , T6) const
+                >
+                , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
+            >
+            (util::mem_fn(f), boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
     }
 }}
