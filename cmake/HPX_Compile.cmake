@@ -66,7 +66,6 @@ macro(hpx_compile name)
               "${${name}_SOURCE}"
               ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
               RESULT_VARIABLE ${name}_RESULT OUTPUT_QUIET ERROR_VARIABLE ${name}_ERROR_OUTPUT)
-      message(${${name}_ERROR_OUTPUT})
   else()
     hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
         " ${${name}_FLAGS} ${${name}_SOURCE}"
