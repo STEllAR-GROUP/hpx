@@ -33,7 +33,7 @@
 namespace hpx { namespace util
 {
 #if HPX_GCC_VERSION >= 40300 \
- || (BOOST_INTEL_CXX_VERSION > 1200 && !defined(BOOST_WINDOWS) \
+ || (BOOST_INTEL_CXX_VERSION > 1200 && !defined(BOOST_WINDOWS)) \
  || (__clang_major__ == 2 && __clang_minor__ > 9) \
  || (__clang_major__ >= 3) 
     //
