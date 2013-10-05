@@ -51,7 +51,7 @@ void initLoop(int i);
 vector<double> A;
 vector<double> L;
 vector<double> U;
-int size = 2000;
+int size = 200;
 
 boost::uint64_t get_tick_count()
 {
@@ -294,3 +294,4 @@ void initLoop(int i) {
         for(int k = 0; k < size; k++)
             A[i*size + j] += L[i*size + k] * U[k*size + j];
 }
+
