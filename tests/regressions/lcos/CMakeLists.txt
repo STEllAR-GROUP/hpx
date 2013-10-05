@@ -6,12 +6,12 @@
 
 set(tests
     async_callback_non_deduced_context
-    future_hang_on_get
-    dataflow_launch
-    regression_future_790
-    regression_future_unwrap_878
-    regression_set_hpx_limit_771
-    regression_set_hpx_limit_798
+    future_hang_on_get_629
+    dataflow_launch_775
+    future_790
+    future_unwrap_878
+    set_hpx_limit_771
+    set_hpx_limit_798
    )
 
 # MSVC 2010 is not able to cope with this test
@@ -21,28 +21,28 @@ if(NOT MSVC10)
   set(dataflow_future_swap_PARAMETERS THREADS_PER_LOCALITY 4)
   set(tests ${tests}
       dataflow_future_swap
-      regression_dataflow_791
+      dataflow_791
      )
   if(HPX_HAVE_CXX11_LAMBDAS)
     set(tests ${tests}
-        dataflow_const_functor
+        dataflow_const_functor_773
         dataflow_future_swap2
-        dataflow_using
+        dataflow_using_774
        )
   endif()
 endif()
 
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
-set(future_hang_on_get_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
-set(dataflow_launch_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(dataflow_launch_775_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 
-set(regression_set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
+set(set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
 
 if(HPX_HAVE_CXX11_LAMBDAS)
-  set(future_hang_on_wait_with_callback_PARAMETERS THREADS_PER_LOCALITY 4)
+  set(future_hang_on_wait_with_callback_629_PARAMETERS THREADS_PER_LOCALITY 4)
   set(tests
     ${tests}
-    future_hang_on_wait_with_callback)
+    future_hang_on_wait_with_callback_629)
 endif()
 
 foreach(test ${tests})
