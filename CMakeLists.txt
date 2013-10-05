@@ -803,45 +803,47 @@ endif()
 ################################################################################
 # Scheduler configuration
 ################################################################################
+hpx_option(HPX_ALL_SCHEDULERS BOOL "Enables all schedulers, overrides individual configuration options (default: OFF)" OFF ADVANCED)
+
 hpx_option(HPX_GLOBAL_SCHEDULER BOOL "Enable the use of --queueing=global (default: OFF)" OFF ADVANCED)
 
-if(HPX_GLOBAL_SCHEDULER)
+if(HPX_GLOBAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_GLOBAL_SCHEDULER)
 endif()
 
 hpx_option(HPX_LOCAL_SCHEDULER BOOL "Enable the use of --queueing=local (default: OFF)" OFF ADVANCED)
 
-if(HPX_LOCAL_SCHEDULER)
+if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_LOCAL_SCHEDULER)
 endif()
 
-hpx_option(HPX_STATIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=static (default: On)" On ADVANCED)
+hpx_option(HPX_STATIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=static (default: OFF)" OFF ADVANCED)
 
-if(HPX_STATIC_PRIORITY_SCHEDULER)
+if(HPX_STATIC_PRIORITY_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_STATIC_PRIORITY_SCHEDULER)
 endif()
 
 hpx_option(HPX_ABP_SCHEDULER BOOL "Enable the use of --queueing=abp (default: OFF)" OFF ADVANCED)
 
-if(HPX_ABP_SCHEDULER)
+if(HPX_ABP_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_ABP_SCHEDULER)
 endif()
 
 hpx_option(HPX_ABP_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=priority_abp (default: OFF)" OFF ADVANCED)
 
-if(HPX_ABP_PRIORITY_SCHEDULER)
+if(HPX_ABP_PRIORITY_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_ABP_PRIORITY_SCHEDULER)
 endif()
 
 hpx_option(HPX_HIERARCHY_SCHEDULER BOOL "Enable the use of --queueing=hierarchy (default: OFF)" OFF ADVANCED)
 
-if(HPX_HIERARCHY_SCHEDULER)
+if(HPX_HIERARCHY_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_HIERARCHY_SCHEDULER)
 endif()
 
 hpx_option(HPX_PERIODIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=periodic (default: OFF)" OFF ADVANCED)
 
-if(HPX_PERIODIC_PRIORITY_SCHEDULER)
+if(HPX_PERIODIC_PRIORITY_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_PERIODIC_PRIORITY_SCHEDULER)
 endif()
 
