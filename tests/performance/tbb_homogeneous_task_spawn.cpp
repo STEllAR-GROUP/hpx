@@ -29,6 +29,8 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "worker.hpp"
+
 #include <hpx/config.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
@@ -41,8 +43,6 @@
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
-
-#include "worker.hpp"
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
