@@ -35,48 +35,42 @@ if platform.startswith('linux'):
   OS_LIN = True
   from select import epoll, EPOLLHUP
 
-if OS_LIN:
-  def kill_process_tree(parent_pid, signal=SIGKILL):
-    def find_process_tree(pid):
+def kill_process_tree(parent_pid, signal=SIGKILL):
+  def find_process_tree(pid):
+    cmd = ""
+
+    if OS_MAC:
       cmd = "ps -o pid --ppid %d --noheaders" % pid
-      ps_command = Popen(cmd, shell=True, stdout=PIPE)
-      ps_output = ps_command.stdout.read()
-      retcode = ps_command.wait()
+    else: 
+      cmd = "ps -o pid,ppid -ax | grep %d | cut -f 1 -d \" \" | tail -1" % pid
 
-      if 0 == ps_command.wait():
-        list = [pid]
+    ps_command = Popen(cmd, shell=True, stdout=PIPE)
+    ps_output = ps_command.stdout.read()
+    retcode = ps_command.wait()
 
-        for pid in ps_output.split("\n")[:-1]:
-          list = list + find_process_tree(int(pid))
+    if 0 == ps_command.wait():
+      list = [pid]
 
-        return list
+      for pid in ps_output.split("\n")[:-1]:
+        list = list + find_process_tree(int(pid))
 
-      else:
-        return [pid]
+      return list
 
-    r = True
+    else:
+      return [pid]
 
-    for pid in find_process_tree(parent_pid):
-      try:
-        kill(int(pid), signal)
-      except OSError, err:
-        if ESRCH != err.errno:
-          raise err
-        else:
-          r = False
+  r = True
 
-    return r
-
-elif OS_MAC:
-  def kill_process_tree(parent_pid, signal=SIGKILL):
+  for pid in find_process_tree(parent_pid):
     try:
-      kill(parent_pid, signal)
-      return True
+      kill(int(pid), signal)
     except OSError, err:
       if ESRCH != err.errno:
         raise err
       else:
-        return False
+        r = False
+
+  return r
 
 class process(object):
   _proc = None
