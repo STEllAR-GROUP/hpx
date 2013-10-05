@@ -35,13 +35,13 @@ file(
   DESTINATION ${CMAKE_BINARY_DIR}/gh-pages/docs)
 
 if(HPX_BUILD_TYPE)
-  set(doc_dir ${CMAKE_BINARY_DIR}/${HPX_BUILD_TYPE})
+  set(doc_dir ${CMAKE_BINARY_DIR}/${HPX_BUILD_TYPE}/share/hpx-${HPX_VERSION})
 else()
-  set(doc_dir ${CMAKE_BINARY_DIR})
+  set(doc_dir ${CMAKE_BINARY_DIR}/share/hpx)
 endif()
 
 file(
-  COPY ${doc_dir}/share/hpx-${HPX_VERSION}/docs
+  COPY ${doc_dir}/docs
   DESTINATION ${CMAKE_BINARY_DIR}/gh-pages)
 
 # copy all source files the docs depend upon
