@@ -15,9 +15,17 @@
 #    define HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS 1
 #  endif
 
+#  undef HPX_CLANG_VERSION
+
+#elif defined(__clang__)
+
+#  define HPX_CLANG_VERSION (__clang_major__*10000 + __clang_minor__*100 + __clang_patchlevel__)
+#  undef HPX_GCC_VERSION
+
 #else
 
 #  undef HPX_GCC_VERSION
+#  undef HPX_CLANG_VERSION
 
 #endif
 
