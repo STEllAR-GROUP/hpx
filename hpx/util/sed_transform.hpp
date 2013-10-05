@@ -40,7 +40,7 @@ HPX_EXPORT bool parse_sed_expression(
   , std::string& replace
     );
 
-/// An unary function object which applies a sed command to it's subject and
+/// An unary function object which applies a sed command to its subject and
 /// returns the resulting string.
 ///
 /// \note Currently, only supports search and replace syntax (s/search/replace/)
@@ -67,6 +67,7 @@ struct HPX_EXPORT sed_transform
 
     operator safe_bool<sed_transform>::result_type() const
     {
+        // avoid compiler warning about conversion to bool
         return safe_bool<sed_transform>()(command_.get() ? true : false);
     }
 

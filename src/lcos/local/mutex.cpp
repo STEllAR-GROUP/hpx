@@ -75,7 +75,7 @@ namespace hpx { namespace lcos { namespace local
                 description_);
         }
 
-        return (threads::wait_timeout == statex) ? true : false;
+        return threads::wait_timeout == statex;
     }
 
     void mutex::set_event()

@@ -299,7 +299,7 @@ namespace hpx { namespace util
             num_localities_ = localities;
         }
 
-        bool run_agas_server = vm.count("hpx:run-agas-server") ? true : false;
+        bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))
             node = env.retrieve_node_number();
 
@@ -418,13 +418,13 @@ namespace hpx { namespace util
             // and no additional option (--hpx:agas or --hpx:node) has been
             // specified. That simplifies running small standalone
             // applications on one locality.
-            run_agas_server = (mode_ != runtime_mode_connect) ? true : false;
+            run_agas_server = mode_ != runtime_mode_connect;
         }
 
         if (hpx_host == agas_host && hpx_port == agas_port) {
             // we assume that we need to run the agas server if the user
             // asked for the same network addresses for HPX and AGAS
-            run_agas_server = (mode_ != runtime_mode_connect) ? true : false;
+            run_agas_server = mode_ != runtime_mode_connect;
         }
         else if (run_agas_server) {
             // otherwise, if the user instructed us to run the AGAS server,
@@ -614,7 +614,7 @@ namespace hpx { namespace util
 #if defined(_POSIX_VERSION) || defined(BOOST_MSVC)
         if(vm_.count("hpx:attach-debugger")) {
 #if defined(_POSIX_VERSION)
-            int i = 0;
+            volatile int i = 0;
             std::cerr
                 << "PID: " << getpid() << " on " << boost::asio::ip::host_name()
                 << " ready for attaching debugger. Once attached set i = 1 and continue"
@@ -629,6 +629,70 @@ namespace hpx { namespace util
         }
 #endif
     }
+
+#if defined(HPX_HAVE_HWLOC)
+    ///////////////////////////////////////////////////////////////////////////
+    void handle_print_bind(boost::program_options::variables_map const& vm_,
+        std::size_t num_threads)
+    {
+        if (!vm_.count("hpx:bind")) {
+            std::size_t num_threads = 1;
+            if (vm_.count("hpx:threads")) {
+                std::string threads = vm_["hpx:threads"].as<std::string>();
+                if (threads == "all")
+                    num_threads = threads::hardware_concurrency();
+                else
+                    num_threads = boost::lexical_cast<std::size_t>(threads);
+            }
+
+            std::size_t pu_offset = 0;
+            if (vm_.count("hpx:pu-offset"))
+                pu_offset = vm_["hpx:pu-offset"].as<std::size_t>();
+
+            std::size_t pu_step = 1;
+            if (vm_.count("hpx:pu-step"))
+                pu_step = vm_["hpx:pu-step"].as<std::size_t>();
+
+            std::string affinity_domain;
+            if (vm_.count("hpx:affinity")) {
+                affinity_domain = vm_["hpx:affinity"].as<std::string>();
+                if (0 != std::string("pu").find(affinity_domain) &&
+                    0 != std::string("core").find(affinity_domain) &&
+                    0 != std::string("numa").find(affinity_domain) &&
+                    0 != std::string("machine").find(affinity_domain))
+                {
+                    throw std::logic_error("Invalid command line option "
+                        "--hpx:affinity, value must be one of: pu, core, numa, "
+                        "or machine.");
+                }
+            }
+
+            threads::policies::detail::affinity_data aff(num_threads,
+                pu_offset, pu_step, affinity_domain, "");
+
+            bool numa_sensitive = vm_.count("hpx:numa-sensitive") != 0;
+            threads::topology& top = threads::create_topology();
+            for (std::size_t i = 0; i != num_threads; ++i)
+            {
+                top.print_affinity_mask(std::cout, i, aff.get_pu_mask(top, i, numa_sensitive));
+            }
+        }
+        else {
+            std::string affinity_desc;
+            std::vector<std::string> bind_affinity =
+                vm_["hpx:bind"].as<std::vector<std::string> >();
+            BOOST_FOREACH(std::string const& s, bind_affinity)
+            {
+                if (!affinity_desc.empty())
+                    affinity_desc += ";";
+                affinity_desc += s;
+            }
+
+            threads::print_affinity_options(std::cout, num_threads,
+                affinity_desc);
+        }
+    }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     int command_line_handling::call(
@@ -731,67 +795,6 @@ namespace hpx { namespace util
                 detail::print_info(std::cout);
             return 1;
         }
-
-#if defined(HPX_HAVE_HWLOC)
-        if (vm_.count("hpx:print-bind")) {
-            if (!vm_.count("hpx:bind")) {
-                std::size_t num_threads = 1;
-                if (vm_.count("hpx:threads")) {
-                    std::string threads = vm_["hpx:threads"].as<std::string>();
-                    if (threads == "all")
-                        num_threads = threads::hardware_concurrency();
-                    else
-                        num_threads = boost::lexical_cast<std::size_t>(threads);
-                }
-
-                std::size_t pu_offset = 0;
-                if (vm_.count("hpx:pu-offset"))
-                    pu_offset = vm_["hpx:pu-offset"].as<std::size_t>();
-
-                std::size_t pu_step = 1;
-                if (vm_.count("hpx:pu-step"))
-                    pu_step = vm_["hpx:pu-step"].as<std::size_t>();
-
-                std::string affinity_domain;
-                if (vm_.count("hpx:affinity")) {
-                    affinity_domain = vm_["hpx:affinity"].as<std::string>();
-                    if (0 != std::string("pu").find(affinity_domain) &&
-                        0 != std::string("core").find(affinity_domain) &&
-                        0 != std::string("numa").find(affinity_domain) &&
-                        0 != std::string("machine").find(affinity_domain))
-                    {
-                        throw std::logic_error("Invalid command line option "
-                            "--hpx:affinity, value must be one of: pu, core, numa, "
-                            "or machine.");
-                    }
-                }
-
-                threads::policies::detail::affinity_data aff(num_threads,
-                    pu_offset, pu_step, affinity_domain, "");
-
-                bool numa_sensitive = vm_.count("hpx:numa-sensitive") ? true : false;
-                threads::topology& top = threads::create_topology();
-                for (std::size_t i = 0; i != num_threads; ++i)
-                {
-                    top.print_affinity_mask(std::cout, i, aff.get_pu_mask(top, i, numa_sensitive));
-                }
-            }
-            else {
-                std::string affinity_desc;
-                std::vector<std::string> bind_affinity =
-                    vm_["hpx:bind"].as<std::vector<std::string> >();
-                BOOST_FOREACH(std::string const& s, bind_affinity)
-                {
-                    if (!affinity_desc.empty())
-                        affinity_desc += ";";
-                    affinity_desc += s;
-                }
-
-                threads::print_affinity_options(std::cout, num_threads_,
-                    affinity_desc);
-            }
-        }
-#endif
 
         // all is good
         return 0;

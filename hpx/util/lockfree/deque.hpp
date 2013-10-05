@@ -185,14 +185,14 @@ struct deque: private boost::noncopyable
 
     void stabilize_left(anchor_pair& lrs)
     {
-        // Get the right node of the leftmost pointer held by lrs and it's ABA
+        // Get the right node of the leftmost pointer held by lrs and its ABA
         // tag (tagged_ptr).
         node_pointer prev = lrs.get_left_ptr()->right.load();
 
         if (anchor_ != lrs)
             return;
 
-        // Get the left node of prev and it's tag (again, a tuple represented by
+        // Get the left node of prev and its tag (again, a tuple represented by
         // a tagged_ptr).
         node_pointer prevnext = prev.get_ptr()->left.load();
 
@@ -215,14 +215,14 @@ struct deque: private boost::noncopyable
 
     void stabilize_right(anchor_pair& lrs)
     {
-        // Get the left node of the rightmost pointer held by lrs and it's ABA
+        // Get the left node of the rightmost pointer held by lrs and its ABA
         // tag (tagged_ptr).
         node_pointer prev = lrs.get_right_ptr()->left.load();
 
         if (anchor_ != lrs)
             return;
 
-        // Get the right node of prev and it's tag (again, a tuple represented
+        // Get the right node of prev and its tag (again, a tuple represented
         // by a tagged_ptr).
         node_pointer prevnext = prev.get_ptr()->right.load();
 
@@ -304,7 +304,7 @@ struct deque: private boost::noncopyable
             if (lrs.get_left_ptr() == 0)
             {
                 // If the deque is empty, we simply install a new anchor which
-                // points to the new node as both it's leftmost and rightmost
+                // points to the new node as both its leftmost and rightmost
                 // element.
                 if (anchor_.cas(lrs, anchor_pair(n, n,
                         lrs.get_left_tag(), lrs.get_right_tag() + 1)))
@@ -361,7 +361,7 @@ struct deque: private boost::noncopyable
             if (lrs.get_right_ptr() == 0)
             {
                 // If the deque is empty, we simply install a new anchor which
-                // points to the new node as both it's leftmost and rightmost
+                // points to the new node as both its leftmost and rightmost
                 // element.
                 if (anchor_.cas(lrs, anchor_pair(n, n,
                         lrs.get_left_tag(), lrs.get_right_tag() + 1)))

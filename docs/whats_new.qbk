@@ -16,26 +16,49 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 922] - Cannot link against BLAS
+* [issue 921] - Implement `hpx::mem_fn`
+* [issue 920] - Output locality with `--hpx:print-bind`
+* [issue 919] - Correct grammar; simplify boolean expressions
+* [issue 917] - adapt cmake file to new boostbook version
+* [issue 916] - fix problem building documentation with xsltproc >= 1.1.27
+* [issue 915] - Add another TBBMalloc library search path
+* [issue 914] - Build problem with Intel compiler on Stampede (TACC)
+* [issue 913] - fix error messages in fibonacci examples
+* [issue 911] - Update OS X build instructions
+* [issue 910] - Want like to specify MPI_ROOT instead of compiler wrapper script
+* [issue 909] - Warning about void* arithmetic
+* [issue 908] - Buildbot for MIC is broken
+* [issue 906] - Can't use --hpx:bind=balanced with multiple MPI processes
+* [issue 904] - Add hpx::lcos::fold and hpx::lcos::inverse_fold collective
+                operation
+* [issue 903] - Add `hpx::when_any_swapped()`
 * [issue 902] - Add `hpx::lcos::reduce` collective operation
 * [issue 900] - Web documentation for trunk has no index
 * [issue 898] - Some tests fail with GCC 4.8.1 and MPI parcel port
 * [issue 897] - HWLOC causes failures on Mac
 * [issue 896] - pu-offset leads to startup error
 * [issue 895] - hpx::get_locality_name not defined
+* [issue 894] - Race condition at shutdown
 * [issue 893] - `--hpx:print-bind` switches std::cout to hexadecimal mode
-* [issue 892] - hwloc_topology_load can be expensive -- don't call multiple times 
-* [issue 891] - The documentation for get_locality_name is wrong
+* [issue 892] - `hwloc_topology_load` can be expensive -- don't call multiple times 
+* [issue 891] - The documentation for `get_locality_name` is wrong
 * [issue 890] - `--hpx:print-bind` should not exit
 * [issue 889] - `--hpx:debug-hpx-log=FILE` does not work
-* [issue 888] - MPI parcelport does not exit cleanly for --hpx:print-bind 
-* [issue 885] - Two threads are slower than one 
+* [issue 888] - MPI parcelport does not exit cleanly for --hpx:print-bind
+* [issue 887] - Choose thread affinities more cleverly
+* [issue 886] - Logging documentation is confusing
+* [issue 885] - Two threads are slower than one
+* [issue 884] - is_callable failing with member pointers in C++11
 * [issue 883] - Need help with is_callable_test
+* [issue 882] - tests.regressions.lcos.future_hang_on_get does not terminate
 * [issue 881] - tests/regressions/block_matrix/matrix.hh won't compile with GCC
                 4.8.1 
 * [issue 878] - `future::unwrap` triggers assertion
 * [issue 877] - "make tests" has build errors on Ubuntu 12.10 
 * [issue 876] - tcmalloc is used by default, even if it is not present
 * [issue 875] - global_fixture is defined in a header file
+* [issue 874] - Some tests take very long
 * [issue 873] - Add block-matrix code as regression test
 * [issue 872] - HPX documentation does not say how to run tests with detailed
                 output
@@ -45,8 +68,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 867] - Reduce the number of copies of hpx::function arguments
 * [issue 863] - Futures should not require a default constructor
 * [issue 862] - value_or_error shall not default construct its result
-* [issue 859] - hpx::endl should flush
-* [issue 858] - Create hpx::get_ptr<>() allowing to access component implementation
+* [issue 859] - `hpx::endl` should flush
+* [issue 858] - Create `hpx::get_ptr<>()` allowing to access component implementation
 * [issue 854] - hpx/hpx.hpp does not include hpx/include/iostreams.hpp
 * [issue 853] - Feature request: null future
 * [issue 852] - Feature request: Locality names
@@ -95,14 +118,19 @@ Here is a list of the important tickets we closed for this release.
 * [issue 807] - Create performance counters exposing overall AGAS statistics
 * [issue 795] - Create timed make_ready_future
 * [issue 721] - Make HPX usable for Xeon Phi
+* [issue 694] - CMake should complain if you attempt to build an example without
+                its dependencies
 * [issue 683] - python/hpx/process.py imports epoll on all platforms
 * [issue 600] - GTC performance broken
 * [issue 577] - Allow for zero copy serialization/networking
+* [issue 554] - Write a custom .lib file on Windows pulling in hpx_init and
+                hpx.dll, phase out hpx_init
 * [issue 551] - Change executable names to have debug postfix in Debug builds
 * [issue 445] - Significant performance mismatch between MPI and HPX in SMP
                 for allgather example
 * [issue 316] - Add message size limitation
 * [issue 249] - Clean up locking code in big boot barrier
+* [issue 136] - Persistent CMake variables need to be marked as cache variables
 
 [endsect]
 

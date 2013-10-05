@@ -559,12 +559,12 @@ namespace hpx { namespace util
 
     bool batch_environment::run_with_pbs() const
     {
-        return std::getenv("PBS_NODENUM") != 0 ? true : false;
+        return std::getenv("PBS_NODENUM") != 0;
     }
 
     bool batch_environment::run_with_slurm() const
     {
-        return std::getenv("SLURM_PROCID") != 0 ? true : false;
+        return std::getenv("SLURM_PROCID") != 0;
     }
 
     // Return a string containing the name of the batch system

@@ -159,7 +159,7 @@ namespace detail
                 continuation_thread_function_void_1<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0));
+                    util::get< 0>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -204,7 +204,7 @@ namespace detail
                 continuation_thread_function_1<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0));
+                    util::get< 0>(boost::forward<Arguments>( args)));
         }
     };
 }
@@ -259,7 +259,7 @@ namespace detail
                 continuation_thread_function_void_2<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -304,7 +304,7 @@ namespace detail
                 continuation_thread_function_2<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)));
         }
     };
 }
@@ -359,7 +359,7 @@ namespace detail
                 continuation_thread_function_void_3<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -404,7 +404,7 @@ namespace detail
                 continuation_thread_function_3<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)));
         }
     };
 }
@@ -459,7 +459,7 @@ namespace detail
                 continuation_thread_function_void_4<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -504,7 +504,7 @@ namespace detail
                 continuation_thread_function_4<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)));
         }
     };
 }
@@ -559,7 +559,7 @@ namespace detail
                 continuation_thread_function_void_5<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -604,7 +604,7 @@ namespace detail
                 continuation_thread_function_5<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)));
         }
     };
 }
@@ -659,7 +659,7 @@ namespace detail
                 continuation_thread_function_void_6<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -704,7 +704,7 @@ namespace detail
                 continuation_thread_function_6<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)));
         }
     };
 }
@@ -759,7 +759,7 @@ namespace detail
                 continuation_thread_function_void_7<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -804,7 +804,7 @@ namespace detail
                 continuation_thread_function_7<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)));
         }
     };
 }
@@ -859,7 +859,7 @@ namespace detail
                 continuation_thread_function_void_8<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -904,7 +904,7 @@ namespace detail
                 continuation_thread_function_8<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)));
         }
     };
 }
@@ -959,7 +959,7 @@ namespace detail
                 continuation_thread_function_void_9<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -1004,7 +1004,7 @@ namespace detail
                 continuation_thread_function_9<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)));
         }
     };
 }
@@ -1059,7 +1059,7 @@ namespace detail
                 continuation_thread_function_void_10<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type9>( args. a9));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)));
         }
     };
     
@@ -1104,7 +1104,7 @@ namespace detail
                 continuation_thread_function_10<Action>(),
                 cont, boost::forward<Func>(func)
               ,
-                    boost::forward< typename util::remove_reference<Arguments>::type:: member_type0>( args. a0) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type1>( args. a1) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type2>( args. a2) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type3>( args. a3) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type4>( args. a4) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type5>( args. a5) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type6>( args. a6) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type7>( args. a7) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type8>( args. a8) , boost::forward< typename util::remove_reference<Arguments>::type:: member_type9>( args. a9));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)));
         }
     };
 }

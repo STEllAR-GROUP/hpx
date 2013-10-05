@@ -194,7 +194,7 @@ int hpx_main(variables_map&)
 
     BOOST_FOREACH(id_type id, localities)
     {
-        bool is_local = (id == find_here()) ? true : false;
+        bool is_local = id == find_here();
 
         if (is_local) {
             // test the void actions locally only (there is no way to get the

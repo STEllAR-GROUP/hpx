@@ -71,7 +71,7 @@ namespace performance_counters { namespace sine
 
         // We enable the performance counters if --sine is specified on the
         // command line.
-        return (vm.count("sine") != 0) ? true : false;
+        return vm.count("sine") != 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////

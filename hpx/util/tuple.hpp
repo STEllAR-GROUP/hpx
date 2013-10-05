@@ -325,6 +325,21 @@ namespace hpx { namespace util
         return t.template get<N>();
     }
 
+    template <int N, typename Tuple>
+    BOOST_FORCEINLINE BOOST_CONSTEXPR
+    typename util::add_rvalue_reference<
+        typename boost::lazy_disable_if<
+            boost::is_reference<Tuple>
+          , detail::tuple_element<N, Tuple>
+        >::type
+    >::type
+    get(BOOST_RV_REF(Tuple) t) BOOST_NOEXCEPT
+    {
+        return
+            boost::forward<typename detail::tuple_element<N, Tuple>::type>
+                (t.template get<N>());
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     using boost::fusion::operator==;
     using boost::fusion::operator!=;

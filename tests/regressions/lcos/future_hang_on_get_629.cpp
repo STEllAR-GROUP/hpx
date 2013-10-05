@@ -1,9 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  Copyright (c) 2012 Bryce Adelstein-Lelbach 
+// 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
+
+#define HPX_LIMIT 6
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/future_wait.hpp>
@@ -24,11 +26,11 @@ using hpx::finalize;
 template <typename T>
 inline T sign(T a)
 {
-    if (a > 0)
+    if (a > 0) 
         return 1;
-    else if (a < 0)
+    else if (a < 0) 
         return -1;
-    else
+    else 
         return 0;
 }
 
@@ -67,7 +69,7 @@ double null_function(
         double v1 = v(prng);
 
         if (compare_real(v1, 0.0, 1e-10))
-            v1 = 1e-10;
+            v1 = 1e-10; 
 
         d += (s(prng) ? 1.0 : -1.0) * (v0 / v1);
     }
@@ -78,26 +80,26 @@ double null_function(
 ///////////////////////////////////////////////////////////////////////////////
 double null_tree(
     boost::uint64_t seed
-  , boost::uint64_t children
   , boost::uint64_t depth
   , boost::uint64_t max_depth
+  , boost::uint64_t children
   , boost::uint64_t delay_iterations
+  , boost::uint32_t num_localities
     );
 
 HPX_PLAIN_ACTION(null_tree, null_tree_action);
 
 double null_tree(
     boost::uint64_t seed
-  , boost::uint64_t children
   , boost::uint64_t depth
   , boost::uint64_t max_depth
+  , boost::uint64_t children
   , boost::uint64_t delay_iterations
-    )
+  , boost::uint32_t num_localities
+    ) 
 {
     if (depth == max_depth)
         return null_function(seed, delay_iterations);
-
-    hpx::id_type const here = hpx::find_here();
 
     double d = 0.;
 
@@ -108,13 +110,21 @@ double null_tree(
 
     for (boost::uint64_t j = 0; j < children; ++j)
     {
-        futures.push_back(hpx::async<null_tree_action>
-            (here, j + p, children, depth + 1, max_depth, delay_iterations));
+        hpx::id_type const target
+            = hpx::naming::get_id_from_locality_id((j + p) % num_localities);
+
+        futures.push_back(hpx::async<null_tree_action>(target, j + p, depth + 1
+                                                     , max_depth
+                                                     , children
+                                                     , delay_iterations
+                                                     , num_localities
+                                                       )); 
     }
 
     null_function(seed, delay_iterations);
 
-    hpx::wait(futures, [&] (std::size_t, double r) { d += r; });
+    for (boost::uint64_t j = 0; j < futures.size(); ++j)
+        d += futures[j].get();
 
     return d;
 }
@@ -135,16 +145,22 @@ int hpx_main(
 
         bool verbose = vm.count("verbose") != 0;
 
+        boost::uint32_t num_localities = hpx::get_num_localities_sync();
+
         hpx::id_type const here = hpx::find_here();
 
         double d = 0.;
 
-        null_tree_action null_act;
         for ( boost::uint64_t i = 0
-            ; ((test_runs == 0) ? true : (i < test_runs))
-            ; ++i)
+            ; (test_runs == 0) || (i < test_runs)
+            ; ++i) 
         {
-            d += null_act(here, 0, children, 1, max_depth, delay_iterations);
+            d += hpx::async<null_tree_action>(here, 0, 1
+                                            , max_depth
+                                            , children
+                                            , delay_iterations
+                                            , num_localities
+                                              ).get(); 
 
             if (verbose)
                 std::cout << (boost::format("%016u : %f\n") % i % d)
@@ -166,7 +182,7 @@ int main(
 
     cmdline.add_options()
         ( "test-runs"
-        , value<boost::uint64_t>()->default_value(10000)
+        , value<boost::uint64_t>()->default_value(100)
         , "number of times to repeat the test (0 == infinite)")
 
         ( "verbose"
@@ -177,7 +193,7 @@ int main(
         , "number of children each node has")
 
         ( "depth"
-        , value<boost::uint64_t>()->default_value(2)
+        , value<boost::uint64_t>()->default_value(3)
         , "depth of the tree structure")
 
         ( "delay-iterations"

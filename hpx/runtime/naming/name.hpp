@@ -415,7 +415,7 @@ namespace hpx { namespace naming
 
         inline bool gid_was_split(gid_type const& id)
         {
-            return (id.get_msb() & gid_type::was_split_mask) ? true : false;
+            return (id.get_msb() & gid_type::was_split_mask) != 0;
         }
     }
 

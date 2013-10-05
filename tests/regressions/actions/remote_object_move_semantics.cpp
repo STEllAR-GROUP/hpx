@@ -124,7 +124,7 @@ int hpx_main(variables_map&)
 
     BOOST_FOREACH(id_type id, localities)
     {
-        bool is_local = (id == hpx::find_here()) ? true : false;
+        bool is_local = id == hpx::find_here();
         {
             object<foo> f = new_<foo>(id).get();
 

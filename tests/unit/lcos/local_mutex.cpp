@@ -45,13 +45,13 @@ struct test_lock
         }
 
         lock_type lock(mtx);
-        HPX_TEST(lock ? true : false);
+        HPX_TEST(bool(lock));
 
         // Test the lock and unlock methods.
         lock.unlock();
         HPX_TEST(!lock);
         lock.lock();
-        HPX_TEST(lock ? true : false);
+        HPX_TEST(bool(lock));
     }
 };
 
@@ -72,7 +72,7 @@ struct test_mutexed_data_lock
     void operator()() const
     {
         lock_type lock(*mtx);
-        HPX_TEST(lock ? true : false);
+        HPX_TEST(bool(lock));
 
         ++(*data);
  
@@ -101,7 +101,7 @@ struct test_mutexed_data_lock_raii
     {
         {
             lock_type lock(*mtx);
-            HPX_TEST(lock ? true : false);
+            HPX_TEST(bool(lock));
 
             ++(*data);
         }
@@ -124,24 +124,24 @@ struct test_try_lock
         // Test the lock's constructors.
         {
             try_lock_type lock(mtx);
-            HPX_TEST(lock ? true : false);
+            HPX_TEST(bool(lock));
         }
         {
             try_lock_type lock(mtx, boost::defer_lock);
             HPX_TEST(!lock);
         }
         try_lock_type lock(mtx);
-        HPX_TEST(lock ? true : false);
+        HPX_TEST(bool(lock));
 
         // Test the lock, unlock and try_lock methods.
         lock.unlock();
         HPX_TEST(!lock);
         lock.lock();
-        HPX_TEST(lock ? true : false);
+        HPX_TEST(bool(lock));
         lock.unlock();
         HPX_TEST(!lock);
         HPX_TEST(lock.try_lock());
-        HPX_TEST(lock ? true : false);
+        HPX_TEST((lock));
     }
 };
 
@@ -167,7 +167,7 @@ struct test_mutexed_data_try_lock
         while (!lock.try_lock())
             {}
 
-        HPX_TEST(lock ? true : false);
+        HPX_TEST(bool(lock));
 
         ++(*data);
 
@@ -243,7 +243,7 @@ int hpx_main(variables_map& vm)
         barr.wait();
 
         mutex::scoped_lock lock(mtx);
-        HPX_TEST(lock ? true : false);
+        HPX_TEST(bool(lock));
 
         HPX_TEST_EQ(data, pxthreads);
     } 
@@ -261,7 +261,7 @@ int hpx_main(variables_map& vm)
         barr.wait();
 
         mutex::scoped_lock lock(mtx);
-        HPX_TEST(lock ? true : false);
+        HPX_TEST(bool(lock));
 
         HPX_TEST_EQ(data, pxthreads);
     }
@@ -287,7 +287,7 @@ int hpx_main(variables_map& vm)
         barr.wait();
 
         mutex::scoped_lock lock(mtx);
-        HPX_TEST(lock ? true : false);
+        HPX_TEST(bool(lock));
 
         HPX_TEST_EQ(data, pxthreads);
     } 
@@ -305,7 +305,7 @@ int hpx_main(variables_map& vm)
         barr.wait();
 
         mutex::scoped_lock lock(mtx);
-        HPX_TEST(lock ? true : false);
+        HPX_TEST(bool(lock));
 
         HPX_TEST_EQ(data, pxthreads);
     }

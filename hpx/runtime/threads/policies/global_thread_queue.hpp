@@ -242,7 +242,7 @@ namespace hpx { namespace threads { namespace policies
                     BOOST_ASSERT(thread_map_.find(todelete) != thread_map_.end());
 
                     --terminated_items_count_;
-                    bool deleted = thread_map_.erase(todelete) ? true : false;
+                    bool deleted = thread_map_.erase(todelete) != 0;
                     HPX_UNUSED(deleted);
                     BOOST_ASSERT(deleted);
                 }
@@ -261,7 +261,7 @@ namespace hpx { namespace threads { namespace policies
                     BOOST_ASSERT(thread_map_.find(todelete) != thread_map_.end());
 
                     --terminated_items_count_;
-                    bool deleted = thread_map_.erase(todelete) ? true : false;
+                    bool deleted = thread_map_.erase(todelete) != 0;
                     BOOST_ASSERT(deleted);
                     if (deleted)
                         --delete_count;

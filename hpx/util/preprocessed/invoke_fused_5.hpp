@@ -19,7 +19,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , args.a0);
+              , util::get< 0>(args));
     }
     template <typename R, typename F, typename Arg0>
     BOOST_FORCEINLINE
@@ -29,7 +29,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0));
+              , util::get< 0>(boost::move(args)));
     }
     template <typename F, typename Arg0>
     BOOST_FORCEINLINE
@@ -41,7 +41,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , args.a0);
+              , util::get< 0>(args));
     }
     template <typename F, typename Arg0>
     BOOST_FORCEINLINE
@@ -53,7 +53,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0));
+              , util::get< 0>(boost::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -67,7 +67,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , args.a0 , args.a1);
+              , util::get< 0>(args) , util::get< 1>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
@@ -77,7 +77,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
@@ -89,7 +89,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , args.a0 , args.a1);
+              , util::get< 0>(args) , util::get< 1>(args));
     }
     template <typename F, typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
@@ -101,7 +101,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -115,7 +115,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
@@ -125,7 +125,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
@@ -137,7 +137,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
@@ -149,7 +149,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -163,7 +163,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2 , args.a3);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
@@ -173,7 +173,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2) , boost::forward<Arg3>(args.a3));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
@@ -185,7 +185,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2 , args.a3);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
@@ -197,7 +197,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2) , boost::forward<Arg3>(args.a3));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -211,7 +211,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2 , args.a3 , args.a4);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
@@ -221,7 +221,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2) , boost::forward<Arg3>(args.a3) , boost::forward<Arg4>(args.a4));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
@@ -233,7 +233,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2 , args.a3 , args.a4);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
@@ -245,7 +245,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2) , boost::forward<Arg3>(args.a3) , boost::forward<Arg4>(args.a4));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -259,7 +259,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2 , args.a3 , args.a4 , args.a5);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
@@ -269,7 +269,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2) , boost::forward<Arg3>(args.a3) , boost::forward<Arg4>(args.a4) , boost::forward<Arg5>(args.a5));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
@@ -281,7 +281,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2 , args.a3 , args.a4 , args.a5);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
@@ -293,7 +293,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2) , boost::forward<Arg3>(args.a3) , boost::forward<Arg4>(args.a4) , boost::forward<Arg5>(args.a5));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -307,7 +307,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2 , args.a3 , args.a4 , args.a5 , args.a6);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
@@ -317,7 +317,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2) , boost::forward<Arg3>(args.a3) , boost::forward<Arg4>(args.a4) , boost::forward<Arg5>(args.a5) , boost::forward<Arg6>(args.a6));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
@@ -329,7 +329,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2 , args.a3 , args.a4 , args.a5 , args.a6);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
@@ -341,7 +341,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2) , boost::forward<Arg3>(args.a3) , boost::forward<Arg4>(args.a4) , boost::forward<Arg5>(args.a5) , boost::forward<Arg6>(args.a6));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -355,7 +355,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2 , args.a3 , args.a4 , args.a5 , args.a6 , args.a7);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
@@ -365,7 +365,7 @@ namespace hpx { namespace util
     {
         return
             invoke_r<R>(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2) , boost::forward<Arg3>(args.a3) , boost::forward<Arg4>(args.a4) , boost::forward<Arg5>(args.a5) , boost::forward<Arg6>(args.a6) , boost::forward<Arg7>(args.a7));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
@@ -377,7 +377,7 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , args.a0 , args.a1 , args.a2 , args.a3 , args.a4 , args.a5 , args.a6 , args.a7);
+              , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
@@ -389,6 +389,6 @@ namespace hpx { namespace util
     {
         return
             invoke(boost::forward<F>(f)
-              , boost::forward<Arg0>(args.a0) , boost::forward<Arg1>(args.a1) , boost::forward<Arg2>(args.a2) , boost::forward<Arg3>(args.a3) , boost::forward<Arg4>(args.a4) , boost::forward<Arg5>(args.a5) , boost::forward<Arg6>(args.a6) , boost::forward<Arg7>(args.a7));
+              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)));
     }
 }}
