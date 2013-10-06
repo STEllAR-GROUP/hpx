@@ -137,7 +137,7 @@ else()
 
   # Quickbook -> BoostBook XML
   macro(hpx_quickbook_to_boostbook name)
-    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;QUICKBOOK_ARGS" "" ${ARGN})
+    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;QUICKBOOK_ARGS;NODOXYGEN" "" ${ARGN})
 
     hpx_print_list("DEBUG"
       "quickbook_to_boostbook.${name}" "Quickbook arguments"
@@ -158,7 +158,7 @@ else()
     endif()
 
     set(doxygen_option "")
-    if(DOXYGEN_FOUND)
+    if(DOXYGEN_FOUND AND NOT ${${name}_NODOXYGEN})
       set(doxygen_option "-D__hpx_doxygen__")
     endif()
 
