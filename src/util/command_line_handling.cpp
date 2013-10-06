@@ -498,7 +498,7 @@ namespace hpx { namespace util
                 vm["hpx:debug-agas-log"].as<std::string>();
             ini_config += "hpx.logging.agas.destination=" +
                 detail::convert_to_log_file(
-                    vm["hpx:debug-hpx-log"].as<std::string>());
+                    vm["hpx:debug-agas-log"].as<std::string>());
             ini_config += "hpx.logging.console.agas.level=5";
             ini_config += "hpx.logging.agas.level=5";
         }
