@@ -129,9 +129,21 @@ hpx_quickbook_to_html(hpx
   AUTOINDEX_ARGS --internal-index
   SINGLEPAGE ${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
 
-add_custom_target(docs
-  DEPENDS hpx_HTML.manifest
-  SOURCES ${documentation_files})
+if(FOP_FOUND)
+  # This assumes that Quickbook -> BoostBook succeeded above.
+  hpx_boostbook_to_xslfo(hpx SOURCE hpx.xml)
+  hpx_xslfo_to_pdf(hpx SOURCE hpx.fo)
+endif()
+
+if(FOP_FOUND)
+  add_custom_target(docs
+    DEPENDS hpx_HTML.manifest hpx.pdf
+    SOURCES ${documentation_files})
+else()
+  add_custom_target(docs
+    DEPENDS hpx_HTML.manifest
+    SOURCES ${documentation_files})
+endif()
 
 if(${HPX_BUILD_DOCUMENTATION_SINGLEPAGE})
   add_custom_target(singlepage_docs
