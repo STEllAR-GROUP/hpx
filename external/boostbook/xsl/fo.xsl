@@ -221,6 +221,13 @@
   </fo:list-item>
 </xsl:template>
 
+<xsl:template match="classname|methodname|functionname|enumname|
+                     macroname|headername|globalname">
+  <computeroutput>
+    <xsl:apply-templates select="." mode="annotation"/>
+  </computeroutput>
+</xsl:template>
+
 <!-- 
 
  The following rules apply syntax highlighting to phrases
