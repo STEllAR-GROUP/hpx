@@ -63,13 +63,13 @@ if(NOT "${git_add_result}" EQUAL "0")
 endif()
 
 # commit changes
-#execute_process(
-#  COMMAND ${GIT_EXECUTABLE} commit -am "Updating docs"
-#  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
-#  RESULT_VARIABLE git_commit_result)
-#if(NOT "${git_commit_result}" EQUAL "0")
-#  message(FATAL_ERROR "Commiting to the GitHub pages branch failed.")
-#endif()
+execute_process(
+  COMMAND ${GIT_EXECUTABLE} commit -am "Updating docs"
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
+  RESULT_VARIABLE git_commit_result)
+if(NOT "${git_commit_result}" EQUAL "0")
+  message(FATAL_ERROR "Commiting to the GitHub pages branch failed.")
+endif()
 
 # push everything up to github
 execute_process(
