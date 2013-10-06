@@ -1,0 +1,283 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>How to Install HPX on OS X (Mac)</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../getting_started.html" title="Getting Started">
+<link rel="prev" href="unix_installation.html" title="How to Install HPX on Unix Variants">
+<link rel="next" href="windows_installation.html" title="How to Install HPX on Windows">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="unix_installation.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="windows_installation.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.tutorial.getting_started.macos_installation"></a><a class="link" href="macos_installation.html" title="How to Install HPX on OS X (Mac)">How
+        to Install <span class="emphasis"><em>HPX</em></span> on OS X (Mac)</a>
+</h4></div></div></div>
+<p>
+          This section describes how to build<span class="emphasis"><em>HPX</em></span> for OS X (Mac)
+          (with recent versions of Clang, libc++, and Boost).
+        </p>
+<p>
+          The standard system compiler on OS X is too old to build HPX. You will
+          have to install a newer compiler manually, either Clang or GCC. Below we
+          describe two possibilities:
+        </p>
+<h6>
+<a name="hpx.tutorial.getting_started.macos_installation.h0"></a>
+          <span class="phrase"><a name="hpx.tutorial.getting_started.macos_installation.install_a_recent_version_of_llvm"></a></span><a class="link" href="macos_installation.html#hpx.tutorial.getting_started.macos_installation.install_a_recent_version_of_llvm">Install
+          a recent version of LLVM and Clang</a>
+        </h6>
+<pre class="programlisting">In order to build <span class="emphasis"><em>HPX</em></span> you will need a fairly recent version of Clang
+(at least version 3.2 of Clang and LLVM). For more instructions please see
+[link http://clang.llvm.org/get_started.html here].
+
+If you're using Homebrew, `brew install llvm --with-clang` will do the trick
+and install 3.2 into `/usr/local/bin`.
+
+In the guide below, I assume you're either using Clang 3.2 as installed by
+Homebrew into /usr/local/bin, or that the following symlinks are created and
+visible in your $PATH:
+</pre>
+<pre class="programlisting">ln -s /path/to/build-llvm/Release/bin/clang++ clang++-3.3
+ln -s /path/to/build-llvm/Release/bin/clang clang-3.3
+</pre>
+<p>
+          (Replace <code class="computeroutput">/path/to</code> here with an absolute path of your liking.)
+        </p>
+<h6>
+<a name="hpx.tutorial.getting_started.macos_installation.h1"></a>
+          <span class="phrase"><a name="hpx.tutorial.getting_started.macos_installation.visit_http_libcxx_llvm_org_to_ge"></a></span><a class="link" href="macos_installation.html#hpx.tutorial.getting_started.macos_installation.visit_http_libcxx_llvm_org_to_ge">Visit
+          http://libcxx.llvm.org/ to get the latest version of the "libc++"
+          C++ standard library</a>
+        </h6>
+<pre class="programlisting">You need to use the trunk version; what's currently bundled with XCode or
+OS X aren't quite there yet. You can follow the steps in
+http://libcxx.llvm.org/ if you choose, but here's briefly how it can be built:
+</pre>
+<pre class="programlisting">cd /path/to
+git clone http://llvm.org/git/libcxx.git
+cd libcxx/lib
+CXX=clang++-3.3 CC=clang-3.3 TRIPLE=-apple- ./buildit
+</pre>
+<p>
+          or alternatively:
+        </p>
+<pre class="programlisting">CXX=/usr/local/bin/clang++ CC=/usr/local/bin/clang TRIPLE=-apple- \
+    ./buildit
+</pre>
+<p>
+          The library is then found in <code class="computeroutput">/path/to/libcxx/include</code> and
+          <code class="computeroutput">/path/to/libcxx/lib</code>, respectively
+        </p>
+<h6>
+<a name="hpx.tutorial.getting_started.macos_installation.h2"></a>
+          <span class="phrase"><a name="hpx.tutorial.getting_started.macos_installation.build_and_install_a_recent_versi"></a></span><a class="link" href="macos_installation.html#hpx.tutorial.getting_started.macos_installation.build_and_install_a_recent_versi">Build
+          (and install) a recent version of Boost, using Clang and libc++</a>
+        </h6>
+<pre class="programlisting">To build Boost with Clang and make it link to libc++ as standard library,
+you'll need to set up either of the following in your `~/user-config.jam`
+file:
+</pre>
+<pre class="programlisting"># user-config.jam (put this file into your home directory)
+# ...
+
+# Clang 3.2
+using clang
+    : 3.2
+    : "/usr/local/bin/clang++"
+    : &lt;cxxflags&gt;"-std=c++11 -stdlib=libc++ -fcolor-diagnostics -isystem /path/to/libcxx/include"
+      &lt;linkflags&gt;"-stdlib=libc++ -L/path/to/libcxx/lib"
+    ;
+
+# Clang trunk ("3.3" for convenience)
+using clang
+    : 3.3
+    : "clang++-3.3"
+    : &lt;cxxflags&gt;"-std=c++11 -stdlib=libc++ -fcolor-diagnostics -isystem /path/to/libcxx/include"
+      &lt;linkflags&gt;"-stdlib=libc++ -L/path/to/libcxx/lib"
+    ;
+</pre>
+<p>
+          (Again, remember to replace <code class="computeroutput">/path/to</code> with whatever you used
+          earlier.)
+        </p>
+<pre class="programlisting">You can then use as build command either:
+</pre>
+<pre class="programlisting">b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang-3.2 install -j4
+</pre>
+<p>
+          or
+        </p>
+<pre class="programlisting">b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang-3.3 install -j4
+</pre>
+<p>
+          we verifed this using Boost V1.53. If you use a different version, just
+          remember to replace <code class="computeroutput">/usr/local/include/boost-1_53</code> with whatever
+          include prefix you had in your installation.
+        </p>
+<h6>
+<a name="hpx.tutorial.getting_started.macos_installation.h3"></a>
+          <span class="phrase"><a name="hpx.tutorial.getting_started.macos_installation.build_hpx_finally"></a></span><a class="link" href="macos_installation.html#hpx.tutorial.getting_started.macos_installation.build_hpx_finally">Build
+          HPX, finally</a>
+        </h6>
+<pre class="programlisting">cd /path/to
+git clone https://github.com/STEllAR-GROUP/hpx.git
+mkdir build-hpx &amp;&amp; cd build-hpx
+</pre>
+<p>
+          To build with Clang 3.2, execute:
+        </p>
+<pre class="programlisting">cmake ../hpx \
+    -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ \
+    -DCMAKE_C_COMPILER=/usr/local/bin/clang-3.3 \
+    -DBOOST_INCLUDE_DIR=/usr/local/include/boost-1_53 \
+    -DBOOST_LIBRARY_DIR=/usr/local/lib \
+    -DBOOST_SUFFIX=-clang-darwin32-mt-1_53 \
+    -DCMAKE_CXX_FLAGS="-isystem /path/to/libcxx/include" \
+    -DLINK_FLAGS="-L /path/to/libcxx/lib"
+make
+</pre>
+<p>
+          To build with Clang 3.3 (trunk), execute:
+        </p>
+<pre class="programlisting">cmake ../hpx \
+    -DCMAKE_CXX_COMPILER=clang++-3.3 \
+    -DCMAKE_C_COMPILER=clang-3.3 \
+    -DBOOST_INCLUDE_DIR=/usr/local/include/boost-1_53 \
+    -DBOOST_LIBRARY_DIR=/usr/local/lib \
+    -DBOOST_SUFFIX=-clang-darwin33-mt-1_53 \
+    -DCMAKE_CXX_FLAGS="-isystem /path/to/libcxx/include" \
+    -DLINK_FLAGS="-L /path/to/libcxx/lib"
+make
+</pre>
+<p>
+          For more detailed information about using <a href="http://www.cmake.org" target="_top">CMake</a>
+          please refer its documentation and to the section <a class="link" href="../../manual/cmake.html" title="Building HPX with CMake">Building
+          <span class="emphasis"><em>HPX</em></span> with CMake</a> for. Please pay special attention
+          to the section about HPX_MALLOC as this is crucial for getting decent performance.
+        </p>
+<h6>
+<a name="hpx.tutorial.getting_started.macos_installation.h4"></a>
+          <span class="phrase"><a name="hpx.tutorial.getting_started.macos_installation.alternative_installation_method_"></a></span><a class="link" href="macos_installation.html#hpx.tutorial.getting_started.macos_installation.alternative_installation_method_">Alternative
+          Installation method of HPX on OS X (Mac)</a>
+        </h6>
+<p>
+          Alternatively, you can install a recent version of gcc as well as all required
+          libraries via MacPorts:
+        </p>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+              Install <a href="http://www.macports.org/" target="_top">MacPorts</a>
+            </li>
+<li class="listitem">
+              <p>
+                Install CMake, gcc 4.8, and hwloc:
+              </p>
+<pre class="programlisting">$ sudo port install gcc48
+$ sudo port install hwloc
+</pre>
+              <p>
+                You may also want:
+              </p>
+<pre class="programlisting">$ sudo port install cmake
+$ sudo port install git-core
+</pre>
+            </li>
+<li class="listitem">
+              <p>
+                Make this version of gcc your default compiler:
+              </p>
+<pre class="programlisting">$ sudo port install gcc_select
+$ sudo port select gcc mp-gcc48
+</pre>
+            </li>
+<li class="listitem">
+              <p>
+                Build Boost manually (the Boost package of MacPorts is built with
+                Clang, and unfortunately doesn't work with a GCC-build version of
+                HPX):
+              </p>
+<pre class="programlisting">wget http://sourceforge.net/projects/boost/files/boost/1.54.0/boost_1_54_0.tar.bz2
+tar xjf boost_1_54_0.tar.bz2
+pushd boost_1_54_0
+export BOOST_ROOT=$HOME/boost_1_54_0
+./bootstrap.sh --prefix=$BOOST_DIR
+./b2 -j8
+./b2 -j8 install
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$BOOST_ROOT/lib
+popd
+</pre>
+            </li>
+<li class="listitem">
+              <p>
+                Build HPX:
+              </p>
+<pre class="programlisting">git clone https://github.com/STEllAR-GROUP/hpx.git
+mkdir hpx-build
+pushd hpx-build
+export HPX_ROOT=$HOME/hpx
+cmake -DCMAKE_C_COMPILER=gcc \
+    -DCMAKE_CXX_COMPILER=g++ \
+    -DCMAKE_FORTRAN_COMPILER=gfortran \
+    -DCMAKE_C_FLAGS="-Wno-unused-local-typedefs" \
+    -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" \
+    -DBOOST_ROOT=$BOOST_ROOT \
+    -DHWLOC_ROOT=/opt/local \
+    -DCMAKE_INSTALL_PREFIX=$HOME/hpx \
+         $(pwd)/../hpx
+make -j8
+make -j8 install
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$HPX_DIR/lib/hpx
+popd
+</pre>
+            </li>
+<li class="listitem">
+              Note that you need to set <code class="computeroutput">BOOST_ROOT</code>, <code class="computeroutput">HPX_ROOT</code>,
+              and <code class="computeroutput">DYLD_LIBRARY_PATH</code> (for both <code class="computeroutput">BOOST_ROOT</code>
+              and <code class="computeroutput">HPX_ROOT</code>) every time you configure, build, or run
+              an HPX application.
+            </li>
+<li class="listitem">
+              If you want to use HPX with MPI, you need to enable the MPI parcelport,
+              and also specify the location of the MPI wrapper scripts. This can
+              be done e.g. with the following command:
+            </li>
+</ol></div>
+<pre class="programlisting">cmake -DHPX_HAVE_PARCELPORT_MPI=ON \
+     -DCMAKE_C_COMPILER=gcc \
+     -DCMAKE_CXX_COMPILER=g++ \
+     -DCMAKE_FORTRAN_COMPILER=gfortran \
+     -DMPI_C_COMPILER=openmpicc \
+     -DMPI_CXX_COMPILER=openmpic++ \
+     -DMPI_FORTRAN_COMPILER=openmpif90 \
+     -DCMAKE_C_FLAGS="-Wno-unused-local-typedefs" \
+     -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" \
+     -DBOOST_ROOT=$BOOST_DIR \
+     -DHWLOC_ROOT=/opt/local \
+     -DCMAKE_INSTALL_PREFIX=$HOME/hpx
+         $(pwd)/../hpx
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="unix_installation.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="windows_installation.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

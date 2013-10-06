@@ -1,0 +1,147 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>HPX specific CMake Variables</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../cmake.html" title="Building HPX with CMake">
+<link rel="prev" href="variables.html" title="Frequently used CMake Variables">
+<link rel="next" href="hpx_variables/cmake_frequently_used.html" title="Frequently used HPX specific CMake Variables">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="variables.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="hpx_variables/cmake_frequently_used.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.cmake.hpx_variables"></a><a class="link" href="hpx_variables.html" title="HPX specific CMake Variables">HPX specific CMake
+        Variables</a>
+</h4></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="hpx_variables/cmake_frequently_used.html">Frequently
+          used HPX specific CMake Variables</a></span></dt>
+<dt><span class="section"><a href="hpx_variables/cmake_hpx_malloc.html">Setting
+          the memory Allocator</a></span></dt>
+<dt><span class="section"><a href="hpx_variables/cmake_threading.html">Variables
+          concerning Thread Scheduling Policies</a></span></dt>
+<dt><span class="section"><a href="hpx_variables/cmake_parcelports.html">Variables
+          concerning Parcelports</a></span></dt>
+<dt><span class="section"><a href="hpx_variables/cmake_additional_tools.html">Additional
+          Tools and Libraries used by HPX</a></span></dt>
+</dl></div>
+<p>
+          Here is a more complete list of CMake variables specific to <span class="emphasis"><em>HPX</em></span>.
+          These variables are used more seldom and are mainly useful for debugging
+          purposes.
+        </p>
+<div class="variablelist">
+<p class="title"><b>Other HPX specific CMake Variables</b></p>
+<dl class="variablelist">
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether <span class="emphasis"><em>HPX</em></span> threads should capture the
+                stack back-trace whenever they are about to be suspended (default:
+                <code class="computeroutput"><span class="identifier">OFF</span></code>).
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH</span><span class="special">:</span><span class="identifier">STRING</span></code></span></dt>
+<dd><p>
+                Sets the depth of the stack back-traces captured during thread suspension
+                (default: <code class="computeroutput"><span class="number">5</span></code>). This value
+                is only meaningful if the CMake variable <code class="computeroutput"><span class="identifier">HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION</span></code>
+                is set to <code class="computeroutput"><span class="identifier">ON</span></code>.
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_USE_ITT_NOTIFY</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether <span class="emphasis"><em>HPX</em></span> supports integration with the
+                diagnostic tools of the Intel Parallel Studio (Intel Amplifier and
+                Intel Inspector). The default value for this variable is <code class="computeroutput"><span class="identifier">OFF</span></code>. Even if the variable is set
+                to <code class="computeroutput"><span class="identifier">ON</span></code> you must separately
+                enable integration with the Intel tools at runtime. This option is
+                available only if the include files and libraries for one of the
+                Intel tools can be located (see CMake variable <code class="computeroutput"><span class="identifier">AMPLIFIER</span></code>
+                below).
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_AUTOMATIC_PREPROCESSING</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether the generated makefiles should regenerate the partially
+                preprocessed files that are part of <span class="emphasis"><em>HPX</em></span>. The
+                default value for this option is <code class="computeroutput"><span class="identifier">OFF</span></code>.
+                This option can be enabled only if the <a href="http://www.boost.org/doc/libs/release/libs/wave/doc/wave_driver.html" target="_top">Boost
+                Wave</a> tool is available (see CMake variable <code class="computeroutput"><span class="identifier">BOOSTWAVE</span></code> below).
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_HAVE_COMPRESSION_ZLIB</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether support for compressing parcels using the <a href="http://www.zlib.net/" target="_top">ZLib</a>
+                library will be enabled or not. This variable is set to <code class="computeroutput"><span class="identifier">OFF</span></code> by default. If you enable this
+                option CMake will try to find the <a href="http://www.zlib.net/" target="_top">ZLib</a>
+                library, which might require setting the CMake variable <code class="computeroutput"><span class="identifier">ZLIB_ROOT</span></code>.
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_HAVE_COMPRESSION_BZIP2</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether support for compressing parcels using the <a href="http://www.bzip.org/" target="_top">BZip2</a>
+                library will be enabled or not. This variable is set to <code class="computeroutput"><span class="identifier">OFF</span></code> by default. If you enable this
+                option CMake will try to find the <a href="http://www.bzip.org/" target="_top">BZip2</a>
+                library, which might require setting the CMake variable <code class="computeroutput"><span class="identifier">BZIP_ROOT</span></code>.
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_HAVE_COMPRESSION_SNAPPY</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether support for compressing parcels using the <a href="http://code.google.com/p/snappy/" target="_top">Snappy</a>
+                library will be enabled or not. This variable is set to <code class="computeroutput"><span class="identifier">OFF</span></code> by default. If you enable this
+                option CMake will try to find the <a href="http://code.google.com/p/snappy/" target="_top">Snappy</a>
+                library, which might require setting the CMake variable <code class="computeroutput"><span class="identifier">SNAPPY_ROOT</span></code>.
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_USE_MORE_THAN_64_THREADS</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether HPX should be configured to run more than 64 threads
+                (for system having more than 64 processing units, like the XeonPhi
+                device). The variable is set to <code class="computeroutput"><span class="identifier">OFF</span></code>
+                by default.
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_HAVE_SECURITY</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether HPX should be configured to include security related
+                code which currently secures inter-locality related traffic and inter-locality
+                action invocations.
+              </p></dd>
+</dl>
+</div>
+<div class="variablelist">
+<p class="title"><b>Additional Tools and Libraries Required by some of the Examples</b></p>
+<dl class="variablelist">
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HDF5_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                Specifies where to look for the <a href="http://www.hdfgroup.org/HDF5" target="_top">Hierarchical
+                Data Format V5 (HDF5)</a> include files and libraries.
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">MPI_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                Specifies where to look for the <a href="http://en.wikipedia.org/wiki/Message_Passing_Interface" target="_top">MPI</a>
+                include files and libraries.
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">MPIEXEC_ROOT</span><span class="special">:</span><span class="identifier">PATH</span></code></span></dt>
+<dd><p>
+                Specifies where to look for the <a href="http://en.wikipedia.org/wiki/Message_Passing_Interface" target="_top">MPI</a>
+                tool <code class="computeroutput"><span class="identifier">mpiexec</span></code>.
+              </p></dd>
+</dl>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="variables.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="hpx_variables/cmake_frequently_used.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

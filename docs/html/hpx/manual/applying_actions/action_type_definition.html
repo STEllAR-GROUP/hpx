@@ -1,0 +1,169 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Action Type Definition</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../applying_actions.html" title="Applying Actions">
+<link rel="prev" href="../applying_actions.html" title="Applying Actions">
+<link rel="next" href="action_invocation.html" title="Action Invocation">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../applying_actions.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../applying_actions.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="action_invocation.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.applying_actions.action_type_definition"></a><a class="link" href="action_type_definition.html" title="Action Type Definition">Action
+        Type Definition</a>
+</h4></div></div></div>
+<p>
+          Actions are special types we use to describe possibly remote operations.
+          For every global function and every member function which has to be invoked
+          distantly, a special type must be defined. For any global function the
+          special macro <code class="computeroutput">HPX_PLAIN_ACTION</code>
+          can be used to define the action type. Here is an example demonstrating
+          this:
+        </p>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">app</span>
+<span class="special">{</span>
+    <span class="keyword">void</span> <span class="identifier">some_global_function</span><span class="special">(</span><span class="keyword">double</span> <span class="identifier">d</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">d</span><span class="special">;</span>
+    <span class="special">}</span>
+<span class="special">}</span>
+
+<span class="comment">// This will define the action type 'some_global_action' which represents</span>
+<span class="comment">// the function 'app::some_global_function'.</span>
+<code class="computeroutput">HPX_PLAIN_ACTION</code><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">some_global_function</span><span class="special">,</span> <span class="identifier">some_global_action</span><span class="special">);</span>
+</pre>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            The macro <code class="computeroutput">HPX_PLAIN_ACTION</code>
+            has to be placed in global namespace, even if the wrapped function is
+            located in some other namespace. The newly defined action type is placed
+            the in global namespace as well.
+          </p></td></tr>
+</table></div>
+<p>
+          If the action type should be defined somewhere not in global namespace,
+          the action type definition has to be split into two macro invocations (<code class="computeroutput">HPX_DEFINE_PLAIN_ACTION</code>
+          and <code class="computeroutput">HPX_REGISTER_PLAIN_ACTION</code>)
+          as shown in the next example:
+        </p>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">app</span>
+<span class="special">{</span>
+    <span class="keyword">void</span> <span class="identifier">some_global_function</span><span class="special">(</span><span class="keyword">double</span> <span class="identifier">d</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">d</span><span class="special">;</span>
+    <span class="special">}</span>
+
+    <span class="comment">// On conforming compilers the following macro expands to:</span>
+    <span class="comment">//</span>
+    <span class="comment">//    typedef hpx::actions::make_action&lt;</span>
+    <span class="comment">//        decltype(&amp;some_global_function), &amp;some_global_function</span>
+    <span class="comment">//    &gt;::type some_global_action;</span>
+    <span class="comment">//</span>
+    <span class="comment">// This will define the action type 'some_global_action' which represents</span>
+    <span class="comment">// the function 'some_global_function'.</span>
+    <code class="computeroutput">HPX_DEFINE_PLAIN_ACTION</code><span class="special">(</span><span class="identifier">some_global_function</span><span class="special">,</span> <span class="identifier">some_global_action</span><span class="special">);</span>
+<span class="special">}</span>
+
+<span class="comment">// The following macro expands to a series of definitions of global objects</span>
+<span class="comment">// which are needed for proper serialization and initialization support</span>
+<span class="comment">// enabling the remote invocation of the function `some_global_function`.</span>
+<code class="computeroutput">HPX_REGISTER_PLAIN_ACTION</code><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">some_global_action</span><span class="special">);</span>
+</pre>
+<p>
+          The shown code defines an action type <code class="computeroutput"><span class="identifier">some_global_action</span></code>
+          inside the namespace <code class="computeroutput"><span class="identifier">app</span></code>.
+        </p>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            If the action type definition is split between two macros as shown above,
+            the name of the action type to create has to be the same for both macro
+            invocations (here <code class="computeroutput"><span class="identifier">some_global_action</span></code>).
+          </p></td></tr>
+</table></div>
+<p>
+          For member functions of objects which have been registered with AGAS (e.g.
+          'components') a different registration macro <code class="computeroutput">HPX_DEFINE_COMPONENT_ACTION</code>
+          has to be utilized. Any component needs to be declared in a header file
+          and have some special support macros defined in a source file. Here is
+          an example demonstrating this. The first snippet has to go into the header
+          file:
+        </p>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">app</span>
+<span class="special">{</span>
+    <span class="keyword">struct</span> <span class="identifier">some_component</span>
+      <span class="special">:</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">components</span><span class="special">::</span><span class="identifier">simple_component_base</span><span class="special">&lt;</span><span class="identifier">some_component</span><span class="special">&gt;</span>
+    <span class="special">{</span>
+        <span class="keyword">int</span> <span class="identifier">some_member_function</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">s</span><span class="special">)</span>
+        <span class="special">{</span>
+            <span class="keyword">return</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">lexical_cast</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;(</span><span class="identifier">s</span><span class="special">);</span>
+        <span class="special">}</span>
+
+        <span class="comment">// This will define the action type 'some_member_action' which</span>
+        <span class="comment">// represents the member function 'some_member_function' of the</span>
+        <span class="comment">// obect type 'some_component'.</span>
+        <code class="computeroutput">HPX_DEFINE_COMPONENT_ACTION</code><span class="special">(</span><span class="identifier">some_component</span><span class="special">,</span> <span class="identifier">some_member_function</span><span class="special">,</span>
+            <span class="identifier">some_member_action</span><span class="special">);</span>
+    <span class="special">};</span>
+<span class="special">}</span>
+
+<span class="comment">// Note: The second arguments to the macro below have to be systemwide-unique</span>
+<span class="comment">//       C++ identifiers</span>
+<code class="computeroutput">HPX_REGISTER_ACTION_DECLARATION</code><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">some_component</span><span class="special">::</span><span class="identifier">some_member_action</span> <span class="special">,</span> <span class="identifier">some_component_some_action</span> <span class="special">);</span>
+</pre>
+<p>
+          The next snippet belongs to the source file (e.g. the main application
+          in the most simple case:
+        </p>
+<pre class="programlisting"><span class="keyword">typedef</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">components</span><span class="special">::</span><span class="identifier">simple_component</span><span class="special">&lt;</span> <span class="identifier">app</span><span class="special">::</span><span class="identifier">some_component</span> <span class="special">&gt;</span> <span class="identifier">component_type</span><span class="special">;</span>
+<span class="keyword">typedef</span> <span class="identifier">app</span><span class="special">::</span><span class="identifier">some_component</span> <span class="identifier">some_component</span><span class="special">;</span>
+
+<span class="identifier">HPX_REGISTER_MINIMAL_COMPONENT_FACTORY</span><span class="special">(</span> <span class="identifier">component_type</span><span class="special">,</span> <span class="identifier">some_component</span> <span class="special">);</span>
+
+<span class="comment">// The parameters for this macro have to be the same as used in the corresponding</span>
+<span class="comment">// HPX_REGISTER_ACTION_DECLARATION() macro invocation above</span>
+<span class="keyword">typedef</span> <span class="identifier">some_component</span><span class="special">::</span><span class="identifier">some_member_action</span> <span class="identifier">some_component_some_action</span><span class="special">;</span>
+<span class="identifier">HPX_REGISTER_ACTION</span><span class="special">(</span> <span class="identifier">some_component_some_action</span> <span class="special">);</span>
+</pre>
+<p>
+          Granted, these macro invocations are a bit more complex than for simple
+          global functions, however we believe they are still manageable.
+        </p>
+<p>
+          The most important macro invocation is the <code class="computeroutput">HPX_DEFINE_COMPONENT_ACTION</code>
+          in the header file as this defines the action type we need to invoke the
+          member function. For a complete example of a simple component action see
+          <a href="file:////home/heller/programming/hpx/examples/quickstart/component_in_executable.cpp" target="_top">component_in_executable.cpp</a>
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../applying_actions.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../applying_actions.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="action_invocation.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

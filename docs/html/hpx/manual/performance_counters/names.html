@@ -1,0 +1,305 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Performance Counter Names</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../performance_counters.html" title="Performance Counters">
+<link rel="prev" href="../performance_counters.html" title="Performance Counters">
+<link rel="next" href="consuming.html" title="Consuming Performance Counter Data">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../performance_counters.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../performance_counters.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="consuming.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.performance_counters.names"></a><a class="link" href="names.html" title="Performance Counter Names">Performance
+        Counter Names</a>
+</h4></div></div></div>
+<p>
+          All Performance Counter instances have a name uniquely identifying this
+          instance. This name can be used to access the counter, retrieve all related
+          meta data, and to query the counter data (as described in the section
+          <a class="link" href="consuming.html" title="Consuming Performance Counter Data">Consuming Performance
+          Counters</a>). Counter names are strings with a predefined structure.
+          The general form of a countername is:
+        </p>
+<pre class="programlisting">/objectname{full_instancename}/countername@parameters
+</pre>
+<p>
+          where <code class="computeroutput"><span class="identifier">full_instancename</span></code>
+          could be either another (full) counter name or a string formatted as:
+        </p>
+<pre class="programlisting">parentinstancename#parentindex/instancename#instanceindex
+</pre>
+<p>
+          Each separate part of a countername (e.g. <code class="computeroutput"><span class="identifier">objectname</span></code>,
+          <code class="computeroutput"><span class="identifier">countername</span></code>, <code class="computeroutput"><span class="identifier">parentinstancename</span></code>, <code class="computeroutput"><span class="identifier">instancename</span></code>,
+          and <code class="computeroutput"><span class="identifier">parameters</span></code>) should
+          start with a letter (<code class="computeroutput"><span class="char">'a'</span></code>...<code class="computeroutput"><span class="char">'z'</span></code>, <code class="computeroutput"><span class="char">'A'</span></code>...<code class="computeroutput"><span class="char">'Z'</span></code>) or an underscore character (<code class="computeroutput"><span class="char">'_'</span></code>), optionally followed by letters, digits
+          (<code class="computeroutput"><span class="char">'0'</span></code>...<code class="computeroutput"><span class="char">'9'</span></code>),
+          hyphen (<code class="computeroutput"><span class="char">'-'</span></code>), or underscore characters.
+          Whitespace is not allowed inside a counter name. The characters <code class="computeroutput"><span class="char">'/'</span></code>, <code class="computeroutput"><span class="char">'{'</span></code>,
+          <code class="computeroutput"><span class="char">'}'</span></code>, <code class="computeroutput"><span class="char">'#'</span></code>,
+          and <code class="computeroutput"><span class="char">'@'</span></code> have a special meaning
+          and are used to delimit the different parts of the counter name.
+        </p>
+<p>
+          The parts <code class="computeroutput"><span class="identifier">parentinstanceindex</span></code>
+          and <code class="computeroutput"><span class="identifier">instanceindex</span></code> are integers.
+          If an index is not specified <span class="emphasis"><em>HPX</em></span> will assume a default
+          of <code class="computeroutput"><span class="special">-</span><span class="number">1</span></code>.
+        </p>
+<h6>
+<a name="hpx.manual.performance_counters.names.h0"></a>
+          <span class="phrase"><a name="hpx.manual.performance_counters.names.example"></a></span><a class="link" href="names.html#hpx.manual.performance_counters.names.example">Two
+          Simple Examples</a>
+        </h6>
+<p>
+          An instance for a well formed (and meaningful) simple counter name would
+          be:
+        </p>
+<pre class="programlisting"><span class="special">/</span><span class="identifier">threads</span><span class="special">{</span><span class="bold"><strong>locality#0/total</strong></span><span class="special">}/</span><span class="identifier">count</span><span class="special">/</span><span class="identifier">cumulative</span>
+</pre>
+<p>
+          This counter returns the current cumulative number of executed (retired)
+          <span class="emphasis"><em>HPX</em></span>-threads for the locality <code class="computeroutput"><span class="number">0</span></code>.
+          The counter type of this counter is <code class="computeroutput"><span class="special">/</span><span class="identifier">threads</span><span class="special">/</span><span class="identifier">count</span><span class="special">/</span><span class="identifier">cumulative</span></code> and the full instance name
+          is <code class="computeroutput">locality#0/total</code> (<span class="bold"><strong>highlighted</strong></span>
+          for readability). This counter type does not require an <code class="computeroutput"><span class="identifier">instanceindex</span></code>
+          or <code class="computeroutput"><span class="identifier">parameters</span></code> to be specified.
+        </p>
+<p>
+          In this case, the <code class="computeroutput"><span class="identifier">parentindex</span></code>
+          (the <code class="computeroutput"><span class="char">'0'</span></code>) designates the locality
+          for which the counter instance is created. The counter will return the
+          number of <span class="emphasis"><em>HPX</em></span>-threads retired on that particular locality.
+        </p>
+<p>
+          Another example for a well formed (aggregate) counter name is:
+        </p>
+<pre class="programlisting">/statistics{<span class="bold"><strong>/threads{locality#0/total}/count/cumulative</strong></span>}/average@500
+</pre>
+<p>
+          This counter takes the simple counter from the first example, samples its
+          values every <code class="computeroutput"><span class="number">500</span></code> milliseconds,
+          and returns the average of the value samples whenever it is queried. The
+          counter type of this counter is <code class="computeroutput"><span class="special">/</span><span class="identifier">statistics</span><span class="special">/</span><span class="identifier">average</span></code> and the instance name is the
+          full name of the counter for which the values have to be averaged. In this
+          case, the <code class="computeroutput"><span class="identifier">parameters</span></code> (the
+          <code class="computeroutput"><span class="char">'500'</span></code>) specify the sampling interval
+          for the averaging to take place (in milliseconds).
+        </p>
+<h6>
+<a name="hpx.manual.performance_counters.names.h1"></a>
+          <span class="phrase"><a name="hpx.manual.performance_counters.names.types"></a></span><a class="link" href="names.html#hpx.manual.performance_counters.names.types">Performance
+          Counter Types</a>
+        </h6>
+<p>
+          Every Performance Counter belongs to a specific Performance Counter type
+          which classifies the counters into groups of common semantics. The type
+          of a counter is identified by the <code class="computeroutput"><span class="identifier">objectname</span></code>
+          and the <code class="computeroutput"><span class="identifier">countername</span></code> parts
+          of the name.
+        </p>
+<pre class="programlisting"><span class="special">/</span><span class="identifier">objectname</span><span class="special">/</span><span class="identifier">countername</span>
+</pre>
+<p>
+          At application start, <span class="emphasis"><em>HPX</em></span> will register all available
+          counter types on each of the localities. These counter types are held in
+          a special Performance Counter registration database which can be later
+          used to retrieve the meta data related to a counter type and to create
+          counter instances based on a given counter instance name.
+        </p>
+<h6>
+<a name="hpx.manual.performance_counters.names.h2"></a>
+          <span class="phrase"><a name="hpx.manual.performance_counters.names.instances"></a></span><a class="link" href="names.html#hpx.manual.performance_counters.names.instances">Performance
+          Counter Instances</a>
+        </h6>
+<p>
+          The <code class="computeroutput"><span class="identifier">full_instancename</span></code> distinguishes
+          different counter instances of the same counter type. The formatting of
+          the <code class="computeroutput"><span class="identifier">full_instancename</span></code> depends
+          on the counter type. There are two types of counters: simple counters which
+          usually generate the counter values based on direct measurements, and aggregate
+          counters which take another counter and transform its values before generating
+          their own counter values. An example for a simple counter is given <a class="link" href="names.html#hpx.manual.performance_counters.names.example">above</a>: counting
+          retired <span class="emphasis"><em>HPX</em></span>-threads. An aggreagate counter is shown
+          as an example <a class="link" href="names.html#hpx.manual.performance_counters.names.example">above</a>
+          as well: calculating the average of the underlying counter values sampled
+          at constant time intervals.
+        </p>
+<p>
+          While simple counters use instance names formatted as <code class="computeroutput"><span class="identifier">parentinstancename</span><span class="preprocessor">#parentindex</span><span class="special">/</span><span class="identifier">instancename</span><span class="preprocessor">#instanceindex</span></code>,
+          most aggregate counters have the full counter name of the embedded counter
+          as its instance name.
+        </p>
+<p>
+          Not all simple counter types require specifying all 4 elements of a full
+          counter instance name, some of the parts (<code class="computeroutput"><span class="identifier">parentinstancename</span></code>,
+          <code class="computeroutput"><span class="identifier">parentindex</span></code>, <code class="computeroutput"><span class="identifier">instancename</span></code>, and <code class="computeroutput"><span class="identifier">instanceindex</span></code>)
+          are optional for specific counters. Please refer to the documentation of
+          a particular counter for more information about the formatting requirements
+          for the name of this counter (see <a class="link" href="counters.html" title="Existing HPX Performance Counters">Existing
+          Performance Counters</a>).
+        </p>
+<p>
+          The <code class="computeroutput"><span class="identifier">parameters</span></code> are used
+          to pass additional information to a counter at creation time. They are
+          optional and they fully depend on the concrete counter. Even if a specific
+          counter type allows additional parameters to be given, those usually are
+          not required as sensible defaults will be chosen. Please refer to the documentation
+          of a particular counter for more information about what parameters are
+          supported, how to specify them, and what default values are assumed (see
+          also <a class="link" href="counters.html" title="Existing HPX Performance Counters">Existing
+          Performance Counters</a>).
+        </p>
+<p>
+          Every locality of an application exposes its own set of Performance Counter
+          types and Performance Counter instances. The set of exposed counters is
+          determinded dynamically at application start based on the execution environment
+          of the application. For instance, this set is influenced by the current
+          hardware environment for the locality (such as whether the locality has
+          access to accelerators), and the software environment of the application
+          (such as the number of OS-threads used to execute <span class="emphasis"><em>HPX</em></span>-threads).
+        </p>
+<h6>
+<a name="hpx.manual.performance_counters.names.h3"></a>
+          <span class="phrase"><a name="hpx.manual.performance_counters.names.wildcards"></a></span><a class="link" href="names.html#hpx.manual.performance_counters.names.wildcards">Using
+          Wildcards in Performance Counter Names</a>
+        </h6>
+<p>
+          It is possible to use wildcard characters when specifying performance counter
+          names. Performance counter names can contain 2 types of wildcard characters:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Wildcard characters in the performance counter type
+            </li>
+<li class="listitem">
+              Wildcard characters in the performance counter instance name
+            </li>
+</ul></div>
+<p>
+          Wildcard character have a meaning which is very close to usual file name
+          wildcard matching rules implemented by common shells (like bash).
+        </p>
+<div class="table">
+<a name="hpx.manual.performance_counters.names.wildcard_characters_in_the_perfo"></a><p class="title"><b>Table&#160;16.&#160;Wildcard characters in the performance counter type</b></p>
+<div class="table-contents"><table class="table" summary="Wildcard characters in the performance counter type">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Wildcard
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="special">*</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    This wildchard character matches any number (zero or more) of
+                    arbitrary characters.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="special">?</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    This wildchard character matches any single arbitrary character.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="special">[...]</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    This wildchard character matches any single character from the
+                    list of specified within the square brackets.
+                  </p>
+                </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><div class="table">
+<a name="hpx.manual.performance_counters.names.wildcard_characters_in_the_perf0"></a><p class="title"><b>Table&#160;17.&#160;Wildcard characters in the performance counter instance name</b></p>
+<div class="table-contents"><table class="table" summary="Wildcard characters in the performance counter instance name">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                  <p>
+                    Wildcard
+                  </p>
+                </th>
+<th>
+                  <p>
+                    Description
+                  </p>
+                </th>
+</tr></thead>
+<tbody><tr>
+<td>
+                  <p>
+                    <code class="computeroutput"><span class="special">*</span></code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    This wildchard character matches any locality or any thread,
+                    depending on whether it is used for <code class="computeroutput"><span class="identifier">locality</span><span class="error">#</span><span class="special">*</span></code>
+                    or <code class="computeroutput"><span class="identifier">worker</span><span class="special">-</span><span class="identifier">thread</span><span class="error">#</span><span class="special">*</span></code>. No other wildcards are allowed
+                    in counter instance names.
+                  </p>
+                </td>
+</tr></tbody>
+</table></div>
+</div>
+<br class="table-break">
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../performance_counters.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../performance_counters.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="consuming.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

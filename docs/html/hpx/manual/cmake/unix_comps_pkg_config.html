@@ -1,0 +1,252 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>How to Build HPX Components with pkg-config</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../cmake.html" title="Building HPX with CMake">
+<link rel="prev" href="unix_apps_pkg_config.html" title="How to Build HPX Applications with pkg-config">
+<link rel="next" href="existing_apps.html" title="How to Use HPX with CMake">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="unix_apps_pkg_config.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="existing_apps.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.cmake.unix_comps_pkg_config"></a><a class="link" href="unix_comps_pkg_config.html" title="How to Build HPX Components with pkg-config">How to Build
+        <span class="emphasis"><em>HPX</em></span> Components with pkg-config</a>
+</h4></div></div></div>
+<p>
+          Let's try a more complex example involving an <span class="emphasis"><em>HPX</em></span>
+          component. An <span class="emphasis"><em>HPX</em></span> component is a class which exposes
+          <span class="emphasis"><em>HPX</em></span> actions. <span class="emphasis"><em>HPX</em></span> components are
+          compiled into dynamically loaded modules called component libraries. Here's
+          the source code:
+        </p>
+<p>
+          <span class="bold"><strong>hello_world_component.cpp</strong></span>
+        </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="string">"hello_world_component.hpp"</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">/</span><span class="identifier">include</span><span class="special">/</span><span class="identifier">iostreams</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">namespace</span> <span class="identifier">examples</span> <span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">server</span>
+<span class="special">{</span>
+
+<span class="keyword">void</span> <span class="identifier">hello_world</span><span class="special">::</span><span class="identifier">invoke</span><span class="special">()</span>
+<span class="special">{</span>
+    <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"Hello HPX World!\n"</span> <span class="special">&lt;&lt;</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">flush</span><span class="special">;</span>
+<span class="special">}</span>
+
+<span class="special">}}</span>
+
+<span class="identifier">HPX_REGISTER_COMPONENT_MODULE</span><span class="special">();</span>
+
+<span class="keyword">typedef</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">components</span><span class="special">::</span><span class="identifier">managed_component</span><span class="special">&lt;</span>
+    <span class="identifier">examples</span><span class="special">::</span><span class="identifier">server</span><span class="special">::</span><span class="identifier">hello_world</span>
+<span class="special">&gt;</span> <span class="identifier">hello_world_type</span><span class="special">;</span>
+
+<span class="identifier">HPX_REGISTER_MINIMAL_COMPONENT_FACTORY</span><span class="special">(</span><span class="identifier">hello_world_type</span><span class="special">,</span> <span class="identifier">hello_world</span><span class="special">);</span>
+
+<span class="identifier">HPX_REGISTER_ACTION</span><span class="special">(</span>
+    <span class="identifier">examples</span><span class="special">::</span><span class="identifier">server</span><span class="special">::</span><span class="identifier">hello_world</span><span class="special">::</span><span class="identifier">invoke_action</span><span class="special">,</span> <span class="identifier">hello_world_invoke_action</span><span class="special">);</span>
+</pre>
+<p>
+          <span class="bold"><strong>hello_world_component.hpp</strong></span>
+        </p>
+<pre class="programlisting"><span class="preprocessor">#if</span> <span class="special">!</span><span class="identifier">defined</span><span class="special">(</span><span class="identifier">HELLO_WORLD_COMPONENT_HPP</span><span class="special">)</span>
+<span class="preprocessor">#define</span> <span class="identifier">HELLO_WORLD_COMPONENT_HPP</span>
+
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">/</span><span class="identifier">hpx_fwd</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">/</span><span class="identifier">include</span><span class="special">/</span><span class="identifier">actions</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">/</span><span class="identifier">include</span><span class="special">/</span><span class="identifier">lcos</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">/</span><span class="identifier">include</span><span class="special">/</span><span class="identifier">components</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">/</span><span class="identifier">include</span><span class="special">/</span><span class="identifier">serialization</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">namespace</span> <span class="identifier">examples</span> <span class="special">{</span> <span class="keyword">namespace</span> <span class="identifier">server</span>
+<span class="special">{</span>
+
+<span class="keyword">struct</span> <span class="identifier">HPX_COMPONENT_EXPORT</span> <span class="identifier">hello_world</span>
+  <span class="special">:</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">components</span><span class="special">::</span><span class="identifier">managed_component_base</span><span class="special">&lt;</span><span class="identifier">hello_world</span><span class="special">&gt;</span>
+<span class="special">{</span>
+    <span class="keyword">void</span> <span class="identifier">invoke</span><span class="special">();</span>
+    <span class="identifier">HPX_DEFINE_COMPONENT_ACTION</span><span class="special">(</span><span class="identifier">hello_world</span><span class="special">,</span> <span class="identifier">invoke</span><span class="special">);</span>
+<span class="special">};</span>
+
+<span class="special">}</span>
+
+<span class="keyword">namespace</span> <span class="identifier">stubs</span>
+<span class="special">{</span>
+
+<span class="keyword">struct</span> <span class="identifier">hello_world</span> <span class="special">:</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">components</span><span class="special">::</span><span class="identifier">stub_base</span><span class="special">&lt;</span><span class="identifier">server</span><span class="special">::</span><span class="identifier">hello_world</span><span class="special">&gt;</span>
+<span class="special">{</span>
+    <span class="keyword">static</span> <span class="keyword">void</span> <span class="identifier">invoke</span><span class="special">(</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">naming</span><span class="special">::</span><span class="identifier">id_type</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">gid</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span><span class="special">&lt;</span><span class="identifier">server</span><span class="special">::</span><span class="identifier">hello_world</span><span class="special">::</span><span class="identifier">invoke_action</span><span class="special">&gt;(</span><span class="identifier">gid</span><span class="special">).</span><span class="identifier">get</span><span class="special">();</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+
+<span class="special">}</span>
+
+<span class="keyword">struct</span> <span class="identifier">hello_world</span>
+  <span class="special">:</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">components</span><span class="special">::</span><span class="identifier">client_base</span><span class="special">&lt;</span><span class="identifier">hello_world</span><span class="special">,</span> <span class="identifier">stubs</span><span class="special">::</span><span class="identifier">hello_world</span><span class="special">&gt;</span>
+<span class="special">{</span>
+    <span class="keyword">typedef</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">components</span><span class="special">::</span><span class="identifier">client_base</span><span class="special">&lt;</span><span class="identifier">hello_world</span><span class="special">,</span> <span class="identifier">stubs</span><span class="special">::</span><span class="identifier">hello_world</span><span class="special">&gt;</span>
+        <span class="identifier">base_type</span><span class="special">;</span>
+
+    <span class="keyword">void</span> <span class="identifier">invoke</span><span class="special">()</span>
+    <span class="special">{</span>
+        <span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">base_type</span><span class="special">::</span><span class="identifier">invoke</span><span class="special">(</span><span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">get_gid</span><span class="special">());</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+
+<span class="special">}</span>
+
+<span class="identifier">HPX_REGISTER_ACTION_DECLARATION</span><span class="special">(</span>
+    <span class="identifier">examples</span><span class="special">::</span><span class="identifier">server</span><span class="special">::</span><span class="identifier">hello_world</span><span class="special">::</span><span class="identifier">invoke_action</span><span class="special">,</span> <span class="identifier">hello_world_invoke_action</span><span class="special">);</span>
+
+<span class="preprocessor">#endif</span> <span class="comment">// HELLO_WORLD_COMPONENT_HPP</span>
+</pre>
+<p>
+          <span class="bold"><strong>hello_world_client.cpp</strong></span>
+        </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="string">"hello_world_component.hpp"</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">/</span><span class="identifier">hpx_init</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">int</span> <span class="identifier">hpx_main</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">program_options</span><span class="special">::</span><span class="identifier">variables_map</span><span class="special">&amp;)</span>
+<span class="special">{</span>
+    <span class="special">{</span>
+        <span class="identifier">examples</span><span class="special">::</span><span class="identifier">hello_world</span> <span class="identifier">client</span><span class="special">;</span>
+
+        <span class="comment">// Create a single instance of the component on this locality.</span>
+        <span class="identifier">client</span><span class="special">.</span><span class="identifier">create</span><span class="special">(</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">());</span>
+
+        <span class="comment">// Invoke the components action, which will print "Hello World!".</span>
+        <span class="identifier">client</span><span class="special">.</span><span class="identifier">invoke</span><span class="special">();</span>
+    <span class="special">}</span>
+
+    <span class="keyword">return</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">finalize</span><span class="special">();</span> <span class="comment">// Initiate shutdown of the runtime system.</span>
+<span class="special">}</span>
+
+<span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
+<span class="special">{</span>
+    <span class="comment">// Configure application-specific options.</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">program_options</span><span class="special">::</span><span class="identifier">options_description</span> <span class="identifier">desc_commandline</span><span class="special">(</span>
+        <span class="string">"usage: "</span> <span class="identifier">HPX_APPLICATION_STRING</span> <span class="string">" [options]"</span><span class="special">);</span>
+
+    <span class="keyword">return</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">init</span><span class="special">(</span><span class="identifier">desc_commandline</span><span class="special">,</span> <span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span> <span class="comment">// Initialize and run HPX.</span>
+<span class="special">}</span>
+</pre>
+<p>
+          Copy the three source files above into three files (called hello_world_component.cpp,
+          hello_world_component.hpp and hello_world_client.cpp respectively).
+        </p>
+<p>
+          Now, in the directory where you put the files, run the following command
+          to build the component library. (where <code class="literal">$HPX_LOCATION</code>
+          is the <code class="literal">CMAKE_INSTALL_PREFIX</code> you used while building
+          <span class="emphasis"><em>HPX</em></span>):
+        </p>
+<pre class="programlisting">$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+$ c++ -o libhello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
+</pre>
+<p>
+          Now pick a directory in which to install your hpx component libraries.
+          For this example, we'll choose a directory named ''my_hpx_libs''.
+        </p>
+<pre class="programlisting">$ mkdir ~/my_hpx_libs
+$ mv libhello_world.so ~/my_hpx_libs
+</pre>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            If HPX was build in debug mode (<code class="computeroutput">cmake -DCMAKE_BUILD_TYPE=Debug</code>)
+            the pkg-config names have to be different. Instead of <code class="computeroutput">hpx_application</code>
+            or <code class="computeroutput">hpx_component</code> you will have to use <code class="computeroutput">hpx_application_debug</code>
+            or <code class="computeroutput">hpx_component_debug</code>. Moreover, all referenced HPX components
+            need to have a appended 'd' suffix, e.g. instead of <code class="computeroutput">-liostreams</code>
+            you will need to specify <code class="computeroutput">-liostreamsd</code>.
+          </p></td></tr>
+</table></div>
+<p>
+          In the ~/my_hpx_libs directory you need to create an ini file inside that
+          directory which matches the name of the component (as supplied by -DHPX_COMPONENT_NAME
+          above).
+        </p>
+<p>
+          <span class="bold"><strong>hello_world.ini</strong></span>
+        </p>
+<pre class="programlisting">[hpx.components.hello_world]
+name = hello_world
+path = ${HOME}/my_hpx_libs
+</pre>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            For additional details about ini file configuration and <span class="emphasis"><em>HPX</em></span>,
+            see <a class="link" href="../init/configuration/loading_ini_files.html" title="Loading INI Files">Loading
+            INI Files</a>
+          </p></td></tr>
+</table></div>
+<p>
+          In addition, you'll need this in your home directory:
+        </p>
+<p>
+          <span class="bold"><strong>.hpx.ini</strong></span>
+        </p>
+<pre class="programlisting">[hpx]
+ini_path = $[hpx.ini_path]:${HOME}/my_hpx_libs
+</pre>
+<p>
+          Now, to build the application that uses this component (hello_world_client.cpp),
+          we do:
+        </p>
+<pre class="programlisting">$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+$ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -liostreams -L${HOME}/my_hpx_libs -lhello_world
+</pre>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            When using pkg-config with <span class="emphasis"><em>HPX</em></span>, the pkg-config flags
+            must go after the <code class="literal">-o</code> flag.
+          </p></td></tr>
+</table></div>
+<p>
+          Finally, you'll need to set your LD_LIBRARY_PATH before you can run the
+          program. To run the program, type:
+        </p>
+<pre class="programlisting">$ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/my_hpx_libs"
+$ ./hello_world_client
+</pre>
+<p>
+          which should print <code class="literal">Hello HPX World!</code> and exit.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="unix_apps_pkg_config.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="existing_apps.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

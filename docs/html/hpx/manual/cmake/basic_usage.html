@@ -1,0 +1,73 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Basic CMake Usage</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../cmake.html" title="Building HPX with CMake">
+<link rel="prev" href="quick_start.html" title="Quick Start">
+<link rel="next" href="options.html" title="Options and Variables">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="quick_start.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="options.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.cmake.basic_usage"></a><a class="link" href="basic_usage.html" title="Basic CMake Usage">Basic CMake Usage</a>
+</h4></div></div></div>
+<p>
+          This section explains basic aspects of <a href="http://www.cmake.org" target="_top">CMake</a>,
+          mostly for explaining those options which you may need on your day-to-day
+          usage.
+        </p>
+<p>
+          CMake comes with extensive documentation in the form of html files and
+          on the cmake executable itself. Execute <code class="computeroutput">cmake --help</code> for further
+          help options.
+        </p>
+<p>
+          CMake requires to know for which build tool it shall generate files (GNU
+          make, Visual Studio, Xcode, etc). If not specified on the command line,
+          it tries to guess it based on you environment. Once identified the build
+          tool, CMake uses the corresponding Generator for creating files for your
+          build tool. You can explicitly specify the generator with the command line
+          option <code class="computeroutput">-G "Name of the generator"</code>. For knowing the
+          available generators on your platform, execute:
+        </p>
+<pre class="programlisting">$ cmake --help
+</pre>
+<p>
+          This will list the generator names at the end of the help text. Generator
+          names are case-sensitive. Example:
+        </p>
+<pre class="programlisting">$ cmake -G "Visual Studio 9 2008" path/to/hpx
+</pre>
+<p>
+          For a given development platform there can be more than one adequate generator.
+          If you use Visual Studio <code class="computeroutput">"NMake Makefiles"</code> is a
+          generator you can use for building with NMake. By default, CMake chooses
+          the more specific generator supported by your development environment.
+          If you want an alternative generator, you must tell this to CMake with
+          the <code class="computeroutput">-G</code> option.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="quick_start.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="options.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

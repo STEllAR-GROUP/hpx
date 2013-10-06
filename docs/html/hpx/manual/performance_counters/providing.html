@@ -1,0 +1,64 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Providing Performance Counter Data</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../performance_counters.html" title="Performance Counters">
+<link rel="prev" href="consuming/api.html" title="Consuming Performance Counter Data using the HPX API">
+<link rel="next" href="providing/simple_counters.html" title="Exposing Performance Counter Data using a Simple Function">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="consuming/api.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../performance_counters.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="providing/simple_counters.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.performance_counters.providing"></a><a class="link" href="providing.html" title="Providing Performance Counter Data">Providing
+        Performance Counter Data</a>
+</h4></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="providing/simple_counters.html">Exposing
+          Performance Counter Data using a Simple Function</a></span></dt>
+<dt><span class="section"><a href="providing/full_counters.html">Implementing
+          a Full Performance Counter</a></span></dt>
+</dl></div>
+<p>
+          <span class="emphasis"><em>HPX</em></span> offers several ways by which you may provide your
+          own data as a performance counter. This has the benefit of exposing additional,
+          possibly application specific information using the existing Performance
+          Counter framework, unifying the process of gathering data about your application.
+        </p>
+<p>
+          An application that wants to provide counter data can implement a Performance
+          Counter to provide the data. When a consumer queries performance data,
+          the <span class="emphasis"><em>HPX</em></span> runtime system calls the provider to collect
+          the data. The runtime system uses an internal registry to determine which
+          provider to call.
+        </p>
+<p>
+          Generally, there two ways of exposing yur own Performance Counter data:
+          a simple, function based way and a more complex, but more powerful way
+          of implementing a full Performance Counter. Both alternatives are described
+          in the following sections.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="consuming/api.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../performance_counters.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="providing/simple_counters.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

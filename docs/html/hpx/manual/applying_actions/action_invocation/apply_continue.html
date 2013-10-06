@@ -1,0 +1,149 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Applying an Action with a Continuation and with Synchronization</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../action_invocation.html" title="Action Invocation">
+<link rel="prev" href="async_continue.html" title="Applying an Action with a Continuation but without any Synchronization">
+<link rel="next" href="compare.html" title="Comparing Actions with C++ Functions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async_continue.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../action_invocation.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="compare.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.applying_actions.action_invocation.apply_continue"></a><a class="link" href="apply_continue.html" title="Applying an Action with a Continuation and with Synchronization">Applying
+          an Action with a Continuation and with Synchronization</a>
+</h5></div></div></div>
+<p>
+            This method is very similar to the method described in section <a class="link" href="async.html" title="Applying an Action Asynchronously with Synchronization">Applying
+            an Action Asynchronously with Synchronization</a>. In addition to
+            what <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span></code> can do, the functions <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async_continue</span></code> takes an additional
+            function argument. This function will be called as the continuation of
+            the executed action. It is expected to perform additional operations
+            and to make sure that a result is returned to the original invocation
+            site. This method chains operations asynchronously by providing a continuation
+            operation which is automatically executed once the first action has finished
+            executing.
+          </p>
+<p>
+            As an example we chain two actions, where the result of the first action
+            is forwarded to the second action and the result of the second action
+            is sent back to the original invocation site:
+          </p>
+<pre class="programlisting"><span class="comment">// first action</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">int32_t</span> <span class="identifier">action1</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">int32_t</span> <span class="identifier">i</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">i</span><span class="special">+</span><span class="number">1</span><span class="special">;</span>
+<span class="special">}</span>
+<span class="identifier">HPX_PLAIN_ACTION</span><span class="special">(</span><span class="identifier">action1</span><span class="special">);</span>    <span class="comment">// defines action1_type</span>
+
+<span class="comment">// second action</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">int32_t</span> <span class="identifier">action2</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">int32_t</span> <span class="identifier">i</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="keyword">return</span> <span class="identifier">i</span><span class="special">*</span><span class="number">2</span><span class="special">;</span>
+<span class="special">}</span>
+<span class="identifier">HPX_PLAIN_ACTION</span><span class="special">(</span><span class="identifier">action2</span><span class="special">);</span>    <span class="comment">// defines action2_type</span>
+
+<span class="comment">// this code invokes 'action1' above and passes along a continuation</span>
+<span class="comment">// function which will forward the result returned from 'action1' to</span>
+<span class="comment">// 'action2'.</span>
+<span class="identifier">action1_type</span> <span class="identifier">act1</span><span class="special">;</span>     <span class="comment">// define an instance of 'action1_type'</span>
+<span class="identifier">action2_type</span> <span class="identifier">act2</span><span class="special">;</span>     <span class="comment">// define an instance of 'action2_type'</span>
+<span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="identifier">f</span> <span class="special">=</span>
+    <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async_continue</span><span class="special">(</span><span class="identifier">act1</span><span class="special">,</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">(),</span> <span class="number">42</span><span class="special">,</span>
+        <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">make_continuation</span><span class="special">(</span><span class="identifier">act2</span><span class="special">));</span>
+<span class="identifier">hpx</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="string">"\n"</span><span class="special">;</span>   <span class="comment">// will print: 86 ((42 + 1) * 2)</span>
+</pre>
+<p>
+            By default, the continuation is executed on the same locality as <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async_continue</span></code> is invoked from. If
+            you want to specify the locality where the continuation should be executed,
+            the code above has to be written as:
+          </p>
+<pre class="programlisting"><span class="comment">// this code invokes 'action1' above and passes along a continuation</span>
+<span class="comment">// function which will forward the result returned from 'action1' to</span>
+<span class="comment">// 'action2'.</span>
+<span class="identifier">action1_type</span> <span class="identifier">act1</span><span class="special">;</span>     <span class="comment">// define an instance of 'action1_type'</span>
+<span class="identifier">action2_type</span> <span class="identifier">act2</span><span class="special">;</span>     <span class="comment">// define an instance of 'action2_type'</span>
+<span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="identifier">f</span> <span class="special">=</span>
+    <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async_continue</span><span class="special">(</span><span class="identifier">act1</span><span class="special">,</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">(),</span> <span class="number">42</span><span class="special">,</span>
+        <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">make_continuation</span><span class="special">(</span><span class="identifier">act2</span><span class="special">,</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">()));</span>
+<span class="identifier">hpx</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="string">"\n"</span><span class="special">;</span>   <span class="comment">// will print: 86 ((42 + 1) * 2)</span>
+</pre>
+<p>
+            Similarily, it is possible to chain more than 2 operations:
+          </p>
+<pre class="programlisting"><span class="identifier">action1_type</span> <span class="identifier">act1</span><span class="special">;</span>     <span class="comment">// define an instance of 'action1_type'</span>
+<span class="identifier">action2_type</span> <span class="identifier">act2</span><span class="special">;</span>     <span class="comment">// define an instance of 'action2_type'</span>
+<span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;</span> <span class="identifier">f</span> <span class="special">=</span>
+    <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async_continue</span><span class="special">(</span><span class="identifier">act1</span><span class="special">,</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">(),</span> <span class="number">42</span><span class="special">,</span>
+        <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">make_continuation</span><span class="special">(</span><span class="identifier">act2</span><span class="special">,</span>
+            <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">make_continuation</span><span class="special">(</span><span class="identifier">act1</span><span class="special">)));</span>
+<span class="identifier">hpx</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">&lt;&lt;</span> <span class="string">"\n"</span><span class="special">;</span>   <span class="comment">// will print: 87 ((42 + 1) * 2 + 1)</span>
+</pre>
+<p>
+            The function <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">make_continuation</span></code> creates a special
+            function object which exposes the following prototype:
+          </p>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">continuation</span>
+<span class="special">{</span>
+    <span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Result</span><span class="special">&gt;</span>
+    <span class="keyword">void</span> <span class="keyword">operator</span><span class="special">()(</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">id_type</span> <span class="identifier">id</span><span class="special">,</span> <span class="identifier">Result</span><span class="special">&amp;&amp;</span> <span class="identifier">result</span><span class="special">)</span> <span class="keyword">const</span>
+    <span class="special">{</span>
+        <span class="special">...</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+</pre>
+<p>
+            where the parameters passed to the overloaded function operator (<code class="computeroutput"><span class="keyword">operator</span><span class="special">()()</span></code>)
+            are:
+          </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+                the <code class="computeroutput"><span class="identifier">id</span></code> is the global
+                id where the final result of the asynchronous chain of operations
+                should be sent to (in most cases this is the id of the <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span></code> returned from the initial
+                call to <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async_continue</span></code>). Any custom continuation
+                function should make sure this <code class="computeroutput"><span class="identifier">id</span></code>
+                is forwarded to the last operation in the chain.
+              </li>
+<li class="listitem">
+                the <code class="computeroutput"><span class="identifier">result</span></code> is the
+                result value of the current operation in the asynchronous execution
+                chain. This value needs to be forwarded to the next operation.
+              </li>
+</ul></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+              All of those operations are implemented by the predefined continuation
+              function object which is returned from <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">make_continuation</span></code>.
+              Any (custom) function object used as a continuation should conform
+              to the same interface.
+            </p></td></tr>
+</table></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="async_continue.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../action_invocation.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="compare.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

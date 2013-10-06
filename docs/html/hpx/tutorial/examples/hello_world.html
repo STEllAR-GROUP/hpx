@@ -1,0 +1,281 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Hello World</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../examples.html" title="Examples">
+<link rel="prev" href="fibonacci.html" title="Fibonacci">
+<link rel="next" href="accumulator.html" title="Accumulator">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="fibonacci.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../examples.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="accumulator.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.tutorial.examples.hello_world"></a><a class="link" href="hello_world.html" title="Hello World">Hello World</a>
+</h4></div></div></div>
+<p>
+          This program will print out a hello world message on every OS-thread on
+          every locality. The output will look something like this:
+        </p>
+<pre class="programlisting">hello world from OS-thread 1 on locality 0
+hello world from OS-thread 1 on locality 1
+hello world from OS-thread 0 on locality 0
+hello world from OS-thread 0 on locality 1
+</pre>
+<h6>
+<a name="hpx.tutorial.examples.hello_world.h0"></a>
+          <span class="phrase"><a name="hpx.tutorial.examples.hello_world.setup"></a></span><a class="link" href="hello_world.html#hpx.tutorial.examples.hello_world.setup">Setup</a>
+        </h6>
+<p>
+          The source code for this example can be found here: <a href="file:////home/heller/programming/hpx/examples/quickstart/hello_world.cpp" target="_top">hello_world.cpp</a>.
+        </p>
+<p>
+          To compile this program, go to your <span class="emphasis"><em>HPX</em></span> build directory
+          (see <a class="link" href="../getting_started.html" title="Getting Started">Getting Started</a>
+          for information on configuring and building <span class="emphasis"><em>HPX</em></span>) and
+          enter:
+        </p>
+<pre class="programlisting">$ make examples.quickstart.hello_world
+</pre>
+<p>
+          To run the program type:
+        </p>
+<pre class="programlisting">$ ./bin/hello_world
+</pre>
+<p>
+          This should print:
+        </p>
+<pre class="programlisting">hello world from OS-thread 0 on locality 0
+</pre>
+<p>
+          To use more OS-threads use the command line option <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options"><code class="literal">--hpx:threads</code></a>
+          and type the number of threads that you wish to use. For example, typing:
+        </p>
+<pre class="programlisting">$ ./bin/hello_world <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options">--hpx:threads</a> 2
+</pre>
+<p>
+          will yield:
+        </p>
+<pre class="programlisting">hello world from OS-thread 1 on locality 0
+hello world from OS-thread 0 on locality 0
+</pre>
+<p>
+          Notice how the ordering of the two print statements will change with subsequent
+          runs. To run this program on multiple localities please see the section
+          <a class="link" href="../getting_started/unix_pbs.html" title="How to Use HPX Applications with PBS">Using PBS</a>.
+        </p>
+<h6>
+<a name="hpx.tutorial.examples.hello_world.h1"></a>
+          <span class="phrase"><a name="hpx.tutorial.examples.hello_world.walkthrough"></a></span><a class="link" href="hello_world.html#hpx.tutorial.examples.hello_world.walkthrough">Walkthrough</a>
+        </h6>
+<p>
+          Now that you have compiled and run the code, lets look at how the code
+          works, beginning with <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>:
+        </p>
+<p>
+          Here is the main entry point. By using the include 'hpx/hpx_main.hpp' HPX
+          will invoke the plain old C-main() as its first HPX thread.
+        </p>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">main</span><span class="special">()</span>
+<span class="special">{</span>
+    <span class="comment">// Get a list of all available localities.</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">naming</span><span class="special">::</span><span class="identifier">id_type</span><span class="special">&gt;</span> <span class="identifier">localities</span> <span class="special">=</span>
+        <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_all_localities</span><span class="special">();</span>
+
+    <span class="comment">// Reserve storage space for futures, one for each locality.</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">lcos</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">void</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">futures</span><span class="special">;</span>
+    <span class="identifier">futures</span><span class="special">.</span><span class="identifier">reserve</span><span class="special">(</span><span class="identifier">localities</span><span class="special">.</span><span class="identifier">size</span><span class="special">());</span>
+
+    <span class="identifier">BOOST_FOREACH</span><span class="special">(</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">naming</span><span class="special">::</span><span class="identifier">id_type</span> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">node</span><span class="special">,</span> <span class="identifier">localities</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="comment">// Asynchronously start a new task. The task is encapsulated in a</span>
+        <span class="comment">// future, which we can query to determine if the task has</span>
+        <span class="comment">// completed.</span>
+        <span class="keyword">typedef</span> <span class="identifier">hello_world_foreman_action</span> <span class="identifier">action_type</span><span class="special">;</span>
+        <span class="identifier">futures</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span><span class="special">&lt;</span><span class="identifier">action_type</span><span class="special">&gt;(</span><span class="identifier">node</span><span class="special">));</span>
+    <span class="special">}</span>
+
+    <span class="comment">// The non-callback version of hpx::lcos::wait takes a single parameter,</span>
+    <span class="comment">// a future of vectors to wait on. hpx::lcos::wait only returns when</span>
+    <span class="comment">// all of the futures have finished.</span>
+    <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">lcos</span><span class="special">::</span><span class="identifier">wait</span><span class="special">(</span><span class="identifier">futures</span><span class="special">);</span>
+    <span class="keyword">return</span> <span class="number">0</span><span class="special">;</span>
+<span class="special">}</span>
+</pre>
+<p>
+          In this excerpt of the code we again see the use of futures. This time
+          the futures are stored in a vector so that they can easily be accessed.
+          <code class="computeroutput">hpx::lcos::wait</code><code class="computeroutput"><span class="special">()</span></code> is a family of functions that wait on
+          for an <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;&gt;</span></code>
+          of futures to become ready. In this piece of code, we are using the synchronous
+          version of <code class="computeroutput">hpx::lcos::wait</code><code class="computeroutput"><span class="special">()</span></code>, which takes one argument (the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;&gt;</span></code>
+          of futures to wait on). This function will not return until all the futures
+          in the vector have been executed.
+        </p>
+<p>
+          In the <a class="link" href="fibonacci.html" title="Fibonacci">Fibonacci Example</a>,
+          we used <code class="computeroutput">hpx::find_here</code><code class="computeroutput"><span class="special">()</span></code> to specified the target' of our actions.
+          Here, we instead use <code class="computeroutput">hpx::find_all_localities</code><code class="computeroutput"><span class="special">()</span></code>, which returns an <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;&gt;</span></code> containing the identifiers of all
+          the machines in the system, including the one that we are on.
+        </p>
+<p>
+          As in the <a class="link" href="fibonacci.html" title="Fibonacci">Fibonacci Example</a>
+          our futures are set using <code class="computeroutput">hpx::lcos::async</code><code class="computeroutput"><span class="special">&lt;&gt;()</span></code>. The <code class="computeroutput"><span class="identifier">hello_world_foreman_action</span></code>
+          is declared here:
+        </p>
+<pre class="programlisting"><span class="comment">// Define the boilerplate code necessary for the function 'hello_world_foreman'</span>
+<span class="comment">// to be invoked as an HPX action.</span>
+<span class="identifier">HPX_PLAIN_ACTION</span><span class="special">(</span><span class="identifier">hello_world_foreman</span><span class="special">,</span> <span class="identifier">hello_world_foreman_action</span><span class="special">);</span>
+<span class="identifier">HPX_ACTION_USES_SNAPPY_COMPRESSION</span><span class="special">(</span><span class="identifier">hello_world_foreman_action</span><span class="special">);</span>
+</pre>
+<p>
+          Another way of thinking about this wrapping technique is as follows: functions
+          (the work to be done) are wrapped in actions, and actions can be executed
+          locally or remotely (e.g. on another machine participating in the computation).
+        </p>
+<p>
+          Now it is time to look at the <code class="computeroutput"><span class="identifier">hello_world_foreman</span><span class="special">()</span></code> function which was wrapped in the action
+          above:
+        </p>
+<pre class="programlisting"><span class="keyword">void</span> <span class="identifier">hello_world_foreman</span><span class="special">()</span>
+<span class="special">{</span>
+    <span class="comment">// Get the number of worker OS-threads in use by this locality.</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="keyword">const</span> <span class="identifier">os_threads</span> <span class="special">=</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">get_os_thread_count</span><span class="special">();</span>
+
+    <span class="comment">// Find the global name of the current locality.</span>
+    <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">naming</span><span class="special">::</span><span class="identifier">id_type</span> <span class="keyword">const</span> <span class="identifier">here</span> <span class="special">=</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">();</span>
+
+    <span class="comment">// Populate a set with the OS-thread numbers of all OS-threads on this</span>
+    <span class="comment">// locality. When the hello world message has been printed on a particular</span>
+    <span class="comment">// OS-thread, we will remove it from the set.</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">set</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span><span class="special">&gt;</span> <span class="identifier">attendance</span><span class="special">;</span>
+    <span class="keyword">for</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">os_thread</span> <span class="special">=</span> <span class="number">0</span><span class="special">;</span> <span class="identifier">os_thread</span> <span class="special">&lt;</span> <span class="identifier">os_threads</span><span class="special">;</span> <span class="special">++</span><span class="identifier">os_thread</span><span class="special">)</span>
+        <span class="identifier">attendance</span><span class="special">.</span><span class="identifier">insert</span><span class="special">(</span><span class="identifier">os_thread</span><span class="special">);</span>
+
+    <span class="comment">// As long as there are still elements in the set, we must keep scheduling</span>
+    <span class="comment">// HPX-threads. Because HPX features work-stealing task schedulers, we have</span>
+    <span class="comment">// no way of enforcing which worker OS-thread will actually execute</span>
+    <span class="comment">// each HPX-thread.</span>
+    <span class="keyword">while</span> <span class="special">(!</span><span class="identifier">attendance</span><span class="special">.</span><span class="identifier">empty</span><span class="special">())</span>
+    <span class="special">{</span>
+        <span class="comment">// Each iteration, we create a task for each element in the set of</span>
+        <span class="comment">// OS-threads that have not said "Hello world". Each of these tasks</span>
+        <span class="comment">// is encapsulated in a future.</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">lcos</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">futures</span><span class="special">;</span>
+        <span class="identifier">futures</span><span class="special">.</span><span class="identifier">reserve</span><span class="special">(</span><span class="identifier">attendance</span><span class="special">.</span><span class="identifier">size</span><span class="special">());</span>
+
+        <span class="identifier">BOOST_FOREACH</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">worker</span><span class="special">,</span> <span class="identifier">attendance</span><span class="special">)</span>
+        <span class="special">{</span>
+            <span class="comment">// Asynchronously start a new task. The task is encapsulated in a</span>
+            <span class="comment">// future, which we can query to determine if the task has</span>
+            <span class="comment">// completed.</span>
+            <span class="keyword">typedef</span> <span class="identifier">hello_world_worker_action</span> <span class="identifier">action_type</span><span class="special">;</span>
+            <span class="identifier">futures</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span><span class="special">&lt;</span><span class="identifier">action_type</span><span class="special">&gt;(</span><span class="identifier">here</span><span class="special">,</span> <span class="identifier">worker</span><span class="special">));</span>
+        <span class="special">}</span>
+
+        <span class="comment">// Wait for all of the futures to finish. The callback version of the</span>
+        <span class="comment">// hpx::lcos::wait function takes two arguments: a vector of futures,</span>
+        <span class="comment">// and a binary callback.  The callback takes two arguments; the first</span>
+        <span class="comment">// is the index of the future in the vector, and the second is the</span>
+        <span class="comment">// return value of the future. hpx::lcos::wait doesn't return until</span>
+        <span class="comment">// all the futures in the vector have returned.</span>
+        <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">lcos</span><span class="special">::</span><span class="identifier">local</span><span class="special">::</span><span class="identifier">spinlock</span> <span class="identifier">mtx</span><span class="special">;</span>
+        <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">wait</span><span class="special">(</span><span class="identifier">futures</span><span class="special">,</span>
+            <span class="special">[&amp;](</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">t</span><span class="special">)</span> <span class="special">{</span>
+                <span class="keyword">if</span> <span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span><span class="special">(-</span><span class="number">1</span><span class="special">)</span> <span class="special">!=</span> <span class="identifier">t</span><span class="special">)</span>
+                <span class="special">{</span>
+                    <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">lcos</span><span class="special">::</span><span class="identifier">local</span><span class="special">::</span><span class="identifier">spinlock</span><span class="special">::</span><span class="identifier">scoped_lock</span> <span class="identifier">lk</span><span class="special">(</span><span class="identifier">mtx</span><span class="special">);</span>
+                    <span class="identifier">attendance</span><span class="special">.</span><span class="identifier">erase</span><span class="special">(</span><span class="identifier">t</span><span class="special">);</span>
+                <span class="special">}</span>
+            <span class="special">});</span>
+    <span class="special">}</span>
+<span class="special">}</span>
+</pre>
+<p>
+          Now, before we discuss <code class="computeroutput"><span class="identifier">hello_world_foreman</span><span class="special">()</span></code>, let's talk about the <code class="computeroutput">hpx::lcos::wait</code><code class="computeroutput"><span class="special">()</span></code> function. <code class="computeroutput">hpx::lcos::wait</code><code class="computeroutput"><span class="special">()</span></code> provides a way to make sure that all
+          of the futures have finished being calculated without having to call <code class="computeroutput">hpx::lcos::future::get</code><code class="computeroutput"><span class="special">()</span></code> for each one. The version of <code class="computeroutput">hpx::lcos::wait</code><code class="computeroutput"><span class="special">()</span></code>
+          used here performs an non-blocking wait, which acts on an <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;&gt;</span></code>.
+          It queries the state of the futures, waiting for them to finish. Whenever
+          a future becomes marked as ready, <code class="computeroutput">hpx::lcos::wait</code><code class="computeroutput"><span class="special">()</span></code> invokes a callback function provided
+          by the user, supplying the callback function with the index of the future
+          in the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;&gt;</span></code>
+          and the result of the future.
+        </p>
+<p>
+          In <code class="computeroutput"><span class="identifier">hello_world_foreman</span><span class="special">()</span></code>, an <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">set</span><span class="special">&lt;&gt;</span></code> called <code class="computeroutput"><span class="identifier">attendance</span></code>
+          keeps track of which OS-threads have printed out the hello world message.
+          When the OS-thread prints out the statement, the future is marked as ready,
+          and <code class="computeroutput">hpx::lcos::wait</code><code class="computeroutput"><span class="special">()</span></code> invokes the callback function, in this
+          case a C+11 lambda. This lambda erases the OS-threads id from the set
+          <code class="computeroutput"><span class="identifier">attendance</span></code>, thus letting
+          <code class="computeroutput"><span class="identifier">hello_world_foreman</span><span class="special">()</span></code>
+          know which OS-threads still need to print out hello world. However, if
+          the future returns a value of -1, the future executed on an OS-thread which
+          has already printed out hello world. In this case, we have to try again
+          by rescheduling the future in the next round. We do this by leaving the
+          OS-thread id in <code class="computeroutput"><span class="identifier">attendance</span></code>.
+        </p>
+<p>
+          Finally, let us look at <code class="computeroutput"><span class="identifier">hello_world_worker</span><span class="special">()</span></code>. Here, <code class="computeroutput"><span class="identifier">hello_world_worker</span><span class="special">()</span></code> checks to see if it is on the target
+          OS-thread. If it is executing on the correct OS-thread, it prints out the
+          hello world message and returns the OS-thread id to <code class="computeroutput">hpx::lcos::wait</code><code class="computeroutput"><span class="special">()</span></code> in <code class="computeroutput"><span class="identifier">hello_world_foreman</span><span class="special">()</span></code>. If it is not executing on the correct
+          OS-thread, it returns a value of -1, which causes <code class="computeroutput"><span class="identifier">hello_world_foreman</span><span class="special">()</span></code> to leave the OS-thread id in <code class="computeroutput"><span class="identifier">attendance</span></code>.
+        </p>
+<pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">hello_world_worker</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">desired</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="comment">// Returns the OS-thread number of the worker that is running this</span>
+    <span class="comment">// HPX-thread.</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">current</span> <span class="special">=</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">get_worker_thread_num</span><span class="special">();</span>
+    <span class="keyword">if</span> <span class="special">(</span><span class="identifier">current</span> <span class="special">==</span> <span class="identifier">desired</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="comment">// The HPX-thread has been run on the desired OS-thread.</span>
+<span class="preprocessor">#ifdef</span> <span class="identifier">HPX_NATIVE_MIC</span>
+        <span class="keyword">char</span> <span class="keyword">const</span><span class="special">*</span> <span class="identifier">msg</span> <span class="special">=</span> <span class="string">"hello world from OS-thread %1% on locality %2% on the Xeon Phi"</span><span class="special">;</span>
+<span class="preprocessor">#else</span>
+        <span class="keyword">char</span> <span class="keyword">const</span><span class="special">*</span> <span class="identifier">msg</span> <span class="special">=</span> <span class="string">"hello world from OS-thread %1% on locality %2%"</span><span class="special">;</span>
+<span class="preprocessor">#endif</span>
+
+        <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">format</span><span class="special">(</span><span class="identifier">msg</span><span class="special">)</span> <span class="special">%</span> <span class="identifier">desired</span> <span class="special">%</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">get_locality_id</span><span class="special">())</span>
+                  <span class="special">&lt;&lt;</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>
+
+        <span class="keyword">return</span> <span class="identifier">desired</span><span class="special">;</span>
+    <span class="special">}</span>
+
+    <span class="comment">// This HPX-thread has been run by the wrong OS-thread, make the foreman</span>
+    <span class="comment">// try again by rescheduling it.</span>
+    <span class="keyword">return</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span><span class="special">(-</span><span class="number">1</span><span class="special">);</span>
+<span class="special">}</span>
+
+<span class="comment">// Define the boilerplate code necessary for the function 'hello_world_worker'</span>
+<span class="comment">// to be invoked as an HPX action (by a HPX future). This macro defines the</span>
+<span class="comment">// type 'hello_world_worker_action'.</span>
+<span class="identifier">HPX_PLAIN_ACTION</span><span class="special">(</span><span class="identifier">hello_world_worker</span><span class="special">,</span> <span class="identifier">hello_world_worker_action</span><span class="special">);</span>
+</pre>
+<p>
+          Because <span class="emphasis"><em>HPX</em></span> features work stealing task schedulers,
+          there is no way to guarantee that an action will be scheduled on a particular
+          OS-thread. This is why we must use a guess-and-check approach.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="fibonacci.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../examples.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="accumulator.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

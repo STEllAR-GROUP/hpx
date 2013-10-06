@@ -1,0 +1,158 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Manual</title>
+<link rel="stylesheet" href="../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="HPX 1.0.0">
+<link rel="up" href="../index.html" title="HPX 1.0.0">
+<link rel="prev" href="tutorial/examples/interest_calculator.html" title="Interest Calculator">
+<link rel="next" href="manual/cmake.html" title="Building HPX with CMake">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="tutorial/examples/interest_calculator.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="manual/cmake.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="hpx.manual"></a><a class="link" href="manual.html" title="Manual">Manual</a>
+</h2></div></div></div>
+<div class="toc"><dl class="toc">
+<dt><span class="section"><a href="manual/cmake.html">Building <span class="emphasis"><em>HPX</em></span> with
+      CMake</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="manual/cmake/introduction.html">Introduction</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/quick_start.html">Quick Start</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/basic_usage.html">Basic CMake Usage</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/options.html">Options and Variables</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/variables.html">Frequently used CMake Variables</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/hpx_variables.html">HPX specific CMake
+        Variables</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="manual/cmake/hpx_variables/cmake_frequently_used.html">Frequently
+          used HPX specific CMake Variables</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/hpx_variables/cmake_hpx_malloc.html">Setting
+          the memory Allocator</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/hpx_variables/cmake_threading.html">Variables
+          concerning Thread Scheduling Policies</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/hpx_variables/cmake_parcelports.html">Variables
+          concerning Parcelports</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/hpx_variables/cmake_additional_tools.html">Additional
+          Tools and Libraries used by HPX</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="manual/cmake/doc_tools.html">Setting up the HPX Documentation
+        Tool Chain</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/unix_apps_pkg_config.html">How to Build
+        <span class="emphasis"><em>HPX</em></span> Applications with pkg-config</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/unix_comps_pkg_config.html">How to Build
+        <span class="emphasis"><em>HPX</em></span> Components with pkg-config</a></span></dt>
+<dt><span class="section"><a href="manual/cmake/existing_apps.html">How to Use <span class="emphasis"><em>HPX</em></span>
+        with CMake</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="manual/testing.html">Testing <span class="emphasis"><em>HPX</em></span></a></span></dt>
+<dt><span class="section"><a href="manual/running_tests.html">Running tests manually</a></span></dt>
+<dt><span class="section"><a href="manual/issues.html">Issue Tracker</a></span></dt>
+<dt><span class="section"><a href="manual/buildbot.html">Buildbot</a></span></dt>
+<dt><span class="section"><a href="manual/init.html">Launching <span class="emphasis"><em>HPX</em></span></a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="manual/init/configuration.html">Configure <span class="emphasis"><em>HPX</em></span>
+        Applications</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="manual/init/configuration/ini_format.html">The <span class="emphasis"><em>HPX</em></span>
+          INI File Format</a></span></dt>
+<dt><span class="section"><a href="manual/init/configuration/config_defaults.html">Built-in
+          Default Configuration Settings</a></span></dt>
+<dt><span class="section"><a href="manual/init/configuration/loading_ini_files.html">Loading
+          INI Files</a></span></dt>
+<dt><span class="section"><a href="manual/init/configuration/loading_components.html">Loading
+          Components</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="manual/init/logging.html">Logging</a></span></dt>
+<dt><span class="section"><a href="manual/init/commandline.html"><span class="emphasis"><em>HPX</em></span>
+        Command Line Options</a></span></dt>
+<dd><dl><dt><span class="section"><a href="manual/init/commandline/details.html">More Details
+          about <span class="emphasis"><em>HPX</em></span> Command Line Options</a></span></dt></dl></dd>
+</dl></dd>
+<dt><span class="section"><a href="manual/applications.html">Writing <span class="emphasis"><em>HPX</em></span>
+      applications</a></span></dt>
+<dt><span class="section"><a href="manual/names.html">Global Names</a></span></dt>
+<dt><span class="section"><a href="manual/applying_actions.html">Applying Actions</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="manual/applying_actions/action_type_definition.html">Action
+        Type Definition</a></span></dt>
+<dt><span class="section"><a href="manual/applying_actions/action_invocation.html">Action
+        Invocation</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="manual/applying_actions/action_invocation/apply.html">Applying
+          an Action Asynchronously without any Synchronization</a></span></dt>
+<dt><span class="section"><a href="manual/applying_actions/action_invocation/async.html">Applying
+          an Action Asynchronously with Synchronization</a></span></dt>
+<dt><span class="section"><a href="manual/applying_actions/action_invocation/sync.html">Applying
+          an Action Synchronously</a></span></dt>
+<dt><span class="section"><a href="manual/applying_actions/action_invocation/async_continue.html">Applying
+          an Action with a Continuation but without any Synchronization</a></span></dt>
+<dt><span class="section"><a href="manual/applying_actions/action_invocation/apply_continue.html">Applying
+          an Action with a Continuation and with Synchronization</a></span></dt>
+<dt><span class="section"><a href="manual/applying_actions/action_invocation/compare.html">Comparing
+          Actions with C++ Functions</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="manual/applying_actions/action_error_handling.html">Action
+        Error Handling</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="manual/plain_actions.html">Writing Plain Actions</a></span></dt>
+<dt><span class="section"><a href="manual/components.html">Writing Components</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="manual/components/components_server.html">Component
+        Server Classes</a></span></dt>
+<dt><span class="section"><a href="manual/components/components_stubs.html">Component Stubs
+        Classes</a></span></dt>
+<dt><span class="section"><a href="manual/components/components_client.html">Component
+        Client Classes</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="manual/lcos.html">Using LCOs</a></span></dt>
+<dt><span class="section"><a href="manual/error_handling.html">Error Handling</a></span></dt>
+<dt><span class="section"><a href="manual/performance_counters.html">Performance Counters</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="manual/performance_counters/names.html">Performance
+        Counter Names</a></span></dt>
+<dt><span class="section"><a href="manual/performance_counters/consuming.html">Consuming
+        Performance Counter Data</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="manual/performance_counters/consuming/commandline.html">Consuming
+          Performance Counter Data from the Command Line</a></span></dt>
+<dt><span class="section"><a href="manual/performance_counters/consuming/api.html">Consuming
+          Performance Counter Data using the <span class="emphasis"><em>HPX</em></span> API</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="manual/performance_counters/providing.html">Providing
+        Performance Counter Data</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="manual/performance_counters/providing/simple_counters.html">Exposing
+          Performance Counter Data using a Simple Function</a></span></dt>
+<dt><span class="section"><a href="manual/performance_counters/providing/full_counters.html">Implementing
+          a Full Performance Counter</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="manual/performance_counters/counters.html">Existing
+        <span class="emphasis"><em>HPX</em></span> Performance Counters</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="manual/schedulers.html"><span class="emphasis"><em>HPX</em></span> Thread
+      Scheduling Policies</a></span></dt>
+</dl></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="tutorial/examples/interest_calculator.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="manual/cmake.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

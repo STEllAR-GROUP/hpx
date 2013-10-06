@@ -1,0 +1,293 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Consuming Performance Counter Data from the Command Line</title>
+<link rel="stylesheet" href="../../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../consuming.html" title="Consuming Performance Counter Data">
+<link rel="prev" href="../consuming.html" title="Consuming Performance Counter Data">
+<link rel="next" href="api.html" title="Consuming Performance Counter Data using the HPX API">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../consuming.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../consuming.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="api.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h5 class="title">
+<a name="hpx.manual.performance_counters.consuming.commandline"></a><a class="link" href="commandline.html" title="Consuming Performance Counter Data from the Command Line">Consuming
+          Performance Counter Data from the Command Line</a>
+</h5></div></div></div>
+<p>
+            <span class="emphasis"><em>HPX</em></span> provides a set of predefined command line options
+            for every application which uses <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">init</span></code>
+            for its initialization. While there are much more command line options
+            available (see <a class="link" href="../../init/commandline.html" title="HPX Command Line Options"><span class="emphasis"><em>HPX</em></span>
+            Command Line Options</a>), the set of options related to Performance
+            Counters allow one to list existing counters, query existing counters
+            once at application termination or repeatedly after a constant time interval.
+          </p>
+<p>
+            The following table summarizes the available command line options:
+          </p>
+<div class="table">
+<a name="hpx.manual.performance_counters.consuming.commandline.hpx_command_line_options_related"></a><p class="title"><b>Table&#160;18.&#160;<span class="emphasis"><em>HPX</em></span> Command Line Options Related to Performance
+            Counters</b></p>
+<div class="table-contents"><table class="table" summary="HPX Command Line Options Related to Performance
+            Counters">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                    <p>
+                      Command line option
+                    </p>
+                  </th>
+<th>
+                    <p>
+                      Description
+                    </p>
+                  </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">print</span><span class="special">-</span><span class="identifier">counter</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      print the specified performance counter either repeatedly or
+                      before shutting down the system (see option <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">print</span><span class="special">-</span><span class="identifier">counter</span><span class="special">-</span><span class="identifier">interval</span></code>)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">print</span><span class="special">-</span><span class="identifier">counter</span><span class="special">-</span><span class="identifier">interval</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      print the performance counter(s) specified with <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">print</span><span class="special">-</span><span class="identifier">counter</span></code>
+                      repeatedly after the time interval (specified in milliseconds)
+                      (default: <code class="computeroutput"><span class="number">0</span></code>, which
+                      means print once at shutdown)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">print</span><span class="special">-</span><span class="identifier">counter</span><span class="special">-</span><span class="identifier">destination</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      print the performance counter(s) specified with <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">print</span><span class="special">-</span><span class="identifier">counter</span></code>
+                      to the given file (default: console)
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">list</span><span class="special">-</span><span class="identifier">counters</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      list the names of all registered performance counters
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">list</span><span class="special">-</span><span class="identifier">counter</span><span class="special">-</span><span class="identifier">infos</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      list the description of all registered performance counters
+                    </p>
+                  </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+            While the options <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">list</span><span class="special">-</span><span class="identifier">counters</span></code>
+            and <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">list</span><span class="special">-</span><span class="identifier">counter</span><span class="special">-</span><span class="identifier">infos</span></code>
+            give a short listing of all available counters, the full documentation
+            for those can be found in the section <a class="link" href="../counters.html" title="Existing HPX Performance Counters">Existing
+            Performance Counters</a>.
+          </p>
+<h6>
+<a name="hpx.manual.performance_counters.consuming.commandline.h0"></a>
+            <span class="phrase"><a name="hpx.manual.performance_counters.consuming.commandline.a_simple_example"></a></span><a class="link" href="commandline.html#hpx.manual.performance_counters.consuming.commandline.a_simple_example">A
+            Simple Example</a>
+          </h6>
+<p>
+            All of the commandline options mentioned above can be for instance tested
+            using the <code class="computeroutput"><span class="identifier">hello_world</span></code>
+            example.
+          </p>
+<p>
+            Listing all available counters (<code class="computeroutput"><span class="identifier">hello_world</span>
+            <span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">list</span><span class="special">-</span><span class="identifier">counters</span></code>)
+            yields:
+          </p>
+<pre class="programlisting">List of available counter instances
+(replace '`*`' below with the appropriate sequence number)
+-------------------------------------------------------------------------
+/agas/count/allocate
+/agas/count/bind
+/agas/count/bind_gid
+/agas/count/bind_name
+...
+/threads{locality#*/allocator#*}/count/objects
+/threads{locality#*/total}/count/stack-recycles
+/threads{locality#*/total}/idle-rate
+/threads{locality#*/worker-thread#*}/idle-rate
+</pre>
+<p>
+            Providing more information about all available counters (<code class="computeroutput"><span class="identifier">hello_world</span> <span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">list</span><span class="special">-</span><span class="identifier">counter</span><span class="special">-</span><span class="identifier">infos</span></code>) yields:
+          </p>
+<pre class="programlisting">Information about available counter instances
+(replace * below with the appropriate sequence number)
+------------------------------------------------------------------------------
+fullname: /agas/count/allocate
+helptext: returns the number of invocations of the AGAS service 'allocate'
+type:     counter_raw
+version:  1.0.0
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+fullname: /agas/count/bind
+helptext: returns the number of invocations of the AGAS service 'bind'
+type:     counter_raw
+version:  1.0.0
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+fullname: /agas/count/bind_gid
+helptext: returns the number of invocations of the AGAS service 'bind_gid'
+type:     counter_raw
+version:  1.0.0
+------------------------------------------------------------------------------
+
+...
+</pre>
+<p>
+            This command will not only list the counter names but also a short description
+            of the data exposed by this counter.
+          </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+              The list of available counters may differ depending on the concrete
+              execution environment (hardware or software) of your application.
+            </p></td></tr>
+</table></div>
+<p>
+            Requesting the counter data for one or more performance counters can
+            be achieved by invoking <code class="computeroutput"><span class="identifier">hello_world</span></code>
+            with a list of counter names:
+          </p>
+<pre class="programlisting">hello_world \
+    --hpx:print-counter=/threads{locality#0/total}/count/cumulative \
+    --hpx:print-counter=/agas{root/total}/count/bind
+</pre>
+<p>
+            which yields for instance:
+          </p>
+<pre class="programlisting">hello world from OS-thread 0 on locality 0
+/threads{locality#0/total}/count/cumulative,1,0.019633[s],36
+/agas{root/total}/count/bind,1,0.020323[s],10
+</pre>
+<p>
+            The first line is the normal output generated by hell_world and has no
+            relation to the counter data listed. The last two lines contain the counter
+            data as gathered at application shutdown. These lines have 4 fields,
+            the counter name, the sequence number of the counter invocation, the
+            time stamp at which this information has been sampled, and the actual
+            counter value.
+          </p>
+<p>
+            Requesting to query the counter data once after a constant time interval
+            with this command line
+          </p>
+<pre class="programlisting">hello_world \
+    --hpx:print-counter=/threads{locality#0/total}/count/cumulative \
+    --hpx:print-counter=/agas{root/total}/count/bind \
+    --hpx:print-counter-interval=20
+</pre>
+<p>
+            yields for instance (leaving off the actual console output of the <code class="computeroutput"><span class="identifier">hello_world</span></code> example for brevity):
+          </p>
+<pre class="programlisting">threads{locality#0/total}/count/cumulative,1,0.002409[s],22
+agas{root/total}/count/bind,1,0.002542[s],9
+threads{locality#0/total}/count/cumulative,2,0.023002[s],41
+agas{root/total}/count/bind,2,0.023557[s],10
+threads{locality#0/total}/count/cumulative,3,0.037514[s],46
+agas{root/total}/count/bind,3,0.038679[s],10
+</pre>
+<p>
+            The command <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">print</span><span class="special">-</span><span class="identifier">counter</span><span class="special">-</span><span class="identifier">destination</span><span class="special">=&lt;</span><span class="identifier">file</span><span class="special">&gt;</span></code> will redirect all counter data gathered
+            to the specified file name, which avoids cluttering the console output
+            of your application.
+          </p>
+<p>
+            The command line option <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">print</span><span class="special">-</span><span class="identifier">counter</span></code> supports using a limited set
+            of wildcards for a (very limited) set of use cases. In particular, all
+            occurences of <code class="computeroutput">#*</code> as in <code class="computeroutput">locality#*</code> and in <code class="computeroutput">worker-thread#*</code>
+            will be automatically expanded to the proper set of performance counter
+            names representing the actual environment for the executed program. For
+            instance, if your program is utilizing 4 worker threads for the execution
+            of HPX threads (see command line option <a class="link" href="../../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">threads</span></code></a>)
+            the following command line
+          </p>
+<pre class="programlisting">hello_world \
+    --hpx:threads=4 \
+    --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative
+</pre>
+<p>
+            will print the value of the performance counters monitoring each of the
+            worker threads:
+          </p>
+<pre class="programlisting">hello world from OS-thread 1 on locality 0
+hello world from OS-thread 0 on locality 0
+hello world from OS-thread 3 on locality 0
+hello world from OS-thread 2 on locality 0
+/threads{locality#0/worker-thread#0}/count/cumulative,1,0.0025214[s],27
+/threads{locality#0/worker-thread#1}/count/cumulative,1,0.0025453[s],33
+/threads{locality#0/worker-thread#2}/count/cumulative,1,0.0025683[s],29
+/threads{locality#0/worker-thread#3}/count/cumulative,1,0.0025904[s],33
+</pre>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../consuming.html"><img src="../../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../consuming.html"><img src="../../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../images/home.png" alt="Home"></a><a accesskey="n" href="api.html"><img src="../../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

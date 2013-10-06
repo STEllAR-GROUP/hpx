@@ -1,0 +1,131 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Terminology</title>
+<link rel="stylesheet" href="../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="HPX 1.0.0">
+<link rel="up" href="../index.html" title="HPX 1.0.0">
+<link rel="prev" href="../index/s05.html" title="Index">
+<link rel="next" href="people.html" title="People">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index/s05.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="people.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="hpx.terminology"></a><a class="link" href="terminology.html" title="Terminology">Terminology</a>
+</h2></div></div></div>
+<p>
+      This section gives definitions for some of the terms used throughout the <span class="emphasis"><em>HPX</em></span>
+      documentation and source code.
+    </p>
+<h4>
+<a name="hpx.terminology.h0"></a>
+      <span class="phrase"><a name="hpx.terminology.locality"></a></span><a class="link" href="terminology.html#hpx.terminology.locality">Locality</a>
+    </h4>
+<p>
+      A locality in <span class="emphasis"><em>HPX</em></span> describes a synchronous domain of execution,
+      or the domain of bounded upper response time. This normally is just a single
+      node in a cluster or a NUMA domain in a SMP machine.
+    </p>
+<h4>
+<a name="hpx.terminology.h1"></a>
+      <span class="phrase"><a name="hpx.terminology.agas"></a></span><a class="link" href="terminology.html#hpx.terminology.agas">Active
+      Global Address Space (AGAS)</a>
+    </h4>
+<p>
+      <span class="emphasis"><em>HPX</em></span> incorporates a global address space. Any executing
+      thread can access any object within the domain of the parallel application
+      with the caveat that it must have appropriate access privileges. The model
+      does not assume that global addresses are cache coherent; all loads and stores
+      will deal directly with the site of the target object. All global addresses
+      within a Synchronous Domain are assumed to be cache coherent for those processor
+      cores that incorporate transparent caches. The Active Global Address Space
+      used by <span class="emphasis"><em>HPX</em></span> differs from research <a href="http://www.pgas.org/" target="_top">PGAS</a>
+      models. Partitioned Global Address Space is passive in their means of address
+      translation. Copy semantics, distributed compound operations, and affinity
+      relationships are some of the global functionality supported by AGAS.
+    </p>
+<h4>
+<a name="hpx.terminology.h2"></a>
+      <span class="phrase"><a name="hpx.terminology.process"></a></span><a class="link" href="terminology.html#hpx.terminology.process">Process</a>
+    </h4>
+<p>
+      The concept of the "process" in <span class="emphasis"><em>HPX</em></span> is extended
+      beyond that of either sequential execution or communicating sequential processes.
+      While the notion of process suggests action (as do "function" or
+      "subroutine") it has a further responsibility of context, that is,
+      the logical container of program state. It is this aspect of operation that
+      process is employed in <span class="emphasis"><em>HPX</em></span>. Furthermore, referring to
+      "parallel processes" in <span class="emphasis"><em>HPX</em></span> designates the presence
+      of parallelism within the context of a given process, as well as the coarse
+      grained parallelism achieved through concurrency of multiple processes of an
+      executing user job. <span class="emphasis"><em>HPX</em></span> processes provide a hierarchical
+      name space within the framework of the active global address space and support
+      multiple means of internal state access from external sources. It also incorporates
+      capabilities based access rights for protection and security.
+    </p>
+<h4>
+<a name="hpx.terminology.h3"></a>
+      <span class="phrase"><a name="hpx.terminology.parcel"></a></span><a class="link" href="terminology.html#hpx.terminology.parcel">Parcel</a>
+    </h4>
+<p>
+      The Parcel is a component in <span class="emphasis"><em>HPX</em></span> that communicates data,
+      invokes an action at a distance, and distributes flow-control through the migration
+      of continuations. Parcels bridge the gap of asynchrony between synchronous
+      domains while maintaining symmetry of semantics between local and global execution.
+      Parcels enable message-driven computation and may be seen as a form of "active
+      messages". Other important forms of message-driven computation predating
+      active messages include <a href="http://en.wikipedia.org/wiki/Dataflow_architecture" target="_top">dataflow
+      tokens</a>, the <a href="http://en.wikipedia.org/wiki/J%E2%80%93Machine" target="_top">J-machine's</a>
+      support for remote method instantiation, and at the coarse grained variations
+      of Unix remote procedure calls, among others. This enables work to be moved
+      to the data as well as performing the more common action of bringing data to
+      the work. A parcel can cause actions to occur remotely and asynchronously,
+      among which are the creation of threads at different system nodes or synchronous
+      domains.
+    </p>
+<h4>
+<a name="hpx.terminology.h4"></a>
+      <span class="phrase"><a name="hpx.terminology.lco"></a></span><a class="link" href="terminology.html#hpx.terminology.lco">Local
+      Control Object (LCO)</a>
+    </h4>
+<p>
+      A local control object (sometimes called a lightweight control object) is a
+      general term for the synchronization mechanisms used in <span class="emphasis"><em>HPX</em></span>.
+      Any object implementing a certain concept can be seen as an LCO. This concepts
+      encapsulates the ability to be triggered by one or more events which when taking
+      the object into a predefined state will cause a thread to be executed. This
+      could either create a new thread or resume an existing thread.
+    </p>
+<p>
+      The LCO is a family of synchronization functions potentially representing many
+      classes of synchronization constructs, each with many possible variations and
+      multiple instances. The LCO is sufficiently general that it can subsume the
+      functionality of conventional synchronization primitives such as spinlocks,
+      mutexes, semaphores, and global barriers. However due to the rich concept an
+      LCO can represent powerful synchronization and control functionality not widely
+      employed, such as dataflow and futures (among others), which open up enormous
+      opportunities for rich diversity of distributed control and operation.
+    </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index/s05.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="people.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

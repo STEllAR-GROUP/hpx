@@ -1,0 +1,167 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>How to Use HPX with CMake</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../cmake.html" title="Building HPX with CMake">
+<link rel="prev" href="unix_comps_pkg_config.html" title="How to Build HPX Components with pkg-config">
+<link rel="next" href="../testing.html" title="Testing HPX">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="unix_comps_pkg_config.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../testing.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.cmake.existing_apps"></a><a class="link" href="existing_apps.html" title="How to Use HPX with CMake">How to Use <span class="emphasis"><em>HPX</em></span>
+        with CMake</a>
+</h4></div></div></div>
+<p>
+          In Addition to the pkg-config support discussed on the previous pages,
+          <span class="emphasis"><em>HPX</em></span> comes with full CMake support. In order to integrate
+          <span class="emphasis"><em>HPX</em></span> into your existing, or new CMakeLists.txt you
+          can include <code class="computeroutput">FindHPX.cmake</code>. Following is the Hello World component
+          example using CMake instead of pkg-config.
+        </p>
+<p>
+          Let's revisit what we have. We have three files which compose our example
+          application:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <code class="computeroutput">hello_world_component.hpp</code>
+            </li>
+<li class="listitem">
+              <code class="computeroutput">hello_world_component.cpp</code>
+            </li>
+<li class="listitem">
+              <code class="computeroutput">hello_world_client.hpp</code>
+            </li>
+</ul></div>
+<p>
+          The basic structure to include <span class="emphasis"><em>HPX</em></span> into your CMakeLists.txt
+          is shown here:
+        </p>
+<pre class="programlisting"># Require a recent version of cmake
+cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
+
+# This project is C++ based.
+project(your_app CXX)
+
+# This adds the HPX cmake configuration directory to the search path.
+set(CMAKE_MODULE_PATH
+    ${HPX_ROOT}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules)
+
+# Instruct cmake to find the HPX settings
+find_package(HPX)
+
+include_directories(${HPX_INCLUDE_DIR})
+link_directories(${HPX_LIBRARY_DIR})
+</pre>
+<p>
+          This cmake script assumes that the location of the HPX installation is
+          set as the value of HPX_ROOT which is best done by passing it on the command
+          line while invoking cmake:
+        </p>
+<pre class="programlisting">cmake -DHPX_ROOT=&lt;HPX installations directory&gt; ...
+</pre>
+<p>
+          Alternatively, if you wish to require HPX for your project, replace the
+          <code class="computeroutput">find_package(HPX)</code> line with <code class="computeroutput">find_package(HPX REQUIRED)</code>.
+        </p>
+<p>
+          The last two lines in the snippet above sets the appropriate include and
+          link directories.
+        </p>
+<p>
+          In order to add the <span class="emphasis"><em>HPX</em></span> component we use the <code class="computeroutput">add_hpx_component</code>
+          macro and add it to the <code class="computeroutput">CMakeLists.txt</code> file:
+        </p>
+<pre class="programlisting"># build your application using HPX
+add_hpx_component(hello_world_component
+    ESSENTIAL
+    SOURCES hello_world_component.cpp
+    HEADERS hello_world_component.hpp
+    COMPONENT_DEPENDENCIES iostreams)
+</pre>
+<p>
+          The available options to <code class="computeroutput">add_hpx_component</code> are:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <code class="computeroutput">SOURCES</code>: The source files for that component
+            </li>
+<li class="listitem">
+              <code class="computeroutput">HEADERS</code>: The header files for that component
+            </li>
+<li class="listitem">
+              <code class="computeroutput">DEPENDENCIES</code>: Other libraries or targets this component
+              depends on
+            </li>
+<li class="listitem">
+              <code class="computeroutput">COMPONENT_DEPENDENCIES</code>: The components this component
+              depends on
+            </li>
+<li class="listitem">
+              <code class="computeroutput">COMPILE_FLAGS</code>: Additional compiler flags
+            </li>
+<li class="listitem">
+              <code class="computeroutput">LINK_FLAGS</code>: Additional linker flags
+            </li>
+<li class="listitem">
+              <code class="computeroutput">ESSENTIAL</code>: Build this component as part of the <code class="computeroutput">all</code>
+              target
+            </li>
+</ul></div>
+<p>
+          After adding the component, the way you add the executable is as follows:
+        </p>
+<pre class="programlisting"># build your application using HPX
+add_hpx_executable(hello_world
+    ESSENTIAL
+    SOURCES hello_world_client.cpp
+    COMPONENT_DEPENDENCIES hello_world_component)
+</pre>
+<p>
+          When you configure your application, all you need to do is set the HPX_ROOT
+          variable to point to the installation of <span class="emphasis"><em>HPX</em></span>!
+        </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            <code class="computeroutput">FindHPX.cmake</code> makes adjustments various cmake internal settings
+            such as compiler and linker flags. This is needed to ensure maximal compatibility
+            between your application and the <span class="emphasis"><em>HPX</em></span> version you
+            are using. The <code class="computeroutput">add_hpx_executable</code> and <code class="computeroutput">add_hpx_component</code>
+            additionally add the proper libraries to link against.
+          </p></td></tr>
+</table></div>
+<p>
+          If you do not use CMake, you can still build against <span class="emphasis"><em>HPX</em></span>
+          but you should refer to the section on <a class="link" href="unix_comps_pkg_config.html" title="How to Build HPX Components with pkg-config">How
+          to Build <span class="emphasis"><em>HPX</em></span> Components with pkg-config</a>.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="unix_comps_pkg_config.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../cmake.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../testing.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

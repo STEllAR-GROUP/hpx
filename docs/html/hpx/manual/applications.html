@@ -1,0 +1,302 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Writing HPX applications</title>
+<link rel="stylesheet" href="../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../manual.html" title="Manual">
+<link rel="prev" href="init/commandline/details.html" title="More Details about HPX Command Line Options">
+<link rel="next" href="names.html" title="Global Names">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="init/commandline/details.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../manual.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="names.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="hpx.manual.applications"></a><a class="link" href="applications.html" title="Writing HPX applications">Writing <span class="emphasis"><em>HPX</em></span>
+      applications</a>
+</h3></div></div></div>
+<p>
+        In order to write an application which uses services from the <span class="emphasis"><em>HPX</em></span>
+        runtime system you need to initialize the <span class="emphasis"><em>HPX</em></span> library
+        by inserting certain calls into the code of your application. Depending on
+        your use case, this can be done in 3 different ways:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            <a class="link" href="applications.html#hpx.manual.applications.minimal">Minimally invasive</a>:
+            Re-use the <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>
+            function as the main <span class="emphasis"><em>HPX</em></span> entry point.
+          </li>
+<li class="listitem">
+            <a class="link" href="applications.html#hpx.manual.applications.medium">Balanced use case</a>:
+            Supply your own main <span class="emphasis"><em>HPX</em></span> entry point while blocking
+            the main thread.
+          </li>
+<li class="listitem">
+            <a class="link" href="applications.html#hpx.manual.applications.flexible">Most flexibility</a>:
+            Supply your own main <span class="emphasis"><em>HPX</em></span> entry point while avoiding
+            to block the main thread.
+          </li>
+</ul></div>
+<h5>
+<a name="hpx.manual.applications.h0"></a>
+        <span class="phrase"><a name="hpx.manual.applications.minimal"></a></span><a class="link" href="applications.html#hpx.manual.applications.minimal">Re-use
+        the <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>
+        function as the main <span class="emphasis"><em>HPX</em></span> entry point</a>
+      </h5>
+<p>
+        This method is the least intrusive to your code. It however provides you
+        with the smallest flexibility in terms of initializing the <span class="emphasis"><em>HPX</em></span>
+        runtime system only. The following code snippet shows what a minimal <span class="emphasis"><em>HPX</em></span>
+        application using this technique looks like:
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput">hpx/hpx_main.hpp</code><span class="special">&gt;</span>
+
+<span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
+<span class="special">{</span>
+    <span class="keyword">return</span> <span class="number">0</span><span class="special">;</span>
+<span class="special">}</span>
+</pre>
+<p>
+        The only change to your code you have to make is to include the file <code class="computeroutput">hpx/hpx_main.hpp</code>.
+        In this case the function <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code> will be invoked as the first <span class="emphasis"><em>HPX</em></span>
+        thread of the application. The runtime system will be initialized behind
+        the scenes before the function <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code> is executed and will automatically stopped
+        after <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>
+        has returned. All <span class="emphasis"><em>HPX</em></span> API functions can be used from
+        within this function now.
+      </p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          The function <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>
+          does not need to expect receiving <code class="computeroutput"><span class="identifier">argc</span></code>/<code class="computeroutput"><span class="identifier">argv</span></code> as shown above, but could expose
+          the signature <code class="computeroutput"><span class="keyword">int</span> <span class="identifier">main</span><span class="special">()</span></code>. This is consistent with the usually
+          allowed prototypes for the function <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code> in C++ applications.
+        </p></td></tr>
+</table></div>
+<p>
+        All command line arguments specific to <span class="emphasis"><em>HPX</em></span> will still
+        be processed by the <span class="emphasis"><em>HPX</em></span> runtime system as usual. However,
+        those command line options will be removed from the list of values passed
+        to <code class="computeroutput"><span class="identifier">argc</span></code>/<code class="computeroutput"><span class="identifier">argv</span></code>
+        of the function <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>.
+        The list of values passed to <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code> will hold only the commandline options
+        which are not recognized by the <span class="emphasis"><em>HPX</em></span> runtime system (see
+        the section <a class="link" href="init/commandline.html" title="HPX Command Line Options"><span class="emphasis"><em>HPX</em></span>
+        Command Line Options</a> for more details on what options are recognized
+        by <span class="emphasis"><em>HPX</em></span>).
+      </p>
+<p>
+        The value returned from the function <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code> as shown above will be returned to the
+        operating system as usual.
+      </p>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+          To achieve this seamless integration, the header file <code class="computeroutput">hpx/hpx_main.hpp</code> defines a macro
+        </p>
+<pre class="programlisting"><span class="preprocessor">#define</span> <span class="identifier">main</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">user_main</span>
+</pre>
+<p>
+          which could result in unexpected behavior.
+        </p>
+</td></tr>
+</table></div>
+<h5>
+<a name="hpx.manual.applications.h1"></a>
+        <span class="phrase"><a name="hpx.manual.applications.medium"></a></span><a class="link" href="applications.html#hpx.manual.applications.medium">Supply
+        your own main <span class="emphasis"><em>HPX</em></span> entry point while blocking the main
+        thread</a>
+      </h5>
+<p>
+        With this method you need to provide an explicit main thread function named
+        <code class="computeroutput">hpx_main</code>
+        at global scope. This function will be invoked as the main entry point of
+        your <span class="emphasis"><em>HPX</em></span> application on the console locality only (this
+        function will be invoked as the first <span class="emphasis"><em>HPX</em></span> thread of
+        your application). All <span class="emphasis"><em>HPX</em></span> API functions can be used
+        from within this function.
+      </p>
+<p>
+        The thread executing the function <code class="computeroutput">hpx::init</code>
+        will block waiting for the runtime system to exit. The value returned from
+        <code class="computeroutput">hpx_main</code>
+        will be returned from <code class="computeroutput">hpx::init</code>
+        after the runtime system has stopped.
+      </p>
+<p>
+        The function <code class="computeroutput">hpx::finalize</code>
+        has to be called on one of the <span class="emphasis"><em>HPX</em></span> localities in order
+        to signal that all work has been scheduled and the runtime system should
+        be stopped after the scheduled work has been executed.
+      </p>
+<p>
+        This method of invoking <span class="emphasis"><em>HPX</em></span> has the advantage of you
+        being able to decide which version of <code class="computeroutput">hpx::init</code>
+        to call. This allows to pass additional configuration parameters while initializing
+        the <span class="emphasis"><em>HPX</em></span> runtime system.
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput">hpx/hpx_init.hpp</code><span class="special">&gt;</span>
+
+<span class="keyword">int</span> <code class="computeroutput">hpx_main</code><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
+<span class="special">{</span>
+    <span class="comment">// Any HPX application logic goes here...</span>
+    <span class="keyword">return</span> <code class="computeroutput">hpx::finalize</code><span class="special">();</span>
+<span class="special">}</span>
+
+<span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
+<span class="special">{</span>
+    <span class="comment">// Initialize HPX, run hpx_main as the first HPX thread, and</span>
+    <span class="comment">// wait for hpx::finalize being called.</span>
+    <span class="keyword">return</span> <code class="computeroutput">hpx::init</code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+          The function <code class="computeroutput">hpx_main</code>
+          does not need to expect receiving <code class="computeroutput"><span class="identifier">argc</span></code>/<code class="computeroutput"><span class="identifier">argv</span></code> as shown above, but could expose
+          one of the following signatures:
+        </p>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">hpx_main</span><span class="special">();</span>
+<span class="keyword">int</span> <span class="identifier">hpx_main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[]);</span>
+<span class="keyword">int</span> <span class="identifier">hpx_main</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">program_options</span><span class="special">::</span><span class="identifier">variables_map</span><span class="special">&amp;</span> <span class="identifier">vm</span><span class="special">);</span>
+</pre>
+<p>
+          This is consistent with (and extends) the usually allowed prototypes for
+          the function <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>
+          in C++ applications.
+        </p>
+</td></tr>
+</table></div>
+<p>
+        The header file to include for this method of using <span class="emphasis"><em>HPX</em></span>
+        is <code class="computeroutput">hpx/hpx_init.hpp</code>.
+      </p>
+<h5>
+<a name="hpx.manual.applications.h2"></a>
+        <span class="phrase"><a name="hpx.manual.applications.flexible"></a></span><a class="link" href="applications.html#hpx.manual.applications.flexible">Supply
+        your own main <span class="emphasis"><em>HPX</em></span> entry point while avoiding to block
+        the main thread</a>
+      </h5>
+<p>
+        With this method you need to provide an explicit main thread function named
+        <code class="computeroutput">hpx_main</code>
+        at global scope. This function will be invoked as the main entry point of
+        your <span class="emphasis"><em>HPX</em></span> application on the console locality only (this
+        function will be invoked as the first <span class="emphasis"><em>HPX</em></span> thread of
+        your application). All <span class="emphasis"><em>HPX</em></span> API functions can be used
+        from within this function.
+      </p>
+<p>
+        The thread executing the function <code class="computeroutput">hpx::start</code>
+        will <span class="bold"><strong>not</strong></span> block waiting for the runtime system
+        to exit, but will return immediatlely.
+      </p>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          You cannot use any of the <span class="emphasis"><em>HPX</em></span> API functions other
+          that <code class="computeroutput">hpx::stop</code>
+          from inside your <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>
+          function.
+        </p></td></tr>
+</table></div>
+<p>
+        The function <code class="computeroutput">hpx::finalize</code>
+        has to be called on one of the <span class="emphasis"><em>HPX</em></span> localities in order
+        to signal that all work has been scheduled and the runtime system should
+        be stopped after the scheduled work has been executed.
+      </p>
+<p>
+        This method of invoking <span class="emphasis"><em>HPX</em></span> is useful for applications
+        where the main thread is used for special operations, such a GUIs. The function
+        <code class="computeroutput">hpx::stop</code>
+        can be used to wait for the <span class="emphasis"><em>HPX</em></span> runtime system to exit
+        and should be at least used as the last function called in <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>.
+        The value returned from <code class="computeroutput">hpx_main</code>
+        will be returned from <code class="computeroutput">hpx::stop</code>
+        after the runtime system has stopped.
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><code class="computeroutput">hpx/hpx_start.hpp</code><span class="special">&gt;</span>
+
+<span class="keyword">int</span> <code class="computeroutput">hpx_main</code><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
+<span class="special">{</span>
+    <span class="comment">// Any HPX application logic goes here...</span>
+    <span class="keyword">return</span> <code class="computeroutput">hpx::finalize</code><span class="special">();</span>
+<span class="special">}</span>
+
+<span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
+<span class="special">{</span>
+    <span class="comment">// Initialize HPX, run hpx_main.</span>
+    <code class="computeroutput">hpx::start</code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
+
+    <span class="comment">// ...Execute other code here...</span>
+
+    <span class="comment">// Wait for hpx::finalize being called.</span>
+    <span class="keyword">return</span> <code class="computeroutput">hpx::stop</code><span class="special">();</span>
+<span class="special">}</span>
+</pre>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+          The function <code class="computeroutput">hpx_main</code>
+          does not need to expect receiving <code class="computeroutput"><span class="identifier">argc</span></code>/<code class="computeroutput"><span class="identifier">argv</span></code> as shown above, but could expose
+          one of the following signatures:
+        </p>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">hpx_main</span><span class="special">();</span>
+<span class="keyword">int</span> <span class="identifier">hpx_main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[]);</span>
+<span class="keyword">int</span> <span class="identifier">hpx_main</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">program_options</span><span class="special">::</span><span class="identifier">variables_map</span><span class="special">&amp;</span> <span class="identifier">vm</span><span class="special">);</span>
+</pre>
+<p>
+          This is consistent with (and extends) the usually allowed prototypes for
+          the function <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>
+          in C++ applications.
+        </p>
+</td></tr>
+</table></div>
+<p>
+        The header file to include for this method of using <span class="emphasis"><em>HPX</em></span>
+        is <code class="computeroutput">hpx/hpx_start.hpp</code>.
+      </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="init/commandline/details.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../manual.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="names.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

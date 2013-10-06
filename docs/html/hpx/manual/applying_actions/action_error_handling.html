@@ -1,0 +1,137 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Action Error Handling</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../applying_actions.html" title="Applying Actions">
+<link rel="prev" href="action_invocation/compare.html" title="Comparing Actions with C++ Functions">
+<link rel="next" href="../plain_actions.html" title="Writing Plain Actions">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="action_invocation/compare.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../applying_actions.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../plain_actions.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.manual.applying_actions.action_error_handling"></a><a class="link" href="action_error_handling.html" title="Action Error Handling">Action
+        Error Handling</a>
+</h4></div></div></div>
+<p>
+          Like in any other asynchronous invocation scheme it is important to be
+          able to handle error conditions occurring while the asynchronous (and possibly
+          remote) operation is executed. In <span class="emphasis"><em>HPX</em></span> all error handling
+          is based on standard C++ exception handling. Any exception thrown during
+          the execution of an asynchronous operation will be transferred back to
+          the original invocation locality, where it is rethrown during synchronization
+          with the calling thread.
+        </p>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            Exceptions thrown during asynchronous execution can be transferred back
+            to the invoking thread only for the synchronous and the asynchronous
+            case with synchronization. Like with any other unhandled exception, any
+            exception thrown during the execution of an asynchronous action <span class="emphasis"><em>without</em></span>
+            synchronization will result in calling <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">terminate</span></code>,
+            causing the running application to exit immediately.
+          </p></td></tr>
+</table></div>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            Even if error handling internally relies on exceptions, most of the API
+            functions exposed by <span class="emphasis"><em>HPX</em></span> can be used without throwing
+            an exception. Please see <a class="link" href="../error_handling.html" title="Error Handling">Error
+            Handling</a> for more information.
+          </p></td></tr>
+</table></div>
+<p>
+          As an example, we will assume that the following remote function will be
+          executed:
+        </p>
+<pre class="programlisting"><span class="keyword">namespace</span> <span class="identifier">app</span>
+<span class="special">{</span>
+    <span class="keyword">void</span> <span class="identifier">some_function_with_error</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">arg</span><span class="special">)</span>
+    <span class="special">{</span>
+        <span class="keyword">if</span> <span class="special">(</span><span class="identifier">arg</span> <span class="special">&lt;</span> <span class="number">0</span><span class="special">)</span> <span class="special">{</span>
+            <code class="computeroutput">HPX_THROW_EXCEPTION</code><span class="special">(</span><span class="identifier">bad_argument</span><span class="special">,</span> <span class="string">"some_function_with_error"</span><span class="special">,</span>
+                <span class="string">"some really bad error happened"</span><span class="special">);</span>
+        <span class="special">}</span>
+        <span class="comment">// do something else...</span>
+    <span class="special">}</span>
+<span class="special">}</span>
+
+<span class="comment">// This will define the action type 'some_error_action' which represents</span>
+<span class="comment">// the function 'app::some_function_with_error'.</span>
+<code class="computeroutput">HPX_PLAIN_ACTION</code><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">some_function_with_error</span><span class="special">,</span> <span class="identifier">some_error_action</span><span class="special">);</span>
+</pre>
+<p>
+          The use of <code class="computeroutput">HPX_THROW_EXCEPTION</code>
+          to report the error encapsulates the creation of a <code class="computeroutput">hpx::exception</code> which is initialized
+          with the error code <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">bad_parameter</span></code>.
+          Additionally it carries the passed strings, the information about the file
+          name, line number, and call stack of the point the exception was thrown
+          from.
+        </p>
+<p>
+          We invoke this action using the synchronous syntax as described before:
+        </p>
+<pre class="programlisting"><span class="comment">// note: wrapped function will throw hpx::exception</span>
+<span class="identifier">some_error_action</span> <span class="identifier">act</span><span class="special">;</span>            <span class="comment">// define an instance of some_error_action</span>
+<span class="keyword">try</span> <span class="special">{</span>
+    <span class="identifier">act</span><span class="special">(</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">(),</span> <span class="special">-</span><span class="number">3</span><span class="special">);</span>    <span class="comment">// exception will be rethrown from here</span>
+<span class="special">}</span>
+<span class="keyword">catch</span> <span class="special">(</span><code class="computeroutput">hpx::exception</code> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">e</span><span class="special">)</span> <span class="special">{</span>
+    <span class="comment">// prints: 'some really bad error happened: HPX(bad parameter)'</span>
+    <span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">e</span><span class="special">.</span><span class="identifier">what</span><span class="special">();</span>
+<span class="special">}</span>
+</pre>
+<p>
+          If this action is invoked asynchronously with synchronization, the exception
+          is propagated to the waiting thread as well and is re-thrown from the future's
+          function <code class="computeroutput"><span class="identifier">get</span><span class="special">()</span></code>:
+        </p>
+<pre class="programlisting"><span class="comment">// note: wrapped function will throw hpx::exception</span>
+<span class="identifier">some_error_action</span> <span class="identifier">act</span><span class="special">;</span>            <span class="comment">// define an instance of some_error_action</span>
+<span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="keyword">void</span><span class="special">&gt;</span> <span class="identifier">f</span> <span class="special">=</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span><span class="special">(</span><span class="identifier">act</span><span class="special">,</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">(),</span> <span class="special">-</span><span class="number">3</span><span class="special">);</span>
+<span class="keyword">try</span> <span class="special">{</span>
+    <span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">();</span>                      <span class="comment">// exception will be rethrown from here</span>
+<span class="special">}</span>
+<span class="keyword">catch</span> <span class="special">(</span><code class="computeroutput">hpx::exception</code> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">e</span><span class="special">)</span> <span class="special">{</span>
+    <span class="comment">// prints: 'some really bad error happened: HPX(bad parameter)'</span>
+    <span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">e</span><span class="special">.</span><span class="identifier">what</span><span class="special">();</span>
+<span class="special">}</span>
+</pre>
+<p>
+          For more information about error handling please refer to the section
+          <a class="link" href="../error_handling.html" title="Error Handling">Error Handling</a>. There
+          we also explain how to handle error conditions without having to rely on
+          exception.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="action_invocation/compare.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../applying_actions.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../plain_actions.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

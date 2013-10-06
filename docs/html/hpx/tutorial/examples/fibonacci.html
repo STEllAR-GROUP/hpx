@@ -1,0 +1,271 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Fibonacci</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="up" href="../examples.html" title="Examples">
+<link rel="prev" href="../examples.html" title="Examples">
+<link rel="next" href="hello_world.html" title="Hello World">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../examples.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../examples.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="hello_world.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.tutorial.examples.fibonacci"></a><a class="link" href="fibonacci.html" title="Fibonacci">Fibonacci</a>
+</h4></div></div></div>
+<p>
+          The Fibonacci sequence is a sequence of numbers starting with 0 and 1 where
+          every subsequent number is the sum of the previous two numbers. In this
+          example, we will use <span class="emphasis"><em>HPX</em></span> to calculate the value of
+          the n-th element of the Fibonacci sequence. In order to compute this problem
+          in parallel, we will use a facility known as a Future.
+        </p>
+<p>
+          As shown in the <a class="link" href="fibonacci.html#examples.future_schematics" title="Figure&#160;1.&#160;Schematic of a Future execution">figure</a>
+          below, a Future encapsulates a delayed computation. It acts as a proxy
+          for a result initially not known, most of the time because the computation
+          of the result has not completed yet. The Future synchronizes the access
+          of this value by optionally suspending any <span class="emphasis"><em>HPX</em></span>-threads
+          requesting the result until the value is available. When a Future is created,
+          it spawns a new <span class="emphasis"><em>HPX</em></span>-thread (either remotely with a
+          parcel or locally by placing it into the thread queue) which, when run,
+          will execute the action associated with the Future. The arguments of the
+          action are bound when the Future is created.
+        </p>
+<p>
+          </p>
+<div class="figure">
+<a name="examples.future_schematics"></a><p class="title"><b>Figure&#160;1.&#160;Schematic of a Future execution</b></p>
+<div class="figure-contents"><span class="inlinemediaobject"><img src="../../.././images/future_schematics.png" alt="Schematic of a Future execution"></span></div>
+</div>
+<p><br class="figure-break">
+        </p>
+<p>
+          Once the action has finished executing, a write operation is performed
+          on the Future. The write operation marks the Future as completed, and optionally
+          stores data returned by the action. When the result of the delayed computation
+          is needed, a read operation is performed on the Future. If the Future's
+          action hasn't completed when a read operation is performed on it, the reader
+          <span class="emphasis"><em>HPX</em></span>-thread is suspended until the Future is ready.
+          The Future facility allows <span class="emphasis"><em>HPX</em></span> to schedule work early
+          in a program so that when the function value is needed it will already
+          be calculated and available. We use this property in our Fibonacci example
+          below to enable its parallel execution.
+        </p>
+<h6>
+<a name="hpx.tutorial.examples.fibonacci.h0"></a>
+          <span class="phrase"><a name="hpx.tutorial.examples.fibonacci.setup"></a></span><a class="link" href="fibonacci.html#hpx.tutorial.examples.fibonacci.setup">Setup</a>
+        </h6>
+<p>
+          The source code for this example can be found here: <a href="file:////home/heller/programming/hpx/examples/quickstart/fibonacci.cpp" target="_top">fibonacci.cpp</a>.
+        </p>
+<p>
+          To compile this program, go to your <span class="emphasis"><em>HPX</em></span> build directory
+          (see <a class="link" href="../getting_started.html" title="Getting Started">Getting Started</a>
+          for information on configuring and building <span class="emphasis"><em>HPX</em></span>) and
+          enter:
+        </p>
+<pre class="programlisting">$ make examples.quickstart.fibonacci
+</pre>
+<p>
+          To run the program type:
+        </p>
+<pre class="programlisting">$ ./bin/fibonacci
+</pre>
+<p>
+          This should print (time should be approximate):
+        </p>
+<pre class="programlisting">fibonacci(10) == 55
+elapsed time: 0.00186288 [s]
+</pre>
+<p>
+          This run used the default settings, which calculate the tenth element of
+          the Fibonacci sequence. To declare which Fibonacci value you want to calculate,
+          use the <code class="literal">--n-value</code> option. Additionally you can use the
+          <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options"><code class="literal">--hpx:threads</code></a>
+          option to declare how many OS-threads you wish to use when running the
+          program. For instance, running:
+        </p>
+<pre class="programlisting">$ ./bin/fibonacci --n-value 20 <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options">--hpx:threads</a> 4
+</pre>
+<p>
+          Will yield:
+        </p>
+<pre class="programlisting">fibonacci(20) == 6765
+elapsed time: 0.233827 [s]
+</pre>
+<h6>
+<a name="hpx.tutorial.examples.fibonacci.h1"></a>
+          <span class="phrase"><a name="hpx.tutorial.examples.fibonacci.walkthrough"></a></span><a class="link" href="fibonacci.html#hpx.tutorial.examples.fibonacci.walkthrough">Walkthrough</a>
+        </h6>
+<p>
+          Now that you have compiled and run the code, let's look at how the code
+          works. Since this code is written in C++, we will begin with the <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>
+          function. Here you can see that in <span class="emphasis"><em>HPX</em></span>, <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code>
+          is only used to initialize the runtime system. It is important to note
+          that application-specific command line options are defined here. <span class="emphasis"><em>HPX</em></span>
+          uses <a href="http://www.boost.org/doc/html/program_options.html" target="_top">Boost.Program
+          Options</a> for command line processing. You can see that our programs
+          <code class="literal">--n-value</code> option is set by calling the <code class="computeroutput"><span class="identifier">add_options</span><span class="special">()</span></code>
+          method on an instance of <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">program_options</span><span class="special">::</span><span class="identifier">options_description</span></code>.
+          The default value of the variable is set to 10. This is why when we ran
+          the program for the first time without using the <code class="literal">--n-value</code>
+          option the program returned the 10th value of the Fibonacci sequence. The
+          constructor argument of the description is the text that appears when a
+          user uses the <a class="link" href="../../manual/init/commandline.html" title="HPX Command Line Options"><code class="literal">--help</code></a>
+          option to see what command line options are available. <code class="computeroutput"><span class="identifier">HPX_APPLICATION_STRING</span></code>
+          is a macro that expands to a string constant containing the name of the
+          <span class="emphasis"><em>HPX</em></span> application currently being compiled.
+        </p>
+<p>
+          In <span class="emphasis"><em>HPX</em></span> <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code> is used to initialize the runtime system
+          and pass the command line arguments to the program. If you wish to add
+          command line options to your program you would add them here using the
+          instance of the Boost class <code class="computeroutput"><span class="identifier">options_description</span></code>,
+          and invoking the public member function <code class="computeroutput"><span class="special">.</span><span class="identifier">add_options</span><span class="special">()</span></code>
+          (see <a href="http://www.boost.org/doc/" target="_top">Boost Documentation</a>
+          or the <a class="link" href="fibonacci.html" title="Fibonacci">Fibonacci Example</a>
+          for more details). <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">init</span><span class="special">()</span></code> calls <code class="computeroutput"><span class="identifier">hpx_main</span><span class="special">()</span></code> after setting up <span class="emphasis"><em>HPX</em></span>,
+          which is where the logic of our program is encoded.
+        </p>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
+<span class="special">{</span>
+    <span class="comment">// Configure application-specific options</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">program_options</span><span class="special">::</span><span class="identifier">options_description</span>
+       <span class="identifier">desc_commandline</span><span class="special">(</span><span class="string">"Usage: "</span> <span class="identifier">HPX_APPLICATION_STRING</span> <span class="string">" [options]"</span><span class="special">);</span>
+
+    <span class="identifier">desc_commandline</span><span class="special">.</span><span class="identifier">add_options</span><span class="special">()</span>
+        <span class="special">(</span> <span class="string">"n-value"</span><span class="special">,</span>
+          <span class="identifier">boost</span><span class="special">::</span><span class="identifier">program_options</span><span class="special">::</span><span class="identifier">value</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint64_t</span><span class="special">&gt;()-&gt;</span><span class="identifier">default_value</span><span class="special">(</span><span class="number">10</span><span class="special">),</span>
+          <span class="string">"n value for the Fibonacci function"</span><span class="special">)</span>
+        <span class="special">;</span>
+
+    <span class="comment">// Initialize and run HPX</span>
+    <span class="keyword">return</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">init</span><span class="special">(</span><span class="identifier">desc_commandline</span><span class="special">,</span> <span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
+<span class="special">}</span>
+</pre>
+<p>
+          The <code class="computeroutput">hpx::init</code><code class="computeroutput"><span class="special">()</span></code> function in <code class="computeroutput"><span class="identifier">main</span><span class="special">()</span></code> starts the runtime system, and invokes
+          <code class="computeroutput">hpx_main</code><code class="computeroutput"><span class="special">()</span></code>
+          as the first <span class="emphasis"><em>HPX</em></span>-thread. Below we can see that the
+          basic program is simple. The command line option <code class="literal">--n-value</code>
+          is read in, a timer (<code class="computeroutput">hpx::util::high_resolution_timer</code>)
+          is set up to record the time it takes to do the computation, the fibonacci
+          action is invoked synchronously, and the answer is printed out.
+        </p>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">hpx_main</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">program_options</span><span class="special">::</span><span class="identifier">variables_map</span><span class="special">&amp;</span> <span class="identifier">vm</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="comment">// extract command line argument, i.e. fib(N)</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint64_t</span> <span class="identifier">n</span> <span class="special">=</span> <span class="identifier">vm</span><span class="special">[</span><span class="string">"n-value"</span><span class="special">].</span><span class="identifier">as</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint64_t</span><span class="special">&gt;();</span>
+
+    <span class="special">{</span>
+        <span class="comment">// Keep track of the time required to execute.</span>
+        <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">util</span><span class="special">::</span><span class="identifier">high_resolution_timer</span> <span class="identifier">t</span><span class="special">;</span>
+
+        <span class="comment">// Wait for fib() to return the value</span>
+        <span class="identifier">fibonacci_action</span> <span class="identifier">fib</span><span class="special">;</span>
+        <span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint64_t</span> <span class="identifier">r</span> <span class="special">=</span> <span class="identifier">fib</span><span class="special">(</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">(),</span> <span class="identifier">n</span><span class="special">);</span>
+
+        <span class="keyword">char</span> <span class="keyword">const</span><span class="special">*</span> <span class="identifier">fmt</span> <span class="special">=</span> <span class="string">"fibonacci(%1%) == %2%\nelapsed time: %3% [s]\n"</span><span class="special">;</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">format</span><span class="special">(</span><span class="identifier">fmt</span><span class="special">)</span> <span class="special">%</span> <span class="identifier">n</span> <span class="special">%</span> <span class="identifier">r</span> <span class="special">%</span> <span class="identifier">t</span><span class="special">.</span><span class="identifier">elapsed</span><span class="special">());</span>
+    <span class="special">}</span>
+
+    <span class="keyword">return</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">finalize</span><span class="special">();</span> <span class="comment">// Handles HPX shutdown</span>
+<span class="special">}</span>
+</pre>
+<p>
+          Upon a closer look we see that the <code class="computeroutput">hpx::lcos::future</code><code class="computeroutput"><span class="special">&lt;&gt;</span></code> we created is assigned the return
+          of <code class="computeroutput">hpx::lcos::async</code><code class="computeroutput"><span class="special">&lt;</span><span class="identifier">fibonacci_action</span><span class="special">&gt;(</span></code><code class="computeroutput">hpx::find_here</code><code class="computeroutput"><span class="special">(),</span> <span class="identifier">n</span><span class="special">)</span></code>. <code class="computeroutput">hpx::lcos::async</code><code class="computeroutput"><span class="special">&lt;&gt;()</span></code> takes an action, in this case
+          <code class="computeroutput"><span class="identifier">fibonacci_action</span></code>, and asynchronously
+          kicks of the computation of the action, returning a future which represents
+          the result of the computation. But wait, what is an action? And what is
+          this <code class="computeroutput"><span class="identifier">fibonacci_action</span></code>?
+          For starters, an action is a wrapper for a function. By wrapping functions,
+          <span class="emphasis"><em>HPX</em></span> can send packets of work to different processing
+          units. These vehicles allow users to calculate work now, later, or on certain
+          nodes. The first argument to <code class="computeroutput">hpx::lcos::async</code><code class="computeroutput"><span class="special">&lt;&gt;()</span></code> is the location where the action
+          should be run. In this case, we just want to run the action on the machine
+          that we are currently on, so we use <code class="computeroutput">hpx::find_here</code><code class="computeroutput"><span class="special">()</span></code>. To further understand this we turn to
+          the code to find where <code class="computeroutput"><span class="identifier">fibonacci_action</span></code>
+          was defined:
+        </p>
+<pre class="programlisting"><span class="comment">// forward declaration of the Fibonacci function</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint64_t</span> <span class="identifier">fibonacci</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint64_t</span> <span class="identifier">n</span><span class="special">);</span>
+
+<span class="comment">// This is to generate the required boilerplate we need for the remote</span>
+<span class="comment">// invocation to work.</span>
+<span class="identifier">HPX_PLAIN_ACTION</span><span class="special">(</span><span class="identifier">fibonacci</span><span class="special">,</span> <span class="identifier">fibonacci_action</span><span class="special">);</span>
+</pre>
+<p>
+          A plain action is the most basic form of action. Plain actions wrap simple
+          global functions which are not associated with any particular object (we
+          will discuss other types of actions in the <a class="link" href="accumulator.html" title="Accumulator">Accumulator
+          Example</a>). In this block of code the function <code class="computeroutput"><span class="identifier">fibonacci</span><span class="special">()</span></code> is declared. After the declaration, the
+          function is wrapped in an action in the declaration <code class="computeroutput">HPX_PLAIN_ACTION</code>. This function
+          takes two aruments: the name of the function that is to be wrapped and
+          the name of the action that you are creating.
+        </p>
+<p>
+          This picture should now start making sense. The function <code class="computeroutput"><span class="identifier">fibonacci</span><span class="special">()</span></code>
+          is wrapped in an action <code class="computeroutput"><span class="identifier">fibonacci_action</span></code>,
+          which was spawned by <code class="computeroutput">hpx::lcos::async</code><code class="computeroutput"><span class="special">&lt;&gt;()</span></code>, which returns a future. Now,
+          lets look at the function <code class="computeroutput"><span class="identifier">fibonacci</span><span class="special">()</span></code>:
+        </p>
+<pre class="programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint64_t</span> <span class="identifier">fibonacci</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint64_t</span> <span class="identifier">n</span><span class="special">)</span>
+<span class="special">{</span>
+    <span class="keyword">if</span> <span class="special">(</span><span class="identifier">n</span> <span class="special">&lt;</span> <span class="number">2</span><span class="special">)</span>
+        <span class="keyword">return</span> <span class="identifier">n</span><span class="special">;</span>
+
+    <span class="comment">// We restrict ourselves to execute the Fibonacci function locally.</span>
+    <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">naming</span><span class="special">::</span><span class="identifier">id_type</span> <span class="keyword">const</span> <span class="identifier">locality_id</span> <span class="special">=</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">();</span>
+
+    <span class="comment">// Invoking the Fibonacci algorithm twice is inefficient.</span>
+    <span class="comment">// However, we intentionally demonstrate it this way to create some</span>
+    <span class="comment">// heavy workload.</span>
+    <span class="keyword">using</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">lcos</span><span class="special">::</span><span class="identifier">future</span><span class="special">;</span>
+    <span class="keyword">using</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">async</span><span class="special">;</span>
+
+    <span class="identifier">fibonacci_action</span> <span class="identifier">fib</span><span class="special">;</span>
+    <span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint64_t</span><span class="special">&gt;</span> <span class="identifier">n1</span> <span class="special">=</span> <span class="identifier">async</span><span class="special">(</span><span class="identifier">fib</span><span class="special">,</span> <span class="identifier">locality_id</span><span class="special">,</span> <span class="identifier">n</span> <span class="special">-</span> <span class="number">1</span><span class="special">);</span>
+    <span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint64_t</span><span class="special">&gt;</span> <span class="identifier">n2</span> <span class="special">=</span> <span class="identifier">async</span><span class="special">(</span><span class="identifier">fib</span><span class="special">,</span> <span class="identifier">locality_id</span><span class="special">,</span> <span class="identifier">n</span> <span class="special">-</span> <span class="number">2</span><span class="special">);</span>
+
+    <span class="keyword">return</span> <span class="identifier">n1</span><span class="special">.</span><span class="identifier">get</span><span class="special">()</span> <span class="special">+</span> <span class="identifier">n2</span><span class="special">.</span><span class="identifier">get</span><span class="special">();</span>   <span class="comment">// wait for the Futures to return their values</span>
+<span class="special">}</span>
+</pre>
+<p>
+          This block of code is much more straightforward. First, <code class="computeroutput"><span class="keyword">if</span>
+          <span class="special">(</span><span class="identifier">n</span>
+          <span class="special">&lt;</span> <span class="number">2</span><span class="special">)</span></code>, meaning n is 0 or 1, then we return 0
+          or 1 (recall the first element of the Fibonacci sequence is 0 and the second
+          is 1). If n is larger than 1, then we spawn two futures, <code class="computeroutput"><span class="identifier">n1</span></code> and <code class="computeroutput"><span class="identifier">n2</span></code>.
+          Each of these futures represents an asynchronous, recursive call to <code class="computeroutput"><span class="identifier">fibonacci</span><span class="special">()</span></code>.
+          After we've created both futures, we wait for both of them to finish computing,
+          and then we add them together, and return that value as our result. The
+          recursive call tree will continue until n is equal to 0 or 1, at which
+          point the value can be returned because it is implicitly known. When this
+          termination condition is reached, the futures can then be added up, producing
+          the n-th value of the Fibonacci sequence.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../examples.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../examples.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="hello_world.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
