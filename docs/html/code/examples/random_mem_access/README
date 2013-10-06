@@ -1,0 +1,15 @@
+Code written/maintained by Matt Anderson (matt@phys.lsu.edu)
+
+This code implements random memory accesses in a large array.
+
+Options:
+        ("array-size", value<std::size_t>()->default_value(8),
+            "the size of the array")
+        ("iterations", value<std::size_t>()->default_value(16),
+            "the number of lookups to perform")
+
+ Example:
+
+   random_mem_access_client --array-size 64 --iterations 4000
+
+  would initialize an array of size 64 with integers and randomly access and update elements of this array 4000 times.

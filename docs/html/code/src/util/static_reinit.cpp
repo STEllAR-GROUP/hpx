@@ -1,0 +1,87 @@
+//  Copyright (c) 2007-2013 Hartmut Kaiser
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/static_reinit.hpp>
+#include <hpx/util/static.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
+
+#include <boost/foreach.hpp>
+
+namespace hpx { namespace util
+{
+    ///////////////////////////////////////////////////////////////////////////
+    struct reinit_functions_storage
+    {
+        typedef lcos::local::spinlock mutex_type;
+
+        typedef HPX_STD_FUNCTION<void()> construct_type;
+        typedef HPX_STD_FUNCTION<void()> destruct_type;
+
+        typedef std::pair<construct_type, destruct_type> value_type;
+        typedef std::vector<value_type> reinit_functions_type;
+
+        void register_functions(construct_type const& construct,
+            destruct_type const& destruct)
+        {
+            mutex_type::scoped_lock l(mtx_);
+            funcs_.push_back(value_type(construct, destruct));
+        }
+
+        void construct_all()
+        {
+            mutex_type::scoped_lock l(mtx_);
+            BOOST_FOREACH(value_type const& val, funcs_)
+            {
+                val.first();
+            }
+        }
+
+        void destruct_all()
+        {
+            mutex_type::scoped_lock l(mtx_);
+            BOOST_FOREACH(value_type const& val, funcs_)
+            {
+                val.second();
+            }
+        }
+
+        struct storage_tag {};
+        static reinit_functions_storage& get();
+
+    private:
+        reinit_functions_type funcs_;
+        mutex_type mtx_;
+    };
+
+    inline reinit_functions_storage& reinit_functions_storage::get()
+    {
+        util::static_<reinit_functions_storage, storage_tag> storage;
+        return storage.get();
+    }
+
+    // This is a global API allowing to register functions to be called before
+    // the runtime system is about to start and after the runtime system has
+    // been terminated. This is used to initialize/reinitialize all
+    // singleton instances.
+    void reinit_register(HPX_STD_FUNCTION<void()> const& construct,
+        HPX_STD_FUNCTION<void()> const& destruct)
+    {
+        reinit_functions_storage::get().register_functions(construct, destruct);
+    }
+
+    // Invoke all globally registered construction functions
+    void reinit_construct()
+    {
+        reinit_functions_storage::get().construct_all();
+    }
+
+    // Invoke all globally registered destruction functions
+    void reinit_destruct()
+    {
+        reinit_functions_storage::get().destruct_all();
+    }
+}}

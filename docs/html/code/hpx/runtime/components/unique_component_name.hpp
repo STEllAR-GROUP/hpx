@@ -1,0 +1,70 @@
+//  Copyright (c) 2011 Bryce Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#if !defined(HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649)
+#define HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649
+
+#include <boost/config.hpp>
+#include <boost/mpl/assert.hpp>
+
+#include <boost/preprocessor/stringize.hpp>
+
+namespace hpx { namespace components
+{
+    struct base_name;
+    struct derived_name;
+
+    template <typename ComponentType, typename Type = derived_name>
+    struct unique_component_name
+    {
+        BOOST_MPL_ASSERT_MSG(0, component_name_is_not_defined, (ComponentType));
+    };
+}}
+
+#define HPX_DEF_UNIQUE_COMPONENT_NAME(ComponentType, name)                    \
+    namespace hpx { namespace components                                      \
+    {                                                                         \
+        template <>                                                           \
+        struct unique_component_name<ComponentType >                          \
+        {                                                                     \
+            typedef char const* type;                                         \
+                                                                              \
+            static type call (void)                                           \
+            {                                                                 \
+                return BOOST_PP_STRINGIZE(name);                              \
+            }                                                                 \
+        };                                                                    \
+    }}                                                                        \
+    /***/
+
+#define HPX_DEF_UNIQUE_DERIVED_COMPONENT_NAME(ComponentType, name, basename)  \
+    namespace hpx { namespace components                                      \
+    {                                                                         \
+        template <>                                                           \
+        struct unique_component_name<ComponentType >                          \
+        {                                                                     \
+            typedef char const* type;                                         \
+                                                                              \
+            static type call (void)                                           \
+            {                                                                 \
+                return BOOST_PP_STRINGIZE(name);                              \
+            }                                                                 \
+        };                                                                    \
+                                                                              \
+        template <>                                                           \
+        struct unique_component_name<ComponentType, base_name >               \
+        {                                                                     \
+            typedef char const* type;                                         \
+                                                                              \
+            static type call (void)                                           \
+            {                                                                 \
+                return basename;                                              \
+            }                                                                 \
+        };                                                                    \
+    }}                                                                        \
+    /***/
+
+#endif // HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649
+
