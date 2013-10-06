@@ -37,17 +37,18 @@ file(
 if(HPX_BUILD_TYPE)
   set(doc_dir ${CMAKE_BINARY_DIR}/${HPX_BUILD_TYPE}/../share/hpx-${HPX_VERSION})
 else()
-  set(doc_dir ${CMAKE_BINARY_DIR}/../share/hpx)
+  set(doc_dir ${CMAKE_BINARY_DIR}/../share/hpx-${HPX_VERSION})
 endif()
 
 # disable copying source files for now, this needs to be fixed...
-#file(
-#  COPY ${doc_dir}/docs
-#  DESTINATION ${CMAKE_BINARY_DIR}/gh-pages)
+file(
+  COPY ${doc_dir}/docs
+  DESTINATION ${CMAKE_BINARY_DIR}/gh-pages)
 
 # copy all source files the docs depend upon
 if(HPX_DOCUMENTATION_FILES)
-  foreach(file ${HPX_DOCUMENTATION_FILES})
+  string(REPLACE " " ";" HPX_DOCUMENTATION_FILES_LIST "${HPX_DOCUMENTATION_FILES}")
+  foreach(file ${HPX_DOCUMENTATION_FILES_LIST})
     file(COPY ${file}
       DESTINATION ${CMAKE_BINARY_DIR}/gh-pages/docs/html/code)
   endforeach()
