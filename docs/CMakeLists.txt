@@ -131,7 +131,10 @@ hpx_quickbook_to_html(hpx
 
 if(FOP_FOUND)
   # This assumes that Quickbook -> BoostBook succeeded above.
-  hpx_boostbook_to_xslfo(hpx SOURCE hpx.xml)
+  hpx_quickbook_to_boostbook(hpx_pdf SOURCE hpx.qbk
+    DEPENDENCIES ${all_documentation_dependencies}
+    NODOXYGEN)
+  hpx_boostbook_to_xslfo(hpx SOURCE hpx_pdf.xml)
   hpx_xslfo_to_pdf(hpx SOURCE hpx.fo)
 endif()
 
