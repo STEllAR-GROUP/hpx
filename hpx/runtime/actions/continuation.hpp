@@ -73,7 +73,7 @@ namespace hpx
         typename lcos::base_lco_with_value<
             typename util::remove_reference<T>::type
         >::set_value_action set;
-        apply(set, id, boost::forward<T>(t));
+        apply(set, id, util::detail::make_temporary<T>::call(t));
     }
 
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,

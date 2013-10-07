@@ -42,7 +42,45 @@
     /**/
 
 namespace hpx { namespace util { namespace detail
-{   
+{
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct make_temporary
+    {
+        template <typename U>
+        static BOOST_RV_REF(T) call(U& u)
+        {
+            return boost::move(u);
+        }
+    };
+
+    template <typename T>
+    struct make_temporary<T&>
+    {
+        static T call(T& u)
+        {
+            return u;
+        }
+    };
+    template <typename T>
+    struct make_temporary<T const&>
+    {
+        static T call(T const& u)
+        {
+            return u;
+        }
+    };
+
+    template <typename T>
+    struct make_temporary<BOOST_RV_REF(T)>
+    {
+        template <typename U>
+        static BOOST_RV_REF(T) call(U& u)
+        {
+            return boost::move(u);
+        }
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     // See class.copy [12.8]/5
     template <typename T, typename U = typename boost::add_const<T>::type>
