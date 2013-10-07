@@ -62,11 +62,14 @@ described in the table below:
     [[`--hpx:threads arg`]      [the number of operating system threads to spawn
                                  for this __hpx__ locality (default: 1, using 'all' will
                                  spawn one thread for each processing unit)]]
+    [[`--hpx:cores arg`]        [the number of cores to utilize for this __hpx__ locality
+                                 locality (default: 'all', i.e. the number of cores is based on
+                                 the number of threads (--hpx:threads) assuming --hpx:bind=compact)]]
     [[`--hpx:affinity arg`]     [the affinity domain the OS threads will be confined to,
                                  possible values: pu, core, numa, machine (default: pu), valid for
                                  `--hpx:queuing=local` and priority_local only]]
     [[`--hpx:bind arg`]         [the detailed affinity description for the OS threads, see
-                                 [link hpx.manual.init.commandline.details the additional documentation] 
+                                 [link hpx.manual.init.commandline.details the additional documentation]
                                  for a detailed description of possible
                                  values. Do not use with `--hpx:pu-step`, `--hpx:pu-offset`, or
                                  `--hpx:affinity` options. Implies `--hpx:numa-sensitive`.]]

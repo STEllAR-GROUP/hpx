@@ -133,12 +133,22 @@ public:
         return std::size_t(boost::thread::hardware_concurrency());
 #endif
     }
-        
+
+    std::size_t get_number_of_cores() const
+    {
+        return ~std::size_t(0);
+    }
+
     std::size_t get_number_of_pus() const
     {
         return noop_topology::hardware_concurrency();
     }
-        
+
+    std::size_t get_number_of_core_pus(std::size_t core) const
+    {
+        return ~std::size_t(0);
+    }
+
     void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const
     {
     }

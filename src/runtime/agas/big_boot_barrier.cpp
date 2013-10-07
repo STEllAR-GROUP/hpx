@@ -28,6 +28,8 @@
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
+#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/certificate.hpp>
@@ -738,6 +740,23 @@ void big_boot_barrier::wait_bootstrap()
     spin();
 } // }}}
 
+namespace detail
+{
+    boost::uint32_t get_number_of_pus_in_cores(boost::uint32_t num_cores)
+    {
+        threads::topology& top = threads::create_topology();
+
+        boost::uint32_t num_pus = 0;
+        for (boost::uint32_t i = 0; i != num_cores; ++i)
+        {
+            num_pus += static_cast<boost::uint32_t>(
+                top.get_number_of_core_pus(i));
+        }
+
+        return num_pus;
+    }
+}
+
 void big_boot_barrier::wait_hosted(std::string const& locality_name,
     void* primary_ns_server, void* symbol_ns_server)
 { // {{{
@@ -748,8 +767,8 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
     BOOST_ASSERT(0 != symbol_ns_server);
 
     runtime& rt = get_runtime();
-    boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
-        rt.get_config().get_entry("hpx.os_threads", boost::uint32_t(1)));
+    boost::uint32_t num_cores = boost::lexical_cast<boost::uint32_t>(
+        rt.get_config().get_entry("hpx.cores", boost::uint32_t(1)));
 
     naming::gid_type suggested_prefix;
 
@@ -764,7 +783,7 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
         rt.here()
         , reinterpret_cast<boost::uint64_t>(primary_ns_server)
         , reinterpret_cast<boost::uint64_t>(symbol_ns_server)
-        , num_threads
+        , detail::get_number_of_pus_in_cores(num_cores)
         , locality_name
         , suggested_prefix);
 

@@ -294,6 +294,10 @@ void* addressing_service::get_bootstrap_symbol_ns_ptr() const
     return &bootstrap->symbol_ns_server_;
 }
 
+namespace detail
+{
+    boost::uint32_t get_number_of_pus_in_cores(boost::uint32_t num_cores);
+}
 
 void addressing_service::launch_bootstrap(
     parcelset::parcelport& pp
@@ -305,10 +309,10 @@ void addressing_service::launch_bootstrap(
     runtime& rt = get_runtime();
 
     // store number of first usable pu
-    boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
-        ini_.get_entry("hpx.os_threads", boost::uint32_t(1)));
+    boost::uint32_t num_cores = boost::lexical_cast<boost::uint32_t>(
+        rt.get_config().get_entry("hpx.cores", boost::uint32_t(1)));
     boost::uint32_t first_pu = rt.assign_cores(
-        pp.get_locality_name(), num_threads);
+        pp.get_locality_name(), detail::get_number_of_pus_in_cores(num_cores));
     rt.get_config().set_first_pu(first_pu);
 
     naming::locality const ep = ini_.get_agas_locality();
@@ -352,6 +356,8 @@ void addressing_service::launch_bootstrap(
         boost::str(boost::format("hpx.locality!=%1%")
                   % naming::get_locality_id_from_gid(here)));
 
+    boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
+        ini_.get_entry("hpx.os_threads", boost::uint32_t(1)));
     request locality_req(locality_ns_allocate, ep, 4, num_threads);
     bootstrap->locality_ns_server_.remote_service(locality_req);
 
