@@ -17,7 +17,7 @@
 
 namespace hpx { namespace detail
 {
-    std::string get_locality_name()
+    std::string get_locality_base_name()
     {
         runtime* rt = get_runtime_ptr();
         if (rt == 0)
@@ -28,6 +28,12 @@ namespace hpx { namespace detail
             return "";
         }
         return rt->get_parcel_handler().get_locality_name();
+    }
+
+    std::string get_locality_name()
+    {
+        std::string basename = get_locality_base_name();
+        return basename + boost::lexical_cast<std::string>(get_locality_id());
     }
 }}
 

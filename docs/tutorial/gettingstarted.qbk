@@ -117,9 +117,6 @@ listed below.
          diagnostics.]]
     [[__libunwind__              ][0.99               ][0.97            ]
         [Dependency of google-perftools on x86-64, used for stack unwinding.]]
-    [[__hdf5__                   ][1.8.7              ][1.6.7           ]
-        [Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
-         and interpolate3d applications. See important note below.]]
 ]
 
 [table Optional Software Prerequisites for __hpx__ on Linux systems
@@ -127,26 +124,17 @@ listed below.
 
     [[__papi__                   ][                   ][                ]
         [Used for accessing hardware performance data.]]
-    [[__lapack__                 ][                   ][                ]
-        [Used in the neutron_star application.]]
-    [[__blas__                   ][                   ][                ]
-        [Used in the neutron_star application.]]
-    [[__gsl__                    ][                   ][                ]
-        [Used in the neutron_star application.]]
-    [[__lorene__                 ][                   ][                ]
-        [Used in the neutron_star application.]]
-    [[__rnpl__                   ][1.11               ][1.11            ]
-        [Used for data I/O in the adaptive1d and neutron_star applications.]]
     [[__jemalloc__               ][2.1.2              ][2.1.0           ]
         [Used as a replacement for the system allocator.]]
+    [[__hdf5__                   ][1.8.7              ][1.6.7           ]
+        [Used for data I/O in some example applications. See important note below.]]
 ]
 
-[table Highly Recommended Optional Software Prerequisites for __hpx__ on Windows systems
+[table Optional Software Prerequisites for __hpx__ on Windows systems
     [[Name                       ][Recommended Version][Minimum Version ][Notes]]
 
     [[__hdf5__                   ][1.8.7              ][1.6.7           ]
-        [Used for data I/O in the gravity, sheneos, neutron_star, interpolate1d
-         and interpolate3d applications. See important note below.]]
+        [Used for data I/O in some example applications. See important note below.]]
 ]
 
 [important The C++ HDF5 libraries must be compiled with enabled threadsafety

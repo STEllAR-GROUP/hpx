@@ -40,9 +40,9 @@ def kill_process_tree(parent_pid, signal=SIGKILL):
     cmd = ""
 
     if OS_MAC:
-      cmd = "ps -o pid --ppid %d --noheaders" % pid
-    else: 
       cmd = "ps -o pid,ppid -ax | grep %d | cut -f 1 -d \" \" | tail -1" % pid
+    else: 
+      cmd = "ps -o pid --ppid %d --noheaders" % pid
 
     ps_command = Popen(cmd, shell=True, stdout=PIPE)
     ps_output = ps_command.stdout.read()

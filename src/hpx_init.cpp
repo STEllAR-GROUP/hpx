@@ -651,13 +651,15 @@ namespace hpx
             typedef hpx::threads::policies::local_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, 1000, numa_sensitive, pu_offset, pu_step,
-                affinity_domain, affinity_desc);
+                cfg.num_threads_, 1000, numa_sensitive);
+            threads::policies::init_affinity_data affinity_init(
+                pu_offset, pu_step, affinity_domain, affinity_desc);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
+                    affinity_init));
 
             if (blocking) {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
@@ -750,14 +752,15 @@ namespace hpx
             typedef hpx::threads::policies::static_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
-                cfg.num_threads_, num_high_priority_queues, 1000,
-                pu_offset, pu_step, affinity_domain,
-                affinity_desc);
+                cfg.num_threads_, num_high_priority_queues, 1000);
+            threads::policies::init_affinity_data affinity_init(
+                pu_offset, pu_step, affinity_domain, affinity_desc);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
+                    affinity_init));
 
             if (blocking) {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
@@ -855,13 +858,15 @@ namespace hpx
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
-                numa_sensitive, pu_offset, pu_step, affinity_domain,
-                affinity_desc);
+                numa_sensitive);
+            threads::policies::init_affinity_data affinity_init(
+                pu_offset, pu_step, affinity_domain, affinity_desc);
 
             // Build and configure this runtime instance.
             typedef hpx::runtime_impl<local_queue_policy> runtime_type;
             HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
+                    affinity_init));
 
             if (blocking) {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,

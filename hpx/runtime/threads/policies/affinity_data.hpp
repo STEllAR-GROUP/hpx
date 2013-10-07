@@ -11,6 +11,27 @@
 
 #include <string>
 
+namespace hpx { namespace threads { namespace policies
+{
+    ///////////////////////////////////////////////////////////////////////////
+    struct init_affinity_data
+    {
+        init_affinity_data(std::size_t pu_offset = 0, std::size_t pu_step = 1,
+                std::string const& affinity = "pu",
+                std::string const& affinity_desc = "")
+          : pu_offset_(pu_offset),
+            pu_step_(pu_step),
+            affinity_domain_(affinity),
+            affinity_desc_(affinity_desc)
+        {}
+
+        std::size_t pu_offset_;
+        std::size_t pu_step_;
+        std::string affinity_domain_;
+        std::string affinity_desc_;
+    };
+}}}
+
 namespace hpx { namespace threads { namespace policies { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -18,15 +39,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     // for the shepherd threads of this instance
     struct affinity_data
     {
-//         affinity_data()
-//           : pu_offset_(0), pu_step_(1),
-//             affinity_domain_("pu"), affinity_masks_(),
-//             pu_nums_()
-//         {}
+        affinity_data(std::size_t num_threads);
 
-        affinity_data(std::size_t num_threads, std::size_t pu_offset,
-            std::size_t pu_step, std::string const& affinity_domain,
-            std::string const& affinity_desc);
+        void init(init_affinity_data const& data);
 
         mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread, bool numa_sensitive) const;

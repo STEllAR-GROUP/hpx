@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -84,7 +84,9 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
       , actions::base_action* act
         );
 
-    void wait(void* primary_ns_ptr = 0, void* symbol_ns_ptr = 0);
+    void wait_bootstrap();
+    void wait_hosted(std::string const& locality_name,
+        void* primary_ns_ptr, void* symbol_ns_ptr);
 
     // no-op on non-bootstrap localities
     void trigger();

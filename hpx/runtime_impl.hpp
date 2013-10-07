@@ -14,6 +14,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -68,7 +69,9 @@ namespace hpx {
         explicit runtime_impl(util::runtime_configuration const& rtcfg,
             runtime_mode locality_mode = runtime_mode_console,
             std::size_t num_threads = 1,
-            init_scheduler_type const& init = init_scheduler_type());
+            init_scheduler_type const& init = init_scheduler_type(),
+            threads::policies::init_affinity_data const& affinity_init =
+                threads::policies::init_affinity_data());
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -160,6 +160,9 @@ namespace hpx
         {
             return topology_;
         }
+
+        boost::uint32_t assign_cores(std::string const& locality_basename,
+            boost::uint32_t num_threads);
 
         /// \brief Install all performance counters related to this runtime
         ///        instance
@@ -361,6 +364,10 @@ namespace hpx
         boost::scoped_ptr<util::thread_mapper> thread_support_;
 
         threads::topology& topology_;
+
+        // locality basename -> used cores
+        typedef std::map<std::string, boost::uint32_t> used_cores_map_type;
+        used_cores_map_type used_cores_map_;
 
         state state_;
 

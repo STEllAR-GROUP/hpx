@@ -101,8 +101,9 @@ namespace hpx {
     template <typename SchedulingPolicy, typename NotificationPolicy>
     runtime_impl<SchedulingPolicy, NotificationPolicy>::runtime_impl(
             util::runtime_configuration const& rtcfg,
-            runtime_mode locality_mode,
-            std::size_t num_threads, init_scheduler_type const& init)
+            runtime_mode locality_mode, std::size_t num_threads,
+            init_scheduler_type const& init,
+            threads::policies::init_affinity_data const& init_affinity)
       : runtime(rtcfg),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
@@ -145,8 +146,19 @@ namespace hpx {
         this->init_security();
 #endif
         // now, launch AGAS and register all nodes, launch all other components
-        agas_client_.initialize();
+        agas_client_.initialize(*parcel_port_);
         parcel_handler_.initialize(parcel_port_);
+
+        // initialize thread affinity settings in the scheduler
+        if (init_affinity.pu_offset_ == 0) {
+            // correct pu_offset from config data if appropriate
+            threads::policies::init_affinity_data init = init_affinity;
+            init.pu_offset_ = this->get_config().get_first_pu();
+            thread_manager_->init(init);
+        }
+        else {
+            thread_manager_->init(init_affinity);
+        }
 
 #if defined(HPX_HAVE_SECURITY)
         // enable parcel capability checking

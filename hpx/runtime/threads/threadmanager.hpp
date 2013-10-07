@@ -21,6 +21,7 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -48,6 +49,8 @@ namespace hpx { namespace threads
 
     public:
         virtual ~threadmanager_base() {}
+
+        virtual void init(policies::init_affinity_data const& data) {}
 
         /// \brief Return whether the thread manager is still running
         virtual state status() const = 0;
