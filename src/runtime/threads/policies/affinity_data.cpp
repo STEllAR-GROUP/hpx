@@ -32,29 +32,35 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             pu_nums_[i] = get_pu_num(i, hardware_concurrency);
     }
 
-    affinity_data::affinity_data(std::size_t num_threads,
-            std::size_t pu_offset, std::size_t pu_step,
-            std::string const& affinity_domain, std::string const& affinity_desc)
-      : num_threads_(num_threads), pu_offset_(pu_offset), pu_step_(pu_step),
-        affinity_domain_(affinity_domain), affinity_masks_(), pu_nums_()
+    affinity_data::affinity_data(std::size_t num_threads)
+      : num_threads_(num_threads), pu_offset_(0), pu_step_(1),
+        affinity_domain_("pu"), affinity_masks_(), pu_nums_()
+    {}
+
+    void affinity_data::init(init_affinity_data const& data)
     {
+        // initialize from command line
+        pu_offset_ = data.pu_offset_;
+        pu_step_ = data.pu_step_;
+        affinity_domain_ = data.affinity_domain_;
+
         std::size_t num_system_pus = hardware_concurrency();
 #if defined(HPX_HAVE_HWLOC)
-        if (!affinity_desc.empty()) {
+        if (!data.affinity_desc_.empty()) {
             affinity_masks_.resize(num_threads_);
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::resize(affinity_masks_[i], num_system_pus);
 
-            parse_affinity_options(affinity_desc, affinity_masks_);
+            parse_affinity_options(data.affinity_desc_, affinity_masks_);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
-            if (num_initialized != num_threads) {
+            if (num_initialized != num_threads_) {
                 HPX_THROW_EXCEPTION(bad_parameter,
                     "affinity_data::affinity_data",
                     boost::str(
                         boost::format("The number of OS threads requested "
                             "(%1%) does not match the number of threads to "
-                            "bind (%2%)") % num_threads % num_initialized));
+                            "bind (%2%)") % num_threads_ % num_initialized));
             }
         }
 #endif

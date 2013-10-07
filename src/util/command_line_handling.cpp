@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -667,8 +667,10 @@ namespace hpx { namespace util
                 }
             }
 
-            threads::policies::detail::affinity_data aff(num_threads,
-                pu_offset, pu_step, affinity_domain, "");
+            threads::policies::init_affinity_data init_data(pu_offset,
+                pu_step, affinity_domain);
+            threads::policies::detail::affinity_data aff(num_threads);
+            aff.init(init_data);
 
             bool numa_sensitive = vm_.count("hpx:numa-sensitive") != 0;
             threads::topology& top = threads::create_topology();

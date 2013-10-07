@@ -710,6 +710,24 @@ namespace hpx
             sizeof(arithmetic_counter_types)/sizeof(arithmetic_counter_types[0]));
     }
 
+    boost::uint32_t runtime::assign_cores(std::string const& locality_basename,
+        boost::uint32_t num_threads)
+    {
+        boost::mutex::scoped_lock l(mtx_);
+
+        used_cores_map_type::iterator it = used_cores_map_.find(locality_basename);
+        if (it == used_cores_map_.end())
+        {
+            used_cores_map_.insert(
+                used_cores_map_type::value_type(locality_basename, num_threads));
+            return 0;
+        }
+
+        boost::uint32_t current = (*it).second;
+        (*it).second += num_threads;
+        return current;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     runtime& get_runtime()
     {

@@ -96,6 +96,7 @@ namespace hpx { namespace util
             "os_threads = 1",
             "localities = 1",
             "runtime_mode = console",
+            "first_pu = 0",
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
@@ -585,6 +586,29 @@ namespace hpx { namespace util
             if (NULL != sec) {
                 sec->add_entry("localities",
                     boost::lexical_cast<std::string>(num_localities));
+            }
+        }
+    }
+
+    boost::uint32_t runtime_configuration::get_first_pu() const
+    {
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                return boost::lexical_cast<boost::uint32_t>(
+                    sec->get_entry("first_pu", 0));
+            }
+        }
+        return 0;
+    }
+
+    void runtime_configuration::set_first_pu(boost::uint32_t first_pu)
+    {
+        if (has_section("hpx")) {
+            util::section* sec = get_section("hpx");
+            if (NULL != sec) {
+                sec->add_entry("first_pu",
+                    boost::lexical_cast<std::string>(first_pu));
             }
         }
     }

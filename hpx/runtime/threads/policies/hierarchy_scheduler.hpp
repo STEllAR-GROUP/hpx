@@ -172,6 +172,8 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
+        void init(init_affinity_data const&) {}
+
         bool numa_sensitive() const { return numa_sensitive_; }
 
         threads::mask_cref_type get_pu_mask(topology const& topology,
