@@ -517,7 +517,7 @@ namespace hpx { namespace util
         }
         return HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE;
     }
-    
+
     std::size_t runtime_configuration::get_max_mpi_requests() const
     {
         if (has_section("hpx.parcel"))
@@ -808,7 +808,7 @@ namespace hpx { namespace util
             }
         }
 #ifdef BOOST_BIG_ENDIAN
-        return "big"
+        return "big";
 #else
         return "little";
 #endif
