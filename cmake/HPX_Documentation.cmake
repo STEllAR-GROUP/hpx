@@ -158,7 +158,7 @@ else()
     endif()
 
     set(doxygen_option "")
-    if(DOXYGEN_FOUND AND NOT ${${name}_NODOXYGEN})
+    if(DOXYGEN_FOUND AND NOT ${name}_NODOXYGEN)
       set(doxygen_option "-D__hpx_doxygen__")
     endif()
 
