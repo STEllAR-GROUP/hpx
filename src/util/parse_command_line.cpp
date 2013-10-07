@@ -435,6 +435,10 @@ namespace hpx { namespace util
                  "the number of operating system threads to spawn for this HPX "
                  "locality (default: 1, using 'all' will spawn one thread for "
                  "each processing unit")
+                ("hpx:cores", value<std::string>()->default_value("all"),
+                 "the number of cores to utilize for this HPX locality"
+                 "locality (default: 'all', i.e. the number of cores is based on"
+                 "the number of threads (--hpx:threads) assuming --hpx:bind=compact)")
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are 'global/g', "
                   "'local/l', 'priority_local/pr', 'abp/a', 'priority_abp', "

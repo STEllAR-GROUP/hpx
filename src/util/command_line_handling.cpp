@@ -120,6 +120,143 @@ namespace hpx { namespace util
             // everything else is assumed to be a file name
             return "file(" + dest + ")";
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        std::size_t handle_num_localities(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm,
+            util::batch_environment& env, bool using_nodelist,
+            std::size_t num_localities)
+        {
+            std::size_t batch_localities = env.retrieve_number_of_localities();
+            if (num_localities == 1)
+            {
+                std::size_t cfg_num_localities = cfgmap.get_value<std::size_t>(
+                    "hpx.localities", batch_localities);
+                if (cfg_num_localities > 1)
+                    num_localities = cfg_num_localities;
+            }
+
+            if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                using_nodelist && (batch_localities != num_localities) &&
+                (num_localities != 1))
+            {
+                detail::report_locality_warning(env.get_batch_name(),
+                    batch_localities, num_localities);
+            }
+
+            if (vm.count("hpx:localities")) {
+                std::size_t localities = vm["hpx:localities"].as<std::size_t>();
+                if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                    using_nodelist && (localities != num_localities) &&
+                    (num_localities != 1))
+                {
+                    detail::report_locality_warning(env.get_batch_name(),
+                        localities, num_localities);
+                }
+                num_localities = localities;
+            }
+            return num_localities;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        std::size_t handle_num_threads(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm,
+            util::batch_environment& env, bool using_nodelist)
+        {
+            std::size_t batch_threads = env.retrieve_number_of_threads();
+            std::string threads_str = cfgmap.get_value<std::string>(
+                "hpx.os_threads", "");
+
+            if ("all" == threads_str) {
+                cfgmap.config_["hpx.os_threads"] =
+                    boost::lexical_cast<std::string>(
+                        thread::hardware_concurrency());
+            }
+
+            std::size_t threads = cfgmap.get_value<std::size_t>(
+                "hpx.os_threads", batch_threads);
+
+            if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                using_nodelist && (threads > batch_threads))
+            {
+                detail::report_thread_warning(env.get_batch_name(),
+                    threads, batch_threads);
+            }
+
+            if (vm.count("hpx:threads")) {
+                threads_str = vm["hpx:threads"].as<std::string>();
+                if ("all" == threads_str)
+                    threads = thread::hardware_concurrency(); //-V101
+                else
+                    threads = boost::lexical_cast<std::size_t>(threads_str);
+
+                if ((env.run_with_pbs() || env.run_with_slurm()) &&
+                    using_nodelist && (threads > batch_threads))
+                {
+                    detail::report_thread_warning(env.get_batch_name(),
+                        threads, batch_threads);
+                }
+
+#if defined(HPX_MAX_CPU_COUNT)
+                if (threads > HPX_MAX_CPU_COUNT) {
+                    throw std::logic_error("Requested more than "
+                        BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" threads to "
+                        "use for this application, use the option "
+                        "-DHPX_MAX_CPU_COUNT=<N> or "
+                        "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
+                }
+#elif !defined(HPX_HAVE_MORE_THAN_64_THREADS)
+                if (threads > 64) {
+                    throw std::logic_error("Requested more than 64 threads to "
+                        "use for this application, use the option "
+                        "-DHPX_MAX_CPU_COUNT=<N> or "
+                        "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
+                }
+#endif
+            }
+            return threads;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        std::size_t get_number_of_default_cores(std::size_t num_threads)
+        {
+            threads::topology& top = threads::create_topology();
+
+            boost::int64_t num_default_cores = static_cast<boost::int64_t>(num_threads);
+            std::size_t num_cores = top.get_number_of_cores();
+            if (num_cores == ~std::size_t(0)) return num_default_cores;
+
+            // find the number of cores neded to accomodate for the requested number
+            // of processing units if we assume starting to count from the first core
+            for (std::size_t i = 0; i != num_cores; ++i)
+            {
+                num_default_cores -= top.get_number_of_core_pus(i);
+                if (num_default_cores <= 0) return i+1;
+            }
+
+            return num_cores;
+        }
+
+        std::size_t handle_num_cores(util::manage_config& cfgmap,
+            boost::program_options::variables_map& vm, std::size_t num_threads)
+        {
+            std::string cores_str = cfgmap.get_value<std::string>("hpx.cores", "");
+            if ("all" == cores_str) {
+                cfgmap.config_["hpx.cores"] = boost::lexical_cast<std::string>(
+                    get_number_of_default_cores(num_threads));
+            }
+
+            std::size_t num_cores = cfgmap.get_value<std::size_t>("hpx.cores", num_threads);
+            if (vm.count("hpx:cores")) {
+                cores_str = vm["hpx:cores"].as<std::string>();
+                if ("all" == cores_str)
+                    num_cores = get_number_of_default_cores(num_threads);
+                else
+                    num_cores = boost::lexical_cast<std::size_t>(cores_str);
+            }
+
+            return num_cores;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -210,94 +347,14 @@ namespace hpx { namespace util
             cfgmap.get_value<boost::uint16_t>("hpx.parcel.port", 
                 HPX_INITIAL_IP_PORT);
 
-        // handle number of threads
-        std::size_t batch_threads = env.retrieve_number_of_threads();
+        // handle number of cores and threads
+        num_threads_ = detail::handle_num_threads(cfgmap, vm, env, using_nodelist);
+        num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_);
 
-        {
-            std::string threads_str =
-                cfgmap.get_value<std::string>("hpx.os_threads", "");
-
-            if ("all" == threads_str) {
-                cfgmap.config_["hpx.os_threads"] =
-                    boost::lexical_cast<std::string>(
-                        thread::hardware_concurrency());
-            }
-        }
-
-        num_threads_ = cfgmap.get_value<std::size_t>("hpx.os_threads", batch_threads);
-
-        if ((env.run_with_pbs() || env.run_with_slurm()) &&
-            using_nodelist && (num_threads_ > batch_threads))
-        {
-            detail::report_thread_warning(env.get_batch_name(),
-                num_threads_, batch_threads);
-        }
-
-        if (vm.count("hpx:threads")) {
-            std::string threads_str = vm["hpx:threads"].as<std::string>();
-
-            std::size_t threads = 0;
-
-            if ("all" == threads_str)
-                threads = thread::hardware_concurrency(); //-V101
-            else
-                threads = boost::lexical_cast<std::size_t>(threads_str);
-
-            if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                using_nodelist && (threads > batch_threads))
-            {
-                detail::report_thread_warning(env.get_batch_name(),
-                    threads, batch_threads);
-            }
-#if defined(HPX_MAX_CPU_COUNT)
-            if (threads > HPX_MAX_CPU_COUNT) {
-                throw std::logic_error("Requested more than "
-                    BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" threads to "
-                    "use for this application, use the option "
-                    "-DHPX_MAX_CPU_COUNT=<N> or "
-                    "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
-            }
-#elif !defined(HPX_HAVE_MORE_THAN_64_THREADS)
-            if (threads > 64) {
-                throw std::logic_error("Requested more than 64 threads to "
-                    "use for this application, use the option "
-                    "-DHPX_MAX_CPU_COUNT=<N> or "
-                    "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
-            }
-#endif
-            num_threads_ = threads;
-        }
-
-        // handling number of localities, might have already been initialized
+        // handling number of localities, those might have already been initialized
         // from MPI environment
-        std::size_t batch_localities = env.retrieve_number_of_localities();
-        if (num_localities_ == 1)
-        {
-            std::size_t cfg_num_localities = cfgmap.get_value<std::size_t>(
-                "hpx.localities", batch_localities);
-            if (cfg_num_localities > 1)
-                num_localities_ = cfg_num_localities;
-        }
-
-        if ((env.run_with_pbs() || env.run_with_slurm()) &&
-            using_nodelist && (batch_localities != num_localities_) &&
-            (num_localities_ != 1))
-        {
-            detail::report_locality_warning(env.get_batch_name(),
-                batch_localities, num_localities_);
-        }
-
-        if (vm.count("hpx:localities")) {
-            std::size_t localities = vm["hpx:localities"].as<std::size_t>();
-            if ((env.run_with_pbs() || env.run_with_slurm()) &&
-                using_nodelist && (localities != num_localities_) &&
-                (num_localities_ != 1))
-            {
-                detail::report_locality_warning(env.get_batch_name(),
-                    localities, num_localities_);
-            }
-            num_localities_ = localities;
-        }
+        num_localities_ = detail::handle_num_localities(cfgmap, vm, env,
+            using_nodelist, num_localities_);
 
         bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))
@@ -503,9 +560,11 @@ namespace hpx { namespace util
             ini_config += "hpx.logging.agas.level=5";
         }
 
-        // Set number of OS threads in configuration.
+        // Set number of cores and OS threads in configuration.
         ini_config += "hpx.os_threads=" +
             boost::lexical_cast<std::string>(num_threads_);
+        ini_config += "hpx.cores=" +
+            boost::lexical_cast<std::string>(num_cores_);
 
         // Set number of localities in configuration (do it everywhere,
         // even if this information is only used by the AGAS server).

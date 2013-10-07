@@ -94,9 +94,10 @@ namespace hpx { namespace util
 
             // add placeholders for keys to be added by command line handling
             "os_threads = 1",
+            "cores = 1",
             "localities = 1",
-            "runtime_mode = console",
             "first_pu = 0",
+            "runtime_mode = console",
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"
