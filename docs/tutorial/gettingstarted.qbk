@@ -92,8 +92,8 @@ visit __stellar_hpx_buildbot__.
 ]
 
 [important Because of a problem in Boost V1.54.0 this version can't be used
-      for compiling __hpx__ if you use gcc V4.6 or newer. Please use either
-      an earlier or a later version of Boost.]
+      for compiling __hpx__ if you use gcc V4.6.x. Please use either
+      an earlier or a later version of Boost with this compiler.]
 
 [table Software Prerequisites for __hpx__ on Windows systems
     [[Name                       ][Recommended Version][Minimum Version ]]
@@ -166,8 +166,8 @@ listed below.
 [section:boost_installation Installing Boost Libraries]
 
 [important Because of a problem in Boost V1.54.0 this version can't be used
-      for compiling __hpx__ if you use gcc V4.6 or newer. Please use either
-      an earlier or a later version of Boost.]
+      for compiling __hpx__ if you use gcc V4.6.x. Please use either
+      an earlier or a later version of Boost with this compiler.]
 
 The easiest way to create a working Boost installation is to compile Boost from
 sources yourself. This is particularly important as many high performance
