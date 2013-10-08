@@ -8,7 +8,7 @@
 [section:whats_new What's New]
 
 [/////////////////////////////////////////////////////////////////////////////]
-[section:hpx_1_0_0 __hpx__ V1.0.0]
+[section:hpx_0_9_7 __hpx__ V0.9.7]
 
 [heading General Changes]
 
@@ -16,6 +16,14 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 935] - Build error with gcc 4.6 and Boost 1.54.0 on hpx trunk and
+                0.9.6
+* [issue 930] - make git-docs is broken
+* [issue 929] - Generating index in docs broken
+* [issue 928] - Optimize hpx::util::static_ for C++11 compilers supporting
+                magic statics
+* [issue 924] - Make kill_process_tree (in process.py) more robust on Mac OSX
+* [issue 923] - Correct BLAS and RNPL cmake tests
 * [issue 922] - Cannot link against BLAS
 * [issue 921] - Implement `hpx::mem_fn`
 * [issue 920] - Output locality with `--hpx:print-bind`
