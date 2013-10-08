@@ -137,7 +137,7 @@ else()
 
   # Quickbook -> BoostBook XML
   macro(hpx_quickbook_to_boostbook name)
-    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;QUICKBOOK_ARGS;NODOXYGEN" "" ${ARGN})
+    hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;QUICKBOOK_ARGS" "NODOXYGEN" ${ARGN})
 
     hpx_print_list("DEBUG"
       "quickbook_to_boostbook.${name}" "Quickbook arguments"
@@ -273,7 +273,7 @@ else()
       set(BOOST_ROOT_FOR_DOCS ${BOOST_ROOT})
     endif()
 
-    hpx_debug("hpx_docbook_to_html.${name}" "SINGLEPAGE:${${name}_SINGLEPAGE}")
+    hpx_debug("hpx_docbook_to_html.${name}" "SINGLEPAGE: ${${name}_SINGLEPAGE}")
 
     if(WIN32)
       set(DOCS_OUTPUT_DIR "file:///${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/html")
@@ -291,8 +291,8 @@ else()
       set(main_xsl_script_manifest ${name}_HTML.manifest)
     endif()
 
-    hpx_debug("hpx_docbook_to_html.${name}" "main_xsl_script:${main_xsl_script}")
-    hpx_debug("hpx_docbook_to_html.${name}" "main_xsl_script_output:${main_xsl_script_output}")
+    hpx_debug("hpx_docbook_to_html.${name}" "main_xsl_script: ${main_xsl_script}")
+    hpx_debug("hpx_docbook_to_html.${name}" "main_xsl_script_output: ${main_xsl_script_output}")
 
     if(WIN32)
       add_custom_command(OUTPUT ${main_xsl_script_manifest}
@@ -353,10 +353,10 @@ else()
         INDEX ${${name}_INDEX}
         SOURCE ${name}.dbk
         AUTOINDEX_ARGS ${${name}_AUTOINDEX_ARGS})
-      set(docbook_source ${name}.auto_index.dbk)
+      set(docbook_source ${name}_auto_index.dbk)
     endif()
 
-    hpx_debug("hpx_quickbook_to_html.${name}" "SINGLEPAGE:${${name}_SINGLEPAGE}")
+    hpx_debug("hpx_quickbook_to_html.${name}" "SINGLEPAGE: ${${name}_SINGLEPAGE}")
 
     if(${${name}_SINGLEPAGE})
       hpx_docbook_to_html(${name}
@@ -488,10 +488,10 @@ else()
       "" ${ARGN})
 
     hpx_print_list("DEBUG"
-      "hpx_generate_auto_index.${name}" "AutoIndex arguments"
+      "hpx_generate_auto_index.${name}" "auto_index arguments"
       ${name}_AUTOINDEX_ARGS)
     hpx_debug("hpx_generate_auto_index.${name}"
-      "INDEX:${${name}_INDEX}, SOURCE:${${name}_SOURCE}")
+      "INDEX: ${${name}_INDEX}, SOURCE: ${${name}_SOURCE}")
 
     # If input is not a full path, it's in the current source directory.
     get_filename_component(input_path ${${name}_INDEX} PATH)
@@ -502,11 +502,11 @@ else()
       set(input_path ${${name}_INDEX})
     endif()
 
-    add_custom_command(OUTPUT ${name}.auto_index.dbk
+    add_custom_command(OUTPUT ${name}_auto_index.dbk
       COMMAND ${BOOSTAUTOINDEX_PROGRAM} ${${name}_AUTOINDEX_ARGS}
               "--script=${input_path}"
               "--in=${${name}_SOURCE}"
-              "--out=${name}.auto_index.dbk"
+              "--out=${name}_auto_index.dbk"
       COMMENT "Collecting Generating auto index."
       DEPENDS ${${name}_SOURCE} ${${name}_INDEX})
   endmacro()
