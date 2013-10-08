@@ -125,7 +125,7 @@ macro(add_hpx_library name)
   endif()
 
   if(NOT MSVC)
-    if(NOT ${${name}_NOLIBS})
+    if(NOT ${name}_NOLIBS)
       target_link_libraries(${name}_lib
         ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
       set_property(TARGET ${name}_lib APPEND
@@ -136,7 +136,7 @@ macro(add_hpx_library name)
         ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})
     endif()
   else()
-    if(NOT ${${name}_NOLIBS})
+    if(NOT ${name}_NOLIBS)
       target_link_libraries(${name}_lib
         ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
     else()

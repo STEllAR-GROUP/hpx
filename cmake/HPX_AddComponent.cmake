@@ -122,7 +122,7 @@ macro(add_hpx_component name)
 
   set(hpx_libs "")
 
-  if(NOT ${${name}_NOLIBS})
+  if(NOT ${name}_NOLIBS)
     if(HPX_EXTERNAL_CMAKE)
       set(hpx_libs ${HPX_LIBRARIES})
     else()
