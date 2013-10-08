@@ -33,6 +33,11 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/serialization/vector.hpp>
 
+namespace hpx { namespace detail
+{
+    std::string get_locality_base_name();
+}}
+
 namespace hpx { namespace agas
 {
 
@@ -219,23 +224,23 @@ addressing_service::addressing_service(
         gva_cache_->reserve(ini_.get_agas_local_cache_size());
 
     if (service_type == service_mode_bootstrap)
-        launch_bootstrap(ini_);
+        launch_bootstrap(pp, ini_);
 
     // now, boot the parcel port
     pp.run(false);
 }
 
-void addressing_service::initialize()
+void addressing_service::initialize(parcelset::parcelport& pp)
 {
     if (service_type == service_mode_bootstrap)
     {
-        get_big_boot_barrier().wait();
+        get_big_boot_barrier().wait_bootstrap();
     }
     else
     {
         launch_hosted();
-        get_big_boot_barrier().wait(&hosted->primary_ns_server_,
-            &hosted->symbol_ns_server_);
+        get_big_boot_barrier().wait_hosted(pp.get_locality_name(),
+            &hosted->primary_ns_server_, &hosted->symbol_ns_server_);
     }
 
     set_status(running);
@@ -289,14 +294,26 @@ void* addressing_service::get_bootstrap_symbol_ns_ptr() const
     return &bootstrap->symbol_ns_server_;
 }
 
+namespace detail
+{
+    boost::uint32_t get_number_of_pus_in_cores(boost::uint32_t num_cores);
+}
 
 void addressing_service::launch_bootstrap(
-    util::runtime_configuration const& ini_
+    parcelset::parcelport& pp
+  , util::runtime_configuration const& ini_
     )
 { // {{{
     bootstrap = boost::make_shared<bootstrap_data_type>();
 
     runtime& rt = get_runtime();
+
+    // store number of first usable pu
+    boost::uint32_t num_cores = boost::lexical_cast<boost::uint32_t>(
+        rt.get_config().get_entry("hpx.cores", boost::uint32_t(1)));
+    boost::uint32_t first_pu = rt.assign_cores(
+        pp.get_locality_name(), detail::get_number_of_pus_in_cores(num_cores));
+    rt.get_config().set_first_pu(first_pu);
 
     naming::locality const ep = ini_.get_agas_locality();
     naming::gid_type const here =
@@ -341,7 +358,6 @@ void addressing_service::launch_bootstrap(
 
     boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
         ini_.get_entry("hpx.os_threads", boost::uint32_t(1)));
-
     request locality_req(locality_ns_allocate, ep, 4, num_threads);
     bootstrap->locality_ns_server_.remote_service(locality_req);
 

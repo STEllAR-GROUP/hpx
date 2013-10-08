@@ -47,6 +47,8 @@ namespace hpx { namespace threads { namespace policies
                   : max_count)
         {}
 
+        void init(init_affinity_data const&) {}
+
         bool numa_sensitive() const { return false; }
 
         threads::mask_cref_type get_pu_mask(topology const& topology,

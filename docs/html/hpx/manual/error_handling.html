@@ -47,8 +47,8 @@
 <span class="identifier">HPX_PLAIN_ACTION</span><span class="special">(</span><span class="identifier">raise_exception</span><span class="special">,</span> <span class="identifier">raise_exception_action</span><span class="special">);</span>
 </pre>
 <p>
-        The exception is thrown using the macro <code class="computeroutput">HPX_THROW_EXCEPTION</code>. The type
-        of the thrown exception is <code class="computeroutput">hpx::exception</code>.
+        The exception is thrown using the macro <code class="computeroutput"><a class="link" href="../../HPX_THROW_EXCEPTION.html" title="Macro HPX_THROW_EXCEPTION">HPX_THROW_EXCEPTION</a></code>. The type
+        of the thrown exception is <code class="computeroutput"><a class="link" href="../exception.html" title="Class exception">hpx::exception</a></code>.
         This associates additional diagnostic information with the exception, such
         as file name and line number, locality id and thread id, and stack backtrace
         from the point where the exception was thrown.
@@ -89,7 +89,7 @@
 </table></div>
 <p>
         Additionally, this example demonstrates how an exception thrown by an (possibly
-        remote) action can be handled. It shows the use of <code class="computeroutput">hpx::diagnostic_information()</code> which retrieves all available
+        remote) action can be handled. It shows the use of <code class="computeroutput"><a class="link" href="../diagnostic_inf_idp15657168.html" title="Function diagnostic_information">hpx::diagnostic_information()</a></code> which retrieves all available
         diagnostic information from the exception as a formatted string. This includes,
         for instance, the name of the source file and line number, the sequence number
         of the OS-thread and the <span class="emphasis"><em>HPX</em></span>-thread id, the locality
@@ -135,9 +135,9 @@
         Most of the API functions exposed by <span class="emphasis"><em>HPX</em></span> can be invoked
         in two different modes. By default those will throw an exception on error
         as described above. However, sometimes it is desireable not to throw an exception
-        in case of an error condition. In this case an object instance of the <code class="computeroutput">hpx::error_code</code>
+        in case of an error condition. In this case an object instance of the <code class="computeroutput"><a class="link" href="../error_code.html" title="Class error_code">hpx::error_code</a></code>
         type can be passed as the last argument to the API function. In case of an
-        error the error condition will be returned in that <code class="computeroutput">hpx::error_code</code>
+        error the error condition will be returned in that <code class="computeroutput"><a class="link" href="../error_code.html" title="Class error_code">hpx::error_code</a></code>
         instance. The following example demonstrates extracting the full diagnostic
         information without exception handling:
       </p>
@@ -176,9 +176,9 @@
 </table></div>
 <p>
         This example show how an error can be handled without having to resolve to
-        exceptions and that the returned <code class="computeroutput">hpx::error_code</code>
-        instance can be used in a very similar way as the <code class="computeroutput">hpx::exception</code>
-        type above. Simply pass it to the <code class="computeroutput">hpx::diagnostic_information()</code> which retrieves all available
+        exceptions and that the returned <code class="computeroutput"><a class="link" href="../error_code.html" title="Class error_code">hpx::error_code</a></code>
+        instance can be used in a very similar way as the <code class="computeroutput"><a class="link" href="../exception.html" title="Class exception">hpx::exception</a></code>
+        type above. Simply pass it to the <code class="computeroutput"><a class="link" href="../diagnostic_inf_idp15657168.html" title="Function diagnostic_information">hpx::diagnostic_information()</a></code> which retrieves all available
         diagnostic information from the error code instance as a formatted string.
       </p>
 <p>
@@ -219,7 +219,7 @@
 <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">flush</span><span class="special">;</span>
 </pre>
 <p>
-        For more information please refer to the documentation of <code class="computeroutput">hpx::get_error_what()</code>, <code class="computeroutput">hpx::get_error_locality_id()</code>, <code class="computeroutput">hpx::get_error_host_name()</code>, <code class="computeroutput">hpx::get_error_process_id()</code>, <code class="computeroutput">hpx::get_error_function_name()</code>, <code class="computeroutput">hpx::get_error_file_name()</code>, <code class="computeroutput">hpx::get_error_line_number()</code>, <code class="computeroutput">hpx::get_error_os_thread()</code>, <code class="computeroutput">hpx::get_error_thread_id()</code>, and <code class="computeroutput">hpx::get_error_thread_description()</code> <code class="computeroutput">hpx::get_error_backtrace()</code> <code class="computeroutput">hpx::get_error_env()</code> for more details.
+        For more information please refer to the documentation of <code class="computeroutput"><a class="link" href="../get_error_what_idp15686480.html" title="Function get_error_what">hpx::get_error_what()</a></code>, <code class="computeroutput"><a class="link" href="../get_error_loca_idp15716480.html" title="Function get_error_locality_id">hpx::get_error_locality_id()</a></code>, <code class="computeroutput"><a class="link" href="../get_error_host_idp15776464.html" title="Function get_error_host_name">hpx::get_error_host_name()</a></code>, <code class="computeroutput"><a class="link" href="../get_error_proc_idp15806048.html" title="Function get_error_process_id">hpx::get_error_process_id()</a></code>, <code class="computeroutput"><a class="link" href="../get_error_func_idp15865232.html" title="Function get_error_function_name">hpx::get_error_function_name()</a></code>, <code class="computeroutput"><a class="link" href="../get_error_file_idp15924464.html" title="Function get_error_file_name">hpx::get_error_file_name()</a></code>, <code class="computeroutput"><a class="link" href="../get_error_line_idp15954160.html" title="Function get_error_line_number">hpx::get_error_line_number()</a></code>, <code class="computeroutput"><a class="link" href="../get_error_os_t_idp15983760.html" title="Function get_error_os_thread">hpx::get_error_os_thread()</a></code>, <code class="computeroutput"><a class="link" href="../get_error_thre_idp16013488.html" title="Function get_error_thread_id">hpx::get_error_thread_id()</a></code>, and <code class="computeroutput"><a class="link" href="../get_error_thre_idp16043088.html" title="Function get_error_thread_description">hpx::get_error_thread_description()</a></code> <code class="computeroutput"><a class="link" href="../get_error_back_idp15894848.html" title="Function get_error_backtrace">hpx::get_error_backtrace()</a></code> <code class="computeroutput"><a class="link" href="../get_error_env_idp15835648.html" title="Function get_error_env">hpx::get_error_env()</a></code> for more details.
       </p>
 <h5>
 <a name="hpx.manual.error_handling.h2"></a>
@@ -256,7 +256,7 @@
 <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">flush</span><span class="special">;</span>
 </pre>
 <p>
-        All functions which retrieve other diagnostic elements from the <code class="computeroutput">hpx::error_code</code>
+        All functions which retrieve other diagnostic elements from the <code class="computeroutput"><a class="link" href="../error_code.html" title="Class error_code">hpx::error_code</a></code>
         will fail if called with a lightweight error_code instance.
       </p>
 </div>

@@ -110,12 +110,12 @@ default = 1
 
         <span class="comment">// Component actions need to be declared, this also defines the</span>
         <span class="comment">// type 'print_greating_action' representing the action.</span>
-        <code class="computeroutput">HPX_DEFINE_COMPONENT_ACTION</code><span class="special">(</span><span class="identifier">server</span><span class="special">,</span> <span class="identifier">print_greating</span><span class="special">,</span> <span class="identifier">print_greating_action</span><span class="special">);</span>
+        <code class="computeroutput"><a class="link" href="../../../../HPX_DEFINE_COMPONENT_ACTION.html" title="Macro HPX_DEFINE_COMPONENT_ACTION">HPX_DEFINE_COMPONENT_ACTION</a></code><span class="special">(</span><span class="identifier">server</span><span class="special">,</span> <span class="identifier">print_greating</span><span class="special">,</span> <span class="identifier">print_greating_action</span><span class="special">);</span>
     <span class="special">};</span>
 <span class="special">}</span>
 
 <span class="comment">// Declare boilerplate code required for each of the component actions.</span>
-<code class="computeroutput">HPX_REGISTER_ACTION_DECLARATION</code><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">server</span><span class="special">::</span><span class="identifier">print_greating_action</span><span class="special">);</span>
+<code class="computeroutput"><a class="link" href="../../../../HPX_REGISTER_ACTION_DECLARATION.html" title="Macro HPX_REGISTER_ACTION_DECLARATION">HPX_REGISTER_ACTION_DECLARATION</a></code><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">server</span><span class="special">::</span><span class="identifier">print_greating_action</span><span class="special">);</span>
 </pre>
 <p>
               The corresponding source file contains mainly macro invocations which
@@ -133,7 +133,7 @@ default = 1
 
 <span class="comment">// Define boilerplate code required for each of the component actions. Use the</span>
 <span class="comment">// same argument as used for HPX_REGISTER_ACTION_DECLARATION above.</span>
-<code class="computeroutput">HPX_REGISTER_ACTION</code><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">server</span><span class="special">::</span><span class="identifier">print_greating_action</span><span class="special">);</span>
+<code class="computeroutput"><a class="link" href="../../../../HPX_REGISTER_ACTION.html" title="Macro HPX_REGISTER_ACTION">HPX_REGISTER_ACTION</a></code><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">server</span><span class="special">::</span><span class="identifier">print_greating_action</span><span class="special">);</span>
 </pre>
 <p>
               The following gives an example of how the component can be used. We
@@ -153,7 +153,7 @@ default = 1
     <span class="special">{</span>
         <span class="comment">// Create an instance of the app_server component on the current locality.</span>
         <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">naming</span><span class="special">:</span><span class="identifier">id_type</span> <span class="identifier">app_server_instance</span> <span class="special">=</span>
-            <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">create_component</span><span class="special">&lt;</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">server</span><span class="special">&gt;(</span><code class="computeroutput">hpx::find_here</code><span class="special">());</span>
+            <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">create_component</span><span class="special">&lt;</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">server</span><span class="special">&gt;(</span><code class="computeroutput"><a class="link" href="../../../find_here.html" title="Function find_here">hpx::find_here</a></code><span class="special">());</span>
 
         <span class="comment">// Create an instance of the action 'print_greating_action'.</span>
         <span class="identifier">app</span><span class="special">::</span><span class="identifier">server</span><span class="special">::</span><span class="identifier">print_greating_action</span> <span class="identifier">print_greating</span><span class="special">;</span>
@@ -161,12 +161,12 @@ default = 1
         <span class="comment">// Invoke the action 'print_greating' on the newly created component.</span>
         <span class="identifier">print_greating</span><span class="special">(</span><span class="identifier">app_server_instance</span><span class="special">);</span>
     <span class="special">}</span>
-    <span class="keyword">return</span> <code class="computeroutput">hpx::finalize</code><span class="special">();</span>
+    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../../../finalize_idp16122048.html" title="Function finalize">hpx::finalize</a></code><span class="special">();</span>
 <span class="special">}</span>
 
 <span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
 <span class="special">{</span>
-    <span class="keyword">return</span> <code class="computeroutput">hpx::init</code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
+    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../../../init_idp16434368.html" title="Function init">hpx::init</a></code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
 <span class="special">]</span>
 </pre>
 <p>

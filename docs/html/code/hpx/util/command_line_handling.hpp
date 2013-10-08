@@ -24,6 +24,7 @@ namespace hpx { namespace util
             ini_config_(ini_config),
             hpx_main_f_(f),
             num_threads_(1),
+            num_cores_(1),
             num_localities_(1)
         {}
 
@@ -38,6 +39,7 @@ namespace hpx { namespace util
         hpx_main_type hpx_main_f_;
 
         std::size_t num_threads_;
+        std::size_t num_cores_;
         std::size_t num_localities_;
         std::string queuing_;
 

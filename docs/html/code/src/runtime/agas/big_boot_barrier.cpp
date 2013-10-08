@@ -28,6 +28,8 @@
 #include <hpx/runtime/agas/server/component_namespace.hpp>
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
 #include <hpx/runtime/agas/stubs/symbol_namespace.hpp>
+#include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/threads/policies/topology.hpp>
 
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/certificate.hpp>
@@ -40,6 +42,11 @@
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+
+namespace hpx { namespace detail
+{
+    std::string get_locality_base_name();
+}}
 
 namespace hpx { namespace agas
 {
@@ -107,12 +114,14 @@ struct registration_header
       , boost::uint64_t primary_ns_ptr_
       , boost::uint64_t symbol_ns_ptr_
       , boost::uint32_t num_threads_
+      , std::string const& hostname_
       , naming::gid_type prefix_ = naming::gid_type()
     ) :
         locality(locality_)
       , primary_ns_ptr(primary_ns_ptr_)
       , symbol_ns_ptr(symbol_ns_ptr_)
       , num_threads(num_threads_)
+      , hostname(hostname_)
       , prefix(prefix_)
     {}
 
@@ -120,6 +129,7 @@ struct registration_header
     boost::uint64_t primary_ns_ptr;
     boost::uint64_t symbol_ns_ptr;
     boost::uint32_t num_threads;
+    std::string hostname;           // hostname of locality
     naming::gid_type prefix;        // suggested prefix (optional)
 
     template <typename Archive>
@@ -129,6 +139,7 @@ struct registration_header
         ar & primary_ns_ptr;
         ar & symbol_ns_ptr;
         ar & num_threads;
+        ar & hostname;
         ar & prefix;
     }
 };
@@ -146,6 +157,7 @@ struct notification_header
       , naming::address const& component_ns_address_
       , naming::address const& symbol_ns_address_
       , boost::uint32_t num_localities_
+      , boost::uint32_t first_pu_
     ) :
         prefix(prefix_)
       , locality_ns_address(locality_ns_address_)
@@ -153,6 +165,7 @@ struct notification_header
       , component_ns_address(component_ns_address_)
       , symbol_ns_address(symbol_ns_address_)
       , num_localities(num_localities_)
+      , first_usable_pu(first_pu_)
     {}
 
     naming::gid_type prefix;
@@ -161,6 +174,7 @@ struct notification_header
     naming::address component_ns_address;
     naming::address symbol_ns_address;
     boost::uint32_t num_localities;
+    boost::uint32_t first_usable_pu;
 
 #if defined(HPX_HAVE_SECURITY)
     components::security::signed_certificate root_certificate;
@@ -175,6 +189,7 @@ struct notification_header
         ar & component_ns_address;
         ar & symbol_ns_address;
         ar & num_localities;
+        ar & first_usable_pu;
 #if defined(HPX_HAVE_SECURITY)
         ar & root_certificate;
 #endif
@@ -372,8 +387,13 @@ void register_worker(registration_header const& header)
         server::symbol_namespace::get_component_type(),
             agas_client.get_bootstrap_symbol_ns_ptr());
 
+    // assign cores to the new locality
+    boost::uint32_t first_pu = rt.assign_cores(header.hostname,
+        header.num_threads);
+
     notification_header hdr (prefix, locality_addr, primary_addr
-      , component_addr, symbol_addr, rt.get_config().get_num_localities());
+      , component_addr, symbol_addr, rt.get_config().get_num_localities()
+      , first_pu);
 
 #if defined(HPX_HAVE_SECURITY)
     // wait for the root certificate to be available
@@ -546,6 +566,9 @@ void notify_worker(notification_header const& header)
     // store number of initial localities
     rt.get_config().set_num_localities(header.num_localities);
 
+    // store number of first usable pu
+    rt.get_config().set_first_pu(header.first_usable_pu);
+
 #if defined(HPX_HAVE_SECURITY)
     // initialize certificate store
     rt.store_root_certificate(header.root_certificate);
@@ -709,49 +732,69 @@ void big_boot_barrier::apply(
     pp.send_early_parcel(p);
 } // }}}
 
-void big_boot_barrier::wait(void* primary_ns_server, void* symbol_ns_server)
+void big_boot_barrier::wait_bootstrap()
 { // {{{
-    if (service_mode_bootstrap == service_type)
+    BOOST_ASSERT(service_mode_bootstrap == service_type);
+
+    // the root just waits until all localities have connected
+    spin();
+} // }}}
+
+namespace detail
+{
+    boost::uint32_t get_number_of_pus_in_cores(boost::uint32_t num_cores)
     {
-        // the root just waits until all localities have connected
-        spin();
+        threads::topology& top = threads::create_topology();
+
+        boost::uint32_t num_pus = 0;
+        for (boost::uint32_t i = 0; i != num_cores; ++i)
+        {
+            num_pus += static_cast<boost::uint32_t>(
+                top.get_number_of_core_pus(i));
+        }
+
+        return num_pus;
     }
+}
 
-    else
-    {
-        // any worker sends a request for registration and waits
-        BOOST_ASSERT(0 != primary_ns_server);
-        BOOST_ASSERT(0 != symbol_ns_server);
+void big_boot_barrier::wait_hosted(std::string const& locality_name,
+    void* primary_ns_server, void* symbol_ns_server)
+{ // {{{
+    BOOST_ASSERT(service_mode_bootstrap != service_type);
 
-        runtime& rt = get_runtime();
-        boost::uint32_t num_threads = boost::lexical_cast<boost::uint32_t>(
-            rt.get_config().get_entry("hpx.os_threads", boost::uint32_t(1)));
+    // any worker sends a request for registration and waits
+    BOOST_ASSERT(0 != primary_ns_server);
+    BOOST_ASSERT(0 != symbol_ns_server);
 
-        naming::gid_type suggested_prefix;
+    runtime& rt = get_runtime();
+    boost::uint32_t num_cores = boost::lexical_cast<boost::uint32_t>(
+        rt.get_config().get_entry("hpx.cores", boost::uint32_t(1)));
+
+    naming::gid_type suggested_prefix;
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-        // if MPI parcelport is enabled we use the MPI rank as the suggested locality_id
-        if (util::mpi_environment::rank() != -1)
-            suggested_prefix = naming::get_gid_from_locality_id(util::mpi_environment::rank());
+    // if MPI parcelport is enabled we use the MPI rank as the suggested locality_id
+    if (util::mpi_environment::rank() != -1)
+        suggested_prefix = naming::get_gid_from_locality_id(util::mpi_environment::rank());
 #endif
 
-        // contact the bootstrap AGAS node
-        registration_header hdr(
-            rt.here()
-          , reinterpret_cast<boost::uint64_t>(primary_ns_server)
-          , reinterpret_cast<boost::uint64_t>(symbol_ns_server)
-          , num_threads
-          , suggested_prefix);
+    // contact the bootstrap AGAS node
+    registration_header hdr(
+        rt.here()
+        , reinterpret_cast<boost::uint64_t>(primary_ns_server)
+        , reinterpret_cast<boost::uint64_t>(symbol_ns_server)
+        , detail::get_number_of_pus_in_cores(num_cores)
+        , locality_name
+        , suggested_prefix);
 
-        apply(
-            naming::invalid_locality_id
-          , 0
-          , bootstrap_agas
-          , new actions::transfer_action<register_worker_action>(hdr));
+    apply(
+        naming::invalid_locality_id
+        , 0
+        , bootstrap_agas
+        , new actions::transfer_action<register_worker_action>(hdr));
 
-        // wait for registration to be complete
-        spin();
-    }
+    // wait for registration to be complete
+    spin();
 } // }}}
 
 void big_boot_barrier::notify()

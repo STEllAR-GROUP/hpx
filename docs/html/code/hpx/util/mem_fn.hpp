@@ -28,6 +28,16 @@ namespace hpx { namespace util
             explicit mem_fn(MemPtr mem_ptr)
               : f(mem_ptr)
             {}
+
+            mem_fn(mem_fn const& other)
+              : f(other.f)
+            {}
+
+            mem_fn& operator=(mem_fn const& other)
+            {
+                f = other.f;
+                return *this;
+            }
             
             template <typename>
             struct result;

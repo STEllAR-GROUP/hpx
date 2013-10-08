@@ -140,6 +140,8 @@ namespace hpx { namespace threads { namespace policies
                 delete high_priority_queues_[i];
         }
 
+        void init(init_affinity_data const&) {}
+
         bool numa_sensitive() const { return numa_sensitive_; }
 
         threads::mask_cref_type get_pu_mask(topology const& topology,

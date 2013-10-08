@@ -100,6 +100,7 @@ namespace hpx { namespace threads
             notification_policy_type& notifier,
             std::size_t num_threads)
       : startup_(NULL),
+        num_threads_(num_threads),
         thread_count_(0),
         state_(starting),
         timer_pool_(timer_pool),
@@ -109,12 +110,7 @@ namespace hpx { namespace threads
         scheduler_(scheduler),
         notifier_(notifier),
         used_processing_units_()
-    {
-        topology const& topology_ = get_topology();
-        resize(used_processing_units_, hardware_concurrency());
-        for (std::size_t i = 0; i < num_threads; ++i)
-            used_processing_units_ |= scheduler_.get_pu_mask(topology_, i);
-    }
+    {}
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     threadmanager_impl<SchedulingPolicy, NotificationPolicy>::~threadmanager_impl()
@@ -126,6 +122,18 @@ namespace hpx { namespace threads
             threads_.clear();
         }
         delete startup_;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::init(
+        policies::init_affinity_data const& data)
+    {
+        scheduler_.init(data);
+
+        topology const& topology_ = get_topology();
+        resize(used_processing_units_, hardware_concurrency());
+        for (std::size_t i = 0; i != num_threads_; ++i)
+            used_processing_units_ |= scheduler_.get_pu_mask(topology_, i);
     }
 
     ///////////////////////////////////////////////////////////////////////////

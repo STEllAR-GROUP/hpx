@@ -65,6 +65,8 @@ namespace hpx { namespace threads
             std::size_t num_threads);
         ~threadmanager_impl();
 
+        void init(policies::init_affinity_data const& data);
+
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds
         /// the task parameters (function, initial state and description) to
@@ -524,6 +526,7 @@ namespace hpx { namespace threads
         mutable mutex_type mtx_;                    ///< mutex protecting the members
         boost::barrier* startup_;                   ///< startup synchronization
 
+        std::size_t num_threads_;
         boost::ptr_vector<boost::thread> threads_;
 
         // count number of executed HPX-threads (invocations)

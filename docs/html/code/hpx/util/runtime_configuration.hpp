@@ -50,6 +50,10 @@ namespace hpx { namespace util
         boost::uint32_t get_num_localities() const;
         void set_num_localities(boost::uint32_t);
 
+        // sequence number of first usable pu
+        boost::uint32_t get_first_pu() const;
+        void set_first_pu(boost::uint32_t);
+
         // Get the AGAS locality to use
         naming::locality get_agas_locality() const;
 

@@ -658,6 +658,8 @@
 // Older Boost versions do not have BOOST_NOEXCEPT defined
 #if !defined(BOOST_NOEXCEPT)
 #define BOOST_NOEXCEPT
+#define BOOST_NOEXCEPT_IF(Predicate)
+#define BOOST_NOEXCEPT_EXPR(Expression) false
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

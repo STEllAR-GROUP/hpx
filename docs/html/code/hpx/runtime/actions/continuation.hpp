@@ -73,7 +73,7 @@ namespace hpx
         typename lcos::base_lco_with_value<
             typename util::remove_reference<T>::type
         >::set_value_action set;
-        apply(set, id, boost::move(t));
+        apply(set, id, util::detail::make_temporary<T>::call(t));
     }
 
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
@@ -239,7 +239,7 @@ namespace hpx { namespace actions
         template <typename T>
         void operator()(hpx::id_type const& lco, BOOST_FWD_REF(T) t) const
         {
-            hpx::apply_c(cont_, lco, target_, t);
+            hpx::apply_c(cont_, lco, target_, boost::forward<T>(t));
         }
 
     private:
@@ -277,7 +277,7 @@ namespace hpx { namespace actions
         void operator()(hpx::id_type const& lco, BOOST_FWD_REF(T) t) const
         {
             using hpx::util::placeholders::_2;
-            hpx::apply_continue(cont_, target_, t, hpx::util::bind(f_, lco, _2));
+            hpx::apply_continue(cont_, target_, boost::forward<T>(t), hpx::util::bind(f_, lco, _2));
         }
 
     private:

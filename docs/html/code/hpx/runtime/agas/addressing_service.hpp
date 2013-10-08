@@ -130,7 +130,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
         destroy_big_boot_barrier();
     }
 
-    void initialize();
+    void initialize(parcelset::parcelport& pp);
 
     void adjust_local_cache_size();
 
@@ -208,7 +208,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
 protected:
     void launch_bootstrap(
-        util::runtime_configuration const& ini_
+        parcelset::parcelport& pp
+      , util::runtime_configuration const& ini_
         );
 
     void launch_hosted();

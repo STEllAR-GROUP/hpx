@@ -64,7 +64,7 @@
     <span class="keyword">void</span> <span class="identifier">some_function_with_error</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">arg</span><span class="special">)</span>
     <span class="special">{</span>
         <span class="keyword">if</span> <span class="special">(</span><span class="identifier">arg</span> <span class="special">&lt;</span> <span class="number">0</span><span class="special">)</span> <span class="special">{</span>
-            <code class="computeroutput">HPX_THROW_EXCEPTION</code><span class="special">(</span><span class="identifier">bad_argument</span><span class="special">,</span> <span class="string">"some_function_with_error"</span><span class="special">,</span>
+            <code class="computeroutput"><a class="link" href="../../../HPX_THROW_EXCEPTION.html" title="Macro HPX_THROW_EXCEPTION">HPX_THROW_EXCEPTION</a></code><span class="special">(</span><span class="identifier">bad_argument</span><span class="special">,</span> <span class="string">"some_function_with_error"</span><span class="special">,</span>
                 <span class="string">"some really bad error happened"</span><span class="special">);</span>
         <span class="special">}</span>
         <span class="comment">// do something else...</span>
@@ -73,11 +73,11 @@
 
 <span class="comment">// This will define the action type 'some_error_action' which represents</span>
 <span class="comment">// the function 'app::some_function_with_error'.</span>
-<code class="computeroutput">HPX_PLAIN_ACTION</code><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">some_function_with_error</span><span class="special">,</span> <span class="identifier">some_error_action</span><span class="special">);</span>
+<code class="computeroutput"><a class="link" href="../../../HPX_PLAIN_ACTION.html" title="Macro HPX_PLAIN_ACTION">HPX_PLAIN_ACTION</a></code><span class="special">(</span><span class="identifier">app</span><span class="special">::</span><span class="identifier">some_function_with_error</span><span class="special">,</span> <span class="identifier">some_error_action</span><span class="special">);</span>
 </pre>
 <p>
-          The use of <code class="computeroutput">HPX_THROW_EXCEPTION</code>
-          to report the error encapsulates the creation of a <code class="computeroutput">hpx::exception</code> which is initialized
+          The use of <code class="computeroutput"><a class="link" href="../../../HPX_THROW_EXCEPTION.html" title="Macro HPX_THROW_EXCEPTION">HPX_THROW_EXCEPTION</a></code>
+          to report the error encapsulates the creation of a <code class="computeroutput"><a class="link" href="../../exception.html" title="Class exception">hpx::exception</a></code> which is initialized
           with the error code <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">bad_parameter</span></code>.
           Additionally it carries the passed strings, the information about the file
           name, line number, and call stack of the point the exception was thrown
@@ -91,7 +91,7 @@
 <span class="keyword">try</span> <span class="special">{</span>
     <span class="identifier">act</span><span class="special">(</span><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">find_here</span><span class="special">(),</span> <span class="special">-</span><span class="number">3</span><span class="special">);</span>    <span class="comment">// exception will be rethrown from here</span>
 <span class="special">}</span>
-<span class="keyword">catch</span> <span class="special">(</span><code class="computeroutput">hpx::exception</code> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">e</span><span class="special">)</span> <span class="special">{</span>
+<span class="keyword">catch</span> <span class="special">(</span><code class="computeroutput"><a class="link" href="../../exception.html" title="Class exception">hpx::exception</a></code> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">e</span><span class="special">)</span> <span class="special">{</span>
     <span class="comment">// prints: 'some really bad error happened: HPX(bad parameter)'</span>
     <span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">e</span><span class="special">.</span><span class="identifier">what</span><span class="special">();</span>
 <span class="special">}</span>
@@ -107,7 +107,7 @@
 <span class="keyword">try</span> <span class="special">{</span>
     <span class="identifier">f</span><span class="special">.</span><span class="identifier">get</span><span class="special">();</span>                      <span class="comment">// exception will be rethrown from here</span>
 <span class="special">}</span>
-<span class="keyword">catch</span> <span class="special">(</span><code class="computeroutput">hpx::exception</code> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">e</span><span class="special">)</span> <span class="special">{</span>
+<span class="keyword">catch</span> <span class="special">(</span><code class="computeroutput"><a class="link" href="../../exception.html" title="Class exception">hpx::exception</a></code> <span class="keyword">const</span><span class="special">&amp;</span> <span class="identifier">e</span><span class="special">)</span> <span class="special">{</span>
     <span class="comment">// prints: 'some really bad error happened: HPX(bad parameter)'</span>
     <span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">e</span><span class="special">.</span><span class="identifier">what</span><span class="special">();</span>
 <span class="special">}</span>
