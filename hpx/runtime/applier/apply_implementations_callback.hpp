@@ -54,7 +54,7 @@ namespace hpx
         template <typename Action, typename Callback,
             BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_r_p_cb(naming::address& addr, naming::id_type const& gid,
+        apply_r_p_cb(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
@@ -62,7 +62,7 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
 
@@ -146,7 +146,7 @@ namespace hpx
             BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
         apply_r_p_cb(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -155,7 +155,7 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)), cont);
 

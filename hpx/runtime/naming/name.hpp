@@ -399,6 +399,8 @@ namespace hpx { namespace naming
                 ((credit & gid_type::credit_base_mask) << 16));
         }
 
+        // splits the current credit of the given id and assigns half of it to the
+        // returned copy
         inline gid_type split_credits_for_gid(gid_type& id, int fraction = 2)
         {
             boost::uint64_t msb = id.get_msb();
@@ -407,10 +409,39 @@ namespace hpx { namespace naming
             boost::uint32_t newcredits = static_cast<boost::uint32_t>(credits / fraction);
 
             msb &= ~gid_type::credit_mask;
-            id.set_msb(msb | (((credits - newcredits) << 16) & gid_type::credit_mask) | gid_type::was_split_mask);
+            id.set_msb(msb |
+                (((credits - newcredits) << 16) & gid_type::credit_mask) |
+                gid_type::was_split_mask);
 
-            return gid_type(msb | ((newcredits << 16) & gid_type::credit_mask) | gid_type::was_split_mask,
+            return gid_type(msb |
+                    ((newcredits << 16) & gid_type::credit_mask) |
+                    gid_type::was_split_mask,
                 id.get_lsb());
+        }
+
+        // subtracts one from the credit of the given id and assigns this to the returned copy
+        inline gid_type split_credits_for_parcel_dest_gid(gid_type& id)
+        {
+            boost::uint64_t msb = id.get_msb();
+            boost::uint16_t credits = boost::uint16_t((msb & gid_type::credit_mask) >> 16);
+
+            BOOST_ASSERT(credits != 0);
+
+            msb &= ~gid_type::credit_mask;
+            if (credits > 1) {
+                id.set_msb(msb |
+                    (((credits - 1) << 16) & gid_type::credit_mask) |
+                    gid_type::was_split_mask);
+
+                return gid_type(msb |
+                        ((1 << 16) & gid_type::credit_mask) |
+                        gid_type::was_split_mask,
+                    id.get_lsb());
+            }
+
+            // no credits left for new id
+            id.set_msb(msb | gid_type::was_split_mask);
+            return gid_type(msb | gid_type::was_split_mask, id.get_lsb());
         }
 
         inline bool gid_was_split(gid_type const& id)
@@ -476,6 +507,9 @@ namespace hpx { namespace naming
             template <typename Archive>
             void load(Archive& ar);
 
+            // make sure one credit goes with the parcel destination gid
+            naming::gid_type prepare_parcel_dest_gid();
+
         private:
             // credit management (called during serialization), this function
             // has to be 'const' as save() above has to be 'const'.
@@ -501,6 +535,9 @@ namespace hpx { namespace naming
                 id_type_impl::get_deleter(p->get_management_type())(p);
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////
     // the local gid is actually just a wrapper around the real thing
@@ -654,6 +691,8 @@ namespace hpx { namespace naming
         }
 
     private:
+        friend gid_type get_parcel_dest_gid(id_type const& id);
+
         friend std::ostream& operator<< (std::ostream& os, id_type const& id);
 
         friend class boost::serialization::access;

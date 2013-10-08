@@ -15,42 +15,17 @@ namespace hpx
     {
         template <typename Action, typename Arg0>
         inline bool
-        apply_r_p(naming::address& addr, naming::id_type const& gid,
+        apply_r_p(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 )));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
-            return false; 
-        }
-        template <typename Action, typename Arg0>
-        inline bool
-        apply_r_p(std::vector<naming::address>& addrs,
-            std::vector<naming::gid_type> const& gids,
-            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
-        {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-            
-            std::map<naming::locality, destinations> dests;
-            std::size_t count = gids.size();
-            for (std::size_t i = 0; i < count; ++i) {
-                complement_addr<action_type>(addrs[i]);
-                destinations& dest = dests[addrs[i].locality_];
-                dest.gids_.push_back(gids[i]);
-                dest.addrs_.push_back(addrs[i]);
-            }
-            
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-            actions::action_type act(
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 )));
-            std::for_each(dests.begin(), dests.end(), send_parcel(ph, act));
             return false; 
         }
         template <typename Action, typename Arg0>
@@ -140,78 +115,19 @@ namespace hpx
             boost::forward<Arg0>( arg0 ));
     }
     
-    template <typename Action, typename Arg0>
-    inline bool
-    apply_p(std::vector<naming::id_type> const& ids,
-        threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
-    {
-        
-        std::vector<naming::gid_type> gids;
-        std::vector<naming::address> addrs;
-        boost::dynamic_bitset<> locals;
-        std::size_t count = ids.size();
-        gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
-            
-            for (std::size_t i = 0; i < count; ++i) {
-                if (locals.test(i)) {
-                    
-                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
-                        arg0);
-                }
-                gids.push_back(applier::detail::convert_to_gid(ids[i]));
-            }
-            
-            std::vector<naming::gid_type>::iterator it =
-                util::remove_local_destinations(gids, addrs, locals);
-            if (it == gids.begin())
-                return true; 
-            gids.erase(it, gids.end());
-            addrs.resize(gids.size());
-        }
-        else {
-            std::transform(ids.begin(), ids.end(), std::back_inserter(gids),
-                applier::detail::convert_to_gid);
-        }
-        
-        return applier::detail::apply_r_p<Action>(addrs, gids, priority,
-            boost::forward<Arg0>( arg0 ));
-    }
-    template <typename Action, typename Arg0>
-    inline bool
-    apply (std::vector<naming::id_type> const& gids,
-        BOOST_FWD_REF(Arg0) arg0)
-    {
-        return apply_p<Action>(gids, actions::action_priority<Action>(),
-            boost::forward<Arg0>( arg0 ));
-    }
-    template <typename Component, typename Result, typename Arguments, 
-        typename Derived, typename Arg0>
-    inline bool
-    apply (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
-        std::vector<naming::id_type> const& gids,
-        BOOST_FWD_REF(Arg0) arg0)
-    {
-        return apply_p<Derived>(gids, actions::action_priority<Derived>(),
-            boost::forward<Arg0>( arg0 ));
-    }
-    
     namespace applier { namespace detail
     {
         template <typename Action, typename Arg0>
         inline bool
         apply_r_p(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Arg0) arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 )), cont);
             
@@ -377,42 +293,17 @@ namespace hpx
     {
         template <typename Action, typename Arg0 , typename Arg1>
         inline bool
-        apply_r_p(naming::address& addr, naming::id_type const& gid,
+        apply_r_p(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
-            return false; 
-        }
-        template <typename Action, typename Arg0 , typename Arg1>
-        inline bool
-        apply_r_p(std::vector<naming::address>& addrs,
-            std::vector<naming::gid_type> const& gids,
-            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
-        {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-            
-            std::map<naming::locality, destinations> dests;
-            std::size_t count = gids.size();
-            for (std::size_t i = 0; i < count; ++i) {
-                complement_addr<action_type>(addrs[i]);
-                destinations& dest = dests[addrs[i].locality_];
-                dest.gids_.push_back(gids[i]);
-                dest.addrs_.push_back(addrs[i]);
-            }
-            
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-            actions::action_type act(
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )));
-            std::for_each(dests.begin(), dests.end(), send_parcel(ph, act));
             return false; 
         }
         template <typename Action, typename Arg0 , typename Arg1>
@@ -502,78 +393,19 @@ namespace hpx
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
     
-    template <typename Action, typename Arg0 , typename Arg1>
-    inline bool
-    apply_p(std::vector<naming::id_type> const& ids,
-        threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
-    {
-        
-        std::vector<naming::gid_type> gids;
-        std::vector<naming::address> addrs;
-        boost::dynamic_bitset<> locals;
-        std::size_t count = ids.size();
-        gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
-            
-            for (std::size_t i = 0; i < count; ++i) {
-                if (locals.test(i)) {
-                    
-                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
-                        arg0 , arg1);
-                }
-                gids.push_back(applier::detail::convert_to_gid(ids[i]));
-            }
-            
-            std::vector<naming::gid_type>::iterator it =
-                util::remove_local_destinations(gids, addrs, locals);
-            if (it == gids.begin())
-                return true; 
-            gids.erase(it, gids.end());
-            addrs.resize(gids.size());
-        }
-        else {
-            std::transform(ids.begin(), ids.end(), std::back_inserter(gids),
-                applier::detail::convert_to_gid);
-        }
-        
-        return applier::detail::apply_r_p<Action>(addrs, gids, priority,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
-    }
-    template <typename Action, typename Arg0 , typename Arg1>
-    inline bool
-    apply (std::vector<naming::id_type> const& gids,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
-    {
-        return apply_p<Action>(gids, actions::action_priority<Action>(),
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
-    }
-    template <typename Component, typename Result, typename Arguments, 
-        typename Derived, typename Arg0 , typename Arg1>
-    inline bool
-    apply (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
-        std::vector<naming::id_type> const& gids,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
-    {
-        return apply_p<Derived>(gids, actions::action_priority<Derived>(),
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
-    }
-    
     namespace applier { namespace detail
     {
         template <typename Action, typename Arg0 , typename Arg1>
         inline bool
         apply_r_p(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )), cont);
             
@@ -739,42 +571,17 @@ namespace hpx
     {
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
         inline bool
-        apply_r_p(naming::address& addr, naming::id_type const& gid,
+        apply_r_p(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
-            return false; 
-        }
-        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
-        inline bool
-        apply_r_p(std::vector<naming::address>& addrs,
-            std::vector<naming::gid_type> const& gids,
-            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
-        {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-            
-            std::map<naming::locality, destinations> dests;
-            std::size_t count = gids.size();
-            for (std::size_t i = 0; i < count; ++i) {
-                complement_addr<action_type>(addrs[i]);
-                destinations& dest = dests[addrs[i].locality_];
-                dest.gids_.push_back(gids[i]);
-                dest.addrs_.push_back(addrs[i]);
-            }
-            
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-            actions::action_type act(
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )));
-            std::for_each(dests.begin(), dests.end(), send_parcel(ph, act));
             return false; 
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
@@ -864,78 +671,19 @@ namespace hpx
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
     
-    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
-    inline bool
-    apply_p(std::vector<naming::id_type> const& ids,
-        threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
-    {
-        
-        std::vector<naming::gid_type> gids;
-        std::vector<naming::address> addrs;
-        boost::dynamic_bitset<> locals;
-        std::size_t count = ids.size();
-        gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
-            
-            for (std::size_t i = 0; i < count; ++i) {
-                if (locals.test(i)) {
-                    
-                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
-                        arg0 , arg1 , arg2);
-                }
-                gids.push_back(applier::detail::convert_to_gid(ids[i]));
-            }
-            
-            std::vector<naming::gid_type>::iterator it =
-                util::remove_local_destinations(gids, addrs, locals);
-            if (it == gids.begin())
-                return true; 
-            gids.erase(it, gids.end());
-            addrs.resize(gids.size());
-        }
-        else {
-            std::transform(ids.begin(), ids.end(), std::back_inserter(gids),
-                applier::detail::convert_to_gid);
-        }
-        
-        return applier::detail::apply_r_p<Action>(addrs, gids, priority,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
-    }
-    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
-    inline bool
-    apply (std::vector<naming::id_type> const& gids,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
-    {
-        return apply_p<Action>(gids, actions::action_priority<Action>(),
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
-    }
-    template <typename Component, typename Result, typename Arguments, 
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
-    inline bool
-    apply (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
-        std::vector<naming::id_type> const& gids,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
-    {
-        return apply_p<Derived>(gids, actions::action_priority<Derived>(),
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
-    }
-    
     namespace applier { namespace detail
     {
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
         inline bool
         apply_r_p(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )), cont);
             
@@ -1101,42 +849,17 @@ namespace hpx
     {
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         inline bool
-        apply_r_p(naming::address& addr, naming::id_type const& gid,
+        apply_r_p(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
-            return false; 
-        }
-        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-        inline bool
-        apply_r_p(std::vector<naming::address>& addrs,
-            std::vector<naming::gid_type> const& gids,
-            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
-        {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-            
-            std::map<naming::locality, destinations> dests;
-            std::size_t count = gids.size();
-            for (std::size_t i = 0; i < count; ++i) {
-                complement_addr<action_type>(addrs[i]);
-                destinations& dest = dests[addrs[i].locality_];
-                dest.gids_.push_back(gids[i]);
-                dest.addrs_.push_back(addrs[i]);
-            }
-            
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-            actions::action_type act(
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )));
-            std::for_each(dests.begin(), dests.end(), send_parcel(ph, act));
             return false; 
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -1226,78 +949,19 @@ namespace hpx
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
     
-    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    inline bool
-    apply_p(std::vector<naming::id_type> const& ids,
-        threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
-    {
-        
-        std::vector<naming::gid_type> gids;
-        std::vector<naming::address> addrs;
-        boost::dynamic_bitset<> locals;
-        std::size_t count = ids.size();
-        gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
-            
-            for (std::size_t i = 0; i < count; ++i) {
-                if (locals.test(i)) {
-                    
-                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
-                        arg0 , arg1 , arg2 , arg3);
-                }
-                gids.push_back(applier::detail::convert_to_gid(ids[i]));
-            }
-            
-            std::vector<naming::gid_type>::iterator it =
-                util::remove_local_destinations(gids, addrs, locals);
-            if (it == gids.begin())
-                return true; 
-            gids.erase(it, gids.end());
-            addrs.resize(gids.size());
-        }
-        else {
-            std::transform(ids.begin(), ids.end(), std::back_inserter(gids),
-                applier::detail::convert_to_gid);
-        }
-        
-        return applier::detail::apply_r_p<Action>(addrs, gids, priority,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
-    }
-    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    inline bool
-    apply (std::vector<naming::id_type> const& gids,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
-    {
-        return apply_p<Action>(gids, actions::action_priority<Action>(),
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
-    }
-    template <typename Component, typename Result, typename Arguments, 
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    inline bool
-    apply (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
-        std::vector<naming::id_type> const& gids,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
-    {
-        return apply_p<Derived>(gids, actions::action_priority<Derived>(),
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
-    }
-    
     namespace applier { namespace detail
     {
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         inline bool
         apply_r_p(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )), cont);
             
@@ -1463,42 +1127,17 @@ namespace hpx
     {
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         inline bool
-        apply_r_p(naming::address& addr, naming::id_type const& gid,
+        apply_r_p(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
-            return false; 
-        }
-        template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-        inline bool
-        apply_r_p(std::vector<naming::address>& addrs,
-            std::vector<naming::gid_type> const& gids,
-            threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
-        {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
-            
-            std::map<naming::locality, destinations> dests;
-            std::size_t count = gids.size();
-            for (std::size_t i = 0; i < count; ++i) {
-                complement_addr<action_type>(addrs[i]);
-                destinations& dest = dests[addrs[i].locality_];
-                dest.gids_.push_back(gids[i]);
-                dest.addrs_.push_back(addrs[i]);
-            }
-            
-            parcelset::parcelhandler& ph =
-                hpx::applier::get_applier().get_parcel_handler();
-            actions::action_type act(
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )));
-            std::for_each(dests.begin(), dests.end(), send_parcel(ph, act));
             return false; 
         }
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -1588,78 +1227,19 @@ namespace hpx
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
     
-    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    inline bool
-    apply_p(std::vector<naming::id_type> const& ids,
-        threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
-    {
-        
-        std::vector<naming::gid_type> gids;
-        std::vector<naming::address> addrs;
-        boost::dynamic_bitset<> locals;
-        std::size_t count = ids.size();
-        gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
-            
-            for (std::size_t i = 0; i < count; ++i) {
-                if (locals.test(i)) {
-                    
-                    applier::detail::apply_l_p_val<Action>(addrs[i], priority,
-                        arg0 , arg1 , arg2 , arg3 , arg4);
-                }
-                gids.push_back(applier::detail::convert_to_gid(ids[i]));
-            }
-            
-            std::vector<naming::gid_type>::iterator it =
-                util::remove_local_destinations(gids, addrs, locals);
-            if (it == gids.begin())
-                return true; 
-            gids.erase(it, gids.end());
-            addrs.resize(gids.size());
-        }
-        else {
-            std::transform(ids.begin(), ids.end(), std::back_inserter(gids),
-                applier::detail::convert_to_gid);
-        }
-        
-        return applier::detail::apply_r_p<Action>(addrs, gids, priority,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
-    }
-    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    inline bool
-    apply (std::vector<naming::id_type> const& gids,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
-    {
-        return apply_p<Action>(gids, actions::action_priority<Action>(),
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
-    }
-    template <typename Component, typename Result, typename Arguments, 
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    inline bool
-    apply (
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > ,
-        std::vector<naming::id_type> const& gids,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
-    {
-        return apply_p<Derived>(gids, actions::action_priority<Derived>(),
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
-    }
-    
     namespace applier { namespace detail
     {
         template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         inline bool
         apply_r_p(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )), cont);
             
