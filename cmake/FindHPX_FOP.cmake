@@ -15,5 +15,5 @@ endif()
 
 hpx_find_program(FOP
   PROGRAMS fop
-  PROGRAM_PATHS bin)
+  PROGRAM_PATHS . bin)
 

@@ -44,9 +44,9 @@ set(CMAKE_CONFIGURATION_TYPES "${CMAKE_BUILD_TYPE}" CACHE INTERNAL "Configuratio
 ################################################################################
 project(hpx CXX C)
 
-set(HPX_MAJOR_VERSION 1)
-set(HPX_MINOR_VERSION 0)
-set(HPX_PATCH_LEVEL   0)
+set(HPX_MAJOR_VERSION 0)
+set(HPX_MINOR_VERSION 9)
+set(HPX_PATCH_LEVEL   7)
 set(HPX_VERSION "${HPX_MAJOR_VERSION}.${HPX_MINOR_VERSION}.${HPX_PATCH_LEVEL}")
 set(HPX_SOVERSION ${HPX_MAJOR_VERSION})
 

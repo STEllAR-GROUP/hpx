@@ -184,7 +184,7 @@ macro(add_hpx_executable name)
   endif()
 
   # linker instructions
-  if(NOT ${${name}_NOLIBS})
+  if(NOT ${name}_NOLIBS)
     if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
       set(hpx_libs
         hpx${HPX_DEBUG_POSTFIX}
