@@ -4,13 +4,13 @@
 <title>Macro HPX_THROWS_IF</title>
 <link rel="stylesheet" href="src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="index.html" title="HPX 1.0.0">
+<link rel="home" href="index.html" title="HPX 0.9.7">
 <link rel="up" href="header/hpx/exception_hpp.html" title="Header &lt;hpx/exception.hpp&gt;">
 <link rel="prev" href="HPX_THROW_EXCEPTION.html" title="Macro HPX_THROW_EXCEPTION">
 <link rel="next" href="header/hpx/hpx_finalize_hpp.html" title="Header &lt;hpx/hpx_finalize.hpp&gt;">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="images/hpx_1_0_0_draft.png"></td></tr></table>
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="images/hpx_0_9_7_draft.png"></td></tr></table>
 <hr>
 <div class="spirit-nav">
 <a accesskey="p" href="HPX_THROW_EXCEPTION.html"><img src="images/prev.png" alt="Prev"></a><a accesskey="u" href="header/hpx/exception_hpp.html"><img src="images/up.png" alt="Up"></a><a accesskey="h" href="index.html"><img src="images/home.png" alt="Home"></a><a accesskey="n" href="header/hpx/hpx_finalize_hpp.html"><img src="images/next.png" alt="Next"></a>
@@ -26,7 +26,7 @@
 
 </span>HPX_THROWS_IF(ec, errcode, f, msg)</pre></div>
 <div class="refsect1">
-<a name="idp16460064"></a><h2>Description</h2>
+<a name="idp16626912"></a><h2>Description</h2>
 <p>The macro <span class="emphasis"><em>HPX_THROWS_IF</em></span> can be used to either throw a <span class="emphasis"><em><a class="link" href="hpx/exception.html" title="Class exception">hpx::exception</a></em></span> or to initialize a <span class="emphasis"><em><a class="link" href="hpx/error_code.html" title="Class error_code">hpx::error_code</a></em></span> from the given parameters. If &amp;ec == &amp;hpx::throws, the semantics of this macro are equivalent to <span class="emphasis"><em>HPX_THROW_EXCEPTION</em></span>. If &amp;ec != &amp;hpx::throws, the <span class="emphasis"><em><a class="link" href="hpx/error_code.html" title="Class error_code">hpx::error_code</a></em></span> instance <code class="computeroutput">ec</code> is initialized instead.</p>
 <p>The parameter <code class="computeroutput">errcode</code> holds the hpx::error code from which the new exception should be initialized. The parameter <code class="computeroutput">f</code> is expected to hold the name of the function exception is thrown from and the parameter <code class="computeroutput">msg</code> holds the error message the new exception should encapsulate. </p>
 </div>

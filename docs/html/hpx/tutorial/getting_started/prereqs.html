@@ -4,13 +4,13 @@
 <title>Prerequisites</title>
 <link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../index.html" title="HPX 1.0.0">
+<link rel="home" href="../../../index.html" title="HPX 0.9.7">
 <link rel="up" href="../getting_started.html" title="Getting Started">
 <link rel="prev" href="../getting_started.html" title="Getting Started">
 <link rel="next" href="boost_installation.html" title="Installing Boost Libraries">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="470" height="120" src="../../../images/hpx_1_0_0_draft.png"></td></tr></table>
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="../../../images/hpx_0_9_7_draft.png"></td></tr></table>
 <hr>
 <div class="spirit-nav">
 <a accesskey="p" href="../getting_started.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="boost_installation.html"><img src="../../../images/next.png" alt="Next"></a>
@@ -192,7 +192,7 @@
                 </td>
 <td>
                   <p>
-                    4.6.3
+                    4.6.3 or newer
                   </p>
                 </td>
 <td>
@@ -275,7 +275,11 @@
                     1.47.0
                   </p>
                 </td>
-<td class="auto-generated">&#160;</td>
+<td>
+                  <p>
+                    See below for an important limitation when using Boost V1.54.0.
+                  </p>
+                </td>
 </tr>
 <tr>
 <td>
@@ -303,7 +307,18 @@
 </tbody>
 </table></div>
 </div>
-<br class="table-break"><div class="table">
+<br class="table-break"><div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            Because of a problem in Boost V1.54.0 this version can't be used for
+            compiling <span class="emphasis"><em>HPX</em></span> if you use gcc V4.6 or newer. Please
+            use either an earlier or a later version of Boost.
+          </p></td></tr>
+</table></div>
+<div class="table">
 <a name="hpx.tutorial.getting_started.prereqs.software_prerequisites_for_hpx_0"></a><p class="title"><b>Table&#160;5.&#160;Software Prerequisites for <span class="emphasis"><em>HPX</em></span> on Windows systems</b></p>
 <div class="table-contents"><table class="table" summary="Software Prerequisites for HPX on Windows systems">
 <colgroup>
@@ -350,7 +365,7 @@
                 </td>
 <td>
                   <p>
-                    2010
+                    2013
                   </p>
                 </td>
 <td>
