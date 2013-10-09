@@ -10,6 +10,7 @@ set(tests
     dataflow_launch_775
     future_790
     future_unwrap_878
+    lifetime_588
     set_hpx_limit_771
     set_hpx_limit_798
    )
