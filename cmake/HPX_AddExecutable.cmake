@@ -10,7 +10,7 @@ include(HPX_Include)
 
 hpx_include(Message
             ParseArguments
-            AppendProperty 
+            AppendProperty
             HandleComponentDependencies
             Install)
 
@@ -157,6 +157,8 @@ macro(add_hpx_executable name)
     hpx_append_property(${name}_exe COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
   endif()
 
+  hpx_append_property(${name}_exe COMPILE_FLAGS "-fPIC")
+
   if(${name}_LINK_FLAGS)
     hpx_append_property(${name}_exe LINK_FLAGS ${${name}_LINK_FLAGS})
   endif()
@@ -179,8 +181,12 @@ macro(add_hpx_executable name)
                                      INSTALL_RPATH_USE_LINK_PATH TRUE
                                      INSTALL_RPATH ${HPX_RPATH})
     if(HPX_PIE)
-      hpx_append_property(${name}_exe LINK_FLAGS -pie)
+       hpx_append_property(${name}_exe LINK_FLAGS -pie)
     endif()
+  endif()
+
+  if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+    hpx_append_property(${name}_exe LINK_FLAGS -dynamic)
   endif()
 
   # linker instructions

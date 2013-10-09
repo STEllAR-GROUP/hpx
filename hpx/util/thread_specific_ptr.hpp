@@ -21,7 +21,7 @@
 // native implementation
 #if defined(HPX_HAVE_NATIVE_TLS)
 
-#if !defined(__ANDROID__) && !defined(ANDROID)
+#if (!defined(__ANDROID__) && !defined(ANDROID)) && !defined(__bgq__)
 
 #if defined(_GLIBCXX_HAVE_TLS)
 #  define HPX_NATIVE_TLS __thread

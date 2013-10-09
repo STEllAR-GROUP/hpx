@@ -140,7 +140,11 @@ namespace hpx { namespace util
 
             // TCPIP related settings
             "[hpx.parcel.tcpip]",
+#if defined(HPX_HAVE_PARCELPORT_TCPIP)
             "enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}",
+#else
+            "enable = ${HPX_HAVE_PARCELPORT_TCPIP:0}",
+#endif
 
             // shmem related settings
             "[hpx.parcel.shmem]",

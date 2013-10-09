@@ -11,7 +11,9 @@
 #endif
 
 #include <hpx/hpx_fwd.hpp>
+#if defined(HPX_HAVE_PARCELPORT_TCPIP)
 #include <hpx/runtime/parcelset/tcp/parcelport.hpp>
+#endif
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
 #  include <hpx/runtime/parcelset/shmem/parcelport.hpp>
 #endif
@@ -52,6 +54,7 @@ namespace hpx { namespace parcelset
         switch(type) {
         case connection_tcpip:
             {
+#if defined(HPX_HAVE_PARCELPORT_TCPIP)
                 std::string enable_tcpip =
                     cfg.get_entry("hpx.parcel.tcpip.enable", "1");
 
@@ -60,6 +63,7 @@ namespace hpx { namespace parcelset
                     return boost::make_shared<parcelset::tcp::parcelport>(
                         cfg, on_start_thread, on_stop_thread);
                 }
+#endif
 
                 HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                     "unsupported connection type 'connection_tcpip'");

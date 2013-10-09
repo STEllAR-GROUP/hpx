@@ -88,6 +88,10 @@ endif()
 ################################################################################
 include(HPX_FortranCompiler)
 
+if(HPX_PLATFORM)
+  string(TOUPPER ${HPX_PLATFORM} HPX_PLATFORM_UC)
+endif()
+
 ################################################################################
 # Boost configuration
 ################################################################################
@@ -330,6 +334,18 @@ endif()
 ################################################################################
 # Decide whether to use shared memory based parcelport (starting with Boost V1.52)
 ################################################################################
+if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+  hpx_option(HPX_HAVE_PARCELPORT_TCPIP BOOL "Enable parcelport based on tcp/ip operations (default: OFF)." OFF ADVANCED)
+else()
+  hpx_option(HPX_HAVE_PARCELPORT_TCPIP BOOL "Enable parcelport based on tcp/ip operations (default: ON)." ON ADVANCED)
+endif()
+if(HPX_HAVE_PARCELPORT_TCPIP)
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_TCPIP)
+endif()
+
+################################################################################
+# Decide whether to use shared memory based parcelport (starting with Boost V1.52)
+################################################################################
 if(${BOOST_MINOR_VERSION} GREATER 51)
   hpx_option(HPX_HAVE_PARCELPORT_SHMEM BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
   if(HPX_HAVE_PARCELPORT_SHMEM)
@@ -352,7 +368,11 @@ endif()
 ################################################################################
 # Decide whether to use MPI based parcelport
 ################################################################################
-hpx_option(HPX_HAVE_PARCELPORT_MPI BOOL "Enable parcelport based on MPI (default: OFF)." OFF ADVANCED)
+if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+  hpx_option(HPX_HAVE_PARCELPORT_MPI BOOL "Enable parcelport based on MPI (default: ON)." ON ADVANCED)
+else()
+  hpx_option(HPX_HAVE_PARCELPORT_MPI BOOL "Enable parcelport based on MPI (default: OFF)." OFF ADVANCED)
+endif()
 if(HPX_HAVE_PARCELPORT_MPI)
   find_package(HPX_MPI)
   if(MPI_FOUND OR MPI_CXX_FOUND)
@@ -1088,7 +1108,13 @@ else()
     hpx_use_flag_if_available(-fno-inline LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     # Optimize for speed
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
+    if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+      # FIXME: we currently run into bug with bgclang when using O3
+      # Until the bug is resolved, we set it to O2
+      #hpx_use_flag_if_available(-O2 LANGUAGES CXX C Fortran)
+    else()
+      hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
+    endif()
 
     # Generate debugging information
     hpx_use_flag_if_available(-g LANGUAGES CXX C Fortran)
@@ -1112,10 +1138,21 @@ else()
     hpx_use_flag_if_available(-Os LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     # Optimize for speed
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
+    if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+      # FIXME: we currently run into bug with bgclang when using O3
+      # Until the bug is resolved, we set it to O2
+      #hpx_use_flag_if_available(-O2 LANGUAGES CXX C Fortran)
+    else()
+      hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
+    endif()
   endif()
 
-  hpx_option(HPX_PIE BOOL "Compile executables as shared objects" ON ADVANCED)
+  if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+    hpx_option(HPX_PIE BOOL "Compile executables as shared objects" OFF ADVANCED)
+  else()
+    hpx_option(HPX_PIE BOOL "Compile executables as shared objects" ON ADVANCED)
+  endif()
+
 
   # This is necessary to ensure that our executables are ELF DYN objects.
   if(HPX_PIE)
@@ -1238,6 +1275,8 @@ else()
       set(enable_visibility_hidden OFF)
     elseif(${GCC_VERSION} GREATER 040699 AND ${GCC_VERSION} LESS 040800)
       # visibility is broken for gcc 4.7.x
+      set(enable_visibility_hidden OFF)
+    elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
       set(enable_visibility_hidden OFF)
     endif()
 
@@ -1545,7 +1584,7 @@ if(NOT HPX_NO_INSTALL)
 #    PATTERN ".git" EXCLUDE
 #    PATTERN "CMakeFiles" EXCLUDE
 #    PATTERN "CTestFiles" EXCLUDE)
-  
+
   file(COPY examples
       DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
       PATTERN "CMakeFiles" EXCLUDE
