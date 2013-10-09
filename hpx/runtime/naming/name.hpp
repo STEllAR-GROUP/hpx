@@ -691,7 +691,7 @@ namespace hpx { namespace naming
         }
 
     private:
-        friend gid_type get_parcel_dest_gid(id_type const& id);
+        friend HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);
 
         friend std::ostream& operator<< (std::ostream& os, id_type const& id);
 
