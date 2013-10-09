@@ -157,7 +157,9 @@ macro(add_hpx_executable name)
     hpx_append_property(${name}_exe COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
   endif()
 
-  hpx_append_property(${name}_exe COMPILE_FLAGS "-fPIC")
+  if(NOT MSVC)
+    hpx_append_property(${name}_exe COMPILE_FLAGS "-fPIC")
+  endif()
 
   if(${name}_LINK_FLAGS)
     hpx_append_property(${name}_exe LINK_FLAGS ${${name}_LINK_FLAGS})
