@@ -247,7 +247,9 @@ detail:
 This command line option allows one to specify the required affinity of the __hpx__
 worker threads to the underlying processing units. As a result the worker
 threads will run only on the processing units identified by the corresponding
-bind specification.
+bind specification. The affinity settings are to be specified using 
+`--hpx:bind=<BINDINGS>`, where `<BINDINGS>` have to be formatted as described
+below.
 
 [note This command line option is only available if __hpx__ was built with
       support for HWLOC (__hwloc__) enabled. Please see __cmake_options__ for more
@@ -332,6 +334,18 @@ Here is a full grammar describing the possible format of mappings:
         'socket' | 'numanode'
         'core'
         'pu'
+
+The following example assumes a system with at least 4 cores, where each core has more
+than 1 processing unit (hardware threads). Running hello_world with 4 OS-threads
+(on 4 processing units), where each of those threads is bound to the first processing
+unit of each of the cores, can be achieved by invoking:
+
+    hello_world -t4 --hpx:bind=thread:0-3=core:0-3.pu:0
+
+Here `thread:0-3` specifies the OS threads for which to define affinity bindings, and
+`core:0-3.pu:0` defines that for each of the cores (`core:0-3`) only their first
+processing unit (`pu:0`) should be used.
+
 
 [c++]
 
