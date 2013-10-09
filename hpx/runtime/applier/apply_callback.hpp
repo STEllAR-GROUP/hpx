@@ -21,14 +21,14 @@ namespace hpx
         // We know it is remote.
         template <typename Action, typename Callback>
         inline bool
-        apply_r_p_cb(naming::address& addr, naming::id_type const& gid,
+        apply_r_p_cb(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Callback) cb)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority));
 
             // Send the parcel through the parcel handler
@@ -99,7 +99,7 @@ namespace hpx
         template <typename Action, typename Callback>
         inline bool
         apply_r_p_cb(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Callback) cb)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -108,7 +108,7 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority), cont);
 
             // Send the parcel through the parcel handler

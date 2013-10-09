@@ -33,7 +33,7 @@ namespace hpx { namespace detail
     std::string get_locality_name()
     {
         std::string basename = get_locality_base_name();
-        return basename + boost::lexical_cast<std::string>(get_locality_id());
+        return basename + '#' + boost::lexical_cast<std::string>(get_locality_id());
     }
 }}
 

@@ -25,6 +25,11 @@ namespace hpx { namespace util
     {
         bool detect_mpi_environment(util::runtime_configuration const& cfg)
         {
+#if defined(__bgq__)
+            // If running on BG/Q, we can safely assume to always run in an
+            // MPI environment
+            return true;
+#else
             std::string mpi_environment_strings = cfg.get_entry(
                 "hpx.parcel.mpi.env", HPX_PARCELPORT_MPI_ENV);
 
@@ -39,6 +44,7 @@ namespace hpx { namespace util
                 if(env) return true;
             }
             return false;
+#endif
         }
 
         int get_cfg_entry(command_line_handling& cfg, std::string const& str,
@@ -66,13 +72,13 @@ namespace hpx { namespace util
         // We assume to use the MPI parcelport if it is not explicitly disabled
         enabled_ = detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1);
         if (!enabled_) return this_rank;
-        
+
         // We disable the MPI parcelport if the application is not run using mpirun
         // and the tcp/ip parcelport is not explicitly disabled
         //
-        // The bottomline is that we use the MPI parcelport either when the application 
+        // The bottomline is that we use the MPI parcelport either when the application
         // was executed using mpirun or if the tcp/ip parcelport was disabled.
-        if (!detail::detect_mpi_environment(cfg.rtcfg_) && 
+        if (!detail::detect_mpi_environment(cfg.rtcfg_) &&
             detail::get_cfg_entry(cfg, "hpx.parcel.tcpip.enable", 1))
         {
             enabled_ = false;

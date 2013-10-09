@@ -43,7 +43,8 @@
 [def __stellar_hpx_download__   [@http://stellar.cct.lsu.edu/downloads/ __hpx__ Downloads]]
 [def __stellar_hpx_github__     [@http://github.com/STEllAR-GROUP/hpx/ Github]]
 [def __stellar_hpx_github_issues__     [@http://github.com/STEllAR-GROUP/hpx/issues __hpx__ Issues]]
-[def __stellar_hpx_buildbot__     [@http://hermione.cct.lsu.edu/ HPX Buildbot Website]]
+[def __stellar_hpx_buildbot__   [@http://hermione.cct.lsu.edu/ HPX Buildbot Website]]
+[def __stellar_support__        [@http://stellar.cct.lsu.edu/support/ Support Website]]
 
 [def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
 [def __cct__                    [@http://www.cct.lsu.edu Center for Computation and Technology (CCT)]]

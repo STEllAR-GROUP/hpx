@@ -60,7 +60,7 @@ namespace hpx { namespace util { namespace plugin {
 
     namespace very_detail
     {
-        template <typename TO, typename FROM> 
+        template <typename TO, typename FROM>
         TO nasty_cast(FROM f)
         {
             union {

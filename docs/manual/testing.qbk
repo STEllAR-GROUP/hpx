@@ -8,12 +8,12 @@
 [section:testing Testing __hpx__]
 
 To ensure correcteness of __hpx__, we ship a large variety of unit and regression tests.
-The tests are driven by the __ctest__ tool and ran automatically by buildbot on each commit.
+The tests are driven by the __ctest__ tool and are executed automatically by buildbot
+(see __stellar_hpx_buildbot__) on each commit to the __hpx__ __stellar_hpx_github__
+repository.
 In addition, it is encouraged to run the test suite manually to ensure proper operation on
 your target system. If a test fails for your platform, we highly recommend to submit an issue
-on our bug tracker with detailed information about the target system.
-
-[endsect]
+on our __stellar_hpx_github_issues__ tracker with detailed information about the target system.
 
 [section:running_tests Running tests manually]
 
@@ -27,7 +27,8 @@ further details.
 [section:issues Issue Tracker]
 
 If you stumble over a bug or missing feature missing feature in __hpx__ please submit an issue
-to our __stellar_hpx_github_issues__.
+to our __stellar_hpx_github_issues__. For more information on how to submit support requests
+or other means of getting in contact with the developers please see the __stellar_support__.
 
 [endsect]
 
@@ -37,3 +38,6 @@ In addition to manual testing, we run automated tests on various platforms. You 
 status of the current master head by visiting the __stellar_hpx_buildbot__.
 
 [endsect]
+
+[endsect]
+

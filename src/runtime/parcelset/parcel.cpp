@@ -93,7 +93,7 @@ namespace hpx { namespace parcelset
             data_.has_source_id_ = source_id_ != 0;
 
             ar.save(data_);
-            ar << addr_;
+            ar << dest_ << addr_;
 
             this->parcel_data::save(ar, data_.has_source_id_,
                 data_.has_continuation_);
@@ -108,9 +108,8 @@ namespace hpx { namespace parcelset
             ar << data_.start_time_ << data_.creation_time_;
             ar << data_.dest_size_;
             ar << data_.has_source_id_ << data_.has_continuation_;
-            ar << data_.dest_;
 
-            ar << addr_;
+            ar << dest_ << addr_;
 
             this->parcel_data::save(ar, data_.has_source_id_,
                 data_.has_continuation_);
@@ -130,7 +129,7 @@ namespace hpx { namespace parcelset
         void single_destination_parcel_data::load_optimized(Archive & ar)
         {
             ar.load(data_);
-            ar >> addr_;
+            ar >> dest_ >> addr_;
 
             this->parcel_data::load(ar, data_.has_source_id_,
                 data_.has_continuation_);
@@ -143,9 +142,8 @@ namespace hpx { namespace parcelset
             ar >> data_.start_time_ >> data_.creation_time_;
             ar >> data_.dest_size_;
             ar >> data_.has_source_id_ >> data_.has_continuation_;
-            ar >> data_.dest_;
 
-            ar >> addr_;
+            ar >> dest_ >> addr_;
 
             this->parcel_data::load(ar, data_.has_source_id_,
                 data_.has_continuation_);
@@ -161,6 +159,7 @@ namespace hpx { namespace parcelset
         }
 
         ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         template <typename Archive>
         void multi_destination_parcel_data::save_optimized(Archive& ar) const
         {
@@ -229,6 +228,7 @@ namespace hpx { namespace parcelset
             else
                 load_optimized(ar);
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // explicit instantiation for the correct archive types
@@ -238,20 +238,23 @@ namespace hpx { namespace parcelset
         template HPX_EXPORT void
         single_destination_parcel_data::load(util::portable_binary_iarchive&);
 
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         template HPX_EXPORT void
         multi_destination_parcel_data::save(util::portable_binary_oarchive&) const;
 
         template HPX_EXPORT void
         multi_destination_parcel_data::load(util::portable_binary_iarchive&);
+#endif
 
         ///////////////////////////////////////////////////////////////////////////
         std::ostream& operator<< (std::ostream& os, single_destination_parcel_data const& p)
         {
-            os << "(" << p.data_.dest_ << ":" << p.addr_ << ":";
+            os << "(" << p.dest_ << ":" << p.addr_ << ":";
             os << p.action_->get_action_name() << ")";
             return os;
         }
 
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         std::ostream& operator<< (std::ostream& os, multi_destination_parcel_data const& p)
         {
             os << "(";
@@ -261,6 +264,7 @@ namespace hpx { namespace parcelset
             os << p.action_->get_action_name() << ")";
             return os;
         }
+#endif
     }
 
     template <typename Archive>
@@ -268,6 +272,7 @@ namespace hpx { namespace parcelset
     {
         BOOST_ASSERT(data_.get() != 0);
 
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         bool is_multi_destination = data_->is_multi_destination();
         ar.save(is_multi_destination);
 
@@ -276,7 +281,9 @@ namespace hpx { namespace parcelset
                 detail::multi_destination_parcel_data
             >(data_)->save(ar);
         }
-        else {
+        else
+#endif
+        {
             boost::static_pointer_cast<
                 detail::single_destination_parcel_data
             >(data_)->save(ar);
@@ -293,6 +300,7 @@ namespace hpx { namespace parcelset
                 "trying to load parcel with unknown version");
         }
 
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         bool is_multi_destination;
         ar.load(is_multi_destination);
 
@@ -305,7 +313,9 @@ namespace hpx { namespace parcelset
             >(data)->load(ar);
             std::swap(data_, data);
         }
-        else {
+        else
+#endif
+        {
             boost::intrusive_ptr<detail::parcel_data> data(
                 new detail::single_destination_parcel_data);
 
@@ -328,10 +338,13 @@ namespace hpx { namespace parcelset
     std::ostream& operator<< (std::ostream& os, parcel const& p)
     {
         BOOST_ASSERT(p.data_.get() != 0);
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         if (p.data_->is_multi_destination()) {
             os << *static_cast<detail::multi_destination_parcel_data const*>(p.data_.get());
         }
-        else {
+        else
+#endif
+        {
             os << *static_cast<detail::single_destination_parcel_data const*>(p.data_.get());
         }
         return os;

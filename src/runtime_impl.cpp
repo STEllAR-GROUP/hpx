@@ -540,12 +540,16 @@ namespace hpx {
 
         // if this is a service thread, set its service affinity
         if (service_thread) {
+            // FIXME: We don't set the affinity of the service threads on BG/Q, as this is
+            // causing a hang (needs to be investigated
+#if !defined(__bgq__)
             threads::mask_cref_type used_processing_units =
                 thread_manager_->get_used_processing_units();
 
             this->topology_.set_thread_affinity_mask(
                 this->topology_.get_service_affinity_mask(
                     used_processing_units));
+#endif
         }
     }
 

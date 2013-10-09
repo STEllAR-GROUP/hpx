@@ -21,6 +21,8 @@
     #include <hpx/util/hardware/timestamp/linux_x86_32.hpp>
 #elif defined(__ANDROID__) && defined(ANDROID)
     #include <hpx/util/hardware/timestamp/linux_generic.hpp>
+#elif defined(__bgq__)
+    #include <hpx/util/hardware/timestamp/bgq.hpp>
 #else
     #error Unsupported platform.
 #endif

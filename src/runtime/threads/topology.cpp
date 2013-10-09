@@ -16,6 +16,10 @@
 #include <cpu-features.h>
 #endif
 
+#if defined(__bgq__)
+#include <hwi/include/bqc/A2_inlines.h>
+#endif
+
 #if defined(_POSIX_VERSION)
 #include <sys/syscall.h>
 #include <sys/resource.h>
@@ -64,7 +68,7 @@ namespace hpx { namespace threads
 
     bool topology::reduce_thread_priority(error_code& ec) const
     {
-#if defined(__linux__) && !defined(__ANDROID__)
+#if defined(__linux__) && !defined(__ANDROID__) && !defined(__bgq__)
         pid_t tid;
         tid = syscall(SYS_gettid);
         if (setpriority(PRIO_PROCESS, tid, 19))
@@ -76,10 +80,12 @@ namespace hpx { namespace threads
 #elif defined(BOOST_MSVC)
         if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST))
         {
-            HPX_THROWS_IF(ec, no_success, "threadmanager_impl::tfunc", 
+            HPX_THROWS_IF(ec, no_success, "threadmanager_impl::tfunc",
                 "SetThreadPriority returned an error");
             return false;
         }
+#elif defined(__bgq__)
+        ThreadPriority_Low();
 #endif
         return true;
     }
