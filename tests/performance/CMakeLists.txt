@@ -3,6 +3,14 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+################################################################################
+# find dependencies
+################################################################################
+find_package(HPX_Qthreads)
+find_package(HPX_TBB)
+find_package(HPX_SWARM)
+find_package(HPX_OpenMP)
+
 set(benchmarks
     boost_tls_overhead
     coroutines_call_overhead
