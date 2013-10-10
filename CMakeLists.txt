@@ -1385,8 +1385,8 @@ else()
   hpx_use_flag_if_available(-mcx16 LANGUAGES CXX C Fortran)
 
   if(HPX_CXX_FLAG_MCX16)
-    hpx_add_config_define(-DHPX_HAVE_GNU_SYNC_16)
-    hpx_add_config_define(-DBOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
+    hpx_add_config_define(HPX_HAVE_GNU_SYNC_16)
+    hpx_add_config_define(BOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
   endif()
 
   # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
