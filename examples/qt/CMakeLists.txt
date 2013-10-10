@@ -5,8 +5,6 @@
 
 # Disabling the Qt example on BG/Q as GUIs don't make sense there anyways
 if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-  find_package(Qt4)
-
   if(HPX_HAVE_CXX11_LAMBDAS AND QT4_FOUND)
     include(${QT_USE_FILE})
 

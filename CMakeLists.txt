@@ -563,7 +563,6 @@ find_package(HPX_PAPI)
 find_package(HPX_TAU)
 find_package(HPX_APEX)
 
-
 ################################################################################
 # Valgrind support
 ################################################################################
@@ -629,6 +628,24 @@ endif()
 
 # Parcel coalescing is used by the main HPX library, enable it always
 hpx_add_config_define(HPX_HAVE_PARCEL_COALESCING)
+
+################################################################################
+# HDF5 
+################################################################################
+find_package(HDF5)
+
+################################################################################
+# Qt 
+################################################################################
+find_package(Qt4)
+
+################################################################################
+# Dependencies for performance benchmarks 
+################################################################################
+find_package(HPX_Qthreads)
+find_package(HPX_TBB)
+find_package(HPX_SWARM)
+find_package(HPX_OpenMP)
 
 ################################################################################
 # Documentation toolchain (DocBook, BoostBook, QuickBook, xsltproc)
