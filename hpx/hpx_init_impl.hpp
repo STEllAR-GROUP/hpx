@@ -22,7 +22,7 @@ namespace hpx
     inline int
     init(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description const& desc_cmdline,
-        int argc, char* argv[], HPX_STD_FUNCTION<void()> const& startup,
+        int argc, char** argv, HPX_STD_FUNCTION<void()> const& startup,
         HPX_STD_FUNCTION<void()> const& shutdown, hpx::runtime_mode mode)
     {
         std::vector<std::string> cfg;
@@ -39,7 +39,7 @@ namespace hpx
     /// in worker mode it will execute an empty `hpx_main`.
     inline int
     init(boost::program_options::options_description const& desc_cmdline,
-        int argc, char* argv[], HPX_STD_FUNCTION<void()> const& startup,
+        int argc, char** argv, HPX_STD_FUNCTION<void()> const& startup,
         HPX_STD_FUNCTION<void()> const& shutdown, hpx::runtime_mode mode)
     {
         return init(static_cast<hpx_main_type>(::hpx_main), desc_cmdline,
@@ -56,7 +56,7 @@ namespace hpx
     /// in worker mode it will execute an empty `hpx_main`.
     inline int
     init(boost::program_options::options_description const& desc_cmdline,
-        int argc, char* argv[], std::vector<std::string> const& cfg,
+        int argc, char** argv, std::vector<std::string> const& cfg,
         HPX_STD_FUNCTION<void()> const& startup,
         HPX_STD_FUNCTION<void()> const& shutdown, hpx::runtime_mode mode)
     {
@@ -73,7 +73,7 @@ namespace hpx
     /// In console mode it will execute the user supplied function `hpx_main`,
     /// in worker mode it will execute an empty `hpx_main`.
     inline int
-    init(int argc, char* argv[], std::vector<std::string> const& cfg,
+    init(int argc, char** argv, std::vector<std::string> const& cfg,
         hpx::runtime_mode mode)
     {
         using boost::program_options::options_description;
@@ -95,14 +95,14 @@ namespace hpx
     /// in worker mode it will execute an empty `hpx_main`.
     inline int
     init(boost::program_options::options_description const& desc_cmdline, int argc,
-        char* argv[], hpx::runtime_mode mode)
+        char** argv, hpx::runtime_mode mode)
     {
         HPX_STD_FUNCTION<void()> const empty;
         return init(static_cast<hpx_main_type>(::hpx_main), desc_cmdline,
             argc, argv, empty, empty, mode);
     }
 
-    /// \fn int init(std::string const& app_name, int argc = 0, char* argv[] = 0)
+    /// \fn int init(std::string const& app_name, int argc = 0, char** argv = 0)
     ///
     /// \brief Main entry point for launching the HPX runtime system.
     ///
@@ -110,7 +110,7 @@ namespace hpx
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
     inline int
-    init(std::string const& app_name, int argc, char* argv[],
+    init(std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
         HPX_STD_FUNCTION<void()> const empty;
@@ -123,7 +123,7 @@ namespace hpx
     /// This is a simplified main entry point, which can be used to set up the
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
-    inline int init(int argc, char* argv[], hpx::runtime_mode mode)
+    inline int init(int argc, char** argv, hpx::runtime_mode mode)
     {
         return init(static_cast<hpx_main_type>(::hpx_main),
             HPX_APPLICATION_STRING, argc, argv, mode);
@@ -155,7 +155,7 @@ namespace hpx
     /// runtime for an HPX application (the runtime system will be set up in
     /// console mode or worker mode depending on the command line settings).
     inline int init(int (*f)(boost::program_options::variables_map& vm),
-        std::string const& app_name, int argc, char* argv[],
+        std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode)
     {
         using boost::program_options::options_description;
