@@ -330,7 +330,7 @@ namespace hpx { namespace components { namespace server
             if (agas::is_local_address(respond_to, addr)) {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
-                hpx::applier::detail::apply_l<action_type>(addr);
+                hpx::applier::detail::apply_l<action_type>(respond_to, addr);
             }
             else {
                 // apply remotely, parcel is sent synchronously
@@ -628,7 +628,7 @@ namespace hpx { namespace components { namespace server
                 if (agas::is_local_address(respond_to, addr)) {
                     // execute locally, action is executed immediately as it is
                     // a direct_action
-                    hpx::applier::detail::apply_l<action_type>(addr);
+                    hpx::applier::detail::apply_l<action_type>(respond_to, addr);
                 }
                 else {
                     // apply remotely, parcel is sent synchronously

@@ -1002,8 +1002,9 @@ void primary_namespace::kill_non_blocking(
                 get_runtime_support_ptr());
 
             // FIXME: Priority?
-            hpx::applier::detail::apply_l<action_type>
-                (rts_addr, type_, at_c<1>(e), at_c<2>(e));
+            hpx::applier::detail::apply_l<action_type>(
+                naming::get_id_from_locality_id(locality_id_), rts_addr, type_,
+                at_c<1>(e), at_c<2>(e));
         }
 
         else
@@ -1018,8 +1019,8 @@ void primary_namespace::kill_non_blocking(
                 naming::id_type::unmanaged);
 
             // FIXME: Priority?
-            hpx::applier::detail::apply_r<action_type>
-                (rts_addr, prefix_, type_, at_c<1>(e), at_c<2>(e));
+            hpx::applier::detail::apply_r<action_type>(
+                rts_addr, prefix_, type_, at_c<1>(e), at_c<2>(e));
         }
     }
 

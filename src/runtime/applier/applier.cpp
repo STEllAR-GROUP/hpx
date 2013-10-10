@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2008 Anshul Tandon
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -254,6 +254,29 @@ namespace hpx { namespace applier
     }
 
     void register_work_plain(
+        BOOST_RV_REF(HPX_STD_FUNCTION<threads::thread_function_type>) func,
+        naming::id_type const& target,
+        char const* desc, naming::address::address_type lva,
+        threads::thread_state_enum state, threads::thread_priority priority,
+        std::size_t os_thread, threads::thread_stacksize stacksize,
+        error_code& ec)
+    {
+        hpx::applier::applier* app = hpx::applier::get_applier_ptr();
+        if (NULL == app)
+        {
+            HPX_THROWS_IF(ec, invalid_status,
+                "hpx::applier::register_work_plain",
+                "global applier object is not accessible");
+            return;
+        }
+
+        threads::thread_init_data data(boost::move(func),
+            desc ? desc : "<unknown>", lva, priority, os_thread,
+            threads::get_stack_size(stacksize), target);
+        app->get_thread_manager().register_work(data, state, ec);
+    }
+
+    void register_work_plain(
         threads::thread_init_data& data, threads::thread_state_enum state,
         error_code& ec)
     {
@@ -410,6 +433,7 @@ namespace hpx { namespace applier
 
         // fetch the set of destinations
         std::size_t size = p.size();
+        naming::id_type const* ids = p.get_destinations();
         naming::address const* addrs = p.get_destination_addrs();
 
         // if the parcel carries a continuation it should be directed to a
@@ -469,7 +493,7 @@ namespace hpx { namespace applier
                 // action and the local-virtual address with the TM only.
                 threads::thread_init_data data;
                 tm.register_work(
-                    act->get_thread_init_data(lva, data),
+                    act->get_thread_init_data(ids[i], lva, data),
                     threads::pending);
             }
             else {
@@ -479,7 +503,7 @@ namespace hpx { namespace applier
                 // afterwards.
                 threads::thread_init_data data;
                 tm.register_work(
-                    act->get_thread_init_data(cont, lva, data),
+                    act->get_thread_init_data(cont, ids[i], lva, data),
                     threads::pending);
             }
         }

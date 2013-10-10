@@ -275,12 +275,12 @@ namespace hpx { namespace actions
 
         /// Return all data needed for thread initialization
         virtual threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data) = 0;
+        get_thread_init_data(naming::id_type const& target,
+            naming::address::address_type lva, threads::thread_init_data& data) = 0;
 
         virtual threads::thread_init_data&
         get_thread_init_data(continuation_type& cont,
-            naming::address::address_type lva,
+            naming::id_type const& target, naming::address::address_type lva,
             threads::thread_init_data& data) = 0;
 
         /// Return a pointer to the filter to be used while serializing an
@@ -590,8 +590,8 @@ namespace hpx { namespace actions
 
         /// Return all data needed for thread initialization
         threads::thread_init_data&
-        get_thread_init_data(naming::address::address_type lva,
-            threads::thread_init_data& data)
+        get_thread_init_data(naming::id_type const& target,
+            naming::address::address_type lva, threads::thread_init_data& data)
         {
             data.func = boost::move(Action::construct_thread_function(lva, arguments_));
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
@@ -606,11 +606,13 @@ namespace hpx { namespace actions
 #endif
             data.priority = priority_;
             data.stacksize = threads::get_stack_size(stacksize_);
+
+            data.target = target;
             return data;
         }
 
         threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
+        get_thread_init_data(continuation_type& cont, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_init_data& data)
         {
             data.func = boost::move(Action::construct_thread_function(cont, lva, arguments_));
@@ -626,6 +628,8 @@ namespace hpx { namespace actions
 #endif
             data.priority = priority_;
             data.stacksize = threads::get_stack_size(stacksize_);
+
+            data.target = target;
             return data;
         }
 

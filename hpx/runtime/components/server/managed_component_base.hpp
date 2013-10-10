@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -146,10 +146,10 @@ namespace hpx { namespace components
         // This is used by the managed_component to decide whether to
         // delete the component implementation depending on it.
         template <typename DtorTag>
-        struct destroy;
+        struct manage_livetime;
 
         template <>
-        struct destroy<traits::managed_object_is_lifetime_controlled>
+        struct manage_livetime<traits::managed_object_is_lifetime_controlled>
         {
             template <typename Component>
             static void call(Component*)
@@ -172,7 +172,7 @@ namespace hpx { namespace components
         };
 
         template <>
-        struct destroy<traits::managed_object_controls_lifetime>
+        struct manage_livetime<traits::managed_object_controls_lifetime>
         {
             template <typename Component>
             static void call(Component* component)
@@ -339,14 +339,14 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     void intrusive_ptr_add_ref(managed_component<Component, Derived>* p)
     {
-        detail_adl_barrier::destroy<
+        detail_adl_barrier::manage_livetime<
             typename traits::managed_component_dtor_policy<Component>::type
         >::addref(p->component_);
     }
     template <typename Component, typename Derived>
     void intrusive_ptr_release(managed_component<Component, Derived>* p)
     {
-        detail_adl_barrier::destroy<
+        detail_adl_barrier::manage_livetime<
             typename traits::managed_component_dtor_policy<Component>::type
         >::release(p->component_);
     }
@@ -390,6 +390,7 @@ namespace hpx { namespace components
         explicit managed_component(Component* comp)
           : component_(comp)
         {
+            intrusive_ptr_add_ref(this);
             component_->set_back_ptr(this);
         }
 
@@ -402,6 +403,7 @@ namespace hpx { namespace components
             detail_adl_barrier::init<
                 typename traits::managed_component_ctor_policy<Component>::type
             >::call(component_, this);
+            intrusive_ptr_add_ref(this);
         }
 
 #define MANAGED_COMPONENT_CONSTRUCT(Z, N, _)                                  \
@@ -412,6 +414,7 @@ namespace hpx { namespace components
             detail_adl_barrier::init<                                         \
                 typename traits::managed_component_ctor_policy<Component>::type \
             >::call(component_, this, HPX_ENUM_FORWARD_ARGS(N, T, t));        \
+            intrusive_ptr_add_ref(this);                                      \
         }                                                                     \
     /**/
 
@@ -424,7 +427,8 @@ namespace hpx { namespace components
         /// \brief The destructor releases any wrapped instances
         ~managed_component()
         {
-            detail_adl_barrier::destroy<
+            intrusive_ptr_release(this);
+            detail_adl_barrier::manage_livetime<
                 typename traits::managed_component_dtor_policy<Component>::type
             >::call(component_);
         }

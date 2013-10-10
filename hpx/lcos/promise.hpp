@@ -68,15 +68,14 @@ namespace hpx { namespace lcos { namespace detail
         enum { value = components::component_promise };
 
         promise()
-          : back_ptr_(0)
         {}
 
         promise(completed_callback_type const& data_sink)
-          : future_data_type(data_sink), back_ptr_(0)
+          : future_data_type(data_sink)
         {}
 
         promise(BOOST_RV_REF(completed_callback_type) data_sink)
-          : future_data_type(boost::move(data_sink)), back_ptr_(0)
+          : future_data_type(boost::move(data_sink))
         {}
 
         // The implementation of the component is responsible for deleting the
@@ -84,7 +83,6 @@ namespace hpx { namespace lcos { namespace detail
         ~promise()
         {
             this->finalize();
-            delete back_ptr_;
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -123,15 +121,30 @@ namespace hpx { namespace lcos { namespace detail
         // retrieve the gid of this promise
         naming::id_type get_gid() const
         {
-            return naming::id_type(
-                naming::detail::get_stripped_gid(get_base_gid())
-              , naming::id_type::unmanaged);
+            naming::gid_type::mutex_type::scoped_lock l(&gid_);
+
+            // take all credits to avoid a self reference
+            naming::gid_type gid = gid_;
+            naming::detail::strip_credit_from_gid(
+                const_cast<naming::gid_type&>(gid_));
+
+            // we request the id of a future only once
+            BOOST_ASSERT(0 != naming::detail::get_credit_from_gid(gid));
+
+            //naming::detail::set_credit_split_mask_for_gid(gid);
+            //if (0 == naming::detail::get_credit_from_gid(gid))
+            //{
+            //    naming::detail::retrieve_new_credits(gid, gid,
+            //        HPX_INITIAL_GLOBALCREDIT, 0, l);
+            //}
+
+            return naming::id_type(gid, naming::id_type::managed);
         }
 
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
-            return back_ptr_->get_base_gid();
+            BOOST_ASSERT(gid_ != naming::invalid_gid);
+            return gid_;
         }
 
     private:
@@ -140,12 +153,12 @@ namespace hpx { namespace lcos { namespace detail
 
         void set_back_ptr(components::managed_component<promise>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
             BOOST_ASSERT(bp);
-            back_ptr_ = bp;
+            BOOST_ASSERT(gid_ == naming::invalid_gid);
+            gid_ = bp->get_base_gid();
         }
 
-        components::managed_component<promise>* back_ptr_;
+        naming::gid_type gid_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -167,15 +180,14 @@ namespace hpx { namespace lcos { namespace detail
         enum { value = components::component_promise };
 
         promise()
-          : back_ptr_(0)
         {}
 
         promise(completed_callback_type const& data_sink)
-          : future_data_type(data_sink), back_ptr_(0)
+          : future_data_type(data_sink)
         {}
 
         promise(BOOST_RV_REF(completed_callback_type) data_sink)
-          : future_data_type(boost::move(data_sink)), back_ptr_(0)
+          : future_data_type(boost::move(data_sink))
         {}
 
         // The implementation of the component is responsible for deleting the
@@ -183,7 +195,6 @@ namespace hpx { namespace lcos { namespace detail
         ~promise()
         {
             this->finalize();
-            delete back_ptr_;
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -222,15 +233,30 @@ namespace hpx { namespace lcos { namespace detail
         // retrieve the gid of this promise
         naming::id_type get_gid() const
         {
-            return naming::id_type(
-                naming::detail::get_stripped_gid(get_base_gid())
-              , naming::id_type::unmanaged);
+            naming::gid_type::mutex_type::scoped_lock l(&gid_);
+
+            // take all credits to avoid a self reference
+            naming::gid_type gid = gid_;
+            naming::detail::strip_credit_from_gid(
+                const_cast<naming::gid_type&>(gid_));
+
+            // we request the id of a future only once
+            BOOST_ASSERT(0 != naming::detail::get_credit_from_gid(gid));
+
+            //naming::detail::set_credit_split_mask_for_gid(gid);
+            //if (0 == naming::detail::get_credit_from_gid(gid))
+            //{
+            //    naming::detail::retrieve_new_credits(gid, gid,
+            //        HPX_INITIAL_GLOBALCREDIT, 0, l);
+            //}
+
+            return naming::id_type(gid, naming::id_type::managed);
         }
 
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
-            return back_ptr_->get_base_gid();
+            BOOST_ASSERT(gid_ != naming::invalid_gid);
+            return gid_;
         }
 
     private:
@@ -239,12 +265,12 @@ namespace hpx { namespace lcos { namespace detail
 
         void set_back_ptr(components::managed_component<promise>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
             BOOST_ASSERT(bp);
-            back_ptr_ = bp;
+            BOOST_ASSERT(gid_ == naming::invalid_gid);
+            gid_ = bp->get_base_gid();
         }
 
-        components::managed_component<promise>* back_ptr_;
+        naming::gid_type gid_;
     };
 }}}
 

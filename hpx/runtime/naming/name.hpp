@@ -37,6 +37,12 @@
 #define HPX_IDTYPE_VERSION  0x20
 #define HPX_GIDTYPE_VERSION 0x10
 
+namespace hpx { namespace agas
+{
+    HPX_API_EXPORT void incref_apply(naming::gid_type const& lower,
+        naming::gid_type const& upper, boost::int64_t credits);
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
@@ -351,6 +357,7 @@ namespace hpx { namespace naming
             BOOST_ASSERT(0 == (c & ~gid_type::credit_base_mask));
             id.set_msb((msb & ~gid_type::credit_mask) |
                 ((c & gid_type::credit_base_mask) << 16));
+
             BOOST_ASSERT(c < (std::numeric_limits<boost::uint16_t>::max)());
             return static_cast<boost::uint16_t>(c);
         }
@@ -399,6 +406,11 @@ namespace hpx { namespace naming
                 ((credit & gid_type::credit_base_mask) << 16));
         }
 
+        inline void set_credit_split_mask_for_gid(gid_type& id)
+        {
+            id.set_msb(id.get_msb() | gid_type::was_split_mask);
+        }
+
         // splits the current credit of the given id and assigns half of it to the
         // returned copy
         inline gid_type split_credits_for_gid(gid_type& id, int fraction = 2)
@@ -442,6 +454,31 @@ namespace hpx { namespace naming
             // no credits left for new id
             id.set_msb(msb | gid_type::was_split_mask);
             return gid_type(msb | gid_type::was_split_mask, id.get_lsb());
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Lock>
+        void retrieve_new_credits(naming::gid_type& newid,
+            naming::gid_type& orig_id, boost::uint16_t credit1,
+            boost::uint16_t credit2, Lock& l)
+        {
+            // We add the new credits to the gids first to avoid
+            // duplicate splitting during concurrent serialization
+            // operations.
+            if (credit1) detail::add_credit_to_gid(newid, credit1);
+            if (credit2) detail::add_credit_to_gid(orig_id, credit2);
+
+            // We unlock the lock as all operations on the local credit
+            // have been performed and we don't want the lock to be
+            // pending during the (possibly remote) AGAS operation.
+            l.unlock();
+
+            // If something goes wrong during the reference count
+            // increment below we will have already added credits to
+            // the split gid. In the worst case this will cause a
+            // memory leak. I'm not sure if it is possible to reliably
+            // handle this problem.
+            agas::incref_apply(orig_id, orig_id, credit1 + credit2);
         }
 
         inline bool gid_was_split(gid_type const& id)

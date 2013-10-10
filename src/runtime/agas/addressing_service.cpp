@@ -1548,7 +1548,8 @@ void addressing_service::route(
     if (is_local_address(target.get_gid(), addr))
     {
         // route through the local AGAS service instance
-        applier::detail::apply_l_p<action_type>(addr, action_priority_, req);
+        applier::detail::apply_l_p<action_type>(
+            target, addr, action_priority_, req);
         f(boost::system::error_code(), 0);      // invoke callback
         return;
     }

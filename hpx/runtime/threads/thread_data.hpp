@@ -159,7 +159,8 @@ namespace hpx { namespace threads
             enabled_interrupt_(true),
             ran_exit_funcs_(false),
             exit_funcs_(0),
-            scheduler_base_(init_data.scheduler_base)
+            scheduler_base_(init_data.scheduler_base),
+            target_(boost::move(init_data.target))
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 
                         << get_description() << ")";
@@ -510,7 +511,12 @@ namespace hpx { namespace threads
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 #endif
-        virtual void reset() = 0;
+
+        /// This function will be called when the thread is about to be deleted
+        virtual void reset()
+        {
+            target_ = naming::invalid_id;       // release target
+        }
 
     protected:
         mutable boost::atomic<thread_state> current_state_;
@@ -553,6 +559,9 @@ namespace hpx { namespace threads
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
+
+        // keep target alive, if needed
+        naming::id_type target_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -641,6 +650,7 @@ namespace hpx { namespace threads
         /// This function will be called when the thread is about to be deleted
         void reset()
         {
+            thread_data_base::reset();
             coroutine_.reset();
         }
 
@@ -724,6 +734,7 @@ namespace hpx { namespace threads
         /// This function will be called when the thread is about to be deleted
         void reset()
         {
+            thread_data_base::reset();
             coroutine_.reset();
         }
 

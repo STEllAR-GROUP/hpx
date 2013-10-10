@@ -60,7 +60,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -144,7 +144,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -169,7 +169,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -348,7 +348,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -432,7 +432,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -457,7 +457,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -636,7 +636,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -720,7 +720,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -745,7 +745,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -924,7 +924,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1008,7 +1008,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1033,7 +1033,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1212,7 +1212,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1296,7 +1296,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1321,7 +1321,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1500,7 +1500,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1584,7 +1584,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1609,7 +1609,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1788,7 +1788,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1872,7 +1872,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1897,7 +1897,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -2076,7 +2076,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -2160,7 +2160,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -2185,7 +2185,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -2364,7 +2364,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -2448,7 +2448,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -2473,7 +2473,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -2652,7 +2652,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -2736,7 +2736,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -2761,7 +2761,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -2940,7 +2940,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3024,7 +3024,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3049,7 +3049,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3228,7 +3228,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3312,7 +3312,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3337,7 +3337,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3516,7 +3516,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3600,7 +3600,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3625,7 +3625,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3804,7 +3804,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3888,7 +3888,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -3913,7 +3913,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -4092,7 +4092,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -4176,7 +4176,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -4201,7 +4201,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -4380,7 +4380,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -4464,7 +4464,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -4489,7 +4489,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -4668,7 +4668,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -4752,7 +4752,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -4777,7 +4777,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -4956,7 +4956,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -5040,7 +5040,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -5065,7 +5065,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -5244,7 +5244,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -5328,7 +5328,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -5353,7 +5353,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -5532,7 +5532,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ) , boost::forward<Arg19>( arg19 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -5616,7 +5616,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ) , boost::forward<Arg19>( arg19 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -5641,7 +5641,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ) , boost::forward<Arg19>( arg19 ));
             cb(boost::system::error_code(), 0); 
             return result;

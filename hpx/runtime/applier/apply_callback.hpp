@@ -64,7 +64,7 @@ namespace hpx
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            bool result = applier::detail::apply_l_p<Action>(addr, priority);   // apply locally
+            bool result = applier::detail::apply_l_p<Action>(gid, gid, addr, priority);   // apply locally
             cb(boost::system::error_code(), 0);     // invoke callback
             return result;
         }
@@ -143,7 +143,7 @@ namespace hpx
 
         // Determine whether the gid is local or remote
         if (addr.locality_ == hpx::get_locality()) {
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority);
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority);
             cb(boost::system::error_code(), 0);     // invoke callback
             return result;
         }
@@ -166,7 +166,7 @@ namespace hpx
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority);
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority);
             cb(boost::system::error_code(), 0);     // invoke callback
             return result;
         }
