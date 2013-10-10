@@ -63,7 +63,7 @@ namespace hpx { namespace util { namespace detail
     template <typename T, typename U>
     struct qualify_as<T, U
       , typename boost::enable_if<
-            boost::is_reference_wrapper<typename util::decay<U>::type>>::type>
+            boost::is_reference_wrapper<typename util::decay<U>::type> >::type>
       : qualify_as_impl<
             T
           , typename boost::unwrap_reference<typename util::decay<U>::type>::type&
