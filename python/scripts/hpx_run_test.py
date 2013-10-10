@@ -101,13 +101,16 @@ if __name__ == '__main__':
 
   (options, files) = parser.parse_args()
 
+  if 'HPX_TEST_ARGUMENTS' in os.environ: 
+    options.args = options.args + os.environ['HPX_TEST_ARGUMENTS']
+
   if not (lambda x: "always" == x or "never" == x or "fail" == x)(options.log):
     print "Error: --log=" + quote_options([options.log]) + " is invalid\n"
     parser.print_help()
     sys.exit(1)
 
   if 0 == len(files):
-    print "Error: no .tests files specified\n"
+    print "Error: test specified\n"
     parser.print_help()
     sys.exit(1)
 

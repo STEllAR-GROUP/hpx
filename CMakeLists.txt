@@ -1925,21 +1925,8 @@ if(NOT HPX_NO_INSTALL)
   endif()
 endif()
 
-file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
-
 # create a symlink in share pointing to the latest HPX installation
 execute_process(COMMAND
   "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
   WORKING_DIRECTORY ${output_dir}/share)
-
-file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests "\"-R tests.unit\"")
-
-file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests "\"-R tests.regression\"")
-
-if(NOT HPX_NO_INSTALL)
-  install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
-          DESTINATION share/hpx-${HPX_VERSION}/tests)
-  install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests
-          DESTINATION share/hpx-${HPX_VERSION}/tests)
-endif()
 

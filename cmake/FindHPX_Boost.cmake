@@ -3,11 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-################################################################################
-# C++-style include guard to prevent multiple searches in the same build
-if(NOT BOOST_SEARCHED)
-set(BOOST_SEARCHED ON CACHE INTERNAL "Found Boost libraries")
-
 include(HPX_Utils)
 
 ################################################################################
@@ -261,6 +256,4 @@ endforeach()
 set(BOOST_FOUND_LIBRARIES ${BOOST_FOUND_LIBRARIES} CACHE STRING "Boost shared libraries found by CMake (default: none).")
 
 ################################################################################
-
-endif()
 

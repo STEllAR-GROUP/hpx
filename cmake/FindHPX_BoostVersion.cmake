@@ -3,10 +3,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-################################################################################
-# C++-style include guard to prevent multiple searches in the same build
-if(NOT BOOST_VERSION_SEARCHED)
-
 include(HPX_Utils)
 
 ################################################################################
@@ -142,7 +138,6 @@ macro(get_boost_version)
 
   hpx_info("boost.version" "Boost version is ${BOOST_VERSION_STR}.")
 
-  set(BOOST_VERSION_SEARCHED ON CACHE INTERNAL "Found Boost version")
   set(BOOST_VERSION_FOUND ON CACHE INTERNAL "Boost version was found.")
 
   set(BOOST_USE_SYSTEM "${BOOST_USE_SYSTEM}" CACHE BOOL
@@ -161,6 +156,4 @@ endmacro()
 get_boost_version()
 
 ################################################################################
-
-endif()
 
