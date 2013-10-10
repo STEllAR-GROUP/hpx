@@ -10,6 +10,7 @@
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -64,6 +65,13 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(
 
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::base_performance_counter)
+
+HPX_REGISTER_PROMISE(
+    hpx::lcos::promise<hpx::performance_counters::counter_info>,
+    counter_info_promise)
+HPX_REGISTER_PROMISE(
+    hpx::lcos::promise<hpx::performance_counters::counter_value>,
+    counter_value_promise)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters

@@ -490,7 +490,7 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    long runtime_support::get_instance_count(components::component_type type)
+    boost::int32_t runtime_support::get_instance_count(components::component_type type)
     {
         component_map_mutex_type::scoped_lock l(cm_mtx_);
 

@@ -43,6 +43,15 @@ namespace hpx { namespace traits
     };
 }}
 
+namespace hpx { namespace components
+{
+    namespace detail_adl_barrier
+    {
+        template <typename BackPtrTag>
+        struct init;
+    }
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
@@ -148,8 +157,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
 
         void set_back_ptr(components::managed_component<promise>* bp)
         {
@@ -260,8 +269,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
 
         void set_back_ptr(components::managed_component<promise>* bp)
         {
@@ -580,25 +589,43 @@ namespace hpx { namespace lcos
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
-    template <typename Result, typename RemoteResult>
-    struct component_type_database<lcos::detail::promise<Result, RemoteResult> >
-    {
-        static components::component_type get()
-        {
-            return component_type_database<
-                lcos::base_lco_with_value<Result, RemoteResult>
-            >::get();
-        }
+//namespace hpx { namespace traits
+//{
+//    template <typename Result, typename RemoteResult>
+//    struct component_type_database<lcos::detail::promise<Result, RemoteResult> >
+//    {
+//        static components::component_type get()
+//        {
+//            return component_type_database<
+//                lcos::base_lco_with_value<Result, RemoteResult>
+//            >::get();
+//        }
+//
+//        static void set(components::component_type t)
+//        {
+//            component_type_database<
+//                lcos::base_lco_with_value<Result, RemoteResult>
+//            >::set(t);
+//        }
+//    };
+//}}
 
-        static void set(components::component_type t)
-        {
-            component_type_database<
-                lcos::base_lco_with_value<Result, RemoteResult>
-            >::set(t);
-        }
-    };
-}}
+#define HPX_REGISTER_PROMISE(...)                                             \
+    HPX_REGISTER_PROMISE_(__VA_ARGS__)                                        \
+/**/
+
+#define HPX_REGISTER_PROMISE_(...)                                            \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_PROMISE_, HPX_UTIL_PP_NARG(__VA_ARGS__)                  \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_PROMISE_1(Value)                                         \
+    HPX_REGISTER_PROMISE_2(Value, Value)                                      \
+/**/
+
+#define HPX_REGISTER_PROMISE_2(Promise, Name)                                 \
+    HPX_REGISTER_ENABLED_BASE_LCO_FACTORY(Promise::wrapping_type, Name)       \
+/**/
 
 #endif

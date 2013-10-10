@@ -914,4 +914,3 @@ void component_namespace::counter_data::increment_num_localities_count()
 }
 
 }}}
-

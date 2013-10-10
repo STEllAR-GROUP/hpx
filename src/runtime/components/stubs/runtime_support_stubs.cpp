@@ -336,7 +336,7 @@ namespace hpx { namespace components { namespace stubs
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve instance count for given component type
-    lcos::future<long> runtime_support::get_instance_count_async(
+    lcos::future<boost::int32_t> runtime_support::get_instance_count_async(
         naming::id_type const& targetgid, components::component_type type)
     {
         // Create a future, execute the required action,
@@ -347,7 +347,7 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(targetgid, type);
     }
 
-    long runtime_support::get_instance_count(naming::id_type const& targetgid,
+    boost::int32_t runtime_support::get_instance_count(naming::id_type const& targetgid,
         components::component_type type)
     {
         // The following get yields control while the action above

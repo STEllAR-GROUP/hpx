@@ -178,7 +178,7 @@ namespace hpx { namespace components { namespace server
 
         /// \brief Return the current instance count for the given component
         ///        type
-        long get_instance_count(components::component_type);
+        boost::int32_t get_instance_count(components::component_type);
 
         /// \brief Remove the given locality from our connection cache
         void remove_from_connection_cache(naming::locality const& l);

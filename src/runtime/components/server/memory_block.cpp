@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
@@ -57,6 +58,10 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(
 HPX_REGISTER_MANAGE_OBJECT_ACTION(
     hpx::actions::manage_object_action<boost::uint8_t>,
     manage_object_action_uint8_t)
+
+HPX_REGISTER_PROMISE(
+    hpx::lcos::promise<hpx::components::memory_block_data>,
+    memory_data_promise)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail

@@ -19,6 +19,7 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -563,4 +564,31 @@ typedef base_lco_with_value<id_type, response> base_lco_id_type_response_type;
 HPX_REGISTER_ACTION(
     base_lco_id_type_response_type::set_value_action,
     set_value_action_agas_id_type_response_type)
+
+HPX_REGISTER_PROMISE(
+    hpx::lcos::promise<hpx::agas::response>,
+    agas_response_promise)
+HPX_REGISTER_PROMISE(
+    hpx::lcos::promise<std::vector<hpx::agas::response> >,
+    agas_response_vector_promise)
+
+typedef hpx::lcos::promise<hpx::naming::id_type, hpx::agas::response>
+    id_type_response_promise;
+HPX_REGISTER_PROMISE(id_type_response_promise)
+
+typedef hpx::lcos::promise<bool, hpx::agas::response>
+    bool_response_promise;
+HPX_REGISTER_PROMISE(bool_response_promise)
+
+typedef hpx::lcos::promise<boost::uint32_t, hpx::agas::response>
+    uint32_t_response_promise;
+HPX_REGISTER_PROMISE(uint32_t_response_promise)
+
+typedef hpx::lcos::promise<std::vector<boost::uint32_t>, hpx::agas::response>
+    uint32_t_vector_response_promise;
+HPX_REGISTER_PROMISE(uint32_t_vector_response_promise)
+
+typedef hpx::lcos::promise<std::vector<hpx::naming::locality>, hpx::agas::response>
+    locality_vector_response_promise;
+HPX_REGISTER_PROMISE(locality_vector_response_promise)
 

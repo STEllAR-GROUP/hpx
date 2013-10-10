@@ -61,7 +61,12 @@ namespace hpx { namespace components
         struct init<traits::construct_with_back_ptr>
         {
             template <typename Component, typename Managed>
-            static void call(Component*& component, Managed* this_)
+            static void call(Component* component, Managed* this_)
+            {
+            }
+
+            template <typename Component, typename Managed>
+            static void call_new(Component*& component, Managed* this_)
             {
                 typedef typename Managed::wrapped_type wrapped_type;
                 component = new wrapped_type(this_);
@@ -88,7 +93,13 @@ namespace hpx { namespace components
         struct init<traits::construct_without_back_ptr>
         {
             template <typename Component, typename Managed>
-            static void call(Component*& component, Managed* this_)
+            static void call(Component* component, Managed* this_)
+            {
+                component->set_back_ptr(this_);
+            }
+
+            template <typename Component, typename Managed>
+            static void call_new(Component*& component, Managed* this_)
             {
                 typedef typename Managed::wrapped_type wrapped_type;
                 component = new wrapped_type();
@@ -270,9 +281,6 @@ namespace hpx { namespace components
         }
 
     private:
-        template <typename, typename>
-        friend class managed_component;
-
         template <typename>
         friend struct detail_adl_barrier::init;
 
@@ -390,8 +398,10 @@ namespace hpx { namespace components
         explicit managed_component(Component* comp)
           : component_(comp)
         {
+            detail_adl_barrier::init<
+                typename traits::managed_component_ctor_policy<Component>::type
+            >::call(component_, this);
             intrusive_ptr_add_ref(this);
-            component_->set_back_ptr(this);
         }
 
     public:
@@ -402,7 +412,7 @@ namespace hpx { namespace components
         {
             detail_adl_barrier::init<
                 typename traits::managed_component_ctor_policy<Component>::type
-            >::call(component_, this);
+            >::call_new(component_, this);
             intrusive_ptr_add_ref(this);
         }
 
