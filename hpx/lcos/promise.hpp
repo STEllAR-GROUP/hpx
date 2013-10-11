@@ -589,26 +589,42 @@ namespace hpx { namespace lcos
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-//namespace hpx { namespace traits
-//{
-//    template <typename Result, typename RemoteResult>
-//    struct component_type_database<lcos::detail::promise<Result, RemoteResult> >
-//    {
-//        static components::component_type get()
-//        {
-//            return component_type_database<
-//                lcos::base_lco_with_value<Result, RemoteResult>
-//            >::get();
-//        }
-//
-//        static void set(components::component_type t)
-//        {
-//            component_type_database<
-//                lcos::base_lco_with_value<Result, RemoteResult>
-//            >::set(t);
-//        }
-//    };
-//}}
+namespace hpx { namespace traits
+{
+    namespace detail
+    {
+        HPX_EXPORT extern boost::detail::atomic_count unique_type;
+    }
+
+    template <typename Result, typename RemoteResult>
+    struct component_type_database<lcos::detail::promise<Result, RemoteResult> >
+    {
+        static components::component_type value;
+
+        HPX_EXPORT static components::component_type get()
+        {
+            // Promises are never created remotely, their factories are not
+            // registered with AGAS, so we can assign the component types locally.
+            if (value == components::component_invalid)
+            {
+                value = derived_component_type(++detail::unique_type,
+                    components::component_base_lco_with_value);
+            }
+            return value;
+        }
+
+        HPX_EXPORT static void set(components::component_type t)
+        {
+            BOOST_ASSERT(false);
+        }
+    };
+
+    template <typename Result, typename RemoteResult>
+    components::component_type
+    component_type_database<
+        lcos::detail::promise<Result, RemoteResult>
+    >::value = components::component_invalid;
+}}
 
 #define HPX_REGISTER_PROMISE(...)                                             \
     HPX_REGISTER_PROMISE_(__VA_ARGS__)                                        \

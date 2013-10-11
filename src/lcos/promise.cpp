@@ -10,6 +10,12 @@
 
 #include <vector>
 
+namespace hpx { namespace traits { namespace detail
+{
+    boost::detail::atomic_count unique_type(
+        static_cast<long>(components::component_last));
+}}}
+
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::naming::gid_type>, gid_promise)
 HPX_REGISTER_PROMISE(hpx::lcos::promise<std::vector<hpx::naming::gid_type> >,

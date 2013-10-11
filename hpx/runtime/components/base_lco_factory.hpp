@@ -78,29 +78,8 @@ namespace hpx { namespace components
             naming::resolver_client& agas_client)
         {
             typedef typename Component::type_holder type_holder;
-            if (component_invalid == components::get_component_type<type_holder>())
-            {
-                component_type base_type = components::component_base_lco_with_value;
-                component_type this_type = components::component_invalid;
-                if (isenabled_) {
-                    this_type = agas_client.register_factory(
-                        locality, unique_component_name<base_lco_factory>::call());
-
-                    if (component_invalid == this_type) {
-                        HPX_THROW_EXCEPTION(duplicate_component_id,
-                            "base_lco_factory::get_component_type",
-                            "the component name " + get_component_name() +
-                            " is already in use");
-                    }
-                }
-                else {
-                    this_type = agas_client.get_component_id(
-                        unique_component_name<base_lco_factory>::call());
-                }
-
-                components::set_component_type<type_holder>(
-                    derived_component_type(this_type, base_type));
-            }
+            BOOST_ASSERT(components::component_invalid != 
+                components::get_component_type<type_holder>());
             return components::get_component_type<type_holder>();
         }
 
@@ -231,13 +210,11 @@ namespace hpx { namespace components
 #define HPX_REGISTER_ENABLED_BASE_LCO_FACTORY(ComponentType, componentname)   \
         HPX_REGISTER_BASE_LCO_FACTORY_3(                                      \
             ComponentType, componentname, ::hpx::components::factory_enabled) \
-        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
 /**/
 
 #define HPX_REGISTER_DISABLED_BASE_LCO_FACTORY(ComponentType, componentname)  \
         HPX_REGISTER_BASE_LCO_FACTORY_3(                                      \
             ComponentType, componentname, ::hpx::components::factory_disabled)\
-        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
 /**/
 
 
@@ -249,7 +226,6 @@ namespace hpx { namespace components
 #define HPX_REGISTER_BASE_LCO_FACTORY_2(ComponentType, componentname)         \
     HPX_REGISTER_BASE_LCO_FACTORY_3(                                          \
         ComponentType, componentname, ::hpx::components::factory_check)       \
-    HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
 /**/
 #define HPX_REGISTER_BASE_LCO_FACTORY_3(                                      \
         ComponentType, componentname, state)                                  \

@@ -12,3 +12,15 @@ HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::int64_t>, int64_t_promise)
 HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::uint64_t>, uint64_t_promise)
 HPX_REGISTER_PROMISE(hpx::lcos::promise<bool>, bool_promise)
 HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::util::section>, section_promise)
+
+#if defined(HPX_SECURITY)
+
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/components/security/certificate_authority_base.hpp>
+#include <hpx/components/security/server/subordinate_certificate_authority.hpp>
+
+HPX_REGISTER_PROMISE(hpx::lcos::promise<
+    hpx::components::security::signed_type<hpx::components::security::certificate>
+>, signed_certificate_promise)
+
+#endif

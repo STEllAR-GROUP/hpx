@@ -92,8 +92,8 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         }
 
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
 
         void set_back_ptr(components::managed_component<dataflow_trigger_slot>* bp)
         {
