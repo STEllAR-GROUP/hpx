@@ -1,0 +1,123 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>How to Install HPX on BlueGene/Q</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 0.9.7">
+<link rel="up" href="../getting_started.html" title="Getting Started">
+<link rel="prev" href="unix_installation.html" title="How to Install HPX on Unix Variants">
+<link rel="next" href="macos_installation.html" title="How to Install HPX on OS X (Mac)">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="../../../images/hpx_0_9_7_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="unix_installation.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="macos_installation.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.tutorial.getting_started.bgq_installation"></a><a class="link" href="bgq_installation.html" title="How to Install HPX on BlueGene/Q">How
+        to Install <span class="emphasis"><em>HPX</em></span> on BlueGene/Q</a>
+</h4></div></div></div>
+<p>
+          So far we only support BGClang for compiling <span class="emphasis"><em>HPX</em></span> on
+          the BlueGene/Q.
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              Check if BGClang is available on your installation. If not obtain and
+              install a copy from the <code class="computeroutput"><span class="identifier">BGClang</span>
+              <span class="identifier">trac</span> <span class="identifier">page</span>
+              <span class="special">&lt;</span><span class="identifier">https</span><span class="special">://</span><span class="identifier">trac</span><span class="special">.</span><span class="identifier">alcf</span><span class="special">.</span><span class="identifier">anl</span><span class="special">.</span><span class="identifier">gov</span><span class="special">/</span><span class="identifier">projects</span><span class="special">/</span><span class="identifier">llvm</span><span class="special">-</span><span class="identifier">bgq</span><span class="special">&gt;</span></code>_
+            </li>
+<li class="listitem">
+              <p>
+                Build (and install) a recent version of <a href="http://http://www.open-mpi.org/software/hwloc/v1.7/" target="_top">hwloc
+                Downloads</a> With the following commands:
+              </p>
+<pre class="programlisting"><span class="error">$</span> <span class="special">./</span><span class="identifier">configure</span> <span class="special">--</span><span class="identifier">host</span><span class="special">=</span><span class="identifier">powerpc64</span><span class="special">-</span><span class="identifier">bgq</span><span class="special">-</span><span class="identifier">linux</span> <span class="special">--</span><span class="identifier">prefix</span><span class="special">=</span><span class="error">$</span><span class="identifier">HOME</span><span class="special">/</span><span class="identifier">install</span><span class="special">/</span><span class="identifier">hwloc</span> <span class="special">--</span><span class="identifier">disable</span><span class="special">-</span><span class="identifier">shared</span> <span class="special">--</span><span class="identifier">enable</span><span class="special">-</span><span class="keyword">static</span> <span class="special">\</span>
+     <span class="identifier">CPPFLAGS</span><span class="special">=</span><span class="char">'-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'</span>
+<span class="error">$</span> <span class="identifier">make</span>
+<span class="error">$</span> <span class="identifier">make</span> <span class="identifier">install</span>
+</pre>
+            </li>
+<li class="listitem">
+              <p>
+                Build (and install) a recent version of Boost, using BGClang:: To
+                build Boost with BGClang, you'll need to set up the following in
+                your Boost
+              </p>
+<pre class="programlisting"><span class="special">~/</span><span class="identifier">user</span><span class="special">-</span><span class="identifier">config</span><span class="special">.</span><span class="identifier">jam</span></pre>
+              <p>
+                file:
+              </p>
+<pre class="programlisting"><span class="preprocessor"># user</span><span class="special">-</span><span class="identifier">config</span><span class="special">.</span><span class="identifier">jam</span> <span class="special">(</span><span class="identifier">put</span> <span class="keyword">this</span> <span class="identifier">file</span> <span class="identifier">into</span> <span class="identifier">your</span> <span class="identifier">home</span> <span class="identifier">directory</span><span class="special">)</span>
+<span class="keyword">using</span> <span class="identifier">clang</span>
+  <span class="special">:</span>
+  <span class="special">:</span> <span class="identifier">bgclang</span><span class="special">++</span><span class="number">11</span>
+  <span class="special">:</span>
+  <span class="special">;</span>
+</pre>
+              <p>
+                You can then use this as your build command:
+              </p>
+<pre class="programlisting"><span class="error">$</span> <span class="special">./</span><span class="identifier">bootstrap</span><span class="special">.</span><span class="identifier">sh</span>
+<span class="error">$</span> <span class="special">./</span><span class="identifier">b2</span> <span class="special">--</span><span class="identifier">build</span><span class="special">-</span><span class="identifier">dir</span><span class="special">=/</span><span class="identifier">tmp</span><span class="special">/</span><span class="identifier">build</span><span class="special">-</span><span class="identifier">boost</span> <span class="special">--</span><span class="identifier">layout</span><span class="special">=</span><span class="identifier">versioned</span> <span class="special">-</span><span class="identifier">j12</span>
+</pre>
+            </li>
+<li class="listitem">
+              <p>
+                Clone the master <span class="emphasis"><em>HPX</em></span> git repository (or a stable
+                tag):
+              </p>
+<pre class="programlisting"><span class="error">$</span> <span class="identifier">git</span> <span class="identifier">clone</span> <span class="identifier">git</span><span class="special">://</span><span class="identifier">github</span><span class="special">.</span><span class="identifier">com</span><span class="special">/</span><span class="identifier">STEllAR</span><span class="special">-</span><span class="identifier">GROUP</span><span class="special">/</span><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">git</span>
+</pre>
+            </li>
+<li class="listitem">
+              <p>
+                Generate the <span class="emphasis"><em>HPX</em></span> buildfiles using cmake:
+              </p>
+<pre class="programlisting"><span class="error">$</span> <span class="identifier">cmake</span> <span class="special">-</span><span class="identifier">DHPX_PLATFORM</span><span class="special">=</span><span class="identifier">BlueGeneQ</span>                 <span class="special">\</span>
+        <span class="special">-</span><span class="identifier">DCMAKE_CXX_COMPILER</span><span class="special">=</span><span class="identifier">bgclang</span><span class="special">++</span><span class="number">11</span>         <span class="special">\</span>
+        <span class="special">-</span><span class="identifier">DMPI_CXX_COMPILER</span><span class="special">=</span><span class="identifier">mpiclang</span><span class="special">++</span><span class="number">11</span>          <span class="special">\</span>
+        <span class="special">-</span><span class="identifier">DHWLOC_ROOT</span><span class="special">=/</span><span class="identifier">path</span><span class="special">/</span><span class="identifier">to</span><span class="special">/</span><span class="identifier">hwloc</span><span class="special">/</span><span class="identifier">installation</span> <span class="special">\</span>
+        <span class="special">-</span><span class="identifier">DBOOST_ROOT</span><span class="special">=/</span><span class="identifier">path</span><span class="special">/</span><span class="identifier">to</span><span class="special">/</span><span class="identifier">boost</span>              <span class="special">\</span>
+        <span class="special">-</span><span class="identifier">DHPX_MALLOC</span><span class="special">=</span><span class="identifier">system</span>                      <span class="special">\</span>
+        <span class="special">/</span><span class="identifier">path</span><span class="special">/</span><span class="identifier">to</span><span class="special">/</span><span class="identifier">hpx</span>
+</pre>
+            </li>
+<li class="listitem">
+              To complete the build and install <span class="emphasis"><em>HPX</em></span>:
+            </li>
+</ul></div>
+<pre class="programlisting"><span class="error">$</span> <span class="identifier">make</span> <span class="special">-</span><span class="identifier">j24</span>
+<span class="error">$</span> <span class="identifier">make</span> <span class="identifier">install</span>
+</pre>
+<p>
+          This will build and install the essential core components of <span class="emphasis"><em>HPX</em></span>
+          only. Use:
+        </p>
+<pre class="programlisting"><span class="error">$</span> <span class="identifier">make</span> <span class="special">-</span><span class="identifier">j24</span> <span class="identifier">examples</span>
+<span class="error">$</span> <span class="identifier">make</span> <span class="special">-</span><span class="identifier">j24</span> <span class="identifier">install</span>
+</pre>
+<p>
+          to build and install the examples.
+        </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="unix_installation.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="macos_installation.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
