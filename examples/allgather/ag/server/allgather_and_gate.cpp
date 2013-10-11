@@ -58,7 +58,12 @@ namespace ag { namespace server
         // assume components_, rank_ and value to be constant, thus no locking
         // is required.
         set_data_action set_data_;
-        hpx::apply(set_data_, components_, rank_, generation, value);
+        std::vector<hpx::id_type>::const_iterator end = components_.end();
+        for (std::vector<hpx::id_type>::const_iterator it = components_.begin();
+             it != end; ++it)
+        {
+            hpx::apply(set_data_, *it, rank_, generation, value);
+        }
 
         // possibly do other stuff while the allgather is going on...
 

@@ -10,7 +10,7 @@
 // Forwarding of hpx::user_main, if necessary. This has to be in a separate
 // translation unit to ensure the linker can pick or ignore this function,
 // depending on whether the main executable defines this symbol or not.
-int hpx::user_main(int argc, char* argv[])
+int hpx::user_main(int argc, char** argv)
 {
     return hpx::user_main();
 }

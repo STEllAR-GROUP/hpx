@@ -590,7 +590,7 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void command_line_handling::store_command_line(int argc, char* argv[])
+    void command_line_handling::store_command_line(int argc, char** argv)
     {
         using namespace boost::assign;
 
@@ -758,7 +758,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     int command_line_handling::call(
         boost::program_options::options_description const& desc_cmdline,
-        int argc, char* argv[])
+        int argc, char** argv)
     {
         util::manage_config cfgmap(ini_config_);
         std::size_t node = std::size_t(-1);

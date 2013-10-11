@@ -23,8 +23,7 @@ HPX_PLAIN_ACTION(test_function, test_action)
 double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     bool continuation, bool zerocopy)
 {
-    hpx::naming::id_type const here_id = hpx::find_here();
-    hpx::naming::gid_type here = here_id.get_gid();
+    hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
         reinterpret_cast<boost::uint64_t>(&test_function));
@@ -69,7 +68,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         outp = hpx::parcelset::parcel(here, addr,
             new hpx::actions::transfer_action<test_action>(
                 hpx::threads::thread_priority_normal, buffer),
-            new hpx::actions::typed_continuation<int>(here_id));
+            new hpx::actions::typed_continuation<int>(here));
     }
     else {
         outp = hpx::parcelset::parcel(here, addr,
@@ -78,7 +77,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     }
 
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here_id);
+    outp.set_source(here);
 
     std::vector<hpx::util::serialization_chunk>* chunks = 0;
     if (zerocopy)

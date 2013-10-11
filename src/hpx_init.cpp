@@ -1047,7 +1047,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int run_or_start(hpx_main_type f,
         boost::program_options::options_description const& desc_cmdline,
-        int argc, char* argv[], std::vector<std::string> const& ini_config,
+        int argc, char** argv, std::vector<std::string> const& ini_config,
         startup_function_type const& startup,
         shutdown_function_type const& shutdown, hpx::runtime_mode mode,
         bool blocking)
@@ -1170,7 +1170,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     int init(hpx_main_type f,
         boost::program_options::options_description const& desc_cmdline,
-        int argc, char* argv[], std::vector<std::string> const& ini_config,
+        int argc, char** argv, std::vector<std::string> const& ini_config,
         startup_function_type const& startup,
         shutdown_function_type const& shutdown, hpx::runtime_mode mode)
     {
@@ -1180,7 +1180,7 @@ namespace hpx
 
     int start(hpx_main_type f,
         boost::program_options::options_description const& desc_cmdline,
-        int argc, char* argv[], std::vector<std::string> const& ini_config,
+        int argc, char** argv, std::vector<std::string> const& ini_config,
         startup_function_type const& startup,
         shutdown_function_type const& shutdown, hpx::runtime_mode mode)
     {

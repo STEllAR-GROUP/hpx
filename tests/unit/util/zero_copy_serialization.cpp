@@ -88,8 +88,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
 template <typename T>
 void test_normal_serialization(T& arg)
 {
-    hpx::naming::id_type const here_id = hpx::find_here();
-    hpx::naming::gid_type here = here_id.get_gid();
+    hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
         reinterpret_cast<boost::uint64_t>(&test_function1));
@@ -107,10 +106,10 @@ void test_normal_serialization(T& arg)
     hpx::parcelset::parcel outp(here, addr,
         new hpx::actions::transfer_action<test_action1>(
             hpx::threads::thread_priority_normal, arg),
-        new hpx::actions::typed_continuation<int>(here_id));
+        new hpx::actions::typed_continuation<int>(here));
 
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here_id);
+    outp.set_source(here);
 
     test_parcel_serialization(outp, in_archive_flags, out_archive_flags, false);
 }
@@ -119,8 +118,7 @@ void test_normal_serialization(T& arg)
 template <typename T>
 void test_zero_copy_serialization(T& arg)
 {
-    hpx::naming::id_type const here_id = hpx::find_here();
-    hpx::naming::gid_type here = here_id.get_gid();
+    hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
         reinterpret_cast<boost::uint64_t>(&test_function1));
@@ -138,10 +136,10 @@ void test_zero_copy_serialization(T& arg)
     hpx::parcelset::parcel outp(here, addr,
         new hpx::actions::transfer_action<test_action1>(
             hpx::threads::thread_priority_normal, arg),
-        new hpx::actions::typed_continuation<int>(here_id));
+        new hpx::actions::typed_continuation<int>(here));
 
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here_id);
+    outp.set_source(here);
 
     test_parcel_serialization(outp, in_archive_flags, out_archive_flags, true);
 }
@@ -149,8 +147,7 @@ void test_zero_copy_serialization(T& arg)
 template <typename T1, typename T2>
 void test_zero_copy_serialization(T1& arg1, T2& arg2)
 {
-    hpx::naming::id_type const here_id = hpx::find_here();
-    hpx::naming::gid_type here = here_id.get_gid();
+    hpx::naming::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
         hpx::components::component_invalid,
         reinterpret_cast<boost::uint64_t>(&test_function2));
@@ -168,10 +165,10 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     hpx::parcelset::parcel outp(here, addr,
         new hpx::actions::transfer_action<test_action2>(
             hpx::threads::thread_priority_normal, arg1, arg2),
-        new hpx::actions::typed_continuation<int>(here_id));
+        new hpx::actions::typed_continuation<int>(here));
 
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
-    outp.set_source(here_id);
+    outp.set_source(here);
 
     test_parcel_serialization(outp, in_archive_flags, out_archive_flags, true);
 }

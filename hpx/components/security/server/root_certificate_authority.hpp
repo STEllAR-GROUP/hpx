@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/runtime/components/server/fixed_component_base.hpp>
 
 #include "certificate_authority_base.hpp"
 #include <hpx/components/security/key_pair.hpp>

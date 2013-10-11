@@ -29,7 +29,7 @@ namespace hpx { namespace util
         {}
 
         int call(boost::program_options::options_description  const& desc_cmdline,
-            int argc, char* argv[]);
+            int argc, char** argv);
 
         boost::program_options::variables_map vm_;
         util::runtime_configuration rtcfg_;
@@ -48,7 +48,7 @@ namespace hpx { namespace util
             boost::program_options::variables_map& vm, 
             std::vector<std::string>& ini_config, std::size_t& node);
 
-        void store_command_line(int argc, char* argv[]);
+        void store_command_line(int argc, char** argv);
         void store_unregistered_options(std::string const& cmd_name,
             std::vector<std::string> const& unregistered_options);
         bool handle_help_options(

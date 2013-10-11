@@ -294,7 +294,7 @@ namespace hpx { namespace util { namespace detail
 
         void construct_value(BOOST_RV_REF(value_type) v) //-V659
         {
-            ::new (get_error_address()) value_type(boost::move(v));
+            ::new (get_value_address()) value_type(boost::move(v));
         }
 
         void construct_error(error_type const& e)

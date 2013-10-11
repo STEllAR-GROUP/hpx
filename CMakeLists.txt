@@ -1385,8 +1385,8 @@ else()
   hpx_use_flag_if_available(-mcx16 LANGUAGES CXX C Fortran)
 
   if(HPX_CXX_FLAG_MCX16)
-    hpx_add_config_define(-DHPX_HAVE_GNU_SYNC_16)
-    hpx_add_config_define(-DBOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
+    hpx_add_config_define(HPX_HAVE_GNU_SYNC_16)
+    hpx_add_config_define(BOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
   endif()
 
   # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
@@ -1925,21 +1925,8 @@ if(NOT HPX_NO_INSTALL)
   endif()
 endif()
 
-file(MAKE_DIRECTORY ${output_dir}/share/hpx-${HPX_VERSION}/tests)
-
 # create a symlink in share pointing to the latest HPX installation
 execute_process(COMMAND
   "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
   WORKING_DIRECTORY ${output_dir}/share)
-
-file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests "\"-R tests.unit\"")
-
-file(WRITE ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests "\"-R tests.regression\"")
-
-if(NOT HPX_NO_INSTALL)
-  install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_unit.tests
-          DESTINATION share/hpx-${HPX_VERSION}/tests)
-  install(FILES ${output_dir}/share/hpx-${HPX_VERSION}/tests/hpx_regressions.tests
-          DESTINATION share/hpx-${HPX_VERSION}/tests)
-endif()
 
