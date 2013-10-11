@@ -53,14 +53,14 @@ namespace hpx
     {
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
-        apply_r_p(naming::address& addr, naming::id_type const& id,
+        apply_r_p(naming::address& addr, naming::id_type const& gid,
             threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
+            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
 
@@ -69,7 +69,6 @@ namespace hpx
             return false;     // destinations are remote
         }
 
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
         apply_r_p(std::vector<naming::address>& addrs,
@@ -101,7 +100,6 @@ namespace hpx
 
             return false;     // destinations are remote
         }
-#endif
 
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
@@ -202,7 +200,6 @@ namespace hpx
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
     // same for multiple destinations
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
@@ -268,7 +265,6 @@ namespace hpx
         return apply_p<Derived>(gids, actions::action_priority<Derived>(),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
@@ -276,7 +272,7 @@ namespace hpx
         template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
         apply_r_p(naming::address& addr, actions::continuation* c,
-            naming::id_type const& id, threads::thread_priority priority,
+            naming::id_type const& gid, threads::thread_priority priority,
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -285,7 +281,7 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
+            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)), cont);
 

@@ -268,7 +268,6 @@ namespace hpx { namespace components
         {
             return boost::move(f);
         }
-
     private:
         template <typename, typename>
         friend class managed_component;
@@ -334,7 +333,6 @@ namespace hpx { namespace components
             }
         };
     }
-
     // reference counting
     template <typename Component, typename Derived>
     void intrusive_ptr_add_ref(managed_component<Component, Derived>* p)
@@ -607,6 +605,7 @@ namespace hpx { namespace components
 #endif
 
     public:
+
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object
         Component* operator-> ()
@@ -643,11 +642,8 @@ namespace hpx { namespace components
 
     public:
         // reference counting
-        template<typename C, typename D>
-        friend void intrusive_ptr_add_ref(managed_component<C, D>* p);
-
-        template<typename C, typename D>
-        friend void intrusive_ptr_release(managed_component<C, D>* p);
+        template<typename C, typename D> friend void intrusive_ptr_add_ref(managed_component<C, D>* p);
+        template<typename C, typename D> friend void intrusive_ptr_release(managed_component<C, D>* p);
 
     protected:
         Component* component_;

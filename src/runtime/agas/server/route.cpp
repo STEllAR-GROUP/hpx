@@ -23,7 +23,7 @@ namespace hpx { namespace agas { namespace server
         parcelset::parcel p = req.get_parcel();
 
         std::size_t size = p.size();
-        naming::id_type const* ids = p.get_destinations();
+        naming::gid_type const* gids = p.get_destinations();
         naming::address* addrs = p.get_destination_addrs();
         std::vector<boost::fusion::vector2<naming::gid_type, gva> > cache_addresses;
 
@@ -40,7 +40,7 @@ namespace hpx { namespace agas { namespace server
             {
                 if (!addrs[i])
                 {
-                    cache_addresses.push_back(resolve_gid_locked(ids[i].get_gid(), ec));
+                    cache_addresses.push_back(resolve_gid_locked(gids[i], ec));
                     boost::fusion::vector2<naming::gid_type, gva> const& r =
                         cache_addresses.back();
 
@@ -50,13 +50,13 @@ namespace hpx { namespace agas { namespace server
                             "primary_namespace::route",
                             boost::str(boost::format(
                                     "can't route parcel to unknown gid: %s"
-                                ) % ids[i]));
+                                ) % gids[i]));
                         return response(primary_ns_route, naming::invalid_gid,
                             gva(), no_success);
                     }
 
                     gva const g = boost::fusion::at_c<1>(r).resolve(
-                        ids[i].get_gid(), boost::fusion::at_c<0>(r));
+                        gids[i], boost::fusion::at_c<0>(r));
 
                     addrs[i].locality_ = g.endpoint;
                     addrs[i].type_ = g.type;

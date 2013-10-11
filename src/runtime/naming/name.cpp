@@ -157,7 +157,7 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // prepare the given id, note: this function modifies 'this'
+        // prepare the given id, note: this function modifies the passed id
         naming::gid_type id_type_impl::prepare_gid() const
         {
             gid_type::mutex_type::scoped_lock l(this);
@@ -194,50 +194,6 @@ namespace hpx { namespace naming
                     // handle this problem.
                     naming::resolver_client& resolver = naming::get_agas_client();
                     resolver.incref_apply(*this, *this, HPX_INITIAL_GLOBALCREDIT * 2);
-                }
-                return newid;
-            }
-
-            BOOST_ASSERT(unmanaged == type_);
-            return *this;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        // prepare the given id, note: this function modifies 'this'
-        naming::gid_type id_type_impl::prepare_parcel_dest_gid()
-        {
-            gid_type::mutex_type::scoped_lock l(this);
-
-            // If the initial credit is zero the gid is 'unmanaged' and no
-            // additional action needs to be performed.
-            boost::uint16_t oldcredits = detail::get_credit_from_gid(*this);
-            if (0 != oldcredits)
-            {
-                // Request new credits from AGAS if needed (i.e. the initial
-                // gid's credit is equal to one and the new gid has no credits
-                // after splitting).
-                naming::gid_type newid = detail::split_credits_for_parcel_dest_gid(*this);
-                if (0 == detail::get_credit_from_gid(newid))
-                {
-                    // We add the new credits to the gids first to avoid
-                    // duplicate splitting during concurrent serialization
-                    // operations.
-                    BOOST_ASSERT(1 == detail::get_credit_from_gid(*this));
-                    detail::add_credit_to_gid(*this, HPX_INITIAL_GLOBALCREDIT);
-                    detail::add_credit_to_gid(newid, 1);
-
-                    // We unlock the lock as all operations on the local credit
-                    // have been performed and we don't want the lock to be
-                    // pending during the (possibly remote) AGAS operation.
-                    l.unlock();
-
-                    // If something goes wrong during the reference count
-                    // increment below we will have already added credits to
-                    // the split gid. In the worst case this will cause a
-                    // memory leak. I'm not sure if it is possible to reliably
-                    // handle this problem.
-                    naming::resolver_client& resolver = naming::get_agas_client();
-                    resolver.incref_apply(*this, *this, HPX_INITIAL_GLOBALCREDIT+1);
                 }
                 return newid;
             }
@@ -298,12 +254,6 @@ namespace hpx { namespace naming
         template HPX_EXPORT void id_type_impl::load(
             util::portable_binary_iarchive&);
     }   // detail
-
-    ///////////////////////////////////////////////////////////////////////////
-    gid_type get_parcel_dest_gid(id_type const& id)
-    {
-        return id.get_gid(); // gid_->prepare_parcel_dest_gid();
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <class Archive>
