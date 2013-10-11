@@ -268,6 +268,65 @@ Windows
 
 9) Build the INSTALL target.
 
+BlueGene/Q
+-------
+
+So far we only support BGClang for compiling HPX on the BlueGene/Q.
+
+1) Check if BGClang is available on your installation. If not obtain and install a copy
+   from the `BGClang trac page <https://trac.alcf.anl.gov/projects/llvm-bgq>`_
+
+2) Build (and install) a recent version of `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_
+   With the following commands::
+
+      $ ./configure --host=powerpc64-bgq-linux --prefix=$HOME/install/hwloc --disable-shared --enable-static \
+           CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
+      $ make
+      $ make install
+
+3) Build (and install) a recent version of Boost, using Clang and libc++::
+   To build Boost with Clang and make it link to libc++ as standard library,
+   you'll need to set up the following in your Boost ``~/user-config.jam``
+   file::
+
+      # user-config.jam (put this file into your home directory)
+      using clang
+        : 
+        : bgclang++11
+        :
+        ;
+
+   You can then use this as your build command::
+   
+      $ ./bootstrap.sh
+      $ ./b2 --build-dir=/tmp/build-boost --layout=versioned -j12
+      
+4) Clone the master HPX git repository (or a stable tag)::
+
+    $ git clone git://github.com/STEllAR-GROUP/hpx.git
+    
+5) Generate the HPX buildfiles using cmake::
+
+    $ cmake -DHPX_PLATFORM=BlueGeneQ                 \
+            -DCMAKE_CXX_COMPILER=bgclang++11         \
+            -DMPI_CXX_COMPILER=mpiclang++11          \
+            -DHWLOC_ROOT=/path/to/hwloc/installation \
+            -DBOOST_ROOT=/path/to/boost              \
+            -DHPX_MALLOC=system                      \
+            /path/to/hpx
+
+6) To complete the build and install HPX::
+
+    $ make -j24
+    $ make install
+
+   This will build and install the essential core components of HPX only. Use::
+
+    $ make -j24 examples
+    $ make -j24 install
+
+   to build and install the examples.
+
 ******************
  Acknowledgements
 ******************
