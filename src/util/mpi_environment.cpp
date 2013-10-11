@@ -70,7 +70,7 @@ namespace hpx { namespace util
         int this_rank = -1;
 
         // We assume to use the MPI parcelport if it is not explicitly disabled
-        enabled_ = detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1);
+        enabled_ = detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) != 0;
         if (!enabled_) return this_rank;
 
         // We disable the MPI parcelport if the application is not run using mpirun
