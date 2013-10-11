@@ -138,7 +138,16 @@ endif()
 
 # Decide whether to use Boost.Context for coroutine implementation
 if(${BOOST_MINOR_VERSION} GREATER 50)
-  if (APPLE)
+  set(use_generic_coroutine_context OFF)
+
+  if(APPLE)
+    set(use_generic_coroutine_context ON)
+  endif()
+  #if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+  #  set(use_generic_coroutine_context ON)
+  #endif()
+
+  if (use_generic_coroutine_context)
     hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: ON)." ON ADVANCED)
   else()
     hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
@@ -1108,13 +1117,7 @@ else()
     hpx_use_flag_if_available(-fno-inline LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     # Optimize for speed
-    if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-      # FIXME: we currently run into bug with bgclang when using O3
-      # Until the bug is resolved, we set it to O2
-      #hpx_use_flag_if_available(-O2 LANGUAGES CXX C Fortran)
-    else()
-      hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
-    endif()
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
 
     # Generate debugging information
     hpx_use_flag_if_available(-g LANGUAGES CXX C Fortran)
@@ -1138,13 +1141,7 @@ else()
     hpx_use_flag_if_available(-Os LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     # Optimize for speed
-    if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-      # FIXME: we currently run into bug with bgclang when using O3
-      # Until the bug is resolved, we set it to O2
-      #hpx_use_flag_if_available(-O2 LANGUAGES CXX C Fortran)
-    else()
-      hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
-    endif()
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
