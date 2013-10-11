@@ -115,7 +115,7 @@ Linux
 
     $ gmake tests
 
-   to build and run the tests and 
+   to build and run the tests and
 
     $ gmake examples
     $ gmake install
@@ -131,13 +131,13 @@ we describe two possibilities:
 
 1) Install a recent version of LLVM and Clang.
    In order to build hpx you will need a fairly recent version of Clang
-   (at least version 3.2 of Clang and LLVM). For more instructions please 
+   (at least version 3.2 of Clang and LLVM). For more instructions please
    see http://clang.llvm.org/get_started.html.
 
    If you're using Homebrew, ``brew install llvm --with-clang`` will do the trick.
    This will install Clang V3.2 into ``/usr/local/bin``.
 
-2) Visit http://libcxx.llvm.org/ to get the latest version of the "libc++" C++ 
+2) Visit http://libcxx.llvm.org/ to get the latest version of the "libc++" C++
    standard library. You need to use the trunk version; what's currently bundled
    with XCode or OS X aren't quite there yet. You can follow the steps in
    http://libcxx.llvm.org/ if you choose, but here's briefly how it could be built::
@@ -197,7 +197,7 @@ we describe two possibilities:
 
     $ make tests
 
-   to build and run the tests and 
+   to build and run the tests and
 
     $ make examples
     $ make install
@@ -250,13 +250,13 @@ Windows
 
 4) Add CMake variable definitions (if any) by clicking the "Add Entry" button.
    Most probably you will need to at least add the directories where `Boost <http://www.boost.org>`_
-   is located as BOOST_ROOT and where `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_ is 
+   is located as BOOST_ROOT and where `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_ is
    located as HWLOC_ROOT.
 
 5) Press the "Configure" button. A window will pop up asking you which compiler
    to use. Select the x64 Visual Studio 10 compiler (x64 Visual Studio 2012 is
-   supported as well). Note that while it is possible to build HPX for x86 
-   we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit 
+   supported as well). Note that while it is possible to build HPX for x86
+   we don't recommend doing so as 32 bit runs are severely restricted by a 32 bit
    Windows system limitation affecting the number of HPX threads you can create.
 
 6) If the "Generate" button is not clickable, press "Configure" again. Repeat
@@ -284,27 +284,26 @@ So far we only support BGClang for compiling HPX on the BlueGene/Q.
       $ make
       $ make install
 
-3) Build (and install) a recent version of Boost, using Clang and libc++::
-   To build Boost with Clang and make it link to libc++ as standard library,
-   you'll need to set up the following in your Boost ``~/user-config.jam``
-   file::
+3) Build (and install) a recent version of Boost, using BGClang::
+   To build Boost with BGClang, you'll need to set up the following in your Boost
+   ``~/user-config.jam`` file::
 
       # user-config.jam (put this file into your home directory)
       using clang
-        : 
+        :
         : bgclang++11
         :
         ;
 
    You can then use this as your build command::
-   
+
       $ ./bootstrap.sh
       $ ./b2 --build-dir=/tmp/build-boost --layout=versioned -j12
-      
+
 4) Clone the master HPX git repository (or a stable tag)::
 
     $ git clone git://github.com/STEllAR-GROUP/hpx.git
-    
+
 5) Generate the HPX buildfiles using cmake::
 
     $ cmake -DHPX_PLATFORM=BlueGeneQ                 \
@@ -331,10 +330,10 @@ So far we only support BGClang for compiling HPX on the BlueGene/Q.
  Acknowledgements
 ******************
 
-This work is supported by the National Science Foundation through awards 1117470 (APX) 
+This work is supported by the National Science Foundation through awards 1117470 (APX)
 and 1240655 (STAR). Any opinions, findings, and conclusions or recommendations expressed
 in this material are those of the author(s) and do not necessarily reflect the views of
 the National Science Foundation.
 
-This work is also supported by the Center of Computation and 
-Technology at Louisiana State University. 
+This work is also supported by the Center of Computation and
+Technology at Louisiana State University and the Chair for Computer Science 3 at the University of Erlangen Nuremberg.

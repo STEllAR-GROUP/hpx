@@ -39,8 +39,9 @@ work, but we do not test __hpx__ with other platforms, so please be warned.
 
 [table Supported Platforms for __hpx__
     [[Name   ][Recommended Version][Minimum Version][Architectures ]]
-    [[Linux  ][3.2                ][2.6            ][x86-32, x86-64, k1om]]
-    [[Windows][7, Server 2008 R2  ][Any NT system  ][x86-64]        ]
+    [[Linux    ][3.2                ][2.6            ][x86-32, x86-64, k1om]]
+    [[BlueGeneQ][V1R2M0             ][V1R2M0         ][PowerPC A2]          ]
+    [[Windows  ][7, Server 2008 R2  ][Any NT system  ][x86-64]              ]
 ]
 
 [heading Software and Libraries]
@@ -263,6 +264,68 @@ HPX_MALLOC as this is crucial for getting decent performance.
 [endsect] [/ How to Install __hpx__ on Unix Variants]
 
 [/////////////////////////////////////////////////////////////////////////////]
+[section:bgq_installation How to Install __hpx__ on BlueGene/Q]
+
+So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
+
+* Check if BGClang is available on your installation. If not obtain and install a copy
+   from the `BGClang trac page <https://trac.alcf.anl.gov/projects/llvm-bgq>`_
+
+* Build (and install) a recent version of __hwloc_downloads__
+   With the following commands:
+``
+      $ ./configure --host=powerpc64-bgq-linux --prefix=$HOME/install/hwloc --disable-shared --enable-static \
+           CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
+      $ make
+      $ make install
+``
+* Build (and install) a recent version of Boost, using BGClang::
+   To build Boost with BGClang, you'll need to set up the following in your Boost
+   ``~/user-config.jam`` file:
+``
+      # user-config.jam (put this file into your home directory)
+      using clang
+        :
+        : bgclang++11
+        :
+        ;
+``
+   You can then use this as your build command:
+``
+      $ ./bootstrap.sh
+      $ ./b2 --build-dir=/tmp/build-boost --layout=versioned -j12
+``
+* Clone the master __hpx__ git repository (or a stable tag):
+``
+    $ git clone git://github.com/STEllAR-GROUP/hpx.git
+``
+* Generate the __hpx__ buildfiles using cmake:
+``
+    $ cmake -DHPX_PLATFORM=BlueGeneQ                 \
+            -DCMAKE_CXX_COMPILER=bgclang++11         \
+            -DMPI_CXX_COMPILER=mpiclang++11          \
+            -DHWLOC_ROOT=/path/to/hwloc/installation \
+            -DBOOST_ROOT=/path/to/boost              \
+            -DHPX_MALLOC=system                      \
+            /path/to/hpx
+``
+* To complete the build and install __hpx__:
+
+``
+    $ make -j24
+    $ make install
+``
+   This will build and install the essential core components of __hpx__ only. Use:
+``
+    $ make -j24 examples
+    $ make -j24 install
+``
+   to build and install the examples.
+
+[endsect] [/ How to Install __hpx__ on BlueGene/Q]
+
+
+[/////////////////////////////////////////////////////////////////////////////]
 [section:macos_installation How to Install __hpx__ on OS X (Mac)]
 
 This section describes how to build__hpx__ for OS X (Mac) (with recent versions
@@ -460,7 +523,7 @@ required libraries via MacPorts:
         -DCMAKE_CXX_FLAGS="-Wno-unused-local-typedefs" \
         -DBOOST_ROOT=$BOOST_DIR \
         -DHWLOC_ROOT=/opt/local \
-        -DCMAKE_INSTALL_PREFIX=$HOME/hpx 
+        -DCMAKE_INSTALL_PREFIX=$HOME/hpx
             $(pwd)/../hpx
 ``
 
