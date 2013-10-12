@@ -266,6 +266,7 @@ HPX_MALLOC as this is crucial for getting decent performance.
 [/////////////////////////////////////////////////////////////////////////////]
 [section:bgq_installation How to Install __hpx__ on BlueGene/Q]
 
+[teletype]
 So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
 
 * Check if BGClang is available on your installation. If not obtain and install a copy
@@ -322,6 +323,7 @@ So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
 ``
    to build and install the examples.
 
+[c++]
 [endsect] [/ How to Install __hpx__ on BlueGene/Q]
 
 
