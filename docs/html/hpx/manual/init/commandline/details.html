@@ -36,10 +36,7 @@
             This command line option allows one to specify the required affinity
             of the <span class="emphasis"><em>HPX</em></span> worker threads to the underlying processing
             units. As a result the worker threads will run only on the processing
-            units identified by the corresponding bind specification. The affinity
-            settings are to be specified using <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">bind</span><span class="special">=&lt;</span><span class="identifier">BINDINGS</span><span class="special">&gt;</span></code>,
-            where <code class="computeroutput"><span class="special">&lt;</span><span class="identifier">BINDINGS</span><span class="special">&gt;</span></code> have to be formatted as described
-            below.
+            units identified by the corresponding bind specification.
           </p>
 <div class="note"><table border="0" summary="Note">
 <tr>
@@ -143,21 +140,6 @@ type:
     'core'
     'pu'
 </pre>
-<p>
-            The following example assumes a system with at least 4 cores, where each
-            core has more than 1 processing unit (hardware threads). Running hello_world
-            with 4 OS-threads (on 4 processing units), where each of those threads
-            is bound to the first processing unit of each of the cores, can be achieved
-            by invoking:
-          </p>
-<pre class="programlisting">hello_world -t4 --hpx:bind=thread:0-3=core:0-3.pu:0
-</pre>
-<p>
-            Here <code class="computeroutput">thread:0-3</code> specifies the OS threads for which to define
-            affinity bindings, and <code class="computeroutput">core:0-3.pu:0</code> defines that for each
-            of the cores (<code class="computeroutput">core:0-3</code>) only their first processing unit
-            (<code class="computeroutput">pu:0</code>) should be used.
-          </p>
 <div class="note"><table border="0" summary="Note">
 <tr>
 <td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../../../images/note.png"></td>
