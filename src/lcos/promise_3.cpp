@@ -8,10 +8,14 @@
 #include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/lcos/promise.hpp>
 
-HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::int64_t>, int64_t_promise)
-HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::uint64_t>, uint64_t_promise)
-HPX_REGISTER_PROMISE(hpx::lcos::promise<bool>, bool_promise)
-HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::util::section>, section_promise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::int64_t>, int64_t_promise,
+    hpx::components::int64_t_promise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::uint64_t>, uint64_t_promise,
+    hpx::components::uint64_t_promise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<bool>, bool_promise,
+    hpx::components::bool_promise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::util::section>, section_promise,
+    hpx::components::section_promise)
 
 #if defined(HPX_SECURITY)
 
@@ -21,6 +25,6 @@ HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::util::section>, section_promise)
 
 HPX_REGISTER_PROMISE(hpx::lcos::promise<
     hpx::components::security::signed_type<hpx::components::security::certificate>
->, signed_certificate_promise)
+>, signed_certificate_promise, hpx::components::signed_certificate_promise)
 
 #endif

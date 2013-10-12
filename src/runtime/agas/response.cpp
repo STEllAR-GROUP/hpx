@@ -20,6 +20,7 @@
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
 #include <hpx/runtime/components/base_lco_factory.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -566,29 +567,35 @@ HPX_REGISTER_ACTION(
     set_value_action_agas_id_type_response_type)
 
 HPX_REGISTER_PROMISE(
-    hpx::lcos::promise<hpx::agas::response>,
-    agas_response_promise)
+    hpx::lcos::promise<hpx::agas::response>, agas_response_promise,
+    hpx::components::agas_response_promise)
 HPX_REGISTER_PROMISE(
     hpx::lcos::promise<std::vector<hpx::agas::response> >,
-    agas_response_vector_promise)
+    agas_response_vector_promise,
+    hpx::components::agas_response_vector_promise)
 
 typedef hpx::lcos::promise<hpx::naming::id_type, hpx::agas::response>
     id_type_response_promise;
-HPX_REGISTER_PROMISE(id_type_response_promise)
+HPX_REGISTER_PROMISE(id_type_response_promise, id_type_response_promise,
+    hpx::components::id_type_response_promise)
 
 typedef hpx::lcos::promise<bool, hpx::agas::response>
     bool_response_promise;
-HPX_REGISTER_PROMISE(bool_response_promise)
+HPX_REGISTER_PROMISE(bool_response_promise, bool_response_promise,
+    hpx::components::bool_response_promise)
 
 typedef hpx::lcos::promise<boost::uint32_t, hpx::agas::response>
     uint32_t_response_promise;
-HPX_REGISTER_PROMISE(uint32_t_response_promise)
+HPX_REGISTER_PROMISE(uint32_t_response_promise, uint32_t_response_promise,
+    hpx::components::uint32_t_response_promise)
 
 typedef hpx::lcos::promise<std::vector<boost::uint32_t>, hpx::agas::response>
     uint32_t_vector_response_promise;
-HPX_REGISTER_PROMISE(uint32_t_vector_response_promise)
+HPX_REGISTER_PROMISE(uint32_t_vector_response_promise, uint32_t_vector_response_promise,
+    hpx::components::uint32_t_vector_response_promise)
 
 typedef hpx::lcos::promise<std::vector<hpx::naming::locality>, hpx::agas::response>
     locality_vector_response_promise;
-HPX_REGISTER_PROMISE(locality_vector_response_promise)
+HPX_REGISTER_PROMISE(locality_vector_response_promise, locality_vector_response_promise,
+    hpx::components::locality_vector_response_promise)
 

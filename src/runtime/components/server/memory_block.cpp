@@ -61,7 +61,7 @@ HPX_REGISTER_MANAGE_OBJECT_ACTION(
 
 HPX_REGISTER_PROMISE(
     hpx::lcos::promise<hpx::components::memory_block_data>,
-    memory_data_promise)
+    memory_data_promise, hpx::components::memory_data_promise)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail

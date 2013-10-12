@@ -208,13 +208,13 @@ namespace hpx { namespace components
 /**/
 
 #define HPX_REGISTER_ENABLED_BASE_LCO_FACTORY(ComponentType, componentname)   \
-        HPX_REGISTER_BASE_LCO_FACTORY_3(                                      \
-            ComponentType, componentname, ::hpx::components::factory_enabled) \
+    HPX_REGISTER_BASE_LCO_FACTORY_3(                                          \
+        ComponentType, componentname, ::hpx::components::factory_enabled)     \
 /**/
 
 #define HPX_REGISTER_DISABLED_BASE_LCO_FACTORY(ComponentType, componentname)  \
-        HPX_REGISTER_BASE_LCO_FACTORY_3(                                      \
-            ComponentType, componentname, ::hpx::components::factory_disabled)\
+    HPX_REGISTER_BASE_LCO_FACTORY_3(                                          \
+        ComponentType, componentname, ::hpx::components::factory_disabled)    \
 /**/
 
 

@@ -86,6 +86,13 @@ namespace hpx { namespace components { namespace server
 
         return naming::invalid_gid;
     }
+
+    template <typename Component>
+    Component* internal_create(typename Component::wrapped_type* impl)
+    {
+        Component* p = Component::heap_type::alloc(1);
+        return new (p) Component::derived_type(impl);
+    }
 }}}
 
 #endif

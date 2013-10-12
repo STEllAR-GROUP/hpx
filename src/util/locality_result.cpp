@@ -74,4 +74,4 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(
 
 HPX_REGISTER_PROMISE(
     hpx::lcos::promise<std::vector<hpx::util::remote_locality_result> >,
-    factory_locality_promise)
+    factory_locality_promise, hpx::components::factory_locality_promise)

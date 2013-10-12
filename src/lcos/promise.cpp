@@ -17,21 +17,25 @@ namespace hpx { namespace traits { namespace detail
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::naming::gid_type>, gid_promise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::naming::gid_type>, gid_promise,
+    hpx::components::gid_promise)
 HPX_REGISTER_PROMISE(hpx::lcos::promise<std::vector<hpx::naming::gid_type> >,
-    vector_gid_romise)
-HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::naming::id_type>, id_promise)
+    vector_gid_romise, hpx::components::vector_gid_romise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::naming::id_type>, id_promise,
+    hpx::components::id_promise)
 
 typedef hpx::lcos::promise<
     hpx::naming::id_type, hpx::naming::gid_type
 > id_gid_promise;
-HPX_REGISTER_PROMISE(id_gid_promise)
+HPX_REGISTER_PROMISE(id_gid_promise, id_gid_promise,
+    hpx::components::id_gid_promise)
 
 HPX_REGISTER_PROMISE(hpx::lcos::promise<std::vector<hpx::naming::id_type> >,
-    vector_id_promise)
+    vector_id_promise, hpx::components::vector_id_promise)
 
 typedef hpx::lcos::promise<
     std::vector<hpx::naming::id_type>, std::vector<hpx::naming::gid_type>
 > id_vector_gid_vector_promise;
-HPX_REGISTER_PROMISE(id_vector_gid_vector_promise)
+HPX_REGISTER_PROMISE(id_vector_gid_vector_promise, id_vector_gid_vector_promise,
+    hpx::components::id_vector_gid_vector_promise)
 

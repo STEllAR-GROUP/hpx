@@ -68,10 +68,10 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 
 HPX_REGISTER_PROMISE(
     hpx::lcos::promise<hpx::performance_counters::counter_info>,
-    counter_info_promise)
+    counter_info_promise, hpx::components::counter_info_promise)
 HPX_REGISTER_PROMISE(
     hpx::lcos::promise<hpx::performance_counters::counter_value>,
-    counter_value_promise)
+    counter_value_promise, hpx::components::counter_value_promise)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters

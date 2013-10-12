@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/traits/get_remote_result.hpp>
@@ -49,6 +50,12 @@ namespace hpx { namespace components
     {
         template <typename BackPtrTag>
         struct init;
+    }
+
+    namespace detail
+    {
+        template <typename Wrapping, typename Wrapped>
+        HPX_ALWAYS_EXPORT Wrapping* create_promise(Wrapped* data);
     }
 }}
 
@@ -322,7 +329,7 @@ namespace hpx { namespace lcos
     ///                  of a type convertible to the type as specified by the
     ///                  template parameter \a RemoteResult
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename RemoteResult>
+    template <typename Result, typename RemoteResult, typename Enable>
     class promise
     {
     public:
@@ -331,6 +338,7 @@ namespace hpx { namespace lcos
         typedef typename wrapped_type::completed_callback_type
             completed_callback_type;
 
+    public:
         /// Construct a new \a promise instance. The supplied
         /// \a thread will be notified as soon as the result of the
         /// operation associated with this future instance has been
@@ -344,21 +352,24 @@ namespace hpx { namespace lcos
         ///               future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         promise()
-          : impl_(new wrapping_type(new wrapped_type())),
+          : impl_(hpx::components::detail::create_promise<wrapping_type>(
+                new wrapped_type())),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
         }
 
         promise(completed_callback_type const& data_sink)
-          : impl_(new wrapping_type(new wrapped_type(data_sink))),
+          : impl_(hpx::components::detail::create_promise<wrapping_type>(
+                new wrapped_type(data_sink))),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
         }
 
         promise(BOOST_RV_REF(completed_callback_type) data_sink)
-          : impl_(new wrapping_type(new wrapped_type(boost::move(data_sink)))),
+          : impl_(hpx::components::detail::create_promise<wrapping_type>(
+                new wrapped_type(boost::move(data_sink)))),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
@@ -463,8 +474,8 @@ namespace hpx { namespace lcos
 #   endif
 
     ///////////////////////////////////////////////////////////////////////////
-    template <>
-    class promise<void, util::unused_type>
+    template <typename Enable>
+    class promise<void, util::unused_type, Enable>
     {
     public:
         typedef detail::promise<void, util::unused_type> wrapped_type;
@@ -484,21 +495,24 @@ namespace hpx { namespace lcos
         ///               future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         promise()
-          : impl_(new wrapping_type(new wrapped_type())),
+          : impl_(hpx::components::detail::create_promise<wrapping_type>(
+                new wrapped_type())),
             future_obtained_(false)
         {
             LLCO_(info) << "promise<void>::promise(" << impl_->get_gid() << ")";
         }
 
         promise(completed_callback_type const& data_sink)
-          : impl_(new wrapping_type(new wrapped_type(data_sink))),
+          : impl_(hpx::components::detail::create_promise<wrapping_type>(
+                new wrapped_type(data_sink))),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
         }
 
         promise(BOOST_RV_REF(completed_callback_type) data_sink)
-          : impl_(new wrapping_type(new wrapped_type(boost::move(data_sink)))),
+          : impl_(hpx::components::detail::create_promise<wrapping_type>(
+                new wrapped_type(boost::move(data_sink)))),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
@@ -626,6 +640,29 @@ namespace hpx { namespace traits
     >::value = components::component_invalid;
 }}
 
+#define HPX_DEFINE_PROMISE_GET_COMPONENT_TYPE(Promise, PromiseType)           \
+    namespace hpx { namespace traits                                          \
+    {                                                                         \
+        template <>                                                           \
+        components::component_type                                            \
+        component_type_database<Promise >::value = PromiseType;               \
+    }}                                                                        \
+/**/
+
+#define HPX_DEFINE_CREATE_PROMISE(Promise)                                    \
+    namespace hpx { namespace components { namespace detail                   \
+    {                                                                         \
+        template <> HPX_ALWAYS_EXPORT Promise::wrapping_type*                 \
+        create_promise<                                                       \
+            Promise::wrapping_type, Promise::wrapped_type>(                   \
+                Promise::wrapped_type* d)                                     \
+        {                                                                     \
+            typedef Promise::wrapping_type wrapping_type;                     \
+            return components::server::internal_create<wrapping_type>(d);     \
+        }                                                                     \
+    }}}                                                                       \
+/**/
+
 #define HPX_REGISTER_PROMISE(...)                                             \
     HPX_REGISTER_PROMISE_(__VA_ARGS__)                                        \
 /**/
@@ -642,6 +679,13 @@ namespace hpx { namespace traits
 
 #define HPX_REGISTER_PROMISE_2(Promise, Name)                                 \
     HPX_REGISTER_ENABLED_BASE_LCO_FACTORY(Promise::wrapping_type, Name)       \
+    HPX_DEFINE_CREATE_PROMISE(Promise)                                        \
+/**/
+
+#define HPX_REGISTER_PROMISE_3(Promise, Name, PromiseType)                    \
+    HPX_REGISTER_ENABLED_BASE_LCO_FACTORY(Promise::wrapping_type, Name)       \
+    HPX_DEFINE_CREATE_PROMISE(Promise)                                        \
+    HPX_DEFINE_PROMISE_GET_COMPONENT_TYPE(Promise::wrapped_type, PromiseType) \
 /**/
 
 #endif

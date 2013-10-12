@@ -10,8 +10,13 @@
 
 #include <string>
 
-HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::int16_t>, int16_t_promise)
-HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::uint16_t>, uint16_t_promise)
-HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::int32_t>, int32_t_promise)
-HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::uint32_t>, uint32_t_promise)
-HPX_REGISTER_PROMISE(hpx::lcos::promise<std::string>, string_promise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::int16_t>, int16_t_promise,
+    hpx::components::int16_t_promise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::uint16_t>, uint16_t_promise,
+    hpx::components::uint16_t_promise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::int32_t>, int32_t_promise,
+    hpx::components::int32_t_promise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<boost::uint32_t>, uint32_t_promise,
+    hpx::components::uint32_t_promise)
+HPX_REGISTER_PROMISE(hpx::lcos::promise<std::string>, string_promise,
+    hpx::components::string_promise)
