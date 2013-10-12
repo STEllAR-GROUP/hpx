@@ -166,7 +166,7 @@ namespace hpx { namespace util
 # else
             "env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}",
 # endif
-            "hpx.parcel.mpi.multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}",
+            "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}",
 #else
             "enable = ${HPX_HAVE_PARCELPORT_MPI:0}",
 #endif
