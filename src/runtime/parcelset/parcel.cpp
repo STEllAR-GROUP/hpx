@@ -164,19 +164,19 @@ namespace hpx { namespace parcelset
         template <typename Archive>
         void multi_destination_parcel_data::save_optimized(Archive& ar) const
         {
-            data_.has_source_id_ = source_id_ != 0;
+            data_.has_source_id_ = source_id_ != naming::invalid_id;
 
             ar.save(data_);
             ar << dests_ << addrs_;
 
-            this->parcel_data::save(ar, data_.has_source_id_,
-                data_.has_continuation_);
+            this->parcel_data::save(ar, data_.has_source_id_ != 0,
+                data_.has_continuation_ != 0);
         }
 
         template <typename Archive>
         void multi_destination_parcel_data::save_normal(Archive& ar) const
         {
-            data_.has_source_id_ = source_id_ != 0;
+            data_.has_source_id_ = source_id_ != naming::invalid_id;
 
             ar << data_.parcel_id_;
             ar << data_.start_time_ << data_.creation_time_;
@@ -184,8 +184,8 @@ namespace hpx { namespace parcelset
             ar << data_.has_source_id_ << data_.has_continuation_;
             ar << dests_ << addrs_;
 
-            this->parcel_data::save(ar, data_.has_source_id_,
-                data_.has_continuation_);
+            this->parcel_data::save(ar, data_.has_source_id_ != 0,
+                data_.has_continuation_ != 0);
         }
 
         template <typename Archive>
@@ -204,8 +204,8 @@ namespace hpx { namespace parcelset
             ar.load(data_);
             ar >> dests_ >> addrs_;
 
-            this->parcel_data::load(ar, data_.has_source_id_,
-                data_.has_continuation_);
+            this->parcel_data::load(ar, data_.has_source_id_ != 0,
+                data_.has_continuation_ != 0);
         }
 
         template <typename Archive>
@@ -217,8 +217,8 @@ namespace hpx { namespace parcelset
             ar >> data_.has_source_id_ >> data_.has_continuation_;
             ar >> dests_ >> addrs_;
 
-            this->parcel_data::load(ar, data_.has_source_id_,
-                data_.has_continuation_);
+            this->parcel_data::load(ar, data_.has_source_id_ != 0,
+                data_.has_continuation_ != 0);
         }
 
         template <typename Archive>
