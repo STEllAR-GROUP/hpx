@@ -279,8 +279,12 @@ So far we only support BGClang for compiling HPX on the BlueGene/Q.
 2) Build (and install) a recent version of `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_
    With the following commands::
 
-      $ ./configure --host=powerpc64-bgq-linux --prefix=$HOME/install/hwloc --disable-shared --enable-static \
-           CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
+      $ ./configure \
+            --host=powerpc64-bgq-linux \
+            --prefix=$HOME/install/hwloc \
+            --disable-shared \
+            --enable-static \
+            CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
       $ make
       $ make install
 

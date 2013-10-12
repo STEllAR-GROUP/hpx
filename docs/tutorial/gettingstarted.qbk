@@ -275,8 +275,12 @@ So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
 * Build (and install) a recent version of __hwloc_downloads__
    With the following commands:
 ``
-      $ ./configure --host=powerpc64-bgq-linux --prefix=$HOME/install/hwloc --disable-shared --enable-static \
-           CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
+      $ ./configure \
+        --host=powerpc64-bgq-linux \
+        --prefix=$HOME/install/hwloc \
+        --disable-shared \
+        --enable-static \
+        CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
       $ make
       $ make install
 ``
@@ -302,12 +306,12 @@ So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
 ``
 * Generate the __hpx__ buildfiles using cmake:
 ``
-    $ cmake -DHPX_PLATFORM=BlueGeneQ                 \
-            -DCMAKE_CXX_COMPILER=bgclang++11         \
-            -DMPI_CXX_COMPILER=mpiclang++11          \
+    $ cmake -DHPX_PLATFORM=BlueGeneQ \
+            -DCMAKE_CXX_COMPILER=bgclang++11 \
+            -DMPI_CXX_COMPILER=mpiclang++11 \
             -DHWLOC_ROOT=/path/to/hwloc/installation \
-            -DBOOST_ROOT=/path/to/boost              \
-            -DHPX_MALLOC=system                      \
+            -DBOOST_ROOT=/path/to/boost \
+            -DHPX_MALLOC=system \
             /path/to/hpx
 ``
 * To complete the build and install __hpx__:
