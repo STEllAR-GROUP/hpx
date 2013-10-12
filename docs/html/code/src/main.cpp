@@ -12,7 +12,7 @@
 // This has to be in a separate translation unit to ensure the linker can pick
 // or ignore this function, depending on whether the main executable defines
 // this symbol or not.
-int main(int argc, char *argv[])
+int main(int argc, char** argv)
 {
     return hpx::init(argc, argv);
 }

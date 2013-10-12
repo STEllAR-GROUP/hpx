@@ -102,7 +102,7 @@
 #if BOOST_VERSION >= 105100
 
 #include <hpx/util/coroutine/detail/context_generic_context.hpp>
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
     typedef generic_context::context_impl default_context_impl;
 }}}}
@@ -111,18 +111,18 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #error Boost.Context is available only with Boost V1.51 or later
 #endif
 
-#elif defined(__linux) || defined(linux) || defined(__linux__)
+#elif (defined(__linux) || defined(linux) || defined(__linux__)) && !defined(__bgq__)
 
 #include <hpx/util/coroutine/detail/context_linux_x86.hpp>
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
     typedef lx::context_impl default_context_impl;
 }}}}
 
-#elif defined(_POSIX_VERSION)
+#elif defined(_POSIX_VERSION) || defined(__bgq__)
 
 #include <hpx/util/coroutine/detail/context_posix.hpp>
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
     typedef posix::context_impl default_context_impl;
 }}}}
@@ -130,7 +130,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #elif defined(BOOST_WINDOWS)
 
 #include <hpx/util/coroutine/detail/context_windows_fibers.hpp>
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
     typedef windows::context_impl default_context_impl;
 }}}}

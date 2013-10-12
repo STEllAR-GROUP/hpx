@@ -33,7 +33,7 @@ namespace hpx { namespace util
     HPX_API_EXPORT bool parse_commandline(
         hpx::util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
-        int argc, char *argv[], boost::program_options::variables_map& vm,
+        int argc, char** argv, boost::program_options::variables_map& vm,
         std::size_t node, commandline_error_mode error_mode = return_on_error,
         hpx::runtime_mode mode = runtime_mode_default, 
         boost::program_options::options_description* visible = 0,

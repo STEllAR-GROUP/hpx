@@ -900,6 +900,8 @@ buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}
           </p>
 <pre class="programlisting">[hpx.parcel.mpi]
 enable = ${HPX_HAVE_PARCELPORT_MPI:1}
+env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}
+multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}
 rank = &lt;MPI_rank&gt;
 processor_name = &lt;MPI_processor_name&gt;
 </pre>
@@ -936,6 +938,36 @@ processor_name = &lt;MPI_processor_name&gt;
                       by default. To explicitly disable the MPI parcelport, set to
                       0. Note that the initial bootstrap of the overall <span class="emphasis"><em>HPX</em></span>
                       application will be performed using MPI as well.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">mpi</span><span class="special">.</span><span class="identifier">env</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property influences which environment variables (comma
+                      separated) will be analyzed to find out whether the application
+                      was invoked by MPI.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">mpi</span><span class="special">.</span><span class="identifier">multithreaded</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property is used to determine what threading mode to use
+                      when initializing MPI. If this setting is <code class="computeroutput"><span class="number">0</span></code>,
+                      <span class="emphasis"><em>HPX</em></span> will initialize MPI with <code class="computeroutput"><span class="identifier">MPI_THREAD_SINGLE</span></code>, if the
+                      value is not equal to <code class="computeroutput"><span class="number">0</span></code>
+                      <span class="emphasis"><em>HPX</em></span> will will initialize MPI with <code class="computeroutput"><span class="identifier">MPI_THREAD_MULTI</span></code>.
                     </p>
                   </td>
 </tr>

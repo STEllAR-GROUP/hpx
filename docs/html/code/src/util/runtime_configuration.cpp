@@ -140,7 +140,11 @@ namespace hpx { namespace util
 
             // TCPIP related settings
             "[hpx.parcel.tcpip]",
+#if defined(HPX_HAVE_PARCELPORT_TCPIP)
             "enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}",
+#else
+            "enable = ${HPX_HAVE_PARCELPORT_TCPIP:0}",
+#endif
 
             // shmem related settings
             "[hpx.parcel.shmem]",
@@ -162,6 +166,7 @@ namespace hpx { namespace util
 # else
             "env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}",
 # endif
+            "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}",
 #else
             "enable = ${HPX_HAVE_PARCELPORT_MPI:0}",
 #endif
@@ -517,7 +522,7 @@ namespace hpx { namespace util
         }
         return HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE;
     }
-    
+
     std::size_t runtime_configuration::get_max_mpi_requests() const
     {
         if (has_section("hpx.parcel"))
@@ -808,7 +813,7 @@ namespace hpx { namespace util
             }
         }
 #ifdef BOOST_BIG_ENDIAN
-        return "big"
+        return "big";
 #else
         return "little";
 #endif

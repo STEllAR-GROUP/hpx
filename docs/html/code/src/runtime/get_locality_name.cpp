@@ -33,7 +33,7 @@ namespace hpx { namespace detail
     std::string get_locality_name()
     {
         std::string basename = get_locality_base_name();
-        return basename + boost::lexical_cast<std::string>(get_locality_id());
+        return basename + '#' + boost::lexical_cast<std::string>(get_locality_id());
     }
 }}
 
@@ -42,6 +42,11 @@ HPX_PLAIN_ACTION(hpx::detail::get_locality_name, hpx_get_locality_name_action);
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
+    std::string get_locality_name()
+    {
+        return detail::get_locality_name();
+    }
+
     future<std::string> get_locality_name(naming::id_type const& id)
     {
         return async<hpx_get_locality_name_action>(id);

@@ -178,7 +178,7 @@ namespace hpx { namespace components
             return g;
         }
 
-//    private:
+    private:
 //        friend class boost::serialization::access;
 //        
 //        template <typename Archive>

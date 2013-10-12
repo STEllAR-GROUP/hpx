@@ -21,7 +21,7 @@
 // native implementation
 #if defined(HPX_HAVE_NATIVE_TLS)
 
-#if !defined(__ANDROID__) && !defined(ANDROID)
+#if (!defined(__ANDROID__) && !defined(ANDROID)) && !defined(__bgq__)
 
 #if defined(_GLIBCXX_HAVE_TLS)
 #  define HPX_NATIVE_TLS __thread
@@ -35,45 +35,43 @@
 
 namespace hpx { namespace util
 {
-
-template <typename T, typename Tag>
-struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
-{
-    typedef T element_type;
-
-    T* get() const
+    template <typename T, typename Tag>
+    struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
     {
-        return ptr_;
-    }
+        typedef T element_type;
 
-    T* operator->() const
-    {
-        return ptr_;
-    }
+        T* get() const
+        {
+            return ptr_;
+        }
 
-    T& operator*() const
-    {
-        BOOST_ASSERT(0 != ptr_);
-        return *ptr_;
-    }
+        T* operator->() const
+        {
+            return ptr_;
+        }
 
-    void reset(
-        T* new_value = 0
-        )
-    {
-        if (0 != ptr_) //-V809
-            delete ptr_;
+        T& operator*() const
+        {
+            BOOST_ASSERT(0 != ptr_);
+            return *ptr_;
+        }
 
-        ptr_ = new_value;
-    }
+        void reset(
+            T* new_value = 0
+            )
+        {
+            if (0 != ptr_) //-V809
+                delete ptr_;
 
-  private:
-    static HPX_NATIVE_TLS T* ptr_;
-};
+            ptr_ = new_value;
+        }
 
-template <typename T, typename Tag>
-HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_ = 0;
+      private:
+        static HPX_NATIVE_TLS T* ptr_;
+    };
 
+    template <typename T, typename Tag>
+    HPX_NATIVE_TLS T* thread_specific_ptr<T, Tag>::ptr_ = 0;
 }}
 
 #else
@@ -88,86 +86,68 @@ namespace hpx { namespace util
     {
         struct thread_specific_ptr_key
         {
-            /*
-            static void make_key()
-            {
-                pthread_key_create(&key, NULL);
-            }
-            */
-
             thread_specific_ptr_key()
-                //: key_once(PTHREAD_ONCE_INIT)
             {
                 //pthread_once(&key_once, &thread_specific_ptr_key::make_key);
                 pthread_key_create(&key, NULL);
             }
 
             pthread_key_t key;
-            //pthread_once_t key_once;
         };
     }
 
-template <typename T, typename Tag>
-struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
-{
-    typedef T element_type;
-
-    static pthread_key_t get_key()
+    template <typename T, typename Tag>
+    struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
     {
-        static_<detail::thread_specific_ptr_key, thread_specific_ptr<T, Tag> > key_holder;
+        typedef T element_type;
 
-        return key_holder.get().key;
-    }
+        static pthread_key_t get_key()
+        {
+            static_<
+                detail::thread_specific_ptr_key,
+                thread_specific_ptr<T, Tag>
+            > key_holder;
 
-    T* get() const
-    {
-        T* ptr = 0;
+            return key_holder.get().key;
+        }
 
-        ptr = reinterpret_cast<T *>(pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
+        T* get() const
+        {
+            return reinterpret_cast<T *>(
+                pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
+        }
 
-        return ptr;
-    }
+        T* operator->() const
+        {
+            return reinterpret_cast<T *>(
+                pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
+        }
 
-    T* operator->() const
-    {
-        T* ptr = 0;
+        T& operator*() const
+        {
+            T* ptr = 0;
 
-        ptr = reinterpret_cast<T *>(pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
+            ptr = reinterpret_cast<T *>(
+                pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
+            BOOST_ASSERT(0 != ptr);
+            return *ptr;
+        }
 
-        return ptr;
-    }
+        void reset(
+            T* new_value = 0
+            )
+        {
+            T* ptr = 0;
 
-    T& operator*() const
-    {
-        T* ptr = 0;
+            ptr = reinterpret_cast<T *>(
+                pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
+            if (0 != ptr)
+                delete ptr;
 
-        ptr = reinterpret_cast<T *>(pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
-        BOOST_ASSERT(0 != ptr);
-        return *ptr;
-    }
-
-    void reset(
-        T* new_value = 0
-        )
-    {
-        T* ptr = 0;
-
-        ptr = reinterpret_cast<T *>(pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
-        if (0 != ptr)
-            delete ptr;
-
-        ptr = new_value;
-        pthread_setspecific(thread_specific_ptr<T, Tag>::get_key(), ptr);
-    }
-
-  private:
-};
-
-/*
-template <typename T, typename Tag>
-static_<detail::thread_specific_ptr_key> thread_specific_ptr<T, Tag>::key_holder = detail::thread_specific_ptr_key();
-*/
-
+            ptr = new_value;
+            pthread_setspecific(thread_specific_ptr<T, Tag>::get_key(), ptr);
+        }
+    };
 }}
 
 #endif
@@ -179,41 +159,40 @@ static_<detail::thread_specific_ptr_key> thread_specific_ptr<T, Tag>::key_holder
 
 namespace hpx { namespace util
 {
-
-template <typename T, typename Tag>
-struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
-{
-    typedef typename boost::thread_specific_ptr<T>::element_type element_type;
-
-    T* get() const
+    template <typename T, typename Tag>
+    struct HPX_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
     {
-        return ptr_.get();
-    }
+        typedef typename boost::thread_specific_ptr<T>::element_type
+            element_type;
 
-    T* operator->() const
-    {
-        return ptr_.operator->();
-    }
+        T* get() const
+        {
+            return ptr_.get();
+        }
 
-    T& operator*() const
-    {
-        return ptr_.operator*();
-    }
+        T* operator->() const
+        {
+            return ptr_.operator->();
+        }
 
-    void reset(
-        T* new_value = 0
-        )
-    {
-        ptr_.reset(new_value);
-    }
+        T& operator*() const
+        {
+            return ptr_.operator*();
+        }
 
-  private:
-    static boost::thread_specific_ptr<T> ptr_;
-};
+        void reset(
+            T* new_value = 0
+            )
+        {
+            ptr_.reset(new_value);
+        }
 
-template <typename T, typename Tag>
-boost::thread_specific_ptr<T> thread_specific_ptr<T, Tag>::ptr_;
+      private:
+        static boost::thread_specific_ptr<T> ptr_;
+    };
 
+    template <typename T, typename Tag>
+    boost::thread_specific_ptr<T> thread_specific_ptr<T, Tag>::ptr_;
 }}
 
 #endif
