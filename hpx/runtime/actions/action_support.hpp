@@ -16,6 +16,7 @@
 #include <hpx/config/tuple.hpp>
 #include <hpx/config/function.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/void_guard.hpp>
 #include <hpx/traits/action_priority.hpp>
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
@@ -821,83 +822,6 @@ namespace hpx { namespace actions
         typedef typename traits::is_future<local_result_type>::type is_future_pred;
 
         // bring in the definition for all overloads for operator()
-        template <typename IdType>
-        BOOST_FORCEINLINE typename boost::enable_if<
-            boost::mpl::and_<
-                boost::mpl::bool_<
-                    util::tuple_size<arguments_type>::value == 0>,
-                boost::is_same<IdType, naming::id_type>,
-                boost::is_same<local_result_type, void> >
-        >::type
-        operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id, error_code& ec = throws) const
-        {
-            hpx::async<action>(policy, id).get(ec);
-        }
-
-        template <typename IdType>
-        BOOST_FORCEINLINE typename boost::enable_if<
-            boost::mpl::and_<
-                boost::mpl::bool_<
-                    util::tuple_size<arguments_type>::value == 0>,
-                boost::is_same<IdType, naming::id_type>,
-                boost::is_same<local_result_type, void> >
-        >::type
-        operator()(IdType const& id, error_code& ec = throws) const
-        {
-            hpx::async<action>(launch::sync, id).get(ec);
-        }
-
-        template <typename LocalResult>
-        struct sync_invoke_0
-        {
-            template <typename IdType>
-            BOOST_FORCEINLINE static LocalResult call(
-                boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
-                IdType const& id, error_code& ec)
-            {
-                return hpx::async<action>(policy, id).move(ec);
-            }
-
-            template <typename IdType>
-            BOOST_FORCEINLINE static LocalResult call(
-                boost::mpl::true_, BOOST_SCOPED_ENUM(launch) policy,
-                IdType const& id, error_code& ec)
-            {
-                return hpx::async<action>(policy, id);
-            }
-        };
-
-        template <typename IdType>
-        BOOST_FORCEINLINE typename boost::enable_if<
-            boost::mpl::and_<
-                boost::mpl::bool_<
-                    util::tuple_size<arguments_type>::value == 0>,
-                boost::is_same<IdType, naming::id_type>,
-                boost::mpl::not_<boost::is_same<local_result_type, void> > >,
-            local_result_type
-        >::type
-        operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
-            error_code& ec = throws) const
-        {
-            return sync_invoke_0<local_result_type>::call(is_future_pred(),
-                policy, id, ec);
-        }
-
-        template <typename IdType>
-        BOOST_FORCEINLINE typename boost::enable_if<
-            boost::mpl::and_<
-                boost::mpl::bool_<
-                    util::tuple_size<arguments_type>::value == 0>,
-                boost::is_same<IdType, naming::id_type>,
-                boost::mpl::not_<boost::is_same<local_result_type, void> > >,
-            local_result_type
-        >::type
-        operator()(IdType const& id, error_code& ec = throws) const
-        {
-            return sync_invoke_0<local_result_type>::call(is_future_pred(),
-                launch::sync, id, ec);
-        }
-
         #include <hpx/runtime/actions/define_function_operators.hpp>
 
         /// retrieve component type
