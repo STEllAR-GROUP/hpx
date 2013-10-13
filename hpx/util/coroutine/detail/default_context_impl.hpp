@@ -97,6 +97,11 @@
      make copyable.
 */
 
+#if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)                              \
+ && defined(HPX_HAVE_FIBER_BASED_COROUTINES)
+#   error HPX_HAVE_GENERIC_CONTEXT_COROUTINES and HPX_HAVE_FIBER_BASED_COROUTINES cannot be defined at the same time.
+#endif
+
 #if defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
 
 #if BOOST_VERSION >= 105100
