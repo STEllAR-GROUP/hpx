@@ -132,7 +132,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef posix::context_impl default_context_impl;
 }}}}
 
-#elif defined(BOOST_WINDOWS)
+#elif defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 
 #include <hpx/util/coroutine/detail/context_windows_fibers.hpp>
 namespace hpx { namespace util { namespace coroutines { namespace detail
