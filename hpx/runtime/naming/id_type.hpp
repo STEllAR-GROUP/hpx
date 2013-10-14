@@ -1,0 +1,102 @@
+//  Copyright (c) 2007-2013 Hartmut Kaiser
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#if !defined(HPX_NAMING_ID_TYPE_OCT_13_2013_0751PM)
+#define HPX_NAMING_ID_TYPE_OCT_13_2013_0751PM
+
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/config/warnings_prefix.hpp>
+#include <hpx/util/move.hpp>
+
+#include <boost/serialization/split_member.hpp>
+#include <boost/intrusive_ptr.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace naming
+{
+    namespace detail
+    {
+        struct HPX_EXPORT id_type_impl;
+        void intrusive_ptr_add_ref(id_type_impl* p);
+        void intrusive_ptr_release(id_type_impl* p);
+    }
+
+    struct HPX_EXPORT gid_type;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // the local gid is actually just a wrapper around the real thing
+    struct HPX_EXPORT id_type
+    {
+    public:
+        enum management_type
+        {
+            unknown_deleter = -1,
+            unmanaged = 0,          ///< unmanaged GID
+            managed = 1             ///< managed GID
+        };
+
+        id_type();
+
+        id_type(boost::uint64_t lsb_id, management_type t);
+        id_type(gid_type const& gid, management_type t);
+        id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id, management_type t);
+
+        id_type(id_type const & o);
+        id_type(BOOST_RV_REF(id_type) o);
+
+        id_type & operator=(BOOST_COPY_ASSIGN_REF(id_type) o);
+        id_type & operator=(BOOST_RV_REF(id_type) o);
+
+        gid_type& get_gid();
+        gid_type const& get_gid() const;
+
+        // This function is used in AGAS unit tests and application code, do not
+        // remove.
+        management_type get_management_type() const;
+
+        id_type& operator++();
+        id_type operator++(int);
+
+        operator util::safe_bool<id_type>::result_type() const;
+
+        // comparison is required as well
+        friend bool operator== (id_type const& lhs, id_type const& rhs);
+        friend bool operator!= (id_type const& lhs, id_type const& rhs);
+
+        friend bool operator< (id_type const& lhs, id_type const& rhs);
+        friend bool operator<= (id_type const& lhs, id_type const& rhs);
+        friend bool operator> (id_type const& lhs, id_type const& rhs);
+        friend bool operator>= (id_type const& lhs, id_type const& rhs);
+
+        // access the internal parts of the gid
+        boost::uint64_t get_msb() const;
+        void set_msb(boost::uint64_t msb);
+
+        boost::uint64_t get_lsb() const;
+        void set_lsb(boost::uint64_t lsb);
+        void set_lsb(void* lsb);
+
+    private:
+        friend HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);
+
+        friend std::ostream& operator<< (std::ostream& os, id_type const& id);
+
+        friend class boost::serialization::access;
+
+        template <typename Archive>
+        void save(Archive & ar, const unsigned int version) const;
+
+        template <typename Archive>
+        void load(Archive & ar, const unsigned int version);
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
+        BOOST_COPYABLE_AND_MOVABLE(id_type)
+
+        boost::intrusive_ptr<detail::id_type_impl> gid_;
+    };
+}}
+
+#endif
+

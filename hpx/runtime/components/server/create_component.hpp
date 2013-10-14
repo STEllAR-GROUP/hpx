@@ -55,7 +55,7 @@ namespace hpx { namespace components { namespace server
     naming::gid_type create(HPX_STD_FUNCTION<void(void*)> const& ctor,
         error_code& ec = throws)
     {
-        Component* c = Component::heap_type::alloc(1);
+        Component* c = (Component*)Component::heap_type::alloc(1);
         ctor(c);
 
         naming::gid_type gid = c->get_base_gid();

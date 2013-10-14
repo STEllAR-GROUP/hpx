@@ -306,29 +306,22 @@ namespace hpx { namespace components
                 detail::fixed_wrapper_heap<Derived> > heap_type;
 
             typedef detail::fixed_wrapper_heap<Derived> block_type;
+            typedef Derived value_type;
 
+        private:
             struct wrapper_heap_tag {};
 
             static heap_type& get_heap()
             {
                 // ensure thread-safe initialization
                 util::reinitializable_static<
-                    heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT
+                    heap_type, wrapper_heap_tag
                 > heap(components::get_component_type<Component>());
-                return heap.get(get_runtime_instance_number());
+                return heap.get();
             }
 
-            static block_type* alloc_heap()
-            {
-                return get_heap().alloc_heap();
-            }
-
-            static void add_heap(block_type* p)
-            {
-                return get_heap().add_heap(p);
-            }
-
-            static Derived* alloc(std::size_t count = 1)
+        public:
+            static void* alloc(std::size_t count = 1)
             {
                 return get_heap().alloc(count);
             }
@@ -388,6 +381,9 @@ namespace hpx { namespace components
         typedef Component wrapped_type;
         typedef Component type_holder;
         typedef typename Component::base_type_holder base_type_holder;
+
+        typedef detail::heap_factory<Component, derived_type> heap_type;
+        typedef typename heap_type::value_type value_type;
 
         /// \brief Construct a managed_component instance holding a
         ///        wrapped instance. This constructor takes ownership of the
@@ -498,8 +494,6 @@ namespace hpx { namespace components
         }
 
     public:
-        typedef detail::heap_factory<Component, derived_type> heap_type;
-
         /// \brief  The memory for managed_component objects is managed by
         ///         a class specific allocator. This allocator uses a one size
         ///         heap implementation, ensuring fast memory allocation.
@@ -512,7 +506,7 @@ namespace hpx { namespace components
         {
             if (size > sizeof(managed_component))
                 return ::operator new(size);
-            derived_type* p = heap_type::alloc();
+            void* p = heap_type::alloc();
             if (NULL == p) {
                 HPX_THROW_STD_EXCEPTION(std::bad_alloc(),
                     "managed_component::operator new(std::size_t size)");
@@ -545,32 +539,32 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and
         //          initialization of arrays of wrappers.
-        static derived_type* create(std::size_t count)
+        static value_type* create(std::size_t count)
         {
             // allocate the memory
-            derived_type* p = heap_type::alloc(count);
+            void* p = heap_type::alloc(count);
             if (NULL == p) {
                 HPX_THROW_STD_EXCEPTION(std::bad_alloc(),
                     "managed_component::create");
             }
 
             if (1 == count)
-                return new (p) derived_type();
+                return new (p) value_type();
 
             // call constructors
             std::size_t succeeded = 0;
             try {
-                derived_type* curr = p;
-                for (std::size_t i = 0; i < count; ++i, ++curr) {
+                value_type* curr = reinterpret_cast<value_type*>(p);
+                for (std::size_t i = 0; i != count; ++i, ++curr) {
                     // call placement new, might throw
-                    new (curr) derived_type();
+                    new (curr) value_type();
                     ++succeeded;
                 }
             }
             catch (...) {
                 // call destructors for successfully constructed objects
-                derived_type* curr = p;
-                for (std::size_t i = 0; i < succeeded; ++i)
+                value_type* curr = reinterpret_cast<value_type*>(p);
+                for (std::size_t i = 0; i != succeeded; ++i)
                 {
                     curr->finalize();
                     curr->~derived_type();
@@ -579,19 +573,19 @@ namespace hpx { namespace components
                 heap_type::free(p, count);     // free memory
                 throw;      // rethrow
             }
-            return p;
+            return reinterpret_cast<value_type*>(p);
         }
 
         /// \brief  The function \a destroy is used for deletion and
         //          de-allocation of arrays of wrappers
-        static void destroy(derived_type* p, std::size_t count = 1)
+        static void destroy(value_type* p, std::size_t count = 1)
         {
             if (NULL == p || 0 == count)
                 return;     // do nothing if given a NULL pointer
 
             // call destructors for all managed_component instances
-            derived_type* curr = p;
-            for (std::size_t i = 0; i < count; ++i)
+            value_type* curr = p;
+            for (std::size_t i = 0; i != count; ++i)
             {
                 curr->finalize();
                 curr->~derived_type();

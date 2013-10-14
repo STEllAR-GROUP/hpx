@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_registry.hpp>
 #include <hpx/runtime/components/base_lco_factory.hpp>
+#include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/promise.hpp>
 
 #include <vector>
@@ -16,26 +17,16 @@ namespace hpx { namespace traits { namespace detail
         static_cast<long>(components::component_last));
 }}}
 
-///////////////////////////////////////////////////////////////////////////////
-HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::naming::gid_type>, gid_promise,
-    hpx::components::gid_promise)
-HPX_REGISTER_PROMISE(hpx::lcos::promise<std::vector<hpx::naming::gid_type> >,
-    vector_gid_romise, hpx::components::vector_gid_romise)
-HPX_REGISTER_PROMISE(hpx::lcos::promise<hpx::naming::id_type>, id_promise,
-    hpx::components::id_promise)
+namespace hpx { namespace components { namespace detail
+{
+    util::one_size_heap_list_base* create_promise_heap(
+        components::component_type type)
+    {
+        typedef detail::wrapper_heap_list<
+            detail::fixed_wrapper_heap<managed_promise>
+        > heap_type;
 
-typedef hpx::lcos::promise<
-    hpx::naming::id_type, hpx::naming::gid_type
-> id_gid_promise;
-HPX_REGISTER_PROMISE(id_gid_promise, id_gid_promise,
-    hpx::components::id_gid_promise)
-
-HPX_REGISTER_PROMISE(hpx::lcos::promise<std::vector<hpx::naming::id_type> >,
-    vector_id_promise, hpx::components::vector_id_promise)
-
-typedef hpx::lcos::promise<
-    std::vector<hpx::naming::id_type>, std::vector<hpx::naming::gid_type>
-> id_vector_gid_vector_promise;
-HPX_REGISTER_PROMISE(id_vector_gid_vector_promise, id_vector_gid_vector_promise,
-    hpx::components::id_vector_gid_vector_promise)
+        return new heap_type(type);
+    }
+}}}
 

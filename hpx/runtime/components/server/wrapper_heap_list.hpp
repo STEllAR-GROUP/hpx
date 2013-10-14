@@ -23,7 +23,8 @@ namespace hpx { namespace components { namespace detail
 
     public:
         wrapper_heap_list(component_type type)
-          : base_type(get_component_type_name(type))
+          : base_type(get_component_type_name(type)),
+            type_(type)
         {}
 
         ///
@@ -38,7 +39,7 @@ namespace hpx { namespace components { namespace detail
                 if ((*it)->did_alloc(p))
                 {
                     util::scoped_unlock<typename base_type::unique_lock_type> ul(guard);
-                    return (*it)->get_gid(id_range_, p);
+                    return (*it)->get_gid(id_range_, p, type_);
                 }
             }
             return naming::invalid_gid;
@@ -54,6 +55,7 @@ namespace hpx { namespace components { namespace detail
 
     private:
         util::unique_id_ranges id_range_;
+        components::component_type type_;
     };
 
 }}} // namespace hpx::components::detail

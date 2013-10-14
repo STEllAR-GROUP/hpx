@@ -52,6 +52,7 @@
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/util/coroutine/detail/fix_result.hpp>
 #include <hpx/util/coroutine/detail/self.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 
 namespace hpx { namespace util { namespace coroutines 
 {
@@ -139,9 +140,10 @@ namespace hpx { namespace util { namespace coroutines
     coroutine() : m_pimpl(0) {}
 
     template <typename Functor>
-    coroutine (BOOST_FWD_REF(Functor) f, thread_id_type id = 0,
-            std::ptrdiff_t stack_size = detail::default_stack_size)
-      : m_pimpl(impl_type::create(boost::forward<Functor>(f), id, stack_size))
+    coroutine (BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+            thread_id_type id = 0, std::ptrdiff_t stack_size = detail::default_stack_size)
+      : m_pimpl(impl_type::create(boost::forward<Functor>(f),
+            boost::move(target), id, stack_size))
     {}
 
     coroutine (impl_ptr p)

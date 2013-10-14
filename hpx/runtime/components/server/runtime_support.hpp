@@ -52,8 +52,14 @@ namespace hpx { namespace components { namespace server
 
             component_factory(
                   boost::shared_ptr<component_factory_base> const& f,
-                  hpx::util::plugin::dll const& d, bool enabled)
+                  hpx::util::plugin::dll const& d, bool enabled = true)
               : first(f), second(d), isenabled(enabled)
+            {};
+
+            component_factory(
+                  boost::shared_ptr<component_factory_base> const& f,
+                  bool enabled = true)
+              : first(f), isenabled(enabled)
             {};
 
             boost::shared_ptr<component_factory_base> first;
@@ -294,6 +300,10 @@ namespace hpx { namespace components { namespace server
         components::security::capability get_factory_capabilities(
             components::component_type type);
 #endif
+
+        ///////////////////////////////////////////////////////////////////////
+        boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+            components::component_type type);
 
     protected:
         // Load all components from the ini files found in the configuration

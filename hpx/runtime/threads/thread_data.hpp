@@ -159,8 +159,7 @@ namespace hpx { namespace threads
             enabled_interrupt_(true),
             ran_exit_funcs_(false),
             exit_funcs_(0),
-            scheduler_base_(init_data.scheduler_base),
-            target_(boost::move(init_data.target))
+            scheduler_base_(init_data.scheduler_base)
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 
                         << get_description() << ")";
@@ -513,10 +512,7 @@ namespace hpx { namespace threads
 #endif
 
         /// This function will be called when the thread is about to be deleted
-        virtual void reset()
-        {
-            target_ = naming::invalid_id;       // release target
-        }
+        virtual void reset() {}
 
     protected:
         mutable boost::atomic<thread_state> current_state_;
@@ -559,9 +555,6 @@ namespace hpx { namespace threads
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
-
-        // keep target alive, if needed
-        naming::id_type target_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -576,7 +569,8 @@ namespace hpx { namespace threads
         thread_data(thread_init_data& init_data, 
                pool_type& pool, thread_state_enum newstate)
           : thread_data_base(init_data, newstate),
-            coroutine_(boost::move(init_data.func), this_(), init_data.stacksize),
+            coroutine_(boost::move(init_data.func), boost::move(init_data.target),
+                this_(), init_data.stacksize),
             pool_(&pool)
         {
             BOOST_ASSERT(init_data.stacksize != 0);
@@ -671,7 +665,7 @@ namespace hpx { namespace threads
         stackless_thread_data(thread_init_data& init_data,
                 void* pool, thread_state_enum newstate)
           : thread_data_base(init_data, newstate),
-            coroutine_(boost::move(init_data.func), this_()),
+            coroutine_(boost::move(init_data.func), boost::move(init_data.target), this_()),
             pool_(pool)
         {
             BOOST_ASSERT(init_data.stacksize == 0);

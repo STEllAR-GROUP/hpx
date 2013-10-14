@@ -59,10 +59,6 @@ HPX_REGISTER_MANAGE_OBJECT_ACTION(
     hpx::actions::manage_object_action<boost::uint8_t>,
     manage_object_action_uint8_t)
 
-HPX_REGISTER_PROMISE(
-    hpx::lcos::promise<hpx::components::memory_block_data>,
-    memory_data_promise, hpx::components::memory_data_promise)
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server { namespace detail
 {

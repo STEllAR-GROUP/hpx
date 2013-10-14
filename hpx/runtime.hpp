@@ -11,6 +11,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/one_size_heap_list_base.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -274,15 +275,17 @@ namespace hpx
         ///
         virtual bool unregister_thread() = 0;
 
+        /// This function creates anew base_lco_factory (if none is available
+        /// for the given type yet), registers this factory with the
+        /// runtime_support object and asks the factory for it's heap object
+        // which can be used to create new promises of the given type.
+        boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+            components::component_type type);
+
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(
             boost::shared_ptr<util::query_counters> const& active_counters);
-        /*
-        {
-            active_counters_ = active_counters;
-        }
-        */
 
         void start_active_counters(error_code& ec = throws);
         void stop_active_counters(error_code& ec = throws);

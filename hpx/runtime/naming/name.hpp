@@ -575,177 +575,13 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);
+}}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // the local gid is actually just a wrapper around the real thing
-    struct HPX_EXPORT id_type
-    {
-    public:
-        enum management_type
-        {
-            unknown_deleter = detail::unknown_deleter,
-            unmanaged = detail::unmanaged,          ///< unmanaged GID
-            managed = detail::managed               ///< managed GID
-        };
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/id_type_impl.hpp>
 
-        id_type() {}
-
-        explicit id_type(boost::uint64_t lsb_id, management_type t)
-          : gid_(new detail::id_type_impl(0, lsb_id,
-                static_cast<detail::id_type_management>(t)))
-        {}
-
-        explicit id_type(gid_type const& gid, management_type t)
-          : gid_(new detail::id_type_impl(gid,
-                static_cast<detail::id_type_management>(t)))
-        {
-            BOOST_ASSERT(detail::get_credit_from_gid(*gid_) || t == unmanaged);
-        }
-
-        explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id,
-                management_type t)
-          : gid_(new detail::id_type_impl(msb_id, lsb_id,
-                static_cast<detail::id_type_management>(t)))
-        {
-            BOOST_ASSERT(detail::get_credit_from_gid(*gid_) || t == unmanaged);
-        }
-
-        id_type(id_type const & o)
-          : gid_(o.gid_)
-        {}
-
-        id_type(BOOST_RV_REF(id_type) o)
-          : gid_(o.gid_)
-        {
-            o.gid_.reset();
-        }
-
-        id_type & operator=(BOOST_COPY_ASSIGN_REF(id_type) o)
-        {
-            gid_ = o.gid_;
-            return *this;
-        }
-
-        id_type & operator=(BOOST_RV_REF(id_type) o)
-        {
-            gid_ = o.gid_;
-            o.gid_.reset();
-            return *this;
-        }
-
-        gid_type& get_gid() { return *gid_; }
-        gid_type const& get_gid() const { return *gid_; }
-
-        // This function is used in AGAS unit tests and application code, do not
-        // remove.
-        management_type get_management_type() const
-        {
-            return management_type(gid_->get_management_type());
-        }
-
-        id_type& operator++()       // pre-increment
-        {
-            ++(*gid_);
-            return *this;
-        }
-        id_type operator++(int)     // post-increment
-        {
-            (*gid_)++;
-            return *this;
-        }
-
-        operator util::safe_bool<id_type>::result_type() const
-        {
-            return util::safe_bool<id_type>()(gid_ && *gid_);
-        }
-
-        // comparison is required as well
-        friend bool operator== (id_type const& lhs, id_type const& rhs)
-        {
-            if (!lhs)
-                return !rhs;
-            if (!rhs)
-                return !lhs;
-
-            return *lhs.gid_ == *rhs.gid_;
-        }
-        friend bool operator!= (id_type const& lhs, id_type const& rhs)
-        {
-            return !(lhs == rhs);
-        }
-
-        friend bool operator< (id_type const& lhs, id_type const& rhs)
-        {
-            // LHS is null, rhs is not.
-            if (!lhs && rhs)
-                return true;
-
-            // RHS is null.
-            if (!rhs)
-                return false;
-
-            return *lhs.gid_ < *rhs.gid_;
-        }
-
-        friend bool operator<= (id_type const& lhs, id_type const& rhs)
-        {
-            // Deduced from <.
-            return !(rhs < lhs);
-        }
-
-        friend bool operator> (id_type const& lhs, id_type const& rhs)
-        {
-            // Deduced from <.
-            return rhs < lhs;
-        }
-
-        friend bool operator>= (id_type const& lhs, id_type const& rhs)
-        {
-            // Deduced from <.
-            return !(lhs < rhs);
-        }
-
-        // access the internal parts of the gid
-        boost::uint64_t get_msb() const
-        {
-            return gid_->get_msb();
-        }
-        void set_msb(boost::uint64_t msb)
-        {
-            gid_->set_msb(msb);
-        }
-        boost::uint64_t get_lsb() const
-        {
-            return gid_->get_lsb();
-        }
-        void set_lsb(boost::uint64_t lsb)
-        {
-            gid_->set_lsb(lsb);
-        }
-        void set_lsb(void* lsb)
-        {
-            gid_->set_lsb(lsb);
-        }
-
-    private:
-        friend HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);
-
-        friend std::ostream& operator<< (std::ostream& os, id_type const& id);
-
-        friend class boost::serialization::access;
-
-        template <class Archive>
-        void save(Archive & ar, const unsigned int version) const;
-
-        template <class Archive>
-        void load(Archive & ar, const unsigned int version);
-
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
-        BOOST_COPYABLE_AND_MOVABLE(id_type)
-
-        boost::intrusive_ptr<detail::id_type_impl> gid_;
-    };
-
+namespace hpx { namespace naming
+{
     ///////////////////////////////////////////////////////////////////////////
     inline std::ostream& operator<< (std::ostream& os, id_type const& id)
     {
@@ -800,11 +636,6 @@ namespace hpx { namespace traits
         }
     };
 
-    //template <>
-    //struct promise_remote_result<naming::id_type>
-    //  : boost::mpl::identity<naming::gid_type>
-    //{};
-
     template <>
     struct promise_local_result<naming::gid_type>
       : boost::mpl::identity<naming::id_type>
@@ -828,11 +659,6 @@ namespace hpx { namespace traits
             return result;
         }
     };
-
-    //template <>
-    //struct promise_remote_result<std::vector<naming::id_type> >
-    //  : boost::mpl::identity<std::vector<naming::gid_type> >
-    //{};
 
     template <>
     struct promise_local_result<std::vector<naming::gid_type> >

@@ -9,6 +9,7 @@
 
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/util/coroutine/detail/coroutine_traits.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 
 #include <boost/move/move.hpp>
 #include <boost/mpl/bool.hpp>
@@ -71,7 +72,8 @@ namespace hpx { namespace util { namespace coroutines
         stackless_coroutine() {}
 
         template <typename Functor>
-        stackless_coroutine(BOOST_FWD_REF(Functor) f, thread_id_type id = 0)
+        stackless_coroutine(BOOST_FWD_REF(Functor) f,
+                BOOST_RV_REF(naming::id_type) target, thread_id_type id = 0)
           : f_(boost::forward<Functor>(f))
           , state_(ctx_ready)
           , id_(id)
@@ -79,8 +81,9 @@ namespace hpx { namespace util { namespace coroutines
           , phase_(0)
 #endif
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
-          ,thread_data_(0)
+          , thread_data_(0)
 #endif
+          , target_(boost::move(target))
         {}
 
         stackless_coroutine(BOOST_RV_REF(stackless_coroutine) rhs)
@@ -93,6 +96,7 @@ namespace hpx { namespace util { namespace coroutines
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
           , thread_data_(rhs.thread_data_)
 #endif
+          , target_(boost::move(rhs.target_))
         {
             rhs.id_ = 0;
             rhs.state_ = ctx_ready;
@@ -121,6 +125,7 @@ namespace hpx { namespace util { namespace coroutines
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
             std::swap(thread_data_, rhs.thread_data_);
 #endif
+            std::swap(target_ rhs.target_)
             return *this;
         }
 
@@ -155,7 +160,8 @@ namespace hpx { namespace util { namespace coroutines
 #endif
 
         template <typename Functor>
-        void rebind(BOOST_FWD_REF(Functor) f, thread_id_type id = 0)
+        void rebind(BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+            thread_id_type id = 0)
         {
             BOOST_ASSERT(exited());
 
@@ -164,11 +170,13 @@ namespace hpx { namespace util { namespace coroutines
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
             phase_ = 0;
 #endif
+            target_ = boost::move(target);
         }
 
         void reset()
         {
             BOOST_ASSERT(exited());
+            target_ = naming::invalid_id;
             f_.reset();
         }
 
@@ -209,6 +217,7 @@ namespace hpx { namespace util { namespace coroutines
 
             // we always have to run to completion
             BOOST_ASSERT(result == 5);       // threads::terminated == 5
+            reset();
             return result;
         }
 
@@ -240,6 +249,8 @@ namespace hpx { namespace util { namespace coroutines
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
         std::size_t thread_data_;
 #endif
+
+        naming::id_type target_;        // keep target alive, if needed
     };
 }}}
 #endif

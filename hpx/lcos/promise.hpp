@@ -20,6 +20,8 @@
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/once.hpp>
+#include <hpx/util/one_size_heap_list_base.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/static_assert.hpp>
@@ -54,8 +56,73 @@ namespace hpx { namespace components
 
     namespace detail
     {
-        template <typename Wrapping, typename Wrapped>
-        HPX_ALWAYS_EXPORT Wrapping* create_promise(Wrapped* data);
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component, typename Derived>
+        struct heap_factory;
+
+        ///////////////////////////////////////////////////////////////////////
+        HPX_EXPORT boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+            components::component_type type);
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Promise>
+        struct promise_heap_factory
+        {
+            typedef Promise component_type;
+            typedef managed_component<Promise> derived_type;
+            typedef derived_type value_type;
+
+            struct wrapper_heap_tag {};
+
+        private:
+            static boost::shared_ptr<util::one_size_heap_list_base> heap_;
+            static lcos::local::once_flag constructed_;
+
+            // this will be called exactly
+            static void create_heap()
+            {
+                heap_ = get_promise_heap(get_component_type<component_type>());
+            }
+
+            static util::one_size_heap_list_base& get_heap()
+            {
+                // ensure thread-safe initialization
+                lcos::local::call_once(constructed_,
+                    &promise_heap_factory::create_heap);
+                return *heap_;
+            }
+
+        public:
+            static void* alloc(std::size_t count = 1)
+            {
+                return get_heap().alloc(count);
+            }
+            static void free(void* p, std::size_t count = 1)
+            {
+                get_heap().free(p, count);
+            }
+            static naming::gid_type get_gid(void* p)
+            {
+                return get_heap().get_gid(p);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Promise>
+        boost::shared_ptr<util::one_size_heap_list_base>
+            promise_heap_factory<Promise>::heap_;
+
+        template <typename Promise>
+        lcos::local::once_flag
+            promise_heap_factory<Promise>::constructed_;
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result, typename RemoteResult>
+        struct heap_factory<
+                lcos::detail::promise<Result, RemoteResult>,
+                managed_component<lcos::detail::promise<Result, RemoteResult> > >
+          : promise_heap_factory<lcos::detail::promise<Result, RemoteResult> >
+        {};
     }
 }}
 
@@ -290,6 +357,40 @@ namespace hpx { namespace lcos { namespace detail
     };
 }}}
 
+namespace hpx { namespace components
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // This is a placeholder shim used for the type erased memory management
+    // for all promise types
+    struct managed_promise : boost::noncopyable
+    {
+        /// \brief Construct a managed_component instance holding a new wrapped
+        ///        instance
+        managed_promise()
+          : promise_(0)
+        {
+            BOOST_ASSERT(false);        // this is never called
+        }
+
+        ~managed_promise()
+        {
+            intrusive_ptr_release(this);
+        }
+
+    private:
+        friend void intrusive_ptr_add_ref(managed_promise* p)
+        {
+            intrusive_ptr_add_ref(p->promise_);
+        }
+        friend void intrusive_ptr_release(managed_promise* p)
+        {
+            intrusive_ptr_release(p->promise_);
+        }
+
+        lcos::detail::promise<void, util::unused_type>* promise_;
+    };
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
@@ -329,7 +430,7 @@ namespace hpx { namespace lcos
     ///                  of a type convertible to the type as specified by the
     ///                  template parameter \a RemoteResult
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result, typename RemoteResult, typename Enable>
+    template <typename Result, typename RemoteResult>
     class promise
     {
     public:
@@ -352,24 +453,21 @@ namespace hpx { namespace lcos
         ///               future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         promise()
-          : impl_(hpx::components::detail::create_promise<wrapping_type>(
-                new wrapped_type())),
+          : impl_(new wrapping_type(new wrapped_type())),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
         }
 
         promise(completed_callback_type const& data_sink)
-          : impl_(hpx::components::detail::create_promise<wrapping_type>(
-                new wrapped_type(data_sink))),
+          : impl_(new wrapping_type(new wrapped_type(data_sink))),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
         }
 
         promise(BOOST_RV_REF(completed_callback_type) data_sink)
-          : impl_(hpx::components::detail::create_promise<wrapping_type>(
-                new wrapped_type(boost::move(data_sink)))),
+          : impl_(new wrapping_type(new wrapped_type(boost::move(data_sink)))),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
@@ -451,31 +549,31 @@ namespace hpx { namespace lcos
             (*impl_)->set_local_data(boost::forward<Result>(result));
         }
 
-#       ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this...
         explicit operator lcos::future<Result>()
         {
             return get_future();
         }
-#       endif
+#endif
 
     protected:
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
-    
-#   ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+
+#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
     // [N3722, 4.1] asks for this...
     template <typename Result>
     inline future<Result>::future(promise<Result>& promise)
     {
         promise.get_future().swap(*this);
     }
-#   endif
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Enable>
-    class promise<void, util::unused_type, Enable>
+    template <>
+    class promise<void, util::unused_type>
     {
     public:
         typedef detail::promise<void, util::unused_type> wrapped_type;
@@ -495,24 +593,21 @@ namespace hpx { namespace lcos
         ///               future instance (as it has to be sent along
         ///               with the action as the continuation parameter).
         promise()
-          : impl_(hpx::components::detail::create_promise<wrapping_type>(
-                new wrapped_type())),
+          : impl_(new wrapping_type(new wrapped_type())),
             future_obtained_(false)
         {
             LLCO_(info) << "promise<void>::promise(" << impl_->get_gid() << ")";
         }
 
         promise(completed_callback_type const& data_sink)
-          : impl_(hpx::components::detail::create_promise<wrapping_type>(
-                new wrapped_type(data_sink))),
+          : impl_(new wrapping_type(new wrapped_type(data_sink))),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
         }
 
         promise(BOOST_RV_REF(completed_callback_type) data_sink)
-          : impl_(hpx::components::detail::create_promise<wrapping_type>(
-                new wrapped_type(boost::move(data_sink)))),
+          : impl_(new wrapping_type(new wrapped_type(boost::move(data_sink)))),
             future_obtained_(false)
         {
             LLCO_(info) << "promise::promise(" << impl_->get_gid() << ")";
@@ -580,26 +675,26 @@ namespace hpx { namespace lcos
             (*impl_)->set_exception(e);
         }
 
-#       ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this...
         explicit operator lcos::future<void>()
         {
             return get_future();
         }
-#       endif
+#endif
 
     protected:
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
-    
-#   ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+
+#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
     // [N3722, 4.1] asks for this...
     inline future<void>::future(promise<void>& promise)
     {
         promise.get_future().swap(*this);
     }
-#   endif
+#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -613,9 +708,9 @@ namespace hpx { namespace traits
     template <typename Result, typename RemoteResult>
     struct component_type_database<lcos::detail::promise<Result, RemoteResult> >
     {
-        static components::component_type value;
+        HPX_ALWAYS_EXPORT static components::component_type value;
 
-        HPX_EXPORT static components::component_type get()
+        static components::component_type get()
         {
             // Promises are never created remotely, their factories are not
             // registered with AGAS, so we can assign the component types locally.
@@ -627,65 +722,17 @@ namespace hpx { namespace traits
             return value;
         }
 
-        HPX_EXPORT static void set(components::component_type t)
+        static void set(components::component_type t)
         {
             BOOST_ASSERT(false);
         }
     };
 
     template <typename Result, typename RemoteResult>
-    components::component_type
+    HPX_ALWAYS_EXPORT components::component_type
     component_type_database<
         lcos::detail::promise<Result, RemoteResult>
     >::value = components::component_invalid;
 }}
-
-#define HPX_DEFINE_PROMISE_GET_COMPONENT_TYPE(Promise, PromiseType)           \
-    namespace hpx { namespace traits                                          \
-    {                                                                         \
-        template <>                                                           \
-        components::component_type                                            \
-        component_type_database<Promise >::value = PromiseType;               \
-    }}                                                                        \
-/**/
-
-#define HPX_DEFINE_CREATE_PROMISE(Promise)                                    \
-    namespace hpx { namespace components { namespace detail                   \
-    {                                                                         \
-        template <> HPX_ALWAYS_EXPORT Promise::wrapping_type*                 \
-        create_promise<                                                       \
-            Promise::wrapping_type, Promise::wrapped_type>(                   \
-                Promise::wrapped_type* d)                                     \
-        {                                                                     \
-            typedef Promise::wrapping_type wrapping_type;                     \
-            return components::server::internal_create<wrapping_type>(d);     \
-        }                                                                     \
-    }}}                                                                       \
-/**/
-
-#define HPX_REGISTER_PROMISE(...)                                             \
-    HPX_REGISTER_PROMISE_(__VA_ARGS__)                                        \
-/**/
-
-#define HPX_REGISTER_PROMISE_(...)                                            \
-    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
-        HPX_REGISTER_PROMISE_, HPX_UTIL_PP_NARG(__VA_ARGS__)                  \
-    )(__VA_ARGS__))                                                           \
-/**/
-
-#define HPX_REGISTER_PROMISE_1(Value)                                         \
-    HPX_REGISTER_PROMISE_2(Value, Value)                                      \
-/**/
-
-#define HPX_REGISTER_PROMISE_2(Promise, Name)                                 \
-    HPX_REGISTER_ENABLED_BASE_LCO_FACTORY(Promise::wrapping_type, Name)       \
-    HPX_DEFINE_CREATE_PROMISE(Promise)                                        \
-/**/
-
-#define HPX_REGISTER_PROMISE_3(Promise, Name, PromiseType)                    \
-    HPX_REGISTER_ENABLED_BASE_LCO_FACTORY(Promise::wrapping_type, Name)       \
-    HPX_DEFINE_CREATE_PROMISE(Promise)                                        \
-    HPX_DEFINE_PROMISE_GET_COMPONENT_TYPE(Promise::wrapped_type, PromiseType) \
-/**/
 
 #endif

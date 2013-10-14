@@ -538,8 +538,7 @@ namespace hpx
 
         template <typename Result,
             typename RemoteResult =
-                typename traits::promise_remote_result<Result>::type,
-            typename Enable = void>
+                typename traits::promise_remote_result<Result>::type>
         class promise;
 
         template <typename Action,

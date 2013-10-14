@@ -66,13 +66,6 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::base_performance_counter)
 
-HPX_REGISTER_PROMISE(
-    hpx::lcos::promise<hpx::performance_counters::counter_info>,
-    counter_info_promise, hpx::components::counter_info_promise)
-HPX_REGISTER_PROMISE(
-    hpx::lcos::promise<hpx::performance_counters::counter_value>,
-    counter_value_promise, hpx::components::counter_value_promise)
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters
 {

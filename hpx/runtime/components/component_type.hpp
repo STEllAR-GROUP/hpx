@@ -47,55 +47,24 @@ namespace hpx { namespace components
 
             // An LCO representing a value which may not have been computed yet.
             component_promise = ((6 << 16) | component_base_lco_with_value),
-            gid_promise = ((7 << 16) | component_base_lco_with_value),
-            vector_gid_romise = ((8 << 16) | component_base_lco_with_value),
-            id_promise = ((9 << 16) | component_base_lco_with_value),
-            id_gid_promise = ((10 << 16) | component_base_lco_with_value),
-            vector_id_promise = ((11 << 16) | component_base_lco_with_value),
-            id_vector_gid_vector_promise = ((12 << 16) | component_base_lco_with_value),
-            void_promise = ((13 << 16) | component_base_lco_with_value),
-            float_promise = ((14 << 16) | component_base_lco_with_value),
-            double_promise = ((15 << 16) | component_base_lco_with_value),
-            int8_t_promise = ((16 << 16) | component_base_lco_with_value),
-            uint8_t_promise = ((17 << 16) | component_base_lco_with_value),
-            int16_t_promise = ((18 << 16) | component_base_lco_with_value),
-            uint16_t_promise = ((19 << 16) | component_base_lco_with_value),
-            int32_t_promise = ((20 << 16) | component_base_lco_with_value),
-            uint32_t_promise = ((21 << 16) | component_base_lco_with_value),
-            int64_t_promise = ((22 << 16) | component_base_lco_with_value),
-            uint64_t_promise = ((23 << 16) | component_base_lco_with_value),
-            string_promise = ((24 << 16) | component_base_lco_with_value),
-            bool_promise = ((25 << 16) | component_base_lco_with_value),
-            section_promise = ((26 << 16) | component_base_lco_with_value),
-            counter_info_promise = ((27 << 16) | component_base_lco_with_value),
-            counter_value_promise = ((28 << 16) | component_base_lco_with_value),
-            agas_response_promise = ((29 << 16) | component_base_lco_with_value),
-            agas_response_vector_promise = ((30 << 16) | component_base_lco_with_value),
-            id_type_response_promise = ((31 << 16) | component_base_lco_with_value),
-            bool_response_promise = ((32 << 16) | component_base_lco_with_value),
-            uint32_t_response_promise = ((33 << 16) | component_base_lco_with_value),
-            uint32_t_vector_response_promise = ((34 << 16) | component_base_lco_with_value),
-            locality_vector_response_promise = ((35 << 16) | component_base_lco_with_value),
-            memory_data_promise = ((36 << 16) | component_base_lco_with_value),
-            factory_locality_promise = ((37 << 16) | component_base_lco_with_value),
 
             // AGAS locality services.
-            component_agas_locality_namespace = 38,
+            component_agas_locality_namespace = 7,
 
             // AGAS primary address resolution services.
-            component_agas_primary_namespace = 39,
+            component_agas_primary_namespace = 8,
 
             // AGAS global type system.
-            component_agas_component_namespace = 40,
+            component_agas_component_namespace = 9,
 
             // AGAS symbolic naming services.
-            component_agas_symbol_namespace = 41,
+            component_agas_symbol_namespace = 10,
 
 #if defined(HPX_HAVE_SODIUM)
             // root CA, subordinate CA
-            signed_certificate_promise = ((42 << 16) | component_base_lco_with_value),
-            component_root_certificate_authority = 43,
-            component_subordinate_certificate_authority = 44,
+            signed_certificate_promise = ((11 << 16) | component_base_lco_with_value),
+            component_root_certificate_authority = 12,
+            component_subordinate_certificate_authority = 13,
 #endif
 
             component_last,

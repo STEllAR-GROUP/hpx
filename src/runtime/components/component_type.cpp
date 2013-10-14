@@ -22,47 +22,16 @@ namespace hpx { namespace components
             "component_base_lco_with_value",                    /*  4 */
             "component_barrier",                                /*  5 */
             "component_promise",                                /*  6 */
-            "gid_promise",                                      /*  7 */
-            "vector_gid_romise",                                /*  8 */
-            "id_promise",                                       /*  9 */
-            "id_gid_promise",                                   /* 10 */
-            "vector_id_promise",                                /* 11 */
-            "id_vector_gid_vector_promise",                     /* 12 */
-            "void_promise",                                     /* 13 */
-            "float_promise",                                    /* 14 */
-            "double_promise",                                   /* 15 */
-            "int8_t_promise",                                   /* 16 */
-            "uint8_t_promise",                                  /* 17 */
-            "int16_t_promise",                                  /* 18 */
-            "uint16_t_promise",                                 /* 19 */
-            "int32_t_promise",                                  /* 20 */
-            "uint32_t_promise",                                 /* 21 */
-            "int64_t_promise",                                  /* 22 */
-            "uint64_t_promise",                                 /* 23 */
-            "string_promise",                                   /* 24 */
-            "bool_promise",                                     /* 25 */
-            "section_promise",                                  /* 26 */
-            "counter_info_promise",                             /* 27 */
-            "counter_value_promise",                            /* 28 */
-            "agas_response_promise",                            /* 29 */
-            "agas_response_vector_promise",                     /* 30 */
-            "id_type_response_promise",                         /* 31 */
-            "bool_response_promise",                            /* 32 */
-            "uint32_t_response_promise",                        /* 33 */
-            "uint32_t_vector_response_promise",                 /* 34 */
-            "locality_vector_response_promise",                 /* 35 */
-            "memory_data_promise",                              /* 36 */
-            "factory_locality_promise",                         /* 37 */
 
-            "component_agas_locality_namespace",                /* 38 */
-            "component_agas_primary_namespace",                 /* 39 */
-            "component_agas_component_namespace",               /* 40 */
-            "component_agas_symbol_namespace",                  /* 41 */
+            "component_agas_locality_namespace",                /*  7 */
+            "component_agas_primary_namespace",                 /*  8 */
+            "component_agas_component_namespace",               /*  9 */
+            "component_agas_symbol_namespace",                  /* 10 */
 
 #if defined(HPX_HAVE_SODIUM)
-            "signed_certificate_promise",                       /* 42 */
-            "component_root_certificate_authority",             /* 43 */
-            "component_subordinate_certificate_authority",      /* 44 */
+            "signed_certificate_promise",                       /* 11 */
+            "component_root_certificate_authority",             /* 12 */
+            "component_subordinate_certificate_authority",      /* 13 */
 #endif
         };
     }
