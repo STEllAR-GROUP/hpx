@@ -70,7 +70,7 @@ hpx::id_type test_server::create_new(hpx::id_type const& id) const
 
 int main()
 {
-    std::vector<hpx::id_type> localities = hpx::find_remote_localities();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     BOOST_FOREACH(hpx::id_type const& id, localities)
     {
