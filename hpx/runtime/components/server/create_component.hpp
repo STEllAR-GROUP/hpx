@@ -91,7 +91,7 @@ namespace hpx { namespace components { namespace server
     Component* internal_create(typename Component::wrapped_type* impl)
     {
         Component* p = Component::heap_type::alloc(1);
-        return new (p) Component::derived_type(impl);
+        return new (p) typename Component::derived_type(impl);
     }
 }}}
 

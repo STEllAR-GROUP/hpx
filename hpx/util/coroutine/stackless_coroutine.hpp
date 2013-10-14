@@ -125,7 +125,7 @@ namespace hpx { namespace util { namespace coroutines
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
             std::swap(thread_data_, rhs.thread_data_);
 #endif
-            std::swap(target_ rhs.target_)
+            std::swap(target_, rhs.target_)
             return *this;
         }
 
