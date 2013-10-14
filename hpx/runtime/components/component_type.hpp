@@ -22,58 +22,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
-        enum component_enum_type
-        {
-            component_invalid = -1,
-
-            // Runtime support component (provides system services such as
-            // component creation, etc). One per locality.
-            component_runtime_support = 0,
-
-            // Pseudo-component for direct access to local virtual memory.
-            component_memory = 1,
-
-            // Generic memory blocks.
-            component_memory_block = 2,
-
-            // Base component for LCOs that do not produce a value.
-            component_base_lco = 3,
-
-            // Base component for LCOs that do produce values.
-            component_base_lco_with_value = 4,
-
-            // Synchronization barrier LCO.
-            component_barrier = ((5 << 16) | component_base_lco),
-
-            // An LCO representing a value which may not have been computed yet.
-            component_promise = ((6 << 16) | component_base_lco_with_value),
-
-            // AGAS locality services.
-            component_agas_locality_namespace = 7,
-
-            // AGAS primary address resolution services.
-            component_agas_primary_namespace = 8,
-
-            // AGAS global type system.
-            component_agas_component_namespace = 9,
-
-            // AGAS symbolic naming services.
-            component_agas_symbol_namespace = 10,
-
-#if defined(HPX_HAVE_SODIUM)
-            // root CA, subordinate CA
-            signed_certificate_promise = ((11 << 16) | component_base_lco_with_value),
-            component_root_certificate_authority = 12,
-            component_subordinate_certificate_authority = 13,
-#endif
-
-            component_last,
-            component_first_dynamic = component_last,
-
-            // Force this enum type to be at least 32 bits.
-            component_upper_bound = 0x7fffffffL //-V112
-        };
-
     /// \brief Return the string representation for a given component type id
     HPX_EXPORT std::string const get_component_type_name(component_type type);
 

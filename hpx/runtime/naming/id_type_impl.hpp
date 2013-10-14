@@ -16,9 +16,6 @@ namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
     // the local gid is actually just a wrapper around the real thing
-    inline id_type::id_type()
-    {}
-
     inline id_type::id_type(boost::uint64_t lsb_id, management_type t)
         : gid_(new detail::id_type_impl(0, lsb_id,
             static_cast<detail::id_type_management>(t)))
@@ -37,29 +34,6 @@ namespace hpx { namespace naming
             static_cast<detail::id_type_management>(t)))
     {
         BOOST_ASSERT(detail::get_credit_from_gid(*gid_) || t == unmanaged);
-    }
-
-    inline id_type::id_type(id_type const & o)
-        : gid_(o.gid_)
-    {}
-
-    inline id_type::id_type(BOOST_RV_REF(id_type) o)
-        : gid_(o.gid_)
-    {
-        o.gid_.reset();
-    }
-
-    inline id_type& id_type::operator=(BOOST_COPY_ASSIGN_REF(id_type) o)
-    {
-        gid_ = o.gid_;
-        return *this;
-    }
-
-    inline id_type & id_type::operator=(BOOST_RV_REF(id_type) o)
-    {
-        gid_ = o.gid_;
-        o.gid_.reset();
-        return *this;
     }
 
     inline gid_type& id_type::get_gid() { return *gid_; }

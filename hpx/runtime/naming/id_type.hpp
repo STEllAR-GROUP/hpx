@@ -37,17 +37,34 @@ namespace hpx { namespace naming
             managed = 1             ///< managed GID
         };
 
-        id_type();
+        id_type() {}
 
         id_type(boost::uint64_t lsb_id, management_type t);
         id_type(gid_type const& gid, management_type t);
         id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id, management_type t);
 
-        id_type(id_type const & o);
-        id_type(BOOST_RV_REF(id_type) o);
+        id_type(id_type const & o) : gid_(o.gid_) {}
+        id_type(BOOST_RV_REF(id_type) o)
+          : gid_(o.gid_)
+        {
+            o.gid_.reset();
+        }
 
-        id_type & operator=(BOOST_COPY_ASSIGN_REF(id_type) o);
-        id_type & operator=(BOOST_RV_REF(id_type) o);
+        id_type & operator=(BOOST_COPY_ASSIGN_REF(id_type) o)
+        {
+            if (this != &o)
+                gid_ = o.gid_;
+            return *this;
+        }
+        id_type & operator=(BOOST_RV_REF(id_type) o)
+        {
+            if (this != &o)
+            {
+                gid_ = o.gid_;
+                o.gid_.reset();
+            }
+            return *this;
+        }
 
         gid_type& get_gid();
         gid_type const& get_gid() const;
@@ -96,6 +113,9 @@ namespace hpx { namespace naming
 
         boost::intrusive_ptr<detail::id_type_impl> gid_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    id_type const invalid_id = id_type();
 }}
 
 #endif
