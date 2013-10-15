@@ -225,13 +225,13 @@ addressing_service::addressing_service(
 
     if (service_type == service_mode_bootstrap)
         launch_bootstrap(pp, ini_);
-
-    // now, boot the parcel port
-    pp.run(false);
 }
 
 void addressing_service::initialize(parcelset::parcelport& pp)
 {
+    // now, boot the parcel port
+    pp.run(false);
+
     if (service_type == service_mode_bootstrap)
     {
         get_big_boot_barrier().wait_bootstrap();
