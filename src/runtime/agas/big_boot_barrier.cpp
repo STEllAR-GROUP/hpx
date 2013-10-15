@@ -726,7 +726,7 @@ void big_boot_barrier::apply(
   , naming::address const& addr
   , actions::base_action* act
 ) { // {{{
-    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
+    parcelset::parcel p(naming::get_gid_from_locality_id(target_locality_id), addr, act);
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
     pp.send_early_parcel(p);
@@ -749,8 +749,12 @@ namespace detail
         boost::uint32_t num_pus = 0;
         for (boost::uint32_t i = 0; i != num_cores; ++i)
         {
-            num_pus += static_cast<boost::uint32_t>(
+            boost::uint32_t num_pus_core = static_cast<boost::uint32_t>(
                 top.get_number_of_core_pus(i));
+            if (num_pus_core == ~boost::uint32_t(0))
+                return num_cores;       // assume one pu per core
+
+            num_pus += num_pus_core;
         }
 
         return num_pus;

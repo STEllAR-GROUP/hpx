@@ -39,12 +39,13 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
     void affinity_data::init(init_affinity_data const& data)
     {
+        std::size_t num_system_pus = hardware_concurrency();
+
         // initialize from command line
-        pu_offset_ = data.pu_offset_;
-        pu_step_ = data.pu_step_;
+        pu_offset_ = data.pu_offset_ % num_system_pus;
+        pu_step_ = data.pu_step_ % num_system_pus;
         affinity_domain_ = data.affinity_domain_;
 
-        std::size_t num_system_pus = hardware_concurrency();
 #if defined(HPX_HAVE_HWLOC)
         if (!data.affinity_desc_.empty()) {
             affinity_masks_.resize(num_threads_);

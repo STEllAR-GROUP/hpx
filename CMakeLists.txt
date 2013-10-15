@@ -138,7 +138,16 @@ endif()
 
 # Decide whether to use Boost.Context for coroutine implementation
 if(${BOOST_MINOR_VERSION} GREATER 50)
-  if (APPLE)
+  set(use_generic_coroutine_context OFF)
+
+  if(APPLE)
+    set(use_generic_coroutine_context ON)
+  endif()
+  #if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+  #  set(use_generic_coroutine_context ON)
+  #endif()
+
+  if (use_generic_coroutine_context)
     hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: ON)." ON ADVANCED)
   else()
     hpx_option(HPX_USE_GENERIC_COROUTINE_CONTEXT BOOL "Use Boost.Context as the underlying coroutines context switch implementation (default: OFF)." OFF ADVANCED)
@@ -1087,7 +1096,9 @@ if(MSVC)
 
   hpx_add_config_define(BOOST_USE_WINDOWS_H)
   hpx_add_config_define(BOOST_SERIALIZATION_DYN_LINK)
-  hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
+  if(NOT HPX_USE_GENERIC_COROUTINE_CONTEXT)
+    hpx_add_config_define(HPX_HAVE_FIBER_BASED_COROUTINES)
+  endif()
   hpx_add_config_define(PSAPI_VERSION 1)
 
 ################################################################################
@@ -1108,13 +1119,7 @@ else()
     hpx_use_flag_if_available(-fno-inline LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     # Optimize for speed
-    if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-      # FIXME: we currently run into bug with bgclang when using O3
-      # Until the bug is resolved, we set it to O2
-      #hpx_use_flag_if_available(-O2 LANGUAGES CXX C Fortran)
-    else()
-      hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
-    endif()
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
 
     # Generate debugging information
     hpx_use_flag_if_available(-g LANGUAGES CXX C Fortran)
@@ -1138,13 +1143,7 @@ else()
     hpx_use_flag_if_available(-Os LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     # Optimize for speed
-    if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-      # FIXME: we currently run into bug with bgclang when using O3
-      # Until the bug is resolved, we set it to O2
-      #hpx_use_flag_if_available(-O2 LANGUAGES CXX C Fortran)
-    else()
-      hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
-    endif()
+    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
@@ -1385,8 +1384,8 @@ else()
   hpx_use_flag_if_available(-mcx16 LANGUAGES CXX C Fortran)
 
   if(HPX_CXX_FLAG_MCX16)
-    hpx_add_config_define(-DHPX_HAVE_GNU_SYNC_16)
-    hpx_add_config_define(-DBOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
+    hpx_add_config_define(HPX_HAVE_GNU_SYNC_16)
+    hpx_add_config_define(BOOST_ATOMIC_HAVE_GNU_SYNC_16) # for the gnu code
   endif()
 
   # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,

@@ -346,6 +346,8 @@ to `ON`).
 ``
     [hpx.parcel.mpi]
     enable = ${HPX_HAVE_PARCELPORT_MPI:1}
+    env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}
+    multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}
     rank = <MPI_rank>
     processor_name = <MPI_processor_name>
 ``
@@ -360,6 +362,14 @@ to `ON`).
      explicitly disable the MPI parcelport, set to 0. Note that the initial
      bootstrap of the overall __hpx__ application will be performed using MPI
      as well.]]
+    [[`hpx.parcel.mpi.env`]
+     [This property influences which environment variables (comma separated)
+      will be analyzed to find out whether the application was invoked by MPI.]]
+    [[`hpx.parcel.mpi.multithreaded`]
+     [This property is used to determine what threading mode to use when
+      initializing MPI. If this setting is `0`, __hpx__ will initialize MPI
+      with `MPI_THREAD_SINGLE`, if the value is not equal to `0` __hpx__ will
+      will initialize MPI with `MPI_THREAD_MULTI`.]]
     [[`hpx.parcel.mpi.rank`]
      [This property will be initialized to the MPI rank of the locality.]]
     [[`hpx.parcel.mpi.processor_name`]

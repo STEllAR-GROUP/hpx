@@ -305,7 +305,7 @@ namespace hpx { namespace util
     bool parse_commandline(
         util::section const& rtcfg,
         boost::program_options::options_description const& app_options,
-        int argc, char *argv[], boost::program_options::variables_map& vm,
+        int argc, char** argv, boost::program_options::variables_map& vm,
         std::size_t node, commandline_error_mode error_mode,
         hpx::runtime_mode mode,
         boost::program_options::options_description* visible,

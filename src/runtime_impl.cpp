@@ -145,10 +145,6 @@ namespace hpx {
         // once all has been initialized, finalize security data for bootstrap
         this->init_security();
 #endif
-        // now, launch AGAS and register all nodes, launch all other components
-        agas_client_.initialize(*parcel_port_);
-        parcel_handler_.initialize(parcel_port_);
-
         // initialize thread affinity settings in the scheduler
         if (init_affinity.pu_offset_ == 0) {
             // correct pu_offset from config data if appropriate
@@ -159,6 +155,10 @@ namespace hpx {
         else {
             thread_manager_->init(init_affinity);
         }
+
+        // now, launch AGAS and register all nodes, launch all other components
+        agas_client_.initialize(*parcel_port_);
+        parcel_handler_.initialize(parcel_port_);
 
 #if defined(HPX_HAVE_SECURITY)
         // enable parcel capability checking

@@ -86,7 +86,7 @@ namespace hpx { namespace components { namespace security
         {
             BOOST_ASSERT(position < security::traits::capability<>::size);
 
-            return bits_[position / CHAR_BIT] & (1ull << (position % CHAR_BIT)) != 0;
+            return (bits_[position / CHAR_BIT] & (1ull << (position % CHAR_BIT))) != 0;
         }
 
         bool verify(capability const & sender) const

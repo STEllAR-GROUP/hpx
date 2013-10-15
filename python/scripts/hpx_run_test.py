@@ -7,6 +7,18 @@
 
 # TODO: Fractional threads_per_locality
 
+# hpx_run_test.py is a script that is designed to manage the execution of HPX
+# tests. It is designed to:
+# 
+# * Robustly clean up failed tests by killing them and all their subprocesses.
+# * Robustly enforce user-specified timeouts for tests with minimal overheads.
+# * Control the output of tests.
+#
+# hpx_run_test.py takes a number of command line arguments, described in 
+# --help. Additionally, it takes a positional argument that describes
+# the test. This argument should be formatted as a python list. Its format is
+# described in --help.
+
 import sys, os, string
 import os.path as osp
 
@@ -24,12 +36,6 @@ if osp.exists(osp.join(sys.path[0], "../share/hpx/python/hpx")):
   sys.path.append(osp.join(sys.path[0], "../share/hpx/python"))
 
 from hpx.process import process, process_group
-
-# Input files should be a list of lists. Each sublist should follow the
-# following structure:
-#
-# format: [ name, timeout, success, nodes, threads_per_node, args ]
-# types:  [ string, float or None, bool, int, int, list ]
 
 signal_map = dict((-1 * k, v) for v, k in signal.__dict__.iteritems() \
                            if re.match("SIG[A-Z]*$", v))
@@ -63,11 +69,13 @@ class TestFailed(Exception):
 
 if __name__ == '__main__':
   # {{{ main
-  usage = "Usage: %prog [options] [test to run]"
+  usage =         "Usage: %prog [options] [test specification]\n"
+  usage = usage + "The test specification should be a python list the following format:\n"
+  usage = usage + "  [ name, timeout, success, nodes, threads_per_node, args ]\n"
+  usage = usage + "The types of the list elements should be:\n"
+  usage = usage + "  [ string, float or None, bool, int, int, list ]\n"
 
   parser = OptionParser(usage=usage)
-
-  exe_dir = osp.normpath(osp.dirname(sys.argv[0])) + '/'
 
   parser.add_option("--suffix",
                     action="store", type="string",
