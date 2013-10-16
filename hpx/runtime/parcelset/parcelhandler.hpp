@@ -66,13 +66,12 @@ namespace hpx { namespace parcelset
 
         void rethrow_exception();
 
-        //
+    public:
         typedef std::pair<naming::locality, std::string> handler_key_type;
         typedef std::map<
             handler_key_type, boost::shared_ptr<policies::message_handler> >
         message_handler_map;
 
-    public:
         typedef parcelport::read_handler_type read_handler_type;
         typedef parcelport::write_handler_type write_handler_type;
 
@@ -479,6 +478,7 @@ namespace hpx { namespace parcelset
         boost::atomic<bool> use_alternative_parcelports_;
 
         /// Store message handlers for actions
+        mutex_type handlers_mtx_;
         message_handler_map handlers_;
 
         /// Count number of (outbound) parcels routed
