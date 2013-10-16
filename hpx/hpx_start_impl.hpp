@@ -149,8 +149,7 @@ namespace hpx
         if (argc == 0 || argv == 0)
         {
             char *dummy_argv[1] = { const_cast<char*>(app_name.c_str()) };
-            start(desc_commandline, 1, dummy_argv, mode);
-            return;
+            return start(desc_commandline, 1, dummy_argv, mode);
         }
 
         HPX_STD_FUNCTION<void()> const empty;
