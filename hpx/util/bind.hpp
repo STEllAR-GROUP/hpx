@@ -228,9 +228,7 @@ namespace hpx { namespace util {
         template <typename F>
         struct bound_functor0
         {
-            typedef typename boost::remove_const<F>::type functor_type;
-
-            functor_type f;
+            F f;
 
             typedef
                 typename util::invoke_result_of<F()>::type
@@ -293,11 +291,14 @@ namespace hpx { namespace util {
     template <typename F>
     typename boost::disable_if<
         hpx::traits::is_action<typename util::remove_reference<F>::type>,
-        detail::bound_functor0<F>
+        detail::bound_functor0<typename util::decay<F>::type>
     >::type
     bind(BOOST_FWD_REF(F) f)
     {
-        return detail::bound_functor0<F>(boost::forward<F>(f));
+        return
+            detail::bound_functor0<
+                typename util::decay<F>::type
+            >(boost::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -527,9 +528,7 @@ namespace hpx { namespace util
         >
         struct BOOST_PP_CAT(bound_functor, N)
         {
-            typedef typename boost::remove_const<F>::type functor_type;
-
-            functor_type f;
+            F f;
 
             template <typename Sig>
             struct result;
@@ -718,7 +717,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         hpx::traits::is_action<typename util::remove_reference<F>::type>
       , BOOST_PP_CAT(detail::bound_functor, N)<
-            typename util::remove_reference<F>::type
+            typename util::decay<F>::type
           , BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
         >
     >::type
@@ -729,7 +728,7 @@ namespace hpx { namespace util
     {
         return
             BOOST_PP_CAT(detail::bound_functor, N)<
-                typename util::remove_reference<F>::type
+                typename util::decay<F>::type
               , BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
             >(
                 boost::forward<F>(f)
