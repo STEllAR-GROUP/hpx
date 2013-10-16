@@ -384,7 +384,7 @@ namespace hpx { namespace util
                 if (!vm.count("hpx:run-hpx-main") &&
                     !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
                 {
-                    hpx_main_f_ = 0;
+                    hpx_main_f_.reset();
                 }
             }
             else if (vm.count("hpx:connect")) {
@@ -403,7 +403,7 @@ namespace hpx { namespace util
             if (!vm.count("hpx:run-hpx-main") && 
                 !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
             {
-                hpx_main_f_ = 0;
+                hpx_main_f_.reset();
             }
         }
         else if (node != std::size_t(-1) || vm.count("hpx:node")) {
@@ -432,7 +432,7 @@ namespace hpx { namespace util
                     if (!vm.count("hpx:run-hpx-main") &&
                         !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
                     {
-                        hpx_main_f_ = 0;
+                        hpx_main_f_.reset();
                     }
                 }
             }
@@ -500,7 +500,7 @@ namespace hpx { namespace util
             if (!vm.count("hpx:run-hpx-main") &&
                 !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
             {
-                hpx_main_f_ = 0;
+                hpx_main_f_.reset();
             }
         }
 

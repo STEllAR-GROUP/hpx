@@ -11,6 +11,8 @@
 #  error Do not directly include hpx/hpx_init_impl.hpp, use hpx/hpx_init.hpp instead!
 #endif
 
+#include <hpx/util/bind.hpp>
+
 namespace hpx
 {
     /// \brief Main entry point for launching the HPX runtime system.
@@ -171,6 +173,35 @@ namespace hpx
 
         HPX_STD_FUNCTION<void()> const empty;
         return init(f, desc_commandline, argc, argv, empty, empty, mode);
+    }
+
+    /// \brief Main entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main entry point, which can be used to set up the
+    /// runtime for an HPX application (the runtime system will be set up in
+    /// console mode or worker mode depending on the command line settings).
+    namespace detail
+    {
+        inline int init_helper(boost::program_options::variables_map& vm,
+            HPX_STD_FUNCTION<int(int, char**)> const& f, int argc, char** argv)
+        {
+            return f(argc, argv);
+        }
+    }
+
+    inline int init(HPX_STD_FUNCTION<int(int, char**)> const& f,
+        std::string const& app_name, int argc, char** argv, hpx::runtime_mode mode)
+    {
+        using boost::program_options::options_description;
+        options_description desc_commandline(
+            std::string("Usage: ") + HPX_APPLICATION_STRING +  " [options]");
+
+        std::vector<std::string> cfg;
+        HPX_STD_FUNCTION<void()> const empty;
+
+        return init(
+            util::bind(detail::init_helper, util::placeholders::_1, f, argc, argv),
+            desc_commandline, argc, argv, cfg, empty, empty, mode);
     }
 }
 
