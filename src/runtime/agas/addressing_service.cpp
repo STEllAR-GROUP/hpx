@@ -1633,8 +1633,14 @@ void addressing_service::decref(
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
+        void (addressing_service::*decref_ptr)(
+            naming::gid_type const&
+          , naming::gid_type const&
+          , boost::int64_t
+          , error_code&
+        ) = &addressing_service::decref;
         threads::register_thread_nullary(
-            HPX_STD_BIND(&addressing_service::decref, this,
+            HPX_STD_BIND(decref_ptr, this,
                 lower, upper, credit, boost::ref(throws)),
                 "addressing_service::decref");
         return;
