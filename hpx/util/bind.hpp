@@ -40,6 +40,41 @@
 namespace hpx { namespace util {
     namespace detail
     {
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+        template <typename T, bool IsRvalueRef =
+            std::is_rvalue_reference<T>::type::value>
+#else
+        template <typename T, bool IsRvalueRef = false>
+#endif
+        struct env_value_type
+        {
+            typedef typename hpx::util::remove_reference<T>::type type;
+        };
+
+        template <typename T>
+        struct env_value_type<T, false>
+        {
+            typedef T type;
+        };
+
+        template <typename T>
+        struct env_value_type<T const, false>
+        {
+            typedef T const type;
+        };
+
+        template <typename T>
+        struct env_value_type<T &, false>
+        {
+            typedef typename hpx::util::remove_reference<T>::type & type;
+        };
+
+        template <typename T>
+        struct env_value_type<T const &, false>
+        {
+            typedef typename hpx::util::remove_reference<T>::type const & type;
+        };
+
         struct not_enough_parameters {};
 
         namespace result_of
