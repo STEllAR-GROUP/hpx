@@ -16,6 +16,32 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 960] - Fix cut and paste error in documentation of get_thread_priority
+* [issue 959] - Change link to boost.atomic in documentation to point to
+                boost.org
+* [issue 958] - Undefined reference to intrusive_ptr_release
+* [issue 957] - Make tuple standard compliant
+* [issue 956] - Segfault with a3382fb
+* [issue 955] - `--hpx:nodes` and `--hpx:nodefiles` do not work with foreign
+                nodes
+* [issue 954] - Make order of arguments for hpx::async and hpx::broadcast
+                consistent
+* [issue 953] - Cannot use MKL with HPX
+* [issue 951] - Assert when number of threads is greater than hardware
+                concurrency
+* [issue 948] - HPX_HAVE_GENERIC_CONTEXT_COROUTINES conflicts with
+                HPX_HAVE_FIBER_BASED_COROUTINES
+* [issue 947] - Need MPI_THREAD_MULTIPLE for backward compatibility
+* [issue 945] - Segfault with hpx::lcos::broadcast
+* [issue 944] - OS X: assertion 'pu_offset_ < hardware_concurrency' failed
+* [issue 943] - #include <hpx/hpx_main.hpp> does not work
+* [issue 942] - Make the BG/Q work with -O3
+* [issue 940] - Use separator when concatenating locality name
+* [issue 939] - Refactor MPI parcelport to use MPI_Wait instead of multiple
+                MPI_Test calls
+* [issue 938] - Want to officially access client_base::gid_
+* [issue 937] - client_base::gid_ should be private
+* [issue 936] - Want doxygen-like source code index
 * [issue 935] - Build error with gcc 4.6 and Boost 1.54.0 on hpx trunk and
                 0.9.6
 * [issue 930] - make git-docs is broken
