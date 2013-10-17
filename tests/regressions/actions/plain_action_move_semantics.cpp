@@ -462,7 +462,7 @@ int hpx_main(variables_map&)
                 return_non_movable_object_action, non_movable_object
             >(id)
         ),
-        is_local ? 5u : 9u);      // gcc V4.4 is special
+        is_local ? 5u : 8u);      // gcc V4.4 is special
 #else
         HPX_TEST_EQ((
             return_move_object<
@@ -478,7 +478,7 @@ int hpx_main(variables_map&)
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
         ),
-        is_local ? 5u : 9u);      // gcc V4.4 is special
+        is_local ? 5u : 8u);      // gcc V4.4 is special
 #else
         HPX_TEST_EQ((
             return_move_object<
