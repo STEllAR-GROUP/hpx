@@ -26,6 +26,11 @@ private:
     static mask_type empty_mask;
 
 public:
+    std::size_t get_pu_number(std::size_t num_thread, error_code& ec = throws) const
+    {
+        return 0;
+    }
+
     std::size_t get_numa_node_number(
         std::size_t thread_num
       , error_code& ec = throws
@@ -147,6 +152,11 @@ public:
     std::size_t get_number_of_core_pus(std::size_t core) const
     {
         return ~std::size_t(0);
+    }
+
+    std::size_t get_core_number(std::size_t num_thread, error_code& ec = throws) const
+    {
+        return 0;
     }
 
     void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const
