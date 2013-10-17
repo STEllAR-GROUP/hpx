@@ -438,7 +438,7 @@ namespace hpx { namespace util
                 ("hpx:cores", value<std::string>()->default_value("all"),
                  "the number of cores to utilize for this HPX locality"
                  "locality (default: 'all', i.e. the number of cores is based on"
-                 "the number of threads (--hpx:threads) assuming --hpx:bind=compact)")
+                 "the number of total cores in the system")
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are 'global/g', "
                   "'local/l', 'priority_local/pr', 'abp/a', 'priority_abp', "

@@ -125,15 +125,17 @@ namespace hpx { namespace threads
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::init(
+    std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::init(
         policies::init_affinity_data const& data)
     {
-        scheduler_.init(data);
-
         topology const& topology_ = get_topology();
+        std::size_t cores_used = scheduler_.init(data, topology_);
+
         resize(used_processing_units_, hardware_concurrency());
         for (std::size_t i = 0; i != num_threads_; ++i)
             used_processing_units_ |= scheduler_.get_pu_mask(topology_, i);
+
+        return cores_used;
     }
 
     ///////////////////////////////////////////////////////////////////////////

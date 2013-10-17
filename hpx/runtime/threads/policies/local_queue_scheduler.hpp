@@ -89,16 +89,18 @@ namespace hpx { namespace threads { namespace policies
                 delete queues_[i];
         }
 
-        void init(init_affinity_data const& data)
+        void init(init_affinity_data const& data, topology const& topology)
         {
-            affinity_data_.init(data);
+            affinity_data_.init(data, topology);
         }
 
         bool numa_sensitive() const { return numa_sensitive_; }
 
-        threads::mask_cref_type get_pu_mask(topology const& topology, std::size_t num_thread) const
+        threads::mask_cref_type get_pu_mask(topology const& topology,
+            std::size_t num_thread) const
         {
-            return affinity_data_.get_pu_mask(topology, num_thread, numa_sensitive_);
+            return affinity_data_.get_pu_mask(topology, num_thread,
+                numa_sensitive_);
         }
 
         std::size_t get_pu_num(std::size_t num_thread) const

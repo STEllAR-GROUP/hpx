@@ -308,12 +308,12 @@ void addressing_service::launch_bootstrap(
 
     runtime& rt = get_runtime();
 
-    // store number of first usable pu
-    boost::uint32_t num_cores = boost::lexical_cast<boost::uint32_t>(
-        rt.get_config().get_entry("hpx.cores", boost::uint32_t(1)));
-    boost::uint32_t first_pu = rt.assign_cores(
-        pp.get_locality_name(), detail::get_number_of_pus_in_cores(num_cores));
-    rt.get_config().set_first_pu(first_pu);
+    // store number of cores used by other processes
+    boost::uint32_t cores_needed = rt.assign_cores();
+    boost::uint32_t used_cores = rt.assign_cores(
+        pp.get_locality_name(), cores_needed);
+    rt.get_config().set_used_cores(used_cores);
+    rt.assign_cores();
 
     naming::locality const ep = ini_.get_agas_locality();
     naming::gid_type const here =
