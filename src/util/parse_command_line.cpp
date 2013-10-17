@@ -440,10 +440,10 @@ namespace hpx { namespace util
                  "locality (default: 'all', i.e. the number of cores is based on"
                  "the number of total cores in the system")
                 ("hpx:queuing", value<std::string>(),
-                  "the queue scheduling policy to use, options are 'global/g', "
-                  "'local/l', 'priority_local/pr', 'abp/a', 'priority_abp', "
-                  "'hierarchy/h', static/s and 'periodic/pe' "
-                  "(default: priority_local/p)")
+                  "the queue scheduling policy to use, options are 'global', "
+                  "'local', 'priority_local', 'abp', 'priority_abp', "
+                  "'hierarchy', static and 'periodic' (default: priority_local); "
+                  "all option values can be abbreviated.")
                 ("hpx:hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
                    "--hpx:queuing=hierarchy only (default: 2)")
