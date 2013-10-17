@@ -398,10 +398,7 @@ void tuple_swap_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-
-int hpx_main(variables_map& vm)
+int main(int argc, char* argv[])
 {
     {
         construction_test();
@@ -417,16 +414,5 @@ int hpx_main(variables_map& vm)
         tuple_swap_test();
     }
 
-    hpx::finalize();
     return hpx::util::report_errors();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char* argv[])
-{
-    // Configure application-specific options
-    options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
-
-    // Initialize and run HPX
-    return hpx::init(cmdline, argc, argv);
 }

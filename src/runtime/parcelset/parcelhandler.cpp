@@ -285,10 +285,8 @@ namespace hpx { namespace parcelset
                 if ((*it).second)
                 {
                     boost::shared_ptr<policies::message_handler> p((*it).second);
-                    {
-                        util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-                        p->flush(stop_buffering);
-                    }
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                    p->flush(stop_buffering);
                 }
             }
         }
@@ -527,11 +525,12 @@ namespace hpx { namespace parcelset
             it = handlers_.find(key);
             if (it != handlers_.end()) {
                 // if some other thread has created the entry in the mean time
+                l.unlock();
                 if (&ec != &throws) {
                     if ((*it).second.get())
                         ec = make_success_code();
                     else
-                        ec = make_error_code(bad_parameter);
+                        ec = make_error_code(bad_parameter, lightweight);
                 }
                 return (*it).second.get();
             }
@@ -542,6 +541,8 @@ namespace hpx { namespace parcelset
                 p.reset();
                 std::pair<message_handler_map::iterator, bool> r =
                     handlers_.insert(message_handler_map::value_type(key, p));
+
+                l.unlock();
                 if (!r.second) {
                     HPX_THROWS_IF(ec, internal_server_error,
                         "parcelhandler::get_message_handler",
@@ -553,6 +554,8 @@ namespace hpx { namespace parcelset
 
             std::pair<message_handler_map::iterator, bool> r =
                 handlers_.insert(message_handler_map::value_type(key, p));
+
+            l.unlock();
             if (!r.second) {
                 HPX_THROWS_IF(ec, internal_server_error,
                     "parcelhandler::get_message_handler",
@@ -562,8 +565,9 @@ namespace hpx { namespace parcelset
             it = r.first;
         }
         else if (!(*it).second.get()) {
+            l.unlock();
             if (&ec != &throws)
-                ec = make_error_code(bad_parameter);
+                ec = make_error_code(bad_parameter, lightweight);
             return 0;           // no message handler available
         }
 

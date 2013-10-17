@@ -21,7 +21,7 @@
 #include <hpx/runtime/parcelset/parcelhandler_queue_base.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -62,7 +62,7 @@ namespace hpx { namespace parcelset
             error_code& ec = throws) const;
 
         // exception handling
-        typedef util::spinlock mutex_type;
+        typedef lcos::local::spinlock mutex_type;
 
         void rethrow_exception();
 

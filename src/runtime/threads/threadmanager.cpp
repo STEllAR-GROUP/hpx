@@ -979,8 +979,11 @@ namespace hpx { namespace threads
         {
             // overall counter
             using performance_counters::detail::create_raw_counter;
+            boost::int64_t (threadmanager_impl::*avg_idle_rate_ptr)(
+                bool
+            ) = &ti::avg_idle_rate;
             HPX_STD_FUNCTION<boost::int64_t(bool)> f =
-                 HPX_STD_BIND(&ti::avg_idle_rate, this, _1);
+                 HPX_STD_BIND(avg_idle_rate_ptr, this, _1);
             return create_raw_counter(info, f, ec);
         }
         else if (paths.instancename_ == "worker-thread" &&
@@ -989,8 +992,12 @@ namespace hpx { namespace threads
         {
             // specific counter
             using performance_counters::detail::create_raw_counter;
+            boost::int64_t (threadmanager_impl::*avg_idle_rate_ptr)(
+                std::size_t, bool
+            ) = &ti::avg_idle_rate;
+            using performance_counters::detail::create_raw_counter;
             HPX_STD_FUNCTION<boost::int64_t(bool)> f =
-                HPX_STD_BIND(&ti::avg_idle_rate, this,
+                HPX_STD_BIND(avg_idle_rate_ptr, this,
                     static_cast<std::size_t>(paths.instanceindex_), _1);
             return create_raw_counter(info, f, ec);
         }

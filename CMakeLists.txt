@@ -1058,8 +1058,8 @@ if(MSVC)
     # which is benign
     hpx_append_flag(-wd4307)
 
-    if(MSVC11)
-      # MSVC2012 is overeager to report 'qualifier applied to function type has no meaning; ignored'
+    if(MSVC11 OR MSVC12)
+      # MSVC2012/2013 are overeager to report 'qualifier applied to function type has no meaning; ignored'
       hpx_append_flag(-wd4180)
     endif()
 
@@ -1225,6 +1225,7 @@ else()
   ##############################################################################
   if(HPX_WARNINGS)
     hpx_use_flag_if_available(-Wall LANGUAGES CXX C Fortran)
+    hpx_use_flag_if_available(-Wno-unused-local-typedefs LANGUAGES CXX C Fortran)
     hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX C Fortran)
     hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX)
   endif()
