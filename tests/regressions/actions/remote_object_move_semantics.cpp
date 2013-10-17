@@ -128,7 +128,7 @@ int hpx_main(variables_map&)
         {
             object<foo> f = new_<foo>(id).get();
 
-            HPX_TEST_EQ((f <= movable_functor<movable_object>()).get(), 0u);
+            HPX_TEST_EQ((f <= movable_functor<movable_object>()).get(), 1u);
             HPX_TEST_EQ((f <= movable_functor<non_movable_object>()).get(), is_local ? 4u : 5u);
 
             HPX_TEST_EQ((f <= non_movable_functor<movable_object>()).get(), is_local ? 4u : 5u);
