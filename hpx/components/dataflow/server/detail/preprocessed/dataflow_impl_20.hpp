@@ -197,8 +197,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -495,8 +495,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -796,8 +796,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -1097,8 +1097,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -1398,8 +1398,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -1699,8 +1699,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -2000,8 +2000,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -2301,8 +2301,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -2602,8 +2602,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -2903,8 +2903,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -3204,8 +3204,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -3505,8 +3505,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -3806,8 +3806,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -4107,8 +4107,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -4408,8 +4408,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -4709,8 +4709,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -5010,8 +5010,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -5311,8 +5311,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -5612,8 +5612,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -5913,8 +5913,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
@@ -6214,8 +6214,8 @@
             return back_ptr_->get_base_gid();
         }
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
             BOOST_ASSERT(0 == back_ptr_);
