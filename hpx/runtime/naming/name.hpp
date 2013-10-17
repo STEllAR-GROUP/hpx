@@ -582,6 +582,7 @@ namespace hpx { namespace naming
                 id_type_impl::get_deleter(p->get_management_type())(p);
         }
 #endif
+#undef HPX_EXPORT_ID_IMPL_HELPERS
     }
 
     ///////////////////////////////////////////////////////////////////////////
