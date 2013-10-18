@@ -90,6 +90,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             }
         }
 #endif
+        pu_offset_ %= num_system_pus;
         init_cached_pu_nums(num_system_pus, topology);
 
         std::vector<std::size_t> cores;
