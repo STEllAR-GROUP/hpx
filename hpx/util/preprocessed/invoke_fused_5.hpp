@@ -10,12 +10,28 @@
 
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        template <typename FD, typename F, typename Tuple>
+        struct invoke_fused_result_of_impl<
+            FD, F(Tuple)
+          , typename boost::enable_if_c<
+                util::tuple_size<Tuple>::value == 1
+            >::type
+        > : invoke_result_of<
+                F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type)
+            >
+        {};
+    }
     
     template <typename R, typename F, typename Arg0>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0> >::value == 1
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0> const& args)
+      , util::tuple<Arg0> const& args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -23,9 +39,12 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0> >::value == 1
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0>))) args)
+        util::tuple<Arg0>))) args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -33,11 +52,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename boost::add_const<Arg0>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0> >::value == 1
+      , typename invoke_result_of<
+            F(typename boost::add_const<Arg0>::type)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0> const& args)
+      , util::tuple<Arg0> const& args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -45,11 +67,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename util::add_rvalue_reference<Arg0>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0> >::value == 1
+      , typename invoke_result_of<
+            F(Arg0)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0>))) args)
+        util::tuple<Arg0>))) args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -58,12 +83,28 @@ namespace hpx { namespace util
 }}
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        template <typename FD, typename F, typename Tuple>
+        struct invoke_fused_result_of_impl<
+            FD, F(Tuple)
+          , typename boost::enable_if_c<
+                util::tuple_size<Tuple>::value == 2
+            >::type
+        > : invoke_result_of<
+                F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type)
+            >
+        {};
+    }
     
     template <typename R, typename F, typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1> >::value == 2
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1> const& args)
+      , util::tuple<Arg0 , Arg1> const& args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -71,9 +112,12 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1> >::value == 2
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1>))) args)
+        util::tuple<Arg0 , Arg1>))) args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -81,11 +125,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1> >::value == 2
+      , typename invoke_result_of<
+            F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1> const& args)
+      , util::tuple<Arg0 , Arg1> const& args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -93,11 +140,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1> >::value == 2
+      , typename invoke_result_of<
+            F(Arg0 , Arg1)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1>))) args)
+        util::tuple<Arg0 , Arg1>))) args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -106,12 +156,28 @@ namespace hpx { namespace util
 }}
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        template <typename FD, typename F, typename Tuple>
+        struct invoke_fused_result_of_impl<
+            FD, F(Tuple)
+          , typename boost::enable_if_c<
+                util::tuple_size<Tuple>::value == 3
+            >::type
+        > : invoke_result_of<
+                F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type)
+            >
+        {};
+    }
     
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2> >::value == 3
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2> const& args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -119,9 +185,12 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2> >::value == 3
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2>))) args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -129,11 +198,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2> >::value == 3
+      , typename invoke_result_of<
+            F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2> const& args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -141,11 +213,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2> >::value == 3
+      , typename invoke_result_of<
+            F(Arg0 , Arg1 , Arg2)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2>))) args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -154,12 +229,28 @@ namespace hpx { namespace util
 }}
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        template <typename FD, typename F, typename Tuple>
+        struct invoke_fused_result_of_impl<
+            FD, F(Tuple)
+          , typename boost::enable_if_c<
+                util::tuple_size<Tuple>::value == 4
+            >::type
+        > : invoke_result_of<
+                F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type)
+            >
+        {};
+    }
     
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3> >::value == 4
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2 , Arg3> const& args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -167,9 +258,12 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3> >::value == 4
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2 , Arg3>))) args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -177,11 +271,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3> >::value == 4
+      , typename invoke_result_of<
+            F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2 , Arg3> const& args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -189,11 +286,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3> >::value == 4
+      , typename invoke_result_of<
+            F(Arg0 , Arg1 , Arg2 , Arg3)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2 , Arg3>))) args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -202,12 +302,28 @@ namespace hpx { namespace util
 }}
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        template <typename FD, typename F, typename Tuple>
+        struct invoke_fused_result_of_impl<
+            FD, F(Tuple)
+          , typename boost::enable_if_c<
+                util::tuple_size<Tuple>::value == 5
+            >::type
+        > : invoke_result_of<
+                F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type)
+            >
+        {};
+    }
     
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> >::value == 5
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> const& args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -215,9 +331,12 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> >::value == 5
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>))) args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -225,11 +344,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> >::value == 5
+      , typename invoke_result_of<
+            F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> const& args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -237,11 +359,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> >::value == 5
+      , typename invoke_result_of<
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>))) args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -250,12 +375,28 @@ namespace hpx { namespace util
 }}
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        template <typename FD, typename F, typename Tuple>
+        struct invoke_fused_result_of_impl<
+            FD, F(Tuple)
+          , typename boost::enable_if_c<
+                util::tuple_size<Tuple>::value == 6
+            >::type
+        > : invoke_result_of<
+                F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type)
+            >
+        {};
+    }
     
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> >::value == 6
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> const& args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -263,9 +404,12 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> >::value == 6
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>))) args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -273,11 +417,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> >::value == 6
+      , typename invoke_result_of<
+            F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> const& args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -285,11 +432,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> >::value == 6
+      , typename invoke_result_of<
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>))) args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -298,12 +448,28 @@ namespace hpx { namespace util
 }}
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        template <typename FD, typename F, typename Tuple>
+        struct invoke_fused_result_of_impl<
+            FD, F(Tuple)
+          , typename boost::enable_if_c<
+                util::tuple_size<Tuple>::value == 7
+            >::type
+        > : invoke_result_of<
+                F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 6 , typename util::decay<Tuple>::type >::type , Tuple >::type)
+            >
+        {};
+    }
     
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> >::value == 7
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> const& args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -311,9 +477,12 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> >::value == 7
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>))) args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -321,11 +490,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> >::value == 7
+      , typename invoke_result_of<
+            F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> const& args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -333,11 +505,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> >::value == 7
+      , typename invoke_result_of<
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>))) args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -346,12 +521,28 @@ namespace hpx { namespace util
 }}
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        template <typename FD, typename F, typename Tuple>
+        struct invoke_fused_result_of_impl<
+            FD, F(Tuple)
+          , typename boost::enable_if_c<
+                util::tuple_size<Tuple>::value == 8
+            >::type
+        > : invoke_result_of<
+                F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 6 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 7 , typename util::decay<Tuple>::type >::type , Tuple >::type)
+            >
+        {};
+    }
     
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> >::value == 8
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> const& args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -359,9 +550,12 @@ namespace hpx { namespace util
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
-    R
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> >::value == 8
+      , R
+    >::type
     invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>))) args)
     {
         return
             invoke_r<R>(boost::forward<F>(f)
@@ -369,11 +563,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> >::value == 8
+      , typename invoke_result_of<
+            F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f
-      , hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> const& args)
+      , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> const& args)
     {
         return
             invoke(boost::forward<F>(f)
@@ -381,11 +578,14 @@ namespace hpx { namespace util
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
-    typename invoke_result_of<
-        F(typename util::add_rvalue_reference<Arg0>::type , typename util::add_rvalue_reference<Arg1>::type , typename util::add_rvalue_reference<Arg2>::type , typename util::add_rvalue_reference<Arg3>::type , typename util::add_rvalue_reference<Arg4>::type , typename util::add_rvalue_reference<Arg5>::type , typename util::add_rvalue_reference<Arg6>::type , typename util::add_rvalue_reference<Arg7>::type)
+    typename boost::enable_if_c<
+        util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> >::value == 8
+      , typename invoke_result_of<
+            F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7)
+        >::type
     >::type
     invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        hpx::util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>))) args)
+        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>))) args)
     {
         return
             invoke(boost::forward<F>(f)
