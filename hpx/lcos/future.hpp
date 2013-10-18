@@ -10,6 +10,7 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/util/always_void.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
@@ -59,18 +60,30 @@ namespace hpx { namespace lcos
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
-        struct then_future_result
+        template <typename Future, typename F, typename Enable = void>
+        struct future_then_result
         {
-            typedef lcos::future<Result> type;
+            typedef struct continuation_not_callable {} type;
         };
 
-        template <typename Result>
-        struct then_future_result<lcos::future<Result> >
+        template <typename Future, typename F>
+        struct future_then_result<
+            Future, F
+          , typename util::always_void<
+                typename boost::result_of<F(Future&)>::type
+            >::type
+        >
         {
-            typedef lcos::future<Result> type;
-        };
+            typedef typename boost::result_of<F(Future&)>::type result;
 
+            typedef
+                typename boost::mpl::if_<
+                    traits::is_future<result>
+                  , result
+                  , lcos::future<result>
+                >
+                type;
+        };
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct unwrapped_future_result
@@ -308,21 +321,15 @@ namespace hpx { namespace lcos
 
         // continuation support
         template <typename F>
-        typename detail::then_future_result<
-            typename boost::result_of<F(future&)>::type
-        >::type
+        typename detail::future_then_result<future, F>::type
         then(BOOST_FWD_REF(F) f);
 
         template <typename F>
-        typename detail::then_future_result<
-            typename boost::result_of<F(future&)>::type
-        >::type
+        typename detail::future_then_result<future, F>::type
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         template <typename F>
-        typename detail::then_future_result<
-            typename boost::result_of<F(future&)>::type
-        >::type
+        typename detail::future_then_result<future, F>::type
         then(threads::executor& sched, BOOST_FWD_REF(F) f);
 
         // wait support
@@ -609,21 +616,15 @@ namespace hpx { namespace lcos
 
         // continuation support
         template <typename F>
-        typename detail::then_future_result<
-            typename boost::result_of<F(future&)>::type
-        >::type
+        typename detail::future_then_result<future, F>::type
         then(BOOST_FWD_REF(F) f);
 
         template <typename F>
-        typename detail::then_future_result<
-            typename boost::result_of<F(future&)>::type
-        >::type
+        typename detail::future_then_result<future, F>::type
         then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
 
         template <typename F>
-        typename detail::then_future_result<
-            typename boost::result_of<F(future&)>::type
-        >::type
+        typename detail::future_then_result<future, F>::type
         then(threads::executor& sched, BOOST_FWD_REF(F) f);
 
         // wait support
