@@ -65,7 +65,7 @@ namespace hpx { namespace threads
             std::size_t num_threads);
         ~threadmanager_impl();
 
-        void init(policies::init_affinity_data const& data);
+        std::size_t init(policies::init_affinity_data const& data);
 
         /// The function \a register_work adds a new work item to the thread
         /// manager. It doesn't immediately create a new \a thread, it just adds

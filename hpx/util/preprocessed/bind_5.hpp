@@ -70,8 +70,7 @@ namespace hpx { namespace util
         >
         struct bound_functor1
         {
-            typedef typename boost::remove_const<F>::type functor_type;
-            functor_type f;
+            F f;
             template <typename Sig>
             struct result;
             template <typename This>
@@ -202,7 +201,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor1<
-            typename util::remove_reference<F>::type
+            typename util::decay<F>::type
           , typename util::remove_reference<A0>::type
         >
     >::type
@@ -213,7 +212,7 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor1<
-                typename util::remove_reference<F>::type
+                typename util::decay<F>::type
               , typename util::remove_reference<A0>::type
             >(
                 boost::forward<F>(f)
@@ -450,8 +449,7 @@ namespace hpx { namespace util
         >
         struct bound_functor2
         {
-            typedef typename boost::remove_const<F>::type functor_type;
-            functor_type f;
+            F f;
             template <typename Sig>
             struct result;
             template <typename This>
@@ -582,7 +580,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor2<
-            typename util::remove_reference<F>::type
+            typename util::decay<F>::type
           , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
         >
     >::type
@@ -593,7 +591,7 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor2<
-                typename util::remove_reference<F>::type
+                typename util::decay<F>::type
               , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type
             >(
                 boost::forward<F>(f)
@@ -802,8 +800,7 @@ namespace hpx { namespace util
         >
         struct bound_functor3
         {
-            typedef typename boost::remove_const<F>::type functor_type;
-            functor_type f;
+            F f;
             template <typename Sig>
             struct result;
             template <typename This>
@@ -934,7 +931,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor3<
-            typename util::remove_reference<F>::type
+            typename util::decay<F>::type
           , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
         >
     >::type
@@ -945,7 +942,7 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor3<
-                typename util::remove_reference<F>::type
+                typename util::decay<F>::type
               , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type
             >(
                 boost::forward<F>(f)
@@ -1154,8 +1151,7 @@ namespace hpx { namespace util
         >
         struct bound_functor4
         {
-            typedef typename boost::remove_const<F>::type functor_type;
-            functor_type f;
+            F f;
             template <typename Sig>
             struct result;
             template <typename This>
@@ -1286,7 +1282,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor4<
-            typename util::remove_reference<F>::type
+            typename util::decay<F>::type
           , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
         >
     >::type
@@ -1297,7 +1293,7 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor4<
-                typename util::remove_reference<F>::type
+                typename util::decay<F>::type
               , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type
             >(
                 boost::forward<F>(f)
@@ -1506,8 +1502,7 @@ namespace hpx { namespace util
         >
         struct bound_functor5
         {
-            typedef typename boost::remove_const<F>::type functor_type;
-            functor_type f;
+            F f;
             template <typename Sig>
             struct result;
             template <typename This>
@@ -1638,7 +1633,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor5<
-            typename util::remove_reference<F>::type
+            typename util::decay<F>::type
           , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
         >
     >::type
@@ -1649,7 +1644,7 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor5<
-                typename util::remove_reference<F>::type
+                typename util::decay<F>::type
               , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type
             >(
                 boost::forward<F>(f)
@@ -1858,8 +1853,7 @@ namespace hpx { namespace util
         >
         struct bound_functor6
         {
-            typedef typename boost::remove_const<F>::type functor_type;
-            functor_type f;
+            F f;
             template <typename Sig>
             struct result;
             template <typename This>
@@ -1990,7 +1984,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor6<
-            typename util::remove_reference<F>::type
+            typename util::decay<F>::type
           , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
         >
     >::type
@@ -2001,7 +1995,7 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor6<
-                typename util::remove_reference<F>::type
+                typename util::decay<F>::type
               , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type
             >(
                 boost::forward<F>(f)
@@ -2210,8 +2204,7 @@ namespace hpx { namespace util
         >
         struct bound_functor7
         {
-            typedef typename boost::remove_const<F>::type functor_type;
-            functor_type f;
+            F f;
             template <typename Sig>
             struct result;
             template <typename This>
@@ -2342,7 +2335,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor7<
-            typename util::remove_reference<F>::type
+            typename util::decay<F>::type
           , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
         >
     >::type
@@ -2353,7 +2346,7 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor7<
-                typename util::remove_reference<F>::type
+                typename util::decay<F>::type
               , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type
             >(
                 boost::forward<F>(f)
@@ -2562,8 +2555,7 @@ namespace hpx { namespace util
         >
         struct bound_functor8
         {
-            typedef typename boost::remove_const<F>::type functor_type;
-            functor_type f;
+            F f;
             template <typename Sig>
             struct result;
             template <typename This>
@@ -2694,7 +2686,7 @@ namespace hpx { namespace util
     typename boost::disable_if<
         hpx::traits::is_action<typename util::remove_reference<F>::type>
       , detail::bound_functor8<
-            typename util::remove_reference<F>::type
+            typename util::decay<F>::type
           , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
         >
     >::type
@@ -2705,7 +2697,7 @@ namespace hpx { namespace util
     {
         return
             detail::bound_functor8<
-                typename util::remove_reference<F>::type
+                typename util::decay<F>::type
               , typename util::remove_reference<A0>::type , typename util::remove_reference<A1>::type , typename util::remove_reference<A2>::type , typename util::remove_reference<A3>::type , typename util::remove_reference<A4>::type , typename util::remove_reference<A5>::type , typename util::remove_reference<A6>::type , typename util::remove_reference<A7>::type
             >(
                 boost::forward<F>(f)

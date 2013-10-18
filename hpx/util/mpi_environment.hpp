@@ -19,7 +19,9 @@ namespace hpx { namespace util {
     {
         static int init(int *argc, char ***argv, command_line_handling& cfg);
         static void finalize();
+
         static bool enabled();
+        static bool multi_threaded();
 
         static int rank();
         static int size();
@@ -28,6 +30,7 @@ namespace hpx { namespace util {
 
     private:
         static bool enabled_;
+        static int provided_threading_flag_;
     };
 }}
 

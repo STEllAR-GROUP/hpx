@@ -50,7 +50,7 @@ namespace hpx { namespace threads
     public:
         virtual ~threadmanager_base() {}
 
-        virtual void init(policies::init_affinity_data const& data) {}
+        virtual std::size_t init(policies::init_affinity_data const& data) = 0;
 
         /// \brief Return whether the thread manager is still running
         virtual state status() const = 0;

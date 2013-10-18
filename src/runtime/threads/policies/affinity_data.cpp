@@ -4,8 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+
+#include <hpx/util/mpi_environment.hpp>
 
 #include <algorithm>
 
@@ -25,11 +28,17 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         return count;
     }
 
-    void affinity_data::init_cached_pu_nums(std::size_t hardware_concurrency)
+    void affinity_data::init_cached_pu_nums(std::size_t hardware_concurrency,
+        topology const & topology)
     {
-        pu_nums_.resize(num_threads_);
-        for (std::size_t i = 0; i != num_threads_; ++i)
-            pu_nums_[i] = get_pu_num(i, hardware_concurrency);
+        if(pu_nums_.empty())
+        {
+            pu_nums_.resize(num_threads_);
+            for (std::size_t i = 0; i != num_threads_; ++i)
+            {
+                pu_nums_[i] = get_pu_num(i, hardware_concurrency);
+            }
+        }
     }
 
     affinity_data::affinity_data(std::size_t num_threads)
@@ -37,21 +46,30 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         affinity_domain_("pu"), affinity_masks_(), pu_nums_()
     {}
 
-    void affinity_data::init(init_affinity_data const& data)
+    std::size_t affinity_data::init(init_affinity_data const& data,
+        topology const & topology)
     {
-        // initialize from command line
-        pu_offset_ = data.pu_offset_;
-        pu_step_ = data.pu_step_;
-        affinity_domain_ = data.affinity_domain_;
-
         std::size_t num_system_pus = hardware_concurrency();
+        std::size_t max_cores =
+            boost::lexical_cast<std::size_t>(
+                get_runtime().get_config().get_entry("hpx.cores", data.used_cores_));
+
+        // initialize from command line
+        pu_offset_ = data.pu_offset_ % num_system_pus;
+        pu_step_ = data.pu_step_ % num_system_pus;
+        affinity_domain_ = data.affinity_domain_;
+        pu_nums_.clear();
+
 #if defined(HPX_HAVE_HWLOC)
-        if (!data.affinity_desc_.empty()) {
+        if (!data.affinity_desc_.empty())
+        {
+            affinity_masks_.clear();
             affinity_masks_.resize(num_threads_);
             for (std::size_t i = 0; i != num_threads_; ++i)
                 threads::resize(affinity_masks_[i], num_system_pus);
 
-            parse_affinity_options(data.affinity_desc_, affinity_masks_);
+            parse_affinity_options(data.affinity_desc_, affinity_masks_,
+                data.used_cores_, max_cores, pu_nums_);
 
             std::size_t num_initialized = count_initialized(affinity_masks_);
             if (num_initialized != num_threads_) {
@@ -63,8 +81,28 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                             "bind (%2%)") % num_threads_ % num_initialized));
             }
         }
+        else
+        {
+            // calculate the pu offset based on the used cores
+            for(std::size_t num_core = 0; num_core != data.used_cores_; ++num_core)
+            {
+                pu_offset_ += topology.get_number_of_core_pus(num_core);
+            }
+        }
 #endif
-        init_cached_pu_nums(num_system_pus);
+        pu_offset_ %= num_system_pus;
+        init_cached_pu_nums(num_system_pus, topology);
+
+        std::vector<std::size_t> cores;
+        cores.reserve(num_threads_);
+        for(std::size_t i = 0; i != num_threads_; ++i)
+        {
+            cores.push_back(topology.get_core_number(get_pu_num(i)));
+        }
+        std::sort(cores.begin(), cores.end());
+        std::vector<std::size_t>::iterator it = std::unique(cores.begin(), cores.end());
+
+        return std::distance(cores.begin(), it);
     }
 
     // means of adding a processing unit after initialization
@@ -91,7 +129,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         if (first_pu != std::size_t(-1))
             pu_offset_ = first_pu;
 
-        init_cached_pu_nums(num_system_pus);
+        // FIXME: Do we need to call the function here?
+        //init_cached_pu_nums(num_system_pus);
     }
 
     mask_cref_type affinity_data::get_pu_mask(topology const& topology,

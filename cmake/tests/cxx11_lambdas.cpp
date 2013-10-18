@@ -11,7 +11,7 @@
 
 int main()
 {
-    boost::array<unsigned, 10> fib { 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 };
+    boost::array<unsigned, 10> fib = { 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 };
 
     unsigned total = 0;
 

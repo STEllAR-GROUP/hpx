@@ -104,7 +104,7 @@ namespace hpx {
             runtime_mode locality_mode, std::size_t num_threads,
             init_scheduler_type const& init,
             threads::policies::init_affinity_data const& init_affinity)
-      : runtime(rtcfg),
+      : runtime(rtcfg, init_affinity),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
             boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2, false),
@@ -148,17 +148,6 @@ namespace hpx {
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(*parcel_port_);
         parcel_handler_.initialize(parcel_port_);
-
-        // initialize thread affinity settings in the scheduler
-        if (init_affinity.pu_offset_ == 0) {
-            // correct pu_offset from config data if appropriate
-            threads::policies::init_affinity_data init = init_affinity;
-            init.pu_offset_ = this->get_config().get_first_pu();
-            thread_manager_->init(init);
-        }
-        else {
-            thread_manager_->init(init_affinity);
-        }
 
 #if defined(HPX_HAVE_SECURITY)
         // enable parcel capability checking

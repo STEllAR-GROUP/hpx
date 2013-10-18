@@ -11,6 +11,7 @@ set(tests
     future_790
     future_unwrap_878
     lifetime_588
+    lifetime_588_1
     set_hpx_limit_771
     set_hpx_limit_798
    )
@@ -36,6 +37,9 @@ endif()
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(dataflow_launch_775_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+
+set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
+set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 
 set(set_hpx_limit_771_FLAGS DEPENDENCIES dataflow_component)
 

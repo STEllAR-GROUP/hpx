@@ -436,7 +436,7 @@ namespace hpx { namespace util
     // been listed in the node file.
     std::size_t batch_environment::retrieve_number_of_threads() const
     {
-        std::size_t result = 1;
+        std::size_t result(-1);
         char* slurm_cpus_per_task = std::getenv("SLURM_CPUS_PER_TASK");
         if(slurm_cpus_per_task)
         {

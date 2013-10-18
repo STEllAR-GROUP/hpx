@@ -241,7 +241,7 @@ namespace hpx { namespace util
     {
         return util::void_guard<R>(), boost::forward<F>(f)();
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename R>
     BOOST_FORCEINLINE
@@ -262,7 +262,7 @@ namespace hpx { namespace util
 
         return util::invoke_r<result_type>(f, boost::forward<T>(t));
     }
-    
+
     template <typename R, typename C, typename T>
     BOOST_FORCEINLINE
     R
@@ -344,7 +344,7 @@ namespace hpx { namespace util
             util::void_guard<R>(), f
                 (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
-    
+
 #   if N < HPX_FUNCTION_ARGUMENT_LIMIT
     template <typename R, typename FR
       , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
@@ -439,7 +439,7 @@ namespace hpx { namespace util
             util::void_guard<R>(), boost::forward<F>(f)
                 (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename R, BOOST_PP_ENUM_PARAMS(N, typename A)
       , BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -454,7 +454,7 @@ namespace hpx { namespace util
               , HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
             );
     }
-    
+
 #   if N < HPX_FUNCTION_ARGUMENT_LIMIT
     template <typename R, typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>

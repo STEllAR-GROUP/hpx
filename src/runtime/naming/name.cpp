@@ -157,7 +157,7 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // prepare the given id, note: this function modifies 'this'
+        // prepare the given id, note: this function modifies the passed id
         naming::gid_type id_type_impl::prepare_gid() const
         {
             gid_type::mutex_type::scoped_lock l(this);
@@ -278,12 +278,6 @@ namespace hpx { namespace naming
         }
 #endif
     }   // detail
-
-    ///////////////////////////////////////////////////////////////////////////
-    gid_type get_parcel_dest_gid(id_type const& id)
-    {
-        return id.get_gid(); // gid_->prepare_parcel_dest_gid();
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <class Archive>

@@ -8,6 +8,7 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -73,7 +74,9 @@ namespace hpx
             boost::uint32_t, std::string const&);
 
         /// construct a new instance of a runtime
-        runtime(util::runtime_configuration const& rtcfg);
+        runtime(
+            util::runtime_configuration const& rtcfg
+          , threads::policies::init_affinity_data const& affinity_init);
 
         virtual ~runtime();
 
@@ -164,6 +167,8 @@ namespace hpx
 
         boost::uint32_t assign_cores(std::string const& locality_basename,
             boost::uint32_t num_threads);
+
+        boost::uint32_t assign_cores();
 
         /// \brief Install all performance counters related to this runtime
         ///        instance
@@ -366,6 +371,7 @@ namespace hpx
         // registered with the library
         boost::scoped_ptr<util::thread_mapper> thread_support_;
 
+        threads::policies::init_affinity_data affinity_init_;
         threads::topology& topology_;
 
         // locality basename -> used cores

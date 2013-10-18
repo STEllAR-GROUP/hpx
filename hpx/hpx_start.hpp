@@ -82,8 +82,9 @@ namespace hpx
     ///                     set up automatically, but sometimes it is necessary
     ///                     to explicitly specify the mode.
     ///
-    /// \returns            The function returns the value, which has been
-    ///                     returned from the user supplied \p f.
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
     ///
     /// \note               If the parameter \p mode is not given (defaulted),
     ///                     the created runtime system instance will be
@@ -91,7 +92,8 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    HPX_EXPORT int start(int (*f)(boost::program_options::variables_map& vm),
+    HPX_EXPORT bool start(
+        HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
@@ -137,8 +139,9 @@ namespace hpx
     ///                     set up automatically, but sometimes it is necessary
     ///                     to explicitly specify the mode.
     ///
-    /// \returns            The function returns the value, which has been
-    ///                     returned from the user supplied \p f.
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
     ///
     /// \note               If the parameter \p mode is not given (defaulted),
     ///                     the created runtime system instance will be
@@ -146,7 +149,7 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline void
+    inline bool
     start(int (*f)(boost::program_options::variables_map& vm),
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv,
@@ -192,9 +195,9 @@ namespace hpx
     ///                     set up automatically, but sometimes it is necessary
     ///                     to explicitly specify the mode.
     ///
-    /// \returns            The function returns the value, which has been
-    ///                     returned from `hpx_main` (or 0 when executed in
-    ///                     worker mode).
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
     ///
     /// \note               If the parameter \p mode is not given (defaulted),
     ///                     the created runtime system instance will be
@@ -202,7 +205,7 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline void
+    inline bool
     start(boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv,
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
@@ -253,9 +256,9 @@ namespace hpx
     ///                     set up automatically, but sometimes it is necessary
     ///                     to explicitly specify the mode.
     ///
-    /// \returns            The function returns the value, which has been
-    ///                     returned from `hpx_main` (or 0 when executed in
-    ///                     worker mode).
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
     ///
     /// \note               If the parameter \p mode is not given (defaulted),
     ///                     the created runtime system instance will be
@@ -263,7 +266,7 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline void
+    inline bool
     start(boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& cfg,
         HPX_STD_FUNCTION<void()> const& startup = HPX_STD_FUNCTION<void()>(),
@@ -301,9 +304,9 @@ namespace hpx
     ///                     set up automatically, but sometimes it is necessary
     ///                     to explicitly specify the mode.
     ///
-    /// \returns            The function returns the value, which has been
-    ///                     returned from `hpx_main` (or 0 when executed in
-    ///                     worker mode).
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
     ///
     /// \note               If the parameter \p mode is runtime_mode_default,
     ///                     the created runtime system instance will be
@@ -311,7 +314,7 @@ namespace hpx
     ///                     command line arguments passed in `argc`/`argv`.
     ///                     Otherwise it will be executed as specified by the
     ///                     parameter\p mode.
-    inline void
+    inline bool
     start(boost::program_options::options_description const& desc_cmdline, int argc,
         char** argv, hpx::runtime_mode mode);
 
@@ -341,14 +344,14 @@ namespace hpx
     ///                     set up automatically, but sometimes it is necessary
     ///                     to explicitly specify the mode.
     ///
-    /// \returns            The function returns the value, which has been
-    ///                     returned from `hpx_main` (or 0 when executed in
-    ///                     worker mode).
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
     ///
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    inline void
+    inline bool
     start(std::string const& app_name, int argc = 0, char** argv = 0,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
@@ -375,9 +378,9 @@ namespace hpx
     ///                     set up automatically, but sometimes it is necessary
     ///                     to explicitly specify the mode.
     ///
-    /// \returns            The function returns the value, which has been
-    ///                     returned from `hpx_main` (or 0 when executed in
-    ///                     worker mode).
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
     ///
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
@@ -389,7 +392,7 @@ namespace hpx
     ///                     runtime system will not support any of the default
     ///                     command line options as described in the section
     ///                     'HPX Command Line Options'.
-    inline void start(int argc = 0, char** argv = 0, 
+    inline bool start(int argc = 0, char** argv = 0, 
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
     /// \brief Main, non-blocking entry point for launching the HPX runtime system.
@@ -415,9 +418,9 @@ namespace hpx
     ///                     set up automatically, but sometimes it is necessary
     ///                     to explicitly specify the mode.
     ///
-    /// \returns            The function returns the value, which has been
-    ///                     returned from `hpx_main` (or 0 when executed in
-    ///                     worker mode).
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
     ///
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
@@ -429,10 +432,10 @@ namespace hpx
     ///                     runtime system will not support any of the default
     ///                     command line options as described in the section
     ///                     'HPX Command Line Options'.
-    inline void start(std::vector<std::string> const& cfg, 
+    inline bool start(std::vector<std::string> const& cfg, 
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 
-    /// \fn int start(int (*f)(boost::program_options::variables_map& vm), std::string const& app_name, int argc, char** argv)
+    /// \fn bool start(int (*f)(boost::program_options::variables_map& vm), std::string const& app_name, int argc, char** argv)
     ///
     /// \brief Main, non-blocking entry point for launching the HPX runtime system.
     ///
@@ -460,13 +463,14 @@ namespace hpx
     ///                     set up automatically, but sometimes it is necessary
     ///                     to explicitly specify the mode.
     ///
-    /// \returns            The function returns the value, which has been
-    ///                     returned from the user supplied function \p f.
+    /// \returns            The function returns \a true if command line processing
+    ///                     succeeded and the runtime system was started successfully.
+    ///                     It will return \a false otherwise.
     ///
     /// \note               The created runtime system instance will be
     ///                     executed in console or worker mode depending on the
     ///                     command line arguments passed in `argc`/`argv`.
-    inline void start(int (*f)(boost::program_options::variables_map& vm),
+    inline bool start(int (*f)(boost::program_options::variables_map& vm),
         std::string const& app_name, int argc, char** argv,
         hpx::runtime_mode mode = hpx::runtime_mode_default);
 }

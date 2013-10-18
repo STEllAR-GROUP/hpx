@@ -117,9 +117,9 @@ namespace hpx { namespace threads { namespace policies
                 delete high_priority_queues_[i];
         }
 
-        void init(init_affinity_data const& data)
+        std::size_t init(init_affinity_data const& data, topology const& topology)
         {
-            affinity_data_.init(data);
+            return affinity_data_.init(data, topology);
         }
 
         bool numa_sensitive() const { return true; }

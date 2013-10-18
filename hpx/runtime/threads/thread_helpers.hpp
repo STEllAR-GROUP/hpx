@@ -339,8 +339,8 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     /// Return priority of the given thread
     ///
-    /// \param id         [in] The thread id of the thread which should be
-    ///                   interrupted.
+    /// \param id         [in] The thread id of the thread whose priority
+    ///                   is queried.
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.

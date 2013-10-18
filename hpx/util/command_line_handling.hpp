@@ -18,7 +18,8 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     struct command_line_handling
     {
-        command_line_handling(hpx::runtime_mode mode, hpx_main_type const& f,
+        command_line_handling(hpx::runtime_mode mode,
+                HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
                 std::vector<std::string> const& ini_config)
           : mode_(mode),
             ini_config_(ini_config),
@@ -36,7 +37,7 @@ namespace hpx { namespace util
 
         hpx::runtime_mode mode_;
         std::vector<std::string> ini_config_;
-        hpx_main_type hpx_main_f_;
+        HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> hpx_main_f_;
 
         std::size_t num_threads_;
         std::size_t num_cores_;

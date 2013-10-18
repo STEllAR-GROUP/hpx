@@ -508,7 +508,8 @@ namespace hpx
         }
 
         ///////////////////////////////////////////////////////////////////////
-        int run(hpx::runtime& rt, hpx_main_type f,
+        int run(hpx::runtime& rt,
+            HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown)
@@ -523,7 +524,8 @@ namespace hpx
             return rt.run();
         }
 
-        int start(hpx::runtime& rt, hpx_main_type f,
+        int start(hpx::runtime& rt,
+            HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
             boost::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type const& startup,
             shutdown_function_type const& shutdown)
@@ -1045,7 +1047,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int run_or_start(hpx_main_type f,
+    int run_or_start(
+        HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& ini_config,
         startup_function_type const& startup,
@@ -1168,7 +1171,8 @@ namespace hpx
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int init(hpx_main_type f,
+    int init(
+        HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& ini_config,
         startup_function_type const& startup,
@@ -1178,13 +1182,14 @@ namespace hpx
             startup, shutdown, mode, true);
     }
 
-    int start(hpx_main_type f,
+    bool start(
+        HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
         boost::program_options::options_description const& desc_cmdline,
         int argc, char** argv, std::vector<std::string> const& ini_config,
         startup_function_type const& startup,
         shutdown_function_type const& shutdown, hpx::runtime_mode mode)
     {
-        return run_or_start(f, desc_cmdline, argc, argv, ini_config,
+        return 0 == run_or_start(f, desc_cmdline, argc, argv, ini_config,
             startup, shutdown, mode, false);
     }
 

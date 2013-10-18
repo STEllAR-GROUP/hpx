@@ -47,7 +47,10 @@ namespace hpx { namespace threads { namespace policies
                   : max_count)
         {}
 
-        void init(init_affinity_data const&) {}
+        std::size_t init(init_affinity_data const&, topology const&)
+        {
+            return 0;
+        }
 
         bool numa_sensitive() const { return false; }
 

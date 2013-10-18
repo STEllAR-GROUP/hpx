@@ -276,10 +276,19 @@ namespace hpx { namespace parcelset
     void parcelhandler::do_background_work(bool stop_buffering)
     {
         // flush all parcel buffers
-        message_handler_map::iterator end = handlers_.end();
-        for (message_handler_map::iterator it = handlers_.begin(); it != end; ++it)
         {
-            (*it).second->flush(stop_buffering);
+            mutex_type::scoped_lock l(handlers_mtx_);
+
+            message_handler_map::iterator end = handlers_.end();
+            for (message_handler_map::iterator it = handlers_.begin(); it != end; ++it)
+            {
+                if ((*it).second)
+                {
+                    boost::shared_ptr<policies::message_handler> p((*it).second);
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                    p->flush(stop_buffering);
+                }
+            }
         }
 
         // make sure all pending parcels are being handled
@@ -421,15 +430,6 @@ namespace hpx { namespace parcelset
         // properly initialize parcel
         init_parcel(p);
 
-        naming::id_type const* ids = p.get_destinations();
-        naming::address* addrs = p.get_destination_addrs();
-
-        bool resolved_locally = true;
-
-#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        if (!addrs[0])
-            resolved_locally = resolver_.resolve(ids[0], addrs[0]);
-#else
         std::size_t size = p.size();
 
         if (0 == size) {
@@ -438,15 +438,18 @@ namespace hpx { namespace parcelset
             return;
         }
 
+        naming::gid_type const* gids = p.get_destinations();
+        naming::address* addrs = p.get_destination_addrs();
+
+        bool resolved_locally = true;
         if (1 == size) {
             if (!addrs[0])
-                resolved_locally = resolver_.resolve(ids[0], addrs[0]);
+                resolved_locally = resolver_.resolve(gids[0], addrs[0]);
         }
         else {
             boost::dynamic_bitset<> locals;
-            resolved_locally = resolver_.resolve(ids, addrs, size, locals);
+            resolved_locally = resolver_.resolve(gids, addrs, size, locals);
         }
-#endif
 
         if (!p.get_parcel_id())
             p.set_parcel_id(parcel::generate_unique_id());
@@ -507,19 +510,52 @@ namespace hpx { namespace parcelset
         std::size_t num_messages, std::size_t interval,
         naming::locality const& loc, connection_type t, error_code& ec)
     {
-        mutex_type::scoped_lock l(mtx_);
+        mutex_type::scoped_lock l(handlers_mtx_);
         handler_key_type key(loc, action);
         message_handler_map::iterator it = handlers_.find(key);
         if (it == handlers_.end()) {
-            boost::shared_ptr<policies::message_handler> p(
-                hpx::create_message_handler(message_handler_type, action,
-                find_parcelport(t), num_messages, interval, ec));
+            boost::shared_ptr<policies::message_handler> p;
 
-            if (ec || !p.get())
+            {
+                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                p.reset(hpx::create_message_handler(message_handler_type,
+                    action, find_parcelport(t), num_messages, interval, ec));
+            }
+
+            it = handlers_.find(key);
+            if (it != handlers_.end()) {
+                // if some other thread has created the entry in the mean time
+                l.unlock();
+                if (&ec != &throws) {
+                    if ((*it).second.get())
+                        ec = make_success_code();
+                    else
+                        ec = make_error_code(bad_parameter, lightweight);
+                }
+                return (*it).second.get();
+            }
+
+            if (ec || !p.get()) {
+                // insert an empty entry into the map to avoid trying to
+                // create this handler again
+                p.reset();
+                std::pair<message_handler_map::iterator, bool> r =
+                    handlers_.insert(message_handler_map::value_type(key, p));
+
+                l.unlock();
+                if (!r.second) {
+                    HPX_THROWS_IF(ec, internal_server_error,
+                        "parcelhandler::get_message_handler",
+                        "could not store empty message handler");
+                    return 0;
+                }
                 return 0;           // no message handler available
+            }
 
             std::pair<message_handler_map::iterator, bool> r =
                 handlers_.insert(message_handler_map::value_type(key, p));
+
+            l.unlock();
             if (!r.second) {
                 HPX_THROWS_IF(ec, internal_server_error,
                     "parcelhandler::get_message_handler",
@@ -527,6 +563,12 @@ namespace hpx { namespace parcelset
                 return 0;
             }
             it = r.first;
+        }
+        else if (!(*it).second.get()) {
+            l.unlock();
+            if (&ec != &throws)
+                ec = make_error_code(bad_parameter, lightweight);
+            return 0;           // no message handler available
         }
 
         if (&ec != &throws)

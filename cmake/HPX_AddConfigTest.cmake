@@ -193,9 +193,15 @@ macro(hpx_check_for_cxx11_std_unique_ptr variable)
   hpx_get_include_directory(include_dir)
   hpx_get_boost_include_directory(boost_include_dir)
 
-  add_hpx_config_test("cxx11_std_unique_ptr" ${variable} LANGUAGE CXX
-    SOURCE cmake/tests/cxx11_std_unique_ptr.cpp
-    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+  if(APPLE)
+    add_hpx_config_test("cxx11_std_unique_ptr" ${variable} LANGUAGE CXX
+      SOURCE cmake/tests/cxx11_std_unique_ptr.cpp
+      FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x -stdlib=libc++" FILE ${ARGN})
+  else()
+    add_hpx_config_test("cxx11_std_unique_ptr" ${variable} LANGUAGE CXX
+      SOURCE cmake/tests/cxx11_std_unique_ptr.cpp
+      FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+  endif()
 endmacro()
 
 ###############################################################################
@@ -203,9 +209,15 @@ macro(hpx_check_for_cxx11_std_tuple variable)
   hpx_get_include_directory(include_dir)
   hpx_get_boost_include_directory(boost_include_dir)
 
-  add_hpx_config_test("cxx11_std_tuple" ${variable} LANGUAGE CXX
-    SOURCE cmake/tests/cxx11_std_tuple.cpp
-    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+  if(APPLE)
+    add_hpx_config_test("cxx11_std_tuple" ${variable} LANGUAGE CXX
+      SOURCE cmake/tests/cxx11_std_tuple.cpp
+      FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x -stdlib=libc++" FILE ${ARGN})
+  else()
+    add_hpx_config_test("cxx11_std_tuple" ${variable} LANGUAGE CXX
+      SOURCE cmake/tests/cxx11_std_tuple.cpp
+      FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+  endif()
 endmacro()
 
 ###############################################################################
@@ -213,9 +225,15 @@ macro(hpx_check_for_cxx11_std_bind variable)
   hpx_get_include_directory(include_dir)
   hpx_get_boost_include_directory(boost_include_dir)
 
-  add_hpx_config_test("cxx11_std_bind" ${variable} LANGUAGE CXX
-    SOURCE cmake/tests/cxx11_std_bind.cpp
-    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+  if(APPLE)
+    add_hpx_config_test("cxx11_std_bind" ${variable} LANGUAGE CXX
+      SOURCE cmake/tests/cxx11_std_bind.cpp
+      FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x -stdlib=libc++" FILE ${ARGN})
+  else()
+    add_hpx_config_test("cxx11_std_bind" ${variable} LANGUAGE CXX
+      SOURCE cmake/tests/cxx11_std_bind.cpp
+      FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+  endif()
 endmacro()
 
 ###############################################################################
@@ -223,18 +241,30 @@ macro(hpx_check_for_cxx11_std_function variable)
   hpx_get_include_directory(include_dir)
   hpx_get_boost_include_directory(boost_include_dir)
 
-  add_hpx_config_test("cxx11_std_function" ${variable} LANGUAGE CXX
-    SOURCE cmake/tests/cxx11_std_function.cpp
-    FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+  if(APPLE)
+    add_hpx_config_test("cxx11_std_function" ${variable} LANGUAGE CXX
+      SOURCE cmake/tests/cxx11_std_function.cpp
+      FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x -stdlib=libc++" FILE ${ARGN})
+  else()
+    add_hpx_config_test("cxx11_std_function" ${variable} LANGUAGE CXX
+      SOURCE cmake/tests/cxx11_std_function.cpp
+      FLAGS ${boost_include_dir} ${include_dir} "-std=c++0x" FILE ${ARGN})
+  endif()
 endmacro()
 
 ###############################################################################
 macro(hpx_check_for_cxx11_std_initializer_list variable)
   hpx_get_include_directory(include_dir)
 
-  add_hpx_config_test("cxx11_std_initializer_list" ${variable} LANGUAGE CXX
-    SOURCE cmake/tests/cxx11_std_initializer_list.cpp
-    FLAGS "-std=c++0x" FILE ${ARGN})
+  if(APPLE)
+    add_hpx_config_test("cxx11_std_initializer_list" ${variable} LANGUAGE CXX
+      SOURCE cmake/tests/cxx11_std_initializer_list.cpp
+      FLAGS "-std=c++0x -stdlib=libc++" FILE ${ARGN})
+  else()
+    add_hpx_config_test("cxx11_std_initializer_list" ${variable} LANGUAGE CXX
+      SOURCE cmake/tests/cxx11_std_initializer_list.cpp
+      FLAGS "-std=c++0x" FILE ${ARGN})
+  endif()
 endmacro()
 
 ###############################################################################
