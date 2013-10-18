@@ -94,11 +94,14 @@ struct abp_queue_scheduler : public scheduler_base
             delete queues_[i];
     }
 
-    void init(init_affinity_data const&) {}
+    std::size_t init(init_affinity_data const&, topology const&)
+    {
+        return 0;
+    }
 
     bool numa_sensitive() const { return numa_sensitive_; }
 
-    threads::mask_cref_type get_pu_mask(topology const& topology, 
+    threads::mask_cref_type get_pu_mask(topology const& topology,
         std::size_t num_thread) const
     {
         return topology.get_thread_affinity_mask(num_thread, numa_sensitive_);
