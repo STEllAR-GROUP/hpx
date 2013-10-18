@@ -245,7 +245,7 @@ namespace hpx { namespace util
     }
 
     void runtime_configuration::post_initialize_ini(
-        std::string const& hpx_ini_file,
+        std::string& hpx_ini_file,
         std::vector<std::string> const& cmdline_ini_defs)
     {
         // add explicit configuration information if its provided
