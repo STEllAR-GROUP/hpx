@@ -125,15 +125,17 @@ namespace hpx { namespace threads
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
-    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::init(
+    std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::init(
         policies::init_affinity_data const& data)
     {
-        scheduler_.init(data);
-
         topology const& topology_ = get_topology();
+        std::size_t cores_used = scheduler_.init(data, topology_);
+
         resize(used_processing_units_, hardware_concurrency());
         for (std::size_t i = 0; i != num_threads_; ++i)
             used_processing_units_ |= scheduler_.get_pu_mask(topology_, i);
+
+        return cores_used;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -979,8 +981,11 @@ namespace hpx { namespace threads
         {
             // overall counter
             using performance_counters::detail::create_raw_counter;
+            boost::int64_t (threadmanager_impl::*avg_idle_rate_ptr)(
+                bool
+            ) = &ti::avg_idle_rate;
             HPX_STD_FUNCTION<boost::int64_t(bool)> f =
-                 HPX_STD_BIND(&ti::avg_idle_rate, this, _1);
+                 HPX_STD_BIND(avg_idle_rate_ptr, this, _1);
             return create_raw_counter(info, f, ec);
         }
         else if (paths.instancename_ == "worker-thread" &&
@@ -989,8 +994,12 @@ namespace hpx { namespace threads
         {
             // specific counter
             using performance_counters::detail::create_raw_counter;
+            boost::int64_t (threadmanager_impl::*avg_idle_rate_ptr)(
+                std::size_t, bool
+            ) = &ti::avg_idle_rate;
+            using performance_counters::detail::create_raw_counter;
             HPX_STD_FUNCTION<boost::int64_t(bool)> f =
-                HPX_STD_BIND(&ti::avg_idle_rate, this,
+                HPX_STD_BIND(avg_idle_rate_ptr, this,
                     static_cast<std::size_t>(paths.instanceindex_), _1);
             return create_raw_counter(info, f, ec);
         }

@@ -164,6 +164,7 @@ namespace hpx { namespace util
             util::batch_environment& env, bool using_nodelist)
         {
             std::size_t batch_threads = env.retrieve_number_of_threads();
+            if(batch_threads == std::size_t(-1)) { batch_threads = 1; }
             std::string threads_str = cfgmap.get_value<std::string>(
                 "hpx.os_threads", "");
 
@@ -218,39 +219,41 @@ namespace hpx { namespace util
         }
 
         ///////////////////////////////////////////////////////////////////////
-        std::size_t get_number_of_default_cores(std::size_t num_threads)
+        std::size_t get_number_of_default_cores(util::batch_environment& env)
         {
             threads::topology& top = threads::create_topology();
 
-            boost::int64_t num_default_cores = static_cast<boost::int64_t>(num_threads);
+            std::size_t batch_threads = env.retrieve_number_of_threads();
             std::size_t num_cores = top.get_number_of_cores();
-            if (num_cores == ~std::size_t(0)) return num_default_cores;
+            if(batch_threads == std::size_t(-1))
+                return num_cores;
 
-            // find the number of cores neded to accomodate for the requested number
-            // of processing units if we assume starting to count from the first core
-            for (std::size_t i = 0; i != num_cores; ++i)
+            // assuming we assign the first N cores ...
+            std::size_t core = 0;
+            for(; core < num_cores; ++core)
             {
-                num_default_cores -= top.get_number_of_core_pus(i);
-                if (num_default_cores <= 0) return i+1;
+                batch_threads -= top.get_number_of_core_pus(core);
+                if(batch_threads == 0) break;
             }
 
-            return num_cores;
+            return core + 1;
         }
 
         std::size_t handle_num_cores(util::manage_config& cfgmap,
-            boost::program_options::variables_map& vm, std::size_t num_threads)
+            boost::program_options::variables_map& vm, std::size_t num_threads,
+            util::batch_environment& env)
         {
             std::string cores_str = cfgmap.get_value<std::string>("hpx.cores", "");
             if ("all" == cores_str) {
                 cfgmap.config_["hpx.cores"] = boost::lexical_cast<std::string>(
-                    get_number_of_default_cores(num_threads));
+                    get_number_of_default_cores(env));
             }
 
             std::size_t num_cores = cfgmap.get_value<std::size_t>("hpx.cores", num_threads);
             if (vm.count("hpx:cores")) {
                 cores_str = vm["hpx:cores"].as<std::string>();
                 if ("all" == cores_str)
-                    num_cores = get_number_of_default_cores(num_threads);
+                    num_cores = get_number_of_default_cores(env);
                 else
                     num_cores = boost::lexical_cast<std::size_t>(cores_str);
             }
@@ -349,7 +352,7 @@ namespace hpx { namespace util
 
         // handle number of cores and threads
         num_threads_ = detail::handle_num_threads(cfgmap, vm, env, using_nodelist);
-        num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_);
+        num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
 
         // handling number of localities, those might have already been initialized
         // from MPI environment
@@ -384,7 +387,7 @@ namespace hpx { namespace util
                 if (!vm.count("hpx:run-hpx-main") &&
                     !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
                 {
-                    hpx_main_f_ = 0;
+                    hpx_main_f_.reset();
                 }
             }
             else if (vm.count("hpx:connect")) {
@@ -403,7 +406,7 @@ namespace hpx { namespace util
             if (!vm.count("hpx:run-hpx-main") && 
                 !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
             {
-                hpx_main_f_ = 0;
+                hpx_main_f_.reset();
             }
         }
         else if (node != std::size_t(-1) || vm.count("hpx:node")) {
@@ -432,7 +435,7 @@ namespace hpx { namespace util
                     if (!vm.count("hpx:run-hpx-main") &&
                         !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
                     {
-                        hpx_main_f_ = 0;
+                        hpx_main_f_.reset();
                     }
                 }
             }
@@ -500,7 +503,7 @@ namespace hpx { namespace util
             if (!vm.count("hpx:run-hpx-main") &&
                 !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
             {
-                hpx_main_f_ = 0;
+                hpx_main_f_.reset();
             }
         }
 
@@ -728,11 +731,15 @@ namespace hpx { namespace util
 
             threads::policies::init_affinity_data init_data(pu_offset,
                 pu_step, affinity_domain);
+            init_data.used_cores_ = get_runtime().get_config().get_used_cores();
             threads::policies::detail::affinity_data aff(num_threads);
-            aff.init(init_data);
+            threads::topology& top = threads::create_topology();
+            aff.init(init_data, top);
 
             bool numa_sensitive = vm_.count("hpx:numa-sensitive") != 0;
-            threads::topology& top = threads::create_topology();
+            std::cout << std::string(79, '*') << '\n';
+            std::cout << "locality: " << hpx::get_locality_id() << '\n';
+
             for (std::size_t i = 0; i != num_threads; ++i)
             {
                 top.print_affinity_mask(std::cout, i, aff.get_pu_mask(top, i, numa_sensitive));

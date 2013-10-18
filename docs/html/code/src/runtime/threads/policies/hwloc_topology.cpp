@@ -180,6 +180,55 @@ namespace hpx { namespace threads
         return std::size_t(-1);
     } // }}}
 
+    std::size_t hwloc_topology::get_pu_number(
+        std::size_t num_thread
+      , error_code& ec
+        ) const
+    { // {{{
+        std::size_t num_pu = num_thread % num_of_pus_;
+
+        if (num_pu < pu_numbers_.size())
+        {
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            return pu_numbers_[num_pu];
+        }
+
+        HPX_THROWS_IF(ec, bad_parameter
+          , "hpx::threads::hwloc_topology::get_pu_number"
+          , boost::str(boost::format(
+                "thread number %1% is out of range")
+                % num_thread));
+        return std::size_t(-1);
+    } // }}}
+
+    std::size_t hwloc_topology::get_pu_number(
+        std::size_t num_core
+      , std::size_t num_pu
+      , error_code& ec
+        ) const
+    { // {{{
+        scoped_lock lk(topo_mtx);
+
+        int num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+        if(num_cores < 0)
+        {
+            HPX_THROWS_IF(ec, no_success, "hwloc_topology::hwloc_get_nobjs_by_type",
+                "Failed to get number of cores");
+        }
+        num_core = num_core % num_cores;
+
+        hwloc_obj_t core_obj;
+
+        core_obj = hwloc_get_obj_by_type(topo,
+            HWLOC_OBJ_CORE, static_cast<unsigned>(num_core));
+
+        num_pu = num_pu % core_obj->arity;
+        
+        return core_obj->children[num_pu]->logical_index;
+    } // }}}
+
     ///////////////////////////////////////////////////////////////////////////
     mask_cref_type hwloc_topology::get_machine_affinity_mask(
         error_code& ec
@@ -902,7 +951,18 @@ namespace hpx { namespace threads
             int num_of_pus = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
 
             if (num_of_pus > 0)
+            {
                 num_of_pus_ = static_cast<std::size_t>(num_of_pus);
+                pu_numbers_.resize(num_of_pus_);
+                for(std::size_t i = 0; i < num_of_pus_; ++i)
+                {
+                    hwloc_obj_t obj;
+                    obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU,
+                        static_cast<unsigned>(i));
+                    if(!obj) pu_numbers_[i] = i;
+                    else     pu_numbers_[i] = obj->os_index;
+                }
+            }
         }
     }
 
