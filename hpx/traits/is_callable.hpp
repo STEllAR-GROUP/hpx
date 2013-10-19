@@ -211,10 +211,13 @@ namespace hpx { namespace traits
 #else // C++11
 
 #include <hpx/util/always_void.hpp>
+#include <hpx/util/decay.hpp>
 
 #include <boost/get_pointer.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/ref.hpp>
 #include <boost/utility/declval.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace traits
 {
@@ -266,6 +269,22 @@ namespace hpx { namespace traits
             )>::type
         > : boost::mpl::true_
         {};
+
+        // support boost::[c]ref, which is not callable as std::[c]ref
+        template <typename T, typename Args>
+        struct is_callable_impl<T, Args
+          , typename boost::enable_if_c<
+                boost::is_reference_wrapper<
+                    typename util::decay<T>::type
+                >::value
+            >::type
+        > : is_callable_impl<
+                typename boost::unwrap_reference<
+                    typename util::decay<T>::type
+                >::type&
+              , Args
+            >
+        {};
     }
 
     template <typename T, typename... A>
@@ -305,7 +324,7 @@ namespace hpx { namespace traits { namespace detail
         >                                                                       \
     {};                                                                         \
     /**/
-    
+
     BOOST_PP_REPEAT(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
       , HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION, _);
 
