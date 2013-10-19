@@ -81,7 +81,7 @@ namespace hpx { namespace lcos
                     traits::is_future<result>
                   , result
                   , lcos::future<result>
-                >
+                >::type
                 type;
         };
         ///////////////////////////////////////////////////////////////////////
