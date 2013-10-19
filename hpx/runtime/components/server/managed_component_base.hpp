@@ -157,10 +157,10 @@ namespace hpx { namespace components
         // This is used by the managed_component to decide whether to
         // delete the component implementation depending on it.
         template <typename DtorTag>
-        struct manage_livetime;
+        struct manage_lifetime;
 
         template <>
-        struct manage_livetime<traits::managed_object_is_lifetime_controlled>
+        struct manage_lifetime<traits::managed_object_is_lifetime_controlled>
         {
             template <typename Component>
             static void call(Component*)
@@ -183,7 +183,7 @@ namespace hpx { namespace components
         };
 
         template <>
-        struct manage_livetime<traits::managed_object_controls_lifetime>
+        struct manage_lifetime<traits::managed_object_controls_lifetime>
         {
             template <typename Component>
             static void call(Component* component)
@@ -338,14 +338,14 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     void intrusive_ptr_add_ref(managed_component<Component, Derived>* p)
     {
-        detail_adl_barrier::manage_livetime<
+        detail_adl_barrier::manage_lifetime<
             typename traits::managed_component_dtor_policy<Component>::type
         >::addref(p->component_);
     }
     template <typename Component, typename Derived>
     void intrusive_ptr_release(managed_component<Component, Derived>* p)
     {
-        detail_adl_barrier::manage_livetime<
+        detail_adl_barrier::manage_lifetime<
             typename traits::managed_component_dtor_policy<Component>::type
         >::release(p->component_);
     }
@@ -432,7 +432,7 @@ namespace hpx { namespace components
         ~managed_component()
         {
             intrusive_ptr_release(this);
-            detail_adl_barrier::manage_livetime<
+            detail_adl_barrier::manage_lifetime<
                 typename traits::managed_component_dtor_policy<Component>::type
             >::call(component_);
         }
@@ -650,8 +650,11 @@ namespace hpx { namespace components
 
     public:
         // reference counting
-        template<typename C, typename D> friend void intrusive_ptr_add_ref(managed_component<C, D>* p);
-        template<typename C, typename D> friend void intrusive_ptr_release(managed_component<C, D>* p);
+        template<typename C, typename D>
+        friend void intrusive_ptr_add_ref(managed_component<C, D>* p);
+
+        template<typename C, typename D>
+        friend void intrusive_ptr_release(managed_component<C, D>* p);
 
     protected:
         Component* component_;

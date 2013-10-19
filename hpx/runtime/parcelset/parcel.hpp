@@ -79,17 +79,19 @@ namespace hpx { namespace parcelset
             virtual double get_creation_time() const = 0;
 
             /// get and set the destination id
-            virtual naming::gid_type* get_destinations() = 0;
-            virtual naming::gid_type const* get_destinations() const = 0;
-            virtual void set_destination(naming::gid_type const& dest) = 0;
-            virtual void set_destinations(std::vector<naming::gid_type> const& dests) = 0;
-
+            virtual naming::id_type* get_destinations() = 0;
+            virtual naming::id_type const* get_destinations() const = 0;
+            virtual void set_destination(naming::id_type const& dest) = 0;
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+            virtual void set_destinations(std::vector<naming::id_type> const& dests) = 0;
+#endif
             /// get and set the destination address
             virtual naming::address* get_destination_addrs() = 0;
             virtual naming::address const* get_destination_addrs() const = 0;
             virtual void set_destination_addr(naming::address const& addr) = 0;
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
             virtual void set_destination_addrs(std::vector<naming::address> const& addrs) = 0;
-
+#endif
             virtual naming::locality const& get_destination_locality() const = 0;
 
             virtual naming::gid_type get_parcel_id() const = 0;
@@ -185,55 +187,54 @@ namespace hpx { namespace parcelset
             {
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
-                data_.dest_size_ = 0;
                 data_.has_source_id_ = 0;
                 data_.has_continuation_ = 0;
             }
 
-            single_destination_parcel_data(naming::gid_type const& apply_to,
+            single_destination_parcel_data(naming::id_type const& apply_to,
                     naming::address const& addr, actions::base_action* act)
               : parcel_data(act)
             {
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
-                data_.dest_size_ = 1;
                 data_.has_source_id_ = 0;
                 data_.has_continuation_ = 0;
-                data_.dest_ = apply_to;
+
+                dest_ = apply_to;
                 addr_ = addr;
 
                 BOOST_ASSERT(components::types_are_compatible(
                     act->get_component_type(), addr.type_));
             }
 
-            single_destination_parcel_data(naming::gid_type const& apply_to,
+            single_destination_parcel_data(naming::id_type const& apply_to,
                     naming::address const& addr, actions::base_action* act,
                    actions::continuation* do_after)
               : parcel_data(act, do_after)
             {
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
-                data_.dest_size_ = 1;
                 data_.has_source_id_ = 0;
                 data_.has_continuation_ = do_after ? 1 : 0;
-                data_.dest_ = apply_to;
+
+                dest_ = apply_to;
                 addr_ = addr;
 
                 BOOST_ASSERT(components::types_are_compatible(
                     act->get_component_type(), addr.type_));
             }
 
-            single_destination_parcel_data(naming::gid_type const& apply_to,
+            single_destination_parcel_data(naming::id_type const& apply_to,
                     naming::address const& addr, actions::base_action* act,
                     actions::continuation_type do_after)
               : parcel_data(act, do_after)
             {
                 data_.start_time_ = 0;
                 data_.creation_time_ = 0;
-                data_.dest_size_ = 1;
                 data_.has_source_id_ = 0;
                 data_.has_continuation_ = do_after ? 1 : 0;
-                data_.dest_ = apply_to;
+
+                dest_ = apply_to;
                 addr_ = addr;
 
                 BOOST_ASSERT(components::types_are_compatible(
@@ -260,23 +261,24 @@ namespace hpx { namespace parcelset
             }
 
             /// get and set the destination id
-            naming::gid_type* get_destinations()
+            naming::id_type* get_destinations()
             {
-                return &data_.dest_;
+                return &dest_;
             }
-            naming::gid_type const* get_destinations() const
+            naming::id_type const* get_destinations() const
             {
-                return &data_.dest_;
+                return &dest_;
             }
-            void set_destination(naming::gid_type const& dest)
+            void set_destination(naming::id_type const& dest)
             {
-                data_.dest_ = dest;
+                dest_ = dest;
             }
-            void set_destinations(std::vector<naming::gid_type> const& dests)
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+            void set_destinations(std::vector<naming::id_type> const& dests)
             {
                 BOOST_ASSERT(false);
             }
-
+#endif
             /// get and set the destination address
             naming::address* get_destination_addrs()
             {
@@ -290,11 +292,12 @@ namespace hpx { namespace parcelset
             {
                 addr_ = addr;
             }
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
             void set_destination_addrs(std::vector<naming::address> const& addrs)
             {
                 BOOST_ASSERT(false);
             }
-
+#endif
             ///
             naming::locality const& get_destination_locality() const
             {
@@ -350,14 +353,16 @@ namespace hpx { namespace parcelset
                 boost::uint64_t dest_size_;
                 mutable boost::uint8_t has_source_id_;
                 boost::uint8_t has_continuation_;
-
-                //  more parcel data
-                naming::gid_type dest_;
             };
+
             parcel_buffer data_;
+
+            // other parcel data
+            naming::id_type dest_;
             naming::address addr_;
         };
 
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         ///////////////////////////////////////////////////////////////////////
         // multi-destination parcel buffer
         class multi_destination_parcel_data : public parcel_data
@@ -373,7 +378,7 @@ namespace hpx { namespace parcelset
             }
 
             multi_destination_parcel_data(
-                    std::vector<naming::gid_type> const& apply_to,
+                    std::vector<naming::id_type> const& apply_to,
                     std::vector<naming::address> const& addrs,
                     actions::action_type act)
               : parcel_data(act)
@@ -429,19 +434,19 @@ namespace hpx { namespace parcelset
             }
 
             /// get and set the destination id
-            naming::gid_type* get_destinations()
+            naming::id_type* get_destinations()
             {
                 return dests_.data();
             }
-            naming::gid_type const* get_destinations() const
+            naming::id_type const* get_destinations() const
             {
                 return dests_.data();
             }
-            void set_destination(naming::gid_type const& dest)
+            void set_destination(naming::id_type const& dest)
             {
                 BOOST_ASSERT(false);
             }
-            void set_destinations(std::vector<naming::gid_type> const& dests)
+            void set_destinations(std::vector<naming::id_type> const& dests)
             {
                 dests_ = dests;
             }
@@ -459,11 +464,12 @@ namespace hpx { namespace parcelset
             {
                 BOOST_ASSERT(false);
             }
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
             void set_destination_addrs(std::vector<naming::address> const& addrs)
             {
                 addrs_ = addrs;
             }
-
+#endif
             /// 
             naming::locality const& get_destination_locality() const
             {
@@ -483,7 +489,7 @@ namespace hpx { namespace parcelset
             std::size_t get_type_size() const
             {
                 return sizeof(parcel_buffer) + 
-                    traits::type_size<std::vector<naming::gid_type> >::call(dests_) +
+                    traits::type_size<std::vector<naming::id_type> >::call(dests_) +
                     traits::type_size<std::vector<naming::address> >::call(addrs_) +
                     this->get_action()->get_type_size();      // action
             }
@@ -527,9 +533,10 @@ namespace hpx { namespace parcelset
             parcel_buffer data_;
 
             // more parcel data
-            std::vector<naming::gid_type> dests_;
+            std::vector<naming::id_type> dests_;
             std::vector<naming::address> addrs_;
         };
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -538,24 +545,26 @@ namespace hpx { namespace parcelset
     public:
         parcel() {}
 
-        parcel(naming::gid_type const& apply_to,
+        parcel(naming::id_type const& apply_to,
                 naming::address const& addrs, actions::base_action* act)
           : data_(new detail::single_destination_parcel_data(apply_to, addrs, act))
         {}
 
-        parcel(std::vector<naming::gid_type> const& apply_to,
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+        parcel(std::vector<naming::id_type> const& apply_to,
                 std::vector<naming::address> const& addrs,
                 actions::action_type act)
           : data_(new detail::multi_destination_parcel_data(apply_to, addrs, act))
         {}
+#endif
 
-        parcel(naming::gid_type const& apply_to,
+        parcel(naming::id_type const& apply_to,
                 naming::address const& addrs, actions::base_action* act,
                 actions::continuation* do_after)
           : data_(new detail::single_destination_parcel_data(apply_to, addrs, act, do_after))
         {}
 
-        parcel(naming::gid_type const& apply_to,
+        parcel(naming::id_type const& apply_to,
                 naming::address const& addrs, actions::base_action* act,
                 actions::continuation_type do_after)
           : data_(new detail::single_destination_parcel_data(apply_to, addrs, act, do_after))
@@ -586,15 +595,6 @@ namespace hpx { namespace parcelset
             return data_->get_source();
         }
 
-        naming::gid_type& get_source_gid()
-        {
-            return get_source().get_gid();
-        }
-        naming::gid_type const& get_source_gid() const
-        {
-            return get_source().get_gid();
-        }
-
         void set_source(naming::id_type const& source_id)
         {
             data_->set_source(source_id);
@@ -606,15 +606,16 @@ namespace hpx { namespace parcelset
         }
 
         /// get and set the destination id
-        naming::gid_type* get_destinations()
+        naming::id_type* get_destinations()
         {
             return data_->get_destinations();
         }
-        naming::gid_type const* get_destinations() const
+        naming::id_type const* get_destinations() const
         {
             return data_->get_destinations();
         }
-        void set_destinations(std::vector<naming::gid_type> const& dests)
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+        void set_destinations(std::vector<naming::id_type> const& dests)
         {
             if (data_->is_multi_destination()) {
                 data_->set_destinations(dests);
@@ -624,7 +625,7 @@ namespace hpx { namespace parcelset
                 data_->set_destination(dests[0]);
             }
         }
-
+#endif
         naming::locality const& get_destination_locality() const
         {
             return data_->get_destination_locality();
@@ -639,6 +640,7 @@ namespace hpx { namespace parcelset
         {
             return data_->get_destination_addrs();
         }
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         void set_destination_addrs(std::vector<naming::address> const& addrs)
         {
             if (data_->is_multi_destination()) {
@@ -649,7 +651,7 @@ namespace hpx { namespace parcelset
                 data_->set_destination_addr(addrs[0]);
             }
         }
-
+#endif
         void set_start_time(double starttime)
         {
             data_->set_start_time(starttime);
@@ -737,11 +739,13 @@ namespace boost { namespace serialization
        : boost::mpl::true_
     {};
 
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
     template <>
     struct is_bitwise_serializable<
             hpx::parcelset::detail::multi_destination_parcel_data::parcel_buffer>
        : boost::mpl::true_
     {};
+#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -759,8 +763,10 @@ BOOST_CLASS_VERSION(hpx::parcelset::parcel, HPX_PARCEL_VERSION)
 
 BOOST_CLASS_TRACKING(hpx::parcelset::detail::single_destination_parcel_data,
     boost::serialization::track_never)
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
 BOOST_CLASS_TRACKING(hpx::parcelset::detail::multi_destination_parcel_data,
     boost::serialization::track_never)
+#endif
 
 #if defined(__GNUG__) && !defined(__INTEL_COMPILER)
 #if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)

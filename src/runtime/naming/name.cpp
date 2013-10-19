@@ -186,32 +186,6 @@ namespace hpx { namespace naming
             return *this;
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // prepare the given id, note: this function modifies 'this'
-        naming::gid_type id_type_impl::prepare_parcel_dest_gid()
-        {
-            gid_type::mutex_type::scoped_lock l(this);
-
-            // If the initial credit is zero the gid is 'unmanaged' and no
-            // additional action needs to be performed.
-            boost::uint16_t oldcredits = detail::get_credit_from_gid(*this);
-            if (0 != oldcredits)
-            {
-                // Request new credits from AGAS if needed (i.e. the initial
-                // gid's credit is equal to one and the new gid has no credits
-                // after splitting).
-                naming::gid_type newid = detail::split_credits_for_parcel_dest_gid(*this);
-                if (0 == detail::get_credit_from_gid(newid))
-                {
-                    retrieve_new_credits(newid, *this, 1, HPX_INITIAL_GLOBALCREDIT, l);
-                }
-                return newid;
-            }
-
-            BOOST_ASSERT(unmanaged == type_);
-            return *this;
-        }
-
         struct gid_serialization_data
         {
             gid_type gid_;

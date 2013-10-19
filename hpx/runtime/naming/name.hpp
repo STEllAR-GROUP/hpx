@@ -421,9 +421,13 @@ namespace hpx { namespace naming
             boost::uint32_t newcredits = static_cast<boost::uint32_t>(credits / fraction);
 
             msb &= ~gid_type::credit_mask;
-            id.set_msb(msb | (((credits - newcredits) << 16) & gid_type::credit_mask) | gid_type::was_split_mask);
+            id.set_msb(msb |
+                (((credits - newcredits) << 16) & gid_type::credit_mask) |
+                gid_type::was_split_mask);
 
-            return gid_type(msb | ((newcredits << 16) & gid_type::credit_mask) | gid_type::was_split_mask,
+            return gid_type(msb |
+                    ((newcredits << 16) & gid_type::credit_mask) |
+                    gid_type::was_split_mask,
                 id.get_lsb());
         }
 

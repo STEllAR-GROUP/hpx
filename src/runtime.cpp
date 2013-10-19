@@ -730,6 +730,17 @@ namespace hpx
         return current;
     }
 
+    boost::uint32_t runtime::assign_cores()
+    {
+        // initialize thread affinity settings in the scheduler
+        if (affinity_init_.used_cores_ == 0) {
+            // correct pu_offset from config data if appropriate
+            affinity_init_.used_cores_ = this->get_config().get_used_cores();
+        }
+
+        return this->get_thread_manager().init(affinity_init_);
+    }
+
     boost::shared_ptr<util::one_size_heap_list_base> runtime::get_promise_heap(
         components::component_type type)
     {

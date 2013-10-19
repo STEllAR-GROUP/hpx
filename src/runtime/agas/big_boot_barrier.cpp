@@ -720,7 +720,7 @@ void big_boot_barrier::apply(
   , naming::address const& addr
   , actions::base_action* act
 ) { // {{{
-    parcelset::parcel p(naming::get_gid_from_locality_id(target_locality_id), addr, act);
+    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
     pp.send_early_parcel(p);

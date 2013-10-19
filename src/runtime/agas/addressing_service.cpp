@@ -1535,10 +1535,10 @@ void addressing_service::route(
 {
     // compose request
     request req(primary_ns_route, p);
-    naming::gid_type const* gids = p.get_destinations();
+    naming::id_type const* ids = p.get_destinations();
 
     naming::id_type const target(
-        stubs::primary_namespace::get_service_instance(gids[0])
+        stubs::primary_namespace::get_service_instance(ids[0])
       , naming::id_type::unmanaged);
 
     typedef server::primary_namespace::service_action action_type;
@@ -1558,12 +1558,14 @@ void addressing_service::route(
     // a service instance
     if (!addr)
     {
-        if (stubs::primary_namespace::is_service_instance(gids[0]) ||
-            stubs::symbol_namespace::is_service_instance(gids[0]))
+        if (stubs::primary_namespace::is_service_instance(ids[0]) ||
+            stubs::symbol_namespace::is_service_instance(ids[0]))
         {
             // construct wrapper parcel
-            parcelset::parcel route_p(bootstrap_primary_namespace_gid()
-              , primary_ns_addr_
+            naming::id_type const route_target(
+                bootstrap_primary_namespace_gid(), naming::id_type::unmanaged);
+
+            parcelset::parcel route_p(route_target, primary_ns_addr_
               , new hpx::actions::transfer_action<action_type>(action_priority_, req));
 
             // send to the main AGAS instance for routing
