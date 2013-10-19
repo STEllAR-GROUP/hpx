@@ -24,6 +24,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_void.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/utility/declval.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -63,7 +64,18 @@ namespace hpx { namespace lcos
         template <typename Future, typename F, typename Enable = void>
         struct future_then_result
         {
-            typedef struct continuation_not_callable {} type;
+            typedef struct continuation_not_callable
+            {
+                void error(Future& future, F& f)
+                {
+                    f(future);
+                }
+
+                ~continuation_not_callable()
+                {
+                    error(boost::declval<Future&>(), boost::declval<F&>());
+                }
+            } type;
         };
 
         template <typename Future, typename F>
@@ -84,6 +96,7 @@ namespace hpx { namespace lcos
                 >::type
                 type;
         };
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Result>
         struct unwrapped_future_result
