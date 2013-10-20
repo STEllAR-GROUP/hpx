@@ -55,7 +55,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                 get_runtime().get_config().get_entry("hpx.cores", data.used_cores_));
 
         // initialize from command line
-        pu_offset_ = data.pu_offset_ % num_system_pus;
+        if (data.pu_offset_ != std::size_t(-1))
+            pu_offset_ = data.pu_offset_;
+
         pu_step_ = data.pu_step_ % num_system_pus;
         affinity_domain_ = data.affinity_domain_;
         pu_nums_.clear();
@@ -81,15 +83,17 @@ namespace hpx { namespace threads { namespace policies { namespace detail
                             "bind (%2%)") % num_threads_ % num_initialized));
             }
         }
-        else
+        else if (data.pu_offset_ == std::size_t(-1))
         {
-            // calculate the pu offset based on the used cores
+            // calculate the pu offset based on the used cores, but only if its 
+            // not explicitly specified
             for(std::size_t num_core = 0; num_core != data.used_cores_; ++num_core)
             {
                 pu_offset_ += topology.get_number_of_core_pus(num_core);
             }
         }
 #endif
+
         pu_offset_ %= num_system_pus;
         init_cached_pu_nums(num_system_pus, topology);
 
@@ -99,6 +103,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         {
             cores.push_back(topology.get_core_number(get_pu_num(i)));
         }
+
         std::sort(cores.begin(), cores.end());
         std::vector<std::size_t>::iterator it = std::unique(cores.begin(), cores.end());
 

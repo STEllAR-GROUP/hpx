@@ -589,7 +589,7 @@ namespace hpx
             if (cfg.vm_.count("hpx:numa-sensitive"))
                 numa_sensitive = true;
 
-            std::size_t pu_offset = 0;
+            std::size_t pu_offset = std::size_t(-1);
             std::size_t pu_step = 1;
             std::string affinity_domain("pu");
             std::string affinity_desc;
@@ -693,7 +693,7 @@ namespace hpx
                     cfg.vm_["hpx:high-priority-threads"].as<std::size_t>();
             }
 
-            std::size_t pu_offset = 0;
+            std::size_t pu_offset = std::size_t(-1);
             std::size_t pu_step = 1;
             std::string affinity_domain("pu");
             std::string affinity_desc;
@@ -796,7 +796,7 @@ namespace hpx
             if (cfg.vm_.count("hpx:numa-sensitive"))
                 numa_sensitive = true;
 
-            std::size_t pu_offset = 0;
+            std::size_t pu_offset = std::size_t(-1);
             std::size_t pu_step = 1;
             std::string affinity_domain("pu");
             std::string affinity_desc;

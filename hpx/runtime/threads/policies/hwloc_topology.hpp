@@ -193,6 +193,7 @@ namespace hpx { namespace threads
         void init_num_of_pus();
 
         hwloc_topology_t topo;
+
         // We need to define a constant pu offset.
         // This is mainly to skip the first Core on the Xeon Phi
         // which is reserved for OS related tasks
