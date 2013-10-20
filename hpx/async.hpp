@@ -12,11 +12,12 @@
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/traits/is_action.hpp>
 #include <hpx/util/bind_action.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/protect.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
-#include <hpx/traits/is_callable.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
@@ -83,8 +84,8 @@ namespace hpx
     // Launch the given function or function object asynchronously and return a
     // future allowing to synchronize with the returned result.
     template <typename F>
-    typename boost::lazy_enable_if<
-        traits::detail::is_callable_not_action<F>
+    typename boost::lazy_enable_if_c<
+        !traits::is_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
     async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
@@ -104,8 +105,8 @@ namespace hpx
     }
 
     template <typename F>
-    typename boost::lazy_enable_if<
-        traits::detail::is_callable_not_action<F>
+    typename boost::lazy_enable_if_c<
+        !traits::is_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
     async (threads::executor& sched, BOOST_FWD_REF(F) f)
@@ -119,8 +120,8 @@ namespace hpx
     }
 
     template <typename F>
-    typename boost::lazy_enable_if<
-        traits::detail::is_callable_not_action<F>
+    typename boost::lazy_enable_if_c<
+        !traits::is_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
     async (BOOST_FWD_REF(F) f)
@@ -136,9 +137,8 @@ namespace hpx
 
 #define HPX_UTIL_BOUND_FUNCTION_ASYNC(Z, N, D)                                \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
-    typename boost::lazy_enable_if<                                           \
-        traits::detail::is_callable_not_action<F                              \
-          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>                      \
+    typename boost::lazy_enable_if_c<                                         \
+        !traits::is_action<typename util::decay<F>::type>::value              \
       , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>                  \
     >::type                                                                   \
     async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,              \
@@ -161,9 +161,8 @@ namespace hpx
         return p.get_future();                                                \
     }                                                                         \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
-    typename boost::lazy_enable_if<                                           \
-        traits::detail::is_callable_not_action<F                              \
-          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>                      \
+    typename boost::lazy_enable_if_c<                                         \
+        !traits::is_action<typename util::decay<F>::type>::value              \
       , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>                  \
     >::type                                                                   \
     async (threads::executor& sched, BOOST_FWD_REF(F) f,                      \
@@ -178,9 +177,8 @@ namespace hpx
         return p.get_future();                                                \
     }                                                                         \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
-    typename boost::lazy_enable_if<                                           \
-        traits::detail::is_callable_not_action<F                              \
-          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>                      \
+    typename boost::lazy_enable_if_c<                                         \
+        !traits::is_action<typename util::decay<F>::type>::value              \
       , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>                  \
     >::type                                                                   \
     async (BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                    \

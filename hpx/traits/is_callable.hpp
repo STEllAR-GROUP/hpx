@@ -13,7 +13,6 @@
  || defined(BOOST_NO_CXX11_DECLTYPE_N3276)                                     \
  || defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) // C++03
 
-#include <hpx/traits/is_action.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
@@ -294,41 +293,5 @@ namespace hpx { namespace traits
 }}
 
 #endif
-
-#include <hpx/traits/is_action.hpp>
-#include <hpx/util/decay.hpp>
-
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/not.hpp>
-
-#include <boost/preprocessor/facilities/intercept.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
-
-namespace hpx { namespace traits { namespace detail
-{
-    template <typename T
-      , BOOST_PP_ENUM_BINARY_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
-          , typename A, = void BOOST_PP_INTERCEPT)
-      , typename Dummy = void>
-    struct is_callable_not_action;
-
-#   define HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION(z, n, data)                   \
-    template <typename T BOOST_PP_ENUM_TRAILING_PARAMS(n, typename A)>          \
-    struct is_callable_not_action<T BOOST_PP_ENUM_TRAILING_PARAMS(n, A)>        \
-      : boost::mpl::and_<                                                       \
-            is_callable<T BOOST_PP_ENUM_TRAILING_PARAMS(n, A)>                  \
-          , boost::mpl::not_<traits::is_action<                                 \
-                typename util::decay<T>::type> >                                \
-        >                                                                       \
-    {};                                                                         \
-    /**/
-
-    BOOST_PP_REPEAT(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
-      , HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION, _);
-
-#   undef HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION
-}}}
 
 #endif
