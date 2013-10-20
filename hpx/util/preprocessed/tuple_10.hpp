@@ -115,7 +115,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value ))
+            )
         {
             _m0._value = other._m0._value;;
             return *this;
@@ -123,7 +125,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value);;
             return *this;
@@ -137,7 +141,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other));;
             return *this;
@@ -147,7 +153,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value );;
         }
@@ -373,7 +381,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value;;
             return *this;
@@ -381,7 +391,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value);;
             return *this;
@@ -395,7 +407,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other));;
             return *this;
@@ -405,7 +419,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value );;
         }
@@ -631,7 +647,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value;;
             return *this;
@@ -639,7 +657,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value);;
             return *this;
@@ -653,7 +673,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other));;
             return *this;
@@ -663,7 +685,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value );;
         }
@@ -910,7 +934,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value;;
             return *this;
@@ -918,7 +944,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value);;
             return *this;
@@ -932,7 +960,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other));;
             return *this;
@@ -942,7 +972,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value );;
         }
@@ -1186,7 +1218,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value;;
             return *this;
@@ -1194,7 +1228,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value);;
             return *this;
@@ -1208,7 +1244,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other));;
             return *this;
@@ -1218,7 +1256,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value );;
         }
@@ -1465,7 +1505,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value;;
             return *this;
@@ -1473,7 +1515,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value);;
             return *this;
@@ -1487,7 +1531,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other));;
             return *this;
@@ -1497,7 +1543,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value );;
         }
@@ -1741,7 +1789,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value )) && BOOST_NOEXCEPT_EXPR(( _m6._value = other._m6._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value; _m6._value = other._m6._value;;
             return *this;
@@ -1749,7 +1799,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = boost::forward<T6> (other._m6._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value); _m6._value = boost::forward<T6> (other._m6._value);;
             return *this;
@@ -1763,7 +1815,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = util::get< 6>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other)); _m6._value = util::get< 6>(boost::forward<UTuple>(other));;
             return *this;
@@ -1773,7 +1827,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m6._value , other._m6._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value ); boost::swap( _m6._value , other._m6._value );;
         }
@@ -2020,7 +2076,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value )) && BOOST_NOEXCEPT_EXPR(( _m6._value = other._m6._value )) && BOOST_NOEXCEPT_EXPR(( _m7._value = other._m7._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value; _m6._value = other._m6._value; _m7._value = other._m7._value;;
             return *this;
@@ -2028,7 +2086,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = boost::forward<T6> (other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = boost::forward<T7> (other._m7._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value); _m6._value = boost::forward<T6> (other._m6._value); _m7._value = boost::forward<T7> (other._m7._value);;
             return *this;
@@ -2042,7 +2102,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = util::get< 6>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = util::get< 7>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other)); _m6._value = util::get< 6>(boost::forward<UTuple>(other)); _m7._value = util::get< 7>(boost::forward<UTuple>(other));;
             return *this;
@@ -2052,7 +2114,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m6._value , other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m7._value , other._m7._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value ); boost::swap( _m6._value , other._m6._value ); boost::swap( _m7._value , other._m7._value );;
         }
@@ -2296,7 +2360,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value )) && BOOST_NOEXCEPT_EXPR(( _m6._value = other._m6._value )) && BOOST_NOEXCEPT_EXPR(( _m7._value = other._m7._value )) && BOOST_NOEXCEPT_EXPR(( _m8._value = other._m8._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value; _m6._value = other._m6._value; _m7._value = other._m7._value; _m8._value = other._m8._value;;
             return *this;
@@ -2304,7 +2370,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = boost::forward<T6> (other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = boost::forward<T7> (other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = boost::forward<T8> (other._m8._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value); _m6._value = boost::forward<T6> (other._m6._value); _m7._value = boost::forward<T7> (other._m7._value); _m8._value = boost::forward<T8> (other._m8._value);;
             return *this;
@@ -2318,7 +2386,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = util::get< 6>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = util::get< 7>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = util::get< 8>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other)); _m6._value = util::get< 6>(boost::forward<UTuple>(other)); _m7._value = util::get< 7>(boost::forward<UTuple>(other)); _m8._value = util::get< 8>(boost::forward<UTuple>(other));;
             return *this;
@@ -2328,7 +2398,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m6._value , other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m7._value , other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m8._value , other._m8._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value ); boost::swap( _m6._value , other._m6._value ); boost::swap( _m7._value , other._m7._value ); boost::swap( _m8._value , other._m8._value );;
         }
@@ -2575,7 +2647,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value )) && BOOST_NOEXCEPT_EXPR(( _m6._value = other._m6._value )) && BOOST_NOEXCEPT_EXPR(( _m7._value = other._m7._value )) && BOOST_NOEXCEPT_EXPR(( _m8._value = other._m8._value )) && BOOST_NOEXCEPT_EXPR(( _m9._value = other._m9._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value; _m6._value = other._m6._value; _m7._value = other._m7._value; _m8._value = other._m8._value; _m9._value = other._m9._value;;
             return *this;
@@ -2583,7 +2657,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = boost::forward<T6> (other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = boost::forward<T7> (other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = boost::forward<T8> (other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = boost::forward<T9> (other._m9._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value); _m6._value = boost::forward<T6> (other._m6._value); _m7._value = boost::forward<T7> (other._m7._value); _m8._value = boost::forward<T8> (other._m8._value); _m9._value = boost::forward<T9> (other._m9._value);;
             return *this;
@@ -2597,7 +2673,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = util::get< 6>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = util::get< 7>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = util::get< 8>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = util::get< 9>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other)); _m6._value = util::get< 6>(boost::forward<UTuple>(other)); _m7._value = util::get< 7>(boost::forward<UTuple>(other)); _m8._value = util::get< 8>(boost::forward<UTuple>(other)); _m9._value = util::get< 9>(boost::forward<UTuple>(other));;
             return *this;
@@ -2607,7 +2685,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m6._value , other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m7._value , other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m8._value , other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m9._value , other._m9._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value ); boost::swap( _m6._value , other._m6._value ); boost::swap( _m7._value , other._m7._value ); boost::swap( _m8._value , other._m8._value ); boost::swap( _m9._value , other._m9._value );;
         }
@@ -2851,7 +2931,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value )) && BOOST_NOEXCEPT_EXPR(( _m6._value = other._m6._value )) && BOOST_NOEXCEPT_EXPR(( _m7._value = other._m7._value )) && BOOST_NOEXCEPT_EXPR(( _m8._value = other._m8._value )) && BOOST_NOEXCEPT_EXPR(( _m9._value = other._m9._value )) && BOOST_NOEXCEPT_EXPR(( _m10._value = other._m10._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value; _m6._value = other._m6._value; _m7._value = other._m7._value; _m8._value = other._m8._value; _m9._value = other._m9._value; _m10._value = other._m10._value;;
             return *this;
@@ -2859,7 +2941,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = boost::forward<T6> (other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = boost::forward<T7> (other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = boost::forward<T8> (other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = boost::forward<T9> (other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = boost::forward<T10> (other._m10._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value); _m6._value = boost::forward<T6> (other._m6._value); _m7._value = boost::forward<T7> (other._m7._value); _m8._value = boost::forward<T8> (other._m8._value); _m9._value = boost::forward<T9> (other._m9._value); _m10._value = boost::forward<T10> (other._m10._value);;
             return *this;
@@ -2873,7 +2957,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = util::get< 6>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = util::get< 7>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = util::get< 8>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = util::get< 9>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = util::get< 10>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other)); _m6._value = util::get< 6>(boost::forward<UTuple>(other)); _m7._value = util::get< 7>(boost::forward<UTuple>(other)); _m8._value = util::get< 8>(boost::forward<UTuple>(other)); _m9._value = util::get< 9>(boost::forward<UTuple>(other)); _m10._value = util::get< 10>(boost::forward<UTuple>(other));;
             return *this;
@@ -2883,7 +2969,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m6._value , other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m7._value , other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m8._value , other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m9._value , other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m10._value , other._m10._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value ); boost::swap( _m6._value , other._m6._value ); boost::swap( _m7._value , other._m7._value ); boost::swap( _m8._value , other._m8._value ); boost::swap( _m9._value , other._m9._value ); boost::swap( _m10._value , other._m10._value );;
         }
@@ -3130,7 +3218,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value )) && BOOST_NOEXCEPT_EXPR(( _m6._value = other._m6._value )) && BOOST_NOEXCEPT_EXPR(( _m7._value = other._m7._value )) && BOOST_NOEXCEPT_EXPR(( _m8._value = other._m8._value )) && BOOST_NOEXCEPT_EXPR(( _m9._value = other._m9._value )) && BOOST_NOEXCEPT_EXPR(( _m10._value = other._m10._value )) && BOOST_NOEXCEPT_EXPR(( _m11._value = other._m11._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value; _m6._value = other._m6._value; _m7._value = other._m7._value; _m8._value = other._m8._value; _m9._value = other._m9._value; _m10._value = other._m10._value; _m11._value = other._m11._value;;
             return *this;
@@ -3138,7 +3228,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = boost::forward<T6> (other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = boost::forward<T7> (other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = boost::forward<T8> (other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = boost::forward<T9> (other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = boost::forward<T10> (other._m10._value) )) && BOOST_NOEXCEPT_EXPR(( _m11._value = boost::forward<T11> (other._m11._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value); _m6._value = boost::forward<T6> (other._m6._value); _m7._value = boost::forward<T7> (other._m7._value); _m8._value = boost::forward<T8> (other._m8._value); _m9._value = boost::forward<T9> (other._m9._value); _m10._value = boost::forward<T10> (other._m10._value); _m11._value = boost::forward<T11> (other._m11._value);;
             return *this;
@@ -3152,7 +3244,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = util::get< 6>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = util::get< 7>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = util::get< 8>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = util::get< 9>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = util::get< 10>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m11._value = util::get< 11>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other)); _m6._value = util::get< 6>(boost::forward<UTuple>(other)); _m7._value = util::get< 7>(boost::forward<UTuple>(other)); _m8._value = util::get< 8>(boost::forward<UTuple>(other)); _m9._value = util::get< 9>(boost::forward<UTuple>(other)); _m10._value = util::get< 10>(boost::forward<UTuple>(other)); _m11._value = util::get< 11>(boost::forward<UTuple>(other));;
             return *this;
@@ -3162,7 +3256,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m6._value , other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m7._value , other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m8._value , other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m9._value , other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m10._value , other._m10._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m11._value , other._m11._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value ); boost::swap( _m6._value , other._m6._value ); boost::swap( _m7._value , other._m7._value ); boost::swap( _m8._value , other._m8._value ); boost::swap( _m9._value , other._m9._value ); boost::swap( _m10._value , other._m10._value ); boost::swap( _m11._value , other._m11._value );;
         }
@@ -3406,7 +3502,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(tuple const& other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value )) && BOOST_NOEXCEPT_EXPR(( _m6._value = other._m6._value )) && BOOST_NOEXCEPT_EXPR(( _m7._value = other._m7._value )) && BOOST_NOEXCEPT_EXPR(( _m8._value = other._m8._value )) && BOOST_NOEXCEPT_EXPR(( _m9._value = other._m9._value )) && BOOST_NOEXCEPT_EXPR(( _m10._value = other._m10._value )) && BOOST_NOEXCEPT_EXPR(( _m11._value = other._m11._value )) && BOOST_NOEXCEPT_EXPR(( _m12._value = other._m12._value ))
+            )
         {
             _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value; _m6._value = other._m6._value; _m7._value = other._m7._value; _m8._value = other._m8._value; _m9._value = other._m9._value; _m10._value = other._m10._value; _m11._value = other._m11._value; _m12._value = other._m12._value;;
             return *this;
@@ -3414,7 +3512,9 @@ namespace hpx { namespace util
         
         
         tuple& operator=(BOOST_RV_REF(tuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = boost::forward<T6> (other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = boost::forward<T7> (other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = boost::forward<T8> (other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = boost::forward<T9> (other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = boost::forward<T10> (other._m10._value) )) && BOOST_NOEXCEPT_EXPR(( _m11._value = boost::forward<T11> (other._m11._value) )) && BOOST_NOEXCEPT_EXPR(( _m12._value = boost::forward<T12> (other._m12._value) ))
+            )
         {
             _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value); _m6._value = boost::forward<T6> (other._m6._value); _m7._value = boost::forward<T7> (other._m7._value); _m8._value = boost::forward<T8> (other._m8._value); _m9._value = boost::forward<T9> (other._m9._value); _m10._value = boost::forward<T10> (other._m10._value); _m11._value = boost::forward<T11> (other._m11._value); _m12._value = boost::forward<T12> (other._m12._value);;
             return *this;
@@ -3428,7 +3528,9 @@ namespace hpx { namespace util
           , tuple&
         >::type
         operator=(BOOST_FWD_REF(UTuple) other)
-            
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = util::get< 6>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = util::get< 7>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = util::get< 8>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = util::get< 9>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = util::get< 10>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m11._value = util::get< 11>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m12._value = util::get< 12>(boost::forward<UTuple>(other)) ))
+            )
         {
             _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other)); _m6._value = util::get< 6>(boost::forward<UTuple>(other)); _m7._value = util::get< 7>(boost::forward<UTuple>(other)); _m8._value = util::get< 8>(boost::forward<UTuple>(other)); _m9._value = util::get< 9>(boost::forward<UTuple>(other)); _m10._value = util::get< 10>(boost::forward<UTuple>(other)); _m11._value = util::get< 11>(boost::forward<UTuple>(other)); _m12._value = util::get< 12>(boost::forward<UTuple>(other));;
             return *this;
@@ -3438,7 +3540,9 @@ namespace hpx { namespace util
         
         
         void swap(tuple& other)
-            
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m6._value , other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m7._value , other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m8._value , other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m9._value , other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m10._value , other._m10._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m11._value , other._m11._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m12._value , other._m12._value) ))
+            )
         {
             boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value ); boost::swap( _m6._value , other._m6._value ); boost::swap( _m7._value , other._m7._value ); boost::swap( _m8._value , other._m8._value ); boost::swap( _m9._value , other._m9._value ); boost::swap( _m10._value , other._m10._value ); boost::swap( _m11._value , other._m11._value ); boost::swap( _m12._value , other._m12._value );;
         }

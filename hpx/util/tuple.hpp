@@ -1124,7 +1124,7 @@ namespace hpx { namespace util
         );                                                                    \
         /**/
         void swap(tuple& other)
-            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+            BOOST_NOEXCEPT_IF(
                 true BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_SWAP_NOEXCEPT, _)
             )
         {
