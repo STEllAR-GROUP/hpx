@@ -132,9 +132,7 @@ namespace hpx { namespace lcos
         struct make_reduce_action
           : make_reduce_action_impl<
                 Action
-              , boost::fusion::result_of::size<
-                    typename Action::arguments_type
-                >::value
+              , util::tuple_size<typename Action::arguments_type>::value
             >
         {};
 
@@ -142,9 +140,7 @@ namespace hpx { namespace lcos
         struct make_reduce_action<reduce_with_index<Action> >
           : make_reduce_action_impl<
                 reduce_with_index<Action>
-              , boost::fusion::result_of::size<
-                    typename Action::arguments_type
-                >::value - 1
+              , util::tuple_size<typename Action::arguments_type>::value - 1
             >
         {};
 
