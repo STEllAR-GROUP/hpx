@@ -38,9 +38,10 @@ namespace hpx
     // MSVC complains about async_continue beeing ambiguous if it sees this
     // forward declaration
     template <typename F, typename Arg1, typename Arg2>
-    inline typename boost::lazy_enable_if_c<
-        !traits::is_action<typename util::decay<F>::type>::value
-      , bool
+    inline typename boost::lazy_enable_if<
+        traits::detail::is_callable_not_action<F
+          , BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2)>
+      , boost::mpl::identity<bool>
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2));
 

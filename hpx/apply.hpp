@@ -14,19 +14,17 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
-#include <hpx/traits/is_action.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/decay.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
+#include <hpx/traits/is_callable.hpp>
 
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/mpl/identity.hpp>
-#include <boost/utility/enable_if.hpp>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/preprocessed/apply.hpp>
@@ -62,9 +60,10 @@ namespace hpx
 
 #define HPX_UTIL_BOUND_FUNCTION_APPLY(Z, N, D)                                \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
-    typename boost::enable_if_c<                                              \
-        !traits::is_action<typename util::decay<F>::type>::value              \
-      , bool                                                                  \
+    typename boost::lazy_enable_if<                                           \
+        traits::detail::is_callable_not_action<F                              \
+          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>                      \
+      , boost::mpl::identity<bool>                                            \
     >::type                                                                   \
     apply(threads::executor& sched, BOOST_FWD_REF(F) f,                       \
         HPX_ENUM_FWD_ARGS(N, A, a))                                           \
@@ -74,9 +73,10 @@ namespace hpx
         return false;                                                         \
     }                                                                         \
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
-    typename boost::enable_if_c<                                              \
-        !traits::is_action<typename util::decay<F>::type>::value              \
-      , bool                                                                  \
+    typename boost::lazy_enable_if<                                           \
+        traits::detail::is_callable_not_action<F                              \
+          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>                      \
+      , boost::mpl::identity<bool>                                            \
     >::type                                                                   \
     apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                     \
     {                                                                         \
