@@ -37,6 +37,12 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
 
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40600
+#   define HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE BOOST_FORCEINLINE
+#else
+#   define HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE inline
+#endif
+
 namespace hpx { namespace util
 {
     namespace detail
@@ -174,7 +180,7 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename FR, typename C, typename T>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -184,7 +190,7 @@ namespace hpx { namespace util
         return util::void_guard<R>(), (boost::forward<T>(t).*f)();
     }
     template <typename R, typename FR, typename C, typename T>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -195,7 +201,7 @@ namespace hpx { namespace util
         return util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f)();
     }
     template <typename R, typename FR, typename C, typename T>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -205,7 +211,7 @@ namespace hpx { namespace util
         return util::void_guard<R>(), (boost::forward<T>(t).*f)();
     }
     template <typename R, typename FR, typename C, typename T>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -264,14 +270,14 @@ namespace hpx { namespace util
     }
 
     template <typename R, typename C, typename T>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(), BOOST_FWD_REF(T) t)
     {
         return util::invoke_r<R>(f, boost::forward<T>(t));
     }
     template <typename R, typename C, typename T>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)() const, BOOST_FWD_REF(T) t)
     {
@@ -326,6 +332,8 @@ namespace hpx { namespace util
 
 #endif
 
+#undef HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
+
 #else // !BOOST_PP_IS_ITERATING
 
 #define N BOOST_PP_ITERATION()
@@ -349,7 +357,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -364,7 +372,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -380,7 +388,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -395,7 +403,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -458,7 +466,7 @@ namespace hpx { namespace util
 #   if N < HPX_FUNCTION_ARGUMENT_LIMIT
     template <typename R, typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(BOOST_PP_ENUM_PARAMS(N, A))
       , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -471,7 +479,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, BOOST_PP_ENUM_PARAMS(N, typename A)
       , typename T, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(BOOST_PP_ENUM_PARAMS(N, A)) const
       , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))

@@ -25,7 +25,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0
       , typename T, typename Arg0>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -40,7 +40,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0
       , typename T, typename Arg0>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -56,7 +56,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0
       , typename T, typename Arg0>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -71,7 +71,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0
       , typename T, typename Arg0>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -128,7 +128,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0
       , typename T, typename Arg0>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0)
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0)
@@ -141,7 +141,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0
       , typename T, typename Arg0>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0) const
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0)
@@ -190,7 +190,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1
       , typename T, typename Arg0 , typename Arg1>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -205,7 +205,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1
       , typename T, typename Arg0 , typename Arg1>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -221,7 +221,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1
       , typename T, typename Arg0 , typename Arg1>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -236,7 +236,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1
       , typename T, typename Arg0 , typename Arg1>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -293,7 +293,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1
       , typename T, typename Arg0 , typename Arg1>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1)
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
@@ -306,7 +306,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1
       , typename T, typename Arg0 , typename Arg1>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1) const
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
@@ -355,7 +355,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2
       , typename T, typename Arg0 , typename Arg1 , typename Arg2>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -370,7 +370,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2
       , typename T, typename Arg0 , typename Arg1 , typename Arg2>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -386,7 +386,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2
       , typename T, typename Arg0 , typename Arg1 , typename Arg2>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -401,7 +401,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2
       , typename T, typename Arg0 , typename Arg1 , typename Arg2>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -458,7 +458,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1 , typename A2
       , typename T, typename Arg0 , typename Arg1 , typename Arg2>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1 , A2)
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
@@ -471,7 +471,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1 , typename A2
       , typename T, typename Arg0 , typename Arg1 , typename Arg2>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1 , A2) const
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
@@ -520,7 +520,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -535,7 +535,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -551,7 +551,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -566,7 +566,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -623,7 +623,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1 , typename A2 , typename A3
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1 , A2 , A3)
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
@@ -636,7 +636,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1 , typename A2 , typename A3
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1 , A2 , A3) const
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
@@ -685,7 +685,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -700,7 +700,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -716,7 +716,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -731,7 +731,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -788,7 +788,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1 , A2 , A3 , A4)
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
@@ -801,7 +801,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1 , A2 , A3 , A4) const
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
@@ -850,7 +850,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -865,7 +865,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -881,7 +881,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -896,7 +896,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -953,7 +953,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1 , A2 , A3 , A4 , A5)
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
@@ -966,7 +966,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1 , A2 , A3 , A4 , A5) const
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
@@ -1015,7 +1015,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -1030,7 +1030,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -1046,7 +1046,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::enable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -1061,7 +1061,7 @@ namespace hpx { namespace util
     template <typename R, typename FR
       , typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     typename boost::disable_if<
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
@@ -1118,7 +1118,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6)
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
@@ -1131,7 +1131,7 @@ namespace hpx { namespace util
     }
     template <typename R, typename C, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
       , typename T, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    BOOST_FORCEINLINE
+    HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(A0 , A1 , A2 , A3 , A4 , A5 , A6) const
       , BOOST_FWD_REF(T) t, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)

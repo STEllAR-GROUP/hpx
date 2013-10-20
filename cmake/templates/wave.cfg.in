@@ -82,6 +82,8 @@
 -NLBT_
 #
 -NHPX_UTIL_STRIP
+#
+-NHPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
 
 #
 # We inhibit expanding this because it otherwise generates some funky
