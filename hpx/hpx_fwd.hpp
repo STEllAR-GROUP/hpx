@@ -1075,8 +1075,7 @@ namespace hpx
     /// \param f  [in] The function to be registered to run by an HPX thread as
     ///           a pre-shutdown function.
     ///
-    /// \note If this function is called before the runtime system is
-    ///       initialized, or while the pre-shutdown functions are
+    /// \note If this function is called while the pre-shutdown functions are
     ///       being executed, or after that point, it will raise a invalid_status
     ///       exception.
     ///
@@ -1095,8 +1094,7 @@ namespace hpx
     /// \param f  [in] The function to be registered to run by an HPX thread as
     ///           a shutdown function.
     ///
-    /// \note If this function is called before the runtime system is
-    ///       initialized, or while the shutdown functions are
+    /// \note If this function is called while the shutdown functions are
     ///       being executed, or after that point, it will raise a invalid_status
     ///       exception.
     ///

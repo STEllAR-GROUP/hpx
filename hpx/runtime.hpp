@@ -59,7 +59,9 @@ namespace hpx
             state_startup = 2,
             state_pre_main = 3,
             state_running = 4,
-            state_stopped = 5
+            state_pre_shutdown = 5,
+            state_shutdown = 6,
+            state_stopped = 7
         };
 
         state get_state() const { return state_; }
@@ -346,7 +348,7 @@ namespace hpx
         void init_tss();
         void deinit_tss();
 
-        friend bool hpx::pre_main(runtime_mode);
+    public:
         void set_state(state s) { state_ = s; }
 
     protected:

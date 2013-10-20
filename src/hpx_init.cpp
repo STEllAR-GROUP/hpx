@@ -1297,6 +1297,7 @@ namespace hpx
 
         p->call_shutdown_functions(true);
         p->call_shutdown_functions(false);
+
         p->stop(shutdown_timeout, naming::invalid_id, true);
 
         return 0;

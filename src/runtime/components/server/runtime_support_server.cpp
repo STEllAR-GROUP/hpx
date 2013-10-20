@@ -683,12 +683,14 @@ namespace hpx { namespace components { namespace server
     void runtime_support::call_shutdown_functions(bool pre_shutdown)
     {
         if (pre_shutdown) {
+            get_runtime().set_state(runtime::state_pre_shutdown);
             BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, pre_shutdown_functions_)
             {
                 f();
             }
         }
         else {
+            get_runtime().set_state(runtime::state_shutdown);
             BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, shutdown_functions_)
             {
                 f();
