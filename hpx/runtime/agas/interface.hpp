@@ -247,6 +247,14 @@ HPX_API_EXPORT naming::gid_type get_next_id(
     std::size_t count
   , error_code& ec = throws
     );
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT void incref_apply(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , boost::int64_t credits
+  );
+
 }}
 
 #endif // HPX_A55506A4_4AC7_4FD0_AB0D_ED0D1368FCC5

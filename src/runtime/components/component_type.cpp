@@ -15,20 +15,23 @@ namespace hpx { namespace components
         // as the values defined in the component_type enumerator
         char const* const names[] =
         {
-            "component_runtime_support",
-            "component_memory",
-            "component_memory_block",
-            "component_base_lco",
-            "component_base_lco_with_value",
-            "component_barrier",
-            "component_promise",
-            "component_agas_locality_namespace",
-            "component_agas_primary_namespace",
-            "component_agas_component_namespace",
-            "component_agas_symbol_namespace",
+            "component_runtime_support",                        /*  0 */
+            "component_memory",                                 /*  1 */
+            "component_memory_block",                           /*  2 */
+            "component_base_lco",                               /*  3 */
+            "component_base_lco_with_value",                    /*  4 */
+            "component_barrier",                                /*  5 */
+            "component_promise",                                /*  6 */
+
+            "component_agas_locality_namespace",                /*  7 */
+            "component_agas_primary_namespace",                 /*  8 */
+            "component_agas_component_namespace",               /*  9 */
+            "component_agas_symbol_namespace",                  /* 10 */
+
 #if defined(HPX_HAVE_SODIUM)
-            "component_root_certificate_authority",
-            "component_subordinate_certificate_authority",
+            "signed_certificate_promise",                       /* 11 */
+            "component_root_certificate_authority",             /* 12 */
+            "component_subordinate_certificate_authority",      /* 13 */
 #endif
         };
     }

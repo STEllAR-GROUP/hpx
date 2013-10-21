@@ -27,9 +27,8 @@ namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 0>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 0
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -54,9 +53,8 @@ namespace hpx
     }
 
     template <typename Action, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 0>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 0
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -70,8 +68,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 0>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 0
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -87,8 +85,8 @@ namespace hpx
 
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 0>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 0
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -138,9 +136,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg),
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == N>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == N
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -165,9 +162,8 @@ namespace hpx
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == N>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == N
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -183,8 +179,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result, typename Arguments,
         typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == N>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == N
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -202,8 +198,8 @@ namespace hpx
 
     template <typename Component, typename Result, typename Arguments,
         typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == N>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == N
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type

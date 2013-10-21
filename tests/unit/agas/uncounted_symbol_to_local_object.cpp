@@ -53,7 +53,7 @@ void hpx_test_main(
     {
         /// AGAS reference-counting test 9 (from #126):
         ///
-        ///     Create a component locally, and register it's credit-stripped
+        ///     Create a component locally, and register its credit-stripped
         ///     raw gid with a symbolic name. Then, let all references to the
         ///     component go out of scope. The component should be destroyed.
         ///     Finally, unregister the symbolic name. Unregistering the

@@ -436,7 +436,7 @@ namespace hpx { namespace util
     // been listed in the node file.
     std::size_t batch_environment::retrieve_number_of_threads() const
     {
-        std::size_t result = 1;
+        std::size_t result(-1);
         char* slurm_cpus_per_task = std::getenv("SLURM_CPUS_PER_TASK");
         if(slurm_cpus_per_task)
         {
@@ -493,10 +493,28 @@ namespace hpx { namespace util
 
     // The number of localities is either one (if no PBS information
     // was found), or it is the same as the number of distinct node
-    // names listed in the node file.
+    // names listed in the node file. In case of SLURM we can extract
+    // the number of localities from the job environment.
     std::size_t batch_environment::retrieve_number_of_localities() const
     {
-        std::size_t result = nodes_.empty() ? 1 : nodes_.size();
+        std::size_t result(-1);
+        char* slurm_ntasks = std::getenv("SLURM_NTASKS");
+        if (slurm_ntasks) {
+            try {
+                std::string value(slurm_ntasks);
+                result = boost::lexical_cast<std::size_t>(value);
+                if (debug_) {
+                    std::cerr << "retrieve_number_of_localities (SLURM_NTASKS): "
+                              << result << std::endl;
+                }
+                return result;
+            }
+            catch (boost::bad_lexical_cast const&) {
+                ; // just ignore the error
+            }
+        }
+
+        result = nodes_.empty() ? 1 : nodes_.size();
         if (debug_) {
             std::cerr << "retrieve_number_of_localities: " << result
                 << std::endl;

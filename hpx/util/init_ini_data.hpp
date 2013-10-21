@@ -25,7 +25,7 @@ namespace hpx { namespace util
     //
     // returns true if at least one alternative location has been read
     // successfully
-    bool init_ini_data_base(section& ini, std::string const& hpx_ini_file = "");
+    bool init_ini_data_base(section& ini, std::string& hpx_ini_file);
 
     ///////////////////////////////////////////////////////////////////////////
     // global function to read component ini information

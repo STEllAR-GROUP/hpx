@@ -16,14 +16,14 @@ namespace hpx
         template <typename Action, typename Callback,
             typename Arg0>
         inline bool
-        apply_r_p_cb(naming::address& addr, naming::id_type const& gid,
+        apply_r_p_cb(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
             BOOST_FWD_REF(Arg0) arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 )));
             
@@ -60,7 +60,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -99,14 +99,14 @@ namespace hpx
             typename Arg0>
         inline bool
         apply_r_p_cb(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 )), cont);
             
@@ -144,7 +144,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -169,7 +169,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -304,14 +304,14 @@ namespace hpx
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1>
         inline bool
-        apply_r_p_cb(naming::address& addr, naming::id_type const& gid,
+        apply_r_p_cb(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )));
             
@@ -348,7 +348,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -387,14 +387,14 @@ namespace hpx
             typename Arg0 , typename Arg1>
         inline bool
         apply_r_p_cb(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )), cont);
             
@@ -432,7 +432,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -457,7 +457,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -592,14 +592,14 @@ namespace hpx
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1 , typename Arg2>
         inline bool
-        apply_r_p_cb(naming::address& addr, naming::id_type const& gid,
+        apply_r_p_cb(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )));
             
@@ -636,7 +636,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -675,14 +675,14 @@ namespace hpx
             typename Arg0 , typename Arg1 , typename Arg2>
         inline bool
         apply_r_p_cb(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )), cont);
             
@@ -720,7 +720,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -745,7 +745,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -880,14 +880,14 @@ namespace hpx
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         inline bool
-        apply_r_p_cb(naming::address& addr, naming::id_type const& gid,
+        apply_r_p_cb(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )));
             
@@ -924,7 +924,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -963,14 +963,14 @@ namespace hpx
             typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         inline bool
         apply_r_p_cb(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )), cont);
             
@@ -1008,7 +1008,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1033,7 +1033,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1168,14 +1168,14 @@ namespace hpx
         template <typename Action, typename Callback,
             typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         inline bool
-        apply_r_p_cb(naming::address& addr, naming::id_type const& gid,
+        apply_r_p_cb(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )));
             
@@ -1212,7 +1212,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1251,14 +1251,14 @@ namespace hpx
             typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         inline bool
         apply_r_p_cb(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority,
+            naming::id_type const& id, threads::thread_priority priority,
             BOOST_FWD_REF(Callback) cb, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
             actions::continuation_type cont(c);
             
             
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(
                     priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )), cont);
             
@@ -1296,7 +1296,7 @@ namespace hpx
         
         if (addr.locality_ == hpx::get_locality()) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
             cb(boost::system::error_code(), 0); 
             return result;
@@ -1321,7 +1321,7 @@ namespace hpx
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            bool result = applier::detail::apply_l_p<Action>(c, addr, priority,
+            bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
             cb(boost::system::error_code(), 0); 
             return result;

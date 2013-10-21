@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2012 Hartmut Kaiser
+//  Copyright (c) 1998-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,12 +24,13 @@
 #include <hpx/lcos/local/shared_mutex.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/one_size_heap_list_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
     template <typename Heap, typename Mutex = lcos::local::spinlock>
-    class one_size_heap_list
+    class one_size_heap_list : public one_size_heap_list_base
     {
     public:
         typedef Heap heap_type;
@@ -100,7 +101,7 @@ namespace hpx { namespace util
         }
 
         // operations
-        value_type* alloc(std::size_t count = 1)
+        void* alloc(std::size_t count = 1)
         {
             unique_lock_type guard(mtx_);
 
@@ -297,7 +298,7 @@ namespace hpx { namespace util
         bool did_alloc(void* p) const
         {
             unique_lock_type ul(mtx_);
-            for (iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
+            for (const_iterator it = heap_list_.begin(); it != heap_list_.end(); ++it)
             {
                 typename list_type::value_type heap = *it;
                 bool did_allocate = false;
@@ -321,7 +322,7 @@ namespace hpx { namespace util
         }
 
     protected:
-        mutex_type mtx_;
+        mutable mutex_type mtx_;
         list_type heap_list_;
 
     private:

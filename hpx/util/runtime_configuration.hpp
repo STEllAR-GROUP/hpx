@@ -51,8 +51,8 @@ namespace hpx { namespace util
         void set_num_localities(boost::uint32_t);
 
         // sequence number of first usable pu
-        boost::uint32_t get_first_pu() const;
-        void set_first_pu(boost::uint32_t);
+        boost::uint32_t get_used_cores() const;
+        void set_used_cores(boost::uint32_t);
 
         // Get the AGAS locality to use
         naming::locality get_agas_locality() const;
@@ -139,7 +139,7 @@ namespace hpx { namespace util
 #endif
 
         void pre_initialize_ini();
-        void post_initialize_ini(std::string const& hpx_ini_file,
+        void post_initialize_ini(std::string& hpx_ini_file,
             std::vector<std::string> const& cmdline_ini_defs);
 
         void reconfigure();

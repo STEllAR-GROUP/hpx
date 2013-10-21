@@ -13,9 +13,8 @@ namespace hpx
     
     template <typename Action, typename Arg0,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 1>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 1,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
@@ -32,8 +31,9 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 1>, bool
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 1,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
@@ -50,9 +50,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 2>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 2,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1,
@@ -69,8 +68,9 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 2>, bool
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 2,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
@@ -87,9 +87,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 3>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 3,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2,
@@ -106,8 +105,9 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 3>, bool
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 3,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
@@ -124,9 +124,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 4>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 4,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3,
@@ -143,8 +142,9 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 4>, bool
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 4,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
@@ -161,9 +161,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 5>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 5,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4,
@@ -180,8 +179,9 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 5>, bool
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 5,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
@@ -198,9 +198,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 6>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 6,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5,
@@ -217,8 +216,9 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 6>, bool
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 6,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
@@ -235,9 +235,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 7>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 7,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6,
@@ -254,8 +253,9 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 7>, bool
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 7,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
@@ -272,9 +272,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 8>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 8,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7,
@@ -291,8 +290,9 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 8>, bool
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 8,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
@@ -309,9 +309,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 9>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 9,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8,
@@ -328,8 +327,9 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 9>, bool
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 9,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<
@@ -346,9 +346,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 10>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 10,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9,
@@ -365,8 +364,9 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 10>, bool
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 10,
+        bool
     >::type
     apply_continue(
         hpx::actions::action<

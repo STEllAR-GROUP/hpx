@@ -57,7 +57,7 @@ namespace hpx { namespace components { namespace server
             count = localities.size();
 
         // retrieve the current number of instances of the given component
-        std::vector<lcos::future<long> > lazy_counts;
+        std::vector<lcos::future<boost::int32_t> > lazy_counts;
         BOOST_FOREACH(naming::id_type const& id, localities)
         {
             lazy_counts.push_back(
@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace server
 
         std::vector<long> counts;
         counts.reserve(lazy_counts.size());
-        BOOST_FOREACH(lcos::future<long> const& f, lazy_counts)
+        BOOST_FOREACH(lcos::future<boost::int32_t> const& f, lazy_counts)
         {
             counts.push_back(f.get());
             maxcount = (std::max)(maxcount, counts.back());

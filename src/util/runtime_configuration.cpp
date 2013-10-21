@@ -246,7 +246,7 @@ namespace hpx { namespace util
     }
 
     void runtime_configuration::post_initialize_ini(
-        std::string const& hpx_ini_file,
+        std::string& hpx_ini_file,
         std::vector<std::string> const& cmdline_ini_defs)
     {
         // add explicit configuration information if its provided
@@ -596,25 +596,25 @@ namespace hpx { namespace util
         }
     }
 
-    boost::uint32_t runtime_configuration::get_first_pu() const
+    boost::uint32_t runtime_configuration::get_used_cores() const
     {
         if (has_section("hpx")) {
             util::section const* sec = get_section("hpx");
             if (NULL != sec) {
                 return boost::lexical_cast<boost::uint32_t>(
-                    sec->get_entry("first_pu", 0));
+                    sec->get_entry("used_cores", 0));
             }
         }
         return 0;
     }
 
-    void runtime_configuration::set_first_pu(boost::uint32_t first_pu)
+    void runtime_configuration::set_used_cores(boost::uint32_t used_cores)
     {
         if (has_section("hpx")) {
             util::section* sec = get_section("hpx");
             if (NULL != sec) {
-                sec->add_entry("first_pu",
-                    boost::lexical_cast<std::string>(first_pu));
+                sec->add_entry("used_cores",
+                    boost::lexical_cast<std::string>(used_cores));
             }
         }
     }

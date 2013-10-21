@@ -41,6 +41,17 @@ namespace hpx { namespace threads
           , error_code& ec = throws
             ) const;
 
+        std::size_t get_pu_number(
+            std::size_t num_thread
+          , error_code& ec = throws
+            ) const;
+
+        std::size_t get_pu_number(
+            std::size_t num_core
+          , std::size_t num_pu
+          , error_code& ec = throws
+            ) const;
+
         mask_cref_type get_machine_affinity_mask(
             error_code& ec = throws
             ) const;
@@ -182,6 +193,7 @@ namespace hpx { namespace threads
         void init_num_of_pus();
 
         hwloc_topology_t topo;
+
         // We need to define a constant pu offset.
         // This is mainly to skip the first Core on the Xeon Phi
         // which is reserved for OS related tasks
@@ -201,6 +213,7 @@ namespace hpx { namespace threads
         std::vector<std::size_t> socket_numbers_;
         std::vector<std::size_t> numa_node_numbers_;
         std::vector<std::size_t> core_numbers_;
+        std::vector<std::size_t> pu_numbers_;
 
         mask_type machine_affinity_mask_;
         std::vector<mask_type> socket_affinity_masks_;

@@ -8,9 +8,11 @@
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/one_size_heap_list_base.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -58,7 +60,9 @@ namespace hpx
             state_startup = 2,
             state_pre_main = 3,
             state_running = 4,
-            state_stopped = 5
+            state_pre_shutdown = 5,
+            state_shutdown = 6,
+            state_stopped = 7
         };
 
         state get_state() const { return state_; }
@@ -72,7 +76,9 @@ namespace hpx
             boost::uint32_t, std::string const&);
 
         /// construct a new instance of a runtime
-        runtime(util::runtime_configuration const& rtcfg);
+        runtime(
+            util::runtime_configuration const& rtcfg
+          , threads::policies::init_affinity_data const& affinity_init);
 
         virtual ~runtime();
 
@@ -163,6 +169,8 @@ namespace hpx
 
         boost::uint32_t assign_cores(std::string const& locality_basename,
             boost::uint32_t num_threads);
+
+        boost::uint32_t assign_cores();
 
         /// \brief Install all performance counters related to this runtime
         ///        instance
@@ -274,15 +282,17 @@ namespace hpx
         ///
         virtual bool unregister_thread() = 0;
 
+        /// This function creates anew base_lco_factory (if none is available
+        /// for the given type yet), registers this factory with the
+        /// runtime_support object and asks the factory for it's heap object
+        // which can be used to create new promises of the given type.
+        boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+            components::component_type type);
+
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(
             boost::shared_ptr<util::query_counters> const& active_counters);
-        /*
-        {
-            active_counters_ = active_counters;
-        }
-        */
 
         void start_active_counters(error_code& ec = throws);
         void stop_active_counters(error_code& ec = throws);
@@ -341,7 +351,7 @@ namespace hpx
         void init_tss();
         void deinit_tss();
 
-        friend bool hpx::pre_main(runtime_mode);
+    public:
         void set_state(state s) { state_ = s; }
 
     protected:
@@ -363,6 +373,7 @@ namespace hpx
         // registered with the library
         boost::scoped_ptr<util::thread_mapper> thread_support_;
 
+        threads::policies::init_affinity_data affinity_init_;
         threads::topology& topology_;
 
         // locality basename -> used cores

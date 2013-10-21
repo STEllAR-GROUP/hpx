@@ -147,6 +147,13 @@ namespace hpx { namespace threads
     {
         virtual ~topology() {}
 
+
+        virtual std::size_t get_pu_number(
+            std::size_t num_thread
+          , error_code& ec = throws
+            ) const = 0;
+
+
         /// \brief Return the NUMA node number of the processing unit the
         ///        given thread is running on.
         ///
@@ -270,6 +277,9 @@ namespace hpx { namespace threads
 
         /// \brief Return number of processing units in given core
         virtual std::size_t get_number_of_core_pus(std::size_t core) const = 0;
+
+        virtual std::size_t get_core_number(std::size_t num_thread,
+            error_code& ec = throws) const = 0;
     };
 
     HPX_API_EXPORT std::size_t hardware_concurrency();
@@ -348,7 +358,11 @@ namespace hpx { namespace threads
     }
 
     HPX_API_EXPORT void parse_affinity_options(std::string const& spec,
-        std::vector<mask_type>& affinities, error_code& ec = throws);
+        std::vector<mask_type>& affinities,
+        std::size_t used_cores,
+        std::size_t max_cores,
+        std::vector<std::size_t>& num_pus,
+        error_code& ec = throws);
 
     HPX_API_EXPORT void print_affinity_options(std::ostream& s,
         std::size_t num_threads, std::string const& affinity_options,

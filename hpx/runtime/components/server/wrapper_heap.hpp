@@ -244,7 +244,8 @@ namespace hpx { namespace components { namespace detail
         ///
         /// \note  The pointer given by the parameter \a p must have been
         ///        allocated by this instance of a \a wrapper_heap
-        naming::gid_type get_gid(util::unique_id_ranges& ids, void* p)
+        naming::gid_type get_gid(util::unique_id_ranges& ids, void* p,
+            components::component_type type)
         {
             util::itt::heap_internal_access hia; HPX_UNUSED(hia);
 
@@ -265,9 +266,7 @@ namespace hpx { namespace components { namespace detail
                     // register the global ids and the base address of this heap
                     // with the AGAS
                     if (!applier::bind_range(base_gid, step_,
-                            naming::address(hpx::get_locality(),
-                                components::get_component_type<typename value_type::type_holder>(),
-                                addr),
+                            naming::address(hpx::get_locality(), type, addr),
                             sizeof(value_type)))
                     {
                         return naming::invalid_gid;

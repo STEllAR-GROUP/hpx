@@ -434,10 +434,12 @@ namespace hpx
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime::runtime(util::runtime_configuration const& rtcfg)
+    runtime::runtime(util::runtime_configuration const& rtcfg
+          , threads::policies::init_affinity_data const& affinity_init)
       : ini_(rtcfg),
         instance_number_(++instance_number_counter_),
         thread_support_(new util::thread_mapper),
+        affinity_init_(affinity_init),
         topology_(threads::create_topology()),
         state_(state_invalid),
         memory_(new components::server::memory),
@@ -711,7 +713,7 @@ namespace hpx
     }
 
     boost::uint32_t runtime::assign_cores(std::string const& locality_basename,
-        boost::uint32_t num_threads)
+        boost::uint32_t cores_needed)
     {
         boost::mutex::scoped_lock l(mtx_);
 
@@ -719,13 +721,31 @@ namespace hpx
         if (it == used_cores_map_.end())
         {
             used_cores_map_.insert(
-                used_cores_map_type::value_type(locality_basename, num_threads));
+                used_cores_map_type::value_type(locality_basename, cores_needed));
             return 0;
         }
 
         boost::uint32_t current = (*it).second;
-        (*it).second += num_threads;
+        (*it).second += cores_needed;
         return current;
+    }
+
+    boost::uint32_t runtime::assign_cores()
+    {
+        // initialize thread affinity settings in the scheduler
+        if (affinity_init_.used_cores_ == 0) {
+            // correct used_cores from config data if appropriate
+            affinity_init_.used_cores_ = this->get_config().get_used_cores();
+        }
+
+        return static_cast<boost::uint32_t>(
+            this->get_thread_manager().init(affinity_init_));
+    }
+
+    boost::shared_ptr<util::one_size_heap_list_base> runtime::get_promise_heap(
+        components::component_type type)
+    {
+        return runtime_support_->get_promise_heap(type);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1101,6 +1121,15 @@ namespace hpx { namespace threads
         return get_runtime().get_config().get_stack_size(stacksize);
     }
 }}
+
+namespace hpx { namespace components { namespace detail
+{
+    boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+        components::component_type type)
+    {
+        return get_runtime().get_promise_heap(type);
+    }
+}}}
 
 #if defined(HPX_HAVE_SECURITY)
 namespace hpx

@@ -159,7 +159,7 @@ namespace hpx { namespace components { namespace stubs
         //naming::resolver_client& agas = appl.get_agas_client();
         if (/*agas.is_bootstrap() || */agas::is_local_address(gid)) {
             // apply locally
-            applier::detail::apply_helper<action_type>::call(
+            applier::detail::apply_helper<action_type>::call(naming::invalid_id,
                 applier::get_applier().get_runtime_support_raw_gid().get_lsb(),
                 threads::thread_priority_default,
                 util::forward_as_tuple(type, gid, count));
@@ -336,7 +336,7 @@ namespace hpx { namespace components { namespace stubs
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve instance count for given component type
-    lcos::future<long> runtime_support::get_instance_count_async(
+    lcos::future<boost::int32_t> runtime_support::get_instance_count_async(
         naming::id_type const& targetgid, components::component_type type)
     {
         // Create a future, execute the required action,
@@ -347,7 +347,7 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(targetgid, type);
     }
 
-    long runtime_support::get_instance_count(naming::id_type const& targetgid,
+    boost::int32_t runtime_support::get_instance_count(naming::id_type const& targetgid,
         components::component_type type)
     {
         // The following get yields control while the action above

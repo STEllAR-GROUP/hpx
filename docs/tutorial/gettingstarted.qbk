@@ -505,7 +505,7 @@ required libraries via MacPorts:
             $(pwd)/../hpx
    make -j8
    make -j8 install
-   export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$HPX_DIR/lib/hpx
+   export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$HPX_ROOT/lib/hpx
    popd
 ``
 

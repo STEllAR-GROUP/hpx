@@ -40,7 +40,7 @@ def kill_process_tree(parent_pid, signal=SIGKILL):
     cmd = ""
 
     if OS_MAC:
-      cmd = "ps -o pid,ppid -ax | grep %d | cut -f 1 -d \" \" | tail -1" % pid
+      cmd = "ps -o pid,ppid -ax | egrep '%d$' | awk '{print $1}'" % pid
     else: 
       cmd = "ps -o pid --ppid %d --noheaders" % pid
 

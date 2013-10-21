@@ -67,7 +67,7 @@
 [def __boost_wave__             [@http://www.boost.org/doc/libs/release/libs/wave/doc/wave_driver.html Boost Wave]]
 
 [def __boost_program_options__  [@http://www.boost.org/doc/html/program_options.html Boost.Program Options]]
-[def __boost_atomic__           [@http://www.chaoticmind.net/~hcb/projects/boost.atomic/doc/index.html Boost.Atomic]]
+[def __boost_atomic__           [@http://www.boost.org/doc/libs/release/doc/html/atomic.html Boost.Atomic]]
 [def __boost_serialization__    [@http://www.boost.org/doc/libs/release/libs/serialization/doc/index.html Boost.Serialization]]
 
 [def __hwloc_downloads__        [@http://http://www.open-mpi.org/software/hwloc/v1.7/ hwloc Downloads]]

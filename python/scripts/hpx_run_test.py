@@ -82,6 +82,11 @@ if __name__ == '__main__':
                     dest="suffix", default="_test",
                     help="Suffix added to test names [default: %default]")
 
+  parser.add_option("--launcher",
+                    action="store", type="string",
+                    dest="launcher", default="",
+                    help="Program used to launch the test [default: %default]")
+
   parser.add_option("--args",
                     action="store", type="string",
                     dest="args", default="",
@@ -110,7 +115,10 @@ if __name__ == '__main__':
   (options, files) = parser.parse_args()
 
   if 'HPX_TEST_ARGUMENTS' in os.environ: 
-    options.args = options.args + os.environ['HPX_TEST_ARGUMENTS']
+    options.args += os.environ['HPX_TEST_ARGUMENTS']
+
+  if 'HPX_TEST_LAUNCHER' in os.environ: 
+    options.launcher += os.environ['HPX_TEST_LAUNCHER']
 
   if not (lambda x: "always" == x or "never" == x or "fail" == x)(options.log):
     print "Error: --log=" + quote_options([options.log]) + " is invalid\n"
@@ -159,10 +167,15 @@ if __name__ == '__main__':
       continue
 
     for node in range(nodes):
-      cmd = [ name
-            , '-t' + str(threads_per_node)
-            , '-l' + str(nodes)
-            , '-' + str(node)]
+      cmd = []
+
+      if options.launcher:
+        cmd = [options.launcher]
+
+      cmd += [ name
+             , '-t' + str(threads_per_node)
+             , '-l' + str(nodes)
+             , '-' + str(node)]
 
       if options.args:
         cmd += [options.args]

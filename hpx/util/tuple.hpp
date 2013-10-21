@@ -90,6 +90,8 @@ namespace hpx { namespace util
         template <typename T>
         struct tuple_member
         {
+            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
+
         public: // exposition-only
             T _value;
 
@@ -115,6 +117,8 @@ namespace hpx { namespace util
         template <typename T>
         struct tuple_member<T&>
         {
+            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
+
         public: // exposition-only
             T& _value;
 
@@ -132,6 +136,8 @@ namespace hpx { namespace util
         template <typename T>
         struct tuple_member<BOOST_RV_REF(T)>
         {
+            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
+
         public: // exposition-only
             BOOST_RV_REF(T) _value;
 
@@ -896,6 +902,8 @@ namespace hpx { namespace util
     class tuple
 #   endif
     {
+        BOOST_COPYABLE_AND_MOVABLE(tuple);
+
     public: // exposition-only
 #       define HPX_UTIL_TUPLE_MEMBER(Z, N, D)                                 \
         detail::tuple_member<BOOST_PP_CAT(T, N)> BOOST_PP_CAT(_m, N);         \
@@ -962,6 +970,10 @@ namespace hpx { namespace util
              && !boost::is_base_of<
                     tuple, typename remove_reference<U0>::type
                  >::value
+             && !detail::are_tuples_compatible<
+                    tuple
+                  , typename add_rvalue_reference<U0>::type
+                >::value
 #       endif
             >::type* = 0
         ) : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_FORWARD_CONSTRUCT, _)
@@ -1112,7 +1124,7 @@ namespace hpx { namespace util
         );                                                                    \
         /**/
         void swap(tuple& other)
-            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+            BOOST_NOEXCEPT_IF(
                 true BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_SWAP_NOEXCEPT, _)
             )
         {

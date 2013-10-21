@@ -67,7 +67,16 @@ void hpx_test_main(
         Client object(find_here());
 
         id_type g0 = split_credits(object.get_gid());
+
+        HPX_TEST(HPX_INITIAL_GLOBALCREDIT % 2);     // HPX_INITIAL_GLOBALCREDIT should be odd
+
+        HPX_TEST_EQ(get_credit(object.get_gid()), (HPX_INITIAL_GLOBALCREDIT+1)/2);
+        HPX_TEST_EQ(get_credit(g0), HPX_INITIAL_GLOBALCREDIT/2);
+
         id_type g1 = split_credits(object.get_gid());
+
+        HPX_TEST_EQ(get_credit(object.get_gid()), (HPX_INITIAL_GLOBALCREDIT+1)/4);
+        HPX_TEST_EQ(get_credit(g1), (HPX_INITIAL_GLOBALCREDIT+1)/4);
 
         cout << "  " << object.get_gid() << " : "
                      << get_credit(object.get_gid()) << "\n"

@@ -339,8 +339,8 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     /// Return priority of the given thread
     ///
-    /// \param id         [in] The thread id of the thread which should be
-    ///                   interrupted.
+    /// \param id         [in] The thread id of the thread whose priority
+    ///                   is queried.
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
@@ -691,6 +691,18 @@ namespace hpx { namespace applier
         std::size_t os_thread = std::size_t(-1),
         threads::thread_stacksize stacksize = threads::thread_stacksize_default,
         error_code& ec = throws);
+
+#if !defined(DOXYGEN)
+    HPX_API_EXPORT void register_work_plain(
+        BOOST_RV_REF(HPX_STD_FUNCTION<threads::thread_function_type>) func,
+        naming::id_type const& target, char const* description = 0,
+        naming::address::address_type lva = 0,
+        threads::thread_state_enum initial_state = threads::pending,
+        threads::thread_priority priority = threads::thread_priority_normal,
+        std::size_t os_thread = std::size_t(-1),
+        threads::thread_stacksize stacksize = threads::thread_stacksize_default,
+        error_code& ec = throws);
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new work item using the given function as the

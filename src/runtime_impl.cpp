@@ -48,6 +48,9 @@ namespace hpx {
     std::list<HPX_STD_FUNCTION<void()> > global_pre_startup_functions;
     std::list<HPX_STD_FUNCTION<void()> > global_startup_functions;
 
+    std::list<HPX_STD_FUNCTION<void()> > global_pre_shutdown_functions;
+    std::list<HPX_STD_FUNCTION<void()> > global_shutdown_functions;
+
     ///////////////////////////////////////////////////////////////////////////
     void register_startup_function(startup_function_type const& f)
     {
@@ -72,7 +75,7 @@ namespace hpx {
         if (NULL != rt) {
             if (rt->get_state() >= runtime::state_pre_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
-                    "register_startup_function",
+                    "register_pre_startup_function",
                     "Too late to register a new pre-startup function.");
                 return;
             }
@@ -86,15 +89,35 @@ namespace hpx {
     void register_pre_shutdown_function(shutdown_function_type const& f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt)
+        if (NULL != rt) {
+            if (rt->get_state() >= runtime::state_pre_shutdown) {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "register_pre_shutdown_function",
+                    "Too late to register a new pre-shutdown function.");
+                return;
+            }
             rt->add_pre_shutdown_function(f);
+        }
+        else {
+            global_pre_shutdown_functions.push_back(f);
+        }
     }
 
     void register_shutdown_function(shutdown_function_type const& f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt)
+        if (NULL != rt) {
+            if (rt->get_state() >= runtime::state_shutdown) {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "register_shutdown_function",
+                    "Too late to register a new shutdown function.");
+                return;
+            }
             rt->add_shutdown_function(f);
+        }
+        else {
+            global_shutdown_functions.push_back(f);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -104,7 +127,7 @@ namespace hpx {
             runtime_mode locality_mode, std::size_t num_threads,
             init_scheduler_type const& init,
             threads::policies::init_affinity_data const& init_affinity)
-      : runtime(rtcfg),
+      : runtime(rtcfg, init_affinity),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
             boost::bind(&runtime_impl::init_tss, This(), "main-thread", ::_1, ::_2, false),
@@ -145,17 +168,6 @@ namespace hpx {
         // once all has been initialized, finalize security data for bootstrap
         this->init_security();
 #endif
-        // initialize thread affinity settings in the scheduler
-        if (init_affinity.pu_offset_ == 0) {
-            // correct pu_offset from config data if appropriate
-            threads::policies::init_affinity_data init = init_affinity;
-            init.pu_offset_ = this->get_config().get_first_pu();
-            thread_manager_->init(init);
-        }
-        else {
-            thread_manager_->init(init_affinity);
-        }
-
         // now, launch AGAS and register all nodes, launch all other components
         agas_client_.initialize(*parcel_port_);
         parcel_handler_.initialize(parcel_port_);
@@ -175,6 +187,18 @@ namespace hpx {
         BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_startup_functions)
         {
             add_startup_function(f);
+        }
+        global_startup_functions.clear();
+
+        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_pre_shutdown_functions)
+        {
+            add_pre_shutdown_function(f);
+        }
+        global_startup_functions.clear();
+
+        BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_shutdown_functions)
+        {
+            add_shutdown_function(f);
         }
         global_startup_functions.clear();
 

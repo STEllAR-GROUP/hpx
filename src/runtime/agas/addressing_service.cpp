@@ -308,12 +308,12 @@ void addressing_service::launch_bootstrap(
 
     runtime& rt = get_runtime();
 
-    // store number of first usable pu
-    boost::uint32_t num_cores = boost::lexical_cast<boost::uint32_t>(
-        rt.get_config().get_entry("hpx.cores", boost::uint32_t(1)));
-    boost::uint32_t first_pu = rt.assign_cores(
-        pp.get_locality_name(), detail::get_number_of_pus_in_cores(num_cores));
-    rt.get_config().set_first_pu(first_pu);
+    // store number of cores used by other processes
+    boost::uint32_t cores_needed = rt.assign_cores();
+    boost::uint32_t used_cores = rt.assign_cores(
+        pp.get_locality_name(), cores_needed);
+    rt.get_config().set_used_cores(used_cores);
+    rt.assign_cores();
 
     naming::locality const ep = ini_.get_agas_locality();
     naming::gid_type const here =
@@ -1535,10 +1535,10 @@ void addressing_service::route(
 {
     // compose request
     request req(primary_ns_route, p);
-    naming::gid_type const* gids = p.get_destinations();
+    naming::id_type const* ids = p.get_destinations();
 
     naming::id_type const target(
-        stubs::primary_namespace::get_service_instance(gids[0])
+        stubs::primary_namespace::get_service_instance(ids[0])
       , naming::id_type::unmanaged);
 
     typedef server::primary_namespace::service_action action_type;
@@ -1548,7 +1548,8 @@ void addressing_service::route(
     if (is_local_address(target.get_gid(), addr))
     {
         // route through the local AGAS service instance
-        applier::detail::apply_l_p<action_type>(addr, action_priority_, req);
+        applier::detail::apply_l_p<action_type>(
+            target, addr, action_priority_, req);
         f(boost::system::error_code(), 0);      // invoke callback
         return;
     }
@@ -1557,12 +1558,14 @@ void addressing_service::route(
     // a service instance
     if (!addr)
     {
-        if (stubs::primary_namespace::is_service_instance(gids[0]) ||
-            stubs::symbol_namespace::is_service_instance(gids[0]))
+        if (stubs::primary_namespace::is_service_instance(ids[0]) ||
+            stubs::symbol_namespace::is_service_instance(ids[0]))
         {
             // construct wrapper parcel
-            parcelset::parcel route_p(bootstrap_primary_namespace_gid()
-              , primary_ns_addr_
+            naming::id_type const route_target(
+                bootstrap_primary_namespace_gid(), naming::id_type::unmanaged);
+
+            parcelset::parcel route_p(route_target, primary_ns_addr_
               , new hpx::actions::transfer_action<action_type>(action_priority_, req));
 
             // send to the main AGAS instance for routing

@@ -56,7 +56,7 @@ namespace hpx { namespace lcos
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        void finalize();
+        virtual void finalize();
 
         /// The \a function set_event_nonvirt is called whenever a
         /// \a set_event_action is applied on a instance of a LCO. This function

@@ -13,9 +13,8 @@ namespace hpx
     
     template <typename Action, typename Arg0,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 1>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 1
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -38,9 +37,8 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 1>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 1
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -55,8 +53,8 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 1>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 1
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -73,8 +71,8 @@ namespace hpx
     }
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 1>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 1
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -95,9 +93,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 2>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 2
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -120,9 +117,8 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 2>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 2
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -137,8 +133,8 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 2>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 2
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -155,8 +151,8 @@ namespace hpx
     }
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 2>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 2
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -177,9 +173,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 3>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 3
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -202,9 +197,8 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 3>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 3
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -219,8 +213,8 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 3>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 3
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -237,8 +231,8 @@ namespace hpx
     }
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 3>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 3
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -259,9 +253,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 4>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 4
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -284,9 +277,8 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 4>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 4
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -301,8 +293,8 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 4>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 4
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -319,8 +311,8 @@ namespace hpx
     }
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 4>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 4
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -341,9 +333,8 @@ namespace hpx
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4,
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 5>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 5
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -366,9 +357,8 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 5>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 5
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
@@ -383,8 +373,8 @@ namespace hpx
     
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 5>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 5
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
@@ -401,8 +391,8 @@ namespace hpx
     }
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 5>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 5
       , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type

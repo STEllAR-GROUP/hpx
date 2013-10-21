@@ -38,8 +38,6 @@ using hpx::applier::get_applier;
 
 using hpx::agas::garbage_collect;
 
-using hpx::actions::plain_action3;
-
 using hpx::async;
 
 using hpx::test::simple_refcnt_monitor;
@@ -57,16 +55,7 @@ void split(
   , boost::uint16_t old_credit
     );
 
-typedef plain_action3<
-    // Arguments.
-    id_type const&
-  , id_type const&
-  , boost::uint16_t
-    // Function.
-  , split
-> split_action;
-
-HPX_REGISTER_PLAIN_ACTION(split_action);
+HPX_PLAIN_ACTION(split);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions.

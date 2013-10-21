@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
@@ -158,7 +159,7 @@ namespace hpx { namespace lcos { namespace detail
                 }
                 started_ = true;
             }
-            
+
             threads::thread_state_enum (continuation_base::*async_impl_ptr)(
                 lcos::future<Result>&
             ) = &continuation_base::async_impl<Result>;
@@ -288,21 +289,17 @@ namespace hpx { namespace lcos { namespace local
                 ContResult, Result
             >::result_type result_type;
 
-            F f_;
-
-            continuation_object(F const& f)
-              : f_(f)
-            {}
+            typename util::decay<F>::type f_;
 
             template <typename Func>
-            continuation_object(BOOST_FWD_REF(Func) f)
+            explicit continuation_object(BOOST_FWD_REF(Func) f)
               : f_(boost::forward<Func>(f))
             {}
 
             void do_run(lcos::future<Result>& f)
             {
                 try {
-                    this->set_data(f_(f));
+                    this->set_data(boost::move(f_)(f));
                 }
                 catch(...) {
                     this->set_exception(boost::current_exception());
@@ -318,21 +315,17 @@ namespace hpx { namespace lcos { namespace local
             typedef typename lcos::detail::continuation<
                 void, Result>::result_type result_type;
 
-            F f_;
-
-            continuation_object(F const& f)
-              : f_(f)
-            {}
+            typename util::decay<F>::type f_;
 
             template <typename Func>
-            continuation_object(BOOST_FWD_REF(Func) f)
+            explicit continuation_object(BOOST_FWD_REF(Func) f)
               : f_(boost::forward<Func>(f))
             {}
 
             void do_run(lcos::future<Result>& f)
             {
                 try {
-                    f_(f);
+                    boost::move(f_)(f);
                     this->set_data(result_type());
                 }
                 catch(...) {
@@ -507,9 +500,7 @@ namespace hpx { namespace lcos
     // attach a local continuation to this future instance
     template <typename Result>
     template <typename F>
-    inline typename detail::then_future_result<
-        typename boost::result_of<F(future<Result>&)>::type
-    >::type
+    inline typename detail::future_then_result<future<Result>, F>::type
     future<Result>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future&)>::type result_type;
@@ -525,7 +516,7 @@ namespace hpx { namespace lcos
         void (cont_impl_type::*cb)(lcos::future<Result>&);
         if (policy & launch::sync)
             cb = &cont_impl_type::template run<Result>;
-        else 
+        else
             cb = &cont_impl_type::template async<Result>;
 
         future_data_->set_on_completed(util::bind(cb, p, *this));
@@ -535,9 +526,7 @@ namespace hpx { namespace lcos
 
     template <typename Result>
     template <typename F>
-    inline typename detail::then_future_result<
-        typename boost::result_of<F(future<Result>&)>::type
-    >::type
+    inline typename detail::future_then_result<future<Result>, F>::type
     future<Result>::then(BOOST_FWD_REF(F) f)
     {
         return then(launch::all, boost::forward<F>(f));
@@ -545,9 +534,7 @@ namespace hpx { namespace lcos
 
     template <typename Result>
     template <typename F>
-    inline typename detail::then_future_result<
-        typename boost::result_of<F(future<Result>&)>::type
-    >::type
+    inline typename detail::future_then_result<future<Result>, F>::type
     future<Result>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future&)>::type result_type;
@@ -570,9 +557,7 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    inline typename detail::then_future_result<
-        typename boost::result_of<F(future<void>&)>::type
-    >::type
+    inline typename detail::future_then_result<future<void>, F>::type
     future<void>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future&)>::type result_type;
@@ -588,7 +573,7 @@ namespace hpx { namespace lcos
         void (cont_impl_type::*cb)(lcos::future<void>&);
         if (policy & launch::sync)
             cb = &cont_impl_type::template run<void>;
-        else 
+        else
             cb = &cont_impl_type::template async<void>;
 
         future_data_->set_on_completed(util::bind(cb, p, *this));
@@ -597,18 +582,14 @@ namespace hpx { namespace lcos
     }
 
     template <typename F>
-    inline typename detail::then_future_result<
-        typename boost::result_of<F(future<void>&)>::type
-    >::type
+    inline typename detail::future_then_result<future<void>, F>::type
     future<void>::then(BOOST_FWD_REF(F) f)
     {
         return then(launch::all, boost::forward<F>(f));
     }
 
     template <typename F>
-    inline typename detail::then_future_result<
-        typename boost::result_of<F(future<void>&)>::type
-    >::type
+    inline typename detail::future_then_result<future<void>, F>::type
     future<void>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F(future&)>::type result_type;
@@ -686,7 +667,7 @@ namespace hpx { namespace lcos
         try {
             // if we get here, this future is ready
             using util::placeholders::_1;
-            
+
             Result inner = get();
             inner.then(util::bind(inner_ready, *this, _1, boost::move(p)));
         }

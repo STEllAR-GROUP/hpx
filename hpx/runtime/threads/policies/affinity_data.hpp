@@ -16,15 +16,17 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     struct init_affinity_data
     {
-        init_affinity_data(std::size_t pu_offset = 0, std::size_t pu_step = 1,
-                std::string const& affinity = "pu",
+        init_affinity_data(std::size_t pu_offset = std::size_t(-1),
+                std::size_t pu_step = 1, std::string const& affinity = "pu",
                 std::string const& affinity_desc = "")
-          : pu_offset_(pu_offset),
+          : used_cores_(0),
+            pu_offset_(pu_offset),
             pu_step_(pu_step),
             affinity_domain_(affinity),
             affinity_desc_(affinity_desc)
         {}
 
+        std::size_t used_cores_;
         std::size_t pu_offset_;
         std::size_t pu_step_;
         std::string affinity_domain_;
@@ -41,7 +43,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     {
         affinity_data(std::size_t num_threads);
 
-        void init(init_affinity_data const& data);
+        std::size_t init(init_affinity_data const& data,
+                topology const & toplogy);
 
         mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread, bool numa_sensitive) const;
@@ -55,7 +58,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         void add_punit(std::size_t virt_core, std::size_t thread_num);
 
     protected:
-        void init_cached_pu_nums(std::size_t hardware_concurrency);
+        void init_cached_pu_nums(std::size_t hardware_concurrency,
+                topology const & topology);
         std::size_t get_pu_num(std::size_t num_thread,
             std::size_t hardware_concurrency) const;
 

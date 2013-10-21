@@ -19,6 +19,8 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/components/base_lco_factory.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>

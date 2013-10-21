@@ -51,18 +51,18 @@ namespace hpx { namespace detail
 namespace hpx { namespace agas
 {
 
-typedef components::detail::heap_factory<
-    lcos::detail::promise<
-        response
-      , response
-    >
-  , components::managed_component<
-        lcos::detail::promise<
-            response
-          , response
-        >
-    >
-> response_heap_type;
+//typedef components::detail::heap_factory<
+//    lcos::detail::promise<
+//        response
+//      , response
+//    >
+//  , components::managed_component<
+//        lcos::detail::promise<
+//            response
+//          , response
+//        >
+//    >
+//> response_heap_type;
 
 // TODO: Make assertions exceptions
 void early_parcel_sink(
@@ -113,14 +113,14 @@ struct registration_header
         naming::locality const& locality_
       , boost::uint64_t primary_ns_ptr_
       , boost::uint64_t symbol_ns_ptr_
-      , boost::uint32_t num_threads_
+      , boost::uint32_t cores_needed_
       , std::string const& hostname_
       , naming::gid_type prefix_ = naming::gid_type()
     ) :
         locality(locality_)
       , primary_ns_ptr(primary_ns_ptr_)
       , symbol_ns_ptr(symbol_ns_ptr_)
-      , num_threads(num_threads_)
+      , cores_needed(cores_needed_)
       , hostname(hostname_)
       , prefix(prefix_)
     {}
@@ -128,7 +128,7 @@ struct registration_header
     naming::locality locality;
     boost::uint64_t primary_ns_ptr;
     boost::uint64_t symbol_ns_ptr;
-    boost::uint32_t num_threads;
+    boost::uint32_t cores_needed;
     std::string hostname;           // hostname of locality
     naming::gid_type prefix;        // suggested prefix (optional)
 
@@ -138,7 +138,7 @@ struct registration_header
         ar & locality;
         ar & primary_ns_ptr;
         ar & symbol_ns_ptr;
-        ar & num_threads;
+        ar & cores_needed;
         ar & hostname;
         ar & prefix;
     }
@@ -157,7 +157,7 @@ struct notification_header
       , naming::address const& component_ns_address_
       , naming::address const& symbol_ns_address_
       , boost::uint32_t num_localities_
-      , boost::uint32_t first_pu_
+      , boost::uint32_t used_cores_
     ) :
         prefix(prefix_)
       , locality_ns_address(locality_ns_address_)
@@ -165,7 +165,7 @@ struct notification_header
       , component_ns_address(component_ns_address_)
       , symbol_ns_address(symbol_ns_address_)
       , num_localities(num_localities_)
-      , first_usable_pu(first_pu_)
+      , used_cores(used_cores_)
     {}
 
     naming::gid_type prefix;
@@ -174,7 +174,7 @@ struct notification_header
     naming::address component_ns_address;
     naming::address symbol_ns_address;
     boost::uint32_t num_localities;
-    boost::uint32_t first_usable_pu;
+    boost::uint32_t used_cores;
 
 #if defined(HPX_HAVE_SECURITY)
     components::security::signed_certificate root_certificate;
@@ -189,7 +189,7 @@ struct notification_header
         ar & component_ns_address;
         ar & symbol_ns_address;
         ar & num_localities;
-        ar & first_usable_pu;
+        ar & used_cores;
 #if defined(HPX_HAVE_SECURITY)
         ar & root_certificate;
 #endif
@@ -350,7 +350,7 @@ void register_worker(registration_header const& header)
         return;
     }
 
-    if (!agas_client.register_locality(header.locality, prefix, header.num_threads))
+    if (!agas_client.register_locality(header.locality, prefix, header.cores_needed))
     {
         HPX_THROW_EXCEPTION(internal_server_error
             , "agas::register_worker"
@@ -388,12 +388,12 @@ void register_worker(registration_header const& header)
             agas_client.get_bootstrap_symbol_ns_ptr());
 
     // assign cores to the new locality
-    boost::uint32_t first_pu = rt.assign_cores(header.hostname,
-        header.num_threads);
+    boost::uint32_t first_core = rt.assign_cores(header.hostname,
+        header.cores_needed);
 
     notification_header hdr (prefix, locality_addr, primary_addr
       , component_addr, symbol_addr, rt.get_config().get_num_localities()
-      , first_pu);
+      , first_core);
 
 #if defined(HPX_HAVE_SECURITY)
     // wait for the root certificate to be available
@@ -493,16 +493,6 @@ void notify_worker(notification_header const& header)
 
     naming::locality const& here = rt.here();
 
-    naming::gid_type parcel_lower, parcel_upper;
-    agas_client.get_id_range(here
-      , response_heap_type::block_type::heap_step
-      , parcel_lower, parcel_upper);
-
-    naming::gid_type heap_lower, heap_upper;
-    agas_client.get_id_range(here
-      , response_heap_type::block_type::heap_step
-      , heap_lower, heap_upper);
-
     // register runtime support component
     naming::gid_type runtime_support_gid(header.prefix.get_msb()
       , rt.get_runtime_support_lva());
@@ -541,33 +531,37 @@ void notify_worker(notification_header const& header)
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
+    naming::gid_type parcel_lower, parcel_upper;
+    agas_client.get_id_range(here, 1000 , parcel_lower, parcel_upper);
+
     rt.get_id_pool().set_range(parcel_lower, parcel_upper);
 
-    // assign the initial gid range to the unique id range allocator that our
-    // response heap is using
-    response_heap_type::get_heap().set_range(heap_lower, heap_upper);
+    //// assign the initial gid range to the unique id range allocator that our
+    //// response heap is using
+    //response_heap_type::get_heap().set_range(heap_lower, heap_upper);
 
-    // allocate our first heap
-    response_heap_type::block_type* p = response_heap_type::alloc_heap();
+    //// allocate our first heap
+    //response_heap_type::block_type* p = response_heap_type::alloc_heap();
 
-    // set the base gid that we bound to this heap
-    p->set_gid(heap_lower);
+    //// set the base gid that we bound to this heap
+    //p->set_gid(heap_lower);
 
-    // push the heap onto the OSHL
-    response_heap_type::get_heap().add_heap(p);
+    //// push the heap onto the OSHL
+    //response_heap_type::get_heap().add_heap(p);
 
-    // bind range of GIDs to head addresses
-    agas_client.bind_range(
-        heap_lower
-      , response_heap_type::block_type::heap_step
-      , p->get_address()
-      , response_heap_type::block_type::heap_size);
+    //// bind range of GIDs to head addresses
+    //agas_client.bind_range(
+    //    heap_lower
+    //  , response_heap_type::block_type::heap_step
+    //  , p->get_address()
+    //  , response_heap_type::block_type::heap_size);
 
     // store number of initial localities
     rt.get_config().set_num_localities(header.num_localities);
 
-    // store number of first usable pu
-    rt.get_config().set_first_pu(header.first_usable_pu);
+    // store number of used cores by other localities
+    rt.get_config().set_used_cores(header.used_cores);
+    rt.assign_cores();
 
 #if defined(HPX_HAVE_SECURITY)
     // initialize certificate store
@@ -726,7 +720,7 @@ void big_boot_barrier::apply(
   , naming::address const& addr
   , actions::base_action* act
 ) { // {{{
-    parcelset::parcel p(naming::get_gid_from_locality_id(target_locality_id), addr, act);
+    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
     pp.send_early_parcel(p);
@@ -771,8 +765,9 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
     BOOST_ASSERT(0 != symbol_ns_server);
 
     runtime& rt = get_runtime();
-    boost::uint32_t num_cores = boost::lexical_cast<boost::uint32_t>(
-        rt.get_config().get_entry("hpx.cores", boost::uint32_t(1)));
+    // get the number of cores we need for our locality. This respects the
+    // affinity description. Cores that are partially used are counted as well
+    boost::uint32_t cores_needed = rt.assign_cores();
 
     naming::gid_type suggested_prefix;
 
@@ -787,7 +782,7 @@ void big_boot_barrier::wait_hosted(std::string const& locality_name,
         rt.here()
         , reinterpret_cast<boost::uint64_t>(primary_ns_server)
         , reinterpret_cast<boost::uint64_t>(symbol_ns_server)
-        , detail::get_number_of_pus_in_cores(num_cores)
+        , cores_needed
         , locality_name
         , suggested_prefix);
 

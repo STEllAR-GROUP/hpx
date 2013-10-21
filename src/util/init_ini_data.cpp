@@ -72,7 +72,7 @@ namespace hpx { namespace util
     //
     // returns true if at least one alternative location has been read
     // successfully
-    bool init_ini_data_base (section& ini, std::string const& hpx_ini_file)
+    bool init_ini_data_base (section& ini, std::string& hpx_ini_file)
     {
         namespace fs = boost::filesystem;
 
@@ -123,11 +123,21 @@ namespace hpx { namespace util
         result = handle_ini_file_env(ini, "PWD", "/.hpx.ini") || result;
 
         if (!hpx_ini_file.empty()) {
-            bool result2 = handle_ini_file(ini, hpx_ini_file);
-            if (result2) {
-                LBT_(info) << "loaded configuration: " << hpx_ini_file;
+            namespace fs = boost::filesystem;
+            if (!fs::exists(hpx_ini_file)) {
+                std::cerr << "hpx::init: command line warning: file specified using "
+                             "--hpx::config does not exist ("
+                    << hpx_ini_file << ")." << std::endl;
+                hpx_ini_file.clear();
+                result = false;
             }
-            return result || result2;
+            else {
+                bool result2 = handle_ini_file(ini, hpx_ini_file);
+                if (result2) {
+                    LBT_(info) << "loaded configuration: " << hpx_ini_file;
+                }
+                return result || result2;
+            }
         }
         return result;
     }

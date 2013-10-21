@@ -452,25 +452,6 @@ namespace hpx
     /// \namespace components
     namespace components
     {
-        enum factory_state_enum
-        {
-            factory_enabled  = 0,
-            factory_disabled = 1,
-            factory_check    = 2
-        };
-
-        /// \ cond NODETAIL
-        namespace detail
-        {
-            struct this_type {};
-            struct fixed_component_tag {};
-            struct simple_component_tag {};
-            struct managed_component_tag {};
-        }
-        /// \ endcond
-
-        ///////////////////////////////////////////////////////////////////////
-        typedef boost::int32_t component_type;
         enum component_enum_type
         {
             component_invalid = -1,
@@ -511,8 +492,9 @@ namespace hpx
 
 #if defined(HPX_HAVE_SODIUM)
             // root CA, subordinate CA
-            component_root_certificate_authority = 11,
-            component_subordinate_certificate_authority = 12,
+            signed_certificate_promise = ((11 << 16) | component_base_lco_with_value),
+            component_root_certificate_authority = 12,
+            component_subordinate_certificate_authority = 13,
 #endif
 
             component_last,
@@ -522,6 +504,25 @@ namespace hpx
             component_upper_bound = 0x7fffffffL //-V112
         };
 
+        enum factory_state_enum
+        {
+            factory_enabled  = 0,
+            factory_disabled = 1,
+            factory_check    = 2
+        };
+
+        /// \ cond NODETAIL
+        namespace detail
+        {
+            struct this_type {};
+            struct fixed_component_tag {};
+            struct simple_component_tag {};
+            struct managed_component_tag {};
+        }
+        /// \ endcond
+
+        ///////////////////////////////////////////////////////////////////////
+        typedef boost::int32_t component_type;
         ///////////////////////////////////////////////////////////////////////
         template <typename Component = detail::this_type>
         class fixed_component_base;
@@ -1075,8 +1076,7 @@ namespace hpx
     /// \param f  [in] The function to be registered to run by an HPX thread as
     ///           a pre-shutdown function.
     ///
-    /// \note If this function is called before the runtime system is
-    ///       initialized, or while the pre-shutdown functions are
+    /// \note If this function is called while the pre-shutdown functions are
     ///       being executed, or after that point, it will raise a invalid_status
     ///       exception.
     ///
@@ -1095,8 +1095,7 @@ namespace hpx
     /// \param f  [in] The function to be registered to run by an HPX thread as
     ///           a shutdown function.
     ///
-    /// \note If this function is called before the runtime system is
-    ///       initialized, or while the shutdown functions are
+    /// \note If this function is called while the shutdown functions are
     ///       being executed, or after that point, it will raise a invalid_status
     ///       exception.
     ///

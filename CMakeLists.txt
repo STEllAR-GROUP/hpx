@@ -1169,7 +1169,7 @@ else()
   ##############################################################################
   if(HPX_HAVE_CXX11)
     # Turn on C++11 support
-    hpx_use_flag_if_available(-std=c++0x)
+    hpx_use_flag_if_available(-std=c++0x CXX)
 
     hpx_check_for_cxx11_rvalue_references(HPX_HAVE_CXX11_RVALUE_REFERENCES
       DEFINITIONS HPX_HAVE_CXX11_RVALUE_REFERENCES)
@@ -1259,7 +1259,7 @@ else()
   # These come from within Boost. Detection for this flag fails with GCC 4.4,
   # 4.5 and 4.6.
   if(040700 LESS ${GCC_VERSION} OR 040700 EQUAL ${GCC_VERSION})
-    hpx_use_flag_if_available(-Wno-delete-non-virtual-dtor)
+    hpx_use_flag_if_available(-Wno-delete-non-virtual-dtor CXX C)
   endif()
 
   # Check if our libraries have unresolved symbols
