@@ -120,10 +120,20 @@ struct HPX_EXPORT symbol_namespace
         return get_service_instance(service_locality_id);
     }
 
+    static naming::gid_type get_service_instance(naming::id_type const& dest)
+    {
+        return get_service_instance(dest.get_gid());
+    }
+
     static bool is_service_instance(naming::gid_type const& gid)
     {
         return gid.get_lsb() == HPX_AGAS_SYMBOL_NS_LSB &&
             (gid.get_msb() & ~naming::gid_type::locality_id_mask) == HPX_AGAS_NS_MSB;
+    }
+
+    static bool is_service_instance(naming::id_type const& id)
+    {
+        return is_service_instance(id.get_gid());
     }
 
     static naming::id_type symbol_namespace_locality(std::string const& key)

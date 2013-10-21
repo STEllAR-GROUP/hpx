@@ -5,6 +5,8 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/locality_result.hpp>
+#include <hpx/runtime/components/component_factory.hpp>
+#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/include/serialization.hpp>
 
 #include <boost/serialization/vector.hpp>
@@ -69,3 +71,4 @@ namespace hpx { namespace util
 HPX_REGISTER_BASE_LCO_WITH_VALUE(
     std::vector<hpx::util::remote_locality_result>,
     factory_locality_result)
+

@@ -32,9 +32,10 @@
 
 namespace hpx { namespace util
 {
-#if HPX_GCC_VERSION >= 40300 \
- || (BOOST_INTEL_CXX_VERSION > 1200 && !defined(BOOST_WINDOWS)) \
- || (HPX_CLANG_VERSION >= 20900) 
+#if HPX_GCC_VERSION >= 40300 || \
+    (BOOST_INTEL_CXX_VERSION > 1200 && !defined(BOOST_WINDOWS)) || \
+    (HPX_CLANG_VERSION >= 20900)
+
     //
     // C++11 requires thread-safe initialization of function-scope statics.
     // For conforming compilers, we utilize this feature.
@@ -44,44 +45,45 @@ namespace hpx { namespace util
     {
     public:
         typedef T value_type;
-    
+
         typedef typename boost::call_traits<T>::reference reference;
         typedef typename boost::call_traits<T>::const_reference const_reference;
-    
+
         static_()
         {
             get_reference();
         }
-    
+
         operator reference()
         {
             return get();
         }
-    
+
         operator const_reference() const
         {
             return get();
         }
-    
+
         reference get()
         {
             return get_reference();
         }
-    
+
         const_reference get() const
         {
             return get_reference();
         }
-    
+
     private:
         static reference get_reference()
         {
             static T t;
-            return t; 
+            return t;
         }
     };
 
 #else
+
     //
     //  Provides thread-safe initialization of a single static instance of T.
     //
@@ -117,18 +119,6 @@ namespace hpx { namespace util
             }
         };
 
-/*
-        template <typename U>
-        struct copy_constructor
-        {
-            static void construct(U const* pv)
-            {
-                new (static_::get_address()) value_type(*pv);
-                static destructor d;
-            }
-        };
-*/
-
     public:
         typedef typename boost::call_traits<T>::reference reference;
         typedef typename boost::call_traits<T>::const_reference const_reference;
@@ -137,15 +127,6 @@ namespace hpx { namespace util
         {
             boost::call_once(&default_constructor::construct, constructed_);
         }
-
-/*
-        template <typename U>
-        static_(U const& val)
-        {
-            boost::call_once(constructed_,
-                boost::bind(&copy_constructor<U>::construct, boost::addressof(val)));
-        }
-*/
 
         operator reference()
         {

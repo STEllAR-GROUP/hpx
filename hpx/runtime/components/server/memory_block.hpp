@@ -608,7 +608,7 @@ namespace hpx { namespace components { namespace server
             actions::manage_object_action_base const& act)
         {
             // allocate the memory
-            memory_block* p = get_heap().alloc();
+            void* p = get_heap().alloc();
             return new (p) memory_block(count, act);
         }
 
@@ -616,7 +616,7 @@ namespace hpx { namespace components { namespace server
             actions::manage_object_action_base const& act)
         {
             // allocate the memory
-            memory_block* p = get_heap().alloc();
+            void* p = get_heap().alloc();
             return new (p) memory_block(rhs, act);
         }
 

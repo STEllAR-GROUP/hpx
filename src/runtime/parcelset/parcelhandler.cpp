@@ -430,6 +430,15 @@ namespace hpx { namespace parcelset
         // properly initialize parcel
         init_parcel(p);
 
+        naming::id_type const* ids = p.get_destinations();
+        naming::address* addrs = p.get_destination_addrs();
+
+        bool resolved_locally = true;
+
+#if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
+        if (!addrs[0])
+            resolved_locally = resolver_.resolve(ids[0], addrs[0]);
+#else
         std::size_t size = p.size();
 
         if (0 == size) {
@@ -438,18 +447,15 @@ namespace hpx { namespace parcelset
             return;
         }
 
-        naming::gid_type const* gids = p.get_destinations();
-        naming::address* addrs = p.get_destination_addrs();
-
-        bool resolved_locally = true;
         if (1 == size) {
             if (!addrs[0])
-                resolved_locally = resolver_.resolve(gids[0], addrs[0]);
+                resolved_locally = resolver_.resolve(ids[0], addrs[0]);
         }
         else {
             boost::dynamic_bitset<> locals;
-            resolved_locally = resolver_.resolve(gids, addrs, size, locals);
+            resolved_locally = resolver_.resolve(ids, addrs, size, locals);
         }
+#endif
 
         if (!p.get_parcel_id())
             p.set_parcel_id(parcel::generate_unique_id());

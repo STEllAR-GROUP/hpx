@@ -11,6 +11,9 @@
 #include <hpx/include/actions.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include <boost/foreach.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
 struct test_server
   : hpx::components::simple_component_base<test_server>
 {
@@ -18,7 +21,7 @@ struct test_server
     {
     }
 
-    hpx::id_type create_new() const;
+    hpx::id_type create_new(hpx::id_type const& id) const;
 
     HPX_DEFINE_COMPONENT_CONST_ACTION(test_server, create_new, create_new_action);
 };
@@ -40,9 +43,7 @@ struct test_client
 
     // create a new instance of a test_server
     test_client()
-    {
-        this->client_base_type::create(hpx::find_here());
-    }
+    {}
 
     // initialize the client from a given server instance
     explicit test_client(hpx::id_type const& id)
@@ -52,36 +53,42 @@ struct test_client
       : client_base_type(fgid)
     {}
 
-    test_client create_new() const
+    test_client create_new(hpx::id_type const& id) const
     {
         create_new_action new_;
-        return test_client(hpx::async(new_, this->get_gid()));
+        return test_client(hpx::async(new_, this->get_gid(), id));
     }
 };
 
 // ask the server to create a new instance
-hpx::id_type test_server::create_new() const
+hpx::id_type test_server::create_new(hpx::id_type const& id) const
 {
-    return test_client().get_gid();     // this waits for the new object to be created
+    // this waits for the new object to be created
+    test_client client;
+    return client.create(id).get_gid();
 }
 
 int main()
 {
-    // repeating this a couple of times forces the issue ...
-    for (int i = 0; i != 100; ++i)
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+
+    BOOST_FOREACH(hpx::id_type const& id, localities)
     {
-        test_client c;      // create a new instance
+        // repeating this a couple of times forces the issue ...
+        for (int i = 0; i != 100; ++i)
+        {
+            test_client c;
+            c.create(id);       // create a new instance
 
-        // this construct overwrites the original client with a newly created
-        // one which causes the only reference to the initial test_server to go
-        // out of scope too early.
-        c = c.create_new();
+            // this construct overwrites the original client with a newly created
+            // one which causes the only reference to the initial test_server to go
+            // out of scope too early.
+            c = c.create_new(id);
 
-        // the new instance 'c' goes out of scope here, which makes the future
-        // holding the only reference to the second server instance disappear
+            // the new instance 'c' goes out of scope here, which makes the future
+            // holding the only reference to the second server instance disappear
+        }
     }
-
-//    c.detach().get();   // wait for operation to finish
 
     return hpx::util::report_errors();
 }

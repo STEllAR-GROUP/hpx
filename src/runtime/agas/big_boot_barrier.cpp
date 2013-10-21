@@ -51,18 +51,18 @@ namespace hpx { namespace detail
 namespace hpx { namespace agas
 {
 
-typedef components::detail::heap_factory<
-    lcos::detail::promise<
-        response
-      , response
-    >
-  , components::managed_component<
-        lcos::detail::promise<
-            response
-          , response
-        >
-    >
-> response_heap_type;
+//typedef components::detail::heap_factory<
+//    lcos::detail::promise<
+//        response
+//      , response
+//    >
+//  , components::managed_component<
+//        lcos::detail::promise<
+//            response
+//          , response
+//        >
+//    >
+//> response_heap_type;
 
 // TODO: Make assertions exceptions
 void early_parcel_sink(
@@ -493,16 +493,6 @@ void notify_worker(notification_header const& header)
 
     naming::locality const& here = rt.here();
 
-    naming::gid_type parcel_lower, parcel_upper;
-    agas_client.get_id_range(here
-      , response_heap_type::block_type::heap_step
-      , parcel_lower, parcel_upper);
-
-    naming::gid_type heap_lower, heap_upper;
-    agas_client.get_id_range(here
-      , response_heap_type::block_type::heap_step
-      , heap_lower, heap_upper);
-
     // register runtime support component
     naming::gid_type runtime_support_gid(header.prefix.get_msb()
       , rt.get_runtime_support_lva());
@@ -541,27 +531,30 @@ void notify_worker(notification_header const& header)
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
+    naming::gid_type parcel_lower, parcel_upper;
+    agas_client.get_id_range(here, 1000 , parcel_lower, parcel_upper);
+
     rt.get_id_pool().set_range(parcel_lower, parcel_upper);
 
-    // assign the initial gid range to the unique id range allocator that our
-    // response heap is using
-    response_heap_type::get_heap().set_range(heap_lower, heap_upper);
+    //// assign the initial gid range to the unique id range allocator that our
+    //// response heap is using
+    //response_heap_type::get_heap().set_range(heap_lower, heap_upper);
 
-    // allocate our first heap
-    response_heap_type::block_type* p = response_heap_type::alloc_heap();
+    //// allocate our first heap
+    //response_heap_type::block_type* p = response_heap_type::alloc_heap();
 
-    // set the base gid that we bound to this heap
-    p->set_gid(heap_lower);
+    //// set the base gid that we bound to this heap
+    //p->set_gid(heap_lower);
 
-    // push the heap onto the OSHL
-    response_heap_type::get_heap().add_heap(p);
+    //// push the heap onto the OSHL
+    //response_heap_type::get_heap().add_heap(p);
 
-    // bind range of GIDs to head addresses
-    agas_client.bind_range(
-        heap_lower
-      , response_heap_type::block_type::heap_step
-      , p->get_address()
-      , response_heap_type::block_type::heap_size);
+    //// bind range of GIDs to head addresses
+    //agas_client.bind_range(
+    //    heap_lower
+    //  , response_heap_type::block_type::heap_step
+    //  , p->get_address()
+    //  , response_heap_type::block_type::heap_size);
 
     // store number of initial localities
     rt.get_config().set_num_localities(header.num_localities);
@@ -727,7 +720,7 @@ void big_boot_barrier::apply(
   , naming::address const& addr
   , actions::base_action* act
 ) { // {{{
-    parcelset::parcel p(naming::get_gid_from_locality_id(target_locality_id), addr, act);
+    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
     pp.send_early_parcel(p);

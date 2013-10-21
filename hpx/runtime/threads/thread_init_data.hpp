@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #define HPX_THREAD_INIT_DATA_SEP_22_2009_1034AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/util/move.hpp>
 
@@ -51,6 +52,7 @@ namespace hpx { namespace threads
             priority(rhs.priority),
             num_os_thread(rhs.num_os_thread),
             stacksize(rhs.stacksize),
+            target(boost::move(rhs.target)),
             scheduler_base(rhs.scheduler_base)
         {}
 
@@ -60,6 +62,7 @@ namespace hpx { namespace threads
                 thread_priority priority_ = thread_priority_normal,
                 std::size_t os_thread = std::size_t(-1),
                 std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1),
+                naming::id_type const& target_ = naming::invalid_id,
                 policies::scheduler_base* scheduler_base_ = 0)
           : func(boost::forward<F>(f)),
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
@@ -74,6 +77,7 @@ namespace hpx { namespace threads
             priority(priority_), num_os_thread(os_thread),
             stacksize(stacksize_ == std::ptrdiff_t(-1) ?
                 get_default_stack_size() : stacksize_),
+            target(target_),
             scheduler_base(scheduler_base_)
         {}
 
@@ -94,6 +98,8 @@ namespace hpx { namespace threads
         thread_priority priority;
         std::size_t num_os_thread;
         std::ptrdiff_t stacksize;
+
+        naming::id_type target;
 
         policies::scheduler_base* scheduler_base;
 

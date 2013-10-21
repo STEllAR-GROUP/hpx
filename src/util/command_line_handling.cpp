@@ -737,12 +737,17 @@ namespace hpx { namespace util
             aff.init(init_data, top);
 
             bool numa_sensitive = vm_.count("hpx:numa-sensitive") != 0;
-            std::cout << std::string(79, '*') << '\n';
-            std::cout << "locality: " << hpx::get_locality_id() << '\n';
-
-            for (std::size_t i = 0; i != num_threads; ++i)
             {
-                top.print_affinity_mask(std::cout, i, aff.get_pu_mask(top, i, numa_sensitive));
+                util::osstream strm;        // make sure all ouput is kept together
+
+                strm << std::string(79, '*') << '\n';
+                strm << "locality: " << hpx::get_locality_id() << '\n';
+                for (std::size_t i = 0; i != num_threads; ++i)
+                {
+                    top.print_affinity_mask(strm, i, aff.get_pu_mask(top, i, numa_sensitive));
+                }
+
+                std::cout << util::osstream_get_string(strm);
             }
         }
         else {

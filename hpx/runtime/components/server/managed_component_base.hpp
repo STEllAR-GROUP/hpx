@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -61,7 +61,12 @@ namespace hpx { namespace components
         struct init<traits::construct_with_back_ptr>
         {
             template <typename Component, typename Managed>
-            static void call(Component*& component, Managed* this_)
+            static void call(Component* component, Managed* this_)
+            {
+            }
+
+            template <typename Component, typename Managed>
+            static void call_new(Component*& component, Managed* this_)
             {
                 typedef typename Managed::wrapped_type wrapped_type;
                 component = new wrapped_type(this_);
@@ -88,7 +93,13 @@ namespace hpx { namespace components
         struct init<traits::construct_without_back_ptr>
         {
             template <typename Component, typename Managed>
-            static void call(Component*& component, Managed* this_)
+            static void call(Component* component, Managed* this_)
+            {
+                component->set_back_ptr(this_);
+            }
+
+            template <typename Component, typename Managed>
+            static void call_new(Component*& component, Managed* this_)
             {
                 typedef typename Managed::wrapped_type wrapped_type;
                 component = new wrapped_type();
@@ -146,10 +157,10 @@ namespace hpx { namespace components
         // This is used by the managed_component to decide whether to
         // delete the component implementation depending on it.
         template <typename DtorTag>
-        struct destroy;
+        struct manage_lifetime;
 
         template <>
-        struct destroy<traits::managed_object_is_lifetime_controlled>
+        struct manage_lifetime<traits::managed_object_is_lifetime_controlled>
         {
             template <typename Component>
             static void call(Component*)
@@ -172,7 +183,7 @@ namespace hpx { namespace components
         };
 
         template <>
-        struct destroy<traits::managed_object_controls_lifetime>
+        struct manage_lifetime<traits::managed_object_controls_lifetime>
         {
             template <typename Component>
             static void call(Component* component)
@@ -269,9 +280,6 @@ namespace hpx { namespace components
             return boost::move(f);
         }
     private:
-        template <typename, typename>
-        friend class managed_component;
-
         template <typename>
         friend struct detail_adl_barrier::init;
 
@@ -297,29 +305,22 @@ namespace hpx { namespace components
                 detail::fixed_wrapper_heap<Derived> > heap_type;
 
             typedef detail::fixed_wrapper_heap<Derived> block_type;
+            typedef Derived value_type;
 
+        private:
             struct wrapper_heap_tag {};
 
             static heap_type& get_heap()
             {
                 // ensure thread-safe initialization
                 util::reinitializable_static<
-                    heap_type, wrapper_heap_tag, HPX_RUNTIME_INSTANCE_LIMIT
+                    heap_type, wrapper_heap_tag
                 > heap(components::get_component_type<Component>());
-                return heap.get(get_runtime_instance_number());
+                return heap.get();
             }
 
-            static block_type* alloc_heap()
-            {
-                return get_heap().alloc_heap();
-            }
-
-            static void add_heap(block_type* p)
-            {
-                return get_heap().add_heap(p);
-            }
-
-            static Derived* alloc(std::size_t count = 1)
+        public:
+            static void* alloc(std::size_t count = 1)
             {
                 return get_heap().alloc(count);
             }
@@ -337,14 +338,14 @@ namespace hpx { namespace components
     template <typename Component, typename Derived>
     void intrusive_ptr_add_ref(managed_component<Component, Derived>* p)
     {
-        detail_adl_barrier::destroy<
+        detail_adl_barrier::manage_lifetime<
             typename traits::managed_component_dtor_policy<Component>::type
         >::addref(p->component_);
     }
     template <typename Component, typename Derived>
     void intrusive_ptr_release(managed_component<Component, Derived>* p)
     {
-        detail_adl_barrier::destroy<
+        detail_adl_barrier::manage_lifetime<
             typename traits::managed_component_dtor_policy<Component>::type
         >::release(p->component_);
     }
@@ -379,6 +380,9 @@ namespace hpx { namespace components
         typedef Component type_holder;
         typedef typename Component::base_type_holder base_type_holder;
 
+        typedef detail::heap_factory<Component, derived_type> heap_type;
+        typedef typename heap_type::value_type value_type;
+
         /// \brief Construct a managed_component instance holding a
         ///        wrapped instance. This constructor takes ownership of the
         ///        passed pointer.
@@ -388,7 +392,10 @@ namespace hpx { namespace components
         explicit managed_component(Component* comp)
           : component_(comp)
         {
-            component_->set_back_ptr(this);
+            detail_adl_barrier::init<
+                typename traits::managed_component_ctor_policy<Component>::type
+            >::call(component_, this);
+            intrusive_ptr_add_ref(this);
         }
 
     public:
@@ -399,7 +406,8 @@ namespace hpx { namespace components
         {
             detail_adl_barrier::init<
                 typename traits::managed_component_ctor_policy<Component>::type
-            >::call(component_, this);
+            >::call_new(component_, this);
+            intrusive_ptr_add_ref(this);
         }
 
 #define MANAGED_COMPONENT_CONSTRUCT(Z, N, _)                                  \
@@ -410,6 +418,7 @@ namespace hpx { namespace components
             detail_adl_barrier::init<                                         \
                 typename traits::managed_component_ctor_policy<Component>::type \
             >::call(component_, this, HPX_ENUM_FORWARD_ARGS(N, T, t));        \
+            intrusive_ptr_add_ref(this);                                      \
         }                                                                     \
     /**/
 
@@ -422,7 +431,8 @@ namespace hpx { namespace components
         /// \brief The destructor releases any wrapped instances
         ~managed_component()
         {
-            detail_adl_barrier::destroy<
+            intrusive_ptr_release(this);
+            detail_adl_barrier::manage_lifetime<
                 typename traits::managed_component_dtor_policy<Component>::type
             >::call(component_);
         }
@@ -482,8 +492,6 @@ namespace hpx { namespace components
         }
 
     public:
-        typedef detail::heap_factory<Component, derived_type> heap_type;
-
         /// \brief  The memory for managed_component objects is managed by
         ///         a class specific allocator. This allocator uses a one size
         ///         heap implementation, ensuring fast memory allocation.
@@ -496,7 +504,7 @@ namespace hpx { namespace components
         {
             if (size > sizeof(managed_component))
                 return ::operator new(size);
-            derived_type* p = heap_type::alloc();
+            void* p = heap_type::alloc();
             if (NULL == p) {
                 HPX_THROW_STD_EXCEPTION(std::bad_alloc(),
                     "managed_component::operator new(std::size_t size)");
@@ -529,32 +537,32 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and
         //          initialization of arrays of wrappers.
-        static derived_type* create(std::size_t count)
+        static value_type* create(std::size_t count)
         {
             // allocate the memory
-            derived_type* p = heap_type::alloc(count);
+            void* p = heap_type::alloc(count);
             if (NULL == p) {
                 HPX_THROW_STD_EXCEPTION(std::bad_alloc(),
                     "managed_component::create");
             }
 
             if (1 == count)
-                return new (p) derived_type();
+                return new (p) value_type();
 
             // call constructors
             std::size_t succeeded = 0;
             try {
-                derived_type* curr = p;
-                for (std::size_t i = 0; i < count; ++i, ++curr) {
+                value_type* curr = reinterpret_cast<value_type*>(p);
+                for (std::size_t i = 0; i != count; ++i, ++curr) {
                     // call placement new, might throw
-                    new (curr) derived_type();
+                    new (curr) value_type();
                     ++succeeded;
                 }
             }
             catch (...) {
                 // call destructors for successfully constructed objects
-                derived_type* curr = p;
-                for (std::size_t i = 0; i < succeeded; ++i)
+                value_type* curr = reinterpret_cast<value_type*>(p);
+                for (std::size_t i = 0; i != succeeded; ++i)
                 {
                     curr->finalize();
                     curr->~derived_type();
@@ -563,19 +571,19 @@ namespace hpx { namespace components
                 heap_type::free(p, count);     // free memory
                 throw;      // rethrow
             }
-            return p;
+            return reinterpret_cast<value_type*>(p);
         }
 
         /// \brief  The function \a destroy is used for deletion and
         //          de-allocation of arrays of wrappers
-        static void destroy(derived_type* p, std::size_t count = 1)
+        static void destroy(value_type* p, std::size_t count = 1)
         {
             if (NULL == p || 0 == count)
                 return;     // do nothing if given a NULL pointer
 
             // call destructors for all managed_component instances
-            derived_type* curr = p;
-            for (std::size_t i = 0; i < count; ++i)
+            value_type* curr = p;
+            for (std::size_t i = 0; i != count; ++i)
             {
                 curr->finalize();
                 curr->~derived_type();
@@ -642,8 +650,11 @@ namespace hpx { namespace components
 
     public:
         // reference counting
-        template<typename C, typename D> friend void intrusive_ptr_add_ref(managed_component<C, D>* p);
-        template<typename C, typename D> friend void intrusive_ptr_release(managed_component<C, D>* p);
+        template<typename C, typename D>
+        friend void intrusive_ptr_add_ref(managed_component<C, D>* p);
+
+        template<typename C, typename D>
+        friend void intrusive_ptr_release(managed_component<C, D>* p);
 
     protected:
         Component* component_;

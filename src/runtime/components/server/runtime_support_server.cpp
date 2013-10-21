@@ -21,6 +21,7 @@
 #include <hpx/runtime/components/server/memory_block.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
+#include <hpx/runtime/components/base_lco_factory.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>
 #include <hpx/runtime/components/component_startup_shutdown_base.hpp>
 #include <hpx/runtime/components/component_commandline_base.hpp>
@@ -41,6 +42,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -181,6 +183,38 @@ namespace hpx { namespace components { namespace server
                         << components::get_component_type_name(type);
         }
         return ids;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    boost::shared_ptr<util::one_size_heap_list_base>
+        runtime_support::get_promise_heap(components::component_type type)
+    {
+        // locate the factory for the requested component type
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
+
+        component_map_type::iterator it = components_.find(type);
+        if (it == components_.end())
+        {
+            // we don't know anything about this promise type yet
+            boost::shared_ptr<components::base_lco_factory> factory(
+                new components::base_lco_factory(type));
+
+            component_factory_type data(factory);
+            std::pair<component_map_type::iterator, bool> p =
+                components_.insert(component_map_type::value_type(type, data));
+            if (!p.second)
+            {
+                HPX_THROW_EXCEPTION(out_of_memory,
+                    "runtime_support::get_promise_heap",
+                    "could not create base_lco_factor for type " +
+                        components::get_component_type_name(type));
+            }
+
+            it = p.first;
+        }
+
+        return boost::static_pointer_cast<components::base_lco_factory>(
+            (*it).second.first)->get_heap();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -330,7 +364,7 @@ namespace hpx { namespace components { namespace server
             if (agas::is_local_address(respond_to, addr)) {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
-                hpx::applier::detail::apply_l<action_type>(addr);
+                hpx::applier::detail::apply_l<action_type>(respond_to, addr);
             }
             else {
                 // apply remotely, parcel is sent synchronously
@@ -490,7 +524,7 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    long runtime_support::get_instance_count(components::component_type type)
+    boost::int32_t runtime_support::get_instance_count(components::component_type type)
     {
         component_map_mutex_type::scoped_lock l(cm_mtx_);
 
@@ -628,7 +662,7 @@ namespace hpx { namespace components { namespace server
                 if (agas::is_local_address(respond_to, addr)) {
                     // execute locally, action is executed immediately as it is
                     // a direct_action
-                    hpx::applier::detail::apply_l<action_type>(addr);
+                    hpx::applier::detail::apply_l<action_type>(respond_to, addr);
                 }
                 else {
                     // apply remotely, parcel is sent synchronously
