@@ -61,22 +61,17 @@ namespace hpx
             return addr;
         }
 
-        inline naming::gid_type const& convert_to_gid(naming::id_type const& id)
-        {
-            return id.get_gid();
-        }
-
         // We know it is remote.
         template <typename Action>
         inline bool
-        apply_r_p(naming::address& addr, naming::id_type const& gid,
+        apply_r_p(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority));
 
             // Send the parcel through the parcel handler
@@ -84,9 +79,10 @@ namespace hpx
             return false;     // destination is remote
         }
 
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         struct destinations
         {
-            std::vector<naming::gid_type> gids_;
+            std::vector<naming::id_type> gids_;
             std::vector<naming::address> addrs_;
         };
 
@@ -141,6 +137,7 @@ namespace hpx
 
             return false;     // destination is remote
         }
+#endif
 
         template <typename Action>
         inline bool
@@ -152,7 +149,8 @@ namespace hpx
         // We know it is local and has to be directly executed.
         template <typename Action>
         inline bool
-        apply_l_p(naming::address const& addr, threads::thread_priority priority)
+        apply_l_p(naming::id_type const& target, naming::address const& addr,
+            threads::thread_priority priority)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
@@ -161,15 +159,15 @@ namespace hpx
                     typename action_type::component_type>()));
 
             util::tuple<> env;
-            apply_helper<action_type>::call(addr.address_, priority, env);
+            apply_helper<action_type>::call(target, addr.address_, priority, env);
             return true;     // no parcel has been sent (dest is local)
         }
 
         template <typename Action>
         inline bool
-        apply_l (naming::address const& addr)
+        apply_l (naming::id_type const& target, naming::address const& addr)
         {
-            return apply_l_p<Action>(addr, actions::action_priority<Action>());
+            return apply_l_p<Action>(target, addr, actions::action_priority<Action>());
         }
     }}
 
@@ -193,7 +191,7 @@ namespace hpx
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address(gid, addr))
-            return applier::detail::apply_l_p<Action>(addr, priority);   // apply locally
+            return applier::detail::apply_l_p<Action>(gid, addr, priority);   // apply locally
 
         // apply remotely
         return applier::detail::apply_r_p<Action>(addr, gid, priority);
@@ -215,6 +213,7 @@ namespace hpx
         return apply_p<Derived>(gid, actions::action_priority<Derived>());
     }
 
+#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
     // same for multiple destinations
     template <typename Action>
     inline bool
@@ -222,7 +221,7 @@ namespace hpx
         threads::thread_priority priority)
     {
         // Determine whether the gids are local or remote
-        std::vector<naming::gid_type> gids;
+        std::vector<naming::id_type> gids;
         std::vector<naming::address> addrs;
         boost::dynamic_bitset<> locals;
 
@@ -232,8 +231,8 @@ namespace hpx
             // at least one destination is local
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i))
-                    applier::detail::apply_l_p<Action>(addrs[i], priority);
-                gids.push_back(applier::detail::convert_to_gid(ids[i]));
+                    applier::detail::apply_l_p<Action>(ids[i], addrs[i], priority);
+                gids.push_back(ids[i]);
             }
 
             // remove local destinations
@@ -246,8 +245,7 @@ namespace hpx
             addrs.resize(gids.size());
         }
         else {
-            std::transform(ids.begin(), ids.end(), std::back_inserter(gids),
-                applier::detail::convert_to_gid);
+            gids = ids;
         }
 
         // apply remotely
@@ -255,9 +253,9 @@ namespace hpx
     }
 
     template <typename Action>
-    inline bool apply (std::vector<naming::id_type> const& gids)
+    inline bool apply (std::vector<naming::id_type> const& ids)
     {
-        return apply_p<Action>(gids, actions::action_priority<Action>());
+        return apply_p<Action>(ids, actions::action_priority<Action>());
     }
 
     template <typename Component, typename Result, typename Arguments,
@@ -265,10 +263,11 @@ namespace hpx
     inline bool apply (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, std::vector<naming::id_type> const& gids)
+        > /*act*/, std::vector<naming::id_type> const& ids)
     {
-        return apply_p<Derived>(gids, actions::action_priority<Derived>());
+        return apply_p<Derived>(ids, actions::action_priority<Derived>());
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     namespace applier { namespace detail
@@ -276,7 +275,7 @@ namespace hpx
         template <typename Action>
         inline bool
         apply_r_p(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, threads::thread_priority priority)
+            naming::id_type const& id, threads::thread_priority priority)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
@@ -284,7 +283,7 @@ namespace hpx
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority), cont);
 
             // Send the parcel through the parcel handler
@@ -303,14 +302,14 @@ namespace hpx
 
         template <typename Action>
         inline bool
-        apply_r_sync_p(naming::address& addr, naming::id_type const& gid,
+        apply_r_sync_p(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p (gid.get_gid(), complement_addr<action_type>(addr),
+            parcelset::parcel p(id, complement_addr<action_type>(addr),
                 new hpx::actions::transfer_action<action_type>(priority));
 
             // Send the parcel through the parcel handler
@@ -328,7 +327,7 @@ namespace hpx
 
         // We know it is local and has to be directly executed.
         template <typename Action>
-        inline bool apply_l_p(actions::continuation* c,
+        inline bool apply_l_p(actions::continuation* c, naming::id_type const& target,
             naming::address const& addr, threads::thread_priority priority)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -339,14 +338,15 @@ namespace hpx
 
             actions::continuation_type cont(c);
             util::tuple<> env;
-            apply_helper<action_type>::call(cont, addr.address_, priority, env);
+            apply_helper<action_type>::call(cont, target, addr.address_, priority, env);
             return true;     // no parcel has been sent (dest is local)
         }
 
         template <typename Action>
-        inline bool apply_l (actions::continuation* c, naming::address const& addr)
+        inline bool apply_l (actions::continuation* c, naming::id_type const& target,
+            naming::address const& addr)
         {
-            return apply_l_p<Action>(c, addr, actions::action_priority<Action>());
+            return apply_l_p<Action>(c, target, addr, actions::action_priority<Action>());
         }
     }}
 
@@ -366,7 +366,7 @@ namespace hpx
         // Determine whether the gid is local or remote
         naming::address addr;
         if (agas::is_local_address(gid, addr))
-            return applier::detail::apply_l_p<Action>(c, addr, priority);
+            return applier::detail::apply_l_p<Action>(c, gid, addr, priority);
 
         // apply remotely
         return applier::detail::apply_r_p<Action>(addr, c, gid, priority);

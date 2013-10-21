@@ -24,9 +24,8 @@ namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == 0>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 0,
         bool
     >::type
     apply_continue(naming::id_type const& gid, BOOST_FWD_REF(F) f)
@@ -43,8 +42,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 0>,
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 0,
         bool
     >::type
     apply_continue(
@@ -91,9 +90,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg),
         typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<
-            typename Action::arguments_type>::value == N>,
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == N,
         bool
     >::type
     apply_continue(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
@@ -112,8 +110,8 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result, typename Arguments,
         typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
-    typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == N>,\
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == N,
         bool
     >::type
     apply_continue(

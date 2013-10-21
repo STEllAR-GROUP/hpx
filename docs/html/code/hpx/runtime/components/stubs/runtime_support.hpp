@@ -270,9 +270,9 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve instance count for given component type
-        static lcos::future<long> get_instance_count_async(
+        static lcos::future<boost::int32_t > get_instance_count_async(
             naming::id_type const& targetgid, components::component_type type);
-        static long get_instance_count(naming::id_type const& targetgid,
+        static boost::int32_t  get_instance_count(naming::id_type const& targetgid,
             components::component_type type);
 
         ///////////////////////////////////////////////////////////////////////

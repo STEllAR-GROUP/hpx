@@ -510,7 +510,9 @@ namespace hpx { namespace threads
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 #endif
-        virtual void reset() = 0;
+
+        /// This function will be called when the thread is about to be deleted
+        virtual void reset() {}
 
     protected:
         mutable boost::atomic<thread_state> current_state_;
@@ -567,7 +569,8 @@ namespace hpx { namespace threads
         thread_data(thread_init_data& init_data, 
                pool_type& pool, thread_state_enum newstate)
           : thread_data_base(init_data, newstate),
-            coroutine_(boost::move(init_data.func), this_(), init_data.stacksize),
+            coroutine_(boost::move(init_data.func), boost::move(init_data.target),
+                this_(), init_data.stacksize),
             pool_(&pool)
         {
             BOOST_ASSERT(init_data.stacksize != 0);
@@ -641,6 +644,7 @@ namespace hpx { namespace threads
         /// This function will be called when the thread is about to be deleted
         void reset()
         {
+            thread_data_base::reset();
             coroutine_.reset();
         }
 
@@ -661,7 +665,7 @@ namespace hpx { namespace threads
         stackless_thread_data(thread_init_data& init_data,
                 void* pool, thread_state_enum newstate)
           : thread_data_base(init_data, newstate),
-            coroutine_(boost::move(init_data.func), this_()),
+            coroutine_(boost::move(init_data.func), boost::move(init_data.target), this_()),
             pool_(pool)
         {
             BOOST_ASSERT(init_data.stacksize == 0);
@@ -724,6 +728,7 @@ namespace hpx { namespace threads
         /// This function will be called when the thread is about to be deleted
         void reset()
         {
+            thread_data_base::reset();
             coroutine_.reset();
         }
 

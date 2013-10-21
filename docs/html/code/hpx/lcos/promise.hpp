@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/traits/get_remote_result.hpp>
@@ -19,6 +20,8 @@
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/once.hpp>
+#include <hpx/util/one_size_heap_list_base.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/static_assert.hpp>
@@ -41,6 +44,86 @@ namespace hpx { namespace traits
     {
         typedef managed_object_is_lifetime_controlled type;
     };
+}}
+
+namespace hpx { namespace components
+{
+    namespace detail_adl_barrier
+    {
+        template <typename BackPtrTag>
+        struct init;
+    }
+
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component, typename Derived>
+        struct heap_factory;
+
+        ///////////////////////////////////////////////////////////////////////
+        HPX_EXPORT boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+            components::component_type type);
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Promise>
+        struct promise_heap_factory
+        {
+            typedef Promise component_type;
+            typedef managed_component<Promise> derived_type;
+            typedef derived_type value_type;
+
+            struct wrapper_heap_tag {};
+
+        private:
+            static boost::shared_ptr<util::one_size_heap_list_base> heap_;
+            static lcos::local::once_flag constructed_;
+
+            // this will be called exactly
+            static void create_heap()
+            {
+                heap_ = get_promise_heap(get_component_type<component_type>());
+            }
+
+            static util::one_size_heap_list_base& get_heap()
+            {
+                // ensure thread-safe initialization
+                lcos::local::call_once(constructed_,
+                    &promise_heap_factory::create_heap);
+                return *heap_;
+            }
+
+        public:
+            static void* alloc(std::size_t count = 1)
+            {
+                return get_heap().alloc(count);
+            }
+            static void free(void* p, std::size_t count = 1)
+            {
+                get_heap().free(p, count);
+            }
+            static naming::gid_type get_gid(void* p)
+            {
+                return get_heap().get_gid(p);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Promise>
+        boost::shared_ptr<util::one_size_heap_list_base>
+            promise_heap_factory<Promise>::heap_;
+
+        template <typename Promise>
+        lcos::local::once_flag
+            promise_heap_factory<Promise>::constructed_;
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result, typename RemoteResult>
+        struct heap_factory<
+                lcos::detail::promise<Result, RemoteResult>,
+                managed_component<lcos::detail::promise<Result, RemoteResult> > >
+          : promise_heap_factory<lcos::detail::promise<Result, RemoteResult> >
+        {};
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,15 +151,14 @@ namespace hpx { namespace lcos { namespace detail
         enum { value = components::component_promise };
 
         promise()
-          : back_ptr_(0)
         {}
 
         promise(completed_callback_type const& data_sink)
-          : future_data_type(data_sink), back_ptr_(0)
+          : future_data_type(data_sink)
         {}
 
         promise(BOOST_RV_REF(completed_callback_type) data_sink)
-          : future_data_type(boost::move(data_sink)), back_ptr_(0)
+          : future_data_type(boost::move(data_sink))
         {}
 
         // The implementation of the component is responsible for deleting the
@@ -84,7 +166,6 @@ namespace hpx { namespace lcos { namespace detail
         ~promise()
         {
             this->finalize();
-            delete back_ptr_;
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -123,29 +204,44 @@ namespace hpx { namespace lcos { namespace detail
         // retrieve the gid of this promise
         naming::id_type get_gid() const
         {
-            return naming::id_type(
-                naming::detail::get_stripped_gid(get_base_gid())
-              , naming::id_type::unmanaged);
+            naming::gid_type::mutex_type::scoped_lock l(&gid_);
+
+            // take all credits to avoid a self reference
+            naming::gid_type gid = gid_;
+            naming::detail::strip_credit_from_gid(
+                const_cast<naming::gid_type&>(gid_));
+
+            // we request the id of a future only once
+            BOOST_ASSERT(0 != naming::detail::get_credit_from_gid(gid));
+
+            //naming::detail::set_credit_split_mask_for_gid(gid);
+            //if (0 == naming::detail::get_credit_from_gid(gid))
+            //{
+            //    naming::detail::retrieve_new_credits(gid, gid,
+            //        HPX_INITIAL_GLOBALCREDIT, 0, l);
+            //}
+
+            return naming::id_type(gid, naming::id_type::managed);
         }
 
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
-            return back_ptr_->get_base_gid();
+            BOOST_ASSERT(gid_ != naming::invalid_gid);
+            return gid_;
         }
 
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
 
         void set_back_ptr(components::managed_component<promise>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
             BOOST_ASSERT(bp);
-            back_ptr_ = bp;
+            BOOST_ASSERT(gid_ == naming::invalid_gid);
+            gid_ = bp->get_base_gid();
         }
 
-        components::managed_component<promise>* back_ptr_;
+        naming::gid_type gid_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -167,15 +263,14 @@ namespace hpx { namespace lcos { namespace detail
         enum { value = components::component_promise };
 
         promise()
-          : back_ptr_(0)
         {}
 
         promise(completed_callback_type const& data_sink)
-          : future_data_type(data_sink), back_ptr_(0)
+          : future_data_type(data_sink)
         {}
 
         promise(BOOST_RV_REF(completed_callback_type) data_sink)
-          : future_data_type(boost::move(data_sink)), back_ptr_(0)
+          : future_data_type(boost::move(data_sink))
         {}
 
         // The implementation of the component is responsible for deleting the
@@ -183,7 +278,6 @@ namespace hpx { namespace lcos { namespace detail
         ~promise()
         {
             this->finalize();
-            delete back_ptr_;
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -222,31 +316,80 @@ namespace hpx { namespace lcos { namespace detail
         // retrieve the gid of this promise
         naming::id_type get_gid() const
         {
-            return naming::id_type(
-                naming::detail::get_stripped_gid(get_base_gid())
-              , naming::id_type::unmanaged);
+            naming::gid_type::mutex_type::scoped_lock l(&gid_);
+
+            // take all credits to avoid a self reference
+            naming::gid_type gid = gid_;
+            naming::detail::strip_credit_from_gid(
+                const_cast<naming::gid_type&>(gid_));
+
+            // we request the id of a future only once
+            BOOST_ASSERT(0 != naming::detail::get_credit_from_gid(gid));
+
+            //naming::detail::set_credit_split_mask_for_gid(gid);
+            //if (0 == naming::detail::get_credit_from_gid(gid))
+            //{
+            //    naming::detail::retrieve_new_credits(gid, gid,
+            //        HPX_INITIAL_GLOBALCREDIT, 0, l);
+            //}
+
+            return naming::id_type(gid, naming::id_type::managed);
         }
 
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
-            return back_ptr_->get_base_gid();
+            BOOST_ASSERT(gid_ != naming::invalid_gid);
+            return gid_;
         }
 
     private:
-        template <typename, typename>
-        friend class components::managed_component;
+        template <typename>
+        friend struct components::detail_adl_barrier::init;
 
         void set_back_ptr(components::managed_component<promise>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
             BOOST_ASSERT(bp);
-            back_ptr_ = bp;
+            BOOST_ASSERT(gid_ == naming::invalid_gid);
+            gid_ = bp->get_base_gid();
         }
 
-        components::managed_component<promise>* back_ptr_;
+        naming::gid_type gid_;
     };
 }}}
+
+namespace hpx { namespace components
+{
+    ///////////////////////////////////////////////////////////////////////////
+    // This is a placeholder shim used for the type erased memory management
+    // for all promise types
+    struct managed_promise : boost::noncopyable
+    {
+        /// \brief Construct a managed_component instance holding a new wrapped
+        ///        instance
+        managed_promise()
+          : promise_(0)
+        {
+            BOOST_ASSERT(false);        // this is never called
+        }
+
+        ~managed_promise()
+        {
+            intrusive_ptr_release(this);
+        }
+
+    private:
+        friend void intrusive_ptr_add_ref(managed_promise* p)
+        {
+            intrusive_ptr_add_ref(p->promise_);
+        }
+        friend void intrusive_ptr_release(managed_promise* p)
+        {
+            intrusive_ptr_release(p->promise_);
+        }
+
+        lcos::detail::promise<void, util::unused_type>* promise_;
+    };
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -296,6 +439,7 @@ namespace hpx { namespace lcos
         typedef typename wrapped_type::completed_callback_type
             completed_callback_type;
 
+    public:
         /// Construct a new \a promise instance. The supplied
         /// \a thread will be notified as soon as the result of the
         /// operation associated with this future instance has been
@@ -405,27 +549,27 @@ namespace hpx { namespace lcos
             (*impl_)->set_local_data(boost::forward<Result>(result));
         }
 
-#       ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this...
         explicit operator lcos::future<Result>()
         {
             return get_future();
         }
-#       endif
+#endif
 
     protected:
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
-    
-#   ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+
+#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
     // [N3722, 4.1] asks for this...
     template <typename Result>
     inline future<Result>::future(promise<Result>& promise)
     {
         promise.get_future().swap(*this);
     }
-#   endif
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
@@ -531,48 +675,64 @@ namespace hpx { namespace lcos
             (*impl_)->set_exception(e);
         }
 
-#       ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this...
         explicit operator lcos::future<void>()
         {
             return get_future();
         }
-#       endif
+#endif
 
     protected:
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
-    
-#   ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+
+#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
     // [N3722, 4.1] asks for this...
     inline future<void>::future(promise<void>& promise)
     {
         promise.get_future().swap(*this);
     }
-#   endif
+#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits
 {
+    namespace detail
+    {
+        HPX_EXPORT extern boost::detail::atomic_count unique_type;
+    }
+
     template <typename Result, typename RemoteResult>
     struct component_type_database<lcos::detail::promise<Result, RemoteResult> >
     {
+        HPX_ALWAYS_EXPORT static components::component_type value;
+
         static components::component_type get()
         {
-            return component_type_database<
-                lcos::base_lco_with_value<Result, RemoteResult>
-            >::get();
+            // Promises are never created remotely, their factories are not
+            // registered with AGAS, so we can assign the component types locally.
+            if (value == components::component_invalid)
+            {
+                value = derived_component_type(++detail::unique_type,
+                    components::component_base_lco_with_value);
+            }
+            return value;
         }
 
         static void set(components::component_type t)
         {
-            component_type_database<
-                lcos::base_lco_with_value<Result, RemoteResult>
-            >::set(t);
+            BOOST_ASSERT(false);
         }
     };
+
+    template <typename Result, typename RemoteResult>
+    HPX_ALWAYS_EXPORT components::component_type
+    component_type_database<
+        lcos::detail::promise<Result, RemoteResult>
+    >::value = components::component_invalid;
 }}
 
 #endif

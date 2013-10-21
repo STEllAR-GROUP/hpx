@@ -564,8 +564,8 @@ response component_namespace::get_component_type_name(
     if (result.empty())
     {
         LAGAS_(info) << (boost::format(
-            "component_namespace::get_component_typename, key(%1%), response(no_success)")
-            % int(t));
+            "component_namespace::get_component_typename, key(%1%/%2%), response(no_success)")
+            % int(components::get_derived_type(t)) % int(components::get_base_type(t)));
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -574,8 +574,8 @@ response component_namespace::get_component_type_name(
     }
 
     LAGAS_(info) << (boost::format(
-        "component_namespace::get_component_typename, key(%1%), response(%2%)")
-        % int(t) % result);
+        "component_namespace::get_component_typename, key(%1%/%2%), response(%3%)")
+        % int(components::get_derived_type(t)) % int(components::get_base_type(t)) % result);
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -914,4 +914,3 @@ void component_namespace::counter_data::increment_num_localities_count()
 }
 
 }}}
-

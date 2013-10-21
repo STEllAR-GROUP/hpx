@@ -734,11 +734,18 @@ namespace hpx
     {
         // initialize thread affinity settings in the scheduler
         if (affinity_init_.used_cores_ == 0) {
-            // correct pu_offset from config data if appropriate
+            // correct used_cores from config data if appropriate
             affinity_init_.used_cores_ = this->get_config().get_used_cores();
         }
 
-        return this->get_thread_manager().init(affinity_init_);
+        return static_cast<boost::uint32_t>(
+            this->get_thread_manager().init(affinity_init_));
+    }
+
+    boost::shared_ptr<util::one_size_heap_list_base> runtime::get_promise_heap(
+        components::component_type type)
+    {
+        return runtime_support_->get_promise_heap(type);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1114,6 +1121,15 @@ namespace hpx { namespace threads
         return get_runtime().get_config().get_stack_size(stacksize);
     }
 }}
+
+namespace hpx { namespace components { namespace detail
+{
+    boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+        components::component_type type)
+    {
+        return get_runtime().get_promise_heap(type);
+    }
+}}}
 
 #if defined(HPX_HAVE_SECURITY)
 namespace hpx

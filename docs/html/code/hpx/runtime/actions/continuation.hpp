@@ -47,8 +47,8 @@ namespace hpx
 
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0, typename F>
-    inline typename boost::enable_if<
-        boost::mpl::bool_<boost::fusion::result_of::size<Arguments>::value == 1>,
+    inline typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 1,
         bool
     >::type
     apply_continue(hpx::actions::action<Component, Result, Arguments, Derived>,

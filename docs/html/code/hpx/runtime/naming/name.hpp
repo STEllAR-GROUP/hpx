@@ -37,6 +37,12 @@
 #define HPX_IDTYPE_VERSION  0x20
 #define HPX_GIDTYPE_VERSION 0x10
 
+namespace hpx { namespace agas
+{
+    HPX_API_EXPORT void incref_apply(naming::gid_type const& lower,
+        naming::gid_type const& upper, boost::int64_t credits);
+}}
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
@@ -351,6 +357,7 @@ namespace hpx { namespace naming
             BOOST_ASSERT(0 == (c & ~gid_type::credit_base_mask));
             id.set_msb((msb & ~gid_type::credit_mask) |
                 ((c & gid_type::credit_base_mask) << 16));
+
             BOOST_ASSERT(c < (std::numeric_limits<boost::uint16_t>::max)());
             return static_cast<boost::uint16_t>(c);
         }
@@ -399,6 +406,13 @@ namespace hpx { namespace naming
                 ((credit & gid_type::credit_base_mask) << 16));
         }
 
+        inline void set_credit_split_mask_for_gid(gid_type& id)
+        {
+            id.set_msb(id.get_msb() | gid_type::was_split_mask);
+        }
+
+        // splits the current credit of the given id and assigns half of it to the
+        // returned copy
         inline gid_type split_credits_for_gid(gid_type& id, int fraction = 2)
         {
             boost::uint64_t msb = id.get_msb();
@@ -407,10 +421,39 @@ namespace hpx { namespace naming
             boost::uint32_t newcredits = static_cast<boost::uint32_t>(credits / fraction);
 
             msb &= ~gid_type::credit_mask;
-            id.set_msb(msb | (((credits - newcredits) << 16) & gid_type::credit_mask) | gid_type::was_split_mask);
+            id.set_msb(msb |
+                (((credits - newcredits) << 16) & gid_type::credit_mask) |
+                gid_type::was_split_mask);
 
-            return gid_type(msb | ((newcredits << 16) & gid_type::credit_mask) | gid_type::was_split_mask,
+            return gid_type(msb |
+                    ((newcredits << 16) & gid_type::credit_mask) |
+                    gid_type::was_split_mask,
                 id.get_lsb());
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Lock>
+        void retrieve_new_credits(naming::gid_type& newid,
+            naming::gid_type& orig_id, boost::uint16_t credit1,
+            boost::uint16_t credit2, Lock& l)
+        {
+            // We add the new credits to the gids first to avoid
+            // duplicate splitting during concurrent serialization
+            // operations.
+            if (credit1) detail::add_credit_to_gid(newid, credit1);
+            if (credit2) detail::add_credit_to_gid(orig_id, credit2);
+
+            // We unlock the lock as all operations on the local credit
+            // have been performed and we don't want the lock to be
+            // pending during the (possibly remote) AGAS operation.
+            l.unlock();
+
+            // If something goes wrong during the reference count
+            // increment below we will have already added credits to
+            // the split gid. In the worst case this will cause a
+            // memory leak. I'm not sure if it is possible to reliably
+            // handle this problem.
+            agas::incref_apply(orig_id, orig_id, credit1 + credit2);
         }
 
         inline bool gid_was_split(gid_type const& id)
@@ -438,6 +481,15 @@ namespace hpx { namespace naming
         // custom deleter for id_type_impl above
         HPX_EXPORT void gid_managed_deleter (id_type_impl* p);
         HPX_EXPORT void gid_unmanaged_deleter (id_type_impl* p);
+
+#if defined(BOOST_INTEL)
+# define HPX_EXPORT_ID_IMPL_HELPERS HPX_EXPORT
+#else
+# define HPX_EXPORT_ID_IMPL_HELPERS /**/
+#endif
+
+        HPX_EXPORT_ID_IMPL_HELPERS void intrusive_ptr_add_ref(id_type_impl* p);
+        HPX_EXPORT_ID_IMPL_HELPERS void intrusive_ptr_release(id_type_impl* p);
 
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
@@ -482,13 +534,14 @@ namespace hpx { namespace naming
             naming::gid_type prepare_gid() const;
 
             // reference counting
-            friend void intrusive_ptr_add_ref(id_type_impl* p);
-            friend void intrusive_ptr_release(id_type_impl* p);
+            friend HPX_EXPORT_ID_IMPL_HELPERS void intrusive_ptr_add_ref(id_type_impl* p);
+            friend HPX_EXPORT_ID_IMPL_HELPERS void intrusive_ptr_release(id_type_impl* p);
 
             boost::detail::atomic_count count_;
             id_type_management type_;
         };
 
+#if !defined(BOOST_INTEL)
         /// support functions for boost::intrusive_ptr
         inline void intrusive_ptr_add_ref(id_type_impl* p)
         {
@@ -500,176 +553,19 @@ namespace hpx { namespace naming
             if (0 == --p->count_)
                 id_type_impl::get_deleter(p->get_management_type())(p);
         }
+#endif
+#undef HPX_EXPORT_ID_IMPL_HELPERS
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // the local gid is actually just a wrapper around the real thing
-    struct HPX_EXPORT id_type
-    {
-    public:
-        enum management_type
-        {
-            unknown_deleter = detail::unknown_deleter,
-            unmanaged = detail::unmanaged,          ///< unmanaged GID
-            managed = detail::managed               ///< managed GID
-        };
+    HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);
+}}
 
-        id_type() {}
+#include <hpx/runtime/naming/id_type.hpp>
+#include <hpx/runtime/naming/id_type_impl.hpp>
 
-        explicit id_type(boost::uint64_t lsb_id, management_type t)
-          : gid_(new detail::id_type_impl(0, lsb_id,
-                static_cast<detail::id_type_management>(t)))
-        {}
-
-        explicit id_type(gid_type const& gid, management_type t)
-          : gid_(new detail::id_type_impl(gid,
-                static_cast<detail::id_type_management>(t)))
-        {
-            BOOST_ASSERT(detail::get_credit_from_gid(*gid_) || t == unmanaged);
-        }
-
-        explicit id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id,
-                management_type t)
-          : gid_(new detail::id_type_impl(msb_id, lsb_id,
-                static_cast<detail::id_type_management>(t)))
-        {
-            BOOST_ASSERT(detail::get_credit_from_gid(*gid_) || t == unmanaged);
-        }
-
-        id_type(id_type const & o)
-          : gid_(o.gid_)
-        {}
-
-        id_type(BOOST_RV_REF(id_type) o)
-          : gid_(o.gid_)
-        {
-            o.gid_.reset();
-        }
-
-        id_type & operator=(BOOST_COPY_ASSIGN_REF(id_type) o)
-        {
-            gid_ = o.gid_;
-            return *this;
-        }
-
-        id_type & operator=(BOOST_RV_REF(id_type) o)
-        {
-            gid_ = o.gid_;
-            o.gid_.reset();
-            return *this;
-        }
-
-        gid_type& get_gid() { return *gid_; }
-        gid_type const& get_gid() const { return *gid_; }
-
-        // This function is used in AGAS unit tests and application code, do not
-        // remove.
-        management_type get_management_type() const
-        {
-            return management_type(gid_->get_management_type());
-        }
-
-        id_type& operator++()       // pre-increment
-        {
-            ++(*gid_);
-            return *this;
-        }
-        id_type operator++(int)     // post-increment
-        {
-            (*gid_)++;
-            return *this;
-        }
-
-        operator util::safe_bool<id_type>::result_type() const
-        {
-            return util::safe_bool<id_type>()(gid_ && *gid_);
-        }
-
-        // comparison is required as well
-        friend bool operator== (id_type const& lhs, id_type const& rhs)
-        {
-            if (!lhs)
-                return !rhs;
-            if (!rhs)
-                return !lhs;
-
-            return *lhs.gid_ == *rhs.gid_;
-        }
-        friend bool operator!= (id_type const& lhs, id_type const& rhs)
-        {
-            return !(lhs == rhs);
-        }
-
-        friend bool operator< (id_type const& lhs, id_type const& rhs)
-        {
-            // LHS is null, rhs is not.
-            if (!lhs && rhs)
-                return true;
-
-            // RHS is null.
-            if (!rhs)
-                return false;
-
-            return *lhs.gid_ < *rhs.gid_;
-        }
-
-        friend bool operator<= (id_type const& lhs, id_type const& rhs)
-        {
-            // Deduced from <.
-            return !(rhs < lhs);
-        }
-
-        friend bool operator> (id_type const& lhs, id_type const& rhs)
-        {
-            // Deduced from <.
-            return rhs < lhs;
-        }
-
-        friend bool operator>= (id_type const& lhs, id_type const& rhs)
-        {
-            // Deduced from <.
-            return !(lhs < rhs);
-        }
-
-        // access the internal parts of the gid
-        boost::uint64_t get_msb() const
-        {
-            return gid_->get_msb();
-        }
-        void set_msb(boost::uint64_t msb)
-        {
-            gid_->set_msb(msb);
-        }
-        boost::uint64_t get_lsb() const
-        {
-            return gid_->get_lsb();
-        }
-        void set_lsb(boost::uint64_t lsb)
-        {
-            gid_->set_lsb(lsb);
-        }
-        void set_lsb(void* lsb)
-        {
-            gid_->set_lsb(lsb);
-        }
-
-    private:
-        friend std::ostream& operator<< (std::ostream& os, id_type const& id);
-
-        friend class boost::serialization::access;
-
-        template <class Archive>
-        void save(Archive & ar, const unsigned int version) const;
-
-        template <class Archive>
-        void load(Archive & ar, const unsigned int version);
-
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
-        BOOST_COPYABLE_AND_MOVABLE(id_type)
-
-        boost::intrusive_ptr<detail::id_type_impl> gid_;
-    };
-
+namespace hpx { namespace naming
+{
     ///////////////////////////////////////////////////////////////////////////
     inline std::ostream& operator<< (std::ostream& os, id_type const& id)
     {
@@ -706,9 +602,6 @@ namespace hpx { namespace naming
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    id_type const invalid_id = id_type();
-
-    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT char const* get_management_type_name(id_type::management_type m);
 }}
 
@@ -723,11 +616,6 @@ namespace hpx { namespace traits
             return naming::id_type(rhs, naming::id_type::managed);
         }
     };
-
-    //template <>
-    //struct promise_remote_result<naming::id_type>
-    //  : boost::mpl::identity<naming::gid_type>
-    //{};
 
     template <>
     struct promise_local_result<naming::gid_type>
@@ -752,11 +640,6 @@ namespace hpx { namespace traits
             return result;
         }
     };
-
-    //template <>
-    //struct promise_remote_result<std::vector<naming::id_type> >
-    //  : boost::mpl::identity<std::vector<naming::gid_type> >
-    //{};
 
     template <>
     struct promise_local_result<std::vector<naming::gid_type> >
