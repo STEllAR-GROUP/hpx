@@ -238,7 +238,7 @@ namespace hpx { namespace naming
         template HPX_EXPORT void id_type_impl::load(
             util::portable_binary_iarchive&);
 
-#if defined(BOOST_INTEL)
+#if defined(BOOST_INTEL) || defined(__clang__)
         /// support functions for boost::intrusive_ptr
         void intrusive_ptr_add_ref(id_type_impl* p)
         {

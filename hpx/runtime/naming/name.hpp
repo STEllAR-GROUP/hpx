@@ -482,7 +482,7 @@ namespace hpx { namespace naming
         HPX_EXPORT void gid_managed_deleter (id_type_impl* p);
         HPX_EXPORT void gid_unmanaged_deleter (id_type_impl* p);
 
-#if defined(BOOST_INTEL)
+#if defined(BOOST_INTEL) || defined(__clang__)
 # define HPX_EXPORT_ID_IMPL_HELPERS HPX_EXPORT
 #else
 # define HPX_EXPORT_ID_IMPL_HELPERS /**/
@@ -541,7 +541,7 @@ namespace hpx { namespace naming
             id_type_management type_;
         };
 
-#if !defined(BOOST_INTEL)
+#if !defined(BOOST_INTEL) && !defined(__clang__)
         /// support functions for boost::intrusive_ptr
         inline void intrusive_ptr_add_ref(id_type_impl* p)
         {
