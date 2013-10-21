@@ -59,7 +59,6 @@
 #   define HPX_TUPLE_MAX HPX_TUPLE_LIMIT
 #endif
 
-
 #if defined(BOOST_NO_SFINAE_EXPR) ||                                          \
     (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40800)
 #   define HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(Predicate)
@@ -139,7 +138,11 @@ namespace hpx { namespace util
             BOOST_COPYABLE_AND_MOVABLE(tuple_member);
 
         public: // exposition-only
+#           if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40600
             BOOST_RV_REF(T) _value;
+#           else
+            T _value;
+#           endif
 
         public:
             // 20.4.2.1, tuple construction
