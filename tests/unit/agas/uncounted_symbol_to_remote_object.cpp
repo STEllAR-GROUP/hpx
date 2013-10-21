@@ -60,7 +60,7 @@ void hpx_test_main(
     {
         /// AGAS reference-counting test 10 (from #126):
         ///
-        ///     Create a component remotely, and register it's credit-stripped
+        ///     Create a component remotely, and register its credit-stripped
         ///     raw gid with a symbolic name. Then, let all references to the
         ///     component go out of scope. The component should be destroyed.
         ///     Finally, unregister the symbolic name. Unregistering the
@@ -101,6 +101,8 @@ void hpx_test_main(
         }
 
         // Flush pending reference counting operations.
+        garbage_collect();
+        garbage_collect(remote_localities[0]);
         garbage_collect();
 
         // The component should not be alive anymore, as the symbolic binding
