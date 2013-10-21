@@ -12,10 +12,43 @@
 
 [heading General Changes]
 
+* Ported HPX to BlueGene/Q
+* Improved HPX support for Xeon/Phi accelerators
+* Reimplemented `hpx::bind`, `hpx::tuple`, and `hpx::function` for better
+  performance and better compliance with the C++11 Standard. Added `hpx::mem_fn`.
+* Reworked `hpx::when_all` and `hpx::when_any` for better compliance with the
+  ongoing C++ standardization effort, added heterogeneous version for those
+  functions. Added `hpx::when_any_swapped`.
+* Added `hpx::copy` as a precursor for a migrate functionality
+* Added `hpx::get_ptr` allowing to directly access the memory underlying a given
+  component
+* Added the `hpx::lcos::broadcast`, `hpx::lcos::reduce`, and `hpx::lcos::fold`
+  collective operations
+* Added `hpx::get_locality_name` allowing to retrieve the name of any of the
+  localities for the application.
+* Added support for more flexible thread affinity control from the HPX command
+  line, such as new modes for `--hpx:bind` (`balanced`, `scattered`, `compact`),
+  improved default settings when running multiple localities on the same node.
+* Added experimental executors for simpler thread pooling and scheduling. This API
+  may change in the future as it will stay aligned with the ongoing C++ 
+  standardization efforts.
+* Massively improved the performance of the HPX serialization code. Added partial
+  support for zero copy serialization of array and bitwise-copyable types.
+
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 976] - Wrong library order in pkgconfig
+* [issue 974] - Option pu-offset ignored in fixing_588 branch
+* [issue 969] - Non-existent INI files requested on the command line via
+                `--hpx:config` do not cause warnings or errors.
+* [issue 968] - Cannot build examples in fixing_588 branch
+* [issue 967] - Command line description of `--hpx:queuing` seems wrong
+* [issue 966] - `--hpx:print-bind` physical core numbers are wrong
+* [issue 963] - Not all worker threads are working
+* [issue 962] - Problem with SLURM integration 
+* [issue 961] - `--hpx:print-bind` outputs incorrect information
 * [issue 960] - Fix cut and paste error in documentation of get_thread_priority
 * [issue 959] - Change link to boost.atomic in documentation to point to
                 boost.org
@@ -29,21 +62,25 @@ Here is a list of the important tickets we closed for this release.
 * [issue 953] - Cannot use MKL with HPX
 * [issue 951] - Assert when number of threads is greater than hardware
                 concurrency
-* [issue 948] - HPX_HAVE_GENERIC_CONTEXT_COROUTINES conflicts with
-                HPX_HAVE_FIBER_BASED_COROUTINES
+* [issue 948] - `HPX_HAVE_GENERIC_CONTEXT_COROUTINES` conflicts with
+                `HPX_HAVE_FIBER_BASED_COROUTINES`
 * [issue 947] - Need MPI_THREAD_MULTIPLE for backward compatibility
-* [issue 945] - Segfault with hpx::lcos::broadcast
+* [issue 946] - HPX does not call `MPI_Finalize`
+* [issue 945] - Segfault with `hpx::lcos::broadcast`
 * [issue 944] - OS X: assertion 'pu_offset_ < hardware_concurrency' failed
 * [issue 943] - #include <hpx/hpx_main.hpp> does not work
 * [issue 942] - Make the BG/Q work with -O3
 * [issue 940] - Use separator when concatenating locality name
-* [issue 939] - Refactor MPI parcelport to use MPI_Wait instead of multiple
-                MPI_Test calls
+* [issue 939] - Refactor MPI parcelport to use `MPI_Wait` instead of multiple
+                `MPI_Test` calls
 * [issue 938] - Want to officially access client_base::gid_
 * [issue 937] - client_base::gid_ should be private
 * [issue 936] - Want doxygen-like source code index
 * [issue 935] - Build error with gcc 4.6 and Boost 1.54.0 on hpx trunk and
                 0.9.6
+* [issue 933] - Cannot build HPX with Boost 1.54.0
+* [issue 932] - Components are destructed too early
+* [issue 931] - Make HPX work on BG/Q
 * [issue 930] - make git-docs is broken
 * [issue 929] - Generating index in docs broken
 * [issue 928] - Optimize hpx::util::static_ for C++11 compilers supporting
@@ -54,6 +91,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 921] - Implement `hpx::mem_fn`
 * [issue 920] - Output locality with `--hpx:print-bind`
 * [issue 919] - Correct grammar; simplify boolean expressions
+* [issue 918] - Link to hello_world.cpp is broken
 * [issue 917] - adapt cmake file to new boostbook version
 * [issue 916] - fix problem building documentation with xsltproc >= 1.1.27
 * [issue 915] - Add another TBBMalloc library search path
@@ -63,16 +101,18 @@ Here is a list of the important tickets we closed for this release.
 * [issue 910] - Want like to specify MPI_ROOT instead of compiler wrapper script
 * [issue 909] - Warning about void* arithmetic
 * [issue 908] - Buildbot for MIC is broken
-* [issue 906] - Can't use --hpx:bind=balanced with multiple MPI processes
+* [issue 906] - Can't use `--hpx:bind=balanced` with multiple MPI processes
+* [issue 905] - `--hpx:bind` documentation should describe full grammar
 * [issue 904] - Add hpx::lcos::fold and hpx::lcos::inverse_fold collective
                 operation
 * [issue 903] - Add `hpx::when_any_swapped()`
 * [issue 902] - Add `hpx::lcos::reduce` collective operation
+* [issue 901] - Web documentation is not searchable
 * [issue 900] - Web documentation for trunk has no index
 * [issue 898] - Some tests fail with GCC 4.8.1 and MPI parcel port
 * [issue 897] - HWLOC causes failures on Mac
 * [issue 896] - pu-offset leads to startup error
-* [issue 895] - hpx::get_locality_name not defined
+* [issue 895] - `hpx::get_locality_name` not defined
 * [issue 894] - Race condition at shutdown
 * [issue 893] - `--hpx:print-bind` switches std::cout to hexadecimal mode
 * [issue 892] - `hwloc_topology_load` can be expensive -- don't call multiple times 
@@ -88,6 +128,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 882] - tests.regressions.lcos.future_hang_on_get does not terminate
 * [issue 881] - tests/regressions/block_matrix/matrix.hh won't compile with GCC
                 4.8.1 
+* [issue 880] - HPX does not work on OS X
 * [issue 878] - `future::unwrap` triggers assertion
 * [issue 877] - "make tests" has build errors on Ubuntu 12.10 
 * [issue 876] - tcmalloc is used by default, even if it is not present
@@ -99,15 +140,19 @@ Here is a list of the important tickets we closed for this release.
 * [issue 871] - All tests fail with "make test"
 * [issue 870] - Please explicitly disable serialization in classes that don't
                 support it
-* [issue 867] - Reduce the number of copies of hpx::function arguments
+* [issue 867] - Reduce the number of copies of `hpx::function` arguments
 * [issue 863] - Futures should not require a default constructor
 * [issue 862] - value_or_error shall not default construct its result
+* [issue 861] - `HPX_UNUSED` macro
+* [issue 860] - Add functionality to copy construct a component
 * [issue 859] - `hpx::endl` should flush
-* [issue 858] - Create `hpx::get_ptr<>()` allowing to access component implementation
-* [issue 854] - hpx/hpx.hpp does not include hpx/include/iostreams.hpp
+* [issue 858] - Create `hpx::get_ptr<>` allowing to access component implementation
+* [issue 855] - Implement `hpx::INVOKE`
+* [issue 854] - `hpx/hpx.hpp` does not include `hpx/include/iostreams.hpp`
 * [issue 853] - Feature request: null future
 * [issue 852] - Feature request: Locality names
-* [issue 851] - hpx::cout output does not appear on screen
+* [issue 851] - `hpx::cout` output does not appear on screen
+* [issue 849] - All tests fail on OS X after installing
 * [issue 848] - Update OS X build instructions
 * [issue 846] - Update hpx_external_example
 * [issue 845] - Issues with having both debug and release modules in the same
@@ -116,13 +161,15 @@ Here is a list of the important tickets we closed for this release.
 * [issue 843] - Tests should use CTest
 * [issue 842] - Remove buffer_pool from MPI parcelport
 * [issue 841] - Add possibility to broadcast an index with hpx::lcos::broadcast
-* [issue 838] - Simplify util::tuple
-* [issue 837] - Adopt boost::tuple tests for util::tuple
-* [issue 836] - Adopt boost::function tests for util::function
+* [issue 838] - Simplify `util::tuple`
+* [issue 837] - Adopt boost::tuple tests for `util::tuple`
+* [issue 836] - Adopt boost::function tests for `util::function`
 * [issue 835] - Tuple interface missing pieces
 * [issue 833] - Partially preprocessing files not working
 * [issue 832] - Native papi counters do not work with wild cards
 * [issue 831] - Arithmetics counter fails if only one parameter is given
+* [issue 830] - Convert hpx::util::function to use new scheme for serializing its base
+                pointer
 * [issue 829] - Consistently use `decay<T>` instead of `remove_const< remove_reference<T>>`
 * [issue 828] - Update future implementation to N3721 and N3722
 * [issue 827] - Enable MPI parcelport for bootstrapping whenever application
@@ -151,17 +198,30 @@ Here is a list of the important tickets we closed for this release.
                 directory
 * [issue 807] - Create performance counters exposing overall AGAS statistics
 * [issue 795] - Create timed make_ready_future
+* [issue 794] - Create heterogeneous `when_all`/`when_any`/etc.
 * [issue 721] - Make HPX usable for Xeon Phi
 * [issue 694] - CMake should complain if you attempt to build an example without
                 its dependencies
+* [issue 692] - SLURM support broken
 * [issue 683] - python/hpx/process.py imports epoll on all platforms
+* [issue 619] - Automate the doc building process
 * [issue 600] - GTC performance broken
 * [issue 577] - Allow for zero copy serialization/networking
-* [issue 554] - Write a custom .lib file on Windows pulling in hpx_init and
-                hpx.dll, phase out hpx_init
 * [issue 551] - Change executable names to have debug postfix in Debug builds
+* [issue 544] - Write a custom .lib file on Windows pulling in hpx_init and
+                hpx.dll, phase out hpx_init
+* [issue 534] - `hpx::init` should take functions by `std::function` and should
+                accept all forms of hpx_main
+* [issue 508] - FindPackage fails to set FOO_LIBRARY_DIR
+* [issue 506] - Add cmake support to generate ini files for external applications
+* [issue 470] - Changing build-type after configure does not update boost
+                library names
+* [issue 453] - Document `hpx_run_tests.py`
 * [issue 445] - Significant performance mismatch between MPI and HPX in SMP
                 for allgather example
+* [issue 443] - Make docs viewable from build directory
+* [issue 421] - Support multiple HPX instances per node in a batch environment
+                like PBS or SLURM
 * [issue 316] - Add message size limitation
 * [issue 249] - Clean up locking code in big boot barrier
 * [issue 136] - Persistent CMake variables need to be marked as cache variables
