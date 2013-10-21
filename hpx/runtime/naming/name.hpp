@@ -482,14 +482,8 @@ namespace hpx { namespace naming
         HPX_EXPORT void gid_managed_deleter (id_type_impl* p);
         HPX_EXPORT void gid_unmanaged_deleter (id_type_impl* p);
 
-#if defined(BOOST_INTEL) || defined(__clang__)
-# define HPX_EXPORT_ID_IMPL_HELPERS HPX_EXPORT
-#else
-# define HPX_EXPORT_ID_IMPL_HELPERS /**/
-#endif
-
-        HPX_EXPORT_ID_IMPL_HELPERS void intrusive_ptr_add_ref(id_type_impl* p);
-        HPX_EXPORT_ID_IMPL_HELPERS void intrusive_ptr_release(id_type_impl* p);
+        HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
+        HPX_EXPORT void intrusive_ptr_release(id_type_impl* p);
 
         ///////////////////////////////////////////////////////////////////////
         struct HPX_EXPORT id_type_impl : gid_type
@@ -534,27 +528,12 @@ namespace hpx { namespace naming
             naming::gid_type prepare_gid() const;
 
             // reference counting
-            friend HPX_EXPORT_ID_IMPL_HELPERS void intrusive_ptr_add_ref(id_type_impl* p);
-            friend HPX_EXPORT_ID_IMPL_HELPERS void intrusive_ptr_release(id_type_impl* p);
+            friend HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
+            friend HPX_EXPORT void intrusive_ptr_release(id_type_impl* p);
 
             boost::detail::atomic_count count_;
             id_type_management type_;
         };
-
-#if !defined(BOOST_INTEL) && !defined(__clang__)
-        /// support functions for boost::intrusive_ptr
-        inline void intrusive_ptr_add_ref(id_type_impl* p)
-        {
-            ++p->count_;
-        }
-
-        inline void intrusive_ptr_release(id_type_impl* p)
-        {
-            if (0 == --p->count_)
-                id_type_impl::get_deleter(p->get_management_type())(p);
-        }
-#endif
-#undef HPX_EXPORT_ID_IMPL_HELPERS
     }
 
     ///////////////////////////////////////////////////////////////////////////
