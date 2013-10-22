@@ -1,0 +1,81 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Function get_locality_name</title>
+<link rel="stylesheet" href="../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="HPX 0.9.7">
+<link rel="up" href="../header/hpx/hpx_fwd_hpp.html" title="Header &lt;hpx/hpx_fwd.hpp&gt;">
+<link rel="prev" href="get_locality_n_idp16140720.html" title="Function get_locality_name">
+<link rel="next" href="trigger_lco_event.html" title="Function trigger_lco_event">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="../images/hpx_0_9_7_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="get_locality_n_idp16140720.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/hpx_fwd_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="trigger_lco_event.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="hpx.get_locality_n_idp16144560"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Function get_locality_name</span></h2>
+<p>hpx::get_locality_name &#8212; Return the name of the referenced locality. </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../header/hpx/hpx_fwd_hpp.html" title="Header &lt;hpx/hpx_fwd.hpp&gt;">hpx/hpx_fwd.hpp</a>&gt;
+
+</span>
+<span class="identifier">future</span><span class="special">&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="special">&gt;</span> <span class="identifier">get_locality_name</span><span class="special">(</span><span class="identifier">naming</span><span class="special">::</span><span class="identifier">id_type</span> <span class="keyword">const</span> <span class="special">&amp;</span> id<span class="special">)</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp101653872"></a><h2>Description</h2>
+<p>This function returns a future referring to the name for the locality of the given id.</p>
+<p>
+
+</p>
+<p><span class="bold"><strong>See Also:</strong></span></p>
+<p><span class="emphasis"><em>std::string</em></span> get_locality_name() </p>
+<p>
+</p>
+<div class="variablelist"><table border="0" class="variablelist compact">
+<colgroup>
+<col align="left" valign="top">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td><p><span class="term">Parameters:</span></p></td>
+<td><div class="variablelist"><table border="0" class="variablelist compact">
+<colgroup>
+<col align="left" valign="top">
+<col>
+</colgroup>
+<tbody><tr>
+<td><p><span class="term"><code class="computeroutput">id</code></span></p></td>
+<td><p>[in] The global id of the locality for which the name should be retrievd</p></td>
+</tr></tbody>
+</table></div></td>
+</tr>
+<tr>
+<td><p><span class="term">Returns:</span></p></td>
+<td><p>This function returns the name for the locality of the given id. The name is retrieved from the underlying networking layer and may be different for different parcelports.</p></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="get_locality_n_idp16140720.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/hpx_fwd_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="trigger_lco_event.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

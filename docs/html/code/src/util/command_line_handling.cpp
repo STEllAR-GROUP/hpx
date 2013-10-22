@@ -11,6 +11,7 @@
 #include <hpx/util/parse_command_line.hpp>
 #include <hpx/util/manage_config.hpp>
 #include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/detail/reset_function.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
@@ -387,7 +388,7 @@ namespace hpx { namespace util
                 if (!vm.count("hpx:run-hpx-main") &&
                     !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
                 {
-                    hpx_main_f_.reset();
+                    util::detail::reset_function(hpx_main_f_);
                 }
             }
             else if (vm.count("hpx:connect")) {
@@ -406,7 +407,7 @@ namespace hpx { namespace util
             if (!vm.count("hpx:run-hpx-main") && 
                 !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
             {
-                hpx_main_f_.reset();
+                util::detail::reset_function(hpx_main_f_);
             }
         }
         else if (node != std::size_t(-1) || vm.count("hpx:node")) {
@@ -435,7 +436,7 @@ namespace hpx { namespace util
                     if (!vm.count("hpx:run-hpx-main") &&
                         !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
                     {
-                        hpx_main_f_.reset();
+                        util::detail::reset_function(hpx_main_f_);
                     }
                 }
             }
@@ -503,7 +504,7 @@ namespace hpx { namespace util
             if (!vm.count("hpx:run-hpx-main") &&
                 !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
             {
-                hpx_main_f_.reset();
+                util::detail::reset_function(hpx_main_f_);
             }
         }
 
