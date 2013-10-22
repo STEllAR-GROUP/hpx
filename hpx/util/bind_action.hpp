@@ -16,11 +16,164 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/include/async.hpp>
 
+#include <boost/get_pointer.hpp>
+#include <boost/fusion/include/at_c.hpp>
+#include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/functional/adapter/fused.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
+
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+        template <typename T, bool IsRvalueRef =
+            std::is_rvalue_reference<T>::type::value>
+#else
+        template <typename T, bool IsRvalueRef = false>
+#endif
+        struct env_value_type
+        {
+            typedef typename hpx::util::remove_reference<T>::type type;
+        };
+
+        template <typename T>
+        struct env_value_type<T, false>
+        {
+            typedef T type;
+        };
+
+        template <typename T>
+        struct env_value_type<T const, false>
+        {
+            typedef T const type;
+        };
+
+        template <typename T>
+        struct env_value_type<T &, false>
+        {
+            typedef typename hpx::util::remove_reference<T>::type & type;
+        };
+
+        template <typename T>
+        struct env_value_type<T const &, false>
+        {
+            typedef typename hpx::util::remove_reference<T>::type const & type;
+        };
+
+        struct not_enough_parameters {};
+
+        namespace result_of
+        {
+            template <typename Env, typename T>
+            struct eval
+            {
+                typedef T & type;
+            };
+
+            template <typename Env, typename T>
+            struct eval<Env, boost::reference_wrapper<T const> >
+            {
+                typedef T const & type;
+            };
+
+            template <typename Env, typename T>
+            struct eval<Env, boost::reference_wrapper<T> >
+            {
+                typedef T & type;
+            };
+        }
+
+        template <typename Env, typename T>
+        T & eval(Env &, T & t)
+        {
+            return t;
+        }
+
+        template <typename Env, typename T>
+        T const & eval(Env &, T const & t)
+        {
+            return t;
+        }
+
+        template <typename Env, typename T>
+        T & eval(Env &, boost::reference_wrapper<T> const & r)
+        {
+            return r.get();
+        }
+
+        template <typename Env, typename T>
+        T const & eval(Env &, boost::reference_wrapper<T const> const & r)
+        {
+            return r.get();
+        }
+
+        template <typename Env, typename T>
+        T & eval(Env &, boost::reference_wrapper<T> & r)
+        {
+            return r.get();
+        }
+
+        template <typename Env, typename T>
+        T const & eval(Env &, boost::reference_wrapper<T const> & r)
+        {
+            return r.get();
+        }
+
+        namespace result_of
+        {
+            template <typename Env, std::size_t N>
+            struct eval<Env, util::detail::placeholder<N> >
+            {
+                typedef typename boost::fusion::result_of::at_c<Env, N-1>::type type;
+            };
+
+            template <typename Env, std::size_t N>
+            struct eval<Env, util::detail::placeholder<N> const>
+            {
+                typedef typename boost::fusion::result_of::at_c<Env, N-1>::type type;
+            };
+        }
+
+        template <typename Env, std::size_t N>
+        typename boost::fusion::result_of::at_c<Env, N-1>::type
+        eval(Env & env, util::detail::placeholder<N>)
+        {
+            return boost::fusion::at_c<N-1>(env);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        using boost::get_pointer;
+
+        template <typename T>
+        T* get_pointer(boost::shared_ptr<T>& p)
+        {
+            return p.get();
+        }
+
+        template <typename T>
+        T* get_pointer(boost::intrusive_ptr<T>& p)
+        {
+            return p.get();
+        }
+
+        template <typename T>
+        T * get_pointer(T &t)
+        {
+            return &t;
+        }
+
+        template <typename T>
+        T const * get_pointer(T const &t)
+        {
+            return &t;
+        }
+    }
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_UTIL_BIND_EVAL(Z, N, D)                                           \
@@ -64,19 +217,6 @@
 #undef HPX_UTIL_BIND_EVAL
 #undef HPX_UTIL_BIND_REMOVE_REFERENCE
 #undef HPX_UTIL_BIND_REFERENCE
-
-namespace boost { namespace serialization
-{
-    // serialization of placeholders is trivial, just provide empty functions
-    template <int N>
-    void serialize(hpx::util::portable_binary_iarchive&,
-        hpx::util::placeholders::arg<N>&, unsigned int const)
-    {}
-    template <int N>
-    void serialize(hpx::util::portable_binary_oarchive&,
-        hpx::util::placeholders::arg<N>&, unsigned int const)
-    {}
-}}
 
 #endif
 

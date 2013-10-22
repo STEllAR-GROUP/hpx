@@ -1,5 +1,4 @@
-#include <hpx/hpx_main.hpp>
-#include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(disable: 4786)  // identifier truncated in debug info

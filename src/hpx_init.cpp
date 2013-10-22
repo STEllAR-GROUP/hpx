@@ -79,8 +79,8 @@ typedef
           , hpx::actions::detail::this_type
         >
       , hpx::naming::id_type
-      , hpx::util::placeholders::arg<0>
-      , hpx::util::placeholders::arg<1>
+      , hpx::util::detail::placeholder<1>
+      , hpx::util::detail::placeholder<2>
     >
     bound_list_symbolic_name_action;
 
@@ -103,8 +103,8 @@ typedef
           , hpx::actions::detail::this_type
         >
       , hpx::naming::id_type
-      , hpx::util::placeholders::arg<0>
-      , hpx::util::placeholders::arg<1>
+      , hpx::util::detail::placeholder<1>
+      , hpx::util::detail::placeholder<2>
     >
     bound_list_component_type_action;
 
