@@ -10,6 +10,9 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_7 __hpx__ V0.9.7]
 
+We have had over 900 commits since the last release and we have closed
+roughly 160 tickets (bugs, feature requests, etc.).
+
 [heading General Changes]
 
 * Ported HPX to BlueGene/Q
@@ -41,11 +44,13 @@ Here is a list of the important tickets we closed for this release.
 
 * [issue 976] - Wrong library order in pkgconfig
 * [issue 974] - Option pu-offset ignored in fixing_588 branch
+* [issue 972] - Cannot use MKL with HPX
 * [issue 969] - Non-existent INI files requested on the command line via
                 `--hpx:config` do not cause warnings or errors.
 * [issue 968] - Cannot build examples in fixing_588 branch
 * [issue 967] - Command line description of `--hpx:queuing` seems wrong
 * [issue 966] - `--hpx:print-bind` physical core numbers are wrong
+* [issue 965] - Deadlock when building in Release mode
 * [issue 963] - Not all worker threads are working
 * [issue 962] - Problem with SLURM integration 
 * [issue 961] - `--hpx:print-bind` outputs incorrect information
@@ -60,6 +65,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 954] - Make order of arguments for hpx::async and hpx::broadcast
                 consistent
 * [issue 953] - Cannot use MKL with HPX
+* [issue 952] - register_[pre_]shutdown_function never throw
 * [issue 951] - Assert when number of threads is greater than hardware
                 concurrency
 * [issue 948] - `HPX_HAVE_GENERIC_CONTEXT_COROUTINES` conflicts with
@@ -140,6 +146,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 871] - All tests fail with "make test"
 * [issue 870] - Please explicitly disable serialization in classes that don't
                 support it
+* [issue 868] - boost_any test failing
 * [issue 867] - Reduce the number of copies of `hpx::function` arguments
 * [issue 863] - Futures should not require a default constructor
 * [issue 862] - value_or_error shall not default construct its result
