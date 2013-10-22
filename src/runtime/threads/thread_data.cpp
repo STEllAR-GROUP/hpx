@@ -106,9 +106,10 @@ namespace hpx { namespace threads
             // now interrupt this thread
             if (throw_on_interrupt)
             {
-                HPX_THROW_EXCEPTION(thread_interrupted,
-                    "hpx::threads::thread_data::interruption_point",
-                    "thread aborts itself due to requested thread interruption");
+                boost::throw_exception(
+                    hpx::exception(thread_interrupted,
+                        "thread aborts itself due to requested thread interruption",
+                        hpx::lightweight));
             }
 
             return true;
