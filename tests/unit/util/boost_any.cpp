@@ -9,6 +9,8 @@
 #include <hpx/util/any.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+#include "small_big_object.hpp"
+
 #include <cstdlib>
 #include <string>
 #include <utility>
@@ -21,7 +23,8 @@ namespace any_tests // test suite
     void test_copy_assign();
     void test_converting_assign();
     void test_bad_cast();
-    void test_swap();
+    void test_swap_small();
+    void test_swap_big();
     void test_null_copying();
     void test_cast_to_reference();
 
@@ -39,7 +42,8 @@ namespace any_tests // test suite
         { "copy assignment operator",       test_copy_assign       },
         { "converting assignment operator", test_converting_assign },
         { "failed custom keyword cast",     test_bad_cast          },
-        { "swap member function",           test_swap              },
+        { "swap member function, small",    test_swap_small        },
+        { "swap member function, big",      test_swap_big          },
         { "copying operations on a null",   test_null_copying      },
         { "cast to reference types",        test_cast_to_reference }
     };
@@ -200,23 +204,60 @@ namespace any_tests // test definitions
         }
     }
 
-    void test_swap()
+    void test_swap_small()
     {
-        std::string text = "test message";
+        if (sizeof(small_object) <= sizeof(void*))
+            std::cout << "object is small\n";
+        else
+            std::cout << "object is large\n";
+
+        small_object text = 17;
         any original = any(text), swapped;
-        std::string * original_ptr = any_cast<std::string>(&original);
+        small_object * original_ptr = any_cast<small_object>(&original);
         any * swap_result = &original.swap(swapped);
 
         HPX_TEST_MSG(original.empty(), "empty on original");
         HPX_TEST_EQ_MSG(false, swapped.empty(), "empty on swapped");
-        HPX_TEST_EQ_MSG(swapped.type(), typeid(std::string), "type");
+        HPX_TEST_EQ_MSG(swapped.type(), typeid(small_object), "type");
         HPX_TEST_EQ_MSG(
-            text, any_cast<std::string>(swapped),
+            text, any_cast<small_object>(swapped),
+            "comparing swapped copy against original text");
+        HPX_TEST_NEQ_MSG((void*)0, original_ptr, "address in pre-swapped original");
+        HPX_TEST_NEQ_MSG(
+            original_ptr,
+            any_cast<small_object>(&swapped),
+            "comparing address in swapped against original");
+        HPX_TEST_EQ_MSG(swap_result, &original, "address of swap result");
+
+        any copy1 = any(copy_counter());
+        any copy2 = any(copy_counter());
+        int count = copy_counter::get_count();
+        swap(copy1, copy2);
+        HPX_TEST_EQ_MSG(count, copy_counter::get_count(), "checking that free swap doesn't make any copies.");
+    }
+
+    void test_swap_big()
+    {
+        if (sizeof(big_object) <= sizeof(void*))
+            std::cout << "object is small\n";
+        else
+            std::cout << "object is large\n";
+
+        big_object text(5, 12);
+        any original = any(text), swapped;
+        big_object * original_ptr = any_cast<big_object>(&original);
+        any * swap_result = &original.swap(swapped);
+
+        HPX_TEST_MSG(original.empty(), "empty on original");
+        HPX_TEST_EQ_MSG(false, swapped.empty(), "empty on swapped");
+        HPX_TEST_EQ_MSG(swapped.type(), typeid(big_object), "type");
+        HPX_TEST_EQ_MSG(
+            text, any_cast<big_object>(swapped),
             "comparing swapped copy against original text");
         HPX_TEST_NEQ_MSG((void*)0, original_ptr, "address in pre-swapped original");
         HPX_TEST_EQ_MSG(
             original_ptr,
-            any_cast<std::string>(&swapped),
+            any_cast<big_object>(&swapped),
             "comparing address in swapped against original");
         HPX_TEST_EQ_MSG(swap_result, &original, "address of swap result");
 
