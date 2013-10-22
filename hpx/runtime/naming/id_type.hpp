@@ -19,8 +19,8 @@ namespace hpx { namespace naming
     namespace detail
     {
         struct HPX_EXPORT id_type_impl;
-        void intrusive_ptr_add_ref(id_type_impl* p);
-        void intrusive_ptr_release(id_type_impl* p);
+        HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
+        HPX_EXPORT void intrusive_ptr_release(id_type_impl* p);
     }
 
     struct HPX_EXPORT gid_type;

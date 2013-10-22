@@ -1874,6 +1874,7 @@ else()
   set(output_dir ${CMAKE_BINARY_DIR})
 endif()
 
+string(REGEX REPLACE "([ ()])" "\\\\\\1" HPX_PREFIX "${HPX_PREFIX}")
 if(HPX_NO_INSTALL)
   set(external_cmake_path ${hpx_SOURCE_DIR}/cmake)
 else()

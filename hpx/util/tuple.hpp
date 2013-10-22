@@ -59,7 +59,6 @@
 #   define HPX_TUPLE_MAX HPX_TUPLE_LIMIT
 #endif
 
-
 #if defined(BOOST_NO_SFINAE_EXPR) ||                                          \
     (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40800)
 #   define HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(Predicate)
@@ -132,7 +131,8 @@ namespace hpx { namespace util
               : _value(other._value)
             {}
         };
-
+        
+#       if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40600
         template <typename T>
         struct tuple_member<BOOST_RV_REF(T)>
         {
@@ -151,6 +151,26 @@ namespace hpx { namespace util
               : _value(boost::forward<T>(other._value))
             {}
         };
+#       else
+        template <typename T>
+        struct tuple_member<BOOST_RV_REF(T)>
+        {
+            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
+
+        public: // exposition-only
+            T _value;
+
+        public:
+            // 20.4.2.1, tuple construction
+            BOOST_CONSTEXPR explicit tuple_member(BOOST_RV_REF(T) value)
+              : _value(boost::forward<T>(value))
+            {}
+
+            BOOST_CONSTEXPR tuple_member(tuple_member const& other)
+              : _value(other._value)
+            {}
+        };
+#       endif
 
         ///////////////////////////////////////////////////////////////////////
         template <typename TTuple, typename UTuple, typename Enable = void>

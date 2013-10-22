@@ -274,6 +274,7 @@ So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
 
 * Build (and install) a recent version of __hwloc_downloads__
    With the following commands:
+
 ``
       $ ./configure \
         --host=powerpc64-bgq-linux \
@@ -284,9 +285,11 @@ So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
       $ make
       $ make install
 ``
+
 * Build (and install) a recent version of Boost, using BGClang::
    To build Boost with BGClang, you'll need to set up the following in your Boost
-   ``~/user-config.jam`` file:
+   `~/user-config.jam` file:
+
 ``
       # user-config.jam (put this file into your home directory)
       using clang
@@ -295,16 +298,22 @@ So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
         :
         ;
 ``
-   You can then use this as your build command:
+
+You can then use this as your build command:
+
 ``
       $ ./bootstrap.sh
       $ ./b2 --build-dir=/tmp/build-boost --layout=versioned -j12
 ``
+
 * Clone the master __hpx__ git repository (or a stable tag):
+
 ``
     $ git clone git://github.com/STEllAR-GROUP/hpx.git
 ``
+
 * Generate the __hpx__ buildfiles using cmake:
+
 ``
     $ cmake -DHPX_PLATFORM=BlueGeneQ \
             -DCMAKE_CXX_COMPILER=bgclang++11 \
@@ -314,17 +323,21 @@ So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
             -DHPX_MALLOC=system \
             /path/to/hpx
 ``
+
 * To complete the build and install __hpx__:
 
 ``
     $ make -j24
     $ make install
 ``
+
    This will build and install the essential core components of __hpx__ only. Use:
+
 ``
     $ make -j24 examples
     $ make -j24 install
 ``
+
    to build and install the examples.
 
 [c++]

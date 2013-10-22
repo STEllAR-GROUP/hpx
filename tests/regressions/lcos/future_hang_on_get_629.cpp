@@ -182,7 +182,7 @@ int main(
 
     cmdline.add_options()
         ( "test-runs"
-        , value<boost::uint64_t>()->default_value(100)
+        , value<boost::uint64_t>()->default_value(10)
         , "number of times to repeat the test (0 == infinite)")
 
         ( "verbose"
