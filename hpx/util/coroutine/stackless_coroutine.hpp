@@ -9,6 +9,7 @@
 
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/util/coroutine/detail/coroutine_traits.hpp>
+#include <hpx/util/detail/reset_function.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
 #include <boost/move/move.hpp>
@@ -177,7 +178,7 @@ namespace hpx { namespace util { namespace coroutines
         {
             BOOST_ASSERT(exited());
             target_ = naming::invalid_id;
-            f_.reset();
+            util::detail::reset_function(f_);
         }
 
         typedef typename arg_slot_traits::template at<0>::type arg0_type;
