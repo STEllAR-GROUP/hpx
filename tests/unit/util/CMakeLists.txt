@@ -59,5 +59,3 @@ foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
   add_hpx_pseudo_dependencies(tests.unit.util tests.unit.util.${subdir}dir)
 endforeach()
-
-#add_test(NAME tests.unit.util.tuple COMMAND ${CMAKE_SOURCE_DIR}/test.sh $<TARGET_FILE:tuple_test_exe>)
