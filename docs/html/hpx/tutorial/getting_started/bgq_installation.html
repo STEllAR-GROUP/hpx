@@ -30,10 +30,10 @@
               install a copy from the <code class="computeroutput">BGClang trac page &lt;https://trac.alcf.anl.gov/projects/llvm-bgq&gt;</code>_
             </li>
 <li class="listitem">
-              <p>
-                Build (and install) a recent version of <a href="http://http://www.open-mpi.org/software/hwloc/v1.7/" target="_top">hwloc
-                Downloads</a> With the following commands:
-              </p>
+              Build (and install) a recent version of <a href="http://http://www.open-mpi.org/software/hwloc/v1.7/" target="_top">hwloc
+              Downloads</a> With the following commands:
+            </li>
+</ul></div>
 <pre class="programlisting">$ ./configure \
   --host=powerpc64-bgq-linux \
   --prefix=$HOME/install/hwloc \
@@ -43,17 +43,11 @@
 $ make
 $ make install
 </pre>
-            </li>
-<li class="listitem">
-              <p>
-                Build (and install) a recent version of Boost, using BGClang:: To
-                build Boost with BGClang, you'll need to set up the following in
-                your Boost
-              </p>
-<pre class="programlisting">~/user-config.jam</pre>
-              <p>
-                file:
-              </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+              Build (and install) a recent version of Boost, using BGClang:: To build
+              Boost with BGClang, you'll need to set up the following in your Boost
+              <code class="computeroutput">~/user-config.jam</code> file:
+            </li></ul></div>
 <pre class="programlisting"># user-config.jam (put this file into your home directory)
 using clang
   :
@@ -61,25 +55,21 @@ using clang
   :
   ;
 </pre>
-              <p>
-                You can then use this as your build command:
-              </p>
+<p>
+          You can then use this as your build command:
+        </p>
 <pre class="programlisting">$ ./bootstrap.sh
 $ ./b2 --build-dir=/tmp/build-boost --layout=versioned -j12
 </pre>
-            </li>
-<li class="listitem">
-              <p>
-                Clone the master <span class="emphasis"><em>HPX</em></span> git repository (or a stable
-                tag):
-              </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+              Clone the master <span class="emphasis"><em>HPX</em></span> git repository (or a stable
+              tag):
+            </li></ul></div>
 <pre class="programlisting">$ git clone git://github.com/STEllAR-GROUP/hpx.git
 </pre>
-            </li>
-<li class="listitem">
-              <p>
-                Generate the <span class="emphasis"><em>HPX</em></span> buildfiles using cmake:
-              </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+              Generate the <span class="emphasis"><em>HPX</em></span> buildfiles using cmake:
+            </li></ul></div>
 <pre class="programlisting">$ cmake -DHPX_PLATFORM=BlueGeneQ \
         -DCMAKE_CXX_COMPILER=bgclang++11 \
         -DMPI_CXX_COMPILER=mpiclang++11 \
@@ -88,24 +78,19 @@ $ ./b2 --build-dir=/tmp/build-boost --layout=versioned -j12
         -DHPX_MALLOC=system \
         /path/to/hpx
 </pre>
-            </li>
-<li class="listitem">
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
               To complete the build and install <span class="emphasis"><em>HPX</em></span>:
-            </li>
-</ul></div>
+            </li></ul></div>
 <pre class="programlisting">$ make -j24
 $ make install
 </pre>
-<p>
-          This will build and install the essential core components of <span class="emphasis"><em>HPX</em></span>
-          only. Use:
-        </p>
+<pre class="programlisting">This will build and install the essential core components of <span class="emphasis"><em>HPX</em></span> only. Use:
+</pre>
 <pre class="programlisting">$ make -j24 examples
 $ make -j24 install
 </pre>
-<p>
-          to build and install the examples.
-        </p>
+<pre class="programlisting">to build and install the examples.
+</pre>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>

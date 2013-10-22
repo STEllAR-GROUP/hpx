@@ -121,10 +121,10 @@ int main()
     function_test_type function_foo(foo);
     function_test_type function_foo_struct = foo_struct();
     function_test_type function_ol_foo(ol_foo);
-    coroutine_test_type coro_foo(foo_coro);
+    coroutine_test_type coro_foo(foo_coro, hpx::find_here());
     foo_struct_coro t;
-    coroutine_test_type coro_foo_struct  (t);
-    coroutine_test_type coro_ol_foo(ol_foo_coro);
+    coroutine_test_type coro_foo_struct  (t, hpx::find_here());
+    coroutine_test_type coro_ol_foo(ol_foo_coro, hpx::find_here());
     cout.setf(ios_base::floatfield);
     cout.unsetf(ios_base::scientific);
     cout << setw(50) << "Call to function: "
@@ -147,9 +147,9 @@ int main()
          << setw(16) << right << noshowpoint << test(coro_ol_foo, iterations) << endl;
 */
     foo_struct_coro t;
-    coroutine_test_type coro_foo_struct(t);
+    coroutine_test_type coro_foo_struct(t, hpx::find_here());
     cout << setw(50) << "Call to coroutine of function object: "
-         << setw(16) << right  << noshowpoint 
+         << setw(16) << right  << noshowpoint
          << test(coro_foo_struct, iterations)/iterations << endl;
 
    return 0;

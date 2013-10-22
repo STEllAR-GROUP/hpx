@@ -131,21 +131,21 @@
         from within this function.
       </p>
 <p>
-        The thread executing the function <code class="computeroutput"><a class="link" href="../init_idp16690000.html" title="Function init">hpx::init</a></code>
+        The thread executing the function <code class="computeroutput"><a class="link" href="../init_idp16691888.html" title="Function init">hpx::init</a></code>
         will block waiting for the runtime system to exit. The value returned from
         <code class="computeroutput">hpx_main</code>
-        will be returned from <code class="computeroutput"><a class="link" href="../init_idp16690000.html" title="Function init">hpx::init</a></code>
+        will be returned from <code class="computeroutput"><a class="link" href="../init_idp16691888.html" title="Function init">hpx::init</a></code>
         after the runtime system has stopped.
       </p>
 <p>
-        The function <code class="computeroutput"><a class="link" href="../finalize_idp16372496.html" title="Function finalize">hpx::finalize</a></code>
+        The function <code class="computeroutput"><a class="link" href="../finalize_idp16374416.html" title="Function finalize">hpx::finalize</a></code>
         has to be called on one of the <span class="emphasis"><em>HPX</em></span> localities in order
         to signal that all work has been scheduled and the runtime system should
         be stopped after the scheduled work has been executed.
       </p>
 <p>
         This method of invoking <span class="emphasis"><em>HPX</em></span> has the advantage of you
-        being able to decide which version of <code class="computeroutput"><a class="link" href="../init_idp16690000.html" title="Function init">hpx::init</a></code>
+        being able to decide which version of <code class="computeroutput"><a class="link" href="../init_idp16691888.html" title="Function init">hpx::init</a></code>
         to call. This allows to pass additional configuration parameters while initializing
         the <span class="emphasis"><em>HPX</em></span> runtime system.
       </p>
@@ -154,14 +154,14 @@
 <span class="keyword">int</span> <code class="computeroutput">hpx_main</code><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
 <span class="special">{</span>
     <span class="comment">// Any HPX application logic goes here...</span>
-    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../finalize_idp16372496.html" title="Function finalize">hpx::finalize</a></code><span class="special">();</span>
+    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../finalize_idp16374416.html" title="Function finalize">hpx::finalize</a></code><span class="special">();</span>
 <span class="special">}</span>
 
 <span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
 <span class="special">{</span>
     <span class="comment">// Initialize HPX, run hpx_main as the first HPX thread, and</span>
     <span class="comment">// wait for hpx::finalize being called.</span>
-    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../init_idp16690000.html" title="Function init">hpx::init</a></code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
+    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../init_idp16691888.html" title="Function init">hpx::init</a></code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
 <span class="special">}</span>
 </pre>
 <div class="note"><table border="0" summary="Note">
@@ -206,7 +206,7 @@
         from within this function.
       </p>
 <p>
-        The thread executing the function <code class="computeroutput"><a class="link" href="../start_idp16830416.html" title="Function start">hpx::start</a></code>
+        The thread executing the function <code class="computeroutput"><a class="link" href="../start_idp16832304.html" title="Function start">hpx::start</a></code>
         will <span class="bold"><strong>not</strong></span> block waiting for the runtime system
         to exit, but will return immediatlely.
       </p>
@@ -223,7 +223,7 @@
         </p></td></tr>
 </table></div>
 <p>
-        The function <code class="computeroutput"><a class="link" href="../finalize_idp16372496.html" title="Function finalize">hpx::finalize</a></code>
+        The function <code class="computeroutput"><a class="link" href="../finalize_idp16374416.html" title="Function finalize">hpx::finalize</a></code>
         has to be called on one of the <span class="emphasis"><em>HPX</em></span> localities in order
         to signal that all work has been scheduled and the runtime system should
         be stopped after the scheduled work has been executed.
@@ -243,13 +243,13 @@
 <span class="keyword">int</span> <code class="computeroutput">hpx_main</code><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
 <span class="special">{</span>
     <span class="comment">// Any HPX application logic goes here...</span>
-    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../finalize_idp16372496.html" title="Function finalize">hpx::finalize</a></code><span class="special">();</span>
+    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../finalize_idp16374416.html" title="Function finalize">hpx::finalize</a></code><span class="special">();</span>
 <span class="special">}</span>
 
 <span class="keyword">int</span> <span class="identifier">main</span><span class="special">(</span><span class="keyword">int</span> <span class="identifier">argc</span><span class="special">,</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">argv</span><span class="special">[])</span>
 <span class="special">{</span>
     <span class="comment">// Initialize HPX, run hpx_main.</span>
-    <code class="computeroutput"><a class="link" href="../start_idp16830416.html" title="Function start">hpx::start</a></code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
+    <code class="computeroutput"><a class="link" href="../start_idp16832304.html" title="Function start">hpx::start</a></code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
 
     <span class="comment">// ...Execute other code here...</span>
 

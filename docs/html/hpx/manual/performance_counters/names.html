@@ -134,7 +134,7 @@
           at constant time intervals.
         </p>
 <p>
-          While simple counters use instance names formatted as <code class="computeroutput"><span class="identifier">parentinstancename</span><span class="preprocessor">#parentindex</span><span class="special">/</span><span class="identifier">instancename</span><span class="preprocessor">#instanceindex</span></code>,
+          While simple counters use instance names formatted as <code class="computeroutput"><span class="identifier">parentinstancename</span><span class="special">#</span><span class="identifier">parentindex</span><span class="special">/</span><span class="identifier">instancename</span><span class="special">#</span><span class="identifier">instanceindex</span></code>,
           most aggregate counters have the full counter name of the embedded counter
           as its instance name.
         </p>
@@ -277,8 +277,7 @@
 <td>
                   <p>
                     This wildchard character matches any locality or any thread,
-                    depending on whether it is used for <code class="computeroutput"><span class="identifier">locality</span><span class="error">#</span><span class="special">*</span></code>
-                    or <code class="computeroutput"><span class="identifier">worker</span><span class="special">-</span><span class="identifier">thread</span><span class="error">#</span><span class="special">*</span></code>. No other wildcards are allowed
+                    depending on whether it is used for <code class="computeroutput"><span class="identifier">locality</span><span class="special">#*</span></code> or <code class="computeroutput"><span class="identifier">worker</span><span class="special">-</span><span class="identifier">thread</span><span class="special">#*</span></code>. No other wildcards are allowed
                     in counter instance names.
                   </p>
                 </td>

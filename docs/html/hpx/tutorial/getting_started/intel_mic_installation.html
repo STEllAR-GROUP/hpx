@@ -31,17 +31,17 @@
               for Linux and unpack the retreived tarball.
             </li>
 <li class="listitem">
-              <p>
-                Adapt your ~/user-config.jam to contain the following lines:
-              </p>
-<pre class="programlisting"><span class="error">#</span><span class="preprocessor"># Toolset</span> <span class="identifier">to</span> <span class="identifier">be</span> <span class="identifier">used</span> <span class="keyword">for</span> <span class="identifier">compiling</span> <span class="keyword">for</span> <span class="identifier">the</span> <span class="identifier">host</span>
+<p class="simpara">
+              Adapt your ~/user-config.jam to contain the following lines:
+            </p>
+<pre class="programlisting"><span class="special">##</span> <span class="identifier">Toolset</span> <span class="identifier">to</span> <span class="identifier">be</span> <span class="identifier">used</span> <span class="keyword">for</span> <span class="identifier">compiling</span> <span class="keyword">for</span> <span class="identifier">the</span> <span class="identifier">host</span>
 <span class="keyword">using</span> <span class="identifier">intel</span>
     <span class="special">:</span> <span class="identifier">host</span>
     <span class="special">:</span>
     <span class="special">:</span> <span class="special">&lt;</span><span class="identifier">cxxflags</span><span class="special">&gt;</span><span class="string">"-std=c++0x"</span>
     <span class="special">;</span>
 
-<span class="error">#</span><span class="preprocessor"># Toolset</span> <span class="identifier">to</span> <span class="identifier">be</span> <span class="identifier">used</span> <span class="keyword">for</span> <span class="identifier">compiling</span> <span class="keyword">for</span> <span class="identifier">the</span> <span class="identifier">Xeon</span> <span class="identifier">Phi</span>
+<span class="special">##</span> <span class="identifier">Toolset</span> <span class="identifier">to</span> <span class="identifier">be</span> <span class="identifier">used</span> <span class="keyword">for</span> <span class="identifier">compiling</span> <span class="keyword">for</span> <span class="identifier">the</span> <span class="identifier">Xeon</span> <span class="identifier">Phi</span>
 <span class="keyword">using</span> <span class="identifier">intel</span>
     <span class="special">:</span> <span class="identifier">mic</span>
     <span class="special">:</span>
@@ -49,17 +49,19 @@
       <span class="special">&lt;</span><span class="identifier">linkflags</span><span class="special">&gt;</span><span class="string">"-std=c++0x -mmic"</span>
     <span class="special">;</span>
 </pre>
-            </li>
+</li>
 <li class="listitem">
-              <p>
-                Change to the directory you unpacked boost in (from now on referred
-                to as $BOOST_ROOT) and execute the following commands:
-              </p>
+<p class="simpara">
+              Change to the directory you unpacked boost in (from now on referred
+              to as $BOOST_ROOT) and execute the following commands:
+            </p>
 <pre class="programlisting">$ ./bootstrap.sh
 $ ./b2 toolset=intel-mic -j&lt;N&gt;
 </pre>
+<p class="simpara">
               You should now have all the required boost libraries.
-            </li>
+            </p>
+</li>
 </ul></div>
 <h6>
 <a name="hpx.tutorial.getting_started.intel_mic_installation.h1"></a>
@@ -73,15 +75,17 @@ $ ./b2 toolset=intel-mic -j&lt;N&gt;
               created directory
             </li>
 <li class="listitem">
-              <p>
-                Run the configure-make-install procedure as follows:
-              </p>
+<p class="simpara">
+              Run the configure-make-install procedure as follows:
+            </p>
 <pre class="programlisting">$ CC=icc CFLAGS=-mmic CXX=icpc CXXFLAGS=-mmic LDFLAGS=-mmic ./configure --host=k1om --prefix=$HWLOC_ROOT
 $ make
 $ make install
 </pre>
+<p class="simpara">
               You now have a working hwloc installation in $HWLOC_ROOT.
-            </li>
+            </p>
+</li>
 </ul></div>
 <h6>
 <a name="hpx.tutorial.getting_started.intel_mic_installation.h2"></a>
