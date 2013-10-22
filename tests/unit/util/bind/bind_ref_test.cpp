@@ -10,7 +10,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt
 //
 
-#include <hpx/hpx_main.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/util/bind.hpp>
 #include <boost/ref.hpp>
 #include <hpx/util/lightweight_test.hpp>

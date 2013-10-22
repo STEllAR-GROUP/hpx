@@ -285,7 +285,10 @@ all applications built with __hpx__. For more information about the
 avalable scheduling policies see the section __scheduling__.
 
 [variablelist Enable HPX Scheduling Policies
-    [[`HPX_LOCAL_SCHEDULER:BOOL`]
+    [[`HPX_STATIC_PRIORITY_SCHEDULER:BOOL`] 
+     [Enable static priority scheduling policy (default: `OFF`)]
+    ]
+    [[`HPX_STATI_SCHEDULER:BOOL`]
      [Enable local scheduling policy (default: `OFF`)]
     ]
     [[`HPX_GLOBAL_SCHEDULER:BOOL`]

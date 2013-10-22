@@ -126,12 +126,45 @@ namespace hpx { namespace detail
         }
     }
 
+    template <typename Exception>
+    HPX_EXPORT boost::exception_ptr construct_lightweight_exception(
+        Exception const& e, std::string const& func, std::string const& file,
+        long line)
+    {
+        // create a boost::exception_ptr object encapsulating the Exception to
+        // be thrown and annotate it with all the local information we have
+        try {
+            throw boost::enable_current_exception(
+                boost::enable_error_info(e)
+                    << hpx::detail::throw_function(func)
+                    << hpx::detail::throw_file(file)
+                    << hpx::detail::throw_line(static_cast<int>(line)));
+        }
+        catch (...) {
+            return boost::current_exception();
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
+    inline bool is_of_lightweight_hpx_category(Exception const& e)
+    {
+        return false;
+    }
+
+    inline bool is_of_lightweight_hpx_category(hpx::exception const& e)
+    {
+        return e.get_error_code().category() == get_lightweight_hpx_category();
+    }
+
+    template <typename Exception>
     HPX_EXPORT boost::exception_ptr
-        get_exception(Exception const& e, std::string const& func,
+    get_exception(Exception const& e, std::string const& func,
         std::string const& file, long line)
     {
+        if (is_of_lightweight_hpx_category(e))
+            return construct_lightweight_exception(e, func, file, line);
+
         boost::int64_t pid_ = ::getpid();
         std::string back_trace(backtrace());
 

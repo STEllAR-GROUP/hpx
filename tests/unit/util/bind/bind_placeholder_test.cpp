@@ -1,5 +1,4 @@
-#include <hpx/hpx_main.hpp>
-#include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
 
 #if defined( BOOST_MSVC )
 
@@ -49,7 +48,7 @@ template< int I > struct custom_placeholder
 {
 };
 
-namespace boost
+namespace hpx { namespace traits
 {
 
 template< int I > struct is_placeholder< custom_placeholder< I > >
@@ -57,7 +56,7 @@ template< int I > struct is_placeholder< custom_placeholder< I > >
     enum { value = I };
 };
 
-} // namespace boost
+}} // namespace boost
 
 int main()
 {

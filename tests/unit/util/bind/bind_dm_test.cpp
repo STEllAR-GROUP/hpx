@@ -1,5 +1,4 @@
-#include <hpx/hpx_main.hpp>
-#include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(disable: 4786)  // identifier truncated in debug info
@@ -72,7 +71,7 @@ int main()
 
     int const v = 42;
 
-    //! HPX_TEST( hpx::util::bind( &X::m, hpx::util::bind( f, placeholders::_1 ) )( v ) == v );
+    HPX_TEST( hpx::util::bind( &X::m, hpx::util::bind( f, placeholders::_1 ) )( v ) == v );
 
     return hpx::util::report_errors();
 }
