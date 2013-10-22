@@ -36,7 +36,7 @@ the command line option  [hpx_cmdline `--hpx:numa-sensitive`]. When NUMA
 sensitivity is turned on work stealing is done from queues associated with the
 same NUMA domain first, only after that work is stolen from other NUMA domains.
 
-[heading Static Scheduling Policy]
+[heading Static Priority Scheduling Policy]
 
 * invoke using: [hpx_cmdline `--hpx:queuing=static`] (or `-qs`)
 * flag to turn on for build: `HPX_STATIC_PRIORITY_SCHEDULER`
