@@ -20,9 +20,10 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_future_range.hpp>
 
-#include <boost/fusion/include/deref.hpp>
 #include <boost/fusion/include/begin.hpp>
+#include <boost/fusion/include/deref.hpp>
 #include <boost/fusion/include/end.hpp>
+#include <boost/fusion/include/invoke.hpp>
 #include <boost/fusion/include/next.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
