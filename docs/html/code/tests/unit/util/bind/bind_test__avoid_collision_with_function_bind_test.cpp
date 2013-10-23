@@ -1,5 +1,4 @@
-#include <hpx/hpx_main.hpp>
-#include <hpx/config.hpp>
+#include <hpx/hpx_init.hpp>
 
 #if defined(BOOST_MSVC)
 #pragma warning(disable: 4786)  // identifier truncated in debug info
@@ -488,8 +487,6 @@ void member_function_void_test()
     HPX_TEST( v.hash == 23558 );
 }
 
-float ff_1(float){return 0;}
-
 void nested_bind_test()
 {
     using namespace boost;
@@ -497,17 +494,17 @@ void nested_bind_test()
     int const x = 1;
     int const y = 2;
 
-    //! HPX_TEST( hpx::util::bind(ff_1, hpx::util::bind(f_1, placeholders::_1))(x) == 1L );
-    //! HPX_TEST( hpx::util::bind(f_1, hpx::util::bind(f_2, placeholders::_1, placeholders::_2))(x, y) == 21L );
-    //! HPX_TEST( hpx::util::bind(f_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_1))(x) == 11L );
-    //! HPX_TEST( hpx::util::bind(f_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_2))(x, y) == 21L );
-    //! HPX_TEST( hpx::util::bind(f_1, hpx::util::bind(f_0))() == 17041L );
+    HPX_TEST( hpx::util::bind(f_1, hpx::util::bind(f_1, placeholders::_1))(x) == 1L );
+    HPX_TEST( hpx::util::bind(f_1, hpx::util::bind(f_2, placeholders::_1, placeholders::_2))(x, y) == 21L );
+    HPX_TEST( hpx::util::bind(f_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_1))(x) == 11L );
+    HPX_TEST( hpx::util::bind(f_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_2))(x, y) == 21L );
+    HPX_TEST( hpx::util::bind(f_1, hpx::util::bind(f_0))() == 17041L );
 
-    //! HPX_TEST( (hpx::util::bind(fv_1, hpx::util::bind(f_1, placeholders::_1))(x), (global_result == 1L)) );
-    //! HPX_TEST( (hpx::util::bind(fv_1, hpx::util::bind(f_2, placeholders::_1, placeholders::_2))(x, y), (global_result == 21L)) );
-    //! HPX_TEST( (hpx::util::bind(fv_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_1))(x), (global_result == 11L)) );
-    //! HPX_TEST( (hpx::util::bind(fv_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_2))(x, y), (global_result == 21L)) );
-    //! HPX_TEST( (hpx::util::bind(fv_1, hpx::util::bind(f_0))(), (global_result == 17041L)) );
+    HPX_TEST( (hpx::util::bind(fv_1, hpx::util::bind(f_1, placeholders::_1))(x), (global_result == 1L)) );
+    HPX_TEST( (hpx::util::bind(fv_1, hpx::util::bind(f_2, placeholders::_1, placeholders::_2))(x, y), (global_result == 21L)) );
+    HPX_TEST( (hpx::util::bind(fv_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_1))(x), (global_result == 11L)) );
+    HPX_TEST( (hpx::util::bind(fv_2, hpx::util::bind(f_1, placeholders::_1), hpx::util::bind(f_1, placeholders::_2))(x, y), (global_result == 21L)) );
+    HPX_TEST( (hpx::util::bind(fv_1, hpx::util::bind(f_0))(), (global_result == 17041L)) );
 }
 
 int main()
@@ -515,11 +512,7 @@ int main()
     function_test();
     function_object_test();
     function_object_test2();
-
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING)
     adaptable_function_object_test();
-#endif
-
     member_function_test();
     member_function_void_test();
     nested_bind_test();
