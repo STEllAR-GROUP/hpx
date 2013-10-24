@@ -29,7 +29,8 @@
 #include <boost/phoenix/bind.hpp>
 #include <boost/fusion/include/pair.hpp>
 
-namespace {
+namespace hpx { namespace util { namespace detail
+{
     struct construct_nodes
     {
         typedef void result_type;
@@ -144,14 +145,15 @@ namespace {
         }
     };
 
-    void add_tasks_per_node(std::size_t idx, std::size_t n, std::vector<std::size_t> & nodes)
+    void add_tasks_per_node(std::size_t idx, std::size_t n,
+        std::vector<std::size_t> & nodes)
     {
-        for(std::size_t i = 0; i < n; ++i)
+        for(std::size_t i = 0; i != n; ++i)
         {
             nodes.push_back(idx);
         }
     }
-}
+}}}
 
 namespace hpx { namespace util
 {
@@ -328,17 +330,13 @@ namespace hpx { namespace util
     std::string batch_environment::init_from_environment(
         std::string const& agas_host)
     {
-        char* slurm_nodelist_env = std::getenv("SLURM_NODELIST");
-
-        /** FIXME: use that info
         char* tasks_per_node_env = std::getenv("SLURM_TASKS_PER_NODE");
-
         std::vector<std::size_t> tasks_per_node;
         if (tasks_per_node_env)
         {
             if (debug_) {
-                std::cerr << "SLURM tasks per node found: " << tasks_per_node_env
-                          << std::endl;
+                std::cerr << "SLURM tasks per node found (SLURM_TASKS_PER_NODE): "
+                    << tasks_per_node_env << std::endl;
             }
 
             std::string tasks_per_node_str(tasks_per_node_env);
@@ -349,29 +347,42 @@ namespace hpx { namespace util
             namespace qi = boost::spirit::qi;
             namespace phoenix = boost::phoenix;
 
-            qi::parse(
-                begin
-              , end
+            qi::parse(begin, end
               , (
                     (qi::int_ >> "(x" >> qi::int_ >> ')')[
-                        phoenix::bind(::add_tasks_per_node, qi::_1, qi::_2, phoenix::ref(tasks_per_node))
+                        phoenix::bind(
+                            detail::add_tasks_per_node, qi::_1, qi::_2,
+                            phoenix::ref(tasks_per_node))
                     ]
-                | qi::int_[
+                |   qi::int_[
                         phoenix::push_back(
-                            phoenix::ref(tasks_per_node)
-                        , qi::_1
-                        )
-                  ]
+                            phoenix::ref(tasks_per_node), qi::_1)
+                    ]
                 ) % ','
             );
-        }
-        **/
 
+            std::size_t node_num = retrieve_node_number();
+            if (node_num == std::size_t(-1)) {
+                if (debug_)
+                    std::cerr << "Can't extract SLURM node number" << std::endl;
+            }
+            else if (node_num < tasks_per_node.size()) {
+                num_tasks_ = tasks_per_node[node_num];
+            }
+            else {
+                if (debug_) {
+                    std::cerr << "SLURM node number outside of available list of tasks"
+                        << std::endl;
+                }
+            }
+        }
+
+        char* slurm_nodelist_env = std::getenv("SLURM_NODELIST");
         if (slurm_nodelist_env)
         {
             if (debug_) {
-                std::cerr << "SLURM nodelist found: " << slurm_nodelist_env
-                          << std::endl;
+                std::cerr << "SLURM nodelist found (SLURM_NODELIST): "
+                    << slurm_nodelist_env << std::endl;
             }
 
             std::string nodelist_str(slurm_nodelist_env);
@@ -383,69 +394,69 @@ namespace hpx { namespace util
             namespace qi = boost::spirit::qi;
             namespace phoenix = boost::phoenix;
 
-            qi::rule<std::string::iterator, std::string()>
-                prefix;
-            prefix %= +(qi::print - (qi::char_("[") | qi::char_(",")));
+            qi::rule<std::string::iterator, std::string()> prefix;
+            qi::rule<std::string::iterator, std::string()> range_str;
+            qi::rule<std::string::iterator, std::vector<std::string>()> range;
+            qi::rule<std::string::iterator,
+                boost::fusion::vector<
+                    std::string,
+                    boost::optional<std::vector<std::vector<std::string> > >
+                >()> ranges;
+            qi::rule<std::string::iterator> hostlist;
+            qi::rule<std::string::iterator> nodelist;
 
-            qi::rule<std::string::iterator, std::string()>
-                range_str;
-            range_str %= +(qi::print - (qi::char_("]") | qi::char_( ",") | qi::char_("-")));
+            // grammar definition
+            prefix %=
+                   +(qi::print - (qi::char_("[") | qi::char_(",")))
+                ;
 
-            qi::rule<std::string::iterator, std::vector<std::string>()>
-                range;
+            range_str %=
+                   +(qi::print - (qi::char_("]") | qi::char_( ",") | qi::char_("-")))
+                ;
+
             range %= range_str >> *('-' >> range_str);
 
-            qi::rule<std::string::iterator,
-                    boost::fusion::vector<
-                        std::string,
-                        boost::optional<std::vector<std::vector<std::string> > >
-                    >()>
-                ranges;
             ranges %= prefix >> -(qi::lit("[") >> (range % ',') >> qi::lit("]"));
 
-            qi::rule<std::string::iterator>
-                hostlist = (+ranges)[
-                                phoenix::bind(::construct_nodes(),
-                                    phoenix::ref(nodes), qi::_1)
-                           ];
+            hostlist =
+                (+ranges)[
+                    phoenix::bind(detail::construct_nodes(),
+                        phoenix::ref(nodes), qi::_1)
+                ];
 
-            qi::rule<std::string::iterator>
-                nodelist = hostlist % ',';
+            nodelist = hostlist % ',';
 
-
-            qi::parse(
-                begin
-              , end
-              , nodelist
-            );
-
-            /*
-            std::cout << nodelist_str << "\n";
-            std::cout << "---\n";
-            for(std::string const & s: nodes) std::cout << s << "\n";
-            std::cout << "---\n";
-            */
+            if (!qi::parse(begin, end, nodelist) || begin != end)
+            {
+                if (debug_) {
+                    std::cerr << "failed to parse SLURM nodelist (SLURM_NODELIST): "
+                        << slurm_nodelist_env << std::endl;
+                }
+                return std::string();
+            }
 
             return init_from_nodelist(nodes, agas_host);
         }
         return std::string();
     }
 
-    // The number of threads is either one (if no PBS information was
+    // The number of threads is either one (if no PBS/SLURM information was
     // found), or it is the same as the number of times this node has
-    // been listed in the node file.
+    // been listed in the node file. Additionally this takes into account
+    // the number of tasks run on this node.
     std::size_t batch_environment::retrieve_number_of_threads() const
     {
         std::size_t result(-1);
         char* slurm_cpus_per_task = std::getenv("SLURM_CPUS_PER_TASK");
-        if(slurm_cpus_per_task)
+        if (slurm_cpus_per_task)
         {
             try {
                 std::string value(slurm_cpus_per_task);
                 result = boost::lexical_cast<std::size_t>(value);
                 if (debug_) {
-                    std::cerr << "retrieve_number_of_threads (SLURM_CPUS_PER_TASK): "
-                              << result << std::endl;
+                    std::cerr
+                        << "retrieve_number_of_threads (SLURM_CPUS_PER_TASK/num_tasks): "
+                        << result << std::endl;
                 }
                 return result;
             }
@@ -459,10 +470,11 @@ namespace hpx { namespace util
             if (slurm_cpus_on_node) {
                 try {
                     std::string value(slurm_cpus_on_node);
-                    result = boost::lexical_cast<std::size_t>(value);
+                    result = boost::lexical_cast<std::size_t>(value) / num_tasks_;
                     if (debug_) {
-                        std::cerr << "retrieve_number_of_threads (SLURM_CPUS_ON_NODE): "
-                                  << result << std::endl;
+                        std::cerr
+                            << "retrieve_number_of_threads (SLURM_CPUS_ON_NODE/num_tasks): "
+                            << result << std::endl;
                     }
                     return result;
                 }
@@ -484,10 +496,11 @@ namespace hpx { namespace util
                 throw std::logic_error("Cannot retrieve number of OS threads "
                     "for host_name: " + host_name());
             }
-            result = (*it).second.second;
+            result = (*it).second.second / num_tasks_;
         }
         if (debug_)
-            std::cerr << "retrieve_number_of_threads: " << result << std::endl;
+            std::cerr << "retrieve_number_of_threads (repeat count of node/num_tasks): " 
+                << result << std::endl;
         return result;
     }
 
@@ -522,7 +535,7 @@ namespace hpx { namespace util
         return result;
     }
 
-    // Try to retrieve the node number from the PBS environment
+    // Try to retrieve the node number from the PBS/SLURM environment
     std::size_t batch_environment::retrieve_node_number() const
     {
         char* nodenum_env = std::getenv("PBS_NODENUM");
