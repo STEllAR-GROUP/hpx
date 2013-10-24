@@ -74,8 +74,10 @@ namespace hpx { namespace traits
         };                                                                      \
         /**/
 
-        BOOST_PP_REPEAT(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
-          , HPX_TRAITS_DECL_FALLBACK, _);
+        BOOST_PP_REPEAT(
+            HPX_FUNCTION_ARGUMENT_LIMIT
+          , HPX_TRAITS_DECL_FALLBACK, _
+        );
 
 #       undef HPX_TRAITS_DECL_FALLBACK
 
@@ -148,8 +150,10 @@ namespace hpx { namespace traits
         };                                                                      \
         /**/
 
-        BOOST_PP_REPEAT(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
-          , HPX_TRAITS_DECL_CALLABLE_WRAPPER_FUNCTION, _);
+        BOOST_PP_REPEAT(
+            HPX_FUNCTION_ARGUMENT_LIMIT
+          , HPX_TRAITS_DECL_CALLABLE_WRAPPER_FUNCTION, _
+        );
 
 #       undef HPX_TRAITS_DECL_CALLABLE_WRAPPER_FUNCTION
 
@@ -164,7 +168,7 @@ namespace hpx { namespace traits
         };
 
         template <typename T
-          , BOOST_PP_ENUM_BINARY_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
+          , BOOST_PP_ENUM_BINARY_PARAMS(HPX_FUNCTION_ARGUMENT_LIMIT
               , typename A, = void BOOST_PP_INTERCEPT)
           , typename Dummy = void>
         struct is_callable_impl;
@@ -192,18 +196,20 @@ namespace hpx { namespace traits
         };                                                                      \
         /**/
 
-        BOOST_PP_REPEAT(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
-          , HPX_TRAITS_DECL_IS_CALLABLE_IMPL, _);
+        BOOST_PP_REPEAT(
+            HPX_FUNCTION_ARGUMENT_LIMIT
+          , HPX_TRAITS_DECL_IS_CALLABLE_IMPL, _
+        );
 
 #       undef HPX_TRAITS_DECL_IS_CALLABLE_IMPL
     }
 
     template <typename T
-      , BOOST_PP_ENUM_BINARY_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
+      , BOOST_PP_ENUM_BINARY_PARAMS(HPX_FUNCTION_ARGUMENT_LIMIT
           , typename A, = void BOOST_PP_INTERCEPT)>
     struct is_callable
       : detail::is_callable_impl<
-            T, BOOST_PP_ENUM_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT), A)
+            T, BOOST_PP_ENUM_PARAMS(HPX_FUNCTION_ARGUMENT_LIMIT, A)
         >
     {};
 }}
@@ -309,7 +315,7 @@ namespace hpx { namespace traits
 namespace hpx { namespace traits { namespace detail
 {
     template <typename T
-      , BOOST_PP_ENUM_BINARY_PARAMS(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
+      , BOOST_PP_ENUM_BINARY_PARAMS(HPX_FUNCTION_ARGUMENT_LIMIT
           , typename A, = void BOOST_PP_INTERCEPT)
       , typename Dummy = void>
     struct is_callable_not_action;
@@ -325,7 +331,7 @@ namespace hpx { namespace traits { namespace detail
     {};                                                                         \
     /**/
 
-    BOOST_PP_REPEAT(HPX_PP_ROUND_UP_ADD3(HPX_TUPLE_LIMIT)
+    BOOST_PP_REPEAT(HPX_FUNCTION_ARGUMENT_LIMIT
       , HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION, _);
 
 #   undef HPX_TRAITS_DECL_IS_CALLABLE_NOT_ACTION

@@ -1226,3 +1226,177 @@ namespace boost { namespace serialization {
         : boost::mpl::int_<boost::serialization::track_never>
     {};
 }}
+namespace hpx { namespace util { namespace detail {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename IArchive
+      , typename OArchive
+    >
+    struct vtable_ptr_base<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+      , IArchive
+      , OArchive
+    >
+        : vtable_ptr_virtbase<IArchive, OArchive>
+    {
+        virtual ~vtable_ptr_base() {}
+        std::type_info const& (*get_type)();
+        void (*static_delete)(void**);
+        void (*destruct)(void**);
+        void (*clone)(void * const*, void **);
+        void (*copy)(void * const*, void **);
+        R (*invoke)(void ** 
+            , typename util::add_rvalue_reference<A0>::type , typename util::add_rvalue_reference<A1>::type , typename util::add_rvalue_reference<A2>::type , typename util::add_rvalue_reference<A3>::type , typename util::add_rvalue_reference<A4>::type , typename util::add_rvalue_reference<A5>::type , typename util::add_rvalue_reference<A6>::type , typename util::add_rvalue_reference<A7>::type , typename util::add_rvalue_reference<A8>::type , typename util::add_rvalue_reference<A9>::type , typename util::add_rvalue_reference<A10>::type , typename util::add_rvalue_reference<A11>::type , typename util::add_rvalue_reference<A12>::type , typename util::add_rvalue_reference<A13>::type , typename util::add_rvalue_reference<A14>::type , typename util::add_rvalue_reference<A15>::type , typename util::add_rvalue_reference<A16>::type , typename util::add_rvalue_reference<A17>::type , typename util::add_rvalue_reference<A18>::type , typename util::add_rvalue_reference<A19>::type , typename util::add_rvalue_reference<A20>::type);
+    };
+    
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+    >
+    struct vtable_ptr_base<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+      , void
+      , void
+    >
+    {
+        virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
+        std::type_info const& (*get_type)();
+        void (*static_delete)(void**);
+        void (*destruct)(void**);
+        void (*clone)(void * const*, void **);
+        void (*copy)(void * const*, void **);
+        R (*invoke)(void **
+            , typename util::add_rvalue_reference<A0>::type , typename util::add_rvalue_reference<A1>::type , typename util::add_rvalue_reference<A2>::type , typename util::add_rvalue_reference<A3>::type , typename util::add_rvalue_reference<A4>::type , typename util::add_rvalue_reference<A5>::type , typename util::add_rvalue_reference<A6>::type , typename util::add_rvalue_reference<A7>::type , typename util::add_rvalue_reference<A8>::type , typename util::add_rvalue_reference<A9>::type , typename util::add_rvalue_reference<A10>::type , typename util::add_rvalue_reference<A11>::type , typename util::add_rvalue_reference<A12>::type , typename util::add_rvalue_reference<A13>::type , typename util::add_rvalue_reference<A14>::type , typename util::add_rvalue_reference<A15>::type , typename util::add_rvalue_reference<A16>::type , typename util::add_rvalue_reference<A17>::type , typename util::add_rvalue_reference<A18>::type , typename util::add_rvalue_reference<A19>::type , typename util::add_rvalue_reference<A20>::type);
+    };
+}}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename IArchive
+      , typename OArchive
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr_base<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20), IArchive, OArchive
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
+namespace hpx { namespace util { namespace detail {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename IArchive
+      , typename OArchive
+    >
+    struct vtable_ptr_base<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+      , IArchive
+      , OArchive
+    >
+        : vtable_ptr_virtbase<IArchive, OArchive>
+    {
+        virtual ~vtable_ptr_base() {}
+        std::type_info const& (*get_type)();
+        void (*static_delete)(void**);
+        void (*destruct)(void**);
+        void (*clone)(void * const*, void **);
+        void (*copy)(void * const*, void **);
+        R (*invoke)(void ** 
+            , typename util::add_rvalue_reference<A0>::type , typename util::add_rvalue_reference<A1>::type , typename util::add_rvalue_reference<A2>::type , typename util::add_rvalue_reference<A3>::type , typename util::add_rvalue_reference<A4>::type , typename util::add_rvalue_reference<A5>::type , typename util::add_rvalue_reference<A6>::type , typename util::add_rvalue_reference<A7>::type , typename util::add_rvalue_reference<A8>::type , typename util::add_rvalue_reference<A9>::type , typename util::add_rvalue_reference<A10>::type , typename util::add_rvalue_reference<A11>::type , typename util::add_rvalue_reference<A12>::type , typename util::add_rvalue_reference<A13>::type , typename util::add_rvalue_reference<A14>::type , typename util::add_rvalue_reference<A15>::type , typename util::add_rvalue_reference<A16>::type , typename util::add_rvalue_reference<A17>::type , typename util::add_rvalue_reference<A18>::type , typename util::add_rvalue_reference<A19>::type , typename util::add_rvalue_reference<A20>::type , typename util::add_rvalue_reference<A21>::type);
+    };
+    
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+    >
+    struct vtable_ptr_base<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+      , void
+      , void
+    >
+    {
+        virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
+        std::type_info const& (*get_type)();
+        void (*static_delete)(void**);
+        void (*destruct)(void**);
+        void (*clone)(void * const*, void **);
+        void (*copy)(void * const*, void **);
+        R (*invoke)(void **
+            , typename util::add_rvalue_reference<A0>::type , typename util::add_rvalue_reference<A1>::type , typename util::add_rvalue_reference<A2>::type , typename util::add_rvalue_reference<A3>::type , typename util::add_rvalue_reference<A4>::type , typename util::add_rvalue_reference<A5>::type , typename util::add_rvalue_reference<A6>::type , typename util::add_rvalue_reference<A7>::type , typename util::add_rvalue_reference<A8>::type , typename util::add_rvalue_reference<A9>::type , typename util::add_rvalue_reference<A10>::type , typename util::add_rvalue_reference<A11>::type , typename util::add_rvalue_reference<A12>::type , typename util::add_rvalue_reference<A13>::type , typename util::add_rvalue_reference<A14>::type , typename util::add_rvalue_reference<A15>::type , typename util::add_rvalue_reference<A16>::type , typename util::add_rvalue_reference<A17>::type , typename util::add_rvalue_reference<A18>::type , typename util::add_rvalue_reference<A19>::type , typename util::add_rvalue_reference<A20>::type , typename util::add_rvalue_reference<A21>::type);
+    };
+}}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename IArchive
+      , typename OArchive
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr_base<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21), IArchive, OArchive
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
+namespace hpx { namespace util { namespace detail {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+      , typename IArchive
+      , typename OArchive
+    >
+    struct vtable_ptr_base<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+      , IArchive
+      , OArchive
+    >
+        : vtable_ptr_virtbase<IArchive, OArchive>
+    {
+        virtual ~vtable_ptr_base() {}
+        std::type_info const& (*get_type)();
+        void (*static_delete)(void**);
+        void (*destruct)(void**);
+        void (*clone)(void * const*, void **);
+        void (*copy)(void * const*, void **);
+        R (*invoke)(void ** 
+            , typename util::add_rvalue_reference<A0>::type , typename util::add_rvalue_reference<A1>::type , typename util::add_rvalue_reference<A2>::type , typename util::add_rvalue_reference<A3>::type , typename util::add_rvalue_reference<A4>::type , typename util::add_rvalue_reference<A5>::type , typename util::add_rvalue_reference<A6>::type , typename util::add_rvalue_reference<A7>::type , typename util::add_rvalue_reference<A8>::type , typename util::add_rvalue_reference<A9>::type , typename util::add_rvalue_reference<A10>::type , typename util::add_rvalue_reference<A11>::type , typename util::add_rvalue_reference<A12>::type , typename util::add_rvalue_reference<A13>::type , typename util::add_rvalue_reference<A14>::type , typename util::add_rvalue_reference<A15>::type , typename util::add_rvalue_reference<A16>::type , typename util::add_rvalue_reference<A17>::type , typename util::add_rvalue_reference<A18>::type , typename util::add_rvalue_reference<A19>::type , typename util::add_rvalue_reference<A20>::type , typename util::add_rvalue_reference<A21>::type , typename util::add_rvalue_reference<A22>::type);
+    };
+    
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+    >
+    struct vtable_ptr_base<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+      , void
+      , void
+    >
+    {
+        virtual ~vtable_ptr_base() {}
+        virtual bool empty() const = 0;
+        std::type_info const& (*get_type)();
+        void (*static_delete)(void**);
+        void (*destruct)(void**);
+        void (*clone)(void * const*, void **);
+        void (*copy)(void * const*, void **);
+        R (*invoke)(void **
+            , typename util::add_rvalue_reference<A0>::type , typename util::add_rvalue_reference<A1>::type , typename util::add_rvalue_reference<A2>::type , typename util::add_rvalue_reference<A3>::type , typename util::add_rvalue_reference<A4>::type , typename util::add_rvalue_reference<A5>::type , typename util::add_rvalue_reference<A6>::type , typename util::add_rvalue_reference<A7>::type , typename util::add_rvalue_reference<A8>::type , typename util::add_rvalue_reference<A9>::type , typename util::add_rvalue_reference<A10>::type , typename util::add_rvalue_reference<A11>::type , typename util::add_rvalue_reference<A12>::type , typename util::add_rvalue_reference<A13>::type , typename util::add_rvalue_reference<A14>::type , typename util::add_rvalue_reference<A15>::type , typename util::add_rvalue_reference<A16>::type , typename util::add_rvalue_reference<A17>::type , typename util::add_rvalue_reference<A18>::type , typename util::add_rvalue_reference<A19>::type , typename util::add_rvalue_reference<A20>::type , typename util::add_rvalue_reference<A21>::type , typename util::add_rvalue_reference<A22>::type);
+    };
+}}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+      , typename IArchive
+      , typename OArchive
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr_base<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22), IArchive, OArchive
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}

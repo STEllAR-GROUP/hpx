@@ -8,16 +8,13 @@
 #ifndef HPX_COMPONENTS_REMOTE_OBJECT_CTOR_FUN_HPP
 #define HPX_COMPONENTS_REMOTE_OBJECT_CTOR_FUN_HPP
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/preprocessor/repetition/enum_params_with_a_default.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
-
-#ifndef HPX_FUNCTION_ARGUMENT_LIMIT
-#define HPX_FUNCTION_ARGUMENT_LIMIT 10
-#endif
 
 namespace hpx { namespace components { namespace remote_object
 {

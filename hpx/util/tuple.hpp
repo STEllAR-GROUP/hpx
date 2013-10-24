@@ -53,12 +53,6 @@
 #include <cstddef> // for size_t
 #include <utility> // for pair
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#   define HPX_TUPLE_MAX BOOST_PP_MIN(BOOST_PP_ADD(HPX_PP_ROUND_UP(HPX_TUPLE_LIMIT), 3), HPX_MAX_LIMIT)
-#else
-#   define HPX_TUPLE_MAX HPX_TUPLE_LIMIT
-#endif
-
 #if defined(BOOST_NO_SFINAE_EXPR) ||                                          \
     (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40800)
 #   define HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(Predicate)
@@ -68,7 +62,7 @@
     /**/
 #endif
 
-#define N HPX_TUPLE_MAX
+#define N HPX_TUPLE_LIMIT
 
 namespace hpx { namespace util
 {
@@ -874,7 +868,7 @@ namespace boost { namespace serialization
 
 #undef HPX_UTIL_TUPLE_NOEXCEPT_SFINAE
 
-#undef HPX_TUPLE_MAX
+#undef HPX_TUPLE_LIMIT
 
 #endif
 

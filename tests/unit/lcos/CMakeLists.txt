@@ -94,6 +94,4 @@ endforeach()
 
 set_property(TARGET dataflow_test_exe APPEND
     PROPERTY COMPILE_DEFINITIONS
-    "HPX_ACTION_ARGUMENT_LIMIT=10"
-    "HPX_FUNCTION_ARGUMENT_LIMIT=13")
-
+    "HPX_LIMIT=10")

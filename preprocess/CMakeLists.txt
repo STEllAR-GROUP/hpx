@@ -23,19 +23,19 @@ set(function_argument_limit_preprocessing_files
   "hpx/util/invoke.hpp"
   "hpx/util/invoke_fused.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
-  hpx_partial_preprocess_header(${file} LIMIT HPX_FUNCTION_ARGUMENT_LIMIT)
+  hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
 
 set(tuple_argument_limit_preprocessing_files
   "hpx/util/tuple.hpp")
 foreach(file ${tuple_argument_limit_preprocessing_files})
-  hpx_partial_preprocess_header(${file} LIMIT HPX_TUPLE_LIMIT)
+  hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
 
 set(lock_argument_limit_preprocessing_files
   "hpx/util/locking_helpers.hpp")
 foreach(file ${lock_argument_limit_preprocessing_files})
-  hpx_partial_preprocess_header(${file} LIMIT HPX_LOCK_LIMIT)
+  hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
 
 set(action_argument_limit_preprocessing_files
@@ -75,7 +75,7 @@ set(action_argument_limit_preprocessing_files ${action_argument_limit_preprocess
   "hpx/runtime/components/server/runtime_support_create_component_capabilities.hpp")
 endif()
 foreach(file ${action_argument_limit_preprocessing_files})
-  hpx_partial_preprocess_header(${file} LIMIT HPX_ACTION_ARGUMENT_LIMIT)
+  hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
 
 set(wait_argument_limit_preprocessing_files
@@ -85,7 +85,7 @@ set(wait_argument_limit_preprocessing_files
   "hpx/lcos/future_wait.hpp"
   "hpx/runtime/components/memory_block.hpp")
 foreach(file ${wait_argument_limit_preprocessing_files})
-  hpx_partial_preprocess_header(${file} LIMIT HPX_WAIT_ARGUMENT_LIMIT)
+  hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
 
 # invoke preprocessing routines

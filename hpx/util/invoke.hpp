@@ -112,9 +112,9 @@ namespace hpx { namespace util
         /**/
 
         BOOST_PP_REPEAT(
-            HPX_PP_ROUND_UP_ADD3(HPX_FUNCTION_ARGUMENT_LIMIT)
+            HPX_FUNCTION_ARGUMENT_LIMIT
           , HPX_UTIL_INVOKE_RESULT_OF_IMPL, _
-        )
+        );
 
 #       undef HPX_UTIL_INVOKE_RESULT_OF_IMPL
 
@@ -142,9 +142,9 @@ namespace hpx { namespace util
     /**/
 
     BOOST_PP_REPEAT(
-        HPX_PP_ROUND_UP_ADD3(HPX_FUNCTION_ARGUMENT_LIMIT)
+        HPX_FUNCTION_ARGUMENT_LIMIT
       , HPX_UTIL_INVOKE_RESULT_OF, _
-    )
+    );
 
 #   undef HPX_UTIL_INVOKE_RESULT_OF
 
