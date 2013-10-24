@@ -180,33 +180,28 @@ namespace hpx { namespace util { namespace coroutines
         typedef void fun(Functor*);
         fun * funp = trampoline;
 
-        m_cb = &cb;
-        m_funp = nasty_cast<void*>(funp);
-        init_stack();
-
-#if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-        valgrind_id = VALGRIND_STACK_REGISTER(m_stack, m_stack + m_stack_size);
-#endif
-      }
-
-      void init_stack()
-      {
         m_sp = (static_cast<void**>(m_stack)
                 + static_cast<std::size_t>(m_stack_size)/sizeof(void*))
                 - context_size;
-        //std::memset(m_sp, 0, context_size * sizeof(std::size_t));
-        m_sp[cb_idx]   = m_cb;
-        m_sp[funp_idx] = m_funp;
+
+        m_sp[backup_cb_idx] = m_sp[cb_idx] = &cb;
+        m_sp[backup_funp_idx] = m_sp[funp_idx] = nasty_cast<void*>(funp);
+
+#if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
+        m_sp[valgrind_id_idx] = reinterpret_cast<void*>(
+            VALGRIND_STACK_REGISTER(m_stack, m_stack + m_stack_size));
+#endif
       }
 
       ~x86_linux_context_impl()
       {
         if(m_stack)
         {
-          posix::free_stack(m_stack, static_cast<std::size_t>(m_stack_size));
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-          VALGRIND_STACK_DEREGISTER(valgrind_id);
+          VALGRIND_STACK_DEREGISTER(
+            reinterpret_cast<std::size_t>(m_sp[valgrind_id_idx]));
 #endif
+          posix::free_stack(m_stack, static_cast<std::size_t>(m_stack_size));
         }
       }
 
@@ -228,16 +223,14 @@ namespace hpx { namespace util { namespace coroutines
       {
         if(m_stack) {
           increment_stack_recycle_count();
-          // On rebind, we re initialize our stack to ensure a virgin stack
-          BOOST_ASSERT(
-            m_sp != (static_cast<void**>(m_stack)
+
+          // On rebind, we initialize our stack to ensure a virgin stack
+          m_sp = (static_cast<void**>(m_stack)
                 + static_cast<std::size_t>(m_stack_size)/sizeof(void*))
-                - context_size);
-          init_stack();
-          BOOST_ASSERT(
-            m_sp == (static_cast<void**>(m_stack)
-                + static_cast<std::size_t>(m_stack_size)/sizeof(void*))
-                - context_size);
+                - context_size;
+
+          m_sp[cb_idx] = m_sp[backup_cb_idx];
+          m_sp[funp_idx] = m_sp[backup_funp_idx];
         }
       }
 
@@ -293,7 +286,9 @@ namespace hpx { namespace util { namespace coroutines
     private:
 #if defined(__x86_64__)
       /** structure of context_data:
-       * 11: additional alignment
+       * 13: backup address of function to execute
+       * 12: backup address of trampoline
+       * 11: additional alignment (or valgrind_id if enabled)
        * 10: parm 0 of trampoline
        * 9:  dummy return address for trampoline
        * 8:  return addr (here: start addr)
@@ -306,11 +301,20 @@ namespace hpx { namespace util { namespace coroutines
        * 1:  r14
        * 0:  r15
        **/
-      static const std::size_t context_size = 12;
+#if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
+      static const std::size_t valgrind_id_idx = 11;
+#endif
+
+      static const std::size_t context_size = 14;
+      static const std::size_t backup_cb_idx = 13;
+      static const std::size_t backup_funp_idx = 12;
       static const std::size_t cb_idx = 10;
       static const std::size_t funp_idx = 8;
 #else
       /** structure of context_data:
+       * 9: valgrind_id (if enabled)
+       * 8: backup address of function to execute
+       * 7: backup address of trampoline
        * 6: parm 0 of trampoline
        * 5: dummy return address for trampoline
        * 4: return addr (here: start addr)
@@ -319,17 +323,21 @@ namespace hpx { namespace util { namespace coroutines
        * 1: esi
        * 0: edi
        **/
-      static const std::size_t context_size = 7;
+#if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
+      static const std::size_t context_size = 10;
+      static const std::size_t valgrind_id_idx = 9;
+#else
+      static const std::size_t context_size = 9;
+#endif
+
+      static const std::size_t backup_cb_idx = 8;
+      static const std::size_t backup_funp_idx = 7;
       static const std::size_t cb_idx = 6;
       static const std::size_t funp_idx = 4;
 #endif
+
       std::ptrdiff_t m_stack_size;
-      void * m_stack;
-      void * m_cb;
-      void * m_funp;
-#if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-      unsigned valgrind_id;
-#endif
+      void* m_stack;
     };
 
     typedef x86_linux_context_impl context_impl;
