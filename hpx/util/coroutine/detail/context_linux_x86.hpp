@@ -176,13 +176,12 @@ namespace hpx { namespace util { namespace coroutines
         m_stack = posix::alloc_stack(static_cast<std::size_t>(m_stack_size));
         BOOST_ASSERT(m_stack);
         posix::watermark_stack(m_stack, static_cast<std::size_t>(m_stack_size));
-        m_tos = (static_cast<void**>(m_stack)
-                + static_cast<std::size_t>(m_stack_size)/sizeof(void*))
-                - context_size;
+        
+        typedef void fun(Functor*);
+        fun * funp = trampoline;
 
         m_cb = &cb;
-        typedef void funp(Functor*);
-        m_funp = nasty_cast<void*>(static_cast<funp *>(trampoline));
+        m_funp = nasty_cast<void*>(funp);
         init_stack();
 
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
@@ -192,8 +191,10 @@ namespace hpx { namespace util { namespace coroutines
 
       void init_stack()
       {
-        m_sp = m_tos;
-        std::memset(m_sp, 0, context_size * sizeof(std::size_t));
+        m_sp = (static_cast<void**>(m_stack)
+                + static_cast<std::size_t>(m_stack_size)/sizeof(void*))
+                - context_size;
+        //std::memset(m_sp, 0, context_size * sizeof(std::size_t));
         m_sp[cb_idx]   = m_cb;
         m_sp[funp_idx] = m_funp;
       }
@@ -228,9 +229,15 @@ namespace hpx { namespace util { namespace coroutines
         if(m_stack) {
           increment_stack_recycle_count();
           // On rebind, we re initialize our stack to ensure a virgin stack
-          BOOST_ASSERT(m_sp != m_tos);
+          BOOST_ASSERT(
+            m_sp != (static_cast<void**>(m_stack)
+                + static_cast<std::size_t>(m_stack_size)/sizeof(void*))
+                - context_size);
           init_stack();
-          BOOST_ASSERT(m_sp == m_tos);
+          BOOST_ASSERT(
+            m_sp == (static_cast<void**>(m_stack)
+                + static_cast<std::size_t>(m_stack_size)/sizeof(void*))
+                - context_size);
         }
       }
 
@@ -318,7 +325,6 @@ namespace hpx { namespace util { namespace coroutines
 #endif
       std::ptrdiff_t m_stack_size;
       void * m_stack;
-      void ** m_tos;
       void * m_cb;
       void * m_funp;
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
