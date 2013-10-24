@@ -342,7 +342,6 @@ namespace hpx { namespace util
             std::string tasks_per_node_str(tasks_per_node_env);
             std::string::iterator begin = tasks_per_node_str.begin();
             std::string::iterator end = tasks_per_node_str.end();
-            int i = 0;
 
             namespace qi = boost::spirit::qi;
             namespace phoenix = boost::phoenix;
