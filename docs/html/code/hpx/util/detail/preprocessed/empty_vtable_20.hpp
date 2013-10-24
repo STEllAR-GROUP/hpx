@@ -785,3 +785,114 @@ namespace hpx { namespace util { namespace detail
         }
     };
 }}}
+namespace hpx { namespace util { namespace detail
+{
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename IArchive
+      , typename OArchive
+    >
+    struct empty_vtable<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+      , IArchive
+      , OArchive
+    >
+        : empty_vtable_base
+    {
+        typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20);
+        static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+          , IArchive
+          , OArchive
+        > *get_ptr()
+        {
+            return
+                get_empty_table<
+                    R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+                >::template get<IArchive, OArchive>();
+        }
+        BOOST_ATTRIBUTE_NORETURN static R
+        invoke(void ** f
+            , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8 , typename util::add_rvalue_reference<A9>::type a9 , typename util::add_rvalue_reference<A10>::type a10 , typename util::add_rvalue_reference<A11>::type a11 , typename util::add_rvalue_reference<A12>::type a12 , typename util::add_rvalue_reference<A13>::type a13 , typename util::add_rvalue_reference<A14>::type a14 , typename util::add_rvalue_reference<A15>::type a15 , typename util::add_rvalue_reference<A16>::type a16 , typename util::add_rvalue_reference<A17>::type a17 , typename util::add_rvalue_reference<A18>::type a18 , typename util::add_rvalue_reference<A19>::type a19 , typename util::add_rvalue_reference<A20>::type a20)
+        {
+            hpx::throw_exception(bad_function_call,
+                "empty function object should not be used",
+                "empty_vtable::operator()");
+        }
+    };
+}}}
+namespace hpx { namespace util { namespace detail
+{
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename IArchive
+      , typename OArchive
+    >
+    struct empty_vtable<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+      , IArchive
+      , OArchive
+    >
+        : empty_vtable_base
+    {
+        typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21);
+        static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+          , IArchive
+          , OArchive
+        > *get_ptr()
+        {
+            return
+                get_empty_table<
+                    R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+                >::template get<IArchive, OArchive>();
+        }
+        BOOST_ATTRIBUTE_NORETURN static R
+        invoke(void ** f
+            , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8 , typename util::add_rvalue_reference<A9>::type a9 , typename util::add_rvalue_reference<A10>::type a10 , typename util::add_rvalue_reference<A11>::type a11 , typename util::add_rvalue_reference<A12>::type a12 , typename util::add_rvalue_reference<A13>::type a13 , typename util::add_rvalue_reference<A14>::type a14 , typename util::add_rvalue_reference<A15>::type a15 , typename util::add_rvalue_reference<A16>::type a16 , typename util::add_rvalue_reference<A17>::type a17 , typename util::add_rvalue_reference<A18>::type a18 , typename util::add_rvalue_reference<A19>::type a19 , typename util::add_rvalue_reference<A20>::type a20 , typename util::add_rvalue_reference<A21>::type a21)
+        {
+            hpx::throw_exception(bad_function_call,
+                "empty function object should not be used",
+                "empty_vtable::operator()");
+        }
+    };
+}}}
+namespace hpx { namespace util { namespace detail
+{
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+      , typename IArchive
+      , typename OArchive
+    >
+    struct empty_vtable<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+      , IArchive
+      , OArchive
+    >
+        : empty_vtable_base
+    {
+        typedef R (*functor_type)(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22);
+        static vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+          , IArchive
+          , OArchive
+        > *get_ptr()
+        {
+            return
+                get_empty_table<
+                    R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+                >::template get<IArchive, OArchive>();
+        }
+        BOOST_ATTRIBUTE_NORETURN static R
+        invoke(void ** f
+            , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8 , typename util::add_rvalue_reference<A9>::type a9 , typename util::add_rvalue_reference<A10>::type a10 , typename util::add_rvalue_reference<A11>::type a11 , typename util::add_rvalue_reference<A12>::type a12 , typename util::add_rvalue_reference<A13>::type a13 , typename util::add_rvalue_reference<A14>::type a14 , typename util::add_rvalue_reference<A15>::type a15 , typename util::add_rvalue_reference<A16>::type a16 , typename util::add_rvalue_reference<A17>::type a17 , typename util::add_rvalue_reference<A18>::type a18 , typename util::add_rvalue_reference<A19>::type a19 , typename util::add_rvalue_reference<A20>::type a20 , typename util::add_rvalue_reference<A21>::type a21 , typename util::add_rvalue_reference<A22>::type a22)
+        {
+            hpx::throw_exception(bad_function_call,
+                "empty function object should not be used",
+                "empty_vtable::operator()");
+        }
+    };
+}}}

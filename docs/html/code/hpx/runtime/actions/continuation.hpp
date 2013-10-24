@@ -34,7 +34,6 @@ namespace hpx
     apply(hpx::actions::action<Component, Result, Arguments, Derived>,
         naming::id_type const&, BOOST_FWD_REF(Arg));
 
-#if !defined(BOOST_MSVC)
     // MSVC complains about async_continue beeing ambiguous if it sees this
     // forward declaration
     template <typename F, typename Arg1, typename Arg2>
@@ -54,7 +53,6 @@ namespace hpx
     apply_continue(hpx::actions::action<Component, Result, Arguments, Derived>,
         naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
         BOOST_FWD_REF(F) f);
-#endif
 
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0>

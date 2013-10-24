@@ -169,10 +169,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         0
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T0>
     {
         template <typename Tuple>
@@ -435,10 +435,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         1
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T1>
     {
         template <typename Tuple>
@@ -701,10 +701,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         2
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T2>
     {
         template <typename Tuple>
@@ -988,10 +988,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         3
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T3>
     {
         template <typename Tuple>
@@ -1272,10 +1272,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         4
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T4>
     {
         template <typename Tuple>
@@ -1559,10 +1559,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         5
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T5>
     {
         template <typename Tuple>
@@ -1843,10 +1843,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         6
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T6>
     {
         template <typename Tuple>
@@ -2130,10 +2130,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         7
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T7>
     {
         template <typename Tuple>
@@ -2414,10 +2414,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         8
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T8>
     {
         template <typename Tuple>
@@ -2701,10 +2701,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         9
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T9>
     {
         template <typename Tuple>
@@ -2985,10 +2985,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         10
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T10>
     {
         template <typename Tuple>
@@ -3272,10 +3272,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         11
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T11>
     {
         template <typename Tuple>
@@ -3556,10 +3556,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         12
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T12>
     {
         template <typename Tuple>
@@ -3843,10 +3843,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         13
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T13>
     {
         template <typename Tuple>
@@ -4127,10 +4127,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         14
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T14>
     {
         template <typename Tuple>
@@ -4414,10 +4414,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         15
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T15>
     {
         template <typename Tuple>
@@ -4698,10 +4698,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         16
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T16>
     {
         template <typename Tuple>
@@ -4985,10 +4985,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         17
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T17>
     {
         template <typename Tuple>
@@ -5269,10 +5269,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         18
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T18>
     {
         template <typename Tuple>
@@ -5429,7 +5429,7 @@ namespace hpx { namespace util
     }
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
-    class tuple
+    class tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
     {
         BOOST_COPYABLE_AND_MOVABLE(tuple);
     public: 
@@ -5556,10 +5556,10 @@ namespace hpx { namespace util
     {};
     
     
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     struct tuple_element<
         19
-      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
     > : boost::mpl::identity<T19>
     {
         template <typename Tuple>
@@ -5684,6 +5684,864 @@ namespace hpx { namespace util
         return
             util::tuple_cat(
                 util::tuple_cat( boost::forward<T0> (t0) , boost::forward<T1> (t1)) , util::tuple_cat( boost::forward<T2> (t2) , boost::forward<T3> (t3)) , util::tuple_cat( boost::forward<T4> (t4) , boost::forward<T5> (t5)) , util::tuple_cat( boost::forward<T6> (t6) , boost::forward<T7> (t7)) , util::tuple_cat( boost::forward<T8> (t8) , boost::forward<T9> (t9)) , util::tuple_cat( boost::forward<T10> (t10) , boost::forward<T11> (t11)) , util::tuple_cat( boost::forward<T12> (t12) , boost::forward<T13> (t13)) , util::tuple_cat( boost::forward<T14> (t14) , boost::forward<T15> (t15)) , util::tuple_cat( boost::forward<T16> (t16) , boost::forward<T17> (t17)) , util::tuple_cat( boost::forward<T18> (t18) , boost::forward<T19> (t19))
+            );
+    }
+}}
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20, typename UTuple>
+        struct are_tuples_compatible<
+            tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20>, UTuple
+          , typename boost::enable_if_c<
+                tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20> >::value == 21
+             && tuple_size<typename remove_reference<UTuple>::type>::value == 21
+            >::type
+        >
+        {
+            typedef char(&no_type)[1];
+            typedef char(&yes_type)[2];
+            static no_type call(...);
+            static yes_type call(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20);
+            static bool const value =
+                sizeof(
+                    call(util::get< 0>(boost::declval<UTuple>()) , util::get< 1>(boost::declval<UTuple>()) , util::get< 2>(boost::declval<UTuple>()) , util::get< 3>(boost::declval<UTuple>()) , util::get< 4>(boost::declval<UTuple>()) , util::get< 5>(boost::declval<UTuple>()) , util::get< 6>(boost::declval<UTuple>()) , util::get< 7>(boost::declval<UTuple>()) , util::get< 8>(boost::declval<UTuple>()) , util::get< 9>(boost::declval<UTuple>()) , util::get< 10>(boost::declval<UTuple>()) , util::get< 11>(boost::declval<UTuple>()) , util::get< 12>(boost::declval<UTuple>()) , util::get< 13>(boost::declval<UTuple>()) , util::get< 14>(boost::declval<UTuple>()) , util::get< 15>(boost::declval<UTuple>()) , util::get< 16>(boost::declval<UTuple>()) , util::get< 17>(boost::declval<UTuple>()) , util::get< 18>(boost::declval<UTuple>()) , util::get< 19>(boost::declval<UTuple>()) , util::get< 20>(boost::declval<UTuple>()))
+                ) == sizeof(yes_type);
+            typedef boost::mpl::bool_<value> type;
+        };
+    }
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
+    class tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20>
+    {
+        BOOST_COPYABLE_AND_MOVABLE(tuple);
+    public: 
+        detail::tuple_member<T0> _m0; detail::tuple_member<T1> _m1; detail::tuple_member<T2> _m2; detail::tuple_member<T3> _m3; detail::tuple_member<T4> _m4; detail::tuple_member<T5> _m5; detail::tuple_member<T6> _m6; detail::tuple_member<T7> _m7; detail::tuple_member<T8> _m8; detail::tuple_member<T9> _m9; detail::tuple_member<T10> _m10; detail::tuple_member<T11> _m11; detail::tuple_member<T12> _m12; detail::tuple_member<T13> _m13; detail::tuple_member<T14> _m14; detail::tuple_member<T15> _m15; detail::tuple_member<T16> _m16; detail::tuple_member<T17> _m17; detail::tuple_member<T18> _m18; detail::tuple_member<T19> _m19; detail::tuple_member<T20> _m20;;
+    public:
+        
+        
+        
+        BOOST_CONSTEXPR tuple()
+          : _m0() , _m1() , _m2() , _m3() , _m4() , _m5() , _m6() , _m7() , _m8() , _m9() , _m10() , _m11() , _m12() , _m13() , _m14() , _m15() , _m16() , _m17() , _m18() , _m19() , _m20()
+        {}
+        
+        
+        
+        BOOST_CONSTEXPR explicit tuple(
+            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15 , typename add_lvalue_reference< typename boost::add_const<T16>::type >::type v16 , typename add_lvalue_reference< typename boost::add_const<T17>::type >::type v17 , typename add_lvalue_reference< typename boost::add_const<T18>::type >::type v18 , typename add_lvalue_reference< typename boost::add_const<T19>::type >::type v19 , typename add_lvalue_reference< typename boost::add_const<T20>::type >::type v20
+        ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15) , _m16(v16) , _m17(v17) , _m18(v18) , _m19(v19) , _m20(v20)
+        {}
+        
+        
+        
+        
+        
+        
+        
+        template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20>
+        BOOST_CONSTEXPR explicit tuple(
+            BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17 , BOOST_FWD_REF(U18) u18 , BOOST_FWD_REF(U19) u19 , BOOST_FWD_REF(U20) u20
+          , typename boost::enable_if_c<
+                detail::are_tuples_compatible<
+                    tuple
+                  , typename add_rvalue_reference<
+                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20>
+                    >::type
+                >::value
+            >::type* = 0
+        ) : _m0 (boost::forward<U0>(u0)) , _m1 (boost::forward<U1>(u1)) , _m2 (boost::forward<U2>(u2)) , _m3 (boost::forward<U3>(u3)) , _m4 (boost::forward<U4>(u4)) , _m5 (boost::forward<U5>(u5)) , _m6 (boost::forward<U6>(u6)) , _m7 (boost::forward<U7>(u7)) , _m8 (boost::forward<U8>(u8)) , _m9 (boost::forward<U9>(u9)) , _m10 (boost::forward<U10>(u10)) , _m11 (boost::forward<U11>(u11)) , _m12 (boost::forward<U12>(u12)) , _m13 (boost::forward<U13>(u13)) , _m14 (boost::forward<U14>(u14)) , _m15 (boost::forward<U15>(u15)) , _m16 (boost::forward<U16>(u16)) , _m17 (boost::forward<U17>(u17)) , _m18 (boost::forward<U18>(u18)) , _m19 (boost::forward<U19>(u19)) , _m20 (boost::forward<U20>(u20))
+        {}
+        
+        
+        
+        BOOST_CONSTEXPR tuple(tuple const& other)
+          : _m0(other._m0) , _m1(other._m1) , _m2(other._m2) , _m3(other._m3) , _m4(other._m4) , _m5(other._m5) , _m6(other._m6) , _m7(other._m7) , _m8(other._m8) , _m9(other._m9) , _m10(other._m10) , _m11(other._m11) , _m12(other._m12) , _m13(other._m13) , _m14(other._m14) , _m15(other._m15) , _m16(other._m16) , _m17(other._m17) , _m18(other._m18) , _m19(other._m19) , _m20(other._m20)
+        {}
+        
+        
+        
+        BOOST_CONSTEXPR tuple(BOOST_RV_REF(tuple) other)
+          : _m0(boost::move(other._m0)) , _m1(boost::move(other._m1)) , _m2(boost::move(other._m2)) , _m3(boost::move(other._m3)) , _m4(boost::move(other._m4)) , _m5(boost::move(other._m5)) , _m6(boost::move(other._m6)) , _m7(boost::move(other._m7)) , _m8(boost::move(other._m8)) , _m9(boost::move(other._m9)) , _m10(boost::move(other._m10)) , _m11(boost::move(other._m11)) , _m12(boost::move(other._m12)) , _m13(boost::move(other._m13)) , _m14(boost::move(other._m14)) , _m15(boost::move(other._m15)) , _m16(boost::move(other._m16)) , _m17(boost::move(other._m17)) , _m18(boost::move(other._m18)) , _m19(boost::move(other._m19)) , _m20(boost::move(other._m20))
+        {}
+        
+        
+        
+        
+        
+        
+        
+        template <typename UTuple>
+        BOOST_CONSTEXPR tuple(
+            BOOST_FWD_REF(UTuple) other
+          , typename boost::enable_if_c<
+                detail::are_tuples_compatible<
+                    tuple
+                  , typename add_rvalue_reference<UTuple>::type
+                >::value
+            >::type* = 0
+        ) : _m0(util::get< 0>(boost::forward<UTuple>(other))) , _m1(util::get< 1>(boost::forward<UTuple>(other))) , _m2(util::get< 2>(boost::forward<UTuple>(other))) , _m3(util::get< 3>(boost::forward<UTuple>(other))) , _m4(util::get< 4>(boost::forward<UTuple>(other))) , _m5(util::get< 5>(boost::forward<UTuple>(other))) , _m6(util::get< 6>(boost::forward<UTuple>(other))) , _m7(util::get< 7>(boost::forward<UTuple>(other))) , _m8(util::get< 8>(boost::forward<UTuple>(other))) , _m9(util::get< 9>(boost::forward<UTuple>(other))) , _m10(util::get< 10>(boost::forward<UTuple>(other))) , _m11(util::get< 11>(boost::forward<UTuple>(other))) , _m12(util::get< 12>(boost::forward<UTuple>(other))) , _m13(util::get< 13>(boost::forward<UTuple>(other))) , _m14(util::get< 14>(boost::forward<UTuple>(other))) , _m15(util::get< 15>(boost::forward<UTuple>(other))) , _m16(util::get< 16>(boost::forward<UTuple>(other))) , _m17(util::get< 17>(boost::forward<UTuple>(other))) , _m18(util::get< 18>(boost::forward<UTuple>(other))) , _m19(util::get< 19>(boost::forward<UTuple>(other))) , _m20(util::get< 20>(boost::forward<UTuple>(other)))
+        {}
+        
+        
+        
+        tuple& operator=(tuple const& other)
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value )) && BOOST_NOEXCEPT_EXPR(( _m6._value = other._m6._value )) && BOOST_NOEXCEPT_EXPR(( _m7._value = other._m7._value )) && BOOST_NOEXCEPT_EXPR(( _m8._value = other._m8._value )) && BOOST_NOEXCEPT_EXPR(( _m9._value = other._m9._value )) && BOOST_NOEXCEPT_EXPR(( _m10._value = other._m10._value )) && BOOST_NOEXCEPT_EXPR(( _m11._value = other._m11._value )) && BOOST_NOEXCEPT_EXPR(( _m12._value = other._m12._value )) && BOOST_NOEXCEPT_EXPR(( _m13._value = other._m13._value )) && BOOST_NOEXCEPT_EXPR(( _m14._value = other._m14._value )) && BOOST_NOEXCEPT_EXPR(( _m15._value = other._m15._value )) && BOOST_NOEXCEPT_EXPR(( _m16._value = other._m16._value )) && BOOST_NOEXCEPT_EXPR(( _m17._value = other._m17._value )) && BOOST_NOEXCEPT_EXPR(( _m18._value = other._m18._value )) && BOOST_NOEXCEPT_EXPR(( _m19._value = other._m19._value )) && BOOST_NOEXCEPT_EXPR(( _m20._value = other._m20._value ))
+            )
+        {
+            _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value; _m6._value = other._m6._value; _m7._value = other._m7._value; _m8._value = other._m8._value; _m9._value = other._m9._value; _m10._value = other._m10._value; _m11._value = other._m11._value; _m12._value = other._m12._value; _m13._value = other._m13._value; _m14._value = other._m14._value; _m15._value = other._m15._value; _m16._value = other._m16._value; _m17._value = other._m17._value; _m18._value = other._m18._value; _m19._value = other._m19._value; _m20._value = other._m20._value;;
+            return *this;
+        }
+        
+        
+        tuple& operator=(BOOST_RV_REF(tuple) other)
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = boost::forward<T6> (other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = boost::forward<T7> (other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = boost::forward<T8> (other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = boost::forward<T9> (other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = boost::forward<T10> (other._m10._value) )) && BOOST_NOEXCEPT_EXPR(( _m11._value = boost::forward<T11> (other._m11._value) )) && BOOST_NOEXCEPT_EXPR(( _m12._value = boost::forward<T12> (other._m12._value) )) && BOOST_NOEXCEPT_EXPR(( _m13._value = boost::forward<T13> (other._m13._value) )) && BOOST_NOEXCEPT_EXPR(( _m14._value = boost::forward<T14> (other._m14._value) )) && BOOST_NOEXCEPT_EXPR(( _m15._value = boost::forward<T15> (other._m15._value) )) && BOOST_NOEXCEPT_EXPR(( _m16._value = boost::forward<T16> (other._m16._value) )) && BOOST_NOEXCEPT_EXPR(( _m17._value = boost::forward<T17> (other._m17._value) )) && BOOST_NOEXCEPT_EXPR(( _m18._value = boost::forward<T18> (other._m18._value) )) && BOOST_NOEXCEPT_EXPR(( _m19._value = boost::forward<T19> (other._m19._value) )) && BOOST_NOEXCEPT_EXPR(( _m20._value = boost::forward<T20> (other._m20._value) ))
+            )
+        {
+            _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value); _m6._value = boost::forward<T6> (other._m6._value); _m7._value = boost::forward<T7> (other._m7._value); _m8._value = boost::forward<T8> (other._m8._value); _m9._value = boost::forward<T9> (other._m9._value); _m10._value = boost::forward<T10> (other._m10._value); _m11._value = boost::forward<T11> (other._m11._value); _m12._value = boost::forward<T12> (other._m12._value); _m13._value = boost::forward<T13> (other._m13._value); _m14._value = boost::forward<T14> (other._m14._value); _m15._value = boost::forward<T15> (other._m15._value); _m16._value = boost::forward<T16> (other._m16._value); _m17._value = boost::forward<T17> (other._m17._value); _m18._value = boost::forward<T18> (other._m18._value); _m19._value = boost::forward<T19> (other._m19._value); _m20._value = boost::forward<T20> (other._m20._value);;
+            return *this;
+        }
+        
+        
+        
+        template <typename UTuple>
+        typename boost::enable_if_c<
+            tuple_size<typename remove_reference<UTuple>::type>::value == 21
+          , tuple&
+        >::type
+        operator=(BOOST_FWD_REF(UTuple) other)
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = util::get< 6>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = util::get< 7>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = util::get< 8>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = util::get< 9>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = util::get< 10>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m11._value = util::get< 11>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m12._value = util::get< 12>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m13._value = util::get< 13>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m14._value = util::get< 14>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m15._value = util::get< 15>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m16._value = util::get< 16>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m17._value = util::get< 17>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m18._value = util::get< 18>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m19._value = util::get< 19>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m20._value = util::get< 20>(boost::forward<UTuple>(other)) ))
+            )
+        {
+            _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other)); _m6._value = util::get< 6>(boost::forward<UTuple>(other)); _m7._value = util::get< 7>(boost::forward<UTuple>(other)); _m8._value = util::get< 8>(boost::forward<UTuple>(other)); _m9._value = util::get< 9>(boost::forward<UTuple>(other)); _m10._value = util::get< 10>(boost::forward<UTuple>(other)); _m11._value = util::get< 11>(boost::forward<UTuple>(other)); _m12._value = util::get< 12>(boost::forward<UTuple>(other)); _m13._value = util::get< 13>(boost::forward<UTuple>(other)); _m14._value = util::get< 14>(boost::forward<UTuple>(other)); _m15._value = util::get< 15>(boost::forward<UTuple>(other)); _m16._value = util::get< 16>(boost::forward<UTuple>(other)); _m17._value = util::get< 17>(boost::forward<UTuple>(other)); _m18._value = util::get< 18>(boost::forward<UTuple>(other)); _m19._value = util::get< 19>(boost::forward<UTuple>(other)); _m20._value = util::get< 20>(boost::forward<UTuple>(other));;
+            return *this;
+        }
+        
+        
+        
+        
+        void swap(tuple& other)
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m6._value , other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m7._value , other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m8._value , other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m9._value , other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m10._value , other._m10._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m11._value , other._m11._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m12._value , other._m12._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m13._value , other._m13._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m14._value , other._m14._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m15._value , other._m15._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m16._value , other._m16._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m17._value , other._m17._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m18._value , other._m18._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m19._value , other._m19._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m20._value , other._m20._value) ))
+            )
+        {
+            boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value ); boost::swap( _m6._value , other._m6._value ); boost::swap( _m7._value , other._m7._value ); boost::swap( _m8._value , other._m8._value ); boost::swap( _m9._value , other._m9._value ); boost::swap( _m10._value , other._m10._value ); boost::swap( _m11._value , other._m11._value ); boost::swap( _m12._value , other._m12._value ); boost::swap( _m13._value , other._m13._value ); boost::swap( _m14._value , other._m14._value ); boost::swap( _m15._value , other._m15._value ); boost::swap( _m16._value , other._m16._value ); boost::swap( _m17._value , other._m17._value ); boost::swap( _m18._value , other._m18._value ); boost::swap( _m19._value , other._m19._value ); boost::swap( _m20._value , other._m20._value );;
+        }
+    };
+    
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
+    struct tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20> >
+      : boost::mpl::size_t<21>
+    {};
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+    struct tuple_element<
+        20
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
+    > : boost::mpl::identity<T20>
+    {
+        template <typename Tuple>
+        static BOOST_CONSTEXPR BOOST_FORCEINLINE
+        typename detail::qualify_as<
+            T20
+          , Tuple&
+        >::type
+        get(Tuple& tuple) BOOST_NOEXCEPT
+        {
+            return tuple._m20._value;
+        }
+    };
+    
+    
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type , typename detail::make_tuple_element<T4>::type , typename detail::make_tuple_element<T5>::type , typename detail::make_tuple_element<T6>::type , typename detail::make_tuple_element<T7>::type , typename detail::make_tuple_element<T8>::type , typename detail::make_tuple_element<T9>::type , typename detail::make_tuple_element<T10>::type , typename detail::make_tuple_element<T11>::type , typename detail::make_tuple_element<T12>::type , typename detail::make_tuple_element<T13>::type , typename detail::make_tuple_element<T14>::type , typename detail::make_tuple_element<T15>::type , typename detail::make_tuple_element<T16>::type , typename detail::make_tuple_element<T17>::type , typename detail::make_tuple_element<T18>::type , typename detail::make_tuple_element<T19>::type , typename detail::make_tuple_element<T20>::type>
+    make_tuple(BOOST_FWD_REF(T0) v0 , BOOST_FWD_REF(T1) v1 , BOOST_FWD_REF(T2) v2 , BOOST_FWD_REF(T3) v3 , BOOST_FWD_REF(T4) v4 , BOOST_FWD_REF(T5) v5 , BOOST_FWD_REF(T6) v6 , BOOST_FWD_REF(T7) v7 , BOOST_FWD_REF(T8) v8 , BOOST_FWD_REF(T9) v9 , BOOST_FWD_REF(T10) v10 , BOOST_FWD_REF(T11) v11 , BOOST_FWD_REF(T12) v12 , BOOST_FWD_REF(T13) v13 , BOOST_FWD_REF(T14) v14 , BOOST_FWD_REF(T15) v15 , BOOST_FWD_REF(T16) v16 , BOOST_FWD_REF(T17) v17 , BOOST_FWD_REF(T18) v18 , BOOST_FWD_REF(T19) v19 , BOOST_FWD_REF(T20) v20)
+    {
+        return
+            tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type , typename detail::make_tuple_element<T4>::type , typename detail::make_tuple_element<T5>::type , typename detail::make_tuple_element<T6>::type , typename detail::make_tuple_element<T7>::type , typename detail::make_tuple_element<T8>::type , typename detail::make_tuple_element<T9>::type , typename detail::make_tuple_element<T10>::type , typename detail::make_tuple_element<T11>::type , typename detail::make_tuple_element<T12>::type , typename detail::make_tuple_element<T13>::type , typename detail::make_tuple_element<T14>::type , typename detail::make_tuple_element<T15>::type , typename detail::make_tuple_element<T16>::type , typename detail::make_tuple_element<T17>::type , typename detail::make_tuple_element<T18>::type , typename detail::make_tuple_element<T19>::type , typename detail::make_tuple_element<T20>::type>(
+                boost::forward<T0>( v0 ) , boost::forward<T1>( v1 ) , boost::forward<T2>( v2 ) , boost::forward<T3>( v3 ) , boost::forward<T4>( v4 ) , boost::forward<T5>( v5 ) , boost::forward<T6>( v6 ) , boost::forward<T7>( v7 ) , boost::forward<T8>( v8 ) , boost::forward<T9>( v9 ) , boost::forward<T10>( v10 ) , boost::forward<T11>( v11 ) , boost::forward<T12>( v12 ) , boost::forward<T13>( v13 ) , boost::forward<T14>( v14 ) , boost::forward<T15>( v15 ) , boost::forward<T16>( v16 ) , boost::forward<T17>( v17 ) , boost::forward<T18>( v18 ) , boost::forward<T19>( v19 ) , boost::forward<T20>( v20 )
+            );
+    }
+    
+    
+    
+    
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
+    BOOST_FORCEINLINE
+    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type>
+    forward_as_tuple(BOOST_FWD_REF(T0) v0 , BOOST_FWD_REF(T1) v1 , BOOST_FWD_REF(T2) v2 , BOOST_FWD_REF(T3) v3 , BOOST_FWD_REF(T4) v4 , BOOST_FWD_REF(T5) v5 , BOOST_FWD_REF(T6) v6 , BOOST_FWD_REF(T7) v7 , BOOST_FWD_REF(T8) v8 , BOOST_FWD_REF(T9) v9 , BOOST_FWD_REF(T10) v10 , BOOST_FWD_REF(T11) v11 , BOOST_FWD_REF(T12) v12 , BOOST_FWD_REF(T13) v13 , BOOST_FWD_REF(T14) v14 , BOOST_FWD_REF(T15) v15 , BOOST_FWD_REF(T16) v16 , BOOST_FWD_REF(T17) v17 , BOOST_FWD_REF(T18) v18 , BOOST_FWD_REF(T19) v19 , BOOST_FWD_REF(T20) v20) BOOST_NOEXCEPT
+    {
+        return
+            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type>(
+                boost::forward<T0>( v0 ) , boost::forward<T1>( v1 ) , boost::forward<T2>( v2 ) , boost::forward<T3>( v3 ) , boost::forward<T4>( v4 ) , boost::forward<T5>( v5 ) , boost::forward<T6>( v6 ) , boost::forward<T7>( v7 ) , boost::forward<T8>( v8 ) , boost::forward<T9>( v9 ) , boost::forward<T10>( v10 ) , boost::forward<T11>( v11 ) , boost::forward<T12>( v12 ) , boost::forward<T13>( v13 ) , boost::forward<T14>( v14 ) , boost::forward<T15>( v15 ) , boost::forward<T16>( v16 ) , boost::forward<T17>( v17 ) , boost::forward<T18>( v18 ) , boost::forward<T19>( v19 ) , boost::forward<T20>( v20 )
+            );
+    }
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
+    BOOST_FORCEINLINE
+    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type>
+    tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15 , T16 & v16 , T17 & v17 , T18 & v18 , T19 & v19 , T20 & v20) BOOST_NOEXCEPT
+    {
+        return
+            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type>(
+                v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16 , v17 , v18 , v19 , v20
+            );
+    }
+    
+    
+    
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
+        struct tuple_cat_result<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20>
+          : tuple_cat_result<
+                typename tuple_cat_result< T0 , T1 >::type , typename tuple_cat_result< T2 , T3 >::type , typename tuple_cat_result< T4 , T5 >::type , typename tuple_cat_result< T6 , T7 >::type , typename tuple_cat_result< T8 , T9 >::type , typename tuple_cat_result< T10 , T11 >::type , typename tuple_cat_result< T12 , T13 >::type , typename tuple_cat_result< T14 , T15 >::type , typename tuple_cat_result< T16 , T17 >::type , typename tuple_cat_result< T18 , T19 >::type
+              , T20
+            >
+        {};
+        template <typename Tuple>
+        struct tuple_cat_result<
+            Tuple
+          , typename boost::enable_if_c<tuple_size<Tuple>::value == 21>::type
+        >
+        {
+            typedef
+                tuple<typename tuple_element< 0, Tuple>::type , typename tuple_element< 1, Tuple>::type , typename tuple_element< 2, Tuple>::type , typename tuple_element< 3, Tuple>::type , typename tuple_element< 4, Tuple>::type , typename tuple_element< 5, Tuple>::type , typename tuple_element< 6, Tuple>::type , typename tuple_element< 7, Tuple>::type , typename tuple_element< 8, Tuple>::type , typename tuple_element< 9, Tuple>::type , typename tuple_element< 10, Tuple>::type , typename tuple_element< 11, Tuple>::type , typename tuple_element< 12, Tuple>::type , typename tuple_element< 13, Tuple>::type , typename tuple_element< 14, Tuple>::type , typename tuple_element< 15, Tuple>::type , typename tuple_element< 16, Tuple>::type , typename tuple_element< 17, Tuple>::type , typename tuple_element< 18, Tuple>::type , typename tuple_element< 19, Tuple>::type , typename tuple_element< 20, Tuple>::type>
+                type;
+        };
+    }
+    template <typename Tuple>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename boost::lazy_enable_if_c<
+        tuple_size<typename remove_reference<Tuple>::type>::value == 21
+      , detail::tuple_cat_result<
+            typename remove_reference<Tuple>::type
+        >
+    >::type
+    tuple_cat(BOOST_FWD_REF(Tuple) t)
+    {
+        return
+            typename detail::tuple_cat_result<
+                typename remove_reference<Tuple>::type
+            >::type(
+                util::get< 0>(boost::forward<Tuple>(t)) , util::get< 1>(boost::forward<Tuple>(t)) , util::get< 2>(boost::forward<Tuple>(t)) , util::get< 3>(boost::forward<Tuple>(t)) , util::get< 4>(boost::forward<Tuple>(t)) , util::get< 5>(boost::forward<Tuple>(t)) , util::get< 6>(boost::forward<Tuple>(t)) , util::get< 7>(boost::forward<Tuple>(t)) , util::get< 8>(boost::forward<Tuple>(t)) , util::get< 9>(boost::forward<Tuple>(t)) , util::get< 10>(boost::forward<Tuple>(t)) , util::get< 11>(boost::forward<Tuple>(t)) , util::get< 12>(boost::forward<Tuple>(t)) , util::get< 13>(boost::forward<Tuple>(t)) , util::get< 14>(boost::forward<Tuple>(t)) , util::get< 15>(boost::forward<Tuple>(t)) , util::get< 16>(boost::forward<Tuple>(t)) , util::get< 17>(boost::forward<Tuple>(t)) , util::get< 18>(boost::forward<Tuple>(t)) , util::get< 19>(boost::forward<Tuple>(t)) , util::get< 20>(boost::forward<Tuple>(t))
+            );
+    }
+    template <typename TTuple, typename UTuple>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename boost::lazy_enable_if_c<
+        tuple_size<typename remove_reference<TTuple>::type>::value
+      + tuple_size<typename remove_reference<UTuple>::type>::value == 21
+      , detail::tuple_cat_result<
+            typename remove_reference<TTuple>::type
+          , typename remove_reference<UTuple>::type
+        >
+    >::type
+    tuple_cat(BOOST_FWD_REF(TTuple) t, BOOST_FWD_REF(UTuple) u)
+    {
+        return
+            typename detail::tuple_cat_result<
+                typename remove_reference<TTuple>::type
+              , typename remove_reference<UTuple>::type
+            >::type(
+                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 20 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u))
+            );
+    }
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename detail::tuple_cat_result<
+        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type , typename remove_reference<T16>::type , typename remove_reference<T17>::type , typename remove_reference<T18>::type , typename remove_reference<T19>::type , typename remove_reference<T20>::type
+    >::type
+    tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11 , BOOST_FWD_REF(T12) t12 , BOOST_FWD_REF(T13) t13 , BOOST_FWD_REF(T14) t14 , BOOST_FWD_REF(T15) t15 , BOOST_FWD_REF(T16) t16 , BOOST_FWD_REF(T17) t17 , BOOST_FWD_REF(T18) t18 , BOOST_FWD_REF(T19) t19 , BOOST_FWD_REF(T20) t20)
+    {
+        return
+            util::tuple_cat(
+                util::tuple_cat( boost::forward<T0> (t0) , boost::forward<T1> (t1)) , util::tuple_cat( boost::forward<T2> (t2) , boost::forward<T3> (t3)) , util::tuple_cat( boost::forward<T4> (t4) , boost::forward<T5> (t5)) , util::tuple_cat( boost::forward<T6> (t6) , boost::forward<T7> (t7)) , util::tuple_cat( boost::forward<T8> (t8) , boost::forward<T9> (t9)) , util::tuple_cat( boost::forward<T10> (t10) , boost::forward<T11> (t11)) , util::tuple_cat( boost::forward<T12> (t12) , boost::forward<T13> (t13)) , util::tuple_cat( boost::forward<T14> (t14) , boost::forward<T15> (t15)) , util::tuple_cat( boost::forward<T16> (t16) , boost::forward<T17> (t17)) , util::tuple_cat( boost::forward<T18> (t18) , boost::forward<T19> (t19))
+              , boost::forward<T20>
+                    (t20)
+            );
+    }
+}}
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21, typename UTuple>
+        struct are_tuples_compatible<
+            tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21>, UTuple
+          , typename boost::enable_if_c<
+                tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21> >::value == 22
+             && tuple_size<typename remove_reference<UTuple>::type>::value == 22
+            >::type
+        >
+        {
+            typedef char(&no_type)[1];
+            typedef char(&yes_type)[2];
+            static no_type call(...);
+            static yes_type call(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21);
+            static bool const value =
+                sizeof(
+                    call(util::get< 0>(boost::declval<UTuple>()) , util::get< 1>(boost::declval<UTuple>()) , util::get< 2>(boost::declval<UTuple>()) , util::get< 3>(boost::declval<UTuple>()) , util::get< 4>(boost::declval<UTuple>()) , util::get< 5>(boost::declval<UTuple>()) , util::get< 6>(boost::declval<UTuple>()) , util::get< 7>(boost::declval<UTuple>()) , util::get< 8>(boost::declval<UTuple>()) , util::get< 9>(boost::declval<UTuple>()) , util::get< 10>(boost::declval<UTuple>()) , util::get< 11>(boost::declval<UTuple>()) , util::get< 12>(boost::declval<UTuple>()) , util::get< 13>(boost::declval<UTuple>()) , util::get< 14>(boost::declval<UTuple>()) , util::get< 15>(boost::declval<UTuple>()) , util::get< 16>(boost::declval<UTuple>()) , util::get< 17>(boost::declval<UTuple>()) , util::get< 18>(boost::declval<UTuple>()) , util::get< 19>(boost::declval<UTuple>()) , util::get< 20>(boost::declval<UTuple>()) , util::get< 21>(boost::declval<UTuple>()))
+                ) == sizeof(yes_type);
+            typedef boost::mpl::bool_<value> type;
+        };
+    }
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
+    class tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21>
+    {
+        BOOST_COPYABLE_AND_MOVABLE(tuple);
+    public: 
+        detail::tuple_member<T0> _m0; detail::tuple_member<T1> _m1; detail::tuple_member<T2> _m2; detail::tuple_member<T3> _m3; detail::tuple_member<T4> _m4; detail::tuple_member<T5> _m5; detail::tuple_member<T6> _m6; detail::tuple_member<T7> _m7; detail::tuple_member<T8> _m8; detail::tuple_member<T9> _m9; detail::tuple_member<T10> _m10; detail::tuple_member<T11> _m11; detail::tuple_member<T12> _m12; detail::tuple_member<T13> _m13; detail::tuple_member<T14> _m14; detail::tuple_member<T15> _m15; detail::tuple_member<T16> _m16; detail::tuple_member<T17> _m17; detail::tuple_member<T18> _m18; detail::tuple_member<T19> _m19; detail::tuple_member<T20> _m20; detail::tuple_member<T21> _m21;;
+    public:
+        
+        
+        
+        BOOST_CONSTEXPR tuple()
+          : _m0() , _m1() , _m2() , _m3() , _m4() , _m5() , _m6() , _m7() , _m8() , _m9() , _m10() , _m11() , _m12() , _m13() , _m14() , _m15() , _m16() , _m17() , _m18() , _m19() , _m20() , _m21()
+        {}
+        
+        
+        
+        BOOST_CONSTEXPR explicit tuple(
+            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15 , typename add_lvalue_reference< typename boost::add_const<T16>::type >::type v16 , typename add_lvalue_reference< typename boost::add_const<T17>::type >::type v17 , typename add_lvalue_reference< typename boost::add_const<T18>::type >::type v18 , typename add_lvalue_reference< typename boost::add_const<T19>::type >::type v19 , typename add_lvalue_reference< typename boost::add_const<T20>::type >::type v20 , typename add_lvalue_reference< typename boost::add_const<T21>::type >::type v21
+        ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15) , _m16(v16) , _m17(v17) , _m18(v18) , _m19(v19) , _m20(v20) , _m21(v21)
+        {}
+        
+        
+        
+        
+        
+        
+        
+        template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21>
+        BOOST_CONSTEXPR explicit tuple(
+            BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17 , BOOST_FWD_REF(U18) u18 , BOOST_FWD_REF(U19) u19 , BOOST_FWD_REF(U20) u20 , BOOST_FWD_REF(U21) u21
+          , typename boost::enable_if_c<
+                detail::are_tuples_compatible<
+                    tuple
+                  , typename add_rvalue_reference<
+                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21>
+                    >::type
+                >::value
+            >::type* = 0
+        ) : _m0 (boost::forward<U0>(u0)) , _m1 (boost::forward<U1>(u1)) , _m2 (boost::forward<U2>(u2)) , _m3 (boost::forward<U3>(u3)) , _m4 (boost::forward<U4>(u4)) , _m5 (boost::forward<U5>(u5)) , _m6 (boost::forward<U6>(u6)) , _m7 (boost::forward<U7>(u7)) , _m8 (boost::forward<U8>(u8)) , _m9 (boost::forward<U9>(u9)) , _m10 (boost::forward<U10>(u10)) , _m11 (boost::forward<U11>(u11)) , _m12 (boost::forward<U12>(u12)) , _m13 (boost::forward<U13>(u13)) , _m14 (boost::forward<U14>(u14)) , _m15 (boost::forward<U15>(u15)) , _m16 (boost::forward<U16>(u16)) , _m17 (boost::forward<U17>(u17)) , _m18 (boost::forward<U18>(u18)) , _m19 (boost::forward<U19>(u19)) , _m20 (boost::forward<U20>(u20)) , _m21 (boost::forward<U21>(u21))
+        {}
+        
+        
+        
+        BOOST_CONSTEXPR tuple(tuple const& other)
+          : _m0(other._m0) , _m1(other._m1) , _m2(other._m2) , _m3(other._m3) , _m4(other._m4) , _m5(other._m5) , _m6(other._m6) , _m7(other._m7) , _m8(other._m8) , _m9(other._m9) , _m10(other._m10) , _m11(other._m11) , _m12(other._m12) , _m13(other._m13) , _m14(other._m14) , _m15(other._m15) , _m16(other._m16) , _m17(other._m17) , _m18(other._m18) , _m19(other._m19) , _m20(other._m20) , _m21(other._m21)
+        {}
+        
+        
+        
+        BOOST_CONSTEXPR tuple(BOOST_RV_REF(tuple) other)
+          : _m0(boost::move(other._m0)) , _m1(boost::move(other._m1)) , _m2(boost::move(other._m2)) , _m3(boost::move(other._m3)) , _m4(boost::move(other._m4)) , _m5(boost::move(other._m5)) , _m6(boost::move(other._m6)) , _m7(boost::move(other._m7)) , _m8(boost::move(other._m8)) , _m9(boost::move(other._m9)) , _m10(boost::move(other._m10)) , _m11(boost::move(other._m11)) , _m12(boost::move(other._m12)) , _m13(boost::move(other._m13)) , _m14(boost::move(other._m14)) , _m15(boost::move(other._m15)) , _m16(boost::move(other._m16)) , _m17(boost::move(other._m17)) , _m18(boost::move(other._m18)) , _m19(boost::move(other._m19)) , _m20(boost::move(other._m20)) , _m21(boost::move(other._m21))
+        {}
+        
+        
+        
+        
+        
+        
+        
+        template <typename UTuple>
+        BOOST_CONSTEXPR tuple(
+            BOOST_FWD_REF(UTuple) other
+          , typename boost::enable_if_c<
+                detail::are_tuples_compatible<
+                    tuple
+                  , typename add_rvalue_reference<UTuple>::type
+                >::value
+            >::type* = 0
+        ) : _m0(util::get< 0>(boost::forward<UTuple>(other))) , _m1(util::get< 1>(boost::forward<UTuple>(other))) , _m2(util::get< 2>(boost::forward<UTuple>(other))) , _m3(util::get< 3>(boost::forward<UTuple>(other))) , _m4(util::get< 4>(boost::forward<UTuple>(other))) , _m5(util::get< 5>(boost::forward<UTuple>(other))) , _m6(util::get< 6>(boost::forward<UTuple>(other))) , _m7(util::get< 7>(boost::forward<UTuple>(other))) , _m8(util::get< 8>(boost::forward<UTuple>(other))) , _m9(util::get< 9>(boost::forward<UTuple>(other))) , _m10(util::get< 10>(boost::forward<UTuple>(other))) , _m11(util::get< 11>(boost::forward<UTuple>(other))) , _m12(util::get< 12>(boost::forward<UTuple>(other))) , _m13(util::get< 13>(boost::forward<UTuple>(other))) , _m14(util::get< 14>(boost::forward<UTuple>(other))) , _m15(util::get< 15>(boost::forward<UTuple>(other))) , _m16(util::get< 16>(boost::forward<UTuple>(other))) , _m17(util::get< 17>(boost::forward<UTuple>(other))) , _m18(util::get< 18>(boost::forward<UTuple>(other))) , _m19(util::get< 19>(boost::forward<UTuple>(other))) , _m20(util::get< 20>(boost::forward<UTuple>(other))) , _m21(util::get< 21>(boost::forward<UTuple>(other)))
+        {}
+        
+        
+        
+        tuple& operator=(tuple const& other)
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value )) && BOOST_NOEXCEPT_EXPR(( _m6._value = other._m6._value )) && BOOST_NOEXCEPT_EXPR(( _m7._value = other._m7._value )) && BOOST_NOEXCEPT_EXPR(( _m8._value = other._m8._value )) && BOOST_NOEXCEPT_EXPR(( _m9._value = other._m9._value )) && BOOST_NOEXCEPT_EXPR(( _m10._value = other._m10._value )) && BOOST_NOEXCEPT_EXPR(( _m11._value = other._m11._value )) && BOOST_NOEXCEPT_EXPR(( _m12._value = other._m12._value )) && BOOST_NOEXCEPT_EXPR(( _m13._value = other._m13._value )) && BOOST_NOEXCEPT_EXPR(( _m14._value = other._m14._value )) && BOOST_NOEXCEPT_EXPR(( _m15._value = other._m15._value )) && BOOST_NOEXCEPT_EXPR(( _m16._value = other._m16._value )) && BOOST_NOEXCEPT_EXPR(( _m17._value = other._m17._value )) && BOOST_NOEXCEPT_EXPR(( _m18._value = other._m18._value )) && BOOST_NOEXCEPT_EXPR(( _m19._value = other._m19._value )) && BOOST_NOEXCEPT_EXPR(( _m20._value = other._m20._value )) && BOOST_NOEXCEPT_EXPR(( _m21._value = other._m21._value ))
+            )
+        {
+            _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value; _m6._value = other._m6._value; _m7._value = other._m7._value; _m8._value = other._m8._value; _m9._value = other._m9._value; _m10._value = other._m10._value; _m11._value = other._m11._value; _m12._value = other._m12._value; _m13._value = other._m13._value; _m14._value = other._m14._value; _m15._value = other._m15._value; _m16._value = other._m16._value; _m17._value = other._m17._value; _m18._value = other._m18._value; _m19._value = other._m19._value; _m20._value = other._m20._value; _m21._value = other._m21._value;;
+            return *this;
+        }
+        
+        
+        tuple& operator=(BOOST_RV_REF(tuple) other)
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = boost::forward<T6> (other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = boost::forward<T7> (other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = boost::forward<T8> (other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = boost::forward<T9> (other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = boost::forward<T10> (other._m10._value) )) && BOOST_NOEXCEPT_EXPR(( _m11._value = boost::forward<T11> (other._m11._value) )) && BOOST_NOEXCEPT_EXPR(( _m12._value = boost::forward<T12> (other._m12._value) )) && BOOST_NOEXCEPT_EXPR(( _m13._value = boost::forward<T13> (other._m13._value) )) && BOOST_NOEXCEPT_EXPR(( _m14._value = boost::forward<T14> (other._m14._value) )) && BOOST_NOEXCEPT_EXPR(( _m15._value = boost::forward<T15> (other._m15._value) )) && BOOST_NOEXCEPT_EXPR(( _m16._value = boost::forward<T16> (other._m16._value) )) && BOOST_NOEXCEPT_EXPR(( _m17._value = boost::forward<T17> (other._m17._value) )) && BOOST_NOEXCEPT_EXPR(( _m18._value = boost::forward<T18> (other._m18._value) )) && BOOST_NOEXCEPT_EXPR(( _m19._value = boost::forward<T19> (other._m19._value) )) && BOOST_NOEXCEPT_EXPR(( _m20._value = boost::forward<T20> (other._m20._value) )) && BOOST_NOEXCEPT_EXPR(( _m21._value = boost::forward<T21> (other._m21._value) ))
+            )
+        {
+            _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value); _m6._value = boost::forward<T6> (other._m6._value); _m7._value = boost::forward<T7> (other._m7._value); _m8._value = boost::forward<T8> (other._m8._value); _m9._value = boost::forward<T9> (other._m9._value); _m10._value = boost::forward<T10> (other._m10._value); _m11._value = boost::forward<T11> (other._m11._value); _m12._value = boost::forward<T12> (other._m12._value); _m13._value = boost::forward<T13> (other._m13._value); _m14._value = boost::forward<T14> (other._m14._value); _m15._value = boost::forward<T15> (other._m15._value); _m16._value = boost::forward<T16> (other._m16._value); _m17._value = boost::forward<T17> (other._m17._value); _m18._value = boost::forward<T18> (other._m18._value); _m19._value = boost::forward<T19> (other._m19._value); _m20._value = boost::forward<T20> (other._m20._value); _m21._value = boost::forward<T21> (other._m21._value);;
+            return *this;
+        }
+        
+        
+        
+        template <typename UTuple>
+        typename boost::enable_if_c<
+            tuple_size<typename remove_reference<UTuple>::type>::value == 22
+          , tuple&
+        >::type
+        operator=(BOOST_FWD_REF(UTuple) other)
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = util::get< 6>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = util::get< 7>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = util::get< 8>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = util::get< 9>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = util::get< 10>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m11._value = util::get< 11>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m12._value = util::get< 12>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m13._value = util::get< 13>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m14._value = util::get< 14>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m15._value = util::get< 15>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m16._value = util::get< 16>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m17._value = util::get< 17>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m18._value = util::get< 18>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m19._value = util::get< 19>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m20._value = util::get< 20>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m21._value = util::get< 21>(boost::forward<UTuple>(other)) ))
+            )
+        {
+            _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other)); _m6._value = util::get< 6>(boost::forward<UTuple>(other)); _m7._value = util::get< 7>(boost::forward<UTuple>(other)); _m8._value = util::get< 8>(boost::forward<UTuple>(other)); _m9._value = util::get< 9>(boost::forward<UTuple>(other)); _m10._value = util::get< 10>(boost::forward<UTuple>(other)); _m11._value = util::get< 11>(boost::forward<UTuple>(other)); _m12._value = util::get< 12>(boost::forward<UTuple>(other)); _m13._value = util::get< 13>(boost::forward<UTuple>(other)); _m14._value = util::get< 14>(boost::forward<UTuple>(other)); _m15._value = util::get< 15>(boost::forward<UTuple>(other)); _m16._value = util::get< 16>(boost::forward<UTuple>(other)); _m17._value = util::get< 17>(boost::forward<UTuple>(other)); _m18._value = util::get< 18>(boost::forward<UTuple>(other)); _m19._value = util::get< 19>(boost::forward<UTuple>(other)); _m20._value = util::get< 20>(boost::forward<UTuple>(other)); _m21._value = util::get< 21>(boost::forward<UTuple>(other));;
+            return *this;
+        }
+        
+        
+        
+        
+        void swap(tuple& other)
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m6._value , other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m7._value , other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m8._value , other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m9._value , other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m10._value , other._m10._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m11._value , other._m11._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m12._value , other._m12._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m13._value , other._m13._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m14._value , other._m14._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m15._value , other._m15._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m16._value , other._m16._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m17._value , other._m17._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m18._value , other._m18._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m19._value , other._m19._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m20._value , other._m20._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m21._value , other._m21._value) ))
+            )
+        {
+            boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value ); boost::swap( _m6._value , other._m6._value ); boost::swap( _m7._value , other._m7._value ); boost::swap( _m8._value , other._m8._value ); boost::swap( _m9._value , other._m9._value ); boost::swap( _m10._value , other._m10._value ); boost::swap( _m11._value , other._m11._value ); boost::swap( _m12._value , other._m12._value ); boost::swap( _m13._value , other._m13._value ); boost::swap( _m14._value , other._m14._value ); boost::swap( _m15._value , other._m15._value ); boost::swap( _m16._value , other._m16._value ); boost::swap( _m17._value , other._m17._value ); boost::swap( _m18._value , other._m18._value ); boost::swap( _m19._value , other._m19._value ); boost::swap( _m20._value , other._m20._value ); boost::swap( _m21._value , other._m21._value );;
+        }
+    };
+    
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
+    struct tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21> >
+      : boost::mpl::size_t<22>
+    {};
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+    struct tuple_element<
+        21
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
+    > : boost::mpl::identity<T21>
+    {
+        template <typename Tuple>
+        static BOOST_CONSTEXPR BOOST_FORCEINLINE
+        typename detail::qualify_as<
+            T21
+          , Tuple&
+        >::type
+        get(Tuple& tuple) BOOST_NOEXCEPT
+        {
+            return tuple._m21._value;
+        }
+    };
+    
+    
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type , typename detail::make_tuple_element<T4>::type , typename detail::make_tuple_element<T5>::type , typename detail::make_tuple_element<T6>::type , typename detail::make_tuple_element<T7>::type , typename detail::make_tuple_element<T8>::type , typename detail::make_tuple_element<T9>::type , typename detail::make_tuple_element<T10>::type , typename detail::make_tuple_element<T11>::type , typename detail::make_tuple_element<T12>::type , typename detail::make_tuple_element<T13>::type , typename detail::make_tuple_element<T14>::type , typename detail::make_tuple_element<T15>::type , typename detail::make_tuple_element<T16>::type , typename detail::make_tuple_element<T17>::type , typename detail::make_tuple_element<T18>::type , typename detail::make_tuple_element<T19>::type , typename detail::make_tuple_element<T20>::type , typename detail::make_tuple_element<T21>::type>
+    make_tuple(BOOST_FWD_REF(T0) v0 , BOOST_FWD_REF(T1) v1 , BOOST_FWD_REF(T2) v2 , BOOST_FWD_REF(T3) v3 , BOOST_FWD_REF(T4) v4 , BOOST_FWD_REF(T5) v5 , BOOST_FWD_REF(T6) v6 , BOOST_FWD_REF(T7) v7 , BOOST_FWD_REF(T8) v8 , BOOST_FWD_REF(T9) v9 , BOOST_FWD_REF(T10) v10 , BOOST_FWD_REF(T11) v11 , BOOST_FWD_REF(T12) v12 , BOOST_FWD_REF(T13) v13 , BOOST_FWD_REF(T14) v14 , BOOST_FWD_REF(T15) v15 , BOOST_FWD_REF(T16) v16 , BOOST_FWD_REF(T17) v17 , BOOST_FWD_REF(T18) v18 , BOOST_FWD_REF(T19) v19 , BOOST_FWD_REF(T20) v20 , BOOST_FWD_REF(T21) v21)
+    {
+        return
+            tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type , typename detail::make_tuple_element<T4>::type , typename detail::make_tuple_element<T5>::type , typename detail::make_tuple_element<T6>::type , typename detail::make_tuple_element<T7>::type , typename detail::make_tuple_element<T8>::type , typename detail::make_tuple_element<T9>::type , typename detail::make_tuple_element<T10>::type , typename detail::make_tuple_element<T11>::type , typename detail::make_tuple_element<T12>::type , typename detail::make_tuple_element<T13>::type , typename detail::make_tuple_element<T14>::type , typename detail::make_tuple_element<T15>::type , typename detail::make_tuple_element<T16>::type , typename detail::make_tuple_element<T17>::type , typename detail::make_tuple_element<T18>::type , typename detail::make_tuple_element<T19>::type , typename detail::make_tuple_element<T20>::type , typename detail::make_tuple_element<T21>::type>(
+                boost::forward<T0>( v0 ) , boost::forward<T1>( v1 ) , boost::forward<T2>( v2 ) , boost::forward<T3>( v3 ) , boost::forward<T4>( v4 ) , boost::forward<T5>( v5 ) , boost::forward<T6>( v6 ) , boost::forward<T7>( v7 ) , boost::forward<T8>( v8 ) , boost::forward<T9>( v9 ) , boost::forward<T10>( v10 ) , boost::forward<T11>( v11 ) , boost::forward<T12>( v12 ) , boost::forward<T13>( v13 ) , boost::forward<T14>( v14 ) , boost::forward<T15>( v15 ) , boost::forward<T16>( v16 ) , boost::forward<T17>( v17 ) , boost::forward<T18>( v18 ) , boost::forward<T19>( v19 ) , boost::forward<T20>( v20 ) , boost::forward<T21>( v21 )
+            );
+    }
+    
+    
+    
+    
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
+    BOOST_FORCEINLINE
+    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type , typename add_rvalue_reference<T21>::type>
+    forward_as_tuple(BOOST_FWD_REF(T0) v0 , BOOST_FWD_REF(T1) v1 , BOOST_FWD_REF(T2) v2 , BOOST_FWD_REF(T3) v3 , BOOST_FWD_REF(T4) v4 , BOOST_FWD_REF(T5) v5 , BOOST_FWD_REF(T6) v6 , BOOST_FWD_REF(T7) v7 , BOOST_FWD_REF(T8) v8 , BOOST_FWD_REF(T9) v9 , BOOST_FWD_REF(T10) v10 , BOOST_FWD_REF(T11) v11 , BOOST_FWD_REF(T12) v12 , BOOST_FWD_REF(T13) v13 , BOOST_FWD_REF(T14) v14 , BOOST_FWD_REF(T15) v15 , BOOST_FWD_REF(T16) v16 , BOOST_FWD_REF(T17) v17 , BOOST_FWD_REF(T18) v18 , BOOST_FWD_REF(T19) v19 , BOOST_FWD_REF(T20) v20 , BOOST_FWD_REF(T21) v21) BOOST_NOEXCEPT
+    {
+        return
+            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type , typename add_rvalue_reference<T21>::type>(
+                boost::forward<T0>( v0 ) , boost::forward<T1>( v1 ) , boost::forward<T2>( v2 ) , boost::forward<T3>( v3 ) , boost::forward<T4>( v4 ) , boost::forward<T5>( v5 ) , boost::forward<T6>( v6 ) , boost::forward<T7>( v7 ) , boost::forward<T8>( v8 ) , boost::forward<T9>( v9 ) , boost::forward<T10>( v10 ) , boost::forward<T11>( v11 ) , boost::forward<T12>( v12 ) , boost::forward<T13>( v13 ) , boost::forward<T14>( v14 ) , boost::forward<T15>( v15 ) , boost::forward<T16>( v16 ) , boost::forward<T17>( v17 ) , boost::forward<T18>( v18 ) , boost::forward<T19>( v19 ) , boost::forward<T20>( v20 ) , boost::forward<T21>( v21 )
+            );
+    }
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
+    BOOST_FORCEINLINE
+    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type , typename util::add_lvalue_reference<T21>::type>
+    tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15 , T16 & v16 , T17 & v17 , T18 & v18 , T19 & v19 , T20 & v20 , T21 & v21) BOOST_NOEXCEPT
+    {
+        return
+            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type , typename util::add_lvalue_reference<T21>::type>(
+                v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16 , v17 , v18 , v19 , v20 , v21
+            );
+    }
+    
+    
+    
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
+        struct tuple_cat_result<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21>
+          : tuple_cat_result<
+                typename tuple_cat_result< T0 , T1 >::type , typename tuple_cat_result< T2 , T3 >::type , typename tuple_cat_result< T4 , T5 >::type , typename tuple_cat_result< T6 , T7 >::type , typename tuple_cat_result< T8 , T9 >::type , typename tuple_cat_result< T10 , T11 >::type , typename tuple_cat_result< T12 , T13 >::type , typename tuple_cat_result< T14 , T15 >::type , typename tuple_cat_result< T16 , T17 >::type , typename tuple_cat_result< T18 , T19 >::type , typename tuple_cat_result< T20 , T21 >::type
+            >
+        {};
+        template <typename Tuple>
+        struct tuple_cat_result<
+            Tuple
+          , typename boost::enable_if_c<tuple_size<Tuple>::value == 22>::type
+        >
+        {
+            typedef
+                tuple<typename tuple_element< 0, Tuple>::type , typename tuple_element< 1, Tuple>::type , typename tuple_element< 2, Tuple>::type , typename tuple_element< 3, Tuple>::type , typename tuple_element< 4, Tuple>::type , typename tuple_element< 5, Tuple>::type , typename tuple_element< 6, Tuple>::type , typename tuple_element< 7, Tuple>::type , typename tuple_element< 8, Tuple>::type , typename tuple_element< 9, Tuple>::type , typename tuple_element< 10, Tuple>::type , typename tuple_element< 11, Tuple>::type , typename tuple_element< 12, Tuple>::type , typename tuple_element< 13, Tuple>::type , typename tuple_element< 14, Tuple>::type , typename tuple_element< 15, Tuple>::type , typename tuple_element< 16, Tuple>::type , typename tuple_element< 17, Tuple>::type , typename tuple_element< 18, Tuple>::type , typename tuple_element< 19, Tuple>::type , typename tuple_element< 20, Tuple>::type , typename tuple_element< 21, Tuple>::type>
+                type;
+        };
+    }
+    template <typename Tuple>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename boost::lazy_enable_if_c<
+        tuple_size<typename remove_reference<Tuple>::type>::value == 22
+      , detail::tuple_cat_result<
+            typename remove_reference<Tuple>::type
+        >
+    >::type
+    tuple_cat(BOOST_FWD_REF(Tuple) t)
+    {
+        return
+            typename detail::tuple_cat_result<
+                typename remove_reference<Tuple>::type
+            >::type(
+                util::get< 0>(boost::forward<Tuple>(t)) , util::get< 1>(boost::forward<Tuple>(t)) , util::get< 2>(boost::forward<Tuple>(t)) , util::get< 3>(boost::forward<Tuple>(t)) , util::get< 4>(boost::forward<Tuple>(t)) , util::get< 5>(boost::forward<Tuple>(t)) , util::get< 6>(boost::forward<Tuple>(t)) , util::get< 7>(boost::forward<Tuple>(t)) , util::get< 8>(boost::forward<Tuple>(t)) , util::get< 9>(boost::forward<Tuple>(t)) , util::get< 10>(boost::forward<Tuple>(t)) , util::get< 11>(boost::forward<Tuple>(t)) , util::get< 12>(boost::forward<Tuple>(t)) , util::get< 13>(boost::forward<Tuple>(t)) , util::get< 14>(boost::forward<Tuple>(t)) , util::get< 15>(boost::forward<Tuple>(t)) , util::get< 16>(boost::forward<Tuple>(t)) , util::get< 17>(boost::forward<Tuple>(t)) , util::get< 18>(boost::forward<Tuple>(t)) , util::get< 19>(boost::forward<Tuple>(t)) , util::get< 20>(boost::forward<Tuple>(t)) , util::get< 21>(boost::forward<Tuple>(t))
+            );
+    }
+    template <typename TTuple, typename UTuple>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename boost::lazy_enable_if_c<
+        tuple_size<typename remove_reference<TTuple>::type>::value
+      + tuple_size<typename remove_reference<UTuple>::type>::value == 22
+      , detail::tuple_cat_result<
+            typename remove_reference<TTuple>::type
+          , typename remove_reference<UTuple>::type
+        >
+    >::type
+    tuple_cat(BOOST_FWD_REF(TTuple) t, BOOST_FWD_REF(UTuple) u)
+    {
+        return
+            typename detail::tuple_cat_result<
+                typename remove_reference<TTuple>::type
+              , typename remove_reference<UTuple>::type
+            >::type(
+                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 20 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 21 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u))
+            );
+    }
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename detail::tuple_cat_result<
+        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type , typename remove_reference<T16>::type , typename remove_reference<T17>::type , typename remove_reference<T18>::type , typename remove_reference<T19>::type , typename remove_reference<T20>::type , typename remove_reference<T21>::type
+    >::type
+    tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11 , BOOST_FWD_REF(T12) t12 , BOOST_FWD_REF(T13) t13 , BOOST_FWD_REF(T14) t14 , BOOST_FWD_REF(T15) t15 , BOOST_FWD_REF(T16) t16 , BOOST_FWD_REF(T17) t17 , BOOST_FWD_REF(T18) t18 , BOOST_FWD_REF(T19) t19 , BOOST_FWD_REF(T20) t20 , BOOST_FWD_REF(T21) t21)
+    {
+        return
+            util::tuple_cat(
+                util::tuple_cat( boost::forward<T0> (t0) , boost::forward<T1> (t1)) , util::tuple_cat( boost::forward<T2> (t2) , boost::forward<T3> (t3)) , util::tuple_cat( boost::forward<T4> (t4) , boost::forward<T5> (t5)) , util::tuple_cat( boost::forward<T6> (t6) , boost::forward<T7> (t7)) , util::tuple_cat( boost::forward<T8> (t8) , boost::forward<T9> (t9)) , util::tuple_cat( boost::forward<T10> (t10) , boost::forward<T11> (t11)) , util::tuple_cat( boost::forward<T12> (t12) , boost::forward<T13> (t13)) , util::tuple_cat( boost::forward<T14> (t14) , boost::forward<T15> (t15)) , util::tuple_cat( boost::forward<T16> (t16) , boost::forward<T17> (t17)) , util::tuple_cat( boost::forward<T18> (t18) , boost::forward<T19> (t19)) , util::tuple_cat( boost::forward<T20> (t20) , boost::forward<T21> (t21))
+            );
+    }
+}}
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22, typename UTuple>
+        struct are_tuples_compatible<
+            tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>, UTuple
+          , typename boost::enable_if_c<
+                tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22> >::value == 23
+             && tuple_size<typename remove_reference<UTuple>::type>::value == 23
+            >::type
+        >
+        {
+            typedef char(&no_type)[1];
+            typedef char(&yes_type)[2];
+            static no_type call(...);
+            static yes_type call(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22);
+            static bool const value =
+                sizeof(
+                    call(util::get< 0>(boost::declval<UTuple>()) , util::get< 1>(boost::declval<UTuple>()) , util::get< 2>(boost::declval<UTuple>()) , util::get< 3>(boost::declval<UTuple>()) , util::get< 4>(boost::declval<UTuple>()) , util::get< 5>(boost::declval<UTuple>()) , util::get< 6>(boost::declval<UTuple>()) , util::get< 7>(boost::declval<UTuple>()) , util::get< 8>(boost::declval<UTuple>()) , util::get< 9>(boost::declval<UTuple>()) , util::get< 10>(boost::declval<UTuple>()) , util::get< 11>(boost::declval<UTuple>()) , util::get< 12>(boost::declval<UTuple>()) , util::get< 13>(boost::declval<UTuple>()) , util::get< 14>(boost::declval<UTuple>()) , util::get< 15>(boost::declval<UTuple>()) , util::get< 16>(boost::declval<UTuple>()) , util::get< 17>(boost::declval<UTuple>()) , util::get< 18>(boost::declval<UTuple>()) , util::get< 19>(boost::declval<UTuple>()) , util::get< 20>(boost::declval<UTuple>()) , util::get< 21>(boost::declval<UTuple>()) , util::get< 22>(boost::declval<UTuple>()))
+                ) == sizeof(yes_type);
+            typedef boost::mpl::bool_<value> type;
+        };
+    }
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+    class tuple
+    {
+        BOOST_COPYABLE_AND_MOVABLE(tuple);
+    public: 
+        detail::tuple_member<T0> _m0; detail::tuple_member<T1> _m1; detail::tuple_member<T2> _m2; detail::tuple_member<T3> _m3; detail::tuple_member<T4> _m4; detail::tuple_member<T5> _m5; detail::tuple_member<T6> _m6; detail::tuple_member<T7> _m7; detail::tuple_member<T8> _m8; detail::tuple_member<T9> _m9; detail::tuple_member<T10> _m10; detail::tuple_member<T11> _m11; detail::tuple_member<T12> _m12; detail::tuple_member<T13> _m13; detail::tuple_member<T14> _m14; detail::tuple_member<T15> _m15; detail::tuple_member<T16> _m16; detail::tuple_member<T17> _m17; detail::tuple_member<T18> _m18; detail::tuple_member<T19> _m19; detail::tuple_member<T20> _m20; detail::tuple_member<T21> _m21; detail::tuple_member<T22> _m22;;
+    public:
+        
+        
+        
+        BOOST_CONSTEXPR tuple()
+          : _m0() , _m1() , _m2() , _m3() , _m4() , _m5() , _m6() , _m7() , _m8() , _m9() , _m10() , _m11() , _m12() , _m13() , _m14() , _m15() , _m16() , _m17() , _m18() , _m19() , _m20() , _m21() , _m22()
+        {}
+        
+        
+        
+        BOOST_CONSTEXPR explicit tuple(
+            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15 , typename add_lvalue_reference< typename boost::add_const<T16>::type >::type v16 , typename add_lvalue_reference< typename boost::add_const<T17>::type >::type v17 , typename add_lvalue_reference< typename boost::add_const<T18>::type >::type v18 , typename add_lvalue_reference< typename boost::add_const<T19>::type >::type v19 , typename add_lvalue_reference< typename boost::add_const<T20>::type >::type v20 , typename add_lvalue_reference< typename boost::add_const<T21>::type >::type v21 , typename add_lvalue_reference< typename boost::add_const<T22>::type >::type v22
+        ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15) , _m16(v16) , _m17(v17) , _m18(v18) , _m19(v19) , _m20(v20) , _m21(v21) , _m22(v22)
+        {}
+        
+        
+        
+        
+        
+        
+        
+        template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21 , typename U22>
+        BOOST_CONSTEXPR explicit tuple(
+            BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17 , BOOST_FWD_REF(U18) u18 , BOOST_FWD_REF(U19) u19 , BOOST_FWD_REF(U20) u20 , BOOST_FWD_REF(U21) u21 , BOOST_FWD_REF(U22) u22
+          , typename boost::enable_if_c<
+                detail::are_tuples_compatible<
+                    tuple
+                  , typename add_rvalue_reference<
+                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21 , U22>
+                    >::type
+                >::value
+            >::type* = 0
+        ) : _m0 (boost::forward<U0>(u0)) , _m1 (boost::forward<U1>(u1)) , _m2 (boost::forward<U2>(u2)) , _m3 (boost::forward<U3>(u3)) , _m4 (boost::forward<U4>(u4)) , _m5 (boost::forward<U5>(u5)) , _m6 (boost::forward<U6>(u6)) , _m7 (boost::forward<U7>(u7)) , _m8 (boost::forward<U8>(u8)) , _m9 (boost::forward<U9>(u9)) , _m10 (boost::forward<U10>(u10)) , _m11 (boost::forward<U11>(u11)) , _m12 (boost::forward<U12>(u12)) , _m13 (boost::forward<U13>(u13)) , _m14 (boost::forward<U14>(u14)) , _m15 (boost::forward<U15>(u15)) , _m16 (boost::forward<U16>(u16)) , _m17 (boost::forward<U17>(u17)) , _m18 (boost::forward<U18>(u18)) , _m19 (boost::forward<U19>(u19)) , _m20 (boost::forward<U20>(u20)) , _m21 (boost::forward<U21>(u21)) , _m22 (boost::forward<U22>(u22))
+        {}
+        
+        
+        
+        BOOST_CONSTEXPR tuple(tuple const& other)
+          : _m0(other._m0) , _m1(other._m1) , _m2(other._m2) , _m3(other._m3) , _m4(other._m4) , _m5(other._m5) , _m6(other._m6) , _m7(other._m7) , _m8(other._m8) , _m9(other._m9) , _m10(other._m10) , _m11(other._m11) , _m12(other._m12) , _m13(other._m13) , _m14(other._m14) , _m15(other._m15) , _m16(other._m16) , _m17(other._m17) , _m18(other._m18) , _m19(other._m19) , _m20(other._m20) , _m21(other._m21) , _m22(other._m22)
+        {}
+        
+        
+        
+        BOOST_CONSTEXPR tuple(BOOST_RV_REF(tuple) other)
+          : _m0(boost::move(other._m0)) , _m1(boost::move(other._m1)) , _m2(boost::move(other._m2)) , _m3(boost::move(other._m3)) , _m4(boost::move(other._m4)) , _m5(boost::move(other._m5)) , _m6(boost::move(other._m6)) , _m7(boost::move(other._m7)) , _m8(boost::move(other._m8)) , _m9(boost::move(other._m9)) , _m10(boost::move(other._m10)) , _m11(boost::move(other._m11)) , _m12(boost::move(other._m12)) , _m13(boost::move(other._m13)) , _m14(boost::move(other._m14)) , _m15(boost::move(other._m15)) , _m16(boost::move(other._m16)) , _m17(boost::move(other._m17)) , _m18(boost::move(other._m18)) , _m19(boost::move(other._m19)) , _m20(boost::move(other._m20)) , _m21(boost::move(other._m21)) , _m22(boost::move(other._m22))
+        {}
+        
+        
+        
+        
+        
+        
+        
+        template <typename UTuple>
+        BOOST_CONSTEXPR tuple(
+            BOOST_FWD_REF(UTuple) other
+          , typename boost::enable_if_c<
+                detail::are_tuples_compatible<
+                    tuple
+                  , typename add_rvalue_reference<UTuple>::type
+                >::value
+            >::type* = 0
+        ) : _m0(util::get< 0>(boost::forward<UTuple>(other))) , _m1(util::get< 1>(boost::forward<UTuple>(other))) , _m2(util::get< 2>(boost::forward<UTuple>(other))) , _m3(util::get< 3>(boost::forward<UTuple>(other))) , _m4(util::get< 4>(boost::forward<UTuple>(other))) , _m5(util::get< 5>(boost::forward<UTuple>(other))) , _m6(util::get< 6>(boost::forward<UTuple>(other))) , _m7(util::get< 7>(boost::forward<UTuple>(other))) , _m8(util::get< 8>(boost::forward<UTuple>(other))) , _m9(util::get< 9>(boost::forward<UTuple>(other))) , _m10(util::get< 10>(boost::forward<UTuple>(other))) , _m11(util::get< 11>(boost::forward<UTuple>(other))) , _m12(util::get< 12>(boost::forward<UTuple>(other))) , _m13(util::get< 13>(boost::forward<UTuple>(other))) , _m14(util::get< 14>(boost::forward<UTuple>(other))) , _m15(util::get< 15>(boost::forward<UTuple>(other))) , _m16(util::get< 16>(boost::forward<UTuple>(other))) , _m17(util::get< 17>(boost::forward<UTuple>(other))) , _m18(util::get< 18>(boost::forward<UTuple>(other))) , _m19(util::get< 19>(boost::forward<UTuple>(other))) , _m20(util::get< 20>(boost::forward<UTuple>(other))) , _m21(util::get< 21>(boost::forward<UTuple>(other))) , _m22(util::get< 22>(boost::forward<UTuple>(other)))
+        {}
+        
+        
+        
+        tuple& operator=(tuple const& other)
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = other._m0._value )) && BOOST_NOEXCEPT_EXPR(( _m1._value = other._m1._value )) && BOOST_NOEXCEPT_EXPR(( _m2._value = other._m2._value )) && BOOST_NOEXCEPT_EXPR(( _m3._value = other._m3._value )) && BOOST_NOEXCEPT_EXPR(( _m4._value = other._m4._value )) && BOOST_NOEXCEPT_EXPR(( _m5._value = other._m5._value )) && BOOST_NOEXCEPT_EXPR(( _m6._value = other._m6._value )) && BOOST_NOEXCEPT_EXPR(( _m7._value = other._m7._value )) && BOOST_NOEXCEPT_EXPR(( _m8._value = other._m8._value )) && BOOST_NOEXCEPT_EXPR(( _m9._value = other._m9._value )) && BOOST_NOEXCEPT_EXPR(( _m10._value = other._m10._value )) && BOOST_NOEXCEPT_EXPR(( _m11._value = other._m11._value )) && BOOST_NOEXCEPT_EXPR(( _m12._value = other._m12._value )) && BOOST_NOEXCEPT_EXPR(( _m13._value = other._m13._value )) && BOOST_NOEXCEPT_EXPR(( _m14._value = other._m14._value )) && BOOST_NOEXCEPT_EXPR(( _m15._value = other._m15._value )) && BOOST_NOEXCEPT_EXPR(( _m16._value = other._m16._value )) && BOOST_NOEXCEPT_EXPR(( _m17._value = other._m17._value )) && BOOST_NOEXCEPT_EXPR(( _m18._value = other._m18._value )) && BOOST_NOEXCEPT_EXPR(( _m19._value = other._m19._value )) && BOOST_NOEXCEPT_EXPR(( _m20._value = other._m20._value )) && BOOST_NOEXCEPT_EXPR(( _m21._value = other._m21._value )) && BOOST_NOEXCEPT_EXPR(( _m22._value = other._m22._value ))
+            )
+        {
+            _m0._value = other._m0._value; _m1._value = other._m1._value; _m2._value = other._m2._value; _m3._value = other._m3._value; _m4._value = other._m4._value; _m5._value = other._m5._value; _m6._value = other._m6._value; _m7._value = other._m7._value; _m8._value = other._m8._value; _m9._value = other._m9._value; _m10._value = other._m10._value; _m11._value = other._m11._value; _m12._value = other._m12._value; _m13._value = other._m13._value; _m14._value = other._m14._value; _m15._value = other._m15._value; _m16._value = other._m16._value; _m17._value = other._m17._value; _m18._value = other._m18._value; _m19._value = other._m19._value; _m20._value = other._m20._value; _m21._value = other._m21._value; _m22._value = other._m22._value;;
+            return *this;
+        }
+        
+        
+        tuple& operator=(BOOST_RV_REF(tuple) other)
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = boost::forward<T0> (other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = boost::forward<T1> (other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = boost::forward<T2> (other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = boost::forward<T3> (other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = boost::forward<T4> (other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = boost::forward<T5> (other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = boost::forward<T6> (other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = boost::forward<T7> (other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = boost::forward<T8> (other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = boost::forward<T9> (other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = boost::forward<T10> (other._m10._value) )) && BOOST_NOEXCEPT_EXPR(( _m11._value = boost::forward<T11> (other._m11._value) )) && BOOST_NOEXCEPT_EXPR(( _m12._value = boost::forward<T12> (other._m12._value) )) && BOOST_NOEXCEPT_EXPR(( _m13._value = boost::forward<T13> (other._m13._value) )) && BOOST_NOEXCEPT_EXPR(( _m14._value = boost::forward<T14> (other._m14._value) )) && BOOST_NOEXCEPT_EXPR(( _m15._value = boost::forward<T15> (other._m15._value) )) && BOOST_NOEXCEPT_EXPR(( _m16._value = boost::forward<T16> (other._m16._value) )) && BOOST_NOEXCEPT_EXPR(( _m17._value = boost::forward<T17> (other._m17._value) )) && BOOST_NOEXCEPT_EXPR(( _m18._value = boost::forward<T18> (other._m18._value) )) && BOOST_NOEXCEPT_EXPR(( _m19._value = boost::forward<T19> (other._m19._value) )) && BOOST_NOEXCEPT_EXPR(( _m20._value = boost::forward<T20> (other._m20._value) )) && BOOST_NOEXCEPT_EXPR(( _m21._value = boost::forward<T21> (other._m21._value) )) && BOOST_NOEXCEPT_EXPR(( _m22._value = boost::forward<T22> (other._m22._value) ))
+            )
+        {
+            _m0._value = boost::forward<T0> (other._m0._value); _m1._value = boost::forward<T1> (other._m1._value); _m2._value = boost::forward<T2> (other._m2._value); _m3._value = boost::forward<T3> (other._m3._value); _m4._value = boost::forward<T4> (other._m4._value); _m5._value = boost::forward<T5> (other._m5._value); _m6._value = boost::forward<T6> (other._m6._value); _m7._value = boost::forward<T7> (other._m7._value); _m8._value = boost::forward<T8> (other._m8._value); _m9._value = boost::forward<T9> (other._m9._value); _m10._value = boost::forward<T10> (other._m10._value); _m11._value = boost::forward<T11> (other._m11._value); _m12._value = boost::forward<T12> (other._m12._value); _m13._value = boost::forward<T13> (other._m13._value); _m14._value = boost::forward<T14> (other._m14._value); _m15._value = boost::forward<T15> (other._m15._value); _m16._value = boost::forward<T16> (other._m16._value); _m17._value = boost::forward<T17> (other._m17._value); _m18._value = boost::forward<T18> (other._m18._value); _m19._value = boost::forward<T19> (other._m19._value); _m20._value = boost::forward<T20> (other._m20._value); _m21._value = boost::forward<T21> (other._m21._value); _m22._value = boost::forward<T22> (other._m22._value);;
+            return *this;
+        }
+        
+        
+        
+        template <typename UTuple>
+        typename boost::enable_if_c<
+            tuple_size<typename remove_reference<UTuple>::type>::value == 23
+          , tuple&
+        >::type
+        operator=(BOOST_FWD_REF(UTuple) other)
+            HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( _m0._value = util::get< 0>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m1._value = util::get< 1>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m2._value = util::get< 2>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m3._value = util::get< 3>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m4._value = util::get< 4>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m5._value = util::get< 5>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m6._value = util::get< 6>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m7._value = util::get< 7>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m8._value = util::get< 8>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m9._value = util::get< 9>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m10._value = util::get< 10>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m11._value = util::get< 11>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m12._value = util::get< 12>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m13._value = util::get< 13>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m14._value = util::get< 14>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m15._value = util::get< 15>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m16._value = util::get< 16>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m17._value = util::get< 17>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m18._value = util::get< 18>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m19._value = util::get< 19>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m20._value = util::get< 20>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m21._value = util::get< 21>(boost::forward<UTuple>(other)) )) && BOOST_NOEXCEPT_EXPR(( _m22._value = util::get< 22>(boost::forward<UTuple>(other)) ))
+            )
+        {
+            _m0._value = util::get< 0>(boost::forward<UTuple>(other)); _m1._value = util::get< 1>(boost::forward<UTuple>(other)); _m2._value = util::get< 2>(boost::forward<UTuple>(other)); _m3._value = util::get< 3>(boost::forward<UTuple>(other)); _m4._value = util::get< 4>(boost::forward<UTuple>(other)); _m5._value = util::get< 5>(boost::forward<UTuple>(other)); _m6._value = util::get< 6>(boost::forward<UTuple>(other)); _m7._value = util::get< 7>(boost::forward<UTuple>(other)); _m8._value = util::get< 8>(boost::forward<UTuple>(other)); _m9._value = util::get< 9>(boost::forward<UTuple>(other)); _m10._value = util::get< 10>(boost::forward<UTuple>(other)); _m11._value = util::get< 11>(boost::forward<UTuple>(other)); _m12._value = util::get< 12>(boost::forward<UTuple>(other)); _m13._value = util::get< 13>(boost::forward<UTuple>(other)); _m14._value = util::get< 14>(boost::forward<UTuple>(other)); _m15._value = util::get< 15>(boost::forward<UTuple>(other)); _m16._value = util::get< 16>(boost::forward<UTuple>(other)); _m17._value = util::get< 17>(boost::forward<UTuple>(other)); _m18._value = util::get< 18>(boost::forward<UTuple>(other)); _m19._value = util::get< 19>(boost::forward<UTuple>(other)); _m20._value = util::get< 20>(boost::forward<UTuple>(other)); _m21._value = util::get< 21>(boost::forward<UTuple>(other)); _m22._value = util::get< 22>(boost::forward<UTuple>(other));;
+            return *this;
+        }
+        
+        
+        
+        
+        void swap(tuple& other)
+            BOOST_NOEXCEPT_IF(
+                true && BOOST_NOEXCEPT_EXPR(( boost::swap( _m0._value , other._m0._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m1._value , other._m1._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m2._value , other._m2._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m3._value , other._m3._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m4._value , other._m4._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m5._value , other._m5._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m6._value , other._m6._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m7._value , other._m7._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m8._value , other._m8._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m9._value , other._m9._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m10._value , other._m10._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m11._value , other._m11._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m12._value , other._m12._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m13._value , other._m13._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m14._value , other._m14._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m15._value , other._m15._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m16._value , other._m16._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m17._value , other._m17._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m18._value , other._m18._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m19._value , other._m19._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m20._value , other._m20._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m21._value , other._m21._value) )) && BOOST_NOEXCEPT_EXPR(( boost::swap( _m22._value , other._m22._value) ))
+            )
+        {
+            boost::swap( _m0._value , other._m0._value ); boost::swap( _m1._value , other._m1._value ); boost::swap( _m2._value , other._m2._value ); boost::swap( _m3._value , other._m3._value ); boost::swap( _m4._value , other._m4._value ); boost::swap( _m5._value , other._m5._value ); boost::swap( _m6._value , other._m6._value ); boost::swap( _m7._value , other._m7._value ); boost::swap( _m8._value , other._m8._value ); boost::swap( _m9._value , other._m9._value ); boost::swap( _m10._value , other._m10._value ); boost::swap( _m11._value , other._m11._value ); boost::swap( _m12._value , other._m12._value ); boost::swap( _m13._value , other._m13._value ); boost::swap( _m14._value , other._m14._value ); boost::swap( _m15._value , other._m15._value ); boost::swap( _m16._value , other._m16._value ); boost::swap( _m17._value , other._m17._value ); boost::swap( _m18._value , other._m18._value ); boost::swap( _m19._value , other._m19._value ); boost::swap( _m20._value , other._m20._value ); boost::swap( _m21._value , other._m21._value ); boost::swap( _m22._value , other._m22._value );;
+        }
+    };
+    
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+    struct tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22> >
+      : boost::mpl::size_t<23>
+    {};
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+    struct tuple_element<
+        22
+      , tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
+    > : boost::mpl::identity<T22>
+    {
+        template <typename Tuple>
+        static BOOST_CONSTEXPR BOOST_FORCEINLINE
+        typename detail::qualify_as<
+            T22
+          , Tuple&
+        >::type
+        get(Tuple& tuple) BOOST_NOEXCEPT
+        {
+            return tuple._m22._value;
+        }
+    };
+    
+    
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type , typename detail::make_tuple_element<T4>::type , typename detail::make_tuple_element<T5>::type , typename detail::make_tuple_element<T6>::type , typename detail::make_tuple_element<T7>::type , typename detail::make_tuple_element<T8>::type , typename detail::make_tuple_element<T9>::type , typename detail::make_tuple_element<T10>::type , typename detail::make_tuple_element<T11>::type , typename detail::make_tuple_element<T12>::type , typename detail::make_tuple_element<T13>::type , typename detail::make_tuple_element<T14>::type , typename detail::make_tuple_element<T15>::type , typename detail::make_tuple_element<T16>::type , typename detail::make_tuple_element<T17>::type , typename detail::make_tuple_element<T18>::type , typename detail::make_tuple_element<T19>::type , typename detail::make_tuple_element<T20>::type , typename detail::make_tuple_element<T21>::type , typename detail::make_tuple_element<T22>::type>
+    make_tuple(BOOST_FWD_REF(T0) v0 , BOOST_FWD_REF(T1) v1 , BOOST_FWD_REF(T2) v2 , BOOST_FWD_REF(T3) v3 , BOOST_FWD_REF(T4) v4 , BOOST_FWD_REF(T5) v5 , BOOST_FWD_REF(T6) v6 , BOOST_FWD_REF(T7) v7 , BOOST_FWD_REF(T8) v8 , BOOST_FWD_REF(T9) v9 , BOOST_FWD_REF(T10) v10 , BOOST_FWD_REF(T11) v11 , BOOST_FWD_REF(T12) v12 , BOOST_FWD_REF(T13) v13 , BOOST_FWD_REF(T14) v14 , BOOST_FWD_REF(T15) v15 , BOOST_FWD_REF(T16) v16 , BOOST_FWD_REF(T17) v17 , BOOST_FWD_REF(T18) v18 , BOOST_FWD_REF(T19) v19 , BOOST_FWD_REF(T20) v20 , BOOST_FWD_REF(T21) v21 , BOOST_FWD_REF(T22) v22)
+    {
+        return
+            tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type , typename detail::make_tuple_element<T4>::type , typename detail::make_tuple_element<T5>::type , typename detail::make_tuple_element<T6>::type , typename detail::make_tuple_element<T7>::type , typename detail::make_tuple_element<T8>::type , typename detail::make_tuple_element<T9>::type , typename detail::make_tuple_element<T10>::type , typename detail::make_tuple_element<T11>::type , typename detail::make_tuple_element<T12>::type , typename detail::make_tuple_element<T13>::type , typename detail::make_tuple_element<T14>::type , typename detail::make_tuple_element<T15>::type , typename detail::make_tuple_element<T16>::type , typename detail::make_tuple_element<T17>::type , typename detail::make_tuple_element<T18>::type , typename detail::make_tuple_element<T19>::type , typename detail::make_tuple_element<T20>::type , typename detail::make_tuple_element<T21>::type , typename detail::make_tuple_element<T22>::type>(
+                boost::forward<T0>( v0 ) , boost::forward<T1>( v1 ) , boost::forward<T2>( v2 ) , boost::forward<T3>( v3 ) , boost::forward<T4>( v4 ) , boost::forward<T5>( v5 ) , boost::forward<T6>( v6 ) , boost::forward<T7>( v7 ) , boost::forward<T8>( v8 ) , boost::forward<T9>( v9 ) , boost::forward<T10>( v10 ) , boost::forward<T11>( v11 ) , boost::forward<T12>( v12 ) , boost::forward<T13>( v13 ) , boost::forward<T14>( v14 ) , boost::forward<T15>( v15 ) , boost::forward<T16>( v16 ) , boost::forward<T17>( v17 ) , boost::forward<T18>( v18 ) , boost::forward<T19>( v19 ) , boost::forward<T20>( v20 ) , boost::forward<T21>( v21 ) , boost::forward<T22>( v22 )
+            );
+    }
+    
+    
+    
+    
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+    BOOST_FORCEINLINE
+    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type , typename add_rvalue_reference<T21>::type , typename add_rvalue_reference<T22>::type>
+    forward_as_tuple(BOOST_FWD_REF(T0) v0 , BOOST_FWD_REF(T1) v1 , BOOST_FWD_REF(T2) v2 , BOOST_FWD_REF(T3) v3 , BOOST_FWD_REF(T4) v4 , BOOST_FWD_REF(T5) v5 , BOOST_FWD_REF(T6) v6 , BOOST_FWD_REF(T7) v7 , BOOST_FWD_REF(T8) v8 , BOOST_FWD_REF(T9) v9 , BOOST_FWD_REF(T10) v10 , BOOST_FWD_REF(T11) v11 , BOOST_FWD_REF(T12) v12 , BOOST_FWD_REF(T13) v13 , BOOST_FWD_REF(T14) v14 , BOOST_FWD_REF(T15) v15 , BOOST_FWD_REF(T16) v16 , BOOST_FWD_REF(T17) v17 , BOOST_FWD_REF(T18) v18 , BOOST_FWD_REF(T19) v19 , BOOST_FWD_REF(T20) v20 , BOOST_FWD_REF(T21) v21 , BOOST_FWD_REF(T22) v22) BOOST_NOEXCEPT
+    {
+        return
+            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type , typename add_rvalue_reference<T21>::type , typename add_rvalue_reference<T22>::type>(
+                boost::forward<T0>( v0 ) , boost::forward<T1>( v1 ) , boost::forward<T2>( v2 ) , boost::forward<T3>( v3 ) , boost::forward<T4>( v4 ) , boost::forward<T5>( v5 ) , boost::forward<T6>( v6 ) , boost::forward<T7>( v7 ) , boost::forward<T8>( v8 ) , boost::forward<T9>( v9 ) , boost::forward<T10>( v10 ) , boost::forward<T11>( v11 ) , boost::forward<T12>( v12 ) , boost::forward<T13>( v13 ) , boost::forward<T14>( v14 ) , boost::forward<T15>( v15 ) , boost::forward<T16>( v16 ) , boost::forward<T17>( v17 ) , boost::forward<T18>( v18 ) , boost::forward<T19>( v19 ) , boost::forward<T20>( v20 ) , boost::forward<T21>( v21 ) , boost::forward<T22>( v22 )
+            );
+    }
+    
+    
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+    BOOST_FORCEINLINE
+    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type , typename util::add_lvalue_reference<T21>::type , typename util::add_lvalue_reference<T22>::type>
+    tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15 , T16 & v16 , T17 & v17 , T18 & v18 , T19 & v19 , T20 & v20 , T21 & v21 , T22 & v22) BOOST_NOEXCEPT
+    {
+        return
+            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type , typename util::add_lvalue_reference<T21>::type , typename util::add_lvalue_reference<T22>::type>(
+                v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16 , v17 , v18 , v19 , v20 , v21 , v22
+            );
+    }
+    
+    
+    
+    namespace detail
+    {
+        template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+        struct tuple_cat_result<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
+          : tuple_cat_result<
+                typename tuple_cat_result< T0 , T1 >::type , typename tuple_cat_result< T2 , T3 >::type , typename tuple_cat_result< T4 , T5 >::type , typename tuple_cat_result< T6 , T7 >::type , typename tuple_cat_result< T8 , T9 >::type , typename tuple_cat_result< T10 , T11 >::type , typename tuple_cat_result< T12 , T13 >::type , typename tuple_cat_result< T14 , T15 >::type , typename tuple_cat_result< T16 , T17 >::type , typename tuple_cat_result< T18 , T19 >::type , typename tuple_cat_result< T20 , T21 >::type
+              , T22
+            >
+        {};
+        template <typename Tuple>
+        struct tuple_cat_result<
+            Tuple
+          , typename boost::enable_if_c<tuple_size<Tuple>::value == 23>::type
+        >
+        {
+            typedef
+                tuple<typename tuple_element< 0, Tuple>::type , typename tuple_element< 1, Tuple>::type , typename tuple_element< 2, Tuple>::type , typename tuple_element< 3, Tuple>::type , typename tuple_element< 4, Tuple>::type , typename tuple_element< 5, Tuple>::type , typename tuple_element< 6, Tuple>::type , typename tuple_element< 7, Tuple>::type , typename tuple_element< 8, Tuple>::type , typename tuple_element< 9, Tuple>::type , typename tuple_element< 10, Tuple>::type , typename tuple_element< 11, Tuple>::type , typename tuple_element< 12, Tuple>::type , typename tuple_element< 13, Tuple>::type , typename tuple_element< 14, Tuple>::type , typename tuple_element< 15, Tuple>::type , typename tuple_element< 16, Tuple>::type , typename tuple_element< 17, Tuple>::type , typename tuple_element< 18, Tuple>::type , typename tuple_element< 19, Tuple>::type , typename tuple_element< 20, Tuple>::type , typename tuple_element< 21, Tuple>::type , typename tuple_element< 22, Tuple>::type>
+                type;
+        };
+    }
+    template <typename Tuple>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename boost::lazy_enable_if_c<
+        tuple_size<typename remove_reference<Tuple>::type>::value == 23
+      , detail::tuple_cat_result<
+            typename remove_reference<Tuple>::type
+        >
+    >::type
+    tuple_cat(BOOST_FWD_REF(Tuple) t)
+    {
+        return
+            typename detail::tuple_cat_result<
+                typename remove_reference<Tuple>::type
+            >::type(
+                util::get< 0>(boost::forward<Tuple>(t)) , util::get< 1>(boost::forward<Tuple>(t)) , util::get< 2>(boost::forward<Tuple>(t)) , util::get< 3>(boost::forward<Tuple>(t)) , util::get< 4>(boost::forward<Tuple>(t)) , util::get< 5>(boost::forward<Tuple>(t)) , util::get< 6>(boost::forward<Tuple>(t)) , util::get< 7>(boost::forward<Tuple>(t)) , util::get< 8>(boost::forward<Tuple>(t)) , util::get< 9>(boost::forward<Tuple>(t)) , util::get< 10>(boost::forward<Tuple>(t)) , util::get< 11>(boost::forward<Tuple>(t)) , util::get< 12>(boost::forward<Tuple>(t)) , util::get< 13>(boost::forward<Tuple>(t)) , util::get< 14>(boost::forward<Tuple>(t)) , util::get< 15>(boost::forward<Tuple>(t)) , util::get< 16>(boost::forward<Tuple>(t)) , util::get< 17>(boost::forward<Tuple>(t)) , util::get< 18>(boost::forward<Tuple>(t)) , util::get< 19>(boost::forward<Tuple>(t)) , util::get< 20>(boost::forward<Tuple>(t)) , util::get< 21>(boost::forward<Tuple>(t)) , util::get< 22>(boost::forward<Tuple>(t))
+            );
+    }
+    template <typename TTuple, typename UTuple>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename boost::lazy_enable_if_c<
+        tuple_size<typename remove_reference<TTuple>::type>::value
+      + tuple_size<typename remove_reference<UTuple>::type>::value == 23
+      , detail::tuple_cat_result<
+            typename remove_reference<TTuple>::type
+          , typename remove_reference<UTuple>::type
+        >
+    >::type
+    tuple_cat(BOOST_FWD_REF(TTuple) t, BOOST_FWD_REF(UTuple) u)
+    {
+        return
+            typename detail::tuple_cat_result<
+                typename remove_reference<TTuple>::type
+              , typename remove_reference<UTuple>::type
+            >::type(
+                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 20 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 21 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u)) , detail::tuple_cat_element< 22 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u))
+            );
+    }
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+    BOOST_CONSTEXPR BOOST_FORCEINLINE
+    typename detail::tuple_cat_result<
+        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type , typename remove_reference<T16>::type , typename remove_reference<T17>::type , typename remove_reference<T18>::type , typename remove_reference<T19>::type , typename remove_reference<T20>::type , typename remove_reference<T21>::type , typename remove_reference<T22>::type
+    >::type
+    tuple_cat(BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11 , BOOST_FWD_REF(T12) t12 , BOOST_FWD_REF(T13) t13 , BOOST_FWD_REF(T14) t14 , BOOST_FWD_REF(T15) t15 , BOOST_FWD_REF(T16) t16 , BOOST_FWD_REF(T17) t17 , BOOST_FWD_REF(T18) t18 , BOOST_FWD_REF(T19) t19 , BOOST_FWD_REF(T20) t20 , BOOST_FWD_REF(T21) t21 , BOOST_FWD_REF(T22) t22)
+    {
+        return
+            util::tuple_cat(
+                util::tuple_cat( boost::forward<T0> (t0) , boost::forward<T1> (t1)) , util::tuple_cat( boost::forward<T2> (t2) , boost::forward<T3> (t3)) , util::tuple_cat( boost::forward<T4> (t4) , boost::forward<T5> (t5)) , util::tuple_cat( boost::forward<T6> (t6) , boost::forward<T7> (t7)) , util::tuple_cat( boost::forward<T8> (t8) , boost::forward<T9> (t9)) , util::tuple_cat( boost::forward<T10> (t10) , boost::forward<T11> (t11)) , util::tuple_cat( boost::forward<T12> (t12) , boost::forward<T13> (t13)) , util::tuple_cat( boost::forward<T14> (t14) , boost::forward<T15> (t15)) , util::tuple_cat( boost::forward<T16> (t16) , boost::forward<T17> (t17)) , util::tuple_cat( boost::forward<T18> (t18) , boost::forward<T19> (t19)) , util::tuple_cat( boost::forward<T20> (t20) , boost::forward<T21> (t21))
+              , boost::forward<T22>
+                    (t22)
             );
     }
 }}

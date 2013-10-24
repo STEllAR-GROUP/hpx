@@ -65,9 +65,9 @@ namespace hpx { namespace util
             /**/
             
             BOOST_PP_REPEAT(
-                HPX_PP_ROUND_UP_ADD3(HPX_FUNCTION_ARGUMENT_LIMIT)
+                HPX_FUNCTION_ARGUMENT_LIMIT
               , HPX_UTIL_MEM_FN_INVOKE, _
-            )
+            );
 
 #           undef HPX_UTIL_MEM_FN_INVOKE
 

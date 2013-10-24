@@ -3725,3 +3725,534 @@ namespace boost { namespace serialization {
         : boost::mpl::int_<boost::serialization::track_never>
     {};
 }}
+namespace hpx { namespace util { namespace detail {
+    
+    template <typename Function>
+    struct init_registration;
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+      , IArchive
+      , OArchive
+      , Vtable
+    >
+        : util::detail::vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+          , IArchive
+          , OArchive
+        >
+    {
+        typedef
+            util::detail::vtable_ptr_virtbase<IArchive, OArchive>
+            vtable_ptr_virtbase_type;
+        typedef
+            util::detail::vtable_ptr_base<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+              , IArchive
+              , OArchive
+            >
+            base_type;
+        vtable_ptr()
+        {
+            base_type::get_type = Vtable::get_type;
+            base_type::static_delete = Vtable::static_delete;
+            base_type::destruct = Vtable::destruct;
+            base_type::clone = Vtable::clone;
+            base_type::copy = Vtable::copy;
+            base_type::invoke = Vtable::invoke;
+        }
+        ~vtable_ptr()
+        {
+            init_registration<vtable_ptr>::g.register_function();
+        }
+        char const* get_function_name() const
+        {
+            return util::detail::get_function_name<vtable_ptr>();
+        }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
+        void save_object(void *const* object, OArchive & ar, unsigned)
+        {
+            ar << Vtable::get(object);
+        }
+        void load_object(void ** object, IArchive & ar, unsigned)
+        {
+            ar >> Vtable::construct(object);
+        }
+    };
+    
+    
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct init_registration<
+        vtable_ptr<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+          , IArchive
+          , OArchive
+          , Vtable
+        >
+    >
+    {
+        typedef vtable_ptr<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+          , IArchive
+          , OArchive
+          , Vtable
+        > vtable_ptr_type;
+        static automatic_function_registration<vtable_ptr_type> g;
+    };
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    automatic_function_registration<
+        vtable_ptr<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+          , IArchive
+          , OArchive
+          , Vtable
+        >
+    >
+        init_registration<
+            vtable_ptr<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+              , IArchive
+              , OArchive
+              , Vtable
+            >
+        >::g = automatic_function_registration<
+                    vtable_ptr<
+                        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+                      , IArchive
+                      , OArchive
+                      , Vtable
+                    >
+                >();
+    
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename Vtable
+    >
+    struct vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+      , void
+      , void
+      , Vtable
+    >
+        : util::detail::vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+          , void
+          , void
+        >
+    {
+        typedef
+            util::detail::vtable_ptr_base<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+              , void
+              , void
+            >
+            base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
+        vtable_ptr()
+        {
+            base_type::get_type = Vtable::get_type;
+            base_type::static_delete = Vtable::static_delete;
+            base_type::destruct = Vtable::destruct;
+            base_type::clone = Vtable::clone;
+            base_type::copy = Vtable::copy;
+            base_type::invoke = Vtable::invoke;
+        }
+    };
+}}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
+namespace hpx { namespace util { namespace detail {
+    
+    template <typename Function>
+    struct init_registration;
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+      , IArchive
+      , OArchive
+      , Vtable
+    >
+        : util::detail::vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+          , IArchive
+          , OArchive
+        >
+    {
+        typedef
+            util::detail::vtable_ptr_virtbase<IArchive, OArchive>
+            vtable_ptr_virtbase_type;
+        typedef
+            util::detail::vtable_ptr_base<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+              , IArchive
+              , OArchive
+            >
+            base_type;
+        vtable_ptr()
+        {
+            base_type::get_type = Vtable::get_type;
+            base_type::static_delete = Vtable::static_delete;
+            base_type::destruct = Vtable::destruct;
+            base_type::clone = Vtable::clone;
+            base_type::copy = Vtable::copy;
+            base_type::invoke = Vtable::invoke;
+        }
+        ~vtable_ptr()
+        {
+            init_registration<vtable_ptr>::g.register_function();
+        }
+        char const* get_function_name() const
+        {
+            return util::detail::get_function_name<vtable_ptr>();
+        }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
+        void save_object(void *const* object, OArchive & ar, unsigned)
+        {
+            ar << Vtable::get(object);
+        }
+        void load_object(void ** object, IArchive & ar, unsigned)
+        {
+            ar >> Vtable::construct(object);
+        }
+    };
+    
+    
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct init_registration<
+        vtable_ptr<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+          , IArchive
+          , OArchive
+          , Vtable
+        >
+    >
+    {
+        typedef vtable_ptr<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+          , IArchive
+          , OArchive
+          , Vtable
+        > vtable_ptr_type;
+        static automatic_function_registration<vtable_ptr_type> g;
+    };
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    automatic_function_registration<
+        vtable_ptr<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+          , IArchive
+          , OArchive
+          , Vtable
+        >
+    >
+        init_registration<
+            vtable_ptr<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+              , IArchive
+              , OArchive
+              , Vtable
+            >
+        >::g = automatic_function_registration<
+                    vtable_ptr<
+                        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+                      , IArchive
+                      , OArchive
+                      , Vtable
+                    >
+                >();
+    
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename Vtable
+    >
+    struct vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+      , void
+      , void
+      , Vtable
+    >
+        : util::detail::vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+          , void
+          , void
+        >
+    {
+        typedef
+            util::detail::vtable_ptr_base<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+              , void
+              , void
+            >
+            base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
+        vtable_ptr()
+        {
+            base_type::get_type = Vtable::get_type;
+            base_type::static_delete = Vtable::static_delete;
+            base_type::destruct = Vtable::destruct;
+            base_type::clone = Vtable::clone;
+            base_type::copy = Vtable::copy;
+            base_type::invoke = Vtable::invoke;
+        }
+    };
+}}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}
+namespace hpx { namespace util { namespace detail {
+    
+    template <typename Function>
+    struct init_registration;
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+      , IArchive
+      , OArchive
+      , Vtable
+    >
+        : util::detail::vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+          , IArchive
+          , OArchive
+        >
+    {
+        typedef
+            util::detail::vtable_ptr_virtbase<IArchive, OArchive>
+            vtable_ptr_virtbase_type;
+        typedef
+            util::detail::vtable_ptr_base<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+              , IArchive
+              , OArchive
+            >
+            base_type;
+        vtable_ptr()
+        {
+            base_type::get_type = Vtable::get_type;
+            base_type::static_delete = Vtable::static_delete;
+            base_type::destruct = Vtable::destruct;
+            base_type::clone = Vtable::clone;
+            base_type::copy = Vtable::copy;
+            base_type::invoke = Vtable::invoke;
+        }
+        ~vtable_ptr()
+        {
+            init_registration<vtable_ptr>::g.register_function();
+        }
+        char const* get_function_name() const
+        {
+            return util::detail::get_function_name<vtable_ptr>();
+        }
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
+        virtual base_type * get_ptr()
+        {
+            return Vtable::get_ptr();
+        }
+        void save_object(void *const* object, OArchive & ar, unsigned)
+        {
+            ar << Vtable::get(object);
+        }
+        void load_object(void ** object, IArchive & ar, unsigned)
+        {
+            ar >> Vtable::construct(object);
+        }
+    };
+    
+    
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct init_registration<
+        vtable_ptr<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+          , IArchive
+          , OArchive
+          , Vtable
+        >
+    >
+    {
+        typedef vtable_ptr<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+          , IArchive
+          , OArchive
+          , Vtable
+        > vtable_ptr_type;
+        static automatic_function_registration<vtable_ptr_type> g;
+    };
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    automatic_function_registration<
+        vtable_ptr<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+          , IArchive
+          , OArchive
+          , Vtable
+        >
+    >
+        init_registration<
+            vtable_ptr<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+              , IArchive
+              , OArchive
+              , Vtable
+            >
+        >::g = automatic_function_registration<
+                    vtable_ptr<
+                        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+                      , IArchive
+                      , OArchive
+                      , Vtable
+                    >
+                >();
+    
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+      , typename Vtable
+    >
+    struct vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+      , void
+      , void
+      , Vtable
+    >
+        : util::detail::vtable_ptr_base<
+            R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+          , void
+          , void
+        >
+    {
+        typedef
+            util::detail::vtable_ptr_base<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+              , void
+              , void
+            >
+            base_type;
+        virtual bool empty() const
+        {
+            return Vtable::empty;
+        }
+        vtable_ptr()
+        {
+            base_type::get_type = Vtable::get_type;
+            base_type::static_delete = Vtable::static_delete;
+            base_type::destruct = Vtable::destruct;
+            base_type::clone = Vtable::clone;
+            base_type::copy = Vtable::copy;
+            base_type::invoke = Vtable::invoke;
+        }
+    };
+}}}
+namespace boost { namespace serialization {
+    template <
+        typename R
+      , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+      , typename IArchive
+      , typename OArchive
+      , typename Vtable
+    >
+    struct tracking_level<hpx::util::detail::vtable_ptr<
+        R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22), IArchive, OArchive, Vtable
+    > >
+        : boost::mpl::int_<boost::serialization::track_never>
+    {};
+}}

@@ -8,6 +8,7 @@
 #ifndef HPX_COMPONENTS_DISTRIBUTED_NEW_HPP
 #define HPX_COMPONENTS_DISTRIBUTED_NEW_HPP
 
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/components/remote_object/new.hpp>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
