@@ -699,7 +699,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         void add_punit(std::size_t virt_core, std::size_t thread_num)
         {
-            affinity_data_.add_punit(virt_core, thread_num);
+            affinity_data_.add_punit(virt_core, thread_num, topology_);
         }
 
         ///////////////////////////////////////////////////////////////////////
