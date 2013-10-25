@@ -98,11 +98,6 @@ void hpx_test_main(
             // let id go out of scope
         }
 
-        // Flush pending reference counting operations.
-        garbage_collect();
-        garbage_collect(remote_localities[0]);
-        garbage_collect();
-
         // The component should still be alive, as the symbolic binding holds
         // a reference to it.
         HPX_TEST_EQ(false, monitor.is_ready(milliseconds(delay)));
@@ -112,6 +107,8 @@ void hpx_test_main(
         HPX_TEST_EQ(gid, unregister_name_sync(name).get_gid());
 
         // Flush pending reference counting operations.
+        garbage_collect();
+        garbage_collect(remote_localities[0]);
         garbage_collect();
 
         // The component should be destroyed.
