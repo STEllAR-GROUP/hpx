@@ -6,7 +6,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/util/lightweight_test.hpp>
-#include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -99,6 +99,8 @@ void hpx_test_main(
         }
 
         // Flush pending reference counting operations.
+        garbage_collect();
+        garbage_collect(remote_localities[0]);
         garbage_collect();
 
         // The component should still be alive, as the symbolic binding holds

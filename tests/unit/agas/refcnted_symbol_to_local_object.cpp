@@ -29,6 +29,7 @@ using hpx::naming::get_management_type_name;
 
 using hpx::agas::register_name_sync;
 using hpx::agas::unregister_name_sync;
+using hpx::agas::garbage_collect;
 
 using hpx::test::simple_refcnt_monitor;
 using hpx::test::managed_refcnt_monitor;
@@ -82,6 +83,9 @@ void hpx_test_main(
 
             // let id go out of scope
         }
+
+        // Flush pending reference counting operations.
+        garbage_collect();
 
         // The component should still be alive, as the symbolic binding holds
         // a reference to it.
