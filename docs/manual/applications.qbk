@@ -59,7 +59,7 @@ to the operating system as usual.
 [important To achieve this seamless integration, the header file
            [headerref hpx/hpx_main.hpp `hpx/hpx_main.hpp`] defines a macro
            ``
-              #define main hpx::user_main
+              #define main hpx_startup::user_main
            ``
            which could result in unexpected behavior.]
 
