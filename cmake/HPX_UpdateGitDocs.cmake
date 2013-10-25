@@ -60,23 +60,30 @@ execute_process(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
   RESULT_VARIABLE git_add_result)
 if(NOT "${git_add_result}" EQUAL "0")
-    message(FATAL_ERROR "Adding files to the GitHub pages branch failed.")
+  message(FATAL_ERROR "Adding files to the GitHub pages branch failed.")
 endif()
 
-# commit changes
+# check if there are changes to commit
 execute_process(
-  COMMAND ${GIT_EXECUTABLE} commit -am "Updating docs"
+  COMMAND ${GIT_EXECUTABLE} diff-index --quiet HEAD
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
-  RESULT_VARIABLE git_commit_result)
-if(NOT "${git_commit_result}" EQUAL "0")
-  message(FATAL_ERROR "Commiting to the GitHub pages branch failed.")
-endif()
-
-# push everything up to github
-execute_process(
-  COMMAND ${GIT_EXECUTABLE} push
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
-  RESULT_VARIABLE git_push_result)
-if(NOT "${git_push_result}" EQUAL "0")
-  message(FATAL_ERROR "Pushing to the GitHub pages branch failed.")
+  RESULT_VARIABLE git_diff_index_result)
+if(NOT "${git_diff_index_result}" EQUAL "0")
+  # commit changes
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} commit -am "Updating docs"
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
+    RESULT_VARIABLE git_commit_result)
+  if(NOT "${git_commit_result}" EQUAL "0")
+    message(FATAL_ERROR "Commiting to the GitHub pages branch failed.")
+  endif()
+  
+  # push everything up to github
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} push
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/gh-pages
+    RESULT_VARIABLE git_push_result)
+  if(NOT "${git_push_result}" EQUAL "0")
+    message(FATAL_ERROR "Pushing to the GitHub pages branch failed.")
+  endif()
 endif()
