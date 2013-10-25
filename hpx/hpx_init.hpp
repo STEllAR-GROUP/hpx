@@ -32,7 +32,7 @@ int hpx_main(boost::program_options::variables_map& vm);
 // as the first HPX-thread (equivalent to hpx_main()). This is implemented by
 // a macro redefining main, so we disable it by default.
 #if defined(HPX_MAIN_IS_MAIN)
-#  define main hpx::detail::user_main
+#  define main hpx_startup::user_main
 #endif
 #endif
 
