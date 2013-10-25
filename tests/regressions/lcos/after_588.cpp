@@ -12,9 +12,6 @@ struct test
     test()
       : finished(false)
     {}
-    test(bool finished_)
-      : finished(finished_)
-    {}
 
     ~test()
     {
@@ -30,7 +27,15 @@ struct test
     {
         for(std::size_t i = 0; i != iterations; ++i)
         {
-            pong_action()(id);
+            const std::size_t num_pongs = 10;
+            std::vector<hpx::future<void> > futures;
+            futures.reserve(num_pongs);
+            for(std::size_t j = 0; j != num_pongs; ++j)
+            {
+                pong_action act;
+                futures.push_back(hpx::async(act, id));
+            }
+            hpx::wait_all(futures);
         }
         finished = true;
     }
@@ -53,9 +58,11 @@ int hpx_main(boost::program_options::variables_map & vm)
         hpx::id_type there = localities.size() == 1 ? localities[0] : localities[1];
 
         hpx::id_type id0 = hpx::components::new_<test>(localities[0]).get();
-        hpx::id_type id1 = hpx::components::new_<test>(there, true).get();
+        hpx::id_type id1 = hpx::components::new_<test>(there).get();
 
-        test::ping_action()(id0, id1, vm["iterations"].as<std::size_t>());
+        hpx::future<void> f0 = hpx::async(test::ping_action(), id0, id1, vm["iterations"].as<std::size_t>());
+        hpx::future<void> f1 = hpx::async(test::ping_action(), id1, id0, vm["iterations"].as<std::size_t>());
+        hpx::wait_all(f0, f1);
     }
     hpx::finalize();
 
