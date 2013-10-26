@@ -1743,15 +1743,16 @@ if(NOT HPX_NO_INSTALL)
       COMPONENT docs
       OPTIONAL
       FILES_MATCHING PATTERN "*.html"
+      PATTERN "*.pdf"
       PATTERN ".git" EXCLUDE)
 
     file(COPY ${hpx_SOURCE_DIR}/docs/index.html
       DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/)
 
-#    install(
-#      FILES ${hpx_SOURCE_DIR}/docs/index.html
-#      DESTINATION share/hpx-${HPX_VERSION}/
-#      COMPONENT docs)
+    install(
+      FILES ${hpx_SOURCE_DIR}/docs/index.html
+      DESTINATION share/hpx-${HPX_VERSION}/
+      COMPONENT docs)
 
     file(COPY ${hpx_SOURCE_DIR}/docs/html/src/
       DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/docs/html/src
