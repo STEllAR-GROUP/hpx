@@ -17,7 +17,7 @@ from subprocess import Popen, STDOUT, PIPE
 from types import StringType
 from shlex import split
 from signal import SIGKILL
-from os import kill, killpg, waitpid, WNOHANG
+from os import kill
 from platform import system
 from Queue import Queue, Empty
 from errno import ESRCH
