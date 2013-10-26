@@ -321,6 +321,115 @@ BOOST_SERIALIZATION_USE_ARRAY_OPTIMIZATION(hpx::util::portable_binary_oarchive)
 namespace boost { namespace archive { namespace detail
 {
     template <>
+    struct save_non_pointer_type<hpx::util::portable_binary_oarchive>
+    {
+        typedef hpx::util::portable_binary_oarchive archive_type;
+
+        // note this bounces the call right back to the archive
+        // with no runtime overhead
+        struct save_primitive
+        {
+            template <typename T>
+            static void invoke(archive_type & ar, const T & t)
+            {
+                save_access::save_primitive(ar, t);
+            }
+        };
+
+        // same as above but passes through serialization
+        struct save_only
+        {
+            template <typename T>
+            static void invoke(archive_type & ar, const T & t)
+            {
+                // make sure call is routed through the highest interface that might
+                // be specialized by the user.
+                boost::serialization::serialize_adl(
+                    ar, 
+                    const_cast<T &>(t), 
+                    ::boost::serialization::version< T >::value
+                );
+            }
+        };
+
+        // adds class information to the archive. This includes
+        // serialization level and class version
+        struct save_standard
+        {
+            template <typename T>
+            static void invoke(archive_type &ar, const T & t)
+            {
+                ar.save_object(
+                    & t, 
+                    boost::serialization::singleton<
+                        oserializer<archive_type, T>
+                    >::get_const_instance()
+                );
+            }
+        };
+
+        // adds class information to the archive. This includes
+        // serialization level and class version
+        struct save_conditional
+        {
+            template <typename T>
+            static void invoke(archive_type &ar, const T &t)
+            {
+                //if(0 == (ar.get_flags() & no_tracking))
+                    save_standard::invoke(ar, t);
+                //else
+                //   save_only::invoke(ar, t);
+            }
+        };
+
+
+        template <typename T>
+        static void invoke(archive_type & ar, const T & t)
+        {
+            typedef 
+                BOOST_DEDUCED_TYPENAME mpl::eval_if<
+                // if its primitive
+                    mpl::equal_to<
+                        boost::serialization::implementation_level< T >,
+                        mpl::int_<boost::serialization::primitive_type>
+                    >,
+                    mpl::identity<save_primitive>,
+                // else
+                BOOST_DEDUCED_TYPENAME mpl::eval_if<
+                    // class info / version
+                    mpl::greater_equal<
+                        boost::serialization::implementation_level< T >,
+                        mpl::int_<boost::serialization::object_class_info>
+                    >,
+                    // do standard save
+                    mpl::identity<save_standard>,
+                // else
+                BOOST_DEDUCED_TYPENAME mpl::eval_if<
+                        // no tracking
+                    mpl::equal_to<
+                        boost::serialization::tracking_level< T >,
+                        mpl::int_<boost::serialization::track_never>
+                    >,
+                    // do a fast save
+                    mpl::identity<save_only>,
+                // else
+                    // do a fast save only tracking is turned off
+                    mpl::identity<save_conditional>
+                > > >::type typex; 
+            check_object_versioning< T >();
+            typex::invoke(ar, t);
+        }
+
+        template <typename T>
+        static void invoke(archive_type & ar, T & t)
+        {
+            check_object_level< T >();
+            //check_object_tracking< T >();      // this has to be disabled to avoid warnings
+            invoke(ar, const_cast<const T &>(t));
+        }
+    };
+
+    template <>
     struct save_pointer_type<hpx::util::portable_binary_oarchive>
     {
         typedef hpx::util::portable_binary_oarchive archive_type;

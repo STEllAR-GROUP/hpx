@@ -312,7 +312,7 @@ namespace hpx { namespace traits
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace serialization
 {
-    // serialization of the bound object, just serialize the function object
+    // serialization of the bound object
     template <typename F, typename BoundArgs>
     void serialize(
         ::hpx::util::portable_binary_iarchive& ar
