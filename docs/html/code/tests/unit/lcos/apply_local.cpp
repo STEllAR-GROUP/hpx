@@ -91,20 +91,18 @@ int hpx_main()
         hpx::apply(hpx::util::bind(obj, 1));
         hpx::apply(hpx::util::bind(obj, _1), 1);
     }
-
-#   if !defined(BOOST_NO_CXX11_LAMBDAS) || !defined( BOOST_NO_CXX11_AUTO_DECLARATIONS)
+    
+#   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
     {
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
 
-// Lambdas are not assignable...
-//
-//        hpx::apply(increment_lambda, 1);
-//
-//        hpx::apply(hpx::util::bind(increment_lambda, 1));
-//        hpx::apply(hpx::util::bind(increment_lambda, _1), 1);
+        hpx::apply(increment_lambda, 1);
+
+        hpx::apply(hpx::util::bind(increment_lambda, 1));
+        hpx::apply(hpx::util::bind(increment_lambda, _1), 1);
     }
-#   endif /*!defined(BOOST_NO_CXX11_LAMBDAS) || !defined( BOOST_NO_CXX11_AUTO_DECLARATIONS)*/
+#   endif
 
     return hpx::finalize();
 }
@@ -116,12 +114,12 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
-
-#   ifndef BOOST_NO_CXX11_LAMBDAS
+    
+#   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
+    HPX_TEST_EQ(accumulator.load(), 15);
+#   else
     HPX_TEST_EQ(accumulator.load(), 12);
-#   else /*BOOST_NO_CXX11_LAMBDAS*/
-    HPX_TEST_EQ(accumulator.load(), 12);
-#   endif /*BOOST_NO_CXX11_LAMBDAS*/
+#   endif
 
     return hpx::util::report_errors();
 }

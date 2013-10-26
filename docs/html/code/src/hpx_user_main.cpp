@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,10 +8,10 @@
 #include <hpx/exception.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Forwarding of hpx::user_main, if necessary. This has to be in a separate
-// translation unit to ensure the linker can pick or ignore this function,
+// Forwarding of hpx_startup::user_main, if necessary. This has to be in a
+// separate translation unit to ensure the linker can pick or ignore this function,
 // depending on whether the main executable defines this symbol or not.
-int hpx::user_main()
+int hpx_startup::user_main()
 {
 //     hpx::util::section const& ini = hpx::get_runtime().get_config();
 //     std::string cmdline(ini.get_entry("hpx.reconstructed_cmd_line", ""));
@@ -36,7 +36,7 @@ int hpx::user_main()
 //     return user_main(static_cast<int>(argcount), argv.get());
     HPX_THROW_EXCEPTION(hpx::not_implemented, 
         "The console locality does not implement any main entry point usable "
-        "as the main HPX thread (e.g. no hpx_main, hpx::user_main, etc.)", 
-        "hpx::user_main")
+        "as the main HPX thread (e.g. no hpx_main, hpx_startup::user_main, etc.)", 
+        "hpx_startup::user_main")
 }
 

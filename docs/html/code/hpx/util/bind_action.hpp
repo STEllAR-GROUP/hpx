@@ -1,5 +1,6 @@
 //  Copyright (c) 2012 Hartmut Kaiser
 //  Copyright (c) 2011 Thomas Heller
+//  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,569 +11,380 @@
 #define HPX_UTIL_BIND_ACTION_HPP
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/config.hpp>
-#include <hpx/util/move.hpp>
-#include <hpx/util/tuple.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/traits/is_action.hpp>
+#include <hpx/traits/is_bind_expression.hpp>
+#include <hpx/traits/is_placeholder.hpp>
+#include <hpx/util/add_rvalue_reference.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/include/async.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/portable_binary_iarchive.hpp>
+#include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/tuple.hpp>
 
-#include <boost/get_pointer.hpp>
-#include <boost/fusion/include/at_c.hpp>
-#include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/functional/adapter/fused.hpp>
-#include <boost/serialization/serialization.hpp>
+#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/identity.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/enum.hpp>
-#include <boost/preprocessor/enum_params.hpp>
-#include <boost/preprocessor/iterate.hpp>
+#include <boost/preprocessor/iteration/iterate.hpp>
+#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
+#include <boost/ref.hpp>
+#include <boost/type_traits/remove_const.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace util
 {
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
-        template <typename T, bool IsRvalueRef =
-            std::is_rvalue_reference<T>::type::value>
-#else
-        template <typename T, bool IsRvalueRef = false>
-#endif
-        struct env_value_type
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action, typename BoundArgs, typename UnboundArgs
+          , typename Enable = void
+        >
+        struct bind_action_apply_impl;
+
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        BOOST_FORCEINLINE
+        bool
+        bind_action_apply(
+            BoundArgs& bound_args
+          , BOOST_FWD_REF(UnboundArgs) unbound_args
+        )
         {
-            typedef typename hpx::util::remove_reference<T>::type type;
-        };
-
-        template <typename T>
-        struct env_value_type<T, false>
-        {
-            typedef T type;
-        };
-
-        template <typename T>
-        struct env_value_type<T const, false>
-        {
-            typedef T const type;
-        };
-
-        template <typename T>
-        struct env_value_type<T &, false>
-        {
-            typedef typename hpx::util::remove_reference<T>::type & type;
-        };
-
-        template <typename T>
-        struct env_value_type<T const &, false>
-        {
-            typedef typename hpx::util::remove_reference<T>::type const & type;
-        };
-
-        struct not_enough_parameters {};
-
-        namespace result_of
-        {
-            template <typename Env, typename T>
-            struct eval
-            {
-                typedef T & type;
-            };
-
-            template <typename Env, typename T>
-            struct eval<Env, boost::reference_wrapper<T const> >
-            {
-                typedef T const & type;
-            };
-
-            template <typename Env, typename T>
-            struct eval<Env, boost::reference_wrapper<T> >
-            {
-                typedef T & type;
-            };
-        }
-
-        template <typename Env, typename T>
-        T & eval(Env &, T & t)
-        {
-            return t;
-        }
-
-        template <typename Env, typename T>
-        T const & eval(Env &, T const & t)
-        {
-            return t;
-        }
-
-        template <typename Env, typename T>
-        T & eval(Env &, boost::reference_wrapper<T> const & r)
-        {
-            return r.get();
-        }
-
-        template <typename Env, typename T>
-        T const & eval(Env &, boost::reference_wrapper<T const> const & r)
-        {
-            return r.get();
-        }
-
-        template <typename Env, typename T>
-        T & eval(Env &, boost::reference_wrapper<T> & r)
-        {
-            return r.get();
-        }
-
-        template <typename Env, typename T>
-        T const & eval(Env &, boost::reference_wrapper<T const> & r)
-        {
-            return r.get();
-        }
-
-        namespace result_of
-        {
-            template <typename Env, std::size_t N>
-            struct eval<Env, util::detail::placeholder<N> >
-            {
-                typedef typename boost::fusion::result_of::at_c<Env, N-1>::type type;
-            };
-
-            template <typename Env, std::size_t N>
-            struct eval<Env, util::detail::placeholder<N> const>
-            {
-                typedef typename boost::fusion::result_of::at_c<Env, N-1>::type type;
-            };
-        }
-
-        template <typename Env, std::size_t N>
-        typename boost::fusion::result_of::at_c<Env, N-1>::type
-        eval(Env & env, util::detail::placeholder<N>)
-        {
-            return boost::fusion::at_c<N-1>(env);
+            return
+                bind_action_apply_impl<Action, BoundArgs, UnboundArgs>::call(
+                    bound_args
+                  , boost::forward<UnboundArgs>(unbound_args)
+                );
         }
 
         ///////////////////////////////////////////////////////////////////////
-        using boost::get_pointer;
+        template <
+            typename Action, typename BoundArgs, typename UnboundArgs
+          , typename Enable = void
+        >
+        struct bind_action_async_impl;
 
-        template <typename T>
-        T* get_pointer(boost::shared_ptr<T>& p)
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        BOOST_FORCEINLINE
+        lcos::future<
+            typename traits::promise_local_result<
+                typename hpx::actions::extract_action<Action>::result_type
+            >::type
+        >
+        bind_action_async(
+            BoundArgs& bound_args
+          , BOOST_FWD_REF(UnboundArgs) unbound_args
+        )
         {
-            return p.get();
+            return
+                bind_action_async_impl<Action, BoundArgs, UnboundArgs>::call(
+                    bound_args
+                  , boost::forward<UnboundArgs>(unbound_args)
+                );
         }
 
-        template <typename T>
-        T* get_pointer(boost::intrusive_ptr<T>& p)
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        BOOST_FORCEINLINE
+        typename traits::promise_local_result<
+            typename hpx::actions::extract_action<Action>::result_type
+        >::type
+        bind_action_invoke(
+            BoundArgs& bound_args
+          , BOOST_FWD_REF(UnboundArgs) unbound_args
+        )
         {
-            return p.get();
+            return
+                bind_action_async_impl<Action, BoundArgs, UnboundArgs>::call(
+                    bound_args
+                  , boost::forward<UnboundArgs>(unbound_args)
+                ).get();
         }
 
-        template <typename T>
-        T * get_pointer(T &t)
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Action, typename BoundArgs>
+        class bound_action
         {
-            return &t;
-        }
+            BOOST_COPYABLE_AND_MOVABLE(bound_action);
+            
+        public:
+            typedef
+                typename traits::promise_local_result<
+                    typename hpx::actions::extract_action<Action>::result_type
+                >::type
+                result_type;
 
-        template <typename T>
-        T const * get_pointer(T const &t)
-        {
-            return &t;
-        }
+        public:
+            // default constructor is needed for serialization
+            bound_action()
+            {}
+
+            template <typename BoundArgs_>
+            explicit bound_action(
+                Action /*action*/
+              , BOOST_FWD_REF(BoundArgs_) bound_args
+            ) : _bound_args(boost::forward<BoundArgs_>(bound_args))
+            {}
+
+            bound_action(bound_action const& other)
+              : _bound_args(other._bound_args)
+            {}
+            bound_action(BOOST_RV_REF(bound_action) other)
+              : _bound_args(boost::move(other._bound_args))
+            {}
+
+            // bring in the definition for all overloads for apply, async, operator()
+            #include <hpx/util/detail/define_bind_action_function_operators.hpp>
+
+        public: // exposition-only
+            BoundArgs _bound_args;
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action>
+    typename boost::enable_if_c<
+        traits::is_action<typename util::remove_reference<Action>::type>::value
+      , detail::bound_action<
+            typename util::decay<Action>::type
+          , util::tuple<>
+        >
+    >::type
+    bind()
+    {
+        typedef
+            detail::bound_action<
+                typename util::decay<Action>::type
+              , util::tuple<>
+            >
+            result_type;
+
+        return result_type(Action(), util::forward_as_tuple());
+    }
+    
+    template <
+        typename Component, typename Result, typename Arguments
+      , typename Derived
+    >
+    detail::bound_action<Derived, util::tuple<> >
+    bind(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > action
+    )
+    {
+        typedef
+            detail::bound_action<Derived, util::tuple<> >
+            result_type;
+
+        return
+            result_type(
+                static_cast<Derived const&>(action)
+              , util::forward_as_tuple()
+            );
     }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_UTIL_BIND_EVAL(Z, N, D)                                           \
-    hpx::util::detail::eval(env, BOOST_PP_CAT(arg, N))                        \
-/**/
-
-#define HPX_UTIL_BIND_REMOVE_REFERENCE(Z, N, D)                               \
-    typename util::decay<BOOST_PP_CAT(D, N)>::type                            \
-/**/
-
-#define HPX_UTIL_BIND_REFERENCE(Z, N, D)                                      \
-    typename detail::env_value_type<BOOST_FWD_REF(BOOST_PP_CAT(D, N))>::type  \
-/**/
-
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/util/preprocessed/bind_action.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/bind_action_" HPX_LIMIT_STR ".hpp")
-#endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (                                                                         \
-        3                                                                     \
-      , (                                                                     \
-            1                                                                 \
-          , HPX_FUNCTION_ARGUMENT_LIMIT                                       \
-          , <hpx/util/bind_action.hpp>                                        \
-        )                                                                     \
-    )                                                                         \
-/**/
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-#undef HPX_UTIL_BIND_EVAL
-#undef HPX_UTIL_BIND_REMOVE_REFERENCE
-#undef HPX_UTIL_BIND_REFERENCE
-
-#endif
-
-#else  // !BOOST_PP_IS_ITERATING
-
-#define N BOOST_PP_FRAME_ITERATION(1)
-#define NN N
-
-#define HPX_UTIL_BIND_INIT_MEMBER(Z, N, D)                                    \
-    BOOST_PP_CAT(arg, N)(boost::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N)))\
-/**/
-#define HPX_UTIL_BIND_MEMBER(Z, N, D)                                         \
-    BOOST_PP_CAT(Arg, N) BOOST_PP_CAT(arg, N);                                \
-/**/
-
-#define HPX_UTIL_BIND_INIT_COPY_MEMBER(Z, N, D)                               \
-    BOOST_PP_CAT(arg, N)(other.BOOST_PP_CAT(arg, N))                          \
-/**/
-
-#define HPX_UTIL_BIND_INIT_MOVE_MEMBER(Z, N, D)                               \
-    BOOST_PP_CAT(arg, N)(boost::move(other.BOOST_PP_CAT(arg, N)))             \
-/**/
-
-#define HPX_UTIL_BIND_ASSIGN_MEMBER(Z, N, D)                                  \
-    BOOST_PP_CAT(arg, N) = other.BOOST_PP_CAT(arg, N);                        \
-/**/
-
-#define HPX_UTIL_BIND_MOVE_MEMBER(Z, N, D)                                    \
-    BOOST_PP_CAT(arg, N) = boost::move(other.BOOST_PP_CAT(arg, N));           \
-/**/
-
-namespace hpx { namespace util
+namespace hpx { namespace traits
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // actions
-    namespace detail
-    {
-        template <
-            typename Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-        >
-        struct BOOST_PP_CAT(bound_action, N)
-        {
-            typedef typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
-            >::type result_type;
-
-            // default constructor is needed for serialization
-            BOOST_PP_CAT(bound_action, N)()
-            {}
-
-            template <BOOST_PP_ENUM_PARAMS(N, typename A)>
-            BOOST_PP_CAT(bound_action, N)(
-                HPX_ENUM_FWD_ARGS(N, A, a)
-            )
-                : BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_MEMBER, _)
-            {}
-
-            BOOST_PP_CAT(bound_action, N)(
-                    BOOST_PP_CAT(bound_action, N) const & other)
-                : BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_COPY_MEMBER, _)
-            {}
-
-            BOOST_PP_CAT(bound_action, N)(BOOST_RV_REF(
-                    BOOST_PP_CAT(bound_action, N)) other)
-                : BOOST_PP_ENUM(N, HPX_UTIL_BIND_INIT_MOVE_MEMBER, _)
-            {}
-
-            BOOST_PP_CAT(bound_action, N) & operator=(
-                BOOST_COPY_ASSIGN_REF(BOOST_PP_CAT(bound_action, N)) other)
-            {
-                BOOST_PP_REPEAT(N, HPX_UTIL_BIND_ASSIGN_MEMBER, _)
-                return *this;
-            }
-
-            BOOST_PP_CAT(bound_action, N) & operator=(
-                BOOST_RV_REF(BOOST_PP_CAT(bound_action, N)) other)
-            {
-                BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MOVE_MEMBER, _)
-                return *this;
-            }
-
-            // apply() invokes the embedded action fully asynchronously
-            bool apply()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return hpx::apply<Action>(
-                    hpx::util::detail::eval(env, arg0)
-                  BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-                        BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
-            }
-
-            bool apply() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return hpx::apply<Action>(
-                    hpx::util::detail::eval(env, arg0)
-                  BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-                        BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
-            }
-
-#define HPX_UTIL_BIND_ACTION_APPLY(Z, N, D)                                   \
-    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
-    bool apply(HPX_ENUM_FWD_ARGS(N, A, a))                                    \
-    {                                                                         \
-        typedef                                                               \
-            hpx::util::tuple<                                                 \
-                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
-            >                                                                 \
-            env_type;                                                         \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                         \
-        return hpx::apply<Action>(                                            \
-            hpx::util::detail::eval(env, arg0)                                \
-          BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
-                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));            \
-    }                                                                         \
-    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
-    bool apply(HPX_ENUM_FWD_ARGS(N, A, a)) const                              \
-    {                                                                         \
-        typedef                                                               \
-            hpx::util::tuple<                                                 \
-                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
-            >                                                                 \
-            env_type;                                                         \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                         \
-        return hpx::apply<Action>(                                            \
-            hpx::util::detail::eval(env, arg0)                                \
-          BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
-                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));            \
-    }                                                                         \
-/**/
-            BOOST_PP_REPEAT_FROM_TO(
-                1
-              , HPX_FUNCTION_ARGUMENT_LIMIT
-              , HPX_UTIL_BIND_ACTION_APPLY, _
-            )
-#undef HPX_UTIL_BIND_ACTION_APPLY
-
-            // async() invokes the embedded action asynchronously and returns
-            // a future representing the result of the embedded operation
-            hpx::lcos::future<result_type> async()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return hpx::async<Action>(
-                    hpx::util::detail::eval(env, arg0)
-                  BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-                        BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
-            }
-
-            hpx::lcos::future<result_type> async() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return hpx::async<Action>(
-                    hpx::util::detail::eval(env, arg0)
-                  BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-                        BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _));
-            }
-
-#define HPX_UTIL_BIND_ACTION_ASYNC(Z, N, D)                                   \
-    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
-    hpx::lcos::future<result_type>                                            \
-    async(HPX_ENUM_FWD_ARGS(N, A, a))                                         \
-    {                                                                         \
-        typedef                                                               \
-            hpx::util::tuple<                                                 \
-                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
-            >                                                                 \
-            env_type;                                                         \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                         \
-        return hpx::async<Action>(                                            \
-            hpx::util::detail::eval(env, arg0)                                \
-          BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
-                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));            \
-    }                                                                         \
-    template <BOOST_PP_ENUM_PARAMS(N, typename A)>                            \
-    hpx::lcos::future<result_type>                                            \
-    async(HPX_ENUM_FWD_ARGS(N, A, a)) const                                   \
-    {                                                                         \
-        typedef                                                               \
-            hpx::util::tuple<                                                 \
-                BOOST_PP_ENUM(N, HPX_UTIL_BIND_REFERENCE, A)                  \
-            >                                                                 \
-            env_type;                                                         \
-        env_type env(HPX_ENUM_FORWARD_ARGS(N, A, a));                         \
-        return hpx::async<Action>(                                            \
-            hpx::util::detail::eval(env, arg0)                                \
-          BOOST_PP_COMMA_IF(BOOST_PP_DEC(NN))                                 \
-                BOOST_PP_ENUM_SHIFTED(NN, HPX_UTIL_BIND_EVAL, _));            \
-    }                                                                         \
-/**/
-            BOOST_PP_REPEAT_FROM_TO(
-                1
-              , HPX_FUNCTION_ARGUMENT_LIMIT
-              , HPX_UTIL_BIND_ACTION_ASYNC, _
-            )
-#undef HPX_UTIL_BIND_ACTION_ASYNC
-
-            // The operator()() invokes the embedded action synchronously.
-            BOOST_FORCEINLINE result_type operator()()
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return hpx::async<Action>(
-                    hpx::util::detail::eval(env, arg0)
-                  BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-                        BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _)).get();
-            }
-
-            BOOST_FORCEINLINE result_type operator()() const
-            {
-                typedef hpx::util::tuple<> env_type;
-                env_type env;
-                return hpx::async<Action>(
-                    hpx::util::detail::eval(env, arg0)
-                  BOOST_PP_COMMA_IF(BOOST_PP_DEC(N))
-                        BOOST_PP_ENUM_SHIFTED(N, HPX_UTIL_BIND_EVAL, _)).get();
-            }
-
-#define BOOST_PP_ITERATION_PARAMS_2                                             \
-    (                                                                           \
-        3                                                                       \
-      , (                                                                       \
-            1                                                                   \
-          , HPX_FUNCTION_ARGUMENT_LIMIT                                         \
-          , <hpx/util/detail/bind_action_functor_operator.hpp>                  \
-        )                                                                       \
-    )                                                                           \
- /**/
-#include BOOST_PP_ITERATE()
-
-            BOOST_PP_REPEAT(N, HPX_UTIL_BIND_MEMBER, _)
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <
-            typename Env
-          , typename Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-        >
-        typename BOOST_PP_CAT(detail::bound_action, N)<
-                Action BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-        >::result_type
-        eval(
-            Env & env
-          , BOOST_PP_CAT(detail::bound_action, N)<
-                Action
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-            > const & f
-        )
-        {
-            return
-                boost::fusion::fused<
-                    BOOST_PP_CAT(detail::bound_action, N)<
-                        Action
-                      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-                    >
-                >(f)(
-                    env
-                 );
-        }
-    }
+    template <typename Action, typename BoundArgs>
+    struct is_bind_expression<util::detail::bound_action<Action, BoundArgs> >
+      : boost::mpl::true_
+    {};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <
-        typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    BOOST_PP_CAT(detail::bound_action, N)<
-        Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
-    >
-    bind(
-        HPX_ENUM_FWD_ARGS(N, A, a)
-    )
-    {
-        return
-            BOOST_PP_CAT(detail::bound_action, N)<
-                Action
-              BOOST_PP_COMMA_IF(N)
-                  BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
-            > (HPX_ENUM_FORWARD_ARGS(N, A, a));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result,
-        typename Arguments, typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
-    >
-    BOOST_PP_CAT(detail::bound_action, N)<
-        Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
-    >
-    bind(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, A, a)
-    )
-    {
-        return
-            BOOST_PP_CAT(detail::bound_action, N)<
-                Derived
-              BOOST_PP_COMMA_IF(N)
-                  BOOST_PP_ENUM(N, HPX_UTIL_BIND_REMOVE_REFERENCE, A)
-            > (HPX_ENUM_FORWARD_ARGS(N, A, a));
-    }
+    template <typename Action, typename BoundArgs>
+    struct is_bound_action<util::detail::bound_action<Action, BoundArgs> >
+      : boost::mpl::true_
+    {};
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace serialization
 {
-    // serialization of the bound object, just serialize members
-#define HPX_UTIL_BIND_SERIALIZE_MEMBER(Z, NNN, _) ar & BOOST_PP_CAT(bound.arg, NNN);
-
-    template <
-        typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    void serialize(hpx::util::portable_binary_iarchive& ar
-      , BOOST_PP_CAT(hpx::util::detail::bound_action, N)<
-            Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-        >& bound
-      , unsigned int const)
+    // serialization of the bound action object
+    template <typename Action, typename BoundArgs>
+    void serialize(
+        ::hpx::util::portable_binary_iarchive& ar
+      , ::hpx::util::detail::bound_action<Action, BoundArgs>& bound
+      , unsigned int const /*version*/)
     {
-        BOOST_PP_REPEAT(N, HPX_UTIL_BIND_SERIALIZE_MEMBER, _)
+        ar >> bound._bound_args;
     }
 
-    template <
-        typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-    >
-    void serialize(hpx::util::portable_binary_oarchive& ar
-      , BOOST_PP_CAT(hpx::util::detail::bound_action, N)<
-            Action
-          BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, Arg)
-        >& bound
-      , unsigned int const)
+    template <typename Action, typename BoundArgs>
+    void serialize(
+        ::hpx::util::portable_binary_oarchive& ar
+      , ::hpx::util::detail::bound_action<Action, BoundArgs>& bound
+      , unsigned int const /*version*/)
     {
-        BOOST_PP_REPEAT(N, HPX_UTIL_BIND_SERIALIZE_MEMBER, _)
+        ar << bound._bound_args;
     }
-
-#undef HPX_UTIL_BIND_SERIALIZE_MEMBER
 }}
 
-#undef HPX_UTIL_BIND_ASSIGN_MEMBER
-#undef HPX_UTIL_BIND_INIT_MOVE_MEMBER
-#undef HPX_UTIL_BIND_INIT_COPY_MEMBER
-#undef HPX_UTIL_BIND_MEMBER
-#undef HPX_UTIL_BIND_INIT_MEMBER
+#   if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+#       include <hpx/util/preprocessed/bind_action.hpp>
+#   else
+#       if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#           pragma wave option(preserve: 1, line: 0, output: "preprocessed/bind_action_" HPX_LIMIT_STR ".hpp")
+#       endif
 
-#undef NN
+        ///////////////////////////////////////////////////////////////////////
+#       define BOOST_PP_ITERATION_PARAMS_1                                    \
+        (                                                                     \
+            3                                                                 \
+          , (                                                                 \
+                1                                                             \
+              , HPX_FUNCTION_ARGUMENT_LIMIT                                   \
+              , <hpx/util/bind_action.hpp>                                    \
+            )                                                                 \
+        )                                                                     \
+        /**/
+#       include BOOST_PP_ITERATE()
+
+#       if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#           pragma wave option(output: null)
+#       endif
+#   endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+
+#endif
+
+#else // !BOOST_PP_IS_ITERATING
+
+#define N BOOST_PP_ITERATION()
+
+namespace hpx { namespace util
+{
+    namespace detail
+    {
+#       define HPX_UTIL_BIND_EVAL_TYPE(Z, N, D)                               \
+        typename detail::bind_eval_impl<                                      \
+            typename util::tuple_element<N, BoundArgs>::type                  \
+          , UnboundArgs                                                       \
+        >::type                                                               \
+        /**/
+#       define HPX_UTIL_BIND_EVAL(Z, N, D)                                    \
+        detail::bind_eval(                                                    \
+            util::get<N>(bound_args)                                          \
+          , boost::forward<UnboundArgs>(unbound_args)                         \
+        )                                                                     \
+        /**/
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == N
+            >::type
+        >
+        {
+            typedef bool type;
+
+            static BOOST_FORCEINLINE
+            type call(
+                BoundArgs& bound_args
+              , BOOST_FWD_REF(UnboundArgs) unbound_args
+            )
+            {
+                return
+                    hpx::apply<Action>(
+                        BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _)
+                    );
+            }
+        };
+        
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_async_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == N
+            >::type
+        >
+        {
+            typedef
+                lcos::future<
+                    typename traits::promise_local_result<
+                        typename hpx::actions::extract_action<Action>::result_type
+                    >::type
+                >
+                type;
+
+            static BOOST_FORCEINLINE
+            type call(
+                BoundArgs& bound_args
+              , BOOST_FWD_REF(UnboundArgs) unbound_args
+            )
+            {
+                return
+                    hpx::async<Action>(
+                        BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _)
+                    );
+            }
+        };
+#       undef HPX_UTIL_BIND_EVAL_TYPE
+#       undef HPX_UTIL_BIND_EVAL
+    }
+
+#   define HPX_UTIL_BIND_DECAY(Z, N, D)                                       \
+    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
+    /**/
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename T)>
+    typename boost::enable_if_c<
+        traits::is_action<typename util::remove_reference<Action>::type>::value
+      , detail::bound_action<
+            typename util::decay<Action>::type
+          , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_BIND_DECAY, _)>
+        >
+    >::type
+    bind(HPX_ENUM_FWD_ARGS(N, T, t))
+    {
+        typedef
+            detail::bound_action<
+                typename util::decay<Action>::type
+              , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_BIND_DECAY, _)>
+            >
+            result_type;
+
+        return
+            result_type(
+                Action()
+              , util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, T, t))
+            );
+    }
+     
+    template <
+        typename Component, typename Result, typename Arguments
+      , typename Derived
+      , BOOST_PP_ENUM_PARAMS(N, typename T)>
+    detail::bound_action<
+        Derived
+      , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_BIND_DECAY, _)>
+    >
+    bind(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > action, HPX_ENUM_FWD_ARGS(N, T, t))
+    {
+        typedef
+            detail::bound_action<
+                Derived
+              , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_BIND_DECAY, _)>
+            >
+            result_type;
+
+        return
+            result_type(
+                static_cast<Derived const&>(action)
+              , util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, T, t))
+            );
+    }
+#   undef HPX_UTIL_BIND_DECAY
+}}
+
 #undef N
 
 #endif

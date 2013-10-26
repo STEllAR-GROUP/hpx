@@ -17,7 +17,6 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/traits/is_callable.hpp>
 
 #include <boost/preprocessor/enum.hpp>
@@ -25,6 +24,7 @@
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/mpl/identity.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/preprocessed/apply.hpp>
@@ -47,53 +47,24 @@ namespace hpx
     }
 
     template <typename F>
-    bool apply(BOOST_FWD_REF(F) f)
+    typename boost::enable_if_c<
+        traits::detail::is_callable_not_action<F>::value
+     && !traits::is_bound_action<typename util::decay<F>::type>::value
+      , bool
+    >::type
+    apply(BOOST_FWD_REF(F) f)
     {
         threads::register_thread(boost::forward<F>(f), "hpx::apply");
         return false;   // executed locally
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Define apply() overloads for plain local functions and function objects.
-
-    // simply launch the given function or function object asynchronously
-
-#define HPX_UTIL_BOUND_FUNCTION_APPLY(Z, N, D)                                \
-    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
-    typename boost::lazy_enable_if<                                           \
-        traits::detail::is_callable_not_action<F                              \
-          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>                      \
-      , boost::mpl::identity<bool>                                            \
-    >::type                                                                   \
-    apply(threads::executor& sched, BOOST_FWD_REF(F) f,                       \
-        HPX_ENUM_FWD_ARGS(N, A, a))                                           \
-    {                                                                         \
-        sched.add(util::bind(util::protect(boost::forward<F>(f)),             \
-            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
-        return false;                                                         \
-    }                                                                         \
-    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>                \
-    typename boost::lazy_enable_if<                                           \
-        traits::detail::is_callable_not_action<F                              \
-          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>                      \
-      , boost::mpl::identity<bool>                                            \
-    >::type                                                                   \
-    apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))                     \
-    {                                                                         \
-        threads::register_thread(util::bind(                                  \
-            util::protect(boost::forward<F>(f)),                              \
-            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");                   \
-        return false;                                                         \
-    }                                                                         \
-    /**/
-
-    BOOST_PP_REPEAT_FROM_TO(
-        1
-      , HPX_FUNCTION_ARGUMENT_LIMIT
-      , HPX_UTIL_BOUND_FUNCTION_APPLY, _
-    )
-
-#undef HPX_UTIL_BOUND_FUNCTION_APPLY
+    // apply a bound action
+    template <typename Action, typename BoundArgs>
+    bool apply(hpx::util::detail::bound_action<Action, BoundArgs> const& bound)
+    {
+        return bound.apply();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -116,57 +87,57 @@ namespace hpx
 #else
 
 #define N BOOST_PP_ITERATION()
-#define NN BOOST_PP_ITERATION()
 
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    // apply a nullary bound action
-    template <
-        typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename T)
-    >
-    bool apply(
-        BOOST_RV_REF(HPX_UTIL_STRIP((
-            BOOST_PP_CAT(hpx::util::detail::bound_action, N)<
-                Action
-              BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, T)
-            >))) bound)
+    // Define apply() overloads for plain local functions and function objects.
+
+    // simply launch the given function or function object asynchronously
+    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>
+    typename boost::enable_if_c<
+        traits::detail::is_callable_not_action<F
+          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>::value
+     && !traits::is_bound_action<typename util::decay<F>::type>::value
+      , bool
+    >::type
+    apply(threads::executor& sched, BOOST_FWD_REF(F) f,
+        HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        return bound.apply();
+        sched.add(util::bind(util::protect(boost::forward<F>(f)),
+            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");
+        return false;
     }
 
-    // define apply() overloads for n-nary bound actions
-#define HPX_UTIL_BOUND_ACTION_APPLY(Z, N, D)                                  \
-    template <                                                                \
-        typename Action                                                       \
-      BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, typename T)              \
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)                \
-    >                                                                         \
-    bool apply(                                                               \
-        BOOST_RV_REF(HPX_UTIL_STRIP((                                         \
-            BOOST_PP_CAT(hpx::util::detail::bound_action, NN)<                \
-                Action                                                        \
-              BOOST_PP_COMMA_IF(NN) BOOST_PP_ENUM_PARAMS(NN, T)               \
-            >))) bound                                                        \
-      , HPX_ENUM_FWD_ARGS(N, A, a)                                            \
-    )                                                                         \
-    {                                                                         \
-        return bound.apply(HPX_ENUM_FORWARD_ARGS(N, A, a));                   \
-    }                                                                         \
-    /**/
+    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>
+    typename boost::enable_if_c<
+        traits::detail::is_callable_not_action<F
+          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>::value
+     && !traits::is_bound_action<typename util::decay<F>::type>::value
+      , bool
+    >::type
+    apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))
+    {
+        threads::register_thread(util::bind(
+            util::protect(boost::forward<F>(f)),
+            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");
+        return false;
+    }
 
-    BOOST_PP_REPEAT_FROM_TO(
-        1
-      , HPX_FUNCTION_ARGUMENT_LIMIT
-      , HPX_UTIL_BOUND_ACTION_APPLY, _
+    // define apply() overloads for bound actions
+    template <
+        typename Action, typename BoundArgs
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
+    >
+    bool apply(
+        hpx::util::detail::bound_action<Action, BoundArgs> const& bound
+      , HPX_ENUM_FWD_ARGS(N, A, a)
     )
-
-#undef HPX_UTIL_BOUND_ACTION_APPLY
-
+    {
+        return bound.apply(HPX_ENUM_FORWARD_ARGS(N, A, a));
+    }
 }
 
-#undef NN
 #undef N
 
 #endif

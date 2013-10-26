@@ -55,7 +55,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
             return pu_nums_[num_thread];
         }
 
-        void add_punit(std::size_t virt_core, std::size_t thread_num);
+        void add_punit(std::size_t virt_core, std::size_t thread_num,
+            topology const& topology);
 
     protected:
         void init_cached_pu_nums(std::size_t hardware_concurrency,

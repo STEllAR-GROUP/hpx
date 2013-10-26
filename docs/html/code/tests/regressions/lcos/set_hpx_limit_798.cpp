@@ -18,6 +18,7 @@
 #include <hpx/util/unwrapped.hpp>
 
 using hpx::lcos::future;
+using hpx::lcos::make_ready_future;
 using hpx::util::unwrapped;
 
 // define large action
