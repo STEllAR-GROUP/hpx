@@ -729,3 +729,111 @@
               , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ) , boost::forward<U17>( u17 ) , boost::forward<U18>( u18 ) , boost::forward<U19>( u19 ))
             );
     }
+    template <typename This, typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20>
+    struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20)>
+      : bind_invoke_impl<
+            F, BoundArgs
+          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type>
+        >
+    {};
+    template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20>
+    BOOST_FORCEINLINE
+    typename result<bound(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20)>::type
+    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17 , BOOST_FWD_REF(U18) u18 , BOOST_FWD_REF(U19) u19 , BOOST_FWD_REF(U20) u20)
+    {
+        return
+            detail::bind_invoke(
+                _f, _bound_args
+              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ) , boost::forward<U17>( u17 ) , boost::forward<U18>( u18 ) , boost::forward<U19>( u19 ) , boost::forward<U20>( u20 ))
+            );
+    }
+    template <typename This, typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20>
+    struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20)>
+      : bind_invoke_impl<
+            F const, BoundArgs const
+          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type>
+        >
+    {};
+    template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20>
+    BOOST_FORCEINLINE
+    typename result<bound const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20)>::type
+    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17 , BOOST_FWD_REF(U18) u18 , BOOST_FWD_REF(U19) u19 , BOOST_FWD_REF(U20) u20) const
+    {
+        return
+            detail::bind_invoke(
+                _f, _bound_args
+              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ) , boost::forward<U17>( u17 ) , boost::forward<U18>( u18 ) , boost::forward<U19>( u19 ) , boost::forward<U20>( u20 ))
+            );
+    }
+    template <typename This, typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21>
+    struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21)>
+      : bind_invoke_impl<
+            F, BoundArgs
+          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type , typename util::add_rvalue_reference<U21>::type>
+        >
+    {};
+    template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21>
+    BOOST_FORCEINLINE
+    typename result<bound(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21)>::type
+    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17 , BOOST_FWD_REF(U18) u18 , BOOST_FWD_REF(U19) u19 , BOOST_FWD_REF(U20) u20 , BOOST_FWD_REF(U21) u21)
+    {
+        return
+            detail::bind_invoke(
+                _f, _bound_args
+              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ) , boost::forward<U17>( u17 ) , boost::forward<U18>( u18 ) , boost::forward<U19>( u19 ) , boost::forward<U20>( u20 ) , boost::forward<U21>( u21 ))
+            );
+    }
+    template <typename This, typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21>
+    struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21)>
+      : bind_invoke_impl<
+            F const, BoundArgs const
+          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type , typename util::add_rvalue_reference<U21>::type>
+        >
+    {};
+    template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21>
+    BOOST_FORCEINLINE
+    typename result<bound const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21)>::type
+    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17 , BOOST_FWD_REF(U18) u18 , BOOST_FWD_REF(U19) u19 , BOOST_FWD_REF(U20) u20 , BOOST_FWD_REF(U21) u21) const
+    {
+        return
+            detail::bind_invoke(
+                _f, _bound_args
+              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ) , boost::forward<U17>( u17 ) , boost::forward<U18>( u18 ) , boost::forward<U19>( u19 ) , boost::forward<U20>( u20 ) , boost::forward<U21>( u21 ))
+            );
+    }
+    template <typename This, typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21 , typename U22>
+    struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21 , U22)>
+      : bind_invoke_impl<
+            F, BoundArgs
+          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type , typename util::add_rvalue_reference<U21>::type , typename util::add_rvalue_reference<U22>::type>
+        >
+    {};
+    template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21 , typename U22>
+    BOOST_FORCEINLINE
+    typename result<bound(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21 , U22)>::type
+    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17 , BOOST_FWD_REF(U18) u18 , BOOST_FWD_REF(U19) u19 , BOOST_FWD_REF(U20) u20 , BOOST_FWD_REF(U21) u21 , BOOST_FWD_REF(U22) u22)
+    {
+        return
+            detail::bind_invoke(
+                _f, _bound_args
+              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ) , boost::forward<U17>( u17 ) , boost::forward<U18>( u18 ) , boost::forward<U19>( u19 ) , boost::forward<U20>( u20 ) , boost::forward<U21>( u21 ) , boost::forward<U22>( u22 ))
+            );
+    }
+    template <typename This, typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21 , typename U22>
+    struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21 , U22)>
+      : bind_invoke_impl<
+            F const, BoundArgs const
+          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type , typename util::add_rvalue_reference<U21>::type , typename util::add_rvalue_reference<U22>::type>
+        >
+    {};
+    template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21 , typename U22>
+    BOOST_FORCEINLINE
+    typename result<bound const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21 , U22)>::type
+    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17 , BOOST_FWD_REF(U18) u18 , BOOST_FWD_REF(U19) u19 , BOOST_FWD_REF(U20) u20 , BOOST_FWD_REF(U21) u21 , BOOST_FWD_REF(U22) u22) const
+    {
+        return
+            detail::bind_invoke(
+                _f, _bound_args
+              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ) , boost::forward<U17>( u17 ) , boost::forward<U18>( u18 ) , boost::forward<U19>( u19 ) , boost::forward<U20>( u20 ) , boost::forward<U21>( u21 ) , boost::forward<U22>( u22 ))
+            );
+    }

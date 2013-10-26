@@ -57,10 +57,6 @@ int hpx_main()
         hpx::future<boost::int32_t> f1 =
             hpx::async(hpx::util::bind(inc, here, 42));
         HPX_TEST_EQ(f1.get(), 43);
-
-        hpx::future<boost::int32_t> f2 =
-            hpx::async(hpx::launch::all, hpx::util::bind(inc, here, 42));
-        HPX_TEST_EQ(f2.get(), 43);
     }
 
     {
@@ -98,28 +94,16 @@ int hpx_main()
             hpx::async(hpx::util::bind(call, dec, 42));
         HPX_TEST_EQ(f1.get(), 41);
 
-        hpx::future<boost::int32_t> f2 =
-            hpx::async(hpx::launch::all, hpx::util::bind(call, dec, 42));
-        HPX_TEST_EQ(f2.get(), 41);
-
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
 
-        hpx::future<boost::int32_t> f3 =
+        hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::util::bind(call, _1, 42), dec);
-        HPX_TEST_EQ(f3.get(), 41);
+        HPX_TEST_EQ(f2.get(), 41);
 
-        hpx::future<boost::int32_t> f4 =
-            hpx::async(hpx::launch::all, hpx::util::bind(call, _1, 42), dec);
-        HPX_TEST_EQ(f4.get(), 41);
-
-        hpx::future<boost::int32_t> f5 =
+        hpx::future<boost::int32_t> f3 =
             hpx::async(hpx::util::bind(call, _1, _2), dec, 42);
-        HPX_TEST_EQ(f5.get(), 41);
-
-        hpx::future<boost::int32_t> f6 =
-            hpx::async(hpx::launch::all, hpx::util::bind(call, _1, _2), dec, 42);
-        HPX_TEST_EQ(f6.get(), 41);
+        HPX_TEST_EQ(f3.get(), 41);
     }
 
     {

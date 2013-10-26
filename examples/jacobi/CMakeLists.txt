@@ -5,9 +5,7 @@
 
 if(HPX_HAVE_CXX11_LAMBDAS)
 
-  add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=5)
-  add_definitions(-DHPX_COMPONENT_CREATE_ARGUMENT_LIMIT=5)
-  add_definitions(-DHPX_FUNCTION_ARGUMENT_LIMIT=8)
+  add_definitions(-DHPX_LIMIT=8)
 
   add_subdirectory(jacobi_component)
 

@@ -260,3 +260,45 @@ namespace hpx { namespace lcos
         f0.get(); f1.get(); f2.get(); f3.get(); f4.get(); f5.get(); f6.get(); f7.get(); f8.get(); f9.get(); f10.get(); f11.get(); f12.get(); f13.get(); f14.get(); f15.get(); f16.get(); f17.get(); f18.get(); f19.get();
     }
 }}
+namespace hpx { namespace lcos
+{
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
+    inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20>
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7 , lcos::future<T8> const& f8 , lcos::future<T9> const& f9 , lcos::future<T10> const& f10 , lcos::future<T11> const& f11 , lcos::future<T12> const& f12 , lcos::future<T13> const& f13 , lcos::future<T14> const& f14 , lcos::future<T15> const& f15 , lcos::future<T16> const& f16 , lcos::future<T17> const& f17 , lcos::future<T18> const& f18 , lcos::future<T19> const& f19 , lcos::future<T20> const& f20)
+    {
+        return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get() , f8.get() , f9.get() , f10.get() , f11.get() , f12.get() , f13.get() , f14.get() , f15.get() , f16.get() , f17.get() , f18.get() , f19.get() , f20.get());
+    }
+    inline void
+    wait (lcos::future<void> const& f0 , lcos::future<void> const& f1 , lcos::future<void> const& f2 , lcos::future<void> const& f3 , lcos::future<void> const& f4 , lcos::future<void> const& f5 , lcos::future<void> const& f6 , lcos::future<void> const& f7 , lcos::future<void> const& f8 , lcos::future<void> const& f9 , lcos::future<void> const& f10 , lcos::future<void> const& f11 , lcos::future<void> const& f12 , lcos::future<void> const& f13 , lcos::future<void> const& f14 , lcos::future<void> const& f15 , lcos::future<void> const& f16 , lcos::future<void> const& f17 , lcos::future<void> const& f18 , lcos::future<void> const& f19 , lcos::future<void> const& f20)
+    {
+        f0.get(); f1.get(); f2.get(); f3.get(); f4.get(); f5.get(); f6.get(); f7.get(); f8.get(); f9.get(); f10.get(); f11.get(); f12.get(); f13.get(); f14.get(); f15.get(); f16.get(); f17.get(); f18.get(); f19.get(); f20.get();
+    }
+}}
+namespace hpx { namespace lcos
+{
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
+    inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21>
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7 , lcos::future<T8> const& f8 , lcos::future<T9> const& f9 , lcos::future<T10> const& f10 , lcos::future<T11> const& f11 , lcos::future<T12> const& f12 , lcos::future<T13> const& f13 , lcos::future<T14> const& f14 , lcos::future<T15> const& f15 , lcos::future<T16> const& f16 , lcos::future<T17> const& f17 , lcos::future<T18> const& f18 , lcos::future<T19> const& f19 , lcos::future<T20> const& f20 , lcos::future<T21> const& f21)
+    {
+        return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get() , f8.get() , f9.get() , f10.get() , f11.get() , f12.get() , f13.get() , f14.get() , f15.get() , f16.get() , f17.get() , f18.get() , f19.get() , f20.get() , f21.get());
+    }
+    inline void
+    wait (lcos::future<void> const& f0 , lcos::future<void> const& f1 , lcos::future<void> const& f2 , lcos::future<void> const& f3 , lcos::future<void> const& f4 , lcos::future<void> const& f5 , lcos::future<void> const& f6 , lcos::future<void> const& f7 , lcos::future<void> const& f8 , lcos::future<void> const& f9 , lcos::future<void> const& f10 , lcos::future<void> const& f11 , lcos::future<void> const& f12 , lcos::future<void> const& f13 , lcos::future<void> const& f14 , lcos::future<void> const& f15 , lcos::future<void> const& f16 , lcos::future<void> const& f17 , lcos::future<void> const& f18 , lcos::future<void> const& f19 , lcos::future<void> const& f20 , lcos::future<void> const& f21)
+    {
+        f0.get(); f1.get(); f2.get(); f3.get(); f4.get(); f5.get(); f6.get(); f7.get(); f8.get(); f9.get(); f10.get(); f11.get(); f12.get(); f13.get(); f14.get(); f15.get(); f16.get(); f17.get(); f18.get(); f19.get(); f20.get(); f21.get();
+    }
+}}
+namespace hpx { namespace lcos
+{
+    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
+    inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>
+    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7 , lcos::future<T8> const& f8 , lcos::future<T9> const& f9 , lcos::future<T10> const& f10 , lcos::future<T11> const& f11 , lcos::future<T12> const& f12 , lcos::future<T13> const& f13 , lcos::future<T14> const& f14 , lcos::future<T15> const& f15 , lcos::future<T16> const& f16 , lcos::future<T17> const& f17 , lcos::future<T18> const& f18 , lcos::future<T19> const& f19 , lcos::future<T20> const& f20 , lcos::future<T21> const& f21 , lcos::future<T22> const& f22)
+    {
+        return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get() , f8.get() , f9.get() , f10.get() , f11.get() , f12.get() , f13.get() , f14.get() , f15.get() , f16.get() , f17.get() , f18.get() , f19.get() , f20.get() , f21.get() , f22.get());
+    }
+    inline void
+    wait (lcos::future<void> const& f0 , lcos::future<void> const& f1 , lcos::future<void> const& f2 , lcos::future<void> const& f3 , lcos::future<void> const& f4 , lcos::future<void> const& f5 , lcos::future<void> const& f6 , lcos::future<void> const& f7 , lcos::future<void> const& f8 , lcos::future<void> const& f9 , lcos::future<void> const& f10 , lcos::future<void> const& f11 , lcos::future<void> const& f12 , lcos::future<void> const& f13 , lcos::future<void> const& f14 , lcos::future<void> const& f15 , lcos::future<void> const& f16 , lcos::future<void> const& f17 , lcos::future<void> const& f18 , lcos::future<void> const& f19 , lcos::future<void> const& f20 , lcos::future<void> const& f21 , lcos::future<void> const& f22)
+    {
+        f0.get(); f1.get(); f2.get(); f3.get(); f4.get(); f5.get(); f6.get(); f7.get(); f8.get(); f9.get(); f10.get(); f11.get(); f12.get(); f13.get(); f14.get(); f15.get(); f16.get(); f17.get(); f18.get(); f19.get(); f20.get(); f21.get(); f22.get();
+    }
+}}

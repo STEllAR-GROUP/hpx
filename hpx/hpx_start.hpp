@@ -24,16 +24,22 @@ int hpx_main(boost::program_options::variables_map& vm);
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// \namespace hpx_startup
+namespace hpx_startup
+{
+#ifndef DOXYGEN
+    // As an alternative, the user can provide a function hpx_startup::user_main,
+    // which is semantically equivalent to the plain old C-main.
+    int user_main();
+    int user_main(int argc, char** argv);
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////////////
 /// \namespace hpx
 namespace hpx
 {
 #ifndef DOXYGEN
-    ///////////////////////////////////////////////////////////////////////////
-    // As an alternative, the user can provide a function hpx::user_main, which
-    // is semantically equivalent to the plain old C-main.
-    int user_main();
-    int user_main(int argc, char** argv);
-
     typedef int (*hpx_main_type)(boost::program_options::variables_map&);
 #endif
 

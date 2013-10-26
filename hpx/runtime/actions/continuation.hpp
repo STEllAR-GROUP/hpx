@@ -16,10 +16,10 @@
 #include <hpx/util/serialize_empty_type.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/remove_reference.hpp>
+#include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_callable.hpp>
 
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/mpl/identity.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -34,14 +34,14 @@ namespace hpx
     apply(hpx::actions::action<Component, Result, Arguments, Derived>,
         naming::id_type const&, BOOST_FWD_REF(Arg));
 
-#if !defined(BOOST_MSVC)
     // MSVC complains about async_continue beeing ambiguous if it sees this
     // forward declaration
     template <typename F, typename Arg1, typename Arg2>
-    inline typename boost::lazy_enable_if<
+    inline typename boost::enable_if_c<
         traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2)>
-      , boost::mpl::identity<bool>
+          , BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2)>::value
+     && !traits::is_bound_action<typename util::decay<F>::type>::value
+      , bool
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2));
 
@@ -54,7 +54,6 @@ namespace hpx
     apply_continue(hpx::actions::action<Component, Result, Arguments, Derived>,
         naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
         BOOST_FWD_REF(F) f);
-#endif
 
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0>

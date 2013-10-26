@@ -2,6 +2,7 @@
 //  Copyright (c) 2007 Robert Perricone
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
@@ -174,41 +175,21 @@ namespace hpx { namespace util { namespace coroutines
 
         m_stack = posix::alloc_stack(static_cast<std::size_t>(m_stack_size));
         BOOST_ASSERT(m_stack);
-        m_sp = (static_cast<void**>(m_stack) + static_cast<std::size_t>(m_stack_size)/sizeof(void*));
-
         posix::watermark_stack(m_stack, static_cast<std::size_t>(m_stack_size));
-
+        
         typedef void fun(Functor*);
         fun * funp = trampoline;
 
-#if defined(__x86_64__)
-        // we have to make sure that the stack pointer is aligned on a 16 Byte
-        // boundary when the code is entering the trampoline (the stack itself
-        // is already properly aligned)
-        *--m_sp = 0;       // additional alignment
+        m_sp = (static_cast<void**>(m_stack)
+                + static_cast<std::size_t>(m_stack_size)/sizeof(void*))
+                - context_size;
 
-        *--m_sp = &cb;     // parm 0 of trampoline;
-        *--m_sp = 0;       // dummy return address for trampoline
-        *--m_sp = nasty_cast<void*>( funp );// return addr (here: start addr)
-        *--m_sp = 0;       // rbp
-        *--m_sp = 0;       // rbx
-        *--m_sp = 0;       // rsi
-        *--m_sp = 0;       // rdi
-        *--m_sp = 0;       // r12
-        *--m_sp = 0;       // r13
-        *--m_sp = 0;       // r14
-        *--m_sp = 0;       // r15
-#else
-        *--m_sp = &cb;     // parm 0 of trampoline;
-        *--m_sp = 0;       // dummy return address for trampoline
-        *--m_sp = nasty_cast<void*>( funp );// return addr (here: start addr)
-        *--m_sp = 0;       // ebp
-        *--m_sp = 0;       // ebx
-        *--m_sp = 0;       // esi
-        *--m_sp = 0;       // edi
-#endif
+        m_sp[backup_cb_idx] = m_sp[cb_idx] = &cb;
+        m_sp[backup_funp_idx] = m_sp[funp_idx] = nasty_cast<void*>(funp);
+
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-        valgrind_id = VALGRIND_STACK_REGISTER(m_stack, m_stack + m_stack_size);
+        m_sp[valgrind_id_idx] = reinterpret_cast<void*>(
+            VALGRIND_STACK_REGISTER(m_stack, m_stack + m_stack_size));
 #endif
       }
 
@@ -216,10 +197,11 @@ namespace hpx { namespace util { namespace coroutines
       {
         if(m_stack)
         {
-          posix::free_stack(m_stack, static_cast<std::size_t>(m_stack_size));
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-          VALGRIND_STACK_DEREGISTER(valgrind_id);
+          VALGRIND_STACK_DEREGISTER(
+            reinterpret_cast<std::size_t>(m_sp[valgrind_id_idx]));
 #endif
+          posix::free_stack(m_stack, static_cast<std::size_t>(m_stack_size));
         }
       }
 
@@ -239,8 +221,17 @@ namespace hpx { namespace util { namespace coroutines
 
       void rebind_stack()
       {
-        if(m_stack) 
+        if(m_stack) {
           increment_stack_recycle_count();
+
+          // On rebind, we initialize our stack to ensure a virgin stack
+          m_sp = (static_cast<void**>(m_stack)
+                + static_cast<std::size_t>(m_stack_size)/sizeof(void*))
+                - context_size;
+
+          m_sp[cb_idx] = m_sp[backup_cb_idx];
+          m_sp[funp_idx] = m_sp[backup_funp_idx];
+        }
       }
 
       typedef boost::atomic<boost::int64_t> counter_type;
@@ -293,11 +284,60 @@ namespace hpx { namespace util { namespace coroutines
       }
 
     private:
-      std::ptrdiff_t m_stack_size;
-      void * m_stack;
+#if defined(__x86_64__)
+      /** structure of context_data:
+       * 13: backup address of function to execute
+       * 12: backup address of trampoline
+       * 11: additional alignment (or valgrind_id if enabled)
+       * 10: parm 0 of trampoline
+       * 9:  dummy return address for trampoline
+       * 8:  return addr (here: start addr)
+       * 7:  rbp
+       * 6:  rbx
+       * 5:  rsi
+       * 4:  rdi
+       * 3:  r12
+       * 2:  r13
+       * 1:  r14
+       * 0:  r15
+       **/
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-      unsigned valgrind_id;
+      static const std::size_t valgrind_id_idx = 11;
 #endif
+
+      static const std::size_t context_size = 14;
+      static const std::size_t backup_cb_idx = 13;
+      static const std::size_t backup_funp_idx = 12;
+      static const std::size_t cb_idx = 10;
+      static const std::size_t funp_idx = 8;
+#else
+      /** structure of context_data:
+       * 9: valgrind_id (if enabled)
+       * 8: backup address of function to execute
+       * 7: backup address of trampoline
+       * 6: parm 0 of trampoline
+       * 5: dummy return address for trampoline
+       * 4: return addr (here: start addr)
+       * 3: ebp
+       * 2: ebx
+       * 1: esi
+       * 0: edi
+       **/
+#if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
+      static const std::size_t context_size = 10;
+      static const std::size_t valgrind_id_idx = 9;
+#else
+      static const std::size_t context_size = 9;
+#endif
+
+      static const std::size_t backup_cb_idx = 8;
+      static const std::size_t backup_funp_idx = 7;
+      static const std::size_t cb_idx = 6;
+      static const std::size_t funp_idx = 4;
+#endif
+
+      std::ptrdiff_t m_stack_size;
+      void* m_stack;
     };
 
     typedef x86_linux_context_impl context_impl;

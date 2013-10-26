@@ -86,7 +86,7 @@ namespace hpx {
                     HPX_STD_BIND(
                         for_each_impl
                       , boost::make_iterator_range(begin, mid)
-                      , f
+                      , HPX_STD_PROTECT(f)
                     )
                 )
             );
@@ -97,7 +97,7 @@ namespace hpx {
                     HPX_STD_BIND(
                         for_each_impl
                       , boost::make_iterator_range(mid, end)
-                      , f
+                      , HPX_STD_PROTECT(f)
                     )
                 )
             );

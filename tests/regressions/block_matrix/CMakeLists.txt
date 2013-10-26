@@ -13,7 +13,7 @@ if(HPX_HAVE_CXX11_AUTO AND HPX_HAVE_CXX11_STD_INITIALIZER_LIST AND
 
   source_group("Source Files" FILES ${sources})
 
-  add_definitions(-DHPX_ACTION_ARGUMENT_LIMIT=6)
+  add_definitions(-DHPX_LIMIT=6)
 
   add_hpx_executable(block_matrix_test
                      SOURCES ${sources}

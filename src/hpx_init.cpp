@@ -71,16 +71,18 @@ HPX_PLAIN_ACTION(hpx::detail::list_component_type,
     list_component_type_action, hpx::components::factory_enabled)
 
 typedef
-    hpx::util::detail::bound_action3<
+    hpx::util::detail::bound_action<
         hpx::actions::plain_action2<
             std::string const&
           , const hpx::naming::gid_type&
           , hpx::detail::list_symbolic_name
           , hpx::actions::detail::this_type
         >
-      , hpx::naming::id_type
-      , hpx::util::detail::placeholder<1>
-      , hpx::util::detail::placeholder<2>
+      , hpx::util::tuple<
+            hpx::naming::id_type
+          , hpx::util::detail::placeholder<1>
+          , hpx::util::detail::placeholder<2>
+        >
     >
     bound_list_symbolic_name_action;
 
@@ -95,16 +97,18 @@ HPX_UTIL_REGISTER_FUNCTION(
   , list_symbolic_name_function)
 
 typedef
-    hpx::util::detail::bound_action3<
+    hpx::util::detail::bound_action<
         hpx::actions::plain_action2<
             std::string const&
           , int
           , hpx::detail::list_component_type
           , hpx::actions::detail::this_type
         >
-      , hpx::naming::id_type
-      , hpx::util::detail::placeholder<1>
-      , hpx::util::detail::placeholder<2>
+      , hpx::util::tuple<
+            hpx::naming::id_type
+          , hpx::util::detail::placeholder<1>
+          , hpx::util::detail::placeholder<2>
+        >
     >
     bound_list_component_type_action;
 

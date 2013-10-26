@@ -111,7 +111,8 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     }
 
     // means of adding a processing unit after initialization
-    void affinity_data::add_punit(std::size_t virt_core, std::size_t thread_num)
+    void affinity_data::add_punit(std::size_t virt_core, std::size_t thread_num,
+        topology const& t)
     {
         std::size_t num_system_pus = hardware_concurrency();
 
@@ -134,8 +135,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         if (first_pu != std::size_t(-1))
             pu_offset_ = first_pu;
 
-        // FIXME: Do we need to call the function here?
-        //init_cached_pu_nums(num_system_pus);
+        init_cached_pu_nums(num_system_pus, t);
     }
 
     mask_cref_type affinity_data::get_pu_mask(topology const& topology,

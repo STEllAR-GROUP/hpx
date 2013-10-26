@@ -9,10 +9,12 @@
 #ifndef HPX_UTIL_DETAIL_DEFINE_BIND_FUNCTION_OPERATORS_HPP
 #define HPX_UTIL_DETAIL_DEFINE_BIND_FUNCTION_OPERATORS_HPP
 
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/iteration/iterate.hpp>
-#include <boost/preprocessor/repetition/enum.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
+#if defined(HPX_CREATE_PREPROCESSED_FILES)
+#   include <boost/preprocessor/cat.hpp>
+#   include <boost/preprocessor/iteration/iterate.hpp>
+#   include <boost/preprocessor/repetition/enum.hpp>
+#   include <boost/preprocessor/repetition/enum_params.hpp>
+#endif
 
     template <typename This>
     struct result<This()>

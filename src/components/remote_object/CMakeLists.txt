@@ -28,15 +28,15 @@ add_hpx_pseudo_dependencies(components.remote_object
 if(${BOOST_MINOR_VERSION} GREATER 50) 
   hpx_partial_preprocess_header(
       "hpx/components/remote_object/distributed_new.hpp"
-      LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+      LIMIT HPX_LIMIT
   )
   hpx_partial_preprocess_header(
       "hpx/components/remote_object/ctor_fun.hpp"
-      LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+      LIMIT HPX_LIMIT
   )
   hpx_partial_preprocess_header(
       "hpx/components/remote_object/new.hpp"
-      LIMIT HPX_FUNCTION_ARGUMENT_LIMIT
+      LIMIT HPX_LIMIT
   )
 endif()
 

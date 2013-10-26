@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    after_588
     async_callback_non_deduced_context
     future_hang_on_get_629
     dataflow_launch_775
@@ -33,6 +34,8 @@ if(NOT MSVC10)
        )
   endif()
 endif()
+
+set(after_588_PARAMETERS LOCALITIES 2)
 
 set(async_callback_non_deduced_context_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_hang_on_get_629_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)

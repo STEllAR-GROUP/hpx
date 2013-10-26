@@ -743,3 +743,108 @@
                     , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ) , boost::forward<A17>( a17 ) , boost::forward<A18>( a18 ) , boost::forward<A19>( a19 ));
             }
         };
+        template <
+            typename Functor
+          , typename R
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20
+          , typename IArchive
+          , typename OArchive
+        >
+        struct type<
+            Functor
+          , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+          , IArchive
+          , OArchive
+        >
+            : type_base<Functor>
+        {
+            static vtable_ptr_base<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+              , IArchive
+              , OArchive
+            > *get_ptr()
+            {
+                return
+                    get_table<
+                        Functor
+                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20)
+                    >::template get<IArchive, OArchive>();
+            }
+            BOOST_FORCEINLINE static R
+            invoke(void ** f
+                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8 , typename util::add_rvalue_reference<A9>::type a9 , typename util::add_rvalue_reference<A10>::type a10 , typename util::add_rvalue_reference<A11>::type a11 , typename util::add_rvalue_reference<A12>::type a12 , typename util::add_rvalue_reference<A13>::type a13 , typename util::add_rvalue_reference<A14>::type a14 , typename util::add_rvalue_reference<A15>::type a15 , typename util::add_rvalue_reference<A16>::type a16 , typename util::add_rvalue_reference<A17>::type a17 , typename util::add_rvalue_reference<A18>::type a18 , typename util::add_rvalue_reference<A19>::type a19 , typename util::add_rvalue_reference<A20>::type a20)
+            {
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ) , boost::forward<A17>( a17 ) , boost::forward<A18>( a18 ) , boost::forward<A19>( a19 ) , boost::forward<A20>( a20 ));
+            }
+        };
+        template <
+            typename Functor
+          , typename R
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21
+          , typename IArchive
+          , typename OArchive
+        >
+        struct type<
+            Functor
+          , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+          , IArchive
+          , OArchive
+        >
+            : type_base<Functor>
+        {
+            static vtable_ptr_base<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+              , IArchive
+              , OArchive
+            > *get_ptr()
+            {
+                return
+                    get_table<
+                        Functor
+                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21)
+                    >::template get<IArchive, OArchive>();
+            }
+            BOOST_FORCEINLINE static R
+            invoke(void ** f
+                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8 , typename util::add_rvalue_reference<A9>::type a9 , typename util::add_rvalue_reference<A10>::type a10 , typename util::add_rvalue_reference<A11>::type a11 , typename util::add_rvalue_reference<A12>::type a12 , typename util::add_rvalue_reference<A13>::type a13 , typename util::add_rvalue_reference<A14>::type a14 , typename util::add_rvalue_reference<A15>::type a15 , typename util::add_rvalue_reference<A16>::type a16 , typename util::add_rvalue_reference<A17>::type a17 , typename util::add_rvalue_reference<A18>::type a18 , typename util::add_rvalue_reference<A19>::type a19 , typename util::add_rvalue_reference<A20>::type a20 , typename util::add_rvalue_reference<A21>::type a21)
+            {
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ) , boost::forward<A17>( a17 ) , boost::forward<A18>( a18 ) , boost::forward<A19>( a19 ) , boost::forward<A20>( a20 ) , boost::forward<A21>( a21 ));
+            }
+        };
+        template <
+            typename Functor
+          , typename R
+          , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19 , typename A20 , typename A21 , typename A22
+          , typename IArchive
+          , typename OArchive
+        >
+        struct type<
+            Functor
+          , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+          , IArchive
+          , OArchive
+        >
+            : type_base<Functor>
+        {
+            static vtable_ptr_base<
+                R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+              , IArchive
+              , OArchive
+            > *get_ptr()
+            {
+                return
+                    get_table<
+                        Functor
+                      , R(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19 , A20 , A21 , A22)
+                    >::template get<IArchive, OArchive>();
+            }
+            BOOST_FORCEINLINE static R
+            invoke(void ** f
+                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8 , typename util::add_rvalue_reference<A9>::type a9 , typename util::add_rvalue_reference<A10>::type a10 , typename util::add_rvalue_reference<A11>::type a11 , typename util::add_rvalue_reference<A12>::type a12 , typename util::add_rvalue_reference<A13>::type a13 , typename util::add_rvalue_reference<A14>::type a14 , typename util::add_rvalue_reference<A15>::type a15 , typename util::add_rvalue_reference<A16>::type a16 , typename util::add_rvalue_reference<A17>::type a17 , typename util::add_rvalue_reference<A18>::type a18 , typename util::add_rvalue_reference<A19>::type a19 , typename util::add_rvalue_reference<A20>::type a20 , typename util::add_rvalue_reference<A21>::type a21 , typename util::add_rvalue_reference<A22>::type a22)
+            {
+                return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
+                    , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ) , boost::forward<A17>( a17 ) , boost::forward<A18>( a18 ) , boost::forward<A19>( a19 ) , boost::forward<A20>( a20 ) , boost::forward<A21>( a21 ) , boost::forward<A22>( a22 ));
+            }
+        };

@@ -250,6 +250,11 @@ namespace hpx { namespace components
         HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_, HPX_UTIL_PP_NARG(__VA_ARGS__)\
     )(__VA_ARGS__))                                                           \
 /**/
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_1(ComponentType)               \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_3(                                 \
+        ComponentType, ComponentType, ::hpx::components::factory_check)       \
+    HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
+/**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_2(ComponentType, componentname)\
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_3(                                 \
         ComponentType, componentname, ::hpx::components::factory_check)       \

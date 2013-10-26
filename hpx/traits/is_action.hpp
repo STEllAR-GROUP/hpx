@@ -28,6 +28,12 @@ namespace hpx { namespace traits
       , typename util::always_void<typename Action::type>::type>
       : is_action<typename Action::type>
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action>
+    struct is_bound_action
+      : boost::mpl::false_
+    {};
 }}
 
 #endif
