@@ -513,7 +513,7 @@ else()
               "--script=${input_path}"
               "--in=${${name}_SOURCE}"
               "--out=${name}_auto_index.dbk"
-      COMMENT "Collecting Generating auto index."
+      COMMENT "Generating auto index."
       DEPENDS ${${name}_SOURCE} ${${name}_INDEX})
   endmacro()
 
