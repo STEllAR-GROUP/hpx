@@ -1228,7 +1228,7 @@ else()
 
     # Earlier versions of GCC don't exit with an error for this flag, so it's
     # difficult to auto-detect.
-    if(040800 GREATER ${GCC_VERSION} OR 40800 EQUAL ${GCC_VERSION})
+    if(040800 LESS ${GCC_VERSION} OR 40800 EQUAL ${GCC_VERSION})
       hpx_use_flag_if_available(-Wno-unused-local-typedefs LANGUAGES CXX C)
     endif()
 
