@@ -1,4 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -152,26 +153,28 @@ namespace hpx { namespace util { namespace coroutines
     //  : m_pimpl(p)
     //{}
 
-    //coroutine(BOOST_RV_REF(coroutine) src)
-    //  : m_pimpl(src->m_pimpl)
-    //{
-    //  src->m_pimpl = 0;
-    //}
+    coroutine(BOOST_RV_REF(coroutine) src)
+      : m_pimpl(src->m_pimpl)
+    {
+      src->m_pimpl = 0;
+    }
 
-    //coroutine& operator=(BOOST_RV_REF(coroutine) src) {
-    //  coroutine(src).swap(*this);
-    //  return *this;
-    //}
+    coroutine& operator=(BOOST_RV_REF(coroutine) src)
+    {
+      coroutine(src).swap(*this);
+      return *this;
+    }
 
-    //coroutine& swap(coroutine& rhs) {
-    //  std::swap(m_pimpl, rhs.m_pimpl);
-    //  return *this;
-    //}
+    coroutine& swap(coroutine& rhs)
+    {
+      std::swap(m_pimpl, rhs.m_pimpl);
+      return *this;
+    }
 
-    //friend
-    //void swap(coroutine& lhs, coroutine& rhs) {
-    //  lhs.swap(rhs);
-    //}
+    friend void swap(coroutine& lhs, coroutine& rhs)
+    {
+      lhs.swap(rhs);
+    }
 
     thread_id_repr_type get_thread_id() const
     {
@@ -272,40 +275,48 @@ namespace hpx { namespace util { namespace coroutines
 #endif
 
     typedef void(coroutine::*bool_type)();
-    operator bool_type() const {
+    operator bool_type() const
+    {
       return good()? &coroutine::bool_type_f: 0;
     }
 
-    bool operator==(const coroutine& rhs) const {
+    bool operator==(const coroutine& rhs) const
+    {
       return m_pimpl == rhs.m_pimpl;
     }
 
-    void exit() {
+    void exit()
+    {
       BOOST_ASSERT(m_pimpl);
       m_pimpl->exit();
     }
 
-    bool waiting() const {
+    bool waiting() const
+    {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->waiting();
     }
 
-    bool pending() const {
+    bool pending() const
+    {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->pending();
     }
 
-    bool exited() const {
+    bool exited() const
+    {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->exited();
     }
 
-    bool is_ready() const {
+    bool is_ready() const
+    {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->is_ready();
     }
 
-    bool empty() const {
+    bool empty() const
+    {
       return m_pimpl == 0;
     }
 
@@ -318,7 +329,8 @@ namespace hpx { namespace util { namespace coroutines
 
     void bool_type_f() {}
 
-    bool good() const  {
+    bool good() const
+    {
       return !empty() && !exited() && !waiting();
     }
 
@@ -356,12 +368,13 @@ namespace hpx { namespace util { namespace coroutines
     //  m_pimpl->release();
     //}
 
-    std::size_t
-    count() const {
+    std::size_t count() const
+    {
       return m_pimpl->count();
     }
 
-    impl_ptr get_impl() {
+    impl_ptr get_impl()
+    {
       return m_pimpl;
     }
   };
