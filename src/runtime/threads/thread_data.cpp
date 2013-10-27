@@ -71,7 +71,7 @@ namespace hpx { namespace threads
 
 #if HPX_DEBUG_THREAD_POOL != 0
             using namespace std;    // some systems have memset in namespace std
-            memset (pt, freed_value, sizeof(thread_data));
+            memset (static_cast<void*>(pt), freed_value, sizeof(thread_data));
 #endif
             pool->deallocate(pt);
         }
@@ -80,7 +80,13 @@ namespace hpx { namespace threads
     void thread_data::operator delete(void *p, thread_pool& pool)
     {
         if (0 != p)
+        {
+#if HPX_DEBUG_THREAD_POOL != 0
+            using namespace std;    // some systems have memset in namespace std
+            memset (p, freed_value, sizeof(thread_data));
+#endif
             pool.deallocate(static_cast<thread_data*>(p));
+        }
     }
 
     void thread_data_base::run_thread_exit_callbacks()
