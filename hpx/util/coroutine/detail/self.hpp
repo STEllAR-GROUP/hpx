@@ -75,7 +75,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef typename coroutine_type::arg_slot_type arg_slot_type;
     typedef typename coroutine_type::arg_slot_traits arg_slot_traits;
     typedef typename coroutine_type::yield_traits yield_traits;
-    typedef typename coroutine_type::thread_id_type thread_id_type;
+    typedef typename coroutine_type::thread_id_repr_type thread_id_repr_type;
 
 #if defined(HPX_GENERIC_COROUTINES)
 
@@ -175,7 +175,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       return m_pimpl->pending();
     }
 
-    thread_id_type get_thread_id() const 
+    thread_id_repr_type get_thread_id() const 
     {
       BOOST_ASSERT(m_pimpl);
       return m_pimpl->get_thread_id();

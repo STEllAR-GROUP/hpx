@@ -14,9 +14,31 @@
 
 #include <boost/assert.hpp>
 
+#if HPX_DEBUG
+#  define HPX_DEBUG_THREAD_POOL 1
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
+#if HPX_DEBUG_THREAD_POOL != 0
+    enum guard_value
+    {
+        initial_value = 0xcc,           // memory has been initialized
+        freed_value = 0xdd              // memory has been freed
+    };
+#endif
+
+    void intrusive_ptr_add_ref(thread_data_base* p)
+    {
+        ++p->count_;
+    }
+    void intrusive_ptr_release(thread_data_base* p)
+    {
+        if (0 == --p->count_)
+            delete p;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     void* thread_data::operator new(std::size_t size, thread_pool& pool)
     {
@@ -24,9 +46,16 @@ namespace hpx { namespace threads
 
         void *ret = reinterpret_cast<void*>(pool.allocate());
         if (0 == ret)
+        {
             HPX_THROW_EXCEPTION(out_of_memory,
                 "thread_data::operator new",
                 "could not allocate memory for thread_data");
+        }
+
+#if HPX_DEBUG_THREAD_POOL != 0
+        using namespace std;    // some systems have memset in namespace std
+        memset (ret, initial_value, sizeof(thread_data));
+#endif
         return ret;
     }
 
@@ -37,8 +66,14 @@ namespace hpx { namespace threads
         if (0 != p)
         {
             thread_data* pt = static_cast<thread_data*>(p);
-            BOOST_ASSERT(pt->pool_);
-            pt->pool_->deallocate(pt);
+            thread_pool* pool = pt->pool_;
+            BOOST_ASSERT(pool);
+
+#if HPX_DEBUG_THREAD_POOL != 0
+            using namespace std;    // some systems have memset in namespace std
+            memset (pt, freed_value, sizeof(thread_data));
+#endif
+            pool->deallocate(pt);
         }
     }
 
@@ -158,7 +193,12 @@ namespace hpx { namespace threads
     thread_id_type get_self_id()
     {
         thread_self* self = get_self_ptr();
-        return (0 != self) ? self->get_thread_id() : threads::invalid_thread_id;
+        if (0 == self)
+            return threads::invalid_thread_id;
+
+        return thread_id_type(
+                reinterpret_cast<thread_data_base*>(self->get_thread_id())
+            );
     }
 
 #if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
@@ -177,28 +217,28 @@ namespace hpx { namespace threads
         return naming::invalid_locality_id;
     }
 #else
-    thread_id_type get_parent_id()
+    thread_id_repr_type get_parent_id()
     {
         thread_self* self = get_self_ptr();
-        return (0 != self) ?
-            static_cast<thread_data_base*>(self->get_thread_id())->get_parent_thread_id() :
-            threads::invalid_thread_id;
+        if (0 == self)
+            return threads::invalid_thread_id_repr;
+        return get_self_id()->get_parent_thread_id();
     }
 
     std::size_t get_parent_phase()
     {
         thread_self* self = get_self_ptr();
-        return (0 != self) ?
-            static_cast<thread_data_base*>(self->get_thread_id())->get_parent_thread_phase() :
-            0;
+        if (0 == self)
+            return 0;
+        return get_self_id()->get_parent_thread_phase();
     }
 
     boost::uint32_t get_parent_locality_id()
     {
         thread_self* self = get_self_ptr();
-        return (0 != self) ?
-            static_cast<thread_data_base*>(self->get_thread_id())->get_parent_locality_id() :
-            naming::invalid_locality_id;
+        if (0 == self)
+            return naming::invalid_locality_id;
+        return get_self_id()->get_parent_locality_id();
     }
 #endif
 
@@ -208,8 +248,9 @@ namespace hpx { namespace threads
         return 0;
 #else
         thread_self* self = get_self_ptr();
-        return (0 != self) ?
-            static_cast<thread_data_base*>(self->get_thread_id())->get_component_id() : 0;
+        if (0 == self)
+            return 0;
+        return get_self_id()->get_component_id();
 #endif
     }
 }}

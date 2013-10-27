@@ -134,44 +134,46 @@ namespace hpx { namespace util { namespace coroutines
 
     typedef detail::coroutine_impl<type, context_impl, Heap> impl_type;
     typedef typename impl_type::pointer impl_ptr;
-    typedef typename impl_type::thread_id_type thread_id_type;
+    typedef typename impl_type::thread_id_repr_type thread_id_repr_type;
 
     typedef detail::coroutine_self<type> self;
     coroutine() : m_pimpl(0) {}
 
     template <typename Functor>
     coroutine (BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
-            thread_id_type id = 0, std::ptrdiff_t stack_size = detail::default_stack_size)
+            thread_id_repr_type id = 0, std::ptrdiff_t stack_size = detail::default_stack_size)
       : m_pimpl(impl_type::create(boost::forward<Functor>(f),
             boost::move(target), id, stack_size))
-    {}
-
-    coroutine (impl_ptr p)
-      : m_pimpl(p)
-    {}
-
-    coroutine(BOOST_RV_REF(coroutine) src)
-      : m_pimpl(src->m_pimpl)
     {
-      src->m_pimpl = 0;
+        BOOST_ASSERT(m_pimpl->is_ready());
     }
 
-    coroutine& operator=(BOOST_RV_REF(coroutine) src) {
-      coroutine(src).swap(*this);
-      return *this;
-    }
+    //coroutine (impl_ptr p)
+    //  : m_pimpl(p)
+    //{}
 
-    coroutine& swap(coroutine& rhs) {
-      std::swap(m_pimpl, rhs.m_pimpl);
-      return *this;
-    }
+    //coroutine(BOOST_RV_REF(coroutine) src)
+    //  : m_pimpl(src->m_pimpl)
+    //{
+    //  src->m_pimpl = 0;
+    //}
 
-    friend
-    void swap(coroutine& lhs, coroutine& rhs) {
-      lhs.swap(rhs);
-    }
+    //coroutine& operator=(BOOST_RV_REF(coroutine) src) {
+    //  coroutine(src).swap(*this);
+    //  return *this;
+    //}
 
-    thread_id_type get_thread_id() const
+    //coroutine& swap(coroutine& rhs) {
+    //  std::swap(m_pimpl, rhs.m_pimpl);
+    //  return *this;
+    //}
+
+    //friend
+    //void swap(coroutine& lhs, coroutine& rhs) {
+    //  lhs.swap(rhs);
+    //}
+
+    thread_id_repr_type get_thread_id() const
     {
         return m_pimpl->get_thread_id();
     }
@@ -194,18 +196,18 @@ namespace hpx { namespace util { namespace coroutines
     }
 #endif
 
-    template <typename Functor>
-    void rebind(Functor f, thread_id_type id = 0)
-    {
-        BOOST_ASSERT(exited());
-        impl_type::rebind(m_pimpl, f, id);
-    }
+    //template <typename Functor>
+    //void rebind(Functor f, thread_id_repr_type id = 0)
+    //{
+    //    BOOST_ASSERT(exited());
+    //    impl_type::rebind(m_pimpl, f, id);
+    //}
 
-    void reset()
-    {
-        BOOST_ASSERT(exited());
-        m_pimpl->reset();
-    }
+    //void reset()
+    //{
+    //    BOOST_ASSERT(exited());
+    //    m_pimpl->reset();
+    //}
 
 #define HPX_COROUTINE_GENERATE_ARGUMENT_N_TYPE(z, n, traits_type)             \
     typedef typename traits_type::template at<n>::type                        \
@@ -253,9 +255,10 @@ namespace hpx { namespace util { namespace coroutines
 
 #else
 
-    BOOST_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type()) 
+    BOOST_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type())
     {
       BOOST_ASSERT(m_pimpl);
+      BOOST_ASSERT(m_pimpl->is_ready());
 
       result_type* ptr;
       m_pimpl->bind_args(&arg0);
@@ -297,6 +300,11 @@ namespace hpx { namespace util { namespace coroutines
       return m_pimpl->exited();
     }
 
+    bool is_ready() const {
+      BOOST_ASSERT(m_pimpl);
+      return m_pimpl->is_ready();
+    }
+
     bool empty() const {
       return m_pimpl == 0;
     }
@@ -304,9 +312,9 @@ namespace hpx { namespace util { namespace coroutines
   protected:
     // The second parameter is used to avoid calling this constructor
     // by mistake from other member functions (specifically operator=).
-    coroutine(impl_type * pimpl, detail::init_from_impl_tag) 
-      : m_pimpl(pimpl) 
-    {}
+    //coroutine(impl_type * pimpl, detail::init_from_impl_tag) 
+    //  : m_pimpl(pimpl) 
+    //{}
 
     void bool_type_f() {}
 
@@ -340,13 +348,13 @@ namespace hpx { namespace util { namespace coroutines
 
     impl_ptr m_pimpl;
 
-    void acquire() {
-      m_pimpl->acquire();
-    }
+    //void acquire() {
+    //  m_pimpl->acquire();
+    //}
 
-    void release() {
-      m_pimpl->release();
-    }
+    //void release() {
+    //  m_pimpl->release();
+    //}
 
     std::size_t
     count() const {

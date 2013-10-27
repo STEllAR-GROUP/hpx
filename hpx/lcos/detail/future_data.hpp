@@ -694,7 +694,7 @@ namespace detail
             reset_id(task_base& target)
               : target_(target)
             {
-                target.set_id(threads::get_self().get_thread_id());
+                target.set_id(threads::get_self_id());
             }
             ~reset_id()
             {

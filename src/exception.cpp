@@ -184,7 +184,7 @@ namespace hpx { namespace detail
         boost::uint32_t node = get_locality_id(ec);
 
         std::size_t shepherd = std::size_t(-1);
-        std::size_t thread_id = 0;
+        threads::thread_id_type thread_id;
         std::string thread_name;
 
         threads::thread_self* self = threads::get_self_ptr();
@@ -193,14 +193,15 @@ namespace hpx { namespace detail
             if (threads::threadmanager_is(running))
                 shepherd = threads::threadmanager_base::get_worker_thread_num();
 
-            thread_id = reinterpret_cast<std::size_t>(self->get_thread_id());
-            thread_name = threads::get_thread_description(self->get_thread_id());
+            thread_id = threads::get_self_id();
+            thread_name = threads::get_thread_description(thread_id);
         }
 
         std::string env(get_execution_environment());
         std::string config(configuration_string());
         return construct_exception(e, func, file, line, back_trace, node,
-            hostname_, pid_, shepherd, thread_id, thread_name, env, config);
+            hostname_, pid_, shepherd, reinterpret_cast<std::size_t>(thread_id.get()),
+            thread_name, env, config);
     }
 
     template <typename Exception>

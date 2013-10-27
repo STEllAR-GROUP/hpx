@@ -21,7 +21,6 @@
 
 #include <boost/thread/mutex.hpp>
 #include <boost/atomic.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 
 // TODO: add branch prediction and function heat
 
@@ -81,8 +80,8 @@ struct thread_deque
     typedef work_item_deque_type work_items_type;
 
     // this is the type of a map holding all threads (except depleted ones)
-    typedef boost::ptr_map<
-        thread_id_type, thread_data, std::less<thread_id_type>
+    typedef std::map<
+        thread_data_base*, thread_id_type, std::less<thread_data_base*>
     > thread_map_type;
 
     // this is the type of the queue of new tasks not yet converted to
@@ -97,7 +96,7 @@ struct thread_deque
 
     typedef boost::lockfree::deque<task_description*> task_items_type;
 
-    typedef boost::lockfree::fifo<thread_id_type> thread_id_queue_type;
+    typedef boost::lockfree::fifo<thread_data_base*> thread_id_queue_type;
 
   protected:
     // add new threads if there is some amount of work available
@@ -122,16 +121,15 @@ struct thread_deque
 
             // create the new thread
             thread_state_enum state = HPX_STD_GET(1, *task);
-            HPX_STD_UNIQUE_PTR<threads::thread_data> thrd(
+            threads::thread_id_type thrd(
                 new (memory_pool_) threads::thread_data(
                     HPX_STD_GET(0, *task), memory_pool_, state));
 
             delete task;
 
             // add the new entry to the map of all threads
-            thread_id_type id = thrd->get_thread_id();
             std::pair<thread_map_type::iterator, bool> p =
-                thread_map_.insert(id, thrd.get());
+                thread_map_.insert(std::make_pair(thrd.get(), thrd));
 
             if (!p.second) {
                 HPX_THROW_EXCEPTION(hpx::out_of_memory,
@@ -148,9 +146,6 @@ struct thread_deque
                 ++added;
                 schedule_thread(thrd.get());
             }
-
-            // transfer ownership to map
-            thrd.release();
         }
 
         if (added)
@@ -181,16 +176,15 @@ struct thread_deque
 
             // create the new thread
             thread_state_enum state = HPX_STD_GET(1, *task);
-            HPX_STD_UNIQUE_PTR<threads::thread_data> thrd(
+            threads::thread_id_type thrd(
                 new (memory_pool_) threads::thread_data(
                     HPX_STD_GET(0, *task), memory_pool_, state));
 
             delete task;
 
             // add the new entry to the map of all threads
-            thread_id_type id = thrd->get_thread_id();
             std::pair<thread_map_type::iterator, bool> p =
-                thread_map_.insert(id, thrd.get());
+                thread_map_.insert(std::make_pair(thrd.get(), thrd));
 
             if (!p.second) {
                 HPX_THROW_EXCEPTION(hpx::out_of_memory,
@@ -207,9 +201,6 @@ struct thread_deque
                 ++added;
                 schedule_thread(thrd.get());
             }
-
-            // transfer ownership to map
-            thrd.release();
         }
 
         if (added)
@@ -257,7 +248,7 @@ struct thread_deque
                 (std::max)(
                     static_cast<boost::int64_t>(terminated_items_count_ / 10),
                     static_cast<boost::int64_t>(max_delete_count));
-            thread_id_type todelete;
+            thread_data_base* todelete;
             while ((delete_all || delete_count) &&
                 terminated_items_.dequeue(todelete))
             {
@@ -348,14 +339,13 @@ struct thread_deque
         if (run_now) {
             mutex_type::scoped_lock lk(mtx_);
 
-            HPX_STD_UNIQUE_PTR<threads::thread_data> thrd(
+            threads::thread_id_type thrd(
                 new (memory_pool_) threads::thread_data(
                     data, memory_pool_, initial_state));
 
             // add a new entry in the map for this thread
-            thread_id_type id = thrd->get_thread_id();
             std::pair<thread_map_type::iterator, bool> p =
-                thread_map_.insert(id, thrd.get());
+                thread_map_.insert(thread_map_type::value_type(thrd.get(), thrd));
 
             if (!p.second) {
                 HPX_THROWS_IF(ec, hpx::out_of_memory,
@@ -368,13 +358,11 @@ struct thread_deque
             if (initial_state == pending)
                 schedule_thread(thrd.get());
 
-            thrd.release(); // release ownership to the map
-
             if (&ec != &throws)
                 ec = make_success_code();
 
             // return the thread_id of the newly created thread
-            return id;
+            return thrd;
         }
 
         // do not execute the work, but register a task description for
@@ -431,8 +419,7 @@ struct thread_deque
     bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
     {
         if (thrd->is_created_from(&memory_pool_)) {
-            thread_id_type id = thrd->get_thread_id();
-            terminated_items_.enqueue(id);
+            terminated_items_.enqueue(thrd);
             if (static_cast<boost::int64_t>(++terminated_items_count_) > busy_count / 10)
                 cleanup_terminated();
             return true;
@@ -474,16 +461,17 @@ struct thread_deque
         for (thread_map_type::iterator it = thread_map_.begin();
               it != end; ++it)
         {
-            if ((*it).second->get_state() == suspended) {
+            if ((*it).second->get_state() == suspended)
+            {
                 (*it).second->set_state_ex(wait_abort);
                 (*it).second->set_state(pending);
-                schedule_thread((*it).second);
+                schedule_thread((*it).second.get());
             }
         }
     }
 
     bool add_new_or_terminate(std::size_t num_thread, bool running,
-                              std::size_t& added)
+        std::size_t& added)
     {
         if (0 == work_items_count_.load(boost::memory_order_relaxed)) {
             util::try_lock_wrapper<mutex_type> lk(mtx_);
