@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
@@ -61,9 +62,9 @@ namespace hpx { namespace naming
 
                     if (get_runtime_ptr())
                     {
-                        error_code ec(lightweight);
                         // Fire-and-forget semantics.
-                        naming::get_agas_client().decref(*p, credits, ec);
+                        error_code ec(lightweight);
+                        agas::decref(*p, credits, ec);
                     }
                 }
                 catch (hpx::exception const& e) {
@@ -157,6 +158,33 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Lock>
+        hpx::future<bool> retrieve_new_credits(naming::gid_type& newid,
+            naming::gid_type& orig_id, boost::uint16_t credit1,
+            boost::uint16_t credit2, naming::id_type const& keep_alive,
+            Lock& l)
+        {
+            // We add the new credits to the gids first to avoid
+            // duplicate splitting during concurrent serialization
+            // operations.
+            if (credit1) detail::add_credit_to_gid(newid, credit1);
+            if (credit2) detail::add_credit_to_gid(orig_id, credit2);
+
+            // We unlock the lock as all operations on the local credit
+            // have been performed and we don't want the lock to be
+            // pending during the (possibly remote) AGAS operation.
+            l.unlock();
+
+            // If something goes wrong during the reference count
+            // increment below we will have already added credits to
+            // the split gid. In the worst case this will cause a
+            // memory leak. I'm not sure if it is possible to reliably
+            // handle this problem.
+            return agas::incref_async(orig_id, orig_id, credit1 + credit2,
+                keep_alive);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // prepare the given id, note: this function modifies the passed id
         naming::gid_type id_type_impl::prepare_gid() const
         {
@@ -176,8 +204,14 @@ namespace hpx { namespace naming
                 if (0 == detail::get_credit_from_gid(newid))
                 {
                     BOOST_ASSERT(1 == detail::get_credit_from_gid(*this));
-                    retrieve_new_credits(newid, const_cast<id_type_impl&>(*this),
-                        HPX_INITIAL_GLOBALCREDIT, HPX_INITIAL_GLOBALCREDIT, l);
+
+                    // note: the future returned by retrieve_new_credits()
+                    //       keeps this instance alive as it is passed along
+                    //       as the keep_alive parameter
+                    retrieve_new_credits(newid,
+                        const_cast<id_type_impl&>(*this),
+                        HPX_INITIAL_GLOBALCREDIT, HPX_INITIAL_GLOBALCREDIT,
+                        id_type(const_cast<id_type_impl*>(this)), l);
                 }
                 return newid;
             }
