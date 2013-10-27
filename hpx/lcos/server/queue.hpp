@@ -133,11 +133,9 @@ namespace hpx { namespace lcos { namespace server
                     thread_queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
-                    threads::thread_data_base* thrd =
-                        static_cast<threads::thread_data_base*>(id);
                     LERR_(fatal) << "~queue: pending thread: "
-                            << get_thread_state_name(thrd->get_state())
-                            << "(" << id << "): " << thrd->get_description();
+                            << get_thread_state_name(id->get_state())
+                            << "(" << id.get() << "): " << id->get_description();
 
                     // forcefully abort thread, do not throw
                     error_code ec(lightweight);
@@ -145,8 +143,8 @@ namespace hpx { namespace lcos { namespace server
                         threads::wait_abort, threads::thread_priority_default, ec);
                     if (ec) {
                         LERR_(fatal) << "~queue: could not abort thread"
-                            << get_thread_state_name(thrd->get_state())
-                            << "(" << id << "): " << thrd->get_description();
+                            << get_thread_state_name(id->get_state())
+                            << "(" << id.get() << "): " << id->get_description();
                     }
                 }
             }

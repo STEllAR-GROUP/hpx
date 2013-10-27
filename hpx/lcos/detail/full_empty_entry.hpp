@@ -198,7 +198,7 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
                 queue_entry f(threads::get_self_id());
@@ -234,7 +234,7 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
                 queue_entry f(threads::get_self_id());
@@ -269,7 +269,7 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
                 queue_entry f(threads::get_self_id());
@@ -307,7 +307,7 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
                 queue_entry f(threads::get_self_id());
@@ -342,7 +342,7 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
                 queue_entry f(threads::get_self_id());
@@ -378,7 +378,7 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
                 queue_entry f(threads::get_self_id());
