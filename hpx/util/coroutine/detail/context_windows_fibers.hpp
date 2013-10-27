@@ -86,7 +86,6 @@ namespace hpx { namespace util { namespace coroutines
 
     /*
      * Return true if current thread is a fiber.
-     * FIXME: on longhorn should use IsThreadAFiber
      */
     inline bool is_fiber() {
 #if _WIN32_WINNT >= 0x0600
