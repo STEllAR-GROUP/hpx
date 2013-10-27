@@ -1225,7 +1225,13 @@ else()
   ##############################################################################
   if(HPX_WARNINGS)
     hpx_use_flag_if_available(-Wall LANGUAGES CXX C Fortran)
-    hpx_use_flag_if_available(-Wno-unused-local-typedefs LANGUAGES CXX C Fortran)
+
+    # Earlier versions of GCC don't exit with an error for this flag, so it's
+    # difficult to auto-detect.
+    if(040800 GREATER ${GCC_VERSION} OR 40800 EQUAL ${GCC_VERSION})
+      hpx_use_flag_if_available(-Wno-unused-local-typedefs LANGUAGES CXX C)
+    endif()
+
     hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX C Fortran)
     hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX)
   endif()
