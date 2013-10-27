@@ -131,10 +131,18 @@ hpx_quickbook_to_html(hpx
 
 if(FOP_FOUND)
   # This assumes that Quickbook -> BoostBook succeeded above.
-  hpx_quickbook_to_boostbook(hpx_pdf SOURCE hpx.qbk
-    DEPENDENCIES ${all_documentation_dependencies}
-    NODOXYGEN)
-  hpx_boostbook_to_xslfo(hpx SOURCE hpx_pdf.xml)
+#  hpx_quickbook_to_boostbook(hpx_pdf SOURCE hpx.qbk
+#    DEPENDENCIES ${all_documentation_dependencies}
+#    QUICKBOOK_ARGS ${quickbook_fixme_mode} ${auto_index_mode}
+#    NODOXYGEN)
+
+  if(BOOSTAUTOINDEX_FOUND)
+    hpx_docbook_to_xslfo(hpx SOURCE hpx_auto_index.dbk
+                         XSLTPROC_ARGS --stringparam index.on.type 1)
+  else()
+    hpx_docbook_to_xslfo(hpx SOURCE hpx.dbk)
+  endif()
+
   hpx_xslfo_to_pdf(hpx SOURCE hpx.fo)
 endif()
 

@@ -52,7 +52,7 @@ if(NOT HPX_BUILD_DOCUMENTATION)
     hpx_error("boostbook_to_docbook" "Documentation toolchain is unavailable.")
   endmacro()
 
-  macro(hpx_boostbook_to_xslfo name)
+  macro(hpx_docbook_to_xslfo name)
     hpx_error("boostbook_to_xslfo" "Documentation toolchain is unavailable.")
   endmacro()
 
@@ -219,8 +219,8 @@ else()
     endif()
   endmacro()
 
-  # BoostBook XML -> XSL-FO
-  macro(hpx_boostbook_to_xslfo name)
+  # DocBook -> XSL-FO
+  macro(hpx_docbook_to_xslfo name)
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS" "" ${ARGN})
 
     if(NOT BOOST_ROOT)

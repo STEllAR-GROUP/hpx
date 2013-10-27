@@ -481,7 +481,7 @@ as `hpx::thread`, `hpx::function`, `hpx::future`, etc.
 
 A lot of work has been put into improving the documentation. Many of the API
 functions are documented now, concepts are explained in detail, and examples
-are better described than before. The new [link hpx.index documentation index]
+are better described than before. The new documentation index
 enables finding information with lesser effort.
 
 This is the first release of HPX we perform after the move to __stellar_hpx_github__.
