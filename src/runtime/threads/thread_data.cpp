@@ -208,9 +208,9 @@ namespace hpx { namespace threads
     }
 
 #if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
-    thread_id_type get_parent_id()
+    thread_id_repr_type get_parent_id()
     {
-        return threads::invalid_thread_id;
+        return threads::invalid_thread_id_repr;
     }
 
     std::size_t get_parent_phase()
