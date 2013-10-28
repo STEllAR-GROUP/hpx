@@ -377,7 +377,7 @@ namespace hpx { namespace threads
         /// Return the thread id of the parent thread
         thread_id_repr_type get_parent_thread_id() const
         {
-            return threads::invalid_thread_id;
+            return threads::invalid_thread_id_repr;
         }
 
         /// Return the phase of the parent thread
