@@ -52,7 +52,7 @@ if(NOT HPX_BUILD_DOCUMENTATION)
     hpx_error("boostbook_to_docbook" "Documentation toolchain is unavailable.")
   endmacro()
 
-  macro(hpx_boostbook_to_xslfo name)
+  macro(hpx_docbook_to_xslfo name)
     hpx_error("boostbook_to_xslfo" "Documentation toolchain is unavailable.")
   endmacro()
 
@@ -219,8 +219,8 @@ else()
     endif()
   endmacro()
 
-  # BoostBook XML -> XSL-FO
-  macro(hpx_boostbook_to_xslfo name)
+  # DocBook -> XSL-FO
+  macro(hpx_docbook_to_xslfo name)
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;CATALOG;XSLTPROC_ARGS" "" ${ARGN})
 
     if(NOT BOOST_ROOT)
@@ -252,13 +252,19 @@ else()
     endif()
   endmacro()
 
-  # BoostBook XML -> XSL-FO
+  # XSL-FO -> PDF 
   macro(hpx_xslfo_to_pdf name)
     hpx_parse_arguments(${name} "SOURCE;DEPENDENCIES;FOP_ARGS" "" ${ARGN})
 
+    if(WIN32)
+      set(DOCS_OUTPUT_DIR "/${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/share/hpx-${HPX_VERSION}/docs/")
+    else()
+      set(DOCS_OUTPUT_DIR "/${CMAKE_BINARY_DIR}/share/hpx-${HPX_VERSION}/docs/")
+    endif()
+
     add_custom_command(OUTPUT ${name}.pdf
       COMMAND ${FOP_PROGRAM} ${${name}_FOP_ARGS}
-              ${${name}_SOURCE} ${name}.pdf
+              ${${name}_SOURCE} ${DOCS_OUTPUT_DIR}/${name}.pdf
       COMMENT "Generating PDF file ${name}.pdf from ${${name}_SOURCE}."
       DEPENDS ${${name}_SOURCE} ${${name}_DEPENDENCIES})
   endmacro()
@@ -507,7 +513,7 @@ else()
               "--script=${input_path}"
               "--in=${${name}_SOURCE}"
               "--out=${name}_auto_index.dbk"
-      COMMENT "Collecting Generating auto index."
+      COMMENT "Generating auto index."
       DEPENDS ${${name}_SOURCE} ${${name}_INDEX})
   endmacro()
 

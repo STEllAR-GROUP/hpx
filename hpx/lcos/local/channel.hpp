@@ -24,7 +24,7 @@ struct channel
 
     boost::intrusive_ptr<future_data> data_;
 
-    BOOST_COPYABLE_AND_MOVABLE(vector3d);
+    BOOST_COPYABLE_AND_MOVABLE(channel<T>);
 
   public:
     typedef typename future_data::completed_callback_type
@@ -155,7 +155,7 @@ struct channel<void>
 
     boost::intrusive_ptr<future_data> data_;
 
-    BOOST_COPYABLE_AND_MOVABLE(vector3d);
+    BOOST_COPYABLE_AND_MOVABLE(channel<void>);
 
   public:
     typedef future_data::completed_callback_type

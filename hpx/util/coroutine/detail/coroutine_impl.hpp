@@ -539,7 +539,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       }
 
 #if defined(_DEBUG)
-      wrapper_type::heap_type const* heaps =
+      typename wrapper_type::heap_type const* heaps =
           wrapper_type::get_first_heap_address(stack_size);
 #endif
 
@@ -563,7 +563,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if defined(_DEBUG)
       typedef coroutine_impl_wrapper<
           functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;
-      wrapper_type::heap_type const* heaps =
+      typename wrapper_type::heap_type const* heaps =
           wrapper_type::get_first_heap_address(p->get_stacksize());
 #endif
       // always hand the stack back to the matching heap

@@ -531,10 +531,12 @@ if(HPX_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_PARENT_REFERENCE 1)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_PHASE_INFORMATION 1)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_DESCRIPTION 1)
+  hpx_add_config_define(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION 1)
 else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_PARENT_REFERENCE 0)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_PHASE_INFORMATION 0)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_DESCRIPTION 0)
+  hpx_add_config_define(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION 0)
 endif()
 
 hpx_option(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL "Enable thread stack back trace being captured on suspension (default: OFF)" OFF ADVANCED)
@@ -1225,7 +1227,13 @@ else()
   ##############################################################################
   if(HPX_WARNINGS)
     hpx_use_flag_if_available(-Wall LANGUAGES CXX C Fortran)
-    hpx_use_flag_if_available(-Wno-unused-local-typedefs LANGUAGES CXX C Fortran)
+
+    # Earlier versions of GCC don't exit with an error for this flag, so it's
+    # difficult to auto-detect.
+    if(040800 LESS ${GCC_VERSION} OR 40800 EQUAL ${GCC_VERSION})
+      hpx_use_flag_if_available(-Wno-unused-local-typedefs LANGUAGES CXX C)
+    endif()
+
     hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX C Fortran)
     hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX)
   endif()
@@ -1743,15 +1751,16 @@ if(NOT HPX_NO_INSTALL)
       COMPONENT docs
       OPTIONAL
       FILES_MATCHING PATTERN "*.html"
+      PATTERN "*.pdf"
       PATTERN ".git" EXCLUDE)
 
     file(COPY ${hpx_SOURCE_DIR}/docs/index.html
       DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/)
 
-#    install(
-#      FILES ${hpx_SOURCE_DIR}/docs/index.html
-#      DESTINATION share/hpx-${HPX_VERSION}/
-#      COMPONENT docs)
+    install(
+      FILES ${hpx_SOURCE_DIR}/docs/index.html
+      DESTINATION share/hpx-${HPX_VERSION}/
+      COMPONENT docs)
 
     file(COPY ${hpx_SOURCE_DIR}/docs/html/src/
       DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/docs/html/src
