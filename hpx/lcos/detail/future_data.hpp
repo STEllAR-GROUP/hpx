@@ -355,9 +355,8 @@ namespace detail
         void set_data(BOOST_FWD_REF(T) result)
         {
             // this future instance coincidentally keeps us alive
-            boost::intrusive_ptr<future_data_base<Result> > this_(this);
             lcos::future<Result> f =
-                lcos::detail::make_future_from_data<Result>(this_);
+                lcos::detail::make_future_from_data<Result>(this);
 
             // set the received result, reset error status
             try {
@@ -399,9 +398,8 @@ namespace detail
         void set_exception(boost::exception_ptr const& e)
         {
             // this future instance coincidentally keeps us alive
-            boost::intrusive_ptr<future_data_base<Result> > this_(this);
             lcos::future<Result> f =
-                lcos::detail::make_future_from_data<Result>(this_);
+                lcos::detail::make_future_from_data<Result>(this);
 
             completed_callback_type on_completed;
             {
@@ -504,9 +502,8 @@ namespace detail
 
             if (!data_sink.empty() && !data_.is_empty()) {
                 // this future instance coincidentally keeps us alive
-                boost::intrusive_ptr<future_data_base<Result> > this_(this);
                 lcos::future<Result> f =
-                    lcos::detail::make_future_from_data<Result>(this_);
+                    lcos::detail::make_future_from_data<Result>(this);
 
                 // invoke the callback (continuation) function right away
                 util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
