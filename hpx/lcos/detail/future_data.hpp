@@ -355,8 +355,9 @@ namespace detail
         void set_data(BOOST_FWD_REF(T) result)
         {
             // this future instance coincidentally keeps us alive
+            boost::intrusive_ptr<future_data_base<Result> > this_(this);
             lcos::future<Result> f =
-                lcos::detail::make_future_from_data<Result>(this);
+                lcos::detail::make_future_from_data<Result>(this_);
 
             // set the received result, reset error status
             try {
@@ -398,8 +399,9 @@ namespace detail
         void set_exception(boost::exception_ptr const& e)
         {
             // this future instance coincidentally keeps us alive
+            boost::intrusive_ptr<future_data_base<Result> > this_(this);
             lcos::future<Result> f =
-                lcos::detail::make_future_from_data<Result>(this);
+                lcos::detail::make_future_from_data<Result>(this_);
 
             completed_callback_type on_completed;
             {
@@ -502,8 +504,9 @@ namespace detail
 
             if (!data_sink.empty() && !data_.is_empty()) {
                 // this future instance coincidentally keeps us alive
+                boost::intrusive_ptr<future_data_base<Result> > this_(this);
                 lcos::future<Result> f =
-                    lcos::detail::make_future_from_data<Result>(this);
+                    lcos::detail::make_future_from_data<Result>(this_);
 
                 // invoke the callback (continuation) function right away
                 util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
@@ -633,28 +636,36 @@ namespace detail
         // retrieving the value
         result_type get_data(error_code& ec = throws)
         {
-            if (!started_)
-                run();
-
+            if (!was_started())
+                this->do_run();
             return boost::move(this->future_data<Result>::get_data(ec));
         }
 
         // moving out the value
         result_type move_data(error_code& ec = throws)
         {
-            if (!started_)
-                run();
-
+            if (!was_started())
+                this->do_run();
             return boost::move(this->future_data<Result>::move_data(ec));
         }
 
     private:
+        bool was_started()
+        {
+            typename mutex_type::scoped_lock l(this->mtx_);
+            if (started_)
+                return true;
+
+            started_ = true;
+            return false;
+        }
+
         void check_started()
         {
             typename mutex_type::scoped_lock l(this->mtx_);
             if (started_) {
                 HPX_THROW_EXCEPTION(task_already_started,
-                    "task_base::run", "this task has already been started");
+                    "task_base::check_started", "this task has already been started");
                 return;
             }
             started_ = true;
@@ -673,6 +684,7 @@ namespace detail
             threads::thread_stacksize stacksize, error_code& ec)
         {
             check_started();
+
             future_base_type this_(this);
 
             if (sched_) {
@@ -726,13 +738,13 @@ namespace detail
         template <typename T>
         void set_data(BOOST_FWD_REF(T) result)
         {
-            started_ = true;
+            BOOST_ASSERT(started_);
             this->future_data<Result>::set_data(boost::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            started_ = true;
+            BOOST_ASSERT(started_);
             this->future_data<Result>::set_exception(e);
         }
 
