@@ -218,7 +218,7 @@ namespace hpx { namespace threads
     /// to change the state of one of the threads managed by this threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_state(thread_id_type id, thread_state_enum new_state,
+        set_state(thread_id_type const& id, thread_state_enum new_state,
             thread_state_ex_enum new_state_ex, thread_priority priority,
             error_code& ec)
     {
@@ -230,10 +230,8 @@ namespace hpx { namespace threads
     /// queries the state of one of the threads known to the threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_state threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_state(thread_id_type id)
+        get_state(thread_id_type const& thrd)
     {
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_state() : thread_state(terminated);
     }
 
@@ -241,10 +239,8 @@ namespace hpx { namespace threads
     /// queries the phase of one of the threads known to the threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_phase(thread_id_type id)
+        get_phase(thread_id_type const& thrd)
     {
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_thread_phase() : std::size_t(~0);
     }
 
@@ -252,10 +248,8 @@ namespace hpx { namespace threads
     /// queries the priority of one of the threads known to the threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_priority threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_priority(thread_id_type id)
+        get_priority(thread_id_type const& thrd)
     {
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_priority() : thread_priority_unknown;
     }
 
@@ -264,26 +258,22 @@ namespace hpx { namespace threads
     /// threadmanager_impl
     template <typename SchedulingPolicy, typename NotificationPolicy>
     char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_description(thread_id_type id) const
+        get_description(thread_id_type const& thrd) const
     {
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_description() : "<unknown>";
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_description(thread_id_type id, char const* desc)
+        set_description(thread_id_type const& thrd, char const* desc)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_description",
                 "NULL thread id encountered");
             return NULL;
         }
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd)
             return thrd->set_description(desc);
         return NULL;
@@ -291,33 +281,29 @@ namespace hpx { namespace threads
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_lco_description(thread_id_type id) const
+        get_lco_description(thread_id_type const& thrd) const
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::get_lco_description",
                 "NULL thread id encountered");
             return NULL;
         }
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_lco_description() : "<unknown>";
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_lco_description(thread_id_type id, char const* desc)
+        set_lco_description(thread_id_type const& thrd, char const* desc)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_lco_description",
                 "NULL thread id encountered");
             return NULL;
         }
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd)
             return thrd->set_lco_description(desc);
         return NULL;
@@ -326,42 +312,38 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     util::backtrace const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_backtrace(thread_id_type id) const
+        get_backtrace(thread_id_type const& thrd) const
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::get_backtrace",
                 "NULL thread id encountered");
             return NULL;
         }
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_backtrace() : 0;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     util::backtrace const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_backtrace(thread_id_type id, util::backtrace const* bt)
+        set_backtrace(thread_id_type const& thrd, util::backtrace const* bt)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_backtrace",
                 "NULL thread id encountered");
             return NULL;
         }
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->set_backtrace(bt) : 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_interruption_enabled(thread_id_type id, error_code& ec)
+        get_interruption_enabled(thread_id_type const& thrd, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::get_interruption_enabled",
                 "NULL thread id encountered");
@@ -371,16 +353,14 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->interruption_enabled() : false;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_interruption_enabled(thread_id_type id, bool enable, error_code& ec)
+        set_interruption_enabled(thread_id_type const& thrd, bool enable, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
                 "threadmanager_impl::set_interruption_enabled",
                 "NULL thread id encountered");
@@ -389,8 +369,6 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd)
             return thrd->set_interruption_enabled(enable);
         return false;
@@ -398,9 +376,9 @@ namespace hpx { namespace threads
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_interruption_requested(thread_id_type id, error_code& ec)
+        get_interruption_requested(thread_id_type const& thrd, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::get_interruption_requested",
                 "NULL thread id encountered");
@@ -410,16 +388,14 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->interruption_requested() : false;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        interrupt(thread_id_type id, bool flag, error_code& ec)
+        interrupt(thread_id_type const& thrd, bool flag, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::interrupt",
                 "NULL thread id encountered");
@@ -429,23 +405,21 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd) {
             thrd->interrupt(flag);      // notify thread
 
             // set thread state to pending, if the thread is currently active,
             // this will be rescheduled until it calls an interruption point
-            set_thread_state(id, pending, wait_abort,
+            set_thread_state(thrd, pending, wait_abort,
                 thread_priority_normal, ec);
         }
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        interruption_point(thread_id_type id, error_code& ec)
+        interruption_point(thread_id_type const& thrd, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::interruption_point",
                 "NULL thread id encountered");
@@ -455,8 +429,6 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd)
             thrd->interruption_point();      // notify thread
     }
@@ -465,34 +437,30 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_thread_data(thread_id_type id, error_code& ec) const
+        get_thread_data(thread_id_type const& thrd, error_code& ec) const
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::get_thread_data",
                 "NULL thread id encountered");
             return 0;
         }
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->get_thread_data() : 0;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     std::size_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_thread_data(thread_id_type id, std::size_t data,
+        set_thread_data(thread_id_type const& thrd, std::size_t data,
             error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::set_thread_data",
                 "NULL thread id encountered");
             return 0;
         }
 
-        // we know that the id is actually the pointer to the thread
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return thrd ? thrd->set_thread_data(data) : 0;
     }
 #endif
@@ -500,9 +468,9 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-    run_thread_exit_callbacks(thread_id_type id, error_code& ec)
+    run_thread_exit_callbacks(thread_id_type const& thrd, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::run_thread_exit_callbacks",
                 "NULL thread id encountered");
@@ -512,17 +480,16 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (thrd)
             thrd->run_thread_exit_callbacks();
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-    add_thread_exit_callback(thread_id_type id, HPX_STD_FUNCTION<void()> const& f,
-        error_code& ec)
+    add_thread_exit_callback(thread_id_type const& thrd,
+        HPX_STD_FUNCTION<void()> const& f, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::add_thread_exit_callback",
                 "NULL thread id encountered");
@@ -532,15 +499,14 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         return (0 != thrd) ? thrd->add_thread_exit_callback(f) : false;
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        free_thread_exit_callbacks(thread_id_type id, error_code& ec)
+        free_thread_exit_callbacks(thread_id_type const& thrd, error_code& ec)
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::free_thread_exit_callbacks",
                 "NULL thread id encountered");
@@ -550,7 +516,6 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (0 != thrd)
             thrd->free_thread_exit_callbacks();
     }
@@ -558,9 +523,9 @@ namespace hpx { namespace threads
     // Return the executor associated with th egiven thread
     template <typename SchedulingPolicy, typename NotificationPolicy>
     executor threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        get_executor(thread_id_type id, error_code& ec) const
+        get_executor(thread_id_type const& thrd, error_code& ec) const
     {
-        if (HPX_UNLIKELY(!id)) {
+        if (HPX_UNLIKELY(!thrd)) {
             HPX_THROWS_IF(ec, null_thread_id,
                 "threadmanager_impl::get_executor",
                 "NULL thread id encountered");
@@ -570,10 +535,8 @@ namespace hpx { namespace threads
         if (&ec != &throws)
             ec = make_success_code();
 
-        thread_data_base* thrd = static_cast<thread_data_base*>(id);
         if (0 == thrd)
             return default_executor();
-
         return executors::generic_thread_pool_executor(thrd->get_scheduler_base());
     }
 
@@ -582,7 +545,7 @@ namespace hpx { namespace threads
     /// new value after it expired (at the given time)
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_state(time_type const& expire_at, thread_id_type id,
+        set_state(time_type const& expire_at, thread_id_type const& id,
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority, error_code& ec)
     {
@@ -594,7 +557,7 @@ namespace hpx { namespace threads
     /// new value after it expired (after the given duration)
     template <typename SchedulingPolicy, typename NotificationPolicy>
     thread_id_type threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
-        set_state(duration_type const& from_now, thread_id_type id,
+        set_state(duration_type const& from_now, thread_id_type const& id,
             thread_state_enum newstate, thread_state_ex_enum newstate_ex,
             thread_priority priority, error_code& ec)
     {

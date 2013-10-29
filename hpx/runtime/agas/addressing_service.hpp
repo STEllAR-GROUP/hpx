@@ -233,6 +233,11 @@ private:
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
+    std::vector<hpx::future<response> > send_refcnt_requests_async(
+        mutex_type::scoped_lock& l
+        );
+
+    /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests_sync(
         mutex_type::scoped_lock& l
       , error_code& ec
@@ -1082,6 +1087,7 @@ public:
         naming::gid_type const& lower
       , naming::gid_type const& upper
       , boost::int64_t credits = 1
+      , naming::id_type const& keep_alive = naming::invalid_id
         );
 
     void incref_apply(
@@ -1144,7 +1150,23 @@ public:
       , error_code& ec = throws
         )
     {
-        return decref(id, id, credits, ec);
+        decref(id, id, credits, ec);
+    }
+
+    lcos::future<void> decref_async(
+        naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , boost::int64_t credits = 1
+      , naming::id_type const& keep_alive = naming::invalid_id
+        );
+
+    lcos::future<void> decref_async(
+        naming::gid_type const& id
+      , boost::int64_t credits = 1
+      , naming::id_type const& keep_alive = naming::invalid_id
+        )
+    {
+        return decref_async(id, id, credits, keep_alive);
     }
 
 #if !defined(HPX_NO_DEPRECATED)

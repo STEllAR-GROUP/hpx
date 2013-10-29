@@ -49,9 +49,8 @@ namespace hpx { namespace lcos { namespace detail
             reset_id(continuation_base& target)
               : target_(target)
             {
-                threads::thread_self* self = threads::get_self_ptr();
-                if (self != 0)
-                    target.set_id(self->get_thread_id());
+                if (threads::get_self_ptr() != 0)
+                    target.set_id(threads::get_self_id());
             }
             ~reset_id()
             {

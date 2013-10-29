@@ -61,7 +61,7 @@ namespace hpx { namespace threads { namespace detail
             thread_self* self = get_self_ptr();
             if (self)
             {
-                data.parent_id = self->get_thread_id();
+                data.parent_id = threads::get_self_id().get();
                 data.parent_phase = self->get_thread_phase();
             }
         }

@@ -97,7 +97,7 @@ namespace hpx { namespace lcos { namespace local
         {
             if (!--recursion_count)
             {
-                locking_thread_id.exchange(threads::thread_id_type(0));
+                locking_thread_id.exchange(threads::thread_id_type());
                 mtx.unlock();
             }
         }

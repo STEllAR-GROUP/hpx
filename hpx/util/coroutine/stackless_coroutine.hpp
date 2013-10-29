@@ -68,13 +68,13 @@ namespace hpx { namespace util { namespace coroutines
         typedef typename traits_type::arg_slot_type arg_slot_type;
         typedef typename traits_type::arg_slot_traits arg_slot_traits;
 
-        typedef void* thread_id_type;
+        typedef void* thread_id_repr_type;
 
         stackless_coroutine() {}
 
         template <typename Functor>
         stackless_coroutine(BOOST_FWD_REF(Functor) f,
-                BOOST_RV_REF(naming::id_type) target, thread_id_type id = 0)
+                BOOST_RV_REF(naming::id_type) target, thread_id_repr_type id = 0)
           : f_(boost::forward<Functor>(f))
           , state_(ctx_ready)
           , id_(id)
@@ -135,7 +135,7 @@ namespace hpx { namespace util { namespace coroutines
             lhs.swap(rhs);
         }
 
-        thread_id_type get_thread_id() const
+        thread_id_repr_type get_thread_id() const
         {
             return id_;
         }
@@ -162,7 +162,7 @@ namespace hpx { namespace util { namespace coroutines
 
         template <typename Functor>
         void rebind(BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
-            thread_id_type id = 0)
+            thread_id_repr_type id = 0)
         {
             BOOST_ASSERT(exited());
 
@@ -242,7 +242,7 @@ namespace hpx { namespace util { namespace coroutines
 
         hpx::util::function_nonser<signature_type> f_;
         context_state state_;
-        thread_id_type id_;
+        thread_id_repr_type id_;
 
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
         std::size_t phase_;

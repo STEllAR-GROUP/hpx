@@ -24,7 +24,7 @@ namespace hpx { namespace lcos { namespace local
             mutex_type::scoped_lock l(mtx_);
             while (!queue_.empty()) {
                 threads::thread_id_type id = queue_.front().id_;
-                queue_.front().id_ = 0;
+                queue_.front().id_ = threads::invalid_thread_id;
                 queue_.pop_front();
 
                 // we know that the id is actually the pointer to the thread
@@ -55,8 +55,7 @@ namespace hpx { namespace lcos { namespace local
             return false;
         }
 
-        threads::thread_self& self = threads::get_self();
-        queue_entry e(self.get_thread_id());
+        queue_entry e(threads::get_self_id());
         queue_.push_back(e);
 
         threads::thread_state_ex_enum statex;
@@ -68,7 +67,7 @@ namespace hpx { namespace lcos { namespace local
 
             // timeout at the given time, if appropriate
             if (!wait_until.is_not_a_date_time())
-                threads::set_thread_state(self.get_thread_id(), wait_until);
+                threads::set_thread_state(threads::get_self_id(), wait_until);
 
             // if this timed out, return true
             statex = this_thread::suspend(threads::suspended,

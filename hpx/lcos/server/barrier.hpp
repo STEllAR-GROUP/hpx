@@ -105,15 +105,13 @@ namespace hpx { namespace lcos { namespace server
 
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
-                    queue_.front().id_ = 0;
+                    queue_.front().id_ = threads::invalid_thread_id;
                     queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
-                    threads::thread_data_base* thrd =
-                        static_cast<threads::thread_data_base*>(id);
                     LERR_(fatal) << "~barrier: pending thread: "
-                            << get_thread_state_name(thrd->get_state())
-                            << "(" << id << "): " << thrd->get_description();
+                            << get_thread_state_name(id->get_state())
+                            << "(" << id.get() << "): " << id->get_description();
 
                     // forcefully abort thread, do not throw
                     error_code ec(lightweight);
@@ -121,8 +119,8 @@ namespace hpx { namespace lcos { namespace server
                         threads::wait_abort, threads::thread_priority_default, ec);
                     if (ec) {
                         LERR_(fatal) << "~barrier: could not abort thread"
-                            << get_thread_state_name(thrd->get_state())
-                            << "(" << id << "): " << thrd->get_description();
+                            << get_thread_state_name(id->get_state())
+                            << "(" << id.get() << "): " << id->get_description();
                     }
                 }
             }
@@ -146,12 +144,9 @@ namespace hpx { namespace lcos { namespace server
         /// entered this function.
         void set_event()
         {
-            threads::thread_self& self = threads::get_self();
-
             mutex_type::scoped_lock l(mtx_);
-
             if (queue_.size() < number_of_threads_-1) {
-                barrier_queue_entry e(self.get_thread_id());
+                barrier_queue_entry e(threads::get_self_id());
                 queue_.push_back(e);
 
                 reset_queue_entry r(e, queue_);
@@ -167,7 +162,7 @@ namespace hpx { namespace lcos { namespace server
                 // release the threads
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
-                    queue_.front().id_ = 0;
+                    queue_.front().id_ = threads::invalid_thread_id;
                     queue_.pop_front();
                     set_thread_state(id, threads::pending);
                 }
@@ -180,7 +175,7 @@ namespace hpx { namespace lcos { namespace server
                 // release the threads
                 while (!queue.empty()) {
                     threads::thread_id_type id = queue.front().id_;
-                    queue.front().id_ = 0;
+                    queue.front().id_ = threads::invalid_thread_id;
                     queue.pop_front();
                     set_thread_state(id, threads::pending);
                 }
@@ -202,7 +197,7 @@ namespace hpx { namespace lcos { namespace server
 
                 while (!queue_.empty()) {
                     threads::thread_id_type id = queue_.front().id_;
-                    queue_.front().id_ = 0;
+                    queue_.front().id_ = threads::invalid_thread_id;
                     queue_.pop_front();
 
                     threads::set_thread_state(id, threads::pending,

@@ -21,7 +21,6 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/atomic.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -60,14 +59,14 @@ namespace hpx { namespace threads { namespace policies
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
         typedef HPX_STD_TUPLE<thread_data_base*, boost::uint64_t> thread_description;
 #else
-        typedef thread_data thread_description;
+        typedef thread_data_base* thread_description;
 #endif
         typedef boost::lockfree::fifo<thread_description*> work_item_queue_type;
         typedef work_item_queue_type work_items_type;
 
         // this is the type of a map holding all threads (except depleted ones)
-        typedef boost::ptr_map<
-            thread_id_type, thread_data, std::less<thread_id_type>
+        typedef std::map<
+            thread_data_base*, thread_id_type, std::less<thread_data_base*>
         > thread_map_type;
 
         // this is the type of the queue of new tasks not yet converted to
@@ -82,7 +81,7 @@ namespace hpx { namespace threads { namespace policies
 
         typedef boost::lockfree::fifo<task_description*> task_items_type;
 
-        typedef boost::lockfree::fifo<thread_id_type> thread_id_queue_type;
+        typedef boost::lockfree::fifo<thread_data_base*> thread_id_queue_type;
 
     protected:
         ///////////////////////////////////////////////////////////////////////
@@ -117,16 +116,16 @@ namespace hpx { namespace threads { namespace policies
 
                 // create the new thread
                 thread_state_enum state = HPX_STD_GET(1, *task);
-                HPX_STD_UNIQUE_PTR<threads::thread_data> thrd (
+                threads::thread_id_type thrd (
                     new (memory_pool_) threads::thread_data(
                         HPX_STD_GET(0, *task), memory_pool_, state));
 
                 delete task;
 
                 // add the new entry to the map of all threads
-                thread_id_type id = thrd->get_thread_id();
+                thread_data_base* repr = thrd.get();
                 std::pair<thread_map_type::iterator, bool> p =
-                    thread_map_.insert(id, thrd.get());
+                    thread_map_.insert(thread_map_type::value_type(repr, thrd));
 
                 if (HPX_UNLIKELY(!p.second)) {
                     HPX_THROW_EXCEPTION(hpx::out_of_memory,
@@ -145,11 +144,8 @@ namespace hpx { namespace threads { namespace policies
                 }
 
                 // this thread has to be in the map now
-                BOOST_ASSERT(thread_map_.find(id) != thread_map_.end());
+                BOOST_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
                 BOOST_ASSERT(thrd->is_created_from(&memory_pool_));
-
-                // transfer ownership to map
-                thrd.release();
             }
 
             if (added) {
@@ -235,7 +231,7 @@ namespace hpx { namespace threads { namespace policies
 
             if (delete_all) {
                 // delete all threads
-                thread_id_type todelete;
+                thread_data_base* todelete;
                 while (terminated_items_.dequeue(todelete))
                 {
                     // this thread has to be in this map
@@ -254,7 +250,7 @@ namespace hpx { namespace threads { namespace policies
                         static_cast<boost::int64_t>(terminated_items_count_ / 10),
                         static_cast<boost::int64_t>(max_delete_count));
 
-                thread_id_type todelete;
+                thread_data_base* todelete;
                 while (delete_count && terminated_items_.dequeue(todelete))
                 {
                     // this thread has to be in this map
@@ -358,14 +354,14 @@ namespace hpx { namespace threads { namespace policies
             if (run_now) {
                 mutex_type::scoped_lock lk(mtx_);
 
-                HPX_STD_UNIQUE_PTR<threads::thread_data> thrd (
+                threads::thread_id_type thrd (
                     new (memory_pool_) threads::thread_data(
                         data, memory_pool_, initial_state));
 
                 // add a new entry in the map for this thread
-                thread_id_type id = thrd->get_thread_id();
+                thread_data_base* repr = thrd.get();
                 std::pair<thread_map_type::iterator, bool> p =
-                    thread_map_.insert(id, thrd.get());
+                    thread_map_.insert(thread_map_type::value_type(repr, thrd));
 
                 if (HPX_UNLIKELY(!p.second)) {
                     HPX_THROWS_IF(ec, hpx::out_of_memory,
@@ -379,17 +375,16 @@ namespace hpx { namespace threads { namespace policies
                     schedule_thread(thrd.get(), num_thread);
 
                 // this thread has to be in the map now
-                BOOST_ASSERT(thread_map_.find(id) != thread_map_.end());
+                BOOST_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
                 BOOST_ASSERT(thrd->is_created_from(&memory_pool_));
 
                 do_some_work();       // try to execute the new work item
-                thrd.release();       // release ownership to the map
 
                 if (&ec != &throws)
                     ec = make_success_code();
 
                 // return the thread_id of the newly created thread
-                return id;
+                return thrd;
             }
 
             // do not execute the work, but register a task description for
@@ -507,8 +502,7 @@ namespace hpx { namespace threads { namespace policies
         {
             if (thrd->is_created_from(&memory_pool_))
             {
-                thread_id_type id = thrd->get_thread_id();
-                terminated_items_.enqueue(id);
+                terminated_items_.enqueue(thrd);
 
                 boost::int64_t count = ++terminated_items_count_;
                 if (count > HPX_MAX_TERMINATED_THREADS)
@@ -559,10 +553,11 @@ namespace hpx { namespace threads { namespace policies
             for (thread_map_type::iterator it = thread_map_.begin();
                  it != end; ++it)
             {
-                if ((*it).second->get_state() == suspended) {
+                if ((*it).second->get_state() == suspended) 
+                {
                     (*it).second->set_state_ex(wait_abort);
                     (*it).second->set_state(pending);
-                    schedule_thread((*it).second, num_thread);
+                    schedule_thread((*it).second.get(), num_thread);
                 }
             }
         }

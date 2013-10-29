@@ -111,16 +111,14 @@ namespace hpx { namespace lcos { namespace detail
             mutex_type::scoped_lock l(mtx_);
             while (!queue.empty()) {
                 threads::thread_id_type id = queue.front().id_;
-                queue.front().id_ = 0;
+                queue.front().id_ = threads::invalid_thread_id;
                 queue.pop_front();
 
                 // we know that the id is actually the pointer to the thread
-                threads::thread_data_base* thrd =
-                    reinterpret_cast<threads::thread_data_base*>(id);
                 LERR_(info) << "~full_empty_entry: aborting pending thread in "
                         << desc << ": "
-                        << get_thread_state_name(thrd->get_state())
-                        << "(" << id << "): " << thrd->get_description();
+                        << get_thread_state_name(id->get_state())
+                        << "(" << id.get() << "): " << id->get_description();
 
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
@@ -128,8 +126,8 @@ namespace hpx { namespace lcos { namespace detail
                     threads::wait_abort, threads::thread_priority_default, ec);
                 if (ec) {
                     LERR_(error) << "~full_empty_entry: could not abort thread"
-                        << get_thread_state_name(thrd->get_state())
-                        << "(" << id << "): " << thrd->get_description();
+                        << get_thread_state_name(id->get_state())
+                        << "(" << id.get() << "): " << id->get_description();
                 }
             }
         }
@@ -200,12 +198,10 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
-
-                threads::thread_id_type id = self->get_thread_id();
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
-                queue_entry f(id);
+                queue_entry f(threads::get_self_id());
                 read_queue_.push_back(f);
 
                 ++full_empty_counter_data_.read_enqueued_;
@@ -238,12 +234,10 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
-
-                threads::thread_id_type id = self->get_thread_id();
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
-                queue_entry f(id);
+                queue_entry f(threads::get_self_id());
                 read_queue_.push_back(f);
 
                 ++full_empty_counter_data_.read_enqueued_;
@@ -275,12 +269,10 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
-
-                threads::thread_id_type id = self->get_thread_id();
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
-                queue_entry f(id);
+                queue_entry f(threads::get_self_id());
                 read_and_empty_queue_.push_back(f);
 
                 reset_queue_entry r(f, read_and_empty_queue_);
@@ -315,12 +307,10 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is empty
             if (state_ == empty) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
-
-                threads::thread_id_type id = self->get_thread_id();
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
-                queue_entry f(id);
+                queue_entry f(threads::get_self_id());
                 read_and_empty_queue_.push_back(f);
 
                 reset_queue_entry r(f, read_and_empty_queue_);
@@ -352,12 +342,10 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
-
-                threads::thread_id_type id = self->get_thread_id();
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
-                queue_entry f(id);
+                queue_entry f(threads::get_self_id());
                 write_queue_.push_back(f);
 
                 reset_queue_entry r(f, write_queue_);
@@ -390,12 +378,10 @@ namespace hpx { namespace lcos { namespace detail
             // block if this entry is already full
             if (state_ == full) {
                 threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (ec) return;
-
-                threads::thread_id_type id = self->get_thread_id();
+                if (0 == self || ec) return;
 
                 // enqueue the request and block this thread
-                queue_entry f(id);
+                queue_entry f(threads::get_self_id());
                 write_queue_.push_back(f);
 
                 reset_queue_entry r(f, write_queue_);
@@ -454,7 +440,7 @@ namespace hpx { namespace lcos { namespace detail
 
             if (!write_queue_.empty()) {
                 threads::thread_id_type id = write_queue_.front().id_;
-                write_queue_.front().id_ = 0;
+                write_queue_.front().id_ = threads::invalid_thread_id;
                 write_queue_.pop_front();
 
                 threads::set_thread_state(id, threads::pending,
@@ -475,7 +461,7 @@ namespace hpx { namespace lcos { namespace detail
             // handle all threads waiting for the block to become full
             while (!read_queue_.empty()) {
                 threads::thread_id_type id = read_queue_.front().id_;
-                read_queue_.front().id_ = 0;
+                read_queue_.front().id_ = threads::invalid_thread_id;
                 read_queue_.pop_front();
 
                 threads::set_thread_state(id, threads::pending,
@@ -489,7 +475,7 @@ namespace hpx { namespace lcos { namespace detail
             // for the block to become full
             if (!read_and_empty_queue_.empty()) {
                 threads::thread_id_type id = read_and_empty_queue_.front().id_;
-                read_and_empty_queue_.front().id_ = 0;
+                read_and_empty_queue_.front().id_ = threads::invalid_thread_id;
                 read_and_empty_queue_.pop_front();
 
                 threads::set_thread_state(id, threads::pending,
