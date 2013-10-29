@@ -21,7 +21,7 @@
 namespace hpx { namespace threads
 {
     ///////////////////////////////////////////////////////////////////////////
-    thread_state set_thread_state(thread_id_type id, thread_state_enum state,
+    thread_state set_thread_state(thread_id_type const& id, thread_state_enum state,
         thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -41,7 +41,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_id_type set_thread_state(thread_id_type id,
+    thread_id_type set_thread_state(thread_id_type const& id,
         boost::posix_time::ptime const& at_time, thread_state_enum state,
         thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
     {
@@ -62,7 +62,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_id_type set_thread_state(thread_id_type id,
+    thread_id_type set_thread_state(thread_id_type const& id,
         boost::posix_time::time_duration const& after, thread_state_enum state,
         thread_state_ex_enum stateex, thread_priority priority, error_code& ec)
     {
@@ -83,7 +83,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    thread_state get_thread_state(thread_id_type id, error_code& ec)
+    thread_state get_thread_state(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -101,7 +101,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t get_thread_phase(thread_id_type id, error_code& ec)
+    std::size_t get_thread_phase(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -119,7 +119,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    threads::thread_priority get_thread_priority(thread_id_type id, error_code& ec)
+    threads::thread_priority get_thread_priority(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -136,7 +136,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_priority(id);
     }
 
-    void interrupt_thread(thread_id_type id, bool flag, error_code& ec)
+    void interrupt_thread(thread_id_type const& id, bool flag, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -149,7 +149,7 @@ namespace hpx { namespace threads
         app->get_thread_manager().interrupt(id, flag, ec);
     }
 
-    void interruption_point(thread_id_type id, error_code& ec)
+    void interruption_point(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -163,7 +163,8 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool get_thread_interruption_enabled(thread_id_type id, error_code& ec)
+    bool get_thread_interruption_enabled(thread_id_type const& id,
+        error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -176,7 +177,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_interruption_enabled(id, ec);
     }
 
-    bool set_thread_interruption_enabled(thread_id_type id, bool enable,
+    bool set_thread_interruption_enabled(thread_id_type const& id, bool enable,
         error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -190,7 +191,8 @@ namespace hpx { namespace threads
         return app->get_thread_manager().set_interruption_enabled(id, enable, ec);
     }
 
-    bool get_thread_interruption_requested(thread_id_type id, error_code& ec)
+    bool get_thread_interruption_requested(thread_id_type const& id,
+        error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -205,7 +207,7 @@ namespace hpx { namespace threads
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t get_thread_data(thread_id_type id, error_code& ec)
+    std::size_t get_thread_data(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -222,7 +224,8 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_thread_data(id, ec);
     }
 
-    std::size_t set_thread_data(thread_id_type id, std::size_t d, error_code& ec)
+    std::size_t set_thread_data(thread_id_type const& id, std::size_t d,
+        error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -241,7 +244,7 @@ namespace hpx { namespace threads
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    void run_thread_exit_callbacks(thread_id_type id, error_code& ec)
+    void run_thread_exit_callbacks(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -254,7 +257,7 @@ namespace hpx { namespace threads
         app->get_thread_manager().run_thread_exit_callbacks(id, ec);
     }
 
-    bool add_thread_exit_callback(thread_id_type id,
+    bool add_thread_exit_callback(thread_id_type const& id,
         HPX_STD_FUNCTION<void()> const& f, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -268,7 +271,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().add_thread_exit_callback(id, f, ec);
     }
 
-    void free_thread_exit_callbacks(thread_id_type id, error_code& ec)
+    void free_thread_exit_callbacks(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -282,7 +285,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    char const* get_thread_description(thread_id_type id, error_code& ec)
+    char const* get_thread_description(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -298,8 +301,8 @@ namespace hpx { namespace threads
 
         return app->get_thread_manager().get_description(id);
     }
-    char const* set_thread_description(thread_id_type id, char const* desc,
-        error_code& ec)
+    char const* set_thread_description(thread_id_type const& id,
+        char const* desc, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -316,7 +319,8 @@ namespace hpx { namespace threads
         return app->get_thread_manager().set_description(id, desc);
     }
 
-    char const* get_thread_lco_description(thread_id_type id, error_code& ec)
+    char const* get_thread_lco_description(thread_id_type const& id,
+        error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -332,8 +336,8 @@ namespace hpx { namespace threads
 
         return app->get_thread_manager().get_lco_description(id);
     }
-    char const* set_thread_lco_description(thread_id_type id, char const* desc,
-        error_code& ec)
+    char const* set_thread_lco_description(thread_id_type const& id,
+        char const* desc, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -351,7 +355,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    util::backtrace const* get_thread_backtrace(thread_id_type id, error_code& ec)
+    util::backtrace const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -367,7 +371,7 @@ namespace hpx { namespace threads
 
         return app->get_thread_manager().get_backtrace(id);
     }
-    util::backtrace const* set_thread_backtrace(thread_id_type id,
+    util::backtrace const* set_thread_backtrace(thread_id_type const& id,
         util::backtrace const* bt, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
@@ -385,7 +389,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().set_backtrace(id, bt);
     }
 
-    threads::executor get_executor(thread_id_type id, error_code& ec)
+    threads::executor get_executor(thread_id_type const& id, error_code& ec)
     {
         hpx::applier::applier* app = hpx::applier::get_applier_ptr();
         if (NULL == app)
@@ -406,7 +410,7 @@ namespace hpx { namespace this_thread
     {
         struct reset_lco_description
         {
-            reset_lco_description(threads::thread_id_type id,
+            reset_lco_description(threads::thread_id_type const& id,
                     char const* description, error_code& ec)
               : id_(id), ec_(ec)
             {
@@ -427,7 +431,7 @@ namespace hpx { namespace this_thread
 #if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
         struct reset_backtrace
         {
-            reset_backtrace(threads::thread_id_type id, error_code& ec)
+            reset_backtrace(threads::thread_id_type const& id, error_code& ec)
               : id_(id),
                 backtrace_(new hpx::util::backtrace(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH)),
                 ec_(ec)
@@ -460,6 +464,7 @@ namespace hpx { namespace this_thread
 
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
+        threads::thread_id_type id = threads::get_self_id();
         threads::thread_state_ex_enum statex = threads::wait_unknown;
         {
             // verify that there are no more registered locks for this OS-thread
@@ -467,7 +472,6 @@ namespace hpx { namespace this_thread
             util::verify_no_locks();
 #endif
 #if HPX_THREAD_MAINTAIN_DESCRIPTION
-            threads::thread_id_type id = self.get_thread_id();
             detail::reset_lco_description desc(id, description, ec);
 #endif
 #if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
@@ -483,9 +487,8 @@ namespace hpx { namespace this_thread
 
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
-            threads::thread_id_type id = self.get_thread_id();
             hpx::util::osstream strm;
-            strm << "thread(" << id << ", "
+            strm << "thread(" << threads::get_self_id() << ", "
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
             HPX_THROWS_IF(ec, yield_aborted, description,
@@ -506,7 +509,7 @@ namespace hpx { namespace this_thread
 
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = self.get_thread_id();
+        threads::thread_id_type id = threads::get_self_id();
 
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = threads::wait_unknown;
@@ -536,7 +539,7 @@ namespace hpx { namespace this_thread
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
             hpx::util::osstream strm;
-            strm << "thread(" << id << ", "
+            strm << "thread(" << threads::get_self_id() << ", "
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
             HPX_THROWS_IF(ec, yield_aborted, description,
@@ -558,7 +561,7 @@ namespace hpx { namespace this_thread
 
         // schedule a thread waking us up after_duration
         threads::thread_self& self = threads::get_self();
-        threads::thread_id_type id = self.get_thread_id();
+        threads::thread_id_type id = threads::get_self_id();
 
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = threads::wait_unknown;
@@ -588,7 +591,7 @@ namespace hpx { namespace this_thread
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
             hpx::util::osstream strm;
-            strm << "thread(" << id << ", "
+            strm << "thread(" << threads::get_self_id() << ", "
                   << threads::get_thread_description(id)
                   << ") aborted (yield returned wait_abort)";
             HPX_THROWS_IF(ec, yield_aborted, description,

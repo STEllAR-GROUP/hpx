@@ -134,9 +134,9 @@ namespace hpx
             result_type operator()()
             {
                 // set callback functions to executed when future is ready
-                threads::thread_id_type id = threads::get_self_id();
                 set_on_completed_callback(lazy_values_, util::bind(
-                        &when_n::on_future_ready, this->shared_from_this(), id));
+                        &when_n::on_future_ready, this->shared_from_this(),
+                        threads::get_self_id()));
 
                 // if all of the requested futures are already set, our
                 // callback above has already been called, otherwise we suspend

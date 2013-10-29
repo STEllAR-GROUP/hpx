@@ -633,28 +633,36 @@ namespace detail
         // retrieving the value
         result_type get_data(error_code& ec = throws)
         {
-            if (!started_)
-                run();
-
+            if (!was_started())
+                this->do_run();
             return boost::move(this->future_data<Result>::get_data(ec));
         }
 
         // moving out the value
         result_type move_data(error_code& ec = throws)
         {
-            if (!started_)
-                run();
-
+            if (!was_started())
+                this->do_run();
             return boost::move(this->future_data<Result>::move_data(ec));
         }
 
     private:
+        bool was_started()
+        {
+            typename mutex_type::scoped_lock l(this->mtx_);
+            if (started_)
+                return true;
+
+            started_ = true;
+            return false;
+        }
+
         void check_started()
         {
             typename mutex_type::scoped_lock l(this->mtx_);
             if (started_) {
                 HPX_THROW_EXCEPTION(task_already_started,
-                    "task_base::run", "this task has already been started");
+                    "task_base::check_started", "this task has already been started");
                 return;
             }
             started_ = true;
@@ -673,6 +681,7 @@ namespace detail
             threads::thread_stacksize stacksize, error_code& ec)
         {
             check_started();
+
             future_base_type this_(this);
 
             if (sched_) {
@@ -694,7 +703,7 @@ namespace detail
             reset_id(task_base& target)
               : target_(target)
             {
-                target.set_id(threads::get_self().get_thread_id());
+                target.set_id(threads::get_self_id());
             }
             ~reset_id()
             {
@@ -726,13 +735,13 @@ namespace detail
         template <typename T>
         void set_data(BOOST_FWD_REF(T) result)
         {
-            started_ = true;
+            BOOST_ASSERT(started_);
             this->future_data<Result>::set_data(boost::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            started_ = true;
+            BOOST_ASSERT(started_);
             this->future_data<Result>::set_exception(e);
         }
 

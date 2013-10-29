@@ -372,10 +372,6 @@ namespace hpx { namespace threads
         std::vector<std::size_t> num_pus;
         parse_affinity_options(spec, affinities, 1, 1, num_pus, ec);
     }
-
-    HPX_API_EXPORT void print_affinity_options(std::ostream& s,
-        std::size_t num_threads, std::string const& affinity_options,
-        error_code& ec = throws);
 #endif
 
     /// \endcond

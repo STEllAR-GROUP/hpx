@@ -37,12 +37,6 @@
 #define HPX_IDTYPE_VERSION  0x20
 #define HPX_GIDTYPE_VERSION 0x10
 
-namespace hpx { namespace agas
-{
-    HPX_API_EXPORT void incref_apply(naming::gid_type const& lower,
-        naming::gid_type const& upper, boost::int64_t credits);
-}}
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
@@ -431,31 +425,6 @@ namespace hpx { namespace naming
                 id.get_lsb());
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Lock>
-        void retrieve_new_credits(naming::gid_type& newid,
-            naming::gid_type& orig_id, boost::uint16_t credit1,
-            boost::uint16_t credit2, Lock& l)
-        {
-            // We add the new credits to the gids first to avoid
-            // duplicate splitting during concurrent serialization
-            // operations.
-            if (credit1) detail::add_credit_to_gid(newid, credit1);
-            if (credit2) detail::add_credit_to_gid(orig_id, credit2);
-
-            // We unlock the lock as all operations on the local credit
-            // have been performed and we don't want the lock to be
-            // pending during the (possibly remote) AGAS operation.
-            l.unlock();
-
-            // If something goes wrong during the reference count
-            // increment below we will have already added credits to
-            // the split gid. In the worst case this will cause a
-            // memory leak. I'm not sure if it is possible to reliably
-            // handle this problem.
-            agas::incref_apply(orig_id, orig_id, credit1 + credit2);
-        }
-
         inline bool gid_was_split(gid_type const& id)
         {
             return (id.get_msb() & gid_type::was_split_mask) != 0;
@@ -525,7 +494,9 @@ namespace hpx { namespace naming
         private:
             // credit management (called during serialization), this function
             // has to be 'const' as save() above has to be 'const'.
-            naming::gid_type prepare_gid() const;
+            naming::gid_type preprocess_gid() const;
+
+            void postprocess_gid();
 
             // reference counting
             friend HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);

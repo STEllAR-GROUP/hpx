@@ -26,9 +26,9 @@
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/util/coroutine/stackless_coroutine.hpp>
-#include <hpx/util/spinlock.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/util/backtrace.hpp>
@@ -49,7 +49,7 @@ namespace hpx { namespace threads
         template <typename CoroutineImpl>
         struct coroutine_allocator
         {
-            typedef util::spinlock mutex_type;
+            typedef lcos::local::spinlock mutex_type;
 
             coroutine_allocator()
             {}
@@ -159,7 +159,8 @@ namespace hpx { namespace threads
             enabled_interrupt_(true),
             ran_exit_funcs_(false),
             exit_funcs_(0),
-            scheduler_base_(init_data.scheduler_base)
+            scheduler_base_(init_data.scheduler_base),
+            count_(0)
         {
             LTM_(debug) << "thread::thread(" << this << "), description(" 
                         << get_description() << ")";
@@ -171,7 +172,7 @@ namespace hpx { namespace threads
                 thread_self* self = get_self_ptr();
                 if (self)
                 {
-                    parent_thread_id_ = self->get_thread_id();
+                    parent_thread_id_ = threads::get_self_id().get();
                     parent_thread_phase_ = self->get_thread_phase();
                 }
             }
@@ -374,9 +375,9 @@ namespace hpx { namespace threads
         }
 
         /// Return the thread id of the parent thread
-        thread_id_type get_parent_thread_id() const
+        thread_id_repr_type get_parent_thread_id() const
         {
-            return threads::invalid_thread_id;
+            return threads::invalid_thread_id_repr;
         }
 
         /// Return the phase of the parent thread
@@ -392,7 +393,7 @@ namespace hpx { namespace threads
         }
 
         /// Return the thread id of the parent thread
-        thread_id_type get_parent_thread_id() const
+        thread_id_repr_type get_parent_thread_id() const
         {
             return parent_thread_id_;
         }
@@ -512,7 +513,10 @@ namespace hpx { namespace threads
 #endif
 
         /// This function will be called when the thread is about to be deleted
-        virtual void reset() {}
+        //virtual void reset() {}
+
+        friend HPX_EXPORT void intrusive_ptr_add_ref(thread_data_base* p);
+        friend HPX_EXPORT void intrusive_ptr_release(thread_data_base* p);
 
     protected:
         mutable boost::atomic<thread_state> current_state_;
@@ -531,7 +535,7 @@ namespace hpx { namespace threads
 
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         boost::uint32_t parent_locality_id_;
-        thread_id_type parent_thread_id_;
+        thread_id_repr_type parent_thread_id_;
         std::size_t parent_thread_phase_;
 #endif
 
@@ -555,6 +559,9 @@ namespace hpx { namespace threads
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
+
+        //reference count
+        boost::detail::atomic_count count_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -574,6 +581,7 @@ namespace hpx { namespace threads
             pool_(&pool)
         {
             BOOST_ASSERT(init_data.stacksize != 0);
+            BOOST_ASSERT(coroutine_.is_ready());
         }
 
         ~thread_data()
@@ -613,12 +621,15 @@ namespace hpx { namespace threads
             current_state_ex_.store(thread_state_ex(wait_signaled,
                 current_state_ex.get_tag() + 1), boost::memory_order_release);
 
+            BOOST_ASSERT(this_() == coroutine_.get_thread_id());
             return coroutine_(current_state_ex);
         }
 
         thread_id_type get_thread_id() const
         {
-            return coroutine_.get_thread_id();
+            return thread_id_type(
+                    reinterpret_cast<thread_data_base*>(coroutine_.get_thread_id())
+                );
         }
 
         std::size_t get_thread_phase() const
@@ -642,11 +653,11 @@ namespace hpx { namespace threads
 #endif
 
         /// This function will be called when the thread is about to be deleted
-        void reset()
-        {
-            thread_data_base::reset();
-            coroutine_.reset();
-        }
+        //void reset()
+        //{
+        //    thread_data_base::reset();
+        //    coroutine_.reset();
+        //}
 
     private:
         coroutine_type coroutine_;
@@ -702,7 +713,9 @@ namespace hpx { namespace threads
 
         thread_id_type get_thread_id() const
         {
-            return coroutine_.get_thread_id();
+            return thread_id_type(
+                    reinterpret_cast<thread_data_base*>(coroutine_.get_thread_id())
+                );
         }
 
         std::size_t get_thread_phase() const
@@ -726,11 +739,11 @@ namespace hpx { namespace threads
 #endif
 
         /// This function will be called when the thread is about to be deleted
-        void reset()
-        {
-            thread_data_base::reset();
-            coroutine_.reset();
-        }
+        //void reset()
+        //{
+        //    thread_data_base::reset();
+        //    coroutine_.reset();
+        //}
 
     private:
         typedef util::coroutines::stackless_coroutine<

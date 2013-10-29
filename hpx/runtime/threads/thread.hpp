@@ -120,7 +120,7 @@ namespace hpx
             HPX_STD_FUNCTION<void()> const& func);
 
         mutable mutex_type mtx_;
-        native_handle_type id_;
+        threads::thread_id_type id_;
     };
 
     inline void swap(thread& x, thread& y) BOOST_NOEXCEPT
@@ -154,7 +154,7 @@ namespace hpx
 
     inline bool operator== (thread::id x, thread::id y) BOOST_NOEXCEPT
     {
-        return x.id_ == y.id_;
+        return x.id_.get() == y.id_.get();
     }
 
     inline bool operator!= (thread::id x, thread::id y) BOOST_NOEXCEPT
@@ -164,22 +164,22 @@ namespace hpx
 
     inline bool operator< (thread::id x, thread::id y) BOOST_NOEXCEPT
     {
-        return x.id_ < y.id_;
+        return x.id_.get() < y.id_.get();
     }
 
     inline bool operator> (thread::id x, thread::id y) BOOST_NOEXCEPT
     {
-        return x.id_ > y.id_;
+        return x.id_.get() > y.id_.get();
     }
 
     inline bool operator<= (thread::id x, thread::id y) BOOST_NOEXCEPT
     {
-        return !(x.id_ > y.id_);
+        return !(x.id_.get() > y.id_.get());
     }
 
     inline bool operator>= (thread::id x, thread::id y) BOOST_NOEXCEPT
     {
-        return !(x.id_ < y.id_);
+        return !(x.id_.get() < y.id_.get());
     }
 
     template <typename Char, typename Traits>

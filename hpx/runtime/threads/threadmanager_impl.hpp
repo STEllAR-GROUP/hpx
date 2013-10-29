@@ -152,7 +152,7 @@ namespace hpx { namespace threads
         ///                 by the \a id parameter can be interrupted. If the
         ///                 thread is not known to the thread-manager the return
         ///                 value will be false.
-        bool get_interruption_enabled(thread_id_type id,
+        bool get_interruption_enabled(thread_id_type const& id,
             error_code& ec = throws);
 
         /// The set_interruption_enabled function is part of the thread related
@@ -160,7 +160,7 @@ namespace hpx { namespace threads
         /// interrupted.
         ///
         /// \param id       [in] The thread id of the thread to query.
-        bool set_interruption_enabled(thread_id_type id, bool enable,
+        bool set_interruption_enabled(thread_id_type const& id, bool enable,
             error_code& ec = throws);
 
         /// The get_interruption_requested function is part of the thread related
@@ -173,7 +173,7 @@ namespace hpx { namespace threads
         ///                 by the \a id parameter has been interrupted. If the
         ///                 thread is not known to the thread-manager the return
         ///                 value will be false.
-        bool get_interruption_requested(thread_id_type id,
+        bool get_interruption_requested(thread_id_type const& id,
             error_code& ec = throws);
 
         /// The interrupt function is part of the thread related API. It
@@ -187,7 +187,7 @@ namespace hpx { namespace threads
         /// \param ec       [in,out] this represents the error status on exit,
         ///                 if this is pre-initialized to \a hpx#throws
         ///                 the function will throw on error instead.
-        void interrupt(thread_id_type id, bool flag, error_code& ec = throws);
+        void interrupt(thread_id_type const& id, bool flag, error_code& ec = throws);
 
         /// Interrupt the current thread at this point if it was canceled. This
         /// will throw a thread_interrupted exception, which will cancel the thread.
@@ -197,13 +197,13 @@ namespace hpx { namespace threads
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        void interruption_point(thread_id_type id, error_code& ec = throws);
+        void interruption_point(thread_id_type const& id, error_code& ec = throws);
 
         /// The run_thread_exit_callbacks function is part of the thread related
         /// API. It runs all exit functions for one of the threads.
         ///
         /// \param id       [in] The thread id of the thread to interrupt.
-        void run_thread_exit_callbacks(thread_id_type id,
+        void run_thread_exit_callbacks(thread_id_type const& id,
             error_code& ec = throws);
 
         /// The add_thread_exit_callback function is part of the thread related
@@ -216,11 +216,11 @@ namespace hpx { namespace threads
         ///                 by the \a id parameter has been interrupted. If the
         ///                 thread is not known to the thread-manager the return
         ///                 value will be false.
-        bool add_thread_exit_callback(thread_id_type id,
+        bool add_thread_exit_callback(thread_id_type const& id,
             HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws);
 
         ///
-        void free_thread_exit_callbacks(thread_id_type id,
+        void free_thread_exit_callbacks(thread_id_type const& id,
             error_code& ec = throws);
 
         /// \brief Forcefully stop the thread-manager
@@ -287,7 +287,7 @@ namespace hpx { namespace threads
         ///                 schedules a new thread which will set the state of
         ///                 the thread as soon as its not active anymore. The
         ///                 function returns \a thread_state#active in this case.
-        thread_state set_state(thread_id_type id, thread_state_enum newstate,
+        thread_state set_state(thread_id_type const& id, thread_state_enum newstate,
             thread_state_ex_enum newstate_ex = wait_signaled,
             thread_priority priority = thread_priority_default,
             error_code& ec = throws);
@@ -304,7 +304,7 @@ namespace hpx { namespace threads
         ///                 \a thread_state enumeration. If the
         ///                 thread is not known to the thread manager the return
         ///                 value will be \a thread_state#unknown.
-        thread_state get_state(thread_id_type id);
+        thread_state get_state(thread_id_type const& id);
 
         /// The get_phase function is part of the thread related API. It
         /// queries the phase of one of the threads known to the thread manager
@@ -316,7 +316,7 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. If the
         ///                 thread is not known to the thread manager the return
         ///                 value will be ~0.
-        std::size_t get_phase(thread_id_type id);
+        std::size_t get_phase(thread_id_type const& id);
 
         /// The get_priority function is part of the thread related API. It
         /// queries the priority of one of the threads known to the thread manager
@@ -328,7 +328,7 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. If the
         ///                 thread is not known to the thread manager the return
         ///                 value will be ~0.
-        thread_priority get_priority(thread_id_type id);
+        thread_priority get_priority(thread_id_type const& id);
 
         /// Set a timer to set the state of the given \a thread to the given
         /// new value after it expired (at the given time)
@@ -350,7 +350,7 @@ namespace hpx { namespace threads
         ///
         /// \returns
         thread_id_type set_state (time_type const& expire_at,
-            thread_id_type id, thread_state_enum newstate = pending,
+            thread_id_type const& id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
             thread_priority priority = thread_priority_default,
             error_code& ec = throws);
@@ -373,7 +373,7 @@ namespace hpx { namespace threads
         ///
         /// \returns
         thread_id_type set_state (duration_type const& expire_from_now,
-            thread_id_type id, thread_state_enum newstate = pending,
+            thread_id_type const& id, thread_state_enum newstate = pending,
             thread_state_ex_enum newstate_ex = wait_timeout,
             thread_priority priority = thread_priority_default,
             error_code& ec = throws);
@@ -389,11 +389,11 @@ namespace hpx { namespace threads
         ///                 thread referenced by the \a id parameter. If the
         ///                 thread is not known to the thread-manager the return
         ///                 value will be the string "<unknown>".
-        char const* get_description(thread_id_type id) const;
-        char const* set_description(thread_id_type id, char const* desc = 0);
+        char const* get_description(thread_id_type const& id) const;
+        char const* set_description(thread_id_type const& id, char const* desc = 0);
 
-        char const* get_lco_description(thread_id_type id) const;
-        char const* set_lco_description(thread_id_type id, char const* desc = 0);
+        char const* get_lco_description(thread_id_type const& id) const;
+        char const* set_lco_description(thread_id_type const& id, char const* desc = 0);
 
         /// The function get_thread_backtrace is part of the thread related API
         /// allows to query the currently stored thread back trace (which is
@@ -408,8 +408,8 @@ namespace hpx { namespace threads
         ///                   back trace of the thread referenced by the \a id
         ///                   parameter. If the thread is not known to the
         ///                   thread-manager the return value will be the zero.
-        util::backtrace const* get_backtrace(thread_id_type id) const;
-        util::backtrace const* set_backtrace(thread_id_type id, util::backtrace const* bt = 0);
+        util::backtrace const* get_backtrace(thread_id_type const& id) const;
+        util::backtrace const* set_backtrace(thread_id_type const& id, util::backtrace const* bt = 0);
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
         /// The get_thread_data function is part of the thread related
@@ -419,7 +419,7 @@ namespace hpx { namespace threads
         ///
         /// \returns        This function returns the thread specific data
         ///                 pointer or zero if none is set.
-        std::size_t get_thread_data(thread_id_type id,
+        std::size_t get_thread_data(thread_id_type const& id,
             error_code& ec = throws) const;
 
         /// The set_thread_data function is part of the thread related
@@ -431,7 +431,7 @@ namespace hpx { namespace threads
         ///
         /// \returns        This function returns the previously set thread
         ///                 specific data pointer or zero if none was set.
-        std::size_t set_thread_data(thread_id_type id,
+        std::size_t set_thread_data(thread_id_type const& id,
             std::size_t data, error_code& ec = throws);
 #endif
 
@@ -504,7 +504,7 @@ namespace hpx { namespace threads
         }
 
         // Return the executor associated with th egiven thread
-        executor get_executor(thread_id_type id, error_code& ec) const;
+        executor get_executor(thread_id_type const& id, error_code& ec) const;
 
     private:
         // counter creator functions

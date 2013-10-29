@@ -187,7 +187,11 @@ namespace hpx
         }
 
         struct HPX_EXPORT threadmanager_base;
+        class HPX_EXPORT thread_data_base;
         class HPX_EXPORT thread_data;
+
+        HPX_EXPORT void intrusive_ptr_add_ref(thread_data_base* p);
+        HPX_EXPORT void intrusive_ptr_release(thread_data_base* p);
 
         template <
             typename SchedulingPolicy,
@@ -282,13 +286,18 @@ namespace hpx
 
         typedef util::coroutines::coroutine<
             thread_function_type, detail::coroutine_allocator> coroutine_type;
-        typedef coroutine_type::thread_id_type thread_id_type;
+        typedef coroutine_type::thread_id_repr_type thread_id_repr_type;
         typedef coroutine_type::self thread_self;
+
+        typedef boost::intrusive_ptr<thread_data_base> thread_id_type;
+
+        HPX_EXPORT void intrusive_ptr_add_ref(thread_data_base* p);
+        HPX_EXPORT void intrusive_ptr_release(thread_data_base* p);
 
         ///////////////////////////////////////////////////////////////////////
         /// \ cond NODETAIL
-        thread_id_type const invalid_thread_id =
-            reinterpret_cast<thread_id_type>(-1);
+        thread_id_repr_type const invalid_thread_id_repr = 0;
+        thread_id_type const invalid_thread_id = thread_id_type();
         /// \ endcond
 
         /// The function \a get_self returns a reference to the (OS thread
@@ -318,7 +327,7 @@ namespace hpx
         /// \note This function will return a meaningful value only if the
         ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         ///       being defined.
-        HPX_API_EXPORT thread_id_type get_parent_id();
+        HPX_API_EXPORT thread_id_repr_type get_parent_id();
 
         /// The function \a get_parent_phase returns the HPX phase of the
         /// current's thread parent (or zero if the current thread is not a

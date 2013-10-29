@@ -15,6 +15,7 @@
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
@@ -61,9 +62,9 @@ namespace hpx { namespace naming
 
                     if (get_runtime_ptr())
                     {
-                        error_code ec(lightweight);
                         // Fire-and-forget semantics.
-                        naming::get_agas_client().decref(*p, credits, ec);
+                        error_code ec(lightweight);
+                        agas::decref(*p, credits, ec);
                     }
                 }
                 catch (hpx::exception const& e) {
@@ -157,8 +158,32 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Lock>
+        hpx::future<bool> retrieve_new_credits(naming::gid_type& id,
+            boost::uint16_t credit, naming::id_type const& keep_alive,
+            Lock& l)
+        {
+            // We add the new credits to the gids first to avoid
+            // duplicate splitting during concurrent serialization
+            // operations.
+            if (credit) detail::add_credit_to_gid(id, credit);
+
+            // We unlock the lock as all operations on the local credit
+            // have been performed and we don't want the lock to be
+            // pending during the (possibly remote) AGAS operation.
+            l.unlock();
+
+            // If something goes wrong during the reference count
+            // increment below we will have already added credits to
+            // the split gid. In the worst case this will cause a
+            // memory leak. I'm not sure if it is possible to reliably
+            // handle this problem.
+            return agas::incref_async(id, id, credit, keep_alive);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // prepare the given id, note: this function modifies the passed id
-        naming::gid_type id_type_impl::prepare_gid() const
+        naming::gid_type id_type_impl::preprocess_gid() const
         {
             gid_type::mutex_type::scoped_lock l(this);
 
@@ -167,23 +192,48 @@ namespace hpx { namespace naming
             boost::uint16_t oldcredits = detail::get_credit_from_gid(*this);
             if (0 != oldcredits)
             {
-                // Request new credits from AGAS if needed (i.e. the initial
-                // gid's credit is equal to one and the new gid has no credits
-                // after splitting).
+                // Request new credits from AGAS if needed (i.e. the remainder
+                // of the credit splitting is equal to one).
                 naming::gid_type newid = detail::split_credits_for_gid(
                     const_cast<id_type_impl&>(*this));
 
-                if (0 == detail::get_credit_from_gid(newid))
+                // We now add new credits to the id which is left behind only.
+                // The credit for the newid will be handled upon arrival
+                // on the destination node.
+                if (1 == detail::get_credit_from_gid(newid))
                 {
-                    BOOST_ASSERT(1 == detail::get_credit_from_gid(*this));
-                    retrieve_new_credits(newid, const_cast<id_type_impl&>(*this),
-                        HPX_INITIAL_GLOBALCREDIT, HPX_INITIAL_GLOBALCREDIT, l);
+                    BOOST_ASSERT(detail::get_credit_from_gid(*this) >= 1);
+
+                    // note: the future returned by retrieve_new_credits()
+                    //       keeps this instance alive as it is passed along
+                    //       as the keep_alive parameter
+                    retrieve_new_credits(
+                        const_cast<id_type_impl&>(*this), HPX_INITIAL_GLOBALCREDIT,
+                        id_type(const_cast<id_type_impl*>(this)), l);
                 }
                 return newid;
             }
 
             BOOST_ASSERT(unmanaged == type_);
             return *this;
+        }
+
+        // prepare the given id, note: this function modifies the passed id
+        void id_type_impl::postprocess_gid()
+        {
+            gid_type::mutex_type::scoped_lock l(this);
+
+            // If the initial credit after deserialization is 1 we need to
+            // add more global credits.
+            boost::uint16_t credits = detail::get_credit_from_gid(*this);
+            if (1 == credits)
+            {
+                // note: the future returned by retrieve_new_credits()
+                //       keeps this instance alive as it is passed along
+                //       as the keep_alive parameter
+                retrieve_new_credits(*this, HPX_INITIAL_GLOBALCREDIT,
+                    id_type(this), l);
+            }
         }
 
         struct gid_serialization_data
@@ -197,12 +247,12 @@ namespace hpx { namespace naming
         void id_type_impl::save(Archive& ar) const
         {
             if(ar.flags() & util::disable_array_optimization) {
-                naming::gid_type split_id(prepare_gid());
+                naming::gid_type split_id(preprocess_gid());
                 ar << split_id << type_;
             }
             else {
                 gid_serialization_data data;
-                data.gid_ = prepare_gid();
+                data.gid_ = preprocess_gid();
                 data.type_ = type_;
 
                 ar.save(data);
@@ -229,6 +279,9 @@ namespace hpx { namespace naming
                 HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
                     "trying to load id_type with unknown deleter");
             }
+
+            // make sure the credits get properly updated on receival
+            postprocess_gid();
         }
 
         // explicit instantiation for the correct archive types

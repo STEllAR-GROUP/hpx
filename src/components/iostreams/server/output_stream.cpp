@@ -59,15 +59,12 @@ void output_stream::call_write_sync(
 void output_stream::write_sync(
     buffer const& in
 ) { // {{{
-    threads::thread_self& self = threads::get_self();
-    threads::thread_id_type id = self.get_thread_id();
-
     // Perform the IO in another OS thread.
     hpx::get_thread_pool("io_pool")->get_io_service().post(
-        boost::bind(&output_stream::call_write_sync, this, in, id));
+        boost::bind(&output_stream::call_write_sync, this, in, threads::get_self_id()));
 
     // Sleep until the worker thread wakes us up.
-    self.yield(threads::suspended);
+    this_thread::suspend(threads::suspended, "output_stream::write_sync");
 } // }}}
 
 }}}

@@ -380,6 +380,18 @@ naming::gid_type get_next_id(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void decref(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , boost::int64_t credits
+  , error_code& ec
+  )
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    resolver.decref(lower, upper, credits, ec);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 void incref_apply(
     naming::gid_type const& lower
   , naming::gid_type const& upper
@@ -388,6 +400,17 @@ void incref_apply(
 {
     naming::resolver_client& resolver = naming::get_agas_client();
     resolver.incref_apply(lower, upper, credits);
+}
+
+hpx::future<bool> incref_async(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , boost::int64_t credits
+  , naming::id_type const& keep_alive
+  )
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.incref_async(lower, upper, credits, keep_alive);
 }
 
 }}

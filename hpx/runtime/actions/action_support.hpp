@@ -257,7 +257,7 @@ namespace hpx { namespace actions
         virtual boost::uint32_t get_parent_locality_id() const = 0;
 
         /// Return the thread id of the parent thread
-        virtual threads::thread_id_type get_parent_thread_id() const = 0;
+        virtual threads::thread_id_repr_type get_parent_thread_id() const = 0;
 
         /// Return the thread phase of the parent thread
         virtual boost::uint64_t get_parent_thread_phase() const = 0;
@@ -539,9 +539,9 @@ namespace hpx { namespace actions
         }
 
         /// Return the thread id of the parent thread
-        threads::thread_id_type get_parent_thread_id() const
+        threads::thread_id_repr_type get_parent_thread_id() const
         {
-            return threads::invalid_thread_id;
+            return threads::invalid_thread_id_repr;
         }
 
         /// Return the phase of the parent thread
@@ -557,9 +557,9 @@ namespace hpx { namespace actions
         }
 
         /// Return the thread id of the parent thread
-        threads::thread_id_type get_parent_thread_id() const
+        threads::thread_id_repr_type get_parent_thread_id() const
         {
-            return reinterpret_cast<threads::thread_id_type>(parent_id_);
+            return reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
         }
 
         /// Return the phase of the parent thread
@@ -600,7 +600,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
 #endif
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(parent_id_);
+            data.parent_id = reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
 #endif
             data.priority = priority_;
@@ -622,7 +622,7 @@ namespace hpx { namespace actions
             data.description = detail::get_action_name<derived_type>();
 #endif
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
-            data.parent_id = reinterpret_cast<threads::thread_id_type>(parent_id_);
+            data.parent_id = reinterpret_cast<threads::thread_id_repr_type>(parent_id_);
             data.parent_locality_id = parent_locality_;
 #endif
             data.priority = priority_;

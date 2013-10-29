@@ -192,12 +192,12 @@ namespace hpx { namespace util
             threads::thread_self* self = threads::get_self_ptr();
             if (0 != self) {
                 // called from inside a HPX thread
-                threads::thread_id_type id = self->get_thread_id();
+                threads::thread_id_type id = threads::get_self_id();
                 if (id != threads::invalid_thread_id) {
                     std::stringstream out;
                     out << std::hex << std::setw(sizeof(void*)*2) 
                         << std::setfill('0')
-                        << reinterpret_cast<std::ptrdiff_t>(id);
+                        << reinterpret_cast<std::ptrdiff_t>(id.get());
                     str.prepend_string(out.str());
                     return;
                 }
@@ -268,7 +268,7 @@ namespace hpx { namespace util
     {
         void operator()(param str) const
         {
-            threads::thread_id_type parent_id = threads::get_parent_id();
+            threads::thread_id_repr_type parent_id = threads::get_parent_id();
             if (0 != parent_id && threads::invalid_thread_id != parent_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
