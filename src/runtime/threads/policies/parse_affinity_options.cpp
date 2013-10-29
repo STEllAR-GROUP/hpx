@@ -770,33 +770,6 @@ namespace hpx { namespace threads
             break;
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void print_affinity_options(std::ostream& os, std::size_t num_threads,
-        std::string const& affinity_options, error_code& ec)
-    {
-        util::osstream strm;        // make sure all ouput is kept together
-
-        strm << std::string(79, '*') << '\n';
-        strm << "locality: " << hpx::get_locality_id() << '\n';
-
-        std::vector<mask_type> affinities(num_threads);
-        std::vector<std::size_t> num_pus;
-        std::size_t used_cores = get_runtime().get_config().get_used_cores();
-        std::size_t max_cores = boost::lexical_cast<std::size_t>(get_runtime().get_config().get_entry("hpx.cores", used_cores));
-        parse_affinity_options(affinity_options, affinities, used_cores, max_cores, num_pus, ec);
-        if (ec) return;
-
-        threads::hwloc_topology& topo = threads::create_topology();
-
-        int i = 0;
-        BOOST_FOREACH(mask_type const& m, affinities)
-        {
-            topo.print_affinity_mask(strm, i++, m);
-        }
-
-        os << util::osstream_get_string(strm);
-    }
 }}
 
 #endif
