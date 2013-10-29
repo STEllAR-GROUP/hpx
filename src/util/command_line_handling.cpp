@@ -147,6 +147,13 @@ namespace hpx { namespace util
 
             if (vm.count("hpx:localities")) {
                 std::size_t localities = vm["hpx:localities"].as<std::size_t>();
+                
+                if (localities == 0)
+                {
+                    throw std::logic_error("Number of --hpx:localities "
+                        "must be greater than 0");
+                }
+
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
                     using_nodelist && (localities != num_localities) &&
                     (num_localities != 1))
@@ -192,6 +199,12 @@ namespace hpx { namespace util
                 else
                     threads = boost::lexical_cast<std::size_t>(threads_str);
 
+                if (threads == 0)
+                {
+                    throw std::logic_error("Number of --hpx:threads "
+                        "must be greater than 0");
+                }
+
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
                     using_nodelist && (threads > batch_threads))
                 {
@@ -202,16 +215,16 @@ namespace hpx { namespace util
 #if defined(HPX_MAX_CPU_COUNT)
                 if (threads > HPX_MAX_CPU_COUNT) {
                     throw std::logic_error("Requested more than "
-                        BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" threads to "
-                        "use for this application, use the option "
+                        BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" --hpx:threads "
+                        "to use for this application, use the option "
                         "-DHPX_MAX_CPU_COUNT=<N> or "
                         "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
                 }
 #elif !defined(HPX_HAVE_MORE_THAN_64_THREADS)
                 if (threads > 64) {
-                    throw std::logic_error("Requested more than 64 threads to "
-                        "use for this application, use the option "
-                        "-DHPX_MAX_CPU_COUNT=<N> or "
+                    throw std::logic_error("Requested more than 64 "
+                        "--hpx:threads to use for this application, use the "
+                        "option -DHPX_MAX_CPU_COUNT=<N> or "
                         "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
                 }
 #endif
