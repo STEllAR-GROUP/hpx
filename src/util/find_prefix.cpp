@@ -13,6 +13,7 @@
 #  include <windows.h>
 #elif defined(__linux) || defined(linux) || defined(__linux__)
 #  include <unistd.h>
+#  include <sys/stat.h>
 #  include <linux/limits.h>
 #elif __APPLE__
 #  include <mach-o/dyld.h>
@@ -27,6 +28,8 @@
 
 #include <boost/cstdint.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 namespace hpx { namespace util
 {
@@ -85,18 +88,77 @@ namespace hpx { namespace util
         r = exe_path;
 
 #elif defined(__linux) || defined(linux) || defined(__linux__)
-        char exe_path[PATH_MAX + 1];
-        ssize_t length = readlink("/proc/self/exe", exe_path, sizeof(exe_path));
+        char buf[PATH_MAX + 1];
+        ssize_t length = ::readlink("/proc/self/exe", buf, sizeof(buf));
 
-        if (length == -1) 
+        if (length != -1) 
         {
-            HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
-                "get_executable_filename",
-                "unable to find executable filename, /proc may be unavailable");
+            buf[length] = '\0';
+            r = buf;
+            return r;
         }
 
-        exe_path[length] = '\0';
-        r = exe_path;
+        std::string argv0_(argv0);
+
+        // REVIEW: Should we resolve symlinks at any point here?
+        if (argv0_.length() > 0)
+        {
+            // Check for an absolute path.
+            if (argv0_[0] == '/')
+                return argv0_;
+
+            // Check for a relative path.
+            if (argv0_.find('/') != std::string::npos)
+            {
+                // Get the current working directory.
+
+                // NOTE: getcwd does give you a null terminated string,
+                // while readlink (above) does not. 
+                if (::getcwd(buf, PATH_MAX))
+                {
+                    r = buf;
+                    r += '/';
+                    r += argv0_; 
+                    return r;
+                }
+            }
+
+            // Search PATH
+            char const* epath = ::getenv("PATH");
+            if (epath)
+            {
+                std::vector<std::string> path_dirs;
+
+                boost::algorithm::split(path_dirs, epath,
+                    boost::algorithm::is_any_of(":"),
+                    boost::algorithm::token_compress_on);
+
+                for (boost::uint64_t i = 0; i < path_dirs.size(); ++i)
+                {
+                    r = path_dirs[i];
+                    r += '/';
+                    r += argv0_; 
+
+                    // Can't use Boost.Filesystem as it doesn't let me access
+                    // st_uid and st_gid.
+                    struct stat s;
+
+                    // Make sure the file is executable and shares our
+                    // effective uid and gid.
+                    // NOTE: If someone was using an HPX application that was
+                    // seteuid'd to root, this may fail.
+                    if (0 == ::stat(r.c_str(), &s))
+                        if ((s.st_uid == ::geteuid()) && (s.st_mode & S_IXUSR)
+                         && (s.st_gid == ::getegid()) && (s.st_mode & S_IXGRP)
+                                                      && (s.st_mode & S_IXOTH))
+                            return r; 
+                }
+            }
+        }
+
+        HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
+            "get_executable_filename",
+            "unable to find executable filename");
 
 #elif defined(__APPLE__)
         HPX_UNUSED(argv0);
