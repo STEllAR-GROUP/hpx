@@ -22,8 +22,10 @@
 #  include <vector>
 #endif
 
-#include <boost/cstdint.hpp>
 #include <hpx/util/plugin/dll.hpp>
+#include <hpx/util/unused.hpp>
+
+#include <boost/cstdint.hpp>
 #include <boost/filesystem/path.hpp>
 
 namespace hpx { namespace util
@@ -58,19 +60,21 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::string get_executable_prefix()
+    std::string get_executable_prefix(char const* argv0)
     {
         using boost::filesystem::path;
-        path p(get_executable_filename());
+        path p(get_executable_filename(argv0));
 
         return p.parent_path().parent_path().string();
     }
 
-    std::string get_executable_filename()
+    std::string get_executable_filename(char const* argv0)
     {
         std::string r;
 
 #if defined(BOOST_WINDOWS)
+        HPX_UNUSED(argv0);
+
         char exe_path[MAX_PATH + 1] = { '\0' };
         if (!GetModuleFileName(NULL, exe_path, sizeof(exe_path)))
         {
@@ -95,6 +99,8 @@ namespace hpx { namespace util
         r = exe_path;
 
 #elif defined(__APPLE__)
+        HPX_UNUSED(argv0);
+
         char exe_path[PATH_MAX + 1];
         boost::uint32_t len = sizeof(exe_path) / sizeof(exe_path[0]);
 
@@ -109,6 +115,8 @@ namespace hpx { namespace util
         r = exe_path;
 
 #elif defined(__FreeBSD__)
+        HPX_UNUSED(argv0);
+
         int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
         size_t cb = 0;
         sysctl(mib, 4, NULL, &cb, NULL, 0);

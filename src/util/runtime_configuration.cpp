@@ -65,8 +65,11 @@ namespace hpx { namespace util
             "[system]",
             "pid = " + boost::lexical_cast<std::string>(getpid()),
             "prefix = " + find_prefix(),
+#if defined(__linux) || defined(linux) || defined(__linux__)
+            "executable_prefix = " + get_executable_prefix(argv0),
+#else
             "executable_prefix = " + get_executable_prefix(),
-
+#endif
             // create default installation location and logging settings
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
@@ -326,13 +329,16 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    runtime_configuration::runtime_configuration()
+    runtime_configuration::runtime_configuration(char const* argv0_)
       : num_localities(0),
         small_stacksize(HPX_SMALL_STACK_SIZE),
         medium_stacksize(HPX_MEDIUM_STACK_SIZE),
         large_stacksize(HPX_LARGE_STACK_SIZE),
         huge_stacksize(HPX_HUGE_STACK_SIZE),
         need_to_call_pre_initialize(true)
+#if defined(__linux) || defined(linux) || defined(__linux__)
+      , argv0(argv0)
+#endif
     {
         pre_initialize_ini();
 

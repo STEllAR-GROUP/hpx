@@ -15,13 +15,11 @@
 namespace hpx { namespace util
 {
     // return the installation path of the specified module
-    HPX_EXPORT std::string find_prefix(
-        std::string library = "hpx"
-        );
+    HPX_EXPORT std::string find_prefix(std::string library = "hpx");
 
     // return the full path of the current executable
-    HPX_EXPORT std::string get_executable_filename();
-    HPX_EXPORT std::string get_executable_prefix();
+    HPX_EXPORT std::string get_executable_filename(char const* argv0 = 0);
+    HPX_EXPORT std::string get_executable_prefix(char const* argv0 = 0);
 }}
 
 #endif // HPX_09DFB7AE_8265_4667_AA02_65BF8C0B1DFD

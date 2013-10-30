@@ -20,8 +20,10 @@ namespace hpx { namespace util
     {
         command_line_handling(hpx::runtime_mode mode,
                 HPX_STD_FUNCTION<int(boost::program_options::variables_map& vm)> const& f,
-                std::vector<std::string> const& ini_config)
-          : mode_(mode),
+                std::vector<std::string> const& ini_config,
+                char const* argv0)
+          : rtcfg_(argv0),
+            mode_(mode),
             ini_config_(ini_config),
             hpx_main_f_(f),
             num_threads_(1),
