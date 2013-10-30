@@ -24,6 +24,7 @@
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
 #include <hpx/lcos/broadcast.hpp>
 #endif
@@ -1603,10 +1604,19 @@ void addressing_service::incref_apply(
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
+static bool synchronize_with_async_incref(
+    hpx::future<bool>& f, naming::id_type const& keep_alive)
+{
+    // do nothing, this is just to be able to keep alive the given id long enough
+    // we just rethrow any exception stored of f
+    return f.get();
+}
+
 lcos::future<bool> addressing_service::incref_async(
     naming::gid_type const& lower
   , naming::gid_type const& upper
   , boost::int64_t credit
+  , naming::id_type const& keep_alive
     )
 { // {{{ incref implementation
     if (HPX_UNLIKELY(0 >= credit))
@@ -1622,7 +1632,12 @@ lcos::future<bool> addressing_service::incref_async(
         stubs::primary_namespace::get_service_instance(lower)
       , naming::id_type::unmanaged);
 
-    return stubs::primary_namespace::service_async<bool>(target, req);
+    lcos::future<bool> f = stubs::primary_namespace::service_async<bool>(target, req);
+    if (!keep_alive)
+        return f;
+
+    using HPX_STD_PLACEHOLDERS::_1;
+    return f.then(HPX_STD_BIND(synchronize_with_async_incref, _1, keep_alive));
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1642,6 +1657,7 @@ void addressing_service::decref(
           , boost::int64_t
           , error_code&
         ) = &addressing_service::decref;
+
         threads::register_thread_nullary(
             HPX_STD_BIND(decref_ptr, this,
                 lower, upper, credit, boost::ref(throws)),
@@ -1667,6 +1683,63 @@ void addressing_service::decref(
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::decref");
+    }
+} // }}}
+
+///////////////////////////////////////////////////////////////////////////////
+static void synchronize_with_async_decref(
+    hpx::future<std::vector<hpx::future<response> > >& f,
+    naming::id_type const& keep_alive)
+{
+    // do nothing, this is just to be able to keep alive the given id long enough
+    // we just rethrow any exception stored of f
+    if (f.has_exception()) f.get();        // rethrow
+}
+
+lcos::future<void> addressing_service::decref_async(
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , boost::int64_t credit
+  , naming::id_type const& keep_alive
+    )
+{ // {{{ incref implementation
+    if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+    {
+        // reschedule this call as an HPX thread
+        lcos::future<void> (addressing_service::*decref_async_ptr)(
+            naming::gid_type const&
+          , naming::gid_type const&
+          , boost::int64_t
+          , naming::id_type const&
+        ) = &addressing_service::decref_async;
+
+        return async(HPX_STD_BIND(decref_async_ptr, this, lower, upper, credit, keep_alive));
+    }
+
+    if (HPX_UNLIKELY(0 >= credit))
+    {
+        HPX_THROW_EXCEPTION(bad_parameter
+          , "addressing_service::decref_async"
+          , boost::str(boost::format("invalid credit count of %1%") % credit));
+        return lcos::future<void>();
+    }
+
+    try {
+        mutex_type::scoped_lock l(refcnt_requests_mtx_);
+
+        refcnt_requests_->apply(lower, upper
+          , util::incrementer<boost::int64_t>(-credit));
+
+        std::vector<hpx::future<response> > results = 
+            send_refcnt_requests_async(l);
+
+        using HPX_STD_PLACEHOLDERS::_1;
+        return when_all(results).then(
+                HPX_STD_BIND(synchronize_with_async_decref, _1, keep_alive)
+            );
+    }
+    catch (hpx::exception const& e) {
+        HPX_RETHROW_EXCEPTION(e, "addressing_service::decref");
     }
 } // }}}
 
@@ -2338,9 +2411,9 @@ void addressing_service::send_refcnt_requests_non_blocking(
     }
 }
 
-void addressing_service::send_refcnt_requests_sync(
+std::vector<hpx::future<response> >
+addressing_service::send_refcnt_requests_async(
     addressing_service::mutex_type::scoped_lock& l
-  , error_code& ec
     )
 {
     boost::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
@@ -2367,6 +2440,17 @@ void addressing_service::send_refcnt_requests_sync(
             stubs::primary_namespace::service_async<response>(
                 target, req, action_priority_));
     }
+
+    return lazy_results;
+}
+
+void addressing_service::send_refcnt_requests_sync(
+    addressing_service::mutex_type::scoped_lock& l
+  , error_code& ec
+    )
+{
+    std::vector<hpx::future<response> > lazy_results =
+        send_refcnt_requests_async(l);
 
     wait_all(lazy_results);
 

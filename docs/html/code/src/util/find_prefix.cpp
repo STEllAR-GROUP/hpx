@@ -13,6 +13,7 @@
 #  include <windows.h>
 #elif defined(__linux) || defined(linux) || defined(__linux__)
 #  include <unistd.h>
+#  include <sys/stat.h>
 #  include <linux/limits.h>
 #elif __APPLE__
 #  include <mach-o/dyld.h>
@@ -22,9 +23,13 @@
 #  include <vector>
 #endif
 
-#include <boost/cstdint.hpp>
 #include <hpx/util/plugin/dll.hpp>
+#include <hpx/util/unused.hpp>
+
+#include <boost/cstdint.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 namespace hpx { namespace util
 {
@@ -58,19 +63,21 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::string get_executable_prefix()
+    std::string get_executable_prefix(char const* argv0)
     {
         using boost::filesystem::path;
-        path p(get_executable_filename());
+        path p(get_executable_filename(argv0));
 
         return p.parent_path().parent_path().string();
     }
 
-    std::string get_executable_filename()
+    std::string get_executable_filename(char const* argv0)
     {
         std::string r;
 
 #if defined(BOOST_WINDOWS)
+        HPX_UNUSED(argv0);
+
         char exe_path[MAX_PATH + 1] = { '\0' };
         if (!GetModuleFileName(NULL, exe_path, sizeof(exe_path)))
         {
@@ -81,20 +88,81 @@ namespace hpx { namespace util
         r = exe_path;
 
 #elif defined(__linux) || defined(linux) || defined(__linux__)
-        char exe_path[PATH_MAX + 1];
-        ssize_t length = readlink("/proc/self/exe", exe_path, sizeof(exe_path));
+        char buf[PATH_MAX + 1];
+        ssize_t length = ::readlink("/proc/self/exe", buf, sizeof(buf));
 
-        if (length == -1) 
+        if (length != -1) 
         {
-            HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
-                "get_executable_filename",
-                "unable to find executable filename, /proc may be unavailable");
+            buf[length] = '\0';
+            r = buf;
+            return r;
         }
 
-        exe_path[length] = '\0';
-        r = exe_path;
+        std::string argv0_(argv0);
+
+        // REVIEW: Should we resolve symlinks at any point here?
+        if (argv0_.length() > 0)
+        {
+            // Check for an absolute path.
+            if (argv0_[0] == '/')
+                return argv0_;
+
+            // Check for a relative path.
+            if (argv0_.find('/') != std::string::npos)
+            {
+                // Get the current working directory.
+
+                // NOTE: getcwd does give you a null terminated string,
+                // while readlink (above) does not. 
+                if (::getcwd(buf, PATH_MAX))
+                {
+                    r = buf;
+                    r += '/';
+                    r += argv0_; 
+                    return r;
+                }
+            }
+
+            // Search PATH
+            char const* epath = ::getenv("PATH");
+            if (epath)
+            {
+                std::vector<std::string> path_dirs;
+
+                boost::algorithm::split(path_dirs, epath,
+                    boost::algorithm::is_any_of(":"),
+                    boost::algorithm::token_compress_on);
+
+                for (boost::uint64_t i = 0; i < path_dirs.size(); ++i)
+                {
+                    r = path_dirs[i];
+                    r += '/';
+                    r += argv0_; 
+
+                    // Can't use Boost.Filesystem as it doesn't let me access
+                    // st_uid and st_gid.
+                    struct stat s;
+
+                    // Make sure the file is executable and shares our
+                    // effective uid and gid.
+                    // NOTE: If someone was using an HPX application that was
+                    // seteuid'd to root, this may fail.
+                    if (0 == ::stat(r.c_str(), &s))
+                        if ((s.st_uid == ::geteuid()) && (s.st_mode & S_IXUSR)
+                         && (s.st_gid == ::getegid()) && (s.st_mode & S_IXGRP)
+                                                      && (s.st_mode & S_IXOTH))
+                            return r; 
+                }
+            }
+        }
+
+        HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
+            "get_executable_filename",
+            "unable to find executable filename");
 
 #elif defined(__APPLE__)
+        HPX_UNUSED(argv0);
+
         char exe_path[PATH_MAX + 1];
         boost::uint32_t len = sizeof(exe_path) / sizeof(exe_path[0]);
 
@@ -109,6 +177,8 @@ namespace hpx { namespace util
         r = exe_path;
 
 #elif defined(__FreeBSD__)
+        HPX_UNUSED(argv0);
+
         int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
         size_t cb = 0;
         sysctl(mib, 4, NULL, &cb, NULL, 0);

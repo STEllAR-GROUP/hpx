@@ -29,7 +29,7 @@ namespace hpx { namespace util
 
     public:
         // initialize and load configuration information
-        runtime_configuration();
+        runtime_configuration(char const* argv0);
 
         // re-initialize all entries based on the additional information from
         // the given configuration file
@@ -151,6 +151,9 @@ namespace hpx { namespace util
         std::ptrdiff_t large_stacksize;
         std::ptrdiff_t huge_stacksize;
         bool need_to_call_pre_initialize;
+#if defined(__linux) || defined(linux) || defined(__linux__)
+        char const* argv0;
+#endif
     };
 }}
 

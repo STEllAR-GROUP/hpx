@@ -30,6 +30,7 @@ using hpx::lcos::future;
 using hpx::async;
 
 using hpx::threads::thread_id_type;
+using hpx::threads::thread_data_base;
 using hpx::this_thread::suspend;
 using hpx::threads::set_thread_state;
 using hpx::threads::thread_state_ex_enum;
@@ -90,10 +91,11 @@ void change_thread_state(
     )
 {
 //    std::cout << "waking up thread (wait_signaled)\n";
-    set_thread_state(reinterpret_cast<void*>(thread), pending, wait_signaled);
+    thread_id_type id(reinterpret_cast<thread_data_base*>(thread));
+    set_thread_state(id, pending, wait_signaled);
 
 //    std::cout << "suspending thread (wait_timeout)\n";
-    set_thread_state(reinterpret_cast<void*>(thread), suspended, wait_timeout);
+    set_thread_state(id, suspended, wait_timeout);
 }
 
 HPX_PLAIN_ACTION(change_thread_state, change_thread_state_action)
@@ -198,13 +200,13 @@ int hpx_main(variables_map& vm)
     {
         id_type const prefix = find_here();
 
-        boost::uint64_t thread = boost::uint64_t(register_thread_nullary
-            (boost::bind(&test_dummy_thread, futures)));
+        thread_id_type thread = register_thread_nullary
+            (boost::bind(&test_dummy_thread, futures));
 
-        tree_boot(futures, grain_size, prefix, thread);
+        tree_boot(futures, grain_size, prefix,
+            reinterpret_cast<boost::uint64_t>(thread.get()));
 
-        set_thread_state(reinterpret_cast<void*>(thread),
-            pending, wait_terminate);
+        set_thread_state(thread, pending, wait_terminate);
     }
 
     finalize();

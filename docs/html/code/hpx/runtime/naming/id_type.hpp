@@ -29,6 +29,13 @@ namespace hpx { namespace naming
     // the local gid is actually just a wrapper around the real thing
     struct HPX_EXPORT id_type
     {
+    private:
+        friend struct detail::id_type_impl;
+
+        id_type(detail::id_type_impl* p)
+          : gid_(p)
+        {}
+
     public:
         enum management_type
         {

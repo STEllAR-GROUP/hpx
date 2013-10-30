@@ -100,7 +100,7 @@ namespace hpx { namespace lcos { namespace local
                     while (!queue_.empty())
                     {
                         threads::thread_id_type id = queue_.front().id_;
-                        queue_.front().id_ = 0;
+                        queue_.front().id_ = threads::invalid_thread_id;
                         queue_.pop_front();
 
                         // we know that the id is actually the pointer to the thread
@@ -164,9 +164,7 @@ namespace hpx { namespace lcos { namespace local
 
                 while (!event_.load(boost::memory_order_acquire))
                 {
-                    threads::thread_self& self = threads::get_self();
-
-                    queue_entry e(self.get_thread_id());
+                    queue_entry e(threads::get_self_id());
                     queue_.push_back(e);
 
                     reset_queue_entry r(e, queue_);
@@ -198,7 +196,7 @@ namespace hpx { namespace lcos { namespace local
                             "lcos::event::set_locked",
                             "NULL thread id encountered");
                     }
-                    queue.front().id_ = 0;
+                    queue.front().id_ = threads::invalid_thread_id;
                     queue.pop_front();
                     threads::set_thread_lco_description(id);
                     threads::set_thread_state(id, threads::pending);

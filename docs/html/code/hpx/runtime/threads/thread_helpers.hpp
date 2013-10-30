@@ -55,7 +55,7 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT thread_state set_thread_state(thread_id_type id,
+    HPX_API_EXPORT thread_state set_thread_state(thread_id_type const& id,
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_signaled,
         thread_priority priority = thread_priority_normal,
@@ -87,7 +87,7 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type id,
+    HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type const& id,
         boost::posix_time::ptime const& at_time,
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
@@ -120,7 +120,7 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type id,
+    HPX_API_EXPORT thread_id_type set_thread_state(thread_id_type const& id,
         boost::posix_time::time_duration const& after_duration,
         thread_state_enum state = pending,
         thread_state_ex_enum stateex = wait_timeout,
@@ -147,14 +147,14 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT char const* get_thread_description(thread_id_type id,
+    HPX_API_EXPORT char const* get_thread_description(thread_id_type const& id,
         error_code& ec = throws);
-    HPX_API_EXPORT char const* set_thread_description(thread_id_type id,
+    HPX_API_EXPORT char const* set_thread_description(thread_id_type const& id,
         char const* desc = 0, error_code& ec = throws);
 
-    HPX_API_EXPORT char const* get_thread_lco_description(thread_id_type id,
+    HPX_API_EXPORT char const* get_thread_lco_description(thread_id_type const& id,
         error_code& ec = throws);
-    HPX_API_EXPORT char const* set_thread_lco_description(thread_id_type id,
+    HPX_API_EXPORT char const* set_thread_lco_description(thread_id_type const& id,
         char const* desc = 0, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -178,9 +178,9 @@ namespace hpx { namespace threads
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     HPX_API_EXPORT util::backtrace const* get_thread_backtrace(
-        thread_id_type id, error_code& ec = throws);
+        thread_id_type const& id, error_code& ec = throws);
     HPX_API_EXPORT util::backtrace const* set_thread_backtrace(
-        thread_id_type id, util::backtrace const* bt = 0, error_code& ec = throws);
+        thread_id_type const& id, util::backtrace const* bt = 0, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_state is part of the thread related API. It
@@ -202,7 +202,7 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT thread_state get_thread_state(thread_id_type id,
+    HPX_API_EXPORT thread_state get_thread_state(thread_id_type const& id,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -225,7 +225,7 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT std::size_t get_thread_phase(thread_id_type id,
+    HPX_API_EXPORT std::size_t get_thread_phase(thread_id_type const& id,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -250,7 +250,7 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT bool get_thread_interruption_enabled(thread_id_type id,
+    HPX_API_EXPORT bool get_thread_interruption_enabled(thread_id_type const& id,
         error_code& ec = throws);
 
     /// Set whether the given thread can be interrupted at this point.
@@ -271,7 +271,7 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT bool set_thread_interruption_enabled(thread_id_type id,
+    HPX_API_EXPORT bool set_thread_interruption_enabled(thread_id_type const& id,
         bool enable, error_code& ec = throws);
 
     /// Returns whether the given thread has been flagged for interruption.
@@ -291,7 +291,7 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT bool get_thread_interruption_requested(thread_id_type id,
+    HPX_API_EXPORT bool get_thread_interruption_requested(thread_id_type const& id,
         error_code& ec = throws);
 
     /// Flag the given thread for interruption.
@@ -310,10 +310,10 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT void interrupt_thread(thread_id_type id, bool flag,
+    HPX_API_EXPORT void interrupt_thread(thread_id_type const& id, bool flag,
         error_code& ec = throws);
 
-    inline void interrupt_thread(thread_id_type id, error_code& ec = throws)
+    inline void interrupt_thread(thread_id_type const& id, error_code& ec = throws)
     {
         interrupt_thread(id, true, ec);
     }
@@ -333,7 +333,7 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_API_EXPORT void interruption_point(thread_id_type id,
+    HPX_API_EXPORT void interruption_point(thread_id_type const& id,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -351,24 +351,24 @@ namespace hpx { namespace threads
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     HPX_API_EXPORT threads::thread_priority get_thread_priority(
-        thread_id_type id, error_code& ec = throws);
+        thread_id_type const& id, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT void run_thread_exit_callbacks(thread_id_type id,
+    HPX_API_EXPORT void run_thread_exit_callbacks(thread_id_type const& id,
         error_code& ec = throws);
 
-    HPX_API_EXPORT bool add_thread_exit_callback(thread_id_type id,
+    HPX_API_EXPORT bool add_thread_exit_callback(thread_id_type const& id,
         HPX_STD_FUNCTION<void()> const& f, error_code& ec = throws);
 
-    HPX_API_EXPORT void free_thread_exit_callbacks(thread_id_type id,
+    HPX_API_EXPORT void free_thread_exit_callbacks(thread_id_type const& id,
         error_code& ec = throws);
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
     ///////////////////////////////////////////////////////////////////////////
-    HPX_API_EXPORT std::size_t get_thread_data(thread_id_type id,
+    HPX_API_EXPORT std::size_t get_thread_data(thread_id_type const& id,
         error_code& ec = throws);
 
-    HPX_API_EXPORT std::size_t set_thread_data(thread_id_type id,
+    HPX_API_EXPORT std::size_t set_thread_data(thread_id_type const& id,
         std::size_t data, error_code& ec = throws);
 #endif
 
@@ -386,7 +386,7 @@ namespace hpx { namespace threads
     ///         \a hpx#invalid_status.
     ///
     HPX_API_EXPORT threads::executor get_executor(
-        thread_id_type id, error_code& ec = throws);
+        thread_id_type const& id, error_code& ec = throws);
 }}
 
 namespace hpx { namespace this_thread

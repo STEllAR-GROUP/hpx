@@ -147,6 +147,13 @@ namespace hpx { namespace util
 
             if (vm.count("hpx:localities")) {
                 std::size_t localities = vm["hpx:localities"].as<std::size_t>();
+                
+                if (localities == 0)
+                {
+                    throw std::logic_error("Number of --hpx:localities "
+                        "must be greater than 0");
+                }
+
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
                     using_nodelist && (localities != num_localities) &&
                     (num_localities != 1))
@@ -192,6 +199,12 @@ namespace hpx { namespace util
                 else
                     threads = boost::lexical_cast<std::size_t>(threads_str);
 
+                if (threads == 0)
+                {
+                    throw std::logic_error("Number of --hpx:threads "
+                        "must be greater than 0");
+                }
+
                 if ((env.run_with_pbs() || env.run_with_slurm()) &&
                     using_nodelist && (threads > batch_threads))
                 {
@@ -202,16 +215,16 @@ namespace hpx { namespace util
 #if defined(HPX_MAX_CPU_COUNT)
                 if (threads > HPX_MAX_CPU_COUNT) {
                     throw std::logic_error("Requested more than "
-                        BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" threads to "
-                        "use for this application, use the option "
+                        BOOST_PP_STRINGIZE(HPX_MAX_CPU_COUNT)" --hpx:threads "
+                        "to use for this application, use the option "
                         "-DHPX_MAX_CPU_COUNT=<N> or "
                         "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
                 }
 #elif !defined(HPX_HAVE_MORE_THAN_64_THREADS)
                 if (threads > 64) {
-                    throw std::logic_error("Requested more than 64 threads to "
-                        "use for this application, use the option "
-                        "-DHPX_MAX_CPU_COUNT=<N> or "
+                    throw std::logic_error("Requested more than 64 "
+                        "--hpx:threads to use for this application, use the "
+                        "option -DHPX_MAX_CPU_COUNT=<N> or "
                         "-DHPX_USE_MORE_THAN_64_THREADS when configuring HPX.");
                 }
 #endif
@@ -698,72 +711,21 @@ namespace hpx { namespace util
     void handle_print_bind(boost::program_options::variables_map const& vm_,
         std::size_t num_threads)
     {
-        if (!vm_.count("hpx:bind")) {
-            std::size_t num_threads = 1;
-            if (vm_.count("hpx:threads")) {
-                std::string threads = vm_["hpx:threads"].as<std::string>();
-                if (threads == "all")
-                    num_threads = threads::hardware_concurrency();
-                else
-                    num_threads = boost::lexical_cast<std::size_t>(threads);
-            }
+        threads::topology& top = threads::create_topology();
+        runtime & rt = get_runtime();
+        {
+            util::osstream strm;        // make sure all ouput is kept together
 
-            std::size_t pu_offset = 0;
-            if (vm_.count("hpx:pu-offset"))
-                pu_offset = vm_["hpx:pu-offset"].as<std::size_t>();
-
-            std::size_t pu_step = 1;
-            if (vm_.count("hpx:pu-step"))
-                pu_step = vm_["hpx:pu-step"].as<std::size_t>();
-
-            std::string affinity_domain;
-            if (vm_.count("hpx:affinity")) {
-                affinity_domain = vm_["hpx:affinity"].as<std::string>();
-                if (0 != std::string("pu").find(affinity_domain) &&
-                    0 != std::string("core").find(affinity_domain) &&
-                    0 != std::string("numa").find(affinity_domain) &&
-                    0 != std::string("machine").find(affinity_domain))
-                {
-                    throw std::logic_error("Invalid command line option "
-                        "--hpx:affinity, value must be one of: pu, core, numa, "
-                        "or machine.");
-                }
-            }
-
-            threads::policies::init_affinity_data init_data(pu_offset,
-                pu_step, affinity_domain);
-            init_data.used_cores_ = get_runtime().get_config().get_used_cores();
-            threads::policies::detail::affinity_data aff(num_threads);
-            threads::topology& top = threads::create_topology();
-            aff.init(init_data, top);
-
-            bool numa_sensitive = vm_.count("hpx:numa-sensitive") != 0;
+            strm << std::string(79, '*') << '\n';
+            strm << "locality: " << hpx::get_locality_id() << '\n';
+            for (std::size_t i = 0; i != num_threads; ++i)
             {
-                util::osstream strm;        // make sure all ouput is kept together
-
-                strm << std::string(79, '*') << '\n';
-                strm << "locality: " << hpx::get_locality_id() << '\n';
-                for (std::size_t i = 0; i != num_threads; ++i)
-                {
-                    top.print_affinity_mask(strm, i, aff.get_pu_mask(top, i, numa_sensitive));
-                }
-
-                std::cout << util::osstream_get_string(strm);
-            }
-        }
-        else {
-            std::string affinity_desc;
-            std::vector<std::string> bind_affinity =
-                vm_["hpx:bind"].as<std::vector<std::string> >();
-            BOOST_FOREACH(std::string const& s, bind_affinity)
-            {
-                if (!affinity_desc.empty())
-                    affinity_desc += ";";
-                affinity_desc += s;
+                top.print_affinity_mask(
+                    strm, i, rt.get_thread_manager().get_pu_mask(top, i)
+                );
             }
 
-            threads::print_affinity_options(std::cout, num_threads,
-                affinity_desc);
+            std::cout << util::osstream_get_string(strm);
         }
     }
 #endif

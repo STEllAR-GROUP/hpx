@@ -50,9 +50,6 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         topology const & topology)
     {
         std::size_t num_system_pus = hardware_concurrency();
-        std::size_t max_cores =
-            boost::lexical_cast<std::size_t>(
-                get_runtime().get_config().get_entry("hpx.cores", data.used_cores_));
 
         // initialize from command line
         if (data.pu_offset_ != std::size_t(-1))
@@ -63,6 +60,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         pu_nums_.clear();
 
 #if defined(HPX_HAVE_HWLOC)
+        std::size_t max_cores =
+            boost::lexical_cast<std::size_t>(
+                get_runtime().get_config().get_entry("hpx.cores", data.used_cores_));
+
         if (!data.affinity_desc_.empty())
         {
             affinity_masks_.clear();

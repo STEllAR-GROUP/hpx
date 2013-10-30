@@ -43,7 +43,8 @@ typedef pthread_t thread_id_type;
 #error Unknown threading type
 #endif
 
-inline thread_id_type get_thread_id() {
+inline thread_id_type get_thread_id()
+{
 #if defined (BOOST_HAS_WINTHREADS)
     return ::GetCurrentThreadId();
 #elif defined (BOOST_HAS_PTHREADS)

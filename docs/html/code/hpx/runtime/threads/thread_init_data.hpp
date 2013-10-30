@@ -91,7 +91,7 @@ namespace hpx { namespace threads
 #endif
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
         boost::uint32_t parent_locality_id;
-        threads::thread_id_type parent_id;
+        threads::thread_id_repr_type parent_id;
         std::size_t parent_phase;
 #endif
 

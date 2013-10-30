@@ -79,7 +79,7 @@ namespace hpx { namespace threads { namespace detail
         thread_data_base* thrd, thread_state_enum state, char const* info)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): " //-V128
-            << "thread(" << thrd->get_thread_id() << "), "
+            << "thread(" << thrd->get_thread_id().get() << "), "
             << "description(" << thrd->get_description() << "), "
             << "new state(" << get_thread_state_name(state) << "), "
             << info;
@@ -89,7 +89,7 @@ namespace hpx { namespace threads { namespace detail
     {
         // log this in any case
         LTM_(warning) << "tfunc(" << num_thread << "): " //-V128
-            << "thread(" << thrd->get_thread_id() << "), "
+            << "thread(" << thrd->get_thread_id().get() << "), "
             << "description(" << thrd->get_description() << "), "
             << "new state(" << get_thread_state_name(state) << "), "
             << info;
@@ -98,7 +98,7 @@ namespace hpx { namespace threads { namespace detail
         thread_data_base* thrd, thread_state_enum state)
     {
         LTM_(debug) << "tfunc(" << num_thread << "): " //-V128
-                    << "thread(" << thrd->get_thread_id() << "), "
+                    << "thread(" << thrd->get_thread_id().get() << "), "
                     << "description(" << thrd->get_description() << "), "
                     << "old state(" << get_thread_state_name(state) << ")";
     }
@@ -270,7 +270,7 @@ namespace hpx { namespace threads { namespace detail
                 }
                 else if (active == state_val) {
                     LTM_(warning) << "tfunc(" << num_thread << "): " //-V128
-                        "thread(" << thrd->get_thread_id() << "), "
+                        "thread(" << thrd->get_thread_id().get() << "), "
                         "description(" << thrd->get_description() << "), "
                         "rescheduling";
 

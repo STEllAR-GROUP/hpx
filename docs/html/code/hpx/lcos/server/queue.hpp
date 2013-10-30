@@ -129,15 +129,13 @@ namespace hpx { namespace lcos { namespace server
                 mutex_type::scoped_lock l(mtx_);
                 while (!thread_queue_.empty()) {
                     threads::thread_id_type id = thread_queue_.front().id_;
-                    thread_queue_.front().id_ = 0;
+                    thread_queue_.front().id_ = threads::invalid_thread_id;
                     thread_queue_.pop_front();
 
                     // we know that the id is actually the pointer to the thread
-                    threads::thread_data_base* thrd =
-                        static_cast<threads::thread_data_base*>(id);
                     LERR_(fatal) << "~queue: pending thread: "
-                            << get_thread_state_name(thrd->get_state())
-                            << "(" << id << "): " << thrd->get_description();
+                            << get_thread_state_name(id->get_state())
+                            << "(" << id.get() << "): " << id->get_description();
 
                     // forcefully abort thread, do not throw
                     error_code ec(lightweight);
@@ -145,8 +143,8 @@ namespace hpx { namespace lcos { namespace server
                         threads::wait_abort, threads::thread_priority_default, ec);
                     if (ec) {
                         LERR_(fatal) << "~queue: could not abort thread"
-                            << get_thread_state_name(thrd->get_state())
-                            << "(" << id << "): " << thrd->get_description();
+                            << get_thread_state_name(id->get_state())
+                            << "(" << id.get() << "): " << id->get_description();
                     }
                 }
             }
@@ -184,7 +182,7 @@ namespace hpx { namespace lcos { namespace server
             // resume the first thread waiting to pick up that value
             if (!thread_queue_.empty()) {
                 threads::thread_id_type id = thread_queue_.front().id_;
-                thread_queue_.front().id_ = 0;
+                thread_queue_.front().id_ = threads::invalid_thread_id;
                 thread_queue_.pop_front();
 
                 threads::set_thread_state(id, threads::pending);
@@ -202,7 +200,7 @@ namespace hpx { namespace lcos { namespace server
 
             while (!thread_queue_.empty()) {
                 threads::thread_id_type id = thread_queue_.front().id_;
-                thread_queue_.front().id_ = 0;
+                thread_queue_.front().id_ = threads::invalid_thread_id;
                 thread_queue_.pop_front();
 
                 threads::set_thread_state(id, threads::pending, threads::wait_abort);
@@ -215,13 +213,11 @@ namespace hpx { namespace lcos { namespace server
         // into the value queue.
         ValueType get_value()
         {
-            threads::thread_self& self = threads::get_self();
-
             mutex_type::scoped_lock l(mtx_);
             if (value_queue_.empty()) {
                 // suspend this thread until a new value is placed into the
                 // value queue
-                queue_thread_entry e(self.get_thread_id());
+                queue_thread_entry e(threads::get_self_id());
                 thread_queue_.push_back(e);
 
                 reset_queue_entry r(e, thread_queue_);
