@@ -337,7 +337,7 @@ namespace hpx { namespace util
         huge_stacksize(HPX_HUGE_STACK_SIZE),
         need_to_call_pre_initialize(true)
 #if defined(__linux) || defined(linux) || defined(__linux__)
-      , argv0(argv0)
+      , argv0(argv0_)
 #endif
     {
         pre_initialize_ini();
