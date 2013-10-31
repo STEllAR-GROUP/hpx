@@ -803,7 +803,7 @@ void primary_namespace::decrement_sweep(
         // Ranges containing dead objects.
         std::list<iterator> dead_list;
 
-        for (; matches.first != matches.second; ++matches.first)
+        for (/**/; matches.first != matches.second; ++matches.first)
         {
             // Sanity check.
             if (matches.first->data_ < 0)
@@ -871,6 +871,15 @@ void primary_namespace::decrement_sweep(
                 if (ec)
                     return;
 
+                if (at_c<0>(r) == naming::invalid_gid)
+                {
+                    LAGAS_(info) << (boost::format(
+                        "primary_namespace::decrement_sweep, failed to resolve gid, "
+                        "lower(%1%), upper(%2%), super-object(%3%)")
+                        % lower % upper % super);
+                    continue;       // couldn't resle this one
+                }
+
                 // Make sure the GVA is valid.
                 // REVIEW: Should we do more to make sure the GVA is valid?
                 if (HPX_UNLIKELY(components::component_invalid
@@ -879,8 +888,8 @@ void primary_namespace::decrement_sweep(
                     HPX_THROWS_IF(ec, internal_server_error
                       , "primary_namespace::decrement_sweep"
                       , boost::str(boost::format(
-                            "encountered a GVA with an invalid type while"
-                            "performing a decrement, gid(%1%), gva(%2%)")
+                            "encountered a GVA with an invalid type while "
+                            "performing a decrement, gid:%1%, gva:%2%")
                             % query % at_c<1>(r)));
                     return;
                 }
@@ -890,8 +899,8 @@ void primary_namespace::decrement_sweep(
                     HPX_THROWS_IF(ec, internal_server_error
                       , "primary_namespace::decrement_sweep"
                       , boost::str(boost::format(
-                            "encountered a GVA with a count of zero while"
-                            "performing a decrement, gid(%1%), gva(%2%)")
+                            "encountered a GVA with a count of zero while "
+                            "performing a decrement, gid:%1%, gva:%2%"")
                             % query % at_c<1>(r)));
                     return;
                 }
