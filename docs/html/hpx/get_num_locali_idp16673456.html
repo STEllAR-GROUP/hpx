@@ -1,0 +1,84 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Function get_num_localities</title>
+<link rel="stylesheet" href="../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="HPX 0.9.7">
+<link rel="up" href="../header/hpx/hpx_fwd_hpp.html" title="Header &lt;hpx/hpx_fwd.hpp&gt;">
+<link rel="prev" href="get_num_locali_idp16662720.html" title="Function get_num_localities_sync">
+<link rel="next" href="register_pre_s_idp16679616.html" title="Function register_pre_startup_function">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="../images/hpx_0_9_7_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="get_num_locali_idp16662720.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/hpx_fwd_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="register_pre_s_idp16679616.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="hpx.get_num_locali_idp16673456"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Function get_num_localities</span></h2>
+<p>hpx::get_num_localities &#8212; Asynchronously return the number of localities which are currently registered for the running application. </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../header/hpx/hpx_fwd_hpp.html" title="Header &lt;hpx/hpx_fwd.hpp&gt;">hpx/hpx_fwd.hpp</a>&gt;
+
+</span>
+<span class="identifier">lcos</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint32_t</span> <span class="special">&gt;</span> 
+<span class="identifier">get_num_localities</span><span class="special">(</span><span class="identifier">components</span><span class="special">::</span><span class="identifier">component_type</span> t<span class="special">)</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp17723472"></a><h2>Description</h2>
+<p>The function <span class="emphasis"><em>get_num_localities</em></span> asynchronously returns the number of localities currently connected to the console which support the creation of the given component type. The returned future represents the actual result.</p>
+<p>
+</p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>This function will return meaningful results only if called from an HPX-thread. It will return 0 otherwise.</p></td></tr>
+</table></div>
+<p>
+</p>
+<p><span class="bold"><strong>See Also:</strong></span></p>
+<p><span class="emphasis"><em>hpx::find_all_localities</em></span>, <span class="emphasis"><em>hpx::get_num_localities</em></span> </p>
+<p>
+</p>
+<div class="variablelist"><table border="0" class="variablelist compact">
+<colgroup>
+<col align="left" valign="top">
+<col>
+</colgroup>
+<tbody><tr>
+<td><p><span class="term">Parameters:</span></p></td>
+<td><div class="variablelist"><table border="0" class="variablelist compact">
+<colgroup>
+<col align="left" valign="top">
+<col>
+</colgroup>
+<tbody><tr>
+<td><p><span class="term"><code class="computeroutput">t</code></span></p></td>
+<td><p>The component type for which the number of connected localities should be retrieved.</p></td>
+</tr></tbody>
+</table></div></td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="get_num_locali_idp16662720.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/hpx_fwd_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="register_pre_s_idp16679616.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
