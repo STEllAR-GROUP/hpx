@@ -900,7 +900,7 @@ void primary_namespace::decrement_sweep(
                       , "primary_namespace::decrement_sweep"
                       , boost::str(boost::format(
                             "encountered a GVA with a count of zero while "
-                            "performing a decrement, gid:%1%, gva:%2%"")
+                            "performing a decrement, gid:%1%, gva:%2%")
                             % query % at_c<1>(r)));
                     return;
                 }
