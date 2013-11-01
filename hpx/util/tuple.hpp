@@ -128,26 +128,8 @@ namespace hpx { namespace util
             {}
         };
 
-#       if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600
-        template <typename T>
-        struct tuple_member<BOOST_RV_REF(T)>
-        {
-            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
-
-        public: // exposition-only
-            T _value;
-
-        public:
-            // 20.4.2.1, tuple construction
-            BOOST_CONSTEXPR explicit tuple_member(BOOST_RV_REF(T) value)
-              : _value(boost::forward<T>(value))
-            {}
-
-            BOOST_CONSTEXPR tuple_member(tuple_member const& other)
-              : _value(other._value)
-            {}
-        };
-#       elif defined(BOOST_MSVC) && BOOST_MSVC < 1800
+#       if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600)              \
+        || (defined(BOOST_MSVC) && BOOST_MSVC < 1800)
         template <typename T>
         struct tuple_member<BOOST_RV_REF(T),
             typename boost::disable_if_c<
