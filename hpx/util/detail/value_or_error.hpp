@@ -97,6 +97,7 @@ namespace hpx { namespace util { namespace detail
             case has_value:
                 {
                     construct_value(rhs.move_value());
+                    rhs.destruct();
                     break;
                 }
             case has_error:
@@ -166,6 +167,7 @@ namespace hpx { namespace util { namespace detail
                 case has_value:
                     {
                         construct_value(rhs.move_value());
+                        rhs.destruct();
                         break;
                     }
                 case has_error:
@@ -231,6 +233,7 @@ namespace hpx { namespace util { namespace detail
             return state_ == has_error;
         }
 
+    private:
         // access stored datprivate:
 #if __GNUC__ == 4 && __GNUC_MINOR__ == 4
         value_type move_value()
@@ -243,22 +246,6 @@ namespace hpx { namespace util { namespace detail
             return boost::move(*get_value_address());
         }
 #else
-    private:
-        // helper to destruct the target on exit
-        struct destruct_
-        {
-            destruct_(value_or_error& val)
-              : val_(val)
-            {}
-            ~destruct_()
-            {
-                val_.destruct();
-            }
-
-            value_or_error& val_;
-        };
-
-    public:
         BOOST_RV_REF(value_type) move_value()
         {
             if (!stores_value()) {
@@ -266,12 +253,11 @@ namespace hpx { namespace util { namespace detail
                     "value_or_error::move_value",
                     "unexpected retrieval of value")
             }
-
-            destruct_ on_exit(*this);
             return boost::move(*get_value_address());
         }
 #endif
 
+    public:
         value_type& get_value()
         {
             if (!stores_value()) {
