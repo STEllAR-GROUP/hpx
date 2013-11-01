@@ -201,7 +201,7 @@ hpx_option(HPX_NATIVE_MIC BOOL
   OFF ADVANCED)
 
 # If we compile natively for the MIC, we need some workarounds for certain
-# boost headers
+# Boost headers
 # FIXME: push changes upstream
 if(HPX_NATIVE_MIC)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/asio)
@@ -209,7 +209,7 @@ endif()
 
 if(HPX_NATIVE_MIC)
   hpx_option(HPX_MAX_CPU_COUNT STRING
-    "HPX applications will not use more than this amount of OS-threads (default: 256)."
+    "HPX applications will not use more than this number of OS-threads (default: 256)."
     "256" ADVANCED)
   if(NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
     hpx_error("HPX on the MIC can only be compiled with the Intel compiler.")
@@ -217,7 +217,7 @@ if(HPX_NATIVE_MIC)
   hpx_add_config_define(HPX_NATIVE_MIC)
 else()
   hpx_option(HPX_MAX_CPU_COUNT STRING
-    "HPX applications will not use more than this amount of OS-threads (default: 64)."
+    "HPX applications will not use more than this number of OS-threads (default: 64)."
     "64" ADVANCED)
 endif()
 
@@ -241,7 +241,8 @@ elseif(HPX_MAX_CPU_COUNT)
 endif()
 
 ###############################################################################
-# We have a patched version of FindBoost loosely based on the one that Kitware ships
+# We have a patched version of FindBoost loosely based on the one that Kitware
+# ships
 find_package(HPX_Boost)
 
 hpx_include_sys_directories(${BOOST_INCLUDE_DIR})
@@ -261,7 +262,7 @@ hpx_add_config_define(HPX_LOG_NO_TSS)
 hpx_add_config_define(HPX_LOG_NO_TS)
 hpx_add_config_define(BOOST_BIGINT_HAS_NATIVE_INT64)
 
-# disable usage of std::atomics in lockfree
+# Disable usage of std::atomics in lockfree
 if(${BOOST_MINOR_VERSION} LESS 53)
   hpx_add_config_define(BOOST_NO_0X_HDR_ATOMIC)
 endif()
@@ -318,7 +319,7 @@ hpx_option(HPX_DEFAULT_BUILD_TARGETS BOOL
   "Associate the core HPX library with the default build target (default: ON)." ON ADVANCED)
 
 hpx_option(HPX_NO_INSTALL BOOL
-  "Build hpx applications so that they can be run without installation (default: OFF)." OFF ADVANCED)
+  "Build HPX applications so that they can be run without installation (default: OFF)." OFF ADVANCED)
 
 if(NOT HPX_NO_INSTALL)
   # for backwards compatibility
@@ -341,19 +342,20 @@ if(NOT HPX_NO_INSTALL)
 endif()
 
 ################################################################################
-# Decide whether to use shared memory based parcelport (starting with Boost V1.52)
+# Decide whether to use TCP/IP based parcelport (starting with Boost V1.52)
 ################################################################################
 if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-  hpx_option(HPX_HAVE_PARCELPORT_TCPIP BOOL "Enable parcelport based on tcp/ip operations (default: OFF)." OFF ADVANCED)
+  hpx_option(HPX_HAVE_PARCELPORT_TCPIP BOOL "Enable parcelport based on TCP/IP operations (default: OFF)." OFF ADVANCED)
 else()
-  hpx_option(HPX_HAVE_PARCELPORT_TCPIP BOOL "Enable parcelport based on tcp/ip operations (default: ON)." ON ADVANCED)
+  hpx_option(HPX_HAVE_PARCELPORT_TCPIP BOOL "Enable parcelport based on TCP/IP operations (default: ON)." ON ADVANCED)
 endif()
 if(HPX_HAVE_PARCELPORT_TCPIP)
   hpx_add_config_define(HPX_HAVE_PARCELPORT_TCPIP)
 endif()
 
 ################################################################################
-# Decide whether to use shared memory based parcelport (starting with Boost V1.52)
+# Decide whether to use shared memory based parcelport (starting with
+# Boost V1.52)
 ################################################################################
 if(${BOOST_MINOR_VERSION} GREATER 51)
   hpx_option(HPX_HAVE_PARCELPORT_SHMEM BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
@@ -363,9 +365,9 @@ if(${BOOST_MINOR_VERSION} GREATER 51)
 endif()
 
 ################################################################################
-# Decide whether to use rdma based ibverbs parcelport
+# Decide whether to use RDMA based ibverbs parcelport
 ################################################################################
-hpx_option(HPX_HAVE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on rdma ibverbs operations (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_HAVE_PARCELPORT_IBVERBS BOOL "Enable parcelport based on RDMA ibverbs operations (default: OFF)." OFF ADVANCED)
 if(HPX_HAVE_PARCELPORT_IBVERBS)
   find_package(HPX_Ibverbs)
   find_package(HPX_Rdmacm)
@@ -416,9 +418,9 @@ if(HPX_HAVE_PARCELPORT_MPI)
         set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} ${MPI_EXTRA_LIBRARY})
         set(hpx_LIBRARIES ${hpx_LIBRARIES} ${MPI_EXTRA_LIBRARY})
     endif()
-    # This list is to detect if we run inside an mpi environment
-    # if one of those environment variables is set, the MPI parcelport
-    # is enabled by default
+    # This list is to detect whether we run inside an mpi environment.
+    # If one of those environment variables is set, the MPI parcelport
+    # is enabled by default.
     # PMI_RANK: Intel MPI and MVAPICH2
     # OMPI_COMM_WORLD_SIZE: OpenMPI starting at version 1.3
     hpx_option(HPX_PARCELPORT_MPI_ENV STRING
@@ -431,15 +433,15 @@ if(HPX_HAVE_PARCELPORT_MPI)
   else()
     hpx_error("parcelport"
         "HPX_HAVE_PARCELPORT_MPI is set but MPI could not be found. "
-        "Please set MPI_CXX_COMPILER, MPI_C_COMPILER and "
-        "MPI_FORTRAN_COMPILER to the appropraite mpi compiler wrapper")
+        "Please set MPI_CXX_COMPILER, MPI_C_COMPILER, and "
+        "MPI_Fortran_COMPILER to the appropraite MPI compiler wrappers")
   endif()
 endif()
 
 ################################################################################
 # Logging configuration
 ################################################################################
-hpx_option(HPX_NO_LOGGING BOOL "Build hpx with logging completely disabled (default: OFF)." OFF ADVANCED)
+hpx_option(HPX_NO_LOGGING BOOL "Build HPX with logging completely disabled (default: OFF)." OFF ADVANCED)
 if(HPX_NO_LOGGING)
   hpx_add_config_define(HPX_NO_LOGGING 1)
 endif()
@@ -455,10 +457,10 @@ if(HPX_NO_INSTALL)
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" CACHE PATH "Prefix prepended to install directories." FORCE)
     set(HPX_PREFIX "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" CACHE PATH "Where the hpx applications look for component dlls" FORCE)
   else()
-    set(HPX_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Where the hpx applications look for component dlls" FORCE)
+    set(HPX_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "Where the HPX applications look for component dlls" FORCE)
   endif()
 else()
-  set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Where the hpx applications look for component dlls" FORCE)
+  set(HPX_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Where the HPX applications look for component dlls" FORCE)
 endif()
 
 hpx_add_config_define(HPX_PREFIX "\"${HPX_PREFIX}\"")
@@ -583,7 +585,7 @@ if(NOT HPX_NATIVE_MIC)
 endif()
 
 ################################################################################
-# hwloc (don't use it on MacOS as it make runs fail and is useless anyways.)
+# hwloc (don't use it on OS X as it make runs fail and is useless anyways.)
 ################################################################################
 if(NOT APPLE)
   find_package(HPX_Hwloc)
@@ -891,9 +893,10 @@ if(HPX_GOOGLE_PERFTOOLS)
   endif()
 endif()
 
-# On Linux, the system allocator has a bad performance for multi-threaded applications. We thus use tcmalloc by default.
-# If tcmalloc is not present, this will fail. It is intentional that overriding this default requires an explicit
-# "-DHPX_MALLOC=system"
+# On Linux, the system allocator has a bad performance for
+# multi-threaded applications. We thus use tcmalloc by default. If
+# tcmalloc is not present, this will fail. It is intentional that
+# overriding this default requires an explicit "-DHPX_MALLOC=system"
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   if(HPX_NATIVE_MIC)
       set(HPX_MALLOC_DEFAULT "tbbmalloc")
@@ -933,8 +936,8 @@ if(MSVC)
   # VS2013 and above know how to do link time constant data segment folding
   if(MSVC12)
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Gw")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Gw")
-    set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Gw")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Gw")
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -Gw")
   endif()
 
   # Exceptions
@@ -1339,7 +1342,6 @@ else()
       #hpx_use_flag_if_available(-ipo)
       #hpx_use_flag_if_available(-opt-class-analysis)
       #hpx_use_flag_if_available(-opt-multi-version-aggressive)
-      #hpx_use_flag_if_available(-xHost)
       #hpx_use_flag_if_available(-fno-alias)
       #hpx_use_flag_if_available(-fbuiltin)
       #hpx_use_flag_if_available(-finline)
@@ -1384,7 +1386,9 @@ else()
   # GCC's -march=native will automatically tune generated code for the host
   # environment. This is available on newish versions of GCC only (4.3ish). If
   # this flag is used, the generated binaries will be less portable.
+  # -xHost is the equivalent Intel flag.
   hpx_use_flag_if_available(-march=native LANGUAGES CXX C Fortran)
+  hpx_use_flag_if_available(-xHost LANGUAGES CXX C Fortran)
 
   # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
   # It allows us to do double quadword (128bit) atomic compare and swap
@@ -1400,14 +1404,14 @@ else()
   # __attribute__ ((aligned(16))) should align a variable to a 16-byte, however,
   # GCC sets an upper limit on the maximum alignment (__BIGGEST_ALIGNMENT__)
   # and some versions don't warn if you ask for an alignment above said limit.
-  # Instead, they'll just silently use the maximum, which can be problematical.
+  # Instead, they'll just silently use the maximum, which can be problematic.
   hpx_check_for_gnu_aligned_16(HPX_GNU_ALIGNED_16
     DEFINITIONS HPX_HAVE_GNU_ALIGNED_16
                 BOOST_ATOMIC_HAVE_GNU_ALIGNED_16) # for the gnu code
 
   # __uint128_t and __int128_t are a nifty, albeit undocumented, GNU extension
-  # that's been supported in GCC (4.1ish and up) and clang-linux for awhile
-  # (strangely, intel-linux doesn't support this). This is particularly useful
+  # that's been supported in GCC (4.1ish and up) and clang-linux for a while
+  # (strangely, Intel-linux doesn't support this). This is particularly useful
   # for use with cmpxchg16b
   hpx_check_for_gnu_128bit_integers(HPX_GNU_128BIT_INTEGERS
     DEFINITIONS HPX_HAVE_GNU_128BIT_INTEGERS
@@ -1461,7 +1465,7 @@ if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
 ################################################################################
-# target specification
+# Target specification
 ################################################################################
 # Recurse into some subdirectories. This does not actually cause another cmake
 # executable to run. The same process will walk through the project's entire
@@ -1556,7 +1560,7 @@ if(NOT HPX_NO_INSTALL)
     PATTERN "CMakeFiles" EXCLUDE
     PATTERN "CTestFiles" EXCLUDE)
 
-  # install all hpx header that have been configured using various
+  # Install all HPX header that have been configured using various
   # cmake options
   install(
     DIRECTORY ${CMAKE_BINARY_DIR}/hpx/
@@ -1619,14 +1623,14 @@ if(NOT HPX_NO_INSTALL)
 #    PATTERN "CMakeFiles" EXCLUDE
 #    PATTERN "CTestFiles" EXCLUDE)
 
-  install( # install all hpx cmake utility files
+  install( # Install all HPX cmake utility files
     DIRECTORY cmake/
     DESTINATION share/hpx-${HPX_VERSION}/cmake
     COMPONENT core
     PATTERN ".cmake.in" EXCLUDE
     PATTERN ".git" EXCLUDE)
 
-  install( # install hpx python scripts
+  install( # Install HPX Python scripts
     DIRECTORY python/scripts/
     DESTINATION bin
     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
@@ -1650,7 +1654,7 @@ if(NOT HPX_NO_INSTALL)
     endforeach()
   endif()
 
-  install( # install hpx python module (TODO: this is a temporary hack)
+  install( # Install HPX Python module (TODO: this is a temporary hack)
     DIRECTORY python/hpx
     DESTINATION share/hpx-${HPX_VERSION}/python
     COMPONENT core
@@ -1665,7 +1669,7 @@ if(NOT HPX_NO_INSTALL)
              \"hpx-${HPX_VERSION}\" \"hpx\"
      WORKING_DIRECTORY \"\${sharedir}\")")
 
-  install( # install external dependencies
+  install( # Install external dependencies
     DIRECTORY external/cache/boost
               external/endian/boost
     DESTINATION include/hpx/external
@@ -1674,7 +1678,7 @@ if(NOT HPX_NO_INSTALL)
     PATTERN ".git" EXCLUDE)
 
   if(${BOOST_MINOR_VERSION} LESS 49)
-    # install Boost.Serialization patch for older Boost versions only
+    # Install Boost.Serialization patch for older Boost versions only
     install(
       DIRECTORY external/serialization/boost
       DESTINATION include/hpx/external
@@ -1694,7 +1698,7 @@ if(NOT HPX_NO_INSTALL)
   endif()
 
   if(${BOOST_MINOR_VERSION} LESS 53)
-    # install Boost.Atomic library for older Boost versions only
+    # Install Boost.Atomic library for older Boost versions only
     install(
       DIRECTORY external/atomic/boost
       DESTINATION include/hpx/external
@@ -1704,7 +1708,7 @@ if(NOT HPX_NO_INSTALL)
   endif()
 
   if(${BOOST_MINOR_VERSION} LESS 53)
-    # install Boost.Lockfree library for older Boost versions only
+    # Install Boost.Lockfree library for older Boost versions only
     install(
       DIRECTORY external/lockfree/boost
       DESTINATION include/hpx/external
@@ -1724,7 +1728,7 @@ if(NOT HPX_NO_INSTALL)
   endif()
 
   if(HPX_INTERNAL_CHRONO)
-    install( # install Boost.Chrono headers if we're using our internal version
+    install( # Install Boost.Chrono headers if we're using our internal version
       DIRECTORY external/chrono/boost
       DESTINATION include/hpx/external
       COMPONENT core
@@ -1738,7 +1742,7 @@ if(NOT HPX_NO_INSTALL)
     COMPONENT license)
 
   if(HPX_BUILD_DOCUMENTATION)
-    # install hpx documentation files
+    # Install HPX documentation files
     if(MSVC)
       set(doc_dir ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
     else()
@@ -1832,7 +1836,7 @@ foreach(lib ${hpx_LIBRARIES})
   set(external_libraries_name "${external_libraries_name} -l${lib}")
 endforeach()
 
-# make lists unique
+# Make lists unique
 list(REMOVE_DUPLICATES external_link_directories)
 list(REMOVE_DUPLICATES external_libraries)
 list(REMOVE_DUPLICATES external_libraries_name)
@@ -1851,7 +1855,7 @@ foreach(directory ${HPX_INCLUDE_DIRECTORIES})
   set(external_include_flags "${external_include_flags} -I${directory}")
 endforeach()
 
-# make lists unique
+# Make lists unique
 list(REMOVE_DUPLICATES external_include_directories)
 list(REMOVE_DUPLICATES external_include_flags)
 
@@ -1872,7 +1876,7 @@ foreach(definition ${HPX_DEFINITIONS})
     set(external_definitions "${external_definitions} ${definition}")
 endforeach()
 
-# make list unique
+# Make list unique
 list(REMOVE_DUPLICATES external_definitions)
 
 set(cmake_dir cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
@@ -1935,8 +1939,7 @@ if(NOT HPX_NO_INSTALL)
   endif()
 endif()
 
-# create a symlink in share pointing to the latest HPX installation
+# Create a symlink in share pointing to the latest HPX installation
 execute_process(COMMAND
   "${CMAKE_COMMAND}" -E create_symlink "hpx-${HPX_VERSION}" "hpx"
   WORKING_DIRECTORY ${output_dir}/share)
-

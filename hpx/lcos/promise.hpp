@@ -22,6 +22,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/once.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
+#include <hpx/util/static_reinit.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/static_assert.hpp>
@@ -78,10 +79,22 @@ namespace hpx { namespace components
             static boost::shared_ptr<util::one_size_heap_list_base> heap_;
             static lcos::local::once_flag constructed_;
 
-            // this will be called exactly
+            static void destruct_heap()
+            {
+                heap_.reset();
+            }
+
+            // this will be called exactly once per runtime initialization
+            static void construct_heap()
+            {
+                heap_ = get_promise_heap(get_component_type<component_type>());
+            }
+
             static void create_heap()
             {
                 heap_ = get_promise_heap(get_component_type<component_type>());
+                util::reinit_register(&promise_heap_factory::construct_heap,
+                    &promise_heap_factory::destruct_heap);
             }
 
             static util::one_size_heap_list_base& get_heap()

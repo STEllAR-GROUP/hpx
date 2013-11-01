@@ -58,10 +58,10 @@ macro(hpx_library_install name suffix)
     endif()
 
     set(target_directory "${CMAKE_INSTALL_PREFIX}/${suffix}")
-	
-	if(MSVC OR MINGW)
-		install(TARGETS ${name} ARCHIVE DESTINATION "${target_directory}" OPTIONAL)
-	endif()
+
+    if(MSVC OR MINGW)
+      install(TARGETS ${name} ARCHIVE DESTINATION "${target_directory}" OPTIONAL)
+    endif()
 
     foreach(target ${targets})
       set(install_code

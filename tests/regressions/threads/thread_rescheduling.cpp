@@ -10,6 +10,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/util/lightweight_test.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
@@ -32,6 +33,7 @@ using hpx::async;
 using hpx::threads::thread_id_type;
 using hpx::this_thread::suspend;
 using hpx::threads::set_thread_state;
+using hpx::threads::thread_data_base;
 using hpx::threads::thread_state_ex_enum;
 using hpx::threads::pending;
 using hpx::threads::suspended;
@@ -85,39 +87,17 @@ namespace detail
 
 ///////////////////////////////////////////////////////////////////////////////
 void change_thread_state(
-    boost::uint64_t thread
+    thread_id_type thread
     )
 {
-    set_thread_state(reinterpret_cast<void*>(thread), suspended);
+    set_thread_state(thread, suspended);
 }
 
-HPX_PLAIN_ACTION(change_thread_state, change_thread_state_action)
-
 ///////////////////////////////////////////////////////////////////////////////
 void tree_boot(
     boost::uint64_t count
   , boost::uint64_t grain_size
-  , id_type const& prefix
-  , boost::uint64_t thread
-    );
-
-#ifdef __GNUG__
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic push
-#endif
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#endif
-HPX_PLAIN_ACTION(tree_boot, tree_boot_action)
-#if defined(HPX_GCC_DIAGNOSTIC_PRAGMA_CONTEXTS)
-#pragma GCC diagnostic pop
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-void tree_boot(
-    boost::uint64_t count
-  , boost::uint64_t grain_size
-  , id_type const& prefix
-  , boost::uint64_t thread
+  , thread_id_type thread
     )
 {
     BOOST_ASSERT(grain_size);
@@ -142,18 +122,14 @@ void tree_boot(
 
         promises.reserve(children + grain_size);
     }
-
     else
         promises.reserve(count);
 
     for (boost::uint64_t i = 0; i < children; ++i)
-    {
-        promises.push_back(async<tree_boot_action>
-            (prefix, child_count, grain_size, prefix, thread));
-    }
+        promises.push_back(async(&tree_boot, child_count, grain_size, thread));
 
     for (boost::uint64_t i = 0; i < actors; ++i)
-        promises.push_back(async<change_thread_state_action>(prefix, thread));
+        promises.push_back(async(&change_thread_state, thread));
 
     detail::wait(promises);
 }
@@ -173,11 +149,7 @@ void test_dummy_thread(
 
         if (statex == wait_terminate)
         {
-            if (woken)
-                std::cout << "rescheduling succeeded\n";
-            else
-                std::cout << "rescheduling failed\n";
-
+            HPX_TEST(woken);
             return;
         }
     }
@@ -190,23 +162,19 @@ int hpx_main(variables_map& vm)
     boost::uint64_t const grain_size = vm["grain-size"].as<boost::uint64_t>();
 
     {
-        id_type const prefix = find_here();
-
-        thread_id_type thread_id = register_thread_nullary
-            (boost::bind(&test_dummy_thread, futures));
-        boost::uint64_t thread = boost::uint64_t(thread_id);
+        thread_id_type thread_id = register_thread_nullary(
+            boost::bind(&test_dummy_thread, futures));
+        HPX_TEST(thread_id != hpx::threads::invalid_thread_id);
 
         // Flood the queues with suspension operations before the rescheduling
         // attempt.
-        future<void> before =
-            async<tree_boot_action>(prefix, futures, grain_size, prefix, thread);
+        future<void> before = async(&tree_boot, futures, grain_size, thread_id);
 
         set_thread_state(thread_id, pending, wait_signaled);
 
         // Flood the queues with suspension operations after the rescheduling
         // attempt.
-        future<void> after =
-            async<tree_boot_action>(prefix, futures, grain_size, prefix, thread);
+        future<void> after = async(&tree_boot, futures, grain_size, thread_id);
 
         before.get();
         after.get();
@@ -236,6 +204,8 @@ int main(int argc, char* argv[])
     ;
 
     // Initialize and run HPX
-    return init(cmdline, argc, argv);
+    HPX_TEST(init(cmdline, argc, argv));
+
+    return hpx::util::report_errors();
 }
 

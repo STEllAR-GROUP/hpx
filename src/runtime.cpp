@@ -450,6 +450,7 @@ namespace hpx
     {
         // initialize our TSS
         runtime::init_tss();
+        util::reinit_construct();       // call only after TLS was initialized
 
         counters_.reset(new performance_counters::registry());
     }

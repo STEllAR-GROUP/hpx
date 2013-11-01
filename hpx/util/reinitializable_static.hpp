@@ -82,8 +82,8 @@ namespace hpx { namespace util
         static void default_constructor()
         {
             default_construct();
-            reinit_register(
-                &reinitializable_static::default_construct, &destruct);
+            reinit_register(&reinitializable_static::default_construct,
+                &reinitializable_static::destruct);
         }
 
         template <typename U>
@@ -91,7 +91,8 @@ namespace hpx { namespace util
         {
             value_construct(*pv);
             reinit_register(boost::bind(
-                &reinitializable_static::value_construct<U>, *pv), &destruct);
+                &reinitializable_static::value_construct<U>, *pv),
+                &reinitializable_static::destruct);
         }
 
     public:

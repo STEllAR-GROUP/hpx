@@ -31,7 +31,6 @@ namespace hpx { namespace util
     {
         reinit_helper()
         {
-            reinit_construct();
         }
         ~reinit_helper ()
         {

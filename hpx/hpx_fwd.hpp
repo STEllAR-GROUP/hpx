@@ -190,9 +190,6 @@ namespace hpx
         class HPX_EXPORT thread_data_base;
         class HPX_EXPORT thread_data;
 
-        HPX_EXPORT void intrusive_ptr_add_ref(thread_data_base* p);
-        HPX_EXPORT void intrusive_ptr_release(thread_data_base* p);
-
         template <
             typename SchedulingPolicy,
             typename NotificationPolicy = threads::policies::callback_notifier>
