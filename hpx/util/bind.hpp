@@ -9,7 +9,6 @@
 #ifndef HPX_UTIL_BIND_HPP
 #define HPX_UTIL_BIND_HPP
 
-#include <hpx/exception.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_callable.hpp>
@@ -23,6 +22,7 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/tuple.hpp>
 
+#include <boost/assert.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -271,12 +271,8 @@ namespace hpx { namespace util
 
             void check_call()
             {
-                if (_called)
-                {
-                    hpx::throw_exception(bad_function_call,
-                        "one-shot bound called more than once",
-                        "one_shot_wrapper::operator()");
-                }
+                BOOST_ASSERT(!_called);
+
                 _called = true;
             }
 
