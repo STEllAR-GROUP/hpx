@@ -320,6 +320,14 @@ namespace detail
             data_.read(d, ec);      // copies the data out of the store
             if (ec) return result_type();
 
+            if (d.is_empty()) {
+                // the value ghas already been moved out of this future
+                HPX_THROWS_IF(ec, future_uninitialized,
+                    "future_data::get_data",
+                    "this future has not been initialized");
+                return result_type();
+            }
+
             // the thread has been re-activated by one of the actions
             // supported by this promise (see \a promise::set_event
             // and promise::set_exception).
@@ -327,7 +335,6 @@ namespace detail
                 return handle_error(d, ec);
 
             // no error has been reported, return the result
-            BOOST_ASSERT(d.stores_value()); // This should never be empty
             return boost::move(d.get_value());
         }
 
@@ -338,6 +345,14 @@ namespace detail
             data_.read_and_empty(d, ec); // moves the data from the store
             if (ec) return result_type();
 
+            if (d.is_empty()) {
+                // the value ghas already been moved out of this future
+                HPX_THROWS_IF(ec, future_uninitialized,
+                    "future_data::move_data",
+                    "this future has not been initialized");
+                return result_type();
+            }
+
             // the thread has been re-activated by one of the actions
             // supported by this promise (see \a promise::set_event
             // and promise::set_exception).
@@ -345,7 +360,6 @@ namespace detail
                 return handle_error(d, ec);
 
             // no error has been reported, return the result
-            BOOST_ASSERT(d.stores_value()); // This should never be empty
             return boost::move(d.get_value());
         }
 
