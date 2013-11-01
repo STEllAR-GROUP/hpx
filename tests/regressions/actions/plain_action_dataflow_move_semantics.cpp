@@ -289,37 +289,37 @@ int hpx_main(variables_map&)
             move_object<pass_non_movable_object_direct_action, non_movable_object>(id)
         ), is_local ? 1u : 1u);
 
-        HPX_TEST_EQ((
+        HPX_TEST_LTE((
             return_object<
                 return_movable_object_action, movable_object
             >(id)
-        ), is_local ? 4u : 5u);
+        ), is_local ? 5u : 5u);
 
-        HPX_TEST_EQ((
+        HPX_TEST_LTE((
             return_object<
                 return_movable_object_direct_action, movable_object
             >(id)
         ), is_local ? 5u : 5u);
 
-        HPX_TEST_EQ((
+        HPX_TEST_LTE((
             return_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), is_local ? 7u : 9u);
+        ), is_local ? 8u : 10u);
 
-        HPX_TEST_EQ((
+        HPX_TEST_LTE((
             return_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
         ), is_local ? 8u : 10u);
 
-        HPX_TEST_EQ((
+        HPX_TEST_LTE((
             return_move_object<
                 return_movable_object_action, movable_object
             >(id)
-        ), is_local ? 3u : 4u);
+        ), is_local ? 4u : 4u);
 
-        HPX_TEST_EQ((
+        HPX_TEST_LTE((
             return_move_object<
                 return_movable_object_direct_action, movable_object
             >(id)
@@ -333,12 +333,12 @@ int hpx_main(variables_map&)
         ),
         is_local ? 9u : 12u);      // gcc V4.4 is special
 #else
-        HPX_TEST_EQ((
+        HPX_TEST_LTE((
             return_move_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
         ),
-        is_local ? 8u : 11u);
+        is_local ? 9u : 11u);
 #endif
         
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 40500)
@@ -348,7 +348,7 @@ int hpx_main(variables_map&)
             >(id)
         ), is_local ? 10u : 12u);      // gcc V4.4 is special
 #else
-        HPX_TEST_EQ((
+        HPX_TEST_LTE((
             return_move_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
