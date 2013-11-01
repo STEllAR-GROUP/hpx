@@ -45,6 +45,7 @@
 #include <boost/type_traits/add_cv.hpp>
 #include <boost/type_traits/add_volatile.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/type_traits/is_fundamental.hpp>
 #include <boost/type_traits/is_reference.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -80,7 +81,7 @@ namespace hpx { namespace util
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////
-        template <typename T>
+        template <typename T, typename Enable = void>
         struct tuple_member
         {
             BOOST_COPYABLE_AND_MOVABLE(tuple_member);
@@ -126,7 +127,7 @@ namespace hpx { namespace util
             {}
         };
         
-#       if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40600
+#       if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600
         template <typename T>
         struct tuple_member<BOOST_RV_REF(T)>
         {
@@ -143,6 +144,49 @@ namespace hpx { namespace util
 
             BOOST_CONSTEXPR tuple_member(tuple_member const& other)
               : _value(boost::forward<T>(other._value))
+            {}
+        };
+#       elif defined(BOOST_MSVC) && BOOST_MSVC < 1800
+        template <typename T>
+        struct tuple_member<
+            BOOST_RV_REF(T)
+          , typename boost::disable_if<boost::is_fundamental<T> >::type
+        >
+        {
+            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
+
+        public: // exposition-only
+            BOOST_RV_REF(T) _value;
+
+        public:
+            // 20.4.2.1, tuple construction
+            BOOST_CONSTEXPR explicit tuple_member(BOOST_RV_REF(T) value)
+              : _value(boost::forward<T>(value))
+            {}
+
+            BOOST_CONSTEXPR tuple_member(tuple_member const& other)
+              : _value(boost::forward<T>(other._value))
+            {}
+        };
+        template <typename T>
+        struct tuple_member<
+            BOOST_RV_REF(T)
+          , typename boost::enable_if<boost::is_fundamental<T> >::type
+        >
+        {
+            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
+
+        public: // exposition-only
+            T _value;
+
+        public:
+            // 20.4.2.1, tuple construction
+            BOOST_CONSTEXPR explicit tuple_member(BOOST_RV_REF(T) value)
+              : _value(boost::forward<T>(value))
+            {}
+
+            BOOST_CONSTEXPR tuple_member(tuple_member const& other)
+              : _value(other._value)
             {}
         };
 #       else
