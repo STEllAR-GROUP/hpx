@@ -79,8 +79,8 @@ problems. __hpx__ is the first practical, reliable, and performance-oriented
 runtime system incorporating the principal concepts of the ParalleX model
 publicly provided in open source release form.
 
-__hpx__ is designed by the __stellar__ Group ([*S]ystems [*T]echnologies,
-[*E]mergent Para[*ll]elism, and [*A]lgorithms [*R]esearch) at __lsu__'s __cct__
+__hpx__ is designed by the __stellar__ Group ([*S]ystems [*T]echnology,
+[*E]mergent Para[*ll]elism, and [*A]lgorithm [*R]esearch) at __lsu__'s __cct__
 to enable developers to exploit the full processing power of many-core systems
 with an unprecedented degree of parallelism. __stellar__ is a research group
 focusing on system software solutions and scientific application development
