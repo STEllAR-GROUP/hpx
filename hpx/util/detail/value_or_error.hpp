@@ -155,7 +155,7 @@ namespace hpx { namespace util { namespace detail
         {
             if (this != &rhs) {
                 destruct();
-                
+
                 state_ = rhs.state_;
                 switch (rhs.state_)
                 {
@@ -181,8 +181,11 @@ namespace hpx { namespace util { namespace detail
         // assign from value or error type
         value_or_error& operator=(BOOST_COPY_ASSIGN_REF(value_type) t)
         {
+            if (stores_value() && get_value_address() == &t)
+                return *this;
+
             destruct();
-            
+
             state_ = has_value;
             construct_value(t);
 
@@ -190,8 +193,11 @@ namespace hpx { namespace util { namespace detail
         }
         value_or_error& operator=(BOOST_RV_REF(value_type) t)
         {
+            if (stores_value() && get_value_address() == &t)
+                return *this;
+
             destruct();
-            
+
             state_ = has_value;
             construct_value(boost::move(t));
 
@@ -200,8 +206,11 @@ namespace hpx { namespace util { namespace detail
 
         value_or_error& operator=(error_type const& e)
         {
+            if (stores_error() && get_error_address() == &e)
+                return *this;
+
             destruct();
-            
+
             state_ = has_error;
             construct_error(e);
 
@@ -222,7 +231,7 @@ namespace hpx { namespace util { namespace detail
             return state_ == has_error;
         }
 
-        // access stored data
+        // access stored datprivate:
 #if __GNUC__ == 4 && __GNUC_MINOR__ == 4
         value_type move_value()
         {
@@ -234,6 +243,22 @@ namespace hpx { namespace util { namespace detail
             return boost::move(*get_value_address());
         }
 #else
+    private:
+        // helper to destruct the target on exit
+        struct destruct_
+        {
+            destruct_(value_or_error& val)
+              : val_(val)
+            {}
+            ~destruct_()
+            {
+                val_.destruct();
+            }
+
+            value_or_error& val_;
+        };
+
+    public:
         BOOST_RV_REF(value_type) move_value()
         {
             if (!stores_value()) {
@@ -241,6 +266,8 @@ namespace hpx { namespace util { namespace detail
                     "value_or_error::move_value",
                     "unexpected retrieval of value")
             }
+
+            destruct_ on_exit(*this);
             return boost::move(*get_value_address());
         }
 #endif
