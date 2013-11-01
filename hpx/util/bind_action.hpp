@@ -264,12 +264,12 @@ namespace hpx { namespace util
     {
 #       define HPX_UTIL_BIND_EVAL_TYPE(Z, N, D)                               \
         typename detail::bind_eval_impl<                                      \
-            typename util::tuple_element<N, BoundArgs>::type                  \
+            Action, typename util::tuple_element<N, BoundArgs>::type          \
           , UnboundArgs                                                       \
         >::type                                                               \
         /**/
 #       define HPX_UTIL_BIND_EVAL(Z, N, D)                                    \
-        detail::bind_eval(                                                    \
+        detail::bind_eval<Action>(                                            \
             util::get<N>(bound_args)                                          \
           , boost::forward<UnboundArgs>(unbound_args)                         \
         )                                                                     \

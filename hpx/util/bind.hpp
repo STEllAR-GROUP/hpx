@@ -9,6 +9,7 @@
 #ifndef HPX_UTIL_BIND_HPP
 #define HPX_UTIL_BIND_HPP
 
+#include <hpx/exception.hpp>
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_callable.hpp>
@@ -28,6 +29,7 @@
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/ref.hpp>
 #include <boost/type_traits/remove_const.hpp>
@@ -42,18 +44,44 @@ namespace hpx { namespace util
 
         struct not_enough_arguments {};
 
+        template <typename F>
+        class one_shot_wrapper;
+
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename UnboundArgs, typename Enable = void>
-        struct bind_eval_impl
+        template <typename F, typename T>
+        struct bind_eval_bound_impl
         {
             typedef T& type;
 
+            template <typename UnboundArgs>
             static BOOST_FORCEINLINE
             type call(T& t, BOOST_RV_REF(UnboundArgs) unbound_args)
             {
-                return t;
+                    return t;
             }
         };
+
+        template <typename F, typename T>
+        struct bind_eval_bound_impl<one_shot_wrapper<F>, T>
+        {
+            typedef BOOST_RV_REF(T) type;
+
+            template <typename UnboundArgs>
+            static BOOST_FORCEINLINE
+            type call(T& t, BOOST_RV_REF(UnboundArgs) unbound_args)
+            {
+                return boost::move(t);
+            }
+        };
+
+        template <
+            typename F
+          , typename T, typename UnboundArgs
+          , typename Enable = void
+        >
+        struct bind_eval_impl
+          : bind_eval_bound_impl<F, T>
+        {};
 
         template <std::size_t I, typename UnboundArgs, typename Enable = void>
         struct bind_eval_placeholder_impl
@@ -92,9 +120,9 @@ namespace hpx { namespace util
             }
         };
 
-        template <typename T, typename UnboundArgs>
+        template <typename F, typename T, typename UnboundArgs>
         struct bind_eval_impl<
-            T, UnboundArgs
+            F, T, UnboundArgs
           , typename boost::enable_if_c<
                 traits::is_placeholder<
                     typename boost::remove_const<T>::type
@@ -108,9 +136,9 @@ namespace hpx { namespace util
             >
         {};
 
-        template <typename T, typename UnboundArgs>
+        template <typename F, typename T, typename UnboundArgs>
         struct bind_eval_impl<
-            T, UnboundArgs
+            F, T, UnboundArgs
           , typename boost::enable_if_c<
                 traits::is_bind_expression<
                     typename boost::remove_const<T>::type
@@ -130,9 +158,9 @@ namespace hpx { namespace util
             }
         };
 
-        template <typename T, typename UnboundArgs>
+        template <typename F, typename T, typename UnboundArgs>
         struct bind_eval_impl<
-            T, UnboundArgs
+            F, T, UnboundArgs
           , typename boost::enable_if_c<
                 boost::is_reference_wrapper<
                     typename boost::remove_const<T>::type
@@ -151,13 +179,13 @@ namespace hpx { namespace util
             }
         };
 
-        template <typename T, typename UnboundArgs>
+        template <typename F, typename T, typename UnboundArgs>
         BOOST_FORCEINLINE
-        typename bind_eval_impl<T, UnboundArgs>::type
+        typename bind_eval_impl<F, T, UnboundArgs>::type
         bind_eval(T& t, BOOST_FWD_REF(UnboundArgs) unbound_args)
         {
             return
-                bind_eval_impl<T, UnboundArgs>::call
+                bind_eval_impl<F, T, UnboundArgs>::call
                     (t, boost::forward<UnboundArgs>(unbound_args));
         }
 
@@ -208,6 +236,101 @@ namespace hpx { namespace util
                   , boost::forward<UnboundArgs>(unbound_args)
                 );
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename F>
+        class one_shot_wrapper
+        {
+            BOOST_COPYABLE_AND_MOVABLE(bound);
+
+        public:
+            // default constructor is needed for serialization
+            one_shot_wrapper()
+              : _called(false)
+            {}
+            
+            explicit one_shot_wrapper(F const& f)
+              : _f(f)
+              , _called(false)
+            {}
+            explicit one_shot_wrapper(BOOST_RV_REF(F) f)
+              : _f(boost::move(f))
+              , _called(false)
+            {}
+
+            one_shot_wrapper(one_shot_wrapper const& other)
+              : _f(other._f)
+              , _called(other._called)
+            {}
+            one_shot_wrapper(BOOST_RV_REF(one_shot_wrapper) other)
+              : _f(boost::move(other._f))
+              , _called(other._called)
+            {
+                other._called = true;
+            }
+
+            void check_call()
+            {
+                if (_called)
+                {
+                    hpx::throw_exception(bad_function_call,
+                        "one-shot bound called more than once",
+                        "one_shot_wrapper::operator()");
+                }
+                _called = true;
+            }
+
+            template <typename>
+            struct result;
+            
+            template <typename This>
+            struct result<This()>
+              : boost::mpl::eval_if<
+                    traits::is_callable<F>
+                  , util::invoke_result_of<F()>
+                  , boost::mpl::identity<cannot_be_called>
+                >
+            {};
+
+            BOOST_FORCEINLINE
+            typename result<one_shot_wrapper()>::type
+            operator()()
+            {
+                check_call();
+                return util::invoke(_f);
+            }
+
+#           define HPX_UTIL_BIND_ONE_SHOT_WRAPPER_FUNCTION_OP(Z, N, D)        \
+            template <typename This, BOOST_PP_ENUM_PARAMS(N, typename T)>     \
+            struct result<This(BOOST_PP_ENUM_PARAMS(N, T))>                   \
+              : boost::mpl::eval_if<                                          \
+                    traits::is_callable<F, BOOST_PP_ENUM_PARAMS(N, T)>        \
+                  , util::invoke_result_of<F(BOOST_PP_ENUM_PARAMS(N, T))>     \
+                  , boost::mpl::identity<cannot_be_called>                    \
+                >                                                             \
+            {};                                                               \
+                                                                              \
+            template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
+            BOOST_FORCEINLINE                                                 \
+            typename result<one_shot_wrapper(BOOST_PP_ENUM_PARAMS(N, T))>::type\
+            operator()(HPX_ENUM_FWD_ARGS(N, T, t))                            \
+            {                                                                 \
+                check_call();                                                 \
+                return util::invoke(_f, HPX_ENUM_FORWARD_ARGS(N, T, t));      \
+            }                                                                 \
+            /**/
+
+            BOOST_PP_REPEAT_FROM_TO(
+                1, HPX_FUNCTION_ARGUMENT_LIMIT
+              , HPX_UTIL_BIND_ONE_SHOT_WRAPPER_FUNCTION_OP, _
+            );
+
+#           undef HPX_UTIL_BIND_ONE_SHOT_WRAPPER_FUNCTION_OP
+
+        public: // exposition-only
+            F _f;
+            bool _called;
+        };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename BoundArgs>
@@ -293,6 +416,18 @@ namespace hpx { namespace util
 
         return result_type(boost::forward<F>(f), util::forward_as_tuple());
     }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F>
+    detail::one_shot_wrapper<typename util::decay<F>::type>
+    one_shot(BOOST_FWD_REF(F) f)
+    {
+        typedef
+            detail::one_shot_wrapper<typename util::decay<F>::type>
+            result_type;
+
+        return result_type(boost::forward<F>(f));
+    }
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -333,6 +468,27 @@ namespace boost { namespace serialization
         ar << bound._bound_args;
     }
     
+    // serialization of the bound object
+    template <typename F>
+    void serialize(
+        ::hpx::util::portable_binary_iarchive& ar
+      , ::hpx::util::detail::one_shot_wrapper<F>& one_shot_wrapper
+      , unsigned int const /*version*/)
+    {
+        ar >> one_shot_wrapper._f;
+        ar >> one_shot_wrapper._called;
+    }
+
+    template <typename F>
+    void serialize(
+        ::hpx::util::portable_binary_oarchive& ar
+      , ::hpx::util::detail::one_shot_wrapper<F>& one_shot_wrapper
+      , unsigned int const /*version*/)
+    {
+        ar << one_shot_wrapper._f;
+        ar << one_shot_wrapper._called;
+    }
+
     // serialization of placeholders is trivial, just provide empty functions
     template <std::size_t I>
     void serialize(
@@ -386,12 +542,12 @@ namespace hpx { namespace util
     {
 #       define HPX_UTIL_BIND_EVAL_TYPE(Z, N, D)                               \
         typename detail::bind_eval_impl<                                      \
-            typename util::tuple_element<N, BoundArgs>::type                  \
+            F, typename util::tuple_element<N, BoundArgs>::type               \
           , UnboundArgs                                                       \
         >::type                                                               \
         /**/
 #       define HPX_UTIL_BIND_EVAL(Z, N, D)                                    \
-        detail::bind_eval(                                                    \
+        detail::bind_eval<F>(                                                 \
             util::get<N>(bound_args)                                          \
           , boost::forward<UnboundArgs>(unbound_args)                         \
         )                                                                     \
