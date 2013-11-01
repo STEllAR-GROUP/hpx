@@ -321,7 +321,7 @@ namespace detail
             if (ec) return result_type();
 
             if (d.is_empty()) {
-                // the value ghas already been moved out of this future
+                // the value has already been moved out of this future
                 HPX_THROWS_IF(ec, future_uninitialized,
                     "future_data::get_data",
                     "this future has not been initialized");
@@ -346,7 +346,7 @@ namespace detail
             if (ec) return result_type();
 
             if (d.is_empty()) {
-                // the value ghas already been moved out of this future
+                // the value has already been moved out of this future
                 HPX_THROWS_IF(ec, future_uninitialized,
                     "future_data::move_data",
                     "this future has not been initialized");
