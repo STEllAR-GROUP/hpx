@@ -37,7 +37,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility/result_of.hpp>
 
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 40700
+#if !defined(HPX_GCC_VERSION)
 #   define HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE BOOST_FORCEINLINE
 #else
 #   define HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE inline
