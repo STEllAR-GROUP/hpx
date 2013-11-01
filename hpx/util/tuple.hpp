@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2013 Thomas Heller
-//  Copyright (c) 2011-2013 Hartmut Kaiser 
+//  Copyright (c) 2011-2013 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,6 +46,7 @@
 #include <boost/type_traits/add_volatile.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_fundamental.hpp>
+#include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/is_reference.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -126,7 +127,7 @@ namespace hpx { namespace util
               : _value(other._value)
             {}
         };
-        
+
 #       if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600
         template <typename T>
         struct tuple_member<BOOST_RV_REF(T)>
@@ -148,9 +149,10 @@ namespace hpx { namespace util
         };
 #       elif defined(BOOST_MSVC) && BOOST_MSVC < 1800
         template <typename T>
-        struct tuple_member<
-            BOOST_RV_REF(T)
-          , typename boost::disable_if<boost::is_fundamental<T> >::type
+        struct tuple_member<BOOST_RV_REF(T),
+            typename boost::disable_if_c<
+                boost::is_fundamental<T>::value || boost::is_pointer<T>::value
+            >::type
         >
         {
             BOOST_COPYABLE_AND_MOVABLE(tuple_member);
@@ -168,10 +170,13 @@ namespace hpx { namespace util
               : _value(boost::forward<T>(other._value))
             {}
         };
+
         template <typename T>
         struct tuple_member<
             BOOST_RV_REF(T)
-          , typename boost::enable_if<boost::is_fundamental<T> >::type
+          , typename boost::enable_if_c<
+                boost::is_fundamental<T>::value || boost::is_pointer<T>::value
+            >::type
         >
         {
             BOOST_COPYABLE_AND_MOVABLE(tuple_member);
@@ -247,13 +252,13 @@ namespace hpx { namespace util
         {}
 
         // tuple(const tuple& u) = default;
-        // Initializes each element of *this with the corresponding element 
+        // Initializes each element of *this with the corresponding element
         // of u.
         BOOST_CONSTEXPR tuple(tuple const& other)
         {}
 
         // tuple(tuple&& u) = default;
-        // For all i, initializes the ith element of *this with 
+        // For all i, initializes the ith element of *this with
         // std::forward<Ti>(get<i>(u)).
         BOOST_CONSTEXPR tuple(BOOST_RV_REF(tuple) other)
         {}
@@ -277,7 +282,7 @@ namespace hpx { namespace util
         // 20.4.2.3, tuple swap
 
         // void swap(tuple& rhs) noexcept(see below);
-        // Calls swap for each element in *this and its corresponding element 
+        // Calls swap for each element in *this and its corresponding element
         // in rhs.
         void swap(tuple& other) BOOST_NOEXCEPT
         {}
@@ -399,7 +404,7 @@ namespace hpx { namespace util
     }
 
     // template <size_t I, class... Types>
-    // constexpr typename tuple_element<I, tuple<Types...> >::type const& 
+    // constexpr typename tuple_element<I, tuple<Types...> >::type const&
     // get(const tuple<Types...>& t) noexcept;
     template <std::size_t I, typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
@@ -413,7 +418,7 @@ namespace hpx { namespace util
     }
 
     // template <size_t I, class... Types>
-    // constexpr typename tuple_element<I, tuple<Types...> >::type&& 
+    // constexpr typename tuple_element<I, tuple<Types...> >::type&&
     // get(tuple<Types...>&& t) noexcept;
     template <std::size_t I, typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
@@ -454,9 +459,9 @@ namespace hpx { namespace util
 
     // template<class... Types>
     // tuple<Types&&...> forward_as_tuple(Types&&... t) noexcept;
-    // Constructs a tuple of references to the arguments in t suitable for 
-    // forwarding as arguments to a function. Because the result may contain 
-    // references to temporary variables, a program shall ensure that the 
+    // Constructs a tuple of references to the arguments in t suitable for
+    // forwarding as arguments to a function. Because the result may contain
+    // references to temporary variables, a program shall ensure that the
     // return value of this function does not outlive any of its arguments.
     BOOST_FORCEINLINE
     tuple<>
@@ -525,7 +530,7 @@ namespace hpx { namespace util
         {
             static const std::size_t offset =
                 tuple_size<T0>::value;
-            
+
             typedef
                 typename tuple_element<
                     I - offset
@@ -566,7 +571,7 @@ namespace hpx { namespace util
         {
             typedef tuple<> type;
         };
-        
+
 #       define HPX_UTIL_TUPLE_CAT_ELEMENT(Z, N, D)                            \
         typename tuple_cat_element<N, TTuple, UTuple>::type                   \
         /**/
@@ -584,7 +589,7 @@ namespace hpx { namespace util
     {
         return tuple<>();
     }
-    
+
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     tuple<BOOST_PP_ENUM_PARAMS(N, T)>
@@ -628,8 +633,8 @@ namespace hpx { namespace util
     // template<class... TTypes, class... UTypes>
     // constexpr bool operator==
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
-    // The elementary comparisons are performed in order from the zeroth index 
-    // upwards. No comparisons or element accesses are performed after the 
+    // The elementary comparisons are performed in order from the zeroth index
+    // upwards. No comparisons or element accesses are performed after the
     // first equality comparison that evaluates to false.
     namespace detail
     {
@@ -703,9 +708,9 @@ namespace hpx { namespace util
     // template<class... TTypes, class... UTypes>
     // constexpr bool operator<
     //     (const tuple<TTypes...>& t, const tuple<UTypes...>& u);
-    // The result is defined as: (bool)(get<0>(t) < get<0>(u)) || 
+    // The result is defined as: (bool)(get<0>(t) < get<0>(u)) ||
     // (!(bool)(get<0>(u) < get<0>(t)) && ttail < utail), where rtail for some
-    // tuple r is a tuple containing all but the first element of r. For any 
+    // tuple r is a tuple containing all but the first element of r. For any
     // two zero-length tuples e and f, e < f returns false.
     namespace detail
     {
@@ -983,7 +988,7 @@ namespace hpx { namespace util
 #       undef HPX_UTIL_TUPLE_DEFAULT_CONSTRUCT
 
         // explicit constexpr tuple(const Types&...);
-        // Initializes each element with the value of the corresponding 
+        // Initializes each element with the value of the corresponding
         // parameter.
 #       define HPX_UTIL_TUPLE_CONST_LV_PARAM(Z, N, D)                         \
         typename add_lvalue_reference<                                        \
@@ -1002,10 +1007,10 @@ namespace hpx { namespace util
 
         // template <class... UTypes>
         // explicit constexpr tuple(UTypes&&... u);
-        // Initializes the elements in the tuple with the corresponding value 
+        // Initializes the elements in the tuple with the corresponding value
         // in std::forward<UTypes>(u).
-        // This constructor shall not participate in overload resolution 
-        // unless each type in UTypes is implicitly convertible to its 
+        // This constructor shall not participate in overload resolution
+        // unless each type in UTypes is implicitly convertible to its
         // corresponding type in Types.
 #       define HPX_UTIL_TUPLE_FWD_REF_PARAM(Z, N, D)                          \
         BOOST_FWD_REF(BOOST_PP_CAT(U, N)) BOOST_PP_CAT(u, N)                  \
@@ -1040,7 +1045,7 @@ namespace hpx { namespace util
 #       undef HPX_UTIL_TUPLE_FORWARD_CONSTRUCT
 
         // tuple(const tuple& u) = default;
-        // Initializes each element of *this with the corresponding element 
+        // Initializes each element of *this with the corresponding element
         // of u.
 #       define HPX_UTIL_TUPLE_COPY_CONSTRUCT(Z, N, D)                         \
         BOOST_PP_CAT(_m, N)(BOOST_PP_CAT(other._m, N))                        \
@@ -1051,7 +1056,7 @@ namespace hpx { namespace util
 #       undef HPX_UTIL_TUPLE_COPY_CONSTRUCT
 
         // tuple(tuple&& u) = default;=
-        // For all i, initializes the ith element of *this with 
+        // For all i, initializes the ith element of *this with
         // std::forward<Ti>(get<i>(u)).
 #       define HPX_UTIL_TUPLE_MOVE_CONSTRUCT(Z, N, D)                         \
         BOOST_PP_CAT(_m, N)(boost::move(BOOST_PP_CAT(other._m, N)))           \
@@ -1063,10 +1068,10 @@ namespace hpx { namespace util
 
         // template <class... UTypes> constexpr tuple(const tuple<UTypes...>& u);
         // template <class... UTypes> constexpr tuple(tuple<UTypes...>&& u);
-        // For all i, initializes the ith element of *this with 
+        // For all i, initializes the ith element of *this with
         // get<i>(std::forward<U>(u).
-        // This constructor shall not participate in overload resolution 
-        // unless each type in UTypes is implicitly convertible to its 
+        // This constructor shall not participate in overload resolution
+        // unless each type in UTypes is implicitly convertible to its
         // corresponding type in Types
 #       define HPX_UTIL_TUPLE_GET_CONSTRUCT(Z, N, D)                          \
         BOOST_PP_CAT(_m, N)(util::get<N>(boost::forward<UTuple>(other)))      \
@@ -1166,7 +1171,7 @@ namespace hpx { namespace util
         // 20.4.2.3, tuple swap
 
         // void swap(tuple& rhs) noexcept(see below );
-        // Calls swap for each element in *this and its corresponding element 
+        // Calls swap for each element in *this and its corresponding element
         // in rhs.
 #       define HPX_UTIL_TUPLE_SWAP_NOEXCEPT(Z, N, D)                          \
          && BOOST_NOEXCEPT_EXPR((                                             \
@@ -1220,7 +1225,7 @@ namespace hpx { namespace util
             return tuple.BOOST_PP_CAT(_m, BOOST_PP_DEC(N))._value;
         }
     };
-    
+
     // 20.4.2.4, tuple creation functions
 
     // template<class... Types>
@@ -1242,9 +1247,9 @@ namespace hpx { namespace util
 
     // template<class... Types>
     // tuple<Types&&...> forward_as_tuple(Types&&... t) noexcept;
-    // Constructs a tuple of references to the arguments in t suitable for 
-    // forwarding as arguments to a function. Because the result may contain 
-    // references to temporary variables, a program shall ensure that the 
+    // Constructs a tuple of references to the arguments in t suitable for
+    // forwarding as arguments to a function. Because the result may contain
+    // references to temporary variables, a program shall ensure that the
     // return value of this function does not outlive any of its arguments.
 #   define HPX_UTIL_FORWARD_AS_TUPLE_ELEMENT(Z, N, D)                         \
     typename add_rvalue_reference<BOOST_PP_CAT(T, N)>::type                   \
@@ -1277,7 +1282,7 @@ namespace hpx { namespace util
             );
     }
 #   undef HPX_UTIL_TIE_ELEMENT
-    
+
     //template <class... Tuples>
     //constexpr tuple<Ctypes ...> tuple_cat(Tuples&&...);
     namespace detail
