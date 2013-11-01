@@ -135,7 +135,7 @@ namespace hpx { namespace util
             BOOST_COPYABLE_AND_MOVABLE(tuple_member);
 
         public: // exposition-only
-            BOOST_RV_REF(T) _value;
+            T _value;
 
         public:
             // 20.4.2.1, tuple construction
@@ -144,7 +144,7 @@ namespace hpx { namespace util
             {}
 
             BOOST_CONSTEXPR tuple_member(tuple_member const& other)
-              : _value(boost::forward<T>(other._value))
+              : _value(other._value)
             {}
         };
 #       elif defined(BOOST_MSVC) && BOOST_MSVC < 1800
@@ -201,7 +201,7 @@ namespace hpx { namespace util
             BOOST_COPYABLE_AND_MOVABLE(tuple_member);
 
         public: // exposition-only
-            T _value;
+            BOOST_RV_REF(T) _value;
 
         public:
             // 20.4.2.1, tuple construction
@@ -210,7 +210,7 @@ namespace hpx { namespace util
             {}
 
             BOOST_CONSTEXPR tuple_member(tuple_member const& other)
-              : _value(other._value)
+              : _value(boost::forward<T>(other._value))
             {}
         };
 #       endif
