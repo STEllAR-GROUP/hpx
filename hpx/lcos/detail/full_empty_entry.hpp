@@ -284,16 +284,13 @@ namespace hpx { namespace lcos { namespace detail
                         "full_empty_entry::enqueue_full_empty", ec);
                     if (ec) return;
                 }
+            }
 
-                // move the data to the destination
-                dest = boost::move(data_);
-            }
-            else {
-                // move the data to the destination
-                dest = boost::move(data_);
-                set_empty_locked(ec);   // state_ = empty;
-                if (ec) return;
-            }
+            // move the data to the destination
+            dest = boost::move(data_);
+
+            set_empty_locked(ec);   // state_ = empty;
+            if (ec) return;
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -323,10 +320,9 @@ namespace hpx { namespace lcos { namespace detail
                     if (ec) return;
                 }
             }
-            else {
-                set_empty_locked(ec);   // state_ = empty
-                if (ec) return;
-            }
+
+            set_empty_locked(ec);   // state_ = empty
+            if (ec) return;
 
             if (&ec != &throws)
                 ec = make_success_code();
