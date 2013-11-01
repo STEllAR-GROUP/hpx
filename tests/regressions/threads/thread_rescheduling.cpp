@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
     ;
 
     // Initialize and run HPX
-    HPX_TEST(init(cmdline, argc, argv));
+    HPX_TEST_EQ(0, init(cmdline, argc, argv));
 
     return hpx::util::report_errors();
 }
