@@ -149,7 +149,7 @@ struct thread_deque
         }
 
         if (added)
-        { LTM_(debug) << "add_new: added " << added << " tasks to queues"; }
+        { LTM_(debug) << "add_new: added " << added << " tasks to queues"; } //-V128
 
         return added;
     }
@@ -204,7 +204,7 @@ struct thread_deque
         }
 
         if (added)
-        { LTM_(debug) << "add_new: added " << added << " tasks to queues"; }
+        { LTM_(debug) << "add_new: added " << added << " tasks to queues"; } //-V128
 
         return added;
     }
@@ -527,7 +527,7 @@ struct thread_deque
                 if (cleanup_terminated_locked())
                     return true;
 
-                LTM_(debug) << "tfunc(" << num_thread
+                LTM_(debug) << "tfunc(" << num_thread //-V128
                            << "): threadmap not empty";
             }
 

@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset { namespace mpi {
             // start collecting statistics for this receive operation
             receive_data_.time_ = util::high_resolution_clock::now();
             buffer_.reset(new std::vector<char/*, allocator<char>*/ >());
-            buffer_->resize(h.size());
+            buffer_->resize(std::size_t(h.size()));
             receive_data_.buffer_allocate_time_ =
                 util::high_resolution_clock::now() - receive_data_.time_;
             receive_data_.serialization_time_ = 0;

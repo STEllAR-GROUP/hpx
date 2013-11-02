@@ -75,7 +75,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
                 set->put_parcels(messages_, handlers_);
         }
 
-        message_buffer_append_state append(parcelset::parcel& p,
+        message_buffer_append_state append(parcelset::parcel const& p,
             parcelset::parcelport::write_handler_type const& f)
         {
             BOOST_ASSERT(messages_.size() == handlers_.size());

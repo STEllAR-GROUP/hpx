@@ -217,16 +217,16 @@ namespace hpx { namespace threads
             HPX_THROWS_IF(ec, no_success, "hwloc_topology::hwloc_get_nobjs_by_type",
                 "Failed to get number of cores");
         }
-        num_core = num_core % num_cores;
+        num_core %= num_cores; // -V101 -V104 -V107
 
         hwloc_obj_t core_obj;
 
         core_obj = hwloc_get_obj_by_type(topo,
             HWLOC_OBJ_CORE, static_cast<unsigned>(num_core));
 
-        num_pu = num_pu % core_obj->arity;
-        
-        return core_obj->children[num_pu]->logical_index;
+        num_pu %= core_obj->arity; // -V101 -V104
+
+        return std::size_t(core_obj->children[num_pu]->logical_index);
     } // }}}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -553,9 +553,9 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(kernel_error
               , "hpx::threads::hwloc_topology::get_number_of_sockets"
               , "hwloc_get_nbobjs_by_type failed");
-            return nobjs;
+            return std::size_t(nobjs);
         }
-        return nobjs;
+        return std::size_t(nobjs);
     }
 
     std::size_t hwloc_topology::get_number_of_numa_nodes() const
@@ -566,9 +566,9 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(kernel_error
               , "hpx::threads::hwloc_topology::get_number_of_numa_nodes"
               , "hwloc_get_nbobjs_by_type failed");
-            return nobjs;
+            return std::size_t(nobjs);
         }
-        return nobjs;
+        return std::size_t(nobjs);
     }
 
     std::size_t hwloc_topology::get_number_of_cores() const
@@ -579,9 +579,9 @@ namespace hpx { namespace threads
             HPX_THROW_EXCEPTION(kernel_error
               , "hpx::threads::hwloc_topology::get_number_of_cores"
               , "hwloc_get_nbobjs_by_type failed");
-            return nobjs;
+            return std::size_t(nobjs);
         }
-        return nobjs;
+        return std::size_t(nobjs);
     }
 
     std::size_t hwloc_topology::get_number_of_socket_pus(
@@ -752,7 +752,7 @@ namespace hpx { namespace threads
 
             if (first) {
                 first = false;
-                os << std::setw(4) << num_thread << ": ";
+                os << std::setw(4) << num_thread << ": "; //-V112 //-V128
             }
             else {
                 os << "      ";
@@ -921,18 +921,23 @@ namespace hpx { namespace threads
 
         {
             scoped_lock lk(topo_mtx);
-            std::size_t num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
-            num_core = (num_core + core_offset) % num_cores;
+            int num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_CORE);
+            if (num_cores < 0) {
+                HPX_THROW_EXCEPTION(kernel_error
+                  , "hpx::threads::hwloc_topology::init_thread_affinity_mask"
+                  , "hwloc_get_nbobjs_by_type failed");
+                return empty_mask;
+            }
+
+            num_core = (num_core + core_offset) % std::size_t(num_cores);
             obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_CORE,
                     static_cast<unsigned>(num_core));
         }
 
         if (!obj)
-        {
             return empty_mask;//get_core_affinity_mask(num_thread, false);
-        }
 
-        num_pu = num_pu % obj->arity;
+        num_pu %= obj->arity; // -V101 -V104
 
         mask_type mask = mask_type();
         resize(mask, get_number_of_pus());
@@ -960,7 +965,7 @@ namespace hpx { namespace threads
                     obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU,
                         static_cast<unsigned>(i));
                     if(!obj) pu_numbers_[i] = i;
-                    else     pu_numbers_[i] = obj->os_index;
+                    else     pu_numbers_[i] = std::size_t(obj->os_index);
                 }
             }
         }

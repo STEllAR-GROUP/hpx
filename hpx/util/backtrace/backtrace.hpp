@@ -140,7 +140,7 @@ namespace hpx { namespace util
         return details::trace_manip(tr);
     }
 
-    inline std::string trace()
+    inline std::string trace() //-V659
     { return backtrace().trace(); }
 
     inline std::string trace_on_new_stack()

@@ -71,7 +71,7 @@ namespace hpx { namespace threads
 
 #if HPX_DEBUG_THREAD_POOL != 0
             using namespace std;    // some systems have memset in namespace std
-            memset (static_cast<void*>(pt), freed_value, sizeof(thread_data));
+            memset (static_cast<void*>(pt), freed_value, sizeof(thread_data)); //-V598
 #endif
             pool->deallocate(pt);
         }

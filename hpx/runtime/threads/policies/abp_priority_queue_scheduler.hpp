@@ -608,12 +608,12 @@ namespace hpx { namespace threads { namespace policies
 
                 if (HPX_UNLIKELY(suspended_only)) {
                     if (running) {
-                        LTM_(error)
+                        LTM_(error) //-V128
                             << "queue(" << num_thread << "): "
                             << "no new work available, are we deadlocked?";
                     }
                     else {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] "
+                        LHPX_CONSOLE_(hpx::util::logging::level::error) << "  [TM] " //-V128
                               << "queue(" << num_thread << "): "
                               << "no new work available, are we deadlocked?\n";
                     }

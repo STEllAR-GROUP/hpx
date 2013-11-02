@@ -103,7 +103,7 @@ namespace hpx { namespace util
             message[msglen] = '\0';
 
             std::string msg("MPI_Init_thread failed: ");
-            msg + message + ".";
+            msg = msg + message + ".";
             throw std::runtime_error(msg.c_str());
         }
         if (flag != provided_threading_flag_)

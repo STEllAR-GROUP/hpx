@@ -607,7 +607,6 @@ namespace hpx { namespace threads { namespace detail
         std::size_t num_cores = max_cores % (t.get_number_of_cores()+1);
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
-        std::vector<std::size_t> logical_idx(num_cores, std::size_t(-1));
         num_pus.resize(num_threads);
 
         for (std::size_t num_thread = 0; num_thread != num_threads; /**/)
@@ -653,6 +652,7 @@ namespace hpx { namespace threads { namespace detail
                     break;
             }
         }
+
         // Iterate over the cores and assigned pus per core. this additional loop
         // is needed so that we have consecutive worker thread numbers
         std::size_t num_thread = 0;

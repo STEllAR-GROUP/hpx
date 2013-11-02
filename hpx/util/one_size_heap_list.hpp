@@ -44,8 +44,8 @@ namespace hpx { namespace util
 
         enum
         {
-            heap_step = heap_type::heap_step,   // default grow step
-            heap_size = heap_type::heap_size    // size of the object
+            heap_step = Heap::heap_step,   // default grow step
+            heap_size = Heap::heap_size    // size of the object
         };
 
         typedef Mutex mutex_type;

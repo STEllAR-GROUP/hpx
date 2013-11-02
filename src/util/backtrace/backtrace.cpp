@@ -373,7 +373,7 @@ namespace hpx { namespace util {
 
         HPX_BACKTRACE_DECL void write_symbols(void *const *addresses,std::size_t size,std::ostream &out)
         {
-            out << size << ((1==size)?" frame:":" frames:");
+            out << size << ((1 == size)?" frame:":" frames:"); //-V128
             for(std::size_t i=0;i<size;i++) {
                 if(addresses[i]!=0)
                     out << '\n' << std::left << std::setw(sizeof(void*)*2) << std::setfill(' ') << addresses[i];

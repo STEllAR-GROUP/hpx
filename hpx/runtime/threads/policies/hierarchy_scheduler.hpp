@@ -270,7 +270,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            return count ? result / count : 0;
+            return count ? (result / count) : 0; //-V609
         }
 
         boost::int64_t get_average_task_wait_time(
@@ -296,8 +296,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            return count ? result / count : 0;
-            return 0;
+            return count ? (result / count) : 0; //-V609
         }
 #endif
 

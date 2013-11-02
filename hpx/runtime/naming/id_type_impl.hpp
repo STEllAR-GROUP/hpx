@@ -53,8 +53,7 @@ namespace hpx { namespace naming
     }
     inline id_type id_type::operator++(int)     // post-increment
     {
-        (*gid_)++;
-        return *this;
+        return id_type((*gid_)++, unmanaged);
     }
 
     inline id_type::operator util::safe_bool<id_type>::result_type() const
