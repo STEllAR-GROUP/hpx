@@ -22,8 +22,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 )));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ))));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -129,8 +129,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 )), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ))), cont);
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -302,8 +302,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -409,8 +409,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))), cont);
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -582,8 +582,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -689,8 +689,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))), cont);
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -862,8 +862,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -969,8 +969,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))), cont);
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -1142,8 +1142,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -1249,8 +1249,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))), cont);
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -1422,8 +1422,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 )));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ))));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -1529,8 +1529,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 )), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ))), cont);
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -1702,8 +1702,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 )));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ))));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -1809,8 +1809,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 )), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ))), cont);
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -1982,8 +1982,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 )));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ))));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -2089,8 +2089,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 )), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ))), cont);
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -2262,8 +2262,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 )));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ))));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -2369,8 +2369,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 )), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ))), cont);
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -2542,8 +2542,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 )));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ))));
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 
@@ -2649,8 +2649,8 @@ namespace hpx
             
             
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 )), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ))), cont);
             
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
             return false; 

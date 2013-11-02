@@ -61,8 +61,8 @@ namespace hpx
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))));
 
             // Send the parcel through the parcel handler
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);
@@ -94,8 +94,8 @@ namespace hpx
             parcelset::parcelhandler& ph =
                 hpx::applier::get_applier().get_parcel_handler();
             actions::action_type act(
-                new hpx::actions::transfer_action<action_type>(
-                    priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))));
 
             std::for_each(dests.begin(), dests.end(), send_parcel(ph, act));
 
@@ -287,8 +287,8 @@ namespace hpx
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(
-                    priority, HPX_ENUM_FORWARD_ARGS(N, Arg, arg)), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))), cont);
 
             // Send the parcel through the parcel handler
             hpx::applier::get_applier().get_parcel_handler().put_parcel(p);

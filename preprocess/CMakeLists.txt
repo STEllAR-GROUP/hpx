@@ -61,8 +61,6 @@ set(action_argument_limit_preprocessing_files
   "hpx/runtime/actions/construct_continuation_functions.hpp"
   "hpx/runtime/actions/define_function_operators.hpp"
   "hpx/runtime/actions/plain_action_implementations.hpp"
-  "hpx/runtime/actions/transfer_action_constructors.hpp"
-  "hpx/runtime/actions/transfer_action_constructors_no_parent_reference.hpp"
   "hpx/runtime/applier/apply_implementations.hpp"
   "hpx/runtime/applier/apply_implementations_callback.hpp"
   "hpx/runtime/applier/apply_continue.hpp"
