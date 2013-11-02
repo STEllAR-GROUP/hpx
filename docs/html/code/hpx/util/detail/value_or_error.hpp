@@ -97,6 +97,7 @@ namespace hpx { namespace util { namespace detail
             case has_value:
                 {
                     construct_value(rhs.move_value());
+                    rhs.destruct();
                     break;
                 }
             case has_error:
@@ -155,7 +156,7 @@ namespace hpx { namespace util { namespace detail
         {
             if (this != &rhs) {
                 destruct();
-                
+
                 state_ = rhs.state_;
                 switch (rhs.state_)
                 {
@@ -166,6 +167,7 @@ namespace hpx { namespace util { namespace detail
                 case has_value:
                     {
                         construct_value(rhs.move_value());
+                        rhs.destruct();
                         break;
                     }
                 case has_error:
@@ -181,8 +183,11 @@ namespace hpx { namespace util { namespace detail
         // assign from value or error type
         value_or_error& operator=(BOOST_COPY_ASSIGN_REF(value_type) t)
         {
+            if (stores_value() && get_value_address() == &t)
+                return *this;
+
             destruct();
-            
+
             state_ = has_value;
             construct_value(t);
 
@@ -190,8 +195,11 @@ namespace hpx { namespace util { namespace detail
         }
         value_or_error& operator=(BOOST_RV_REF(value_type) t)
         {
+            if (stores_value() && get_value_address() == &t)
+                return *this;
+
             destruct();
-            
+
             state_ = has_value;
             construct_value(boost::move(t));
 
@@ -200,8 +208,11 @@ namespace hpx { namespace util { namespace detail
 
         value_or_error& operator=(error_type const& e)
         {
+            if (stores_error() && get_error_address() == &e)
+                return *this;
+
             destruct();
-            
+
             state_ = has_error;
             construct_error(e);
 
@@ -222,7 +233,8 @@ namespace hpx { namespace util { namespace detail
             return state_ == has_error;
         }
 
-        // access stored data
+    private:
+        // access stored datprivate:
 #if __GNUC__ == 4 && __GNUC_MINOR__ == 4
         value_type move_value()
         {
@@ -245,6 +257,7 @@ namespace hpx { namespace util { namespace detail
         }
 #endif
 
+    public:
         value_type& get_value()
         {
             if (!stores_value()) {

@@ -286,8 +286,26 @@ namespace hpx { namespace lcos
             return future_data_->get_data(ec);
         }
 
+    private:
+        struct invalidate
+        {
+            invalidate(future& f)
+              : f_(f)
+            {}
+
+            ~invalidate()
+            {
+                f_.future_data_.reset();
+            }
+
+            future& f_;
+        };
+        friend struct invalidate;
+
+    public:
         Result move(error_code& ec = throws)
         {
+            invalidate on_exit(*this);
             return boost::move(future_data_->move_data(ec));
         }
 
@@ -584,6 +602,7 @@ namespace hpx { namespace lcos
         void move(error_code& ec = throws)
         {
             future_data_->move_data(ec);
+            future_data_.reset();
         }
 
         // state introspection
