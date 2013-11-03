@@ -118,32 +118,132 @@ struct non_movable_functor
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(variables_map&)
+void test_object()
 {
     std::vector<id_type> localities = hpx::find_all_localities();
 
     BOOST_FOREACH(id_type id, localities)
     {
         bool is_local = id == hpx::find_here();
+
+        dataflow_object<foo> f(new_<foo>(id).get());
+
+        // test movable_functor<movable_object>()
+        if (is_local)
         {
-            object<foo> f = new_<foo>(id).get();
-
-            HPX_TEST_EQ((f <= movable_functor<movable_object>()).get(), is_local ? 0u : 1u);
-            HPX_TEST_EQ((f <= movable_functor<non_movable_object>()).get(), is_local ? 4u : 5u);
-
-            HPX_TEST_EQ((f <= non_movable_functor<movable_object>()).get(), is_local ? 4u : 5u);
-            HPX_TEST_EQ((f <= non_movable_functor<non_movable_object>()).get(), is_local ? 4u : 5u);
+            HPX_TEST_EQ((
+                f.apply(movable_functor<movable_object>()).get_future().get()
+            ), 1u);
+        } else {
+            HPX_TEST_EQ((
+                f.apply(movable_functor<movable_object>()).get_future().get()
+            ), 1u);
         }
+
+        // test movable_functor<non_movable_object>()
+        if (is_local)
         {
-            dataflow_object<foo> f(new_<foo>(id).get());
+            HPX_TEST_EQ((
+                f.apply(movable_functor<non_movable_object>()).get_future().get()
+            ), 3u);
+        } else {
+            HPX_TEST_EQ((
+                f.apply(movable_functor<non_movable_object>()).get_future().get()
+            ), 3u);
+        }
 
-            HPX_TEST_EQ(f.apply(movable_functor<movable_object>()).get_future().get(), 1u);
-            HPX_TEST_EQ(f.apply(movable_functor<non_movable_object>()).get_future().get(), is_local ? 3u : 3u);
+        // test non_movable_functor<movable_object>()
+        if (is_local)
+        {
+            HPX_TEST_EQ((
+                f.apply(non_movable_functor<movable_object>()).get_future().get()
+            ), 3u);
+        } else {
+            HPX_TEST_EQ((
+                f.apply(non_movable_functor<movable_object>()).get_future().get()
+            ), 3u);
+        }
 
-            HPX_TEST_EQ(f.apply(non_movable_functor<movable_object>()).get_future().get(), is_local ? 3u : 3u);
-            HPX_TEST_EQ(f.apply(non_movable_functor<non_movable_object>()).get_future().get(), is_local ? 3u : 3u);
+        // test non_movable_functor<non_movable_object>()
+        if (is_local)
+        {
+            HPX_TEST_EQ((
+                f.apply(non_movable_functor<non_movable_object>()).get_future().get()
+            ), 3u);
+        } else {
+            HPX_TEST_EQ((
+                f.apply(non_movable_functor<non_movable_object>()).get_future().get()
+            ), 3u);
         }
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void test_dataflow_object()
+{
+    std::vector<id_type> localities = hpx::find_all_localities();
+
+    BOOST_FOREACH(id_type id, localities)
+    {
+        bool is_local = id == hpx::find_here();
+
+        object<foo> f = new_<foo>(id).get();
+
+        // test movable_functor<movable_object>()
+        if (is_local)
+        {
+            HPX_TEST_EQ((
+                (f <= movable_functor<movable_object>()).get()
+            ), 0u);
+        } else {
+            HPX_TEST_EQ((
+                (f <= movable_functor<movable_object>()).get()
+            ), 1u);
+        }
+
+        // test movable_functor<non_movable_object>()
+        if (is_local)
+        {
+            HPX_TEST_EQ((
+                (f <= movable_functor<non_movable_object>()).get()
+            ), 4u);
+        } else {
+            HPX_TEST_EQ((
+                (f <= movable_functor<non_movable_object>()).get()
+            ), 5u);
+        }
+
+        // test non_movable_functor<movable_object>()
+        if (is_local)
+        {
+            HPX_TEST_EQ((
+                (f <= non_movable_functor<movable_object>()).get()
+            ), 4u);
+        } else {
+            HPX_TEST_EQ((
+                (f <= non_movable_functor<movable_object>()).get()
+            ), 5u);
+        }
+
+        // test non_movable_functor<non_movable_object>()
+        if (is_local)
+        {
+            HPX_TEST_EQ((
+                (f <= non_movable_functor<non_movable_object>()).get()
+            ), 4u);
+        } else {
+            HPX_TEST_EQ((
+                (f <= non_movable_functor<non_movable_object>()).get()
+            ), 5u);
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+int hpx_main(variables_map&)
+{
+    test_object();
+    test_dataflow_object();
 
     finalize();
 
@@ -160,4 +260,3 @@ int main(int argc, char* argv[])
     // Initialize and run HPX.
     return init(desc_commandline, argc, argv);
 }
-
