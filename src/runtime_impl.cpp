@@ -543,31 +543,33 @@ namespace hpx {
         // initialize applier TSS
         applier_.init_tss();
 
-        // set the thread's name
-        BOOST_ASSERT(NULL == runtime::thread_name_.get());    // shouldn't be initialized yet
+        // set the thread's name, if it's not already set
+        if (NULL == runtime::thread_name_.get())
+        {
+            std::string* fullname = new std::string(context);
+            if (postfix && *postfix)
+                *fullname += postfix;
+            *fullname += "#" + boost::lexical_cast<std::string>(num);
+            runtime::thread_name_.reset(fullname);
 
-        std::string* fullname = new std::string(context);
-        if (postfix && *postfix)
-            *fullname += postfix;
-        *fullname += "#" + boost::lexical_cast<std::string>(num);
-        runtime::thread_name_.reset(fullname);
+            char const* name = runtime::thread_name_.get()->c_str();
 
-        char const* name = runtime::thread_name_.get()->c_str();
+            // initialize thread mapping for external libraries (i.e. PAPI)
+            thread_support_->register_thread(name);
 
-        // initialize thread mapping for external libraries (i.e. PAPI)
-        thread_support_->register_thread(name);
+            // initialize coroutines context switcher
+            hpx::util::coroutines::thread_startup(name);
 
-        // initialize coroutines context switcher
-        hpx::util::coroutines::thread_startup(name);
+            // register this thread with any possibly active Intel tool
+            HPX_ITT_THREAD_SET_NAME(name);
 
-        // register this thread with any possibly active Intel tool
-        HPX_ITT_THREAD_SET_NAME(name);
-
-        // set thread name as shown in Visual Studio
-        util::set_thread_name(name);
+            // set thread name as shown in Visual Studio
+            util::set_thread_name(name);
+        }
 
         // if this is a service thread, set its service affinity
-        if (service_thread) {
+        if (service_thread)
+        {
             // FIXME: We don't set the affinity of the service threads on BG/Q, as this is
             // causing a hang (needs to be investigated
 #if !defined(__bgq__)
