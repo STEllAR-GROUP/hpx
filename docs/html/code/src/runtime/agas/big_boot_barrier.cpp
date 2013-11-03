@@ -744,7 +744,7 @@ namespace detail
         for (boost::uint32_t i = 0; i != num_cores; ++i)
         {
             boost::uint32_t num_pus_core = static_cast<boost::uint32_t>(
-                top.get_number_of_core_pus(i));
+                top.get_number_of_core_pus(std::size_t(i)));
             if (num_pus_core == ~boost::uint32_t(0))
                 return num_cores;       // assume one pu per core
 

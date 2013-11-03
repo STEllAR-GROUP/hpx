@@ -56,7 +56,7 @@
 <p>
             The next step in exposing this counter to the runtime system is to register
             the function as a new raw counter type using the <span class="emphasis"><em>HPX</em></span>
-            API function <code class="computeroutput"><a class="link" href="../../../performance_counters/install_counte_idp17063952.html" title="Function install_counter_type">hpx::performance_counters::install_counter_type</a></code>.
+            API function <code class="computeroutput"><a class="link" href="../../../performance_counters/install_counte_idp17014688.html" title="Function install_counter_type">hpx::performance_counters::install_counter_type</a></code>.
             A counter type represents certain common characteristics of counters,
             like their counter type name, and any associated description information.
             The following snippet shows an example of how to register the function
@@ -70,7 +70,7 @@
 <span class="keyword">void</span> <span class="identifier">register_counter_type</span><span class="special">()</span>
 <span class="special">{</span>
     <span class="comment">// Call the HPX API function to register the counter type.</span>
-    <code class="computeroutput"><a class="link" href="../../../performance_counters/install_counte_idp17063952.html" title="Function install_counter_type">hpx::performance_counters::install_counter_type</a></code><span class="special">(</span>
+    <code class="computeroutput"><a class="link" href="../../../performance_counters/install_counte_idp17014688.html" title="Function install_counter_type">hpx::performance_counters::install_counter_type</a></code><span class="special">(</span>
         <span class="string">"/test/data"</span><span class="special">,</span>                                   <span class="comment">// counter type name</span>
         <span class="special">&amp;</span><span class="identifier">some_performance_data</span><span class="special">,</span>                         <span class="comment">// function providing counter data</span>
         <span class="string">"returns a linearly increasing counter value"</span>   <span class="comment">// description text (optional)</span>
@@ -83,7 +83,7 @@
             naming scheme <code class="computeroutput"><span class="string">"/test{locality#*/total}/data"</span></code>,
             where '<code class="computeroutput"><span class="special">*</span></code>' is a zero based
             integer index indentifying the locality for which the counter instance
-            should be accessed. The function <code class="computeroutput"><a class="link" href="../../../performance_counters/install_counte_idp17063952.html" title="Function install_counter_type">install_counter_type</a></code>
+            should be accessed. The function <code class="computeroutput"><a class="link" href="../../../performance_counters/install_counte_idp17014688.html" title="Function install_counter_type">install_counter_type</a></code>
             enables to instantiate exactly one counter instance for each locality.
             Repeated requests to instantiate such a counter will return the same
             instance, e.g. the instance created for the first request.
@@ -107,7 +107,7 @@
     <code class="computeroutput"><a class="link" href="../../../register_startup_function.html" title="Function register_startup_function">hpx::register_startup_function</a></code><span class="special">(&amp;</span><span class="identifier">register_counter_type</span><span class="special">);</span>
 
     <span class="comment">// Initialize and run HPX.</span>
-    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../../../init_idp16717472.html" title="Function init">hpx::init</a></code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
+    <span class="keyword">return</span> <code class="computeroutput"><a class="link" href="../../../init_idp16668208.html" title="Function init">hpx::init</a></code><span class="special">(</span><span class="identifier">argc</span><span class="special">,</span> <span class="identifier">argv</span><span class="special">);</span>
 <span class="special">}</span>
 </pre>
 <p>

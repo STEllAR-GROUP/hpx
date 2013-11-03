@@ -134,16 +134,16 @@ namespace hpx
     private:
         threads::thread_id_type id_;
 
-        friend bool operator== (thread::id x, thread::id y) BOOST_NOEXCEPT;
-        friend bool operator!= (thread::id x, thread::id y) BOOST_NOEXCEPT;
-        friend bool operator< (thread::id x, thread::id y) BOOST_NOEXCEPT;
-        friend bool operator> (thread::id x, thread::id y) BOOST_NOEXCEPT;
-        friend bool operator<= (thread::id x, thread::id y) BOOST_NOEXCEPT;
-        friend bool operator>= (thread::id x, thread::id y) BOOST_NOEXCEPT;
+        friend bool operator== (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT;
+        friend bool operator!= (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT;
+        friend bool operator< (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT;
+        friend bool operator> (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT;
+        friend bool operator<= (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT;
+        friend bool operator>= (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT;
 
         template <typename Char, typename Traits>
         friend std::basic_ostream<Char, Traits>&
-        operator<< (std::basic_ostream<Char, Traits>&, thread::id);
+        operator<< (std::basic_ostream<Char, Traits>&, thread::id const&);
 
         friend class thread;
 
@@ -152,39 +152,39 @@ namespace hpx
         explicit id(threads::thread_id_type i) BOOST_NOEXCEPT : id_(i) {}
     };
 
-    inline bool operator== (thread::id x, thread::id y) BOOST_NOEXCEPT
+    inline bool operator== (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT
     {
         return x.id_.get() == y.id_.get();
     }
 
-    inline bool operator!= (thread::id x, thread::id y) BOOST_NOEXCEPT
+    inline bool operator!= (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT
     {
         return !(x == y);
     }
 
-    inline bool operator< (thread::id x, thread::id y) BOOST_NOEXCEPT
+    inline bool operator< (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT
     {
         return x.id_.get() < y.id_.get();
     }
 
-    inline bool operator> (thread::id x, thread::id y) BOOST_NOEXCEPT
+    inline bool operator> (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT
     {
         return x.id_.get() > y.id_.get();
     }
 
-    inline bool operator<= (thread::id x, thread::id y) BOOST_NOEXCEPT
+    inline bool operator<= (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT
     {
         return !(x.id_.get() > y.id_.get());
     }
 
-    inline bool operator>= (thread::id x, thread::id y) BOOST_NOEXCEPT
+    inline bool operator>= (thread::id const& x, thread::id const& y) BOOST_NOEXCEPT
     {
         return !(x.id_.get() < y.id_.get());
     }
 
     template <typename Char, typename Traits>
     std::basic_ostream<Char, Traits>&
-    operator<< (std::basic_ostream<Char, Traits>& out, thread::id id)
+    operator<< (std::basic_ostream<Char, Traits>& out, thread::id const& id)
     {
         out << id.id_;
         return out;

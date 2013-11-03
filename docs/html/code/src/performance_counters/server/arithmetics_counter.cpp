@@ -111,7 +111,8 @@ namespace hpx { namespace performance_counters { namespace server
             value = Operation()(value, base_value.get_value<double>());
         }
 
-        if (base_values[0].scale_inverse_ && base_values[0].scaling_ != 1.0) {
+        if (base_values[0].scale_inverse_ != 0.0 && base_values[0].scaling_ != 1.0)
+        {
             base_values[0].value_ =
                 static_cast<boost::int64_t>(value * base_values[0].scaling_);
         }

@@ -149,7 +149,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             if (added) {
-                LTM_(debug) << "add_new: added " << added << " tasks to queues";
+                LTM_(debug) << "add_new: added " << added << " tasks to queues"; //-V128
             }
             return added;
         }
@@ -239,7 +239,7 @@ namespace hpx { namespace threads { namespace policies
 
                     --terminated_items_count_;
                     bool deleted = thread_map_.erase(todelete) != 0;
-                    HPX_UNUSED(deleted);
+                    HPX_UNUSED(deleted); //-V601
                     BOOST_ASSERT(deleted);
                 }
             }
@@ -622,7 +622,7 @@ namespace hpx { namespace threads { namespace policies
                         break;                // terminate scheduling loop
                     }
 
-                    LTM_(debug) << "tfunc(" << num_thread
+                    LTM_(debug) << "tfunc(" << num_thread //-V128
                                 << "): threadmap not empty";
                 }
                 else {
@@ -648,7 +648,7 @@ namespace hpx { namespace threads { namespace policies
                 // Ask again if queues are empty to avoid race conditions (we
                 // needed to lock anyways...), this way no notify_all() gets lost
                 if (0 == work_items_count_) {
-                    LTM_(debug) << "tfunc(" << num_thread
+                    LTM_(debug) << "tfunc(" << num_thread //-V128
                                << "): queues empty, entering wait";
 
     #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
@@ -668,7 +668,7 @@ namespace hpx { namespace threads { namespace policies
                     bool timed_out = !cond_.timed_wait(lk,
                         bpt::microseconds(static_cast<boost::int64_t>(10*idle_loop_count)));
 
-                    LTM_(debug) << "tfunc(" << num_thread << "): exiting wait";
+                    LTM_(debug) << "tfunc(" << num_thread << "): exiting wait"; //-V128
 
                     // make sure all pending new threads are properly queued
                     // but do that only if the lock has been acquired while

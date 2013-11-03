@@ -722,7 +722,7 @@ namespace hpx { namespace performance_counters
         ///////////////////////////////////////////////////////////////////////
         /// Expand all wild-cards in a counter base name (for aggregate counters)
         bool expand_basecounter(
-            counter_info& info, counter_path_elements& p,
+            counter_info const& info, counter_path_elements& p,
             HPX_STD_FUNCTION<discover_counter_func> const& f, error_code& ec)
         {
             // discover all base names
@@ -820,8 +820,7 @@ namespace hpx { namespace performance_counters
             // handle wild-cards in aggregate counters
             if (p.parentinstance_is_basename_)
             {
-                counter_info i = info;
-                return detail::expand_basecounter(i, p, f, ec);
+                return detail::expand_basecounter(info, p, f, ec);
             }
 
             // everything else is handled directly

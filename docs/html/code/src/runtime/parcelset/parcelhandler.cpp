@@ -119,7 +119,7 @@ namespace hpx { namespace parcelset
         boost::shared_ptr<lcos::local::counting_semaphore> sema_;
     };
 
-    void parcelhandler::sync_put_parcel(parcel& p)
+    void parcelhandler::sync_put_parcel(parcel& p) //-V669
     {
         wait_for_put_parcel wfp;
         put_parcel(p, wfp);  // schedule parcel send

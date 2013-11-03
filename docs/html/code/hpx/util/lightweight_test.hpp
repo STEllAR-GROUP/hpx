@@ -186,7 +186,7 @@ inline int report_errors(std::ostream& stream = std::cerr)
     else
     {
         boost::io::ios_flags_saver ifs(stream);
-        stream << sanity << " sanity check"
+        stream << sanity << " sanity check" //-V128
                << ((sanity == 1) ? " and " : "s and ")
                << test << " test"
                << ((test == 1) ? " failed." : "s failed.")

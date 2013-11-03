@@ -185,7 +185,7 @@ namespace hpx { namespace traits
             {
                 result.push_back(result_type::value_type(r));
             }
-            return result;
+            return result; //-V614
         }
     };
 

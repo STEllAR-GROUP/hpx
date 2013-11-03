@@ -522,7 +522,7 @@ namespace hpx { namespace applier
     }
 
     // The function \a get_locality_id returns the id of this locality
-    boost::uint32_t get_locality_id(error_code& ec)
+    boost::uint32_t get_locality_id(error_code& ec) //-V659
     {
         applier** appl = applier::applier_.get();
         return appl ? (*appl)->get_locality_id(ec) : naming::invalid_locality_id;

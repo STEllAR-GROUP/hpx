@@ -194,13 +194,13 @@ namespace hpx {
         {
             add_pre_shutdown_function(f);
         }
-        global_startup_functions.clear();
+        global_pre_shutdown_functions.clear();
 
         BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, global_shutdown_functions)
         {
             add_shutdown_function(f);
         }
-        global_startup_functions.clear();
+        global_shutdown_functions.clear();
 
         // set state to initialized
         set_state(state_initialized);

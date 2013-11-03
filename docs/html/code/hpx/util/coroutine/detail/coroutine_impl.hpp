@@ -540,7 +540,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
       // start looking at the matching heap
       std::size_t const heap_count = wrapper_type::get_heap_count(stack_size);
-      std::size_t const heap_num = std::size_t(id)/32;
+      std::size_t const heap_num = std::size_t(id)/32; //-V112
 
       // look through all heaps to find an available coroutine object
       wrapper_type* wrapper = wrapper_type::allocate(heap_num, stack_size);
@@ -568,7 +568,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   coroutine_impl_wrapper<Functor, CoroutineType, ContextImpl, Heap>::destroy(type* p)
   {
       // always hand the stack back to the matching heap
-      deallocate(p, std::size_t(p->get_thread_id())/32);
+      deallocate(p, std::size_t(p->get_thread_id())/32); //-V112
   }
 
 }}}}
