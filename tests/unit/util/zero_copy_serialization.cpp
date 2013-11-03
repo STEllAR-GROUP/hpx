@@ -106,7 +106,7 @@ void test_normal_serialization(T& arg)
     hpx::parcelset::parcel outp(here, addr,
         new hpx::actions::transfer_action<test_action1>(
             hpx::threads::thread_priority_normal,
-                util::forward_as_tuple(arg)),
+                hpx::util::forward_as_tuple(arg)),
         new hpx::actions::typed_continuation<int>(here));
 
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
@@ -137,7 +137,7 @@ void test_zero_copy_serialization(T& arg)
     hpx::parcelset::parcel outp(here, addr,
         new hpx::actions::transfer_action<test_action1>(
             hpx::threads::thread_priority_normal,
-                util::forward_as_tuple(arg)),
+                hpx::util::forward_as_tuple(arg)),
         new hpx::actions::typed_continuation<int>(here));
 
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
@@ -167,7 +167,7 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     hpx::parcelset::parcel outp(here, addr,
         new hpx::actions::transfer_action<test_action2>(
             hpx::threads::thread_priority_normal,
-                util::forward_as_tuple(arg1, arg2)),
+                hpx::util::forward_as_tuple(arg1, arg2)),
         new hpx::actions::typed_continuation<int>(here));
 
     outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
