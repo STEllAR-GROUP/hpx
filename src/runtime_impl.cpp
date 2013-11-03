@@ -319,6 +319,10 @@ namespace hpx {
         if (blocking)
             return wait();     // wait for the shutdown_action to be executed
 
+        // Register this thread with the runtime system to allow calling certain
+        // HPX functionality from the main thread.
+        init_tss("main-thread", 0, "", false);
+
         return 0;   // return zero as we don't know the outcome of hpx_main yet
     }
 
