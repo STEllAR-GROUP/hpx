@@ -65,6 +65,10 @@ void hpx_test_main(
             HPX_TEST_EQ(false, monitor.is_ready(milliseconds(delay)));
         }
 
+        // Flush pending reference counting operations.
+        garbage_collect();
+        garbage_collect();
+
         // The component should be out of scope now.
         HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));
     }
