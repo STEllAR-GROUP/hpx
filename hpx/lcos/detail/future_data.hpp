@@ -190,6 +190,7 @@ namespace detail
         {
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
+                boost::intrusive_ptr<future_data_base> this_(this);
                 wake_me_up callback(threads::get_self_id());
                 reset_cb r(*this, boost::ref(callback), l);
 
@@ -203,6 +204,7 @@ namespace detail
         {
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
+                boost::intrusive_ptr<future_data_base> this_(this);
                 wake_me_up callback(threads::get_self_id());
                 reset_cb r(*this, boost::ref(callback), l);
 
@@ -218,6 +220,7 @@ namespace detail
         {
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
+                boost::intrusive_ptr<future_data_base> this_(this);
                 wake_me_up callback(threads::get_self_id());
                 reset_cb r(*this, boost::ref(callback), l);
 
