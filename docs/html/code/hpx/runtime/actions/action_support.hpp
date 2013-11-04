@@ -393,26 +393,9 @@ namespace hpx { namespace actions
         transfer_action() {}
 
         // construct an action from its arguments
-        explicit transfer_action(threads::thread_priority priority)
-          : arguments_(),
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
-            parent_locality_(transfer_action::get_locality_id()),
-            parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
-            parent_phase_(threads::get_parent_phase()),
-#endif
-            priority_(
-                detail::thread_priority<
-                    static_cast<threads::thread_priority>(priority_value)
-                >::call(priority)),
-            stacksize_(
-                detail::thread_stacksize<
-                    static_cast<threads::thread_stacksize>(stacksize_value)
-                >::call(threads::thread_stacksize_default))
-        {}
-
-        template <typename Arg0>
-        explicit transfer_action(BOOST_FWD_REF(Arg0) arg0)
-          : arguments_(boost::forward<Arg0>(arg0)),
+        template <typename Args>
+        explicit transfer_action(BOOST_FWD_REF(Args) args)
+          : arguments_(boost::forward<Args>(args)),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
@@ -428,9 +411,9 @@ namespace hpx { namespace actions
                 >::call(threads::thread_stacksize_default))
         {}
 
-        template <typename Arg0>
-        transfer_action(threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
-          : arguments_(boost::forward<Arg0>(arg0)),
+        template <typename Args>
+        transfer_action(threads::thread_priority priority, BOOST_FWD_REF(Args) args)
+          : arguments_(boost::forward<Args>(args)),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
@@ -445,13 +428,6 @@ namespace hpx { namespace actions
                     static_cast<threads::thread_stacksize>(stacksize_value)
                 >::call(threads::thread_stacksize_default))
         {}
-
-        // bring in the rest of the constructors
-#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
-        #include <hpx/runtime/actions/transfer_action_constructors.hpp>
-#else
-        #include <hpx/runtime/actions/transfer_action_constructors_no_parent_reference.hpp>
-#endif
 
         //
         ~transfer_action()

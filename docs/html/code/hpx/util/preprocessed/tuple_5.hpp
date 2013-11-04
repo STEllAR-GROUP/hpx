@@ -189,7 +189,6 @@ namespace hpx { namespace util
     
     
     
-    
     template <typename T0>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     tuple<typename detail::make_tuple_element<T0>::type>
@@ -228,7 +227,6 @@ namespace hpx { namespace util
                 v0
             );
     }
-    
     
     
     namespace detail
@@ -455,7 +453,6 @@ namespace hpx { namespace util
     
     
     
-    
     template <typename T0 , typename T1>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type>
@@ -494,7 +491,6 @@ namespace hpx { namespace util
                 v0 , v1
             );
     }
-    
     
     
     namespace detail
@@ -721,7 +717,6 @@ namespace hpx { namespace util
     
     
     
-    
     template <typename T0 , typename T1 , typename T2>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type>
@@ -760,7 +755,6 @@ namespace hpx { namespace util
                 v0 , v1 , v2
             );
     }
-    
     
     
     namespace detail
@@ -1008,7 +1002,6 @@ namespace hpx { namespace util
     
     
     
-    
     template <typename T0 , typename T1 , typename T2 , typename T3>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type>
@@ -1047,7 +1040,6 @@ namespace hpx { namespace util
                 v0 , v1 , v2 , v3
             );
     }
-    
     
     
     namespace detail
@@ -1292,7 +1284,6 @@ namespace hpx { namespace util
     
     
     
-    
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type , typename detail::make_tuple_element<T4>::type>
@@ -1331,7 +1322,6 @@ namespace hpx { namespace util
                 v0 , v1 , v2 , v3 , v4
             );
     }
-    
     
     
     namespace detail
@@ -1579,7 +1569,6 @@ namespace hpx { namespace util
     
     
     
-    
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type , typename detail::make_tuple_element<T4>::type , typename detail::make_tuple_element<T5>::type>
@@ -1618,7 +1607,6 @@ namespace hpx { namespace util
                 v0 , v1 , v2 , v3 , v4 , v5
             );
     }
-    
     
     
     namespace detail
@@ -1863,7 +1851,6 @@ namespace hpx { namespace util
     
     
     
-    
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type , typename detail::make_tuple_element<T4>::type , typename detail::make_tuple_element<T5>::type , typename detail::make_tuple_element<T6>::type>
@@ -1902,7 +1889,6 @@ namespace hpx { namespace util
                 v0 , v1 , v2 , v3 , v4 , v5 , v6
             );
     }
-    
     
     
     namespace detail
@@ -2150,7 +2136,6 @@ namespace hpx { namespace util
     
     
     
-    
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     tuple<typename detail::make_tuple_element<T0>::type , typename detail::make_tuple_element<T1>::type , typename detail::make_tuple_element<T2>::type , typename detail::make_tuple_element<T3>::type , typename detail::make_tuple_element<T4>::type , typename detail::make_tuple_element<T5>::type , typename detail::make_tuple_element<T6>::type , typename detail::make_tuple_element<T7>::type>
@@ -2189,7 +2174,6 @@ namespace hpx { namespace util
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7
             );
     }
-    
     
     
     namespace detail

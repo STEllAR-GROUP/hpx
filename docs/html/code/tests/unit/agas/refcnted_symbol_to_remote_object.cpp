@@ -107,6 +107,7 @@ void hpx_test_main(
         HPX_TEST_EQ(gid, unregister_name_sync(name).get_gid());
 
         // Flush pending reference counting operations.
+        garbage_collect(remote_localities[0]);
         garbage_collect();
         garbage_collect(remote_localities[0]);
         garbage_collect();

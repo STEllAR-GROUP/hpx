@@ -170,6 +170,33 @@ struct fixture
         }
         return true;
     }
+
+    template <typename T, typename U, typename V>
+    bool check_range(char const* file, int line, char const* function,
+                          counter_type c, T const& t, U const& u, V const& v,
+                          char const* msg)
+    {
+        if (!(t >= u && t <= v))
+        {
+            mutex_type::scoped_lock l(mutex_);
+            boost::io::ios_flags_saver ifs(stream_);
+            if (!(t >= u))
+            {
+                stream_
+                    << file << "(" << line << "): " << msg
+                    << " failed in function '" << function << "': "
+                    << "'" << t << "' < '" << u << "'" << std::endl;
+            } else {
+                stream_
+                    << file << "(" << line << "): " << msg
+                    << " failed in function '" << function << "': "
+                    << "'" << t << "' > '" << v << "'" << std::endl;
+            }
+            increment(c);
+            return false;
+        }
+        return true;
+    }
 };
 
 extern fixture global_fixture;
@@ -243,6 +270,15 @@ inline int report_errors(std::ostream& stream = std::cerr)
                                 BOOST_PP_STRINGIZE(expr2) "'")              \
     /***/
 
+#define HPX_TEST_RANGE(expr1, expr2, expr3)                                 \
+    ::hpx::util::detail::global_fixture.check_range                         \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::counter_test,                                         \
+         expr1, expr2, expr3, "test '" BOOST_PP_STRINGIZE(expr2) " <= "     \
+                                BOOST_PP_STRINGIZE(expr1) " <= "            \
+                                BOOST_PP_STRINGIZE(expr3) "'")              \
+    /***/
+
 #define HPX_TEST_EQ_MSG(expr1, expr2, msg)                                  \
     ::hpx::util::detail::global_fixture.check_equal                         \
         (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
@@ -301,6 +337,15 @@ inline int report_errors(std::ostream& stream = std::cerr)
          ::hpx::util::counter_sanity,                                       \
          expr1, expr2, "sanity check '" BOOST_PP_STRINGIZE(expr1) " <= "    \
                                         BOOST_PP_STRINGIZE(expr2) "'")      \
+    /***/
+
+#define HPX_SANITY_RANGE(expr1, expr2, expr3)                               \
+    ::hpx::util::detail::global_fixture.check_range                         \
+        (__FILE__, __LINE__, BOOST_CURRENT_FUNCTION,                        \
+         ::hpx::util::counter_sanity,                                       \
+         expr1, expr2, expr3, "sanity check '" BOOST_PP_STRINGIZE(expr2) " <= "\
+                                               BOOST_PP_STRINGIZE(expr1) " <= "\
+                                               BOOST_PP_STRINGIZE(expr3) "'")\
     /***/
 
 #define HPX_SANITY_EQ_MSG(expr1, expr2, msg)                                \

@@ -26,6 +26,8 @@ using boost::posix_time::milliseconds;
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
 
+using hpx::agas::garbage_collect;
+
 using hpx::test::simple_refcnt_monitor;
 using hpx::test::managed_refcnt_monitor;
 
@@ -64,6 +66,10 @@ void hpx_test_main(
             // The component should still be alive.
             HPX_TEST_EQ(false, monitor.is_ready(milliseconds(delay)));
         }
+
+        // Flush pending reference counting operations.
+        garbage_collect();
+        garbage_collect();
 
         // The component should be out of scope now.
         HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));

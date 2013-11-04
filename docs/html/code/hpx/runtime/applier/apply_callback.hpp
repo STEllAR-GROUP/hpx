@@ -29,7 +29,8 @@ namespace hpx
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(priority));
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple()));
 
             // Send the parcel through the parcel handler
             hpx::applier::get_applier().get_parcel_handler()
@@ -109,7 +110,8 @@ namespace hpx
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(priority), cont);
+                new hpx::actions::transfer_action<action_type>(priority,
+                    util::forward_as_tuple()), cont);
 
             // Send the parcel through the parcel handler
             hpx::applier::get_applier().get_parcel_handler()

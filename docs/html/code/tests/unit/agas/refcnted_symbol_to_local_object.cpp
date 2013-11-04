@@ -94,6 +94,7 @@ void hpx_test_main(
 
         // Flush pending reference counting operations.
         garbage_collect();
+        garbage_collect();
 
         // The component should be destroyed.
         HPX_TEST_EQ(true, monitor.is_ready(milliseconds(delay)));
