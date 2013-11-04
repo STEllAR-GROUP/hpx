@@ -233,8 +233,7 @@ namespace hpx { namespace util { namespace detail
             return state_ == has_error;
         }
 
-    private:
-        // access stored datprivate:
+        // access stored data
 #if __GNUC__ == 4 && __GNUC_MINOR__ == 4
         value_type move_value()
         {
@@ -257,7 +256,6 @@ namespace hpx { namespace util { namespace detail
         }
 #endif
 
-    public:
         value_type& get_value()
         {
             if (!stores_value()) {

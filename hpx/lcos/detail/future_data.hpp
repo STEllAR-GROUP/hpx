@@ -334,7 +334,7 @@ namespace detail
                 return handle_error(d, ec);
 
             // no error has been reported, return the result
-            return boost::move(d.get_value());
+            return d.move_value();
         }
 
         result_type move_data(error_code& ec = throws)
@@ -359,7 +359,7 @@ namespace detail
                 return handle_error(d, ec);
 
             // no error has been reported, return the result
-            return boost::move(d.get_value());
+            return d.move_value();
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -490,7 +490,7 @@ namespace detail
         set_on_completed(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
-            return boost::move(set_on_completed_locked(boost::move(data_sink), l));
+            return set_on_completed_locked(boost::move(data_sink), l);
         }
 
     private:
@@ -648,7 +648,7 @@ namespace detail
         {
             if (!was_started())
                 this->do_run();
-            return boost::move(this->future_data<Result>::get_data(ec));
+            return this->future_data<Result>::get_data(ec);
         }
 
         // moving out the value
@@ -656,7 +656,7 @@ namespace detail
         {
             if (!was_started())
                 this->do_run();
-            return boost::move(this->future_data<Result>::move_data(ec));
+            return this->future_data<Result>::move_data(ec);
         }
 
     private:

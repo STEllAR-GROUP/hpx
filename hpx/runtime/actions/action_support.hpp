@@ -480,8 +480,7 @@ namespace hpx { namespace actions
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva)
         {
-            return boost::move(Action::construct_thread_function(
-                lva, arguments_));
+            return Action::construct_thread_function(lva, arguments_);
         }
 
         /// The \a get_thread_function constructs a proper thread function for
@@ -503,8 +502,7 @@ namespace hpx { namespace actions
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
-            return boost::move(Action::construct_thread_function(
-                cont, lva, arguments_));
+            return Action::construct_thread_function(cont, lva, arguments_);
         }
 
 #if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
@@ -568,7 +566,7 @@ namespace hpx { namespace actions
         get_thread_init_data(naming::id_type const& target,
             naming::address::address_type lva, threads::thread_init_data& data)
         {
-            data.func = boost::move(Action::construct_thread_function(lva, arguments_));
+            data.func = get_thread_function(lva);
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             data.lva = lva;
 #endif
@@ -590,7 +588,7 @@ namespace hpx { namespace actions
         get_thread_init_data(continuation_type& cont, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_init_data& data)
         {
-            data.func = boost::move(Action::construct_thread_function(cont, lva, arguments_));
+            data.func = get_thread_function(cont, lva);
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             data.lva = lva;
 #endif
@@ -824,7 +822,7 @@ namespace hpx { namespace actions
         decorate_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type lva)
         {
-            return boost::move(Component::wrap_action(boost::move(f), lva));
+            return Component::wrap_action(boost::move(f), lva);
         }
 
     private:

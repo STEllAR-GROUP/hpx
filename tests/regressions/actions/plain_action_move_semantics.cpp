@@ -505,9 +505,9 @@ void test_object_actions()
                 return_move_object<
                     return_non_movable_object_action, non_movable_object
                 >(id)
-            ), 4u, 6u); // ?call + value_or_error(w) + value_or_error(r) +
-                    // future_data::move_data + future::move + ?return
-            //! should be: ?call + value_or_error(w) + future::move + ?return
+            ), 3u, 6u); // ?call + value_or_error(w) + value_or_error(r) +
+                    // future_data::move_data + ?future::move + ?return
+            //! should be: ?call + value_or_error(w) + ?future::move + ?return
         } else {
             HPX_TEST_RANGE((
                 return_object<
@@ -523,11 +523,11 @@ void test_object_actions()
                 return_move_object<
                     return_non_movable_object_action, non_movable_object
                 >(id)
-            ), 7u, 9u); // transfer_action + bind + function + ?call +
+            ), 6u, 9u); // transfer_action + bind + function + ?call +
                     // value_or_error(w) + value_or_error(r) +
-                    // future_data::move_data + future::move + ?return
+                    // future_data::move_data + ?future::move + ?return
             //! should be: transfer_action + bind + function + ?call +
-            //             value_or_error(w) + future::move + ?return
+            //             value_or_error(w) + ?future::move + ?return
         }
     }
 }
@@ -671,9 +671,9 @@ void test_object_direct_actions()
                 return_move_object<
                     return_non_movable_object_direct_action, non_movable_object
                 >(id)
-            ), 4u, 6u); // ?call + value_or_error(w) + value_or_error(r) +
-                    // future_data::move_data + future::move + ?return
-            //! should be: ?call + value_or_error(w) + future::move + ?return
+            ), 3u, 6u); // ?call + value_or_error(w) + value_or_error(r) +
+                    // future_data::move_data + ?future::move + ?return
+            //! should be: ?call + value_or_error(w) + ?future::move + ?return
         } else {
             HPX_TEST_RANGE((
                 return_object<
@@ -689,11 +689,11 @@ void test_object_direct_actions()
                 return_move_object<
                     return_non_movable_object_direct_action, non_movable_object
                 >(id)
-            ), 7u, 9u); // transfer_action + bind + function + ?call +
+            ), 6u, 9u); // transfer_action + bind + function + ?call +
                     // value_or_error(w) + value_or_error(r) +
-                    // future_data::move_data + future::move + ?return
+                    // future_data::move_data + ?future::move + ?return
             //! should be: transfer_action + bind + function + ?call +
-            //             value_or_error(w) + future::move + ?return
+            //             value_or_error(w) + ?future::move + ?return
         }
     }
 }
