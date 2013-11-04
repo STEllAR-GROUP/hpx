@@ -102,7 +102,7 @@ void test_actions()
                 pass_object<
                     action_move_semantics::test_movable_action, movable_object
                 >(id)
-            ), 2u); // transfer_action*2
+            ), 2u); // transfer_action + bind
             //! should be: transfer_action
 
             HPX_TEST_EQ((
@@ -154,7 +154,7 @@ void test_actions()
                 return_object<
                     action_move_semantics::return_test_movable_action, movable_object
                 >(id)
-            ), 2u); // transfer_action*2
+            ), 2u); // transfer_action + bind
             //! should_be: transfer_action
         }
         
@@ -211,7 +211,7 @@ void test_direct_actions()
                 pass_object<
                     action_move_semantics::test_movable_direct_action, movable_object
                 >(id)
-            ), 2u); // transfer_action*2
+            ), 2u); // transfer_action + bind
             //! should be: transfer_action
 
             HPX_TEST_EQ((
