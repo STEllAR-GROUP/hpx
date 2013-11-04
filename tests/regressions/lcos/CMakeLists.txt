@@ -15,6 +15,7 @@ set(tests
     lifetime_588_1
     set_hpx_limit_771
     set_hpx_limit_798
+    promise_leak
    )
 
 # MSVC 2010 is not able to cope with this test
