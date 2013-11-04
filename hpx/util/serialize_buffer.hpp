@@ -37,7 +37,7 @@ namespace hpx { namespace util
           : size_(0)
         {}
 
-        serialize_buffer (T* data, std::size_t size, init_mode mode = copy)
+        serialize_buffer (const T* data, std::size_t size, init_mode mode = copy)
           : data_(), size_(size)
         {
             if (mode == copy) {
