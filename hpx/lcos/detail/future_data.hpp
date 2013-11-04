@@ -156,7 +156,7 @@ namespace detail
             ) : thread_id_(thread_id)
             {}
 
-            void operator()() const
+            void operator()(lcos::future<Result>& /*f*/) const
             {
                 threads::set_thread_state(
                     thread_id_, threads::pending, threads::wait_timeout);
