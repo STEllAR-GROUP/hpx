@@ -148,10 +148,22 @@ namespace detail
         virtual completed_callback_type reset_on_completed_locked() = 0;
 
         // wait support
-        void wake_me_up(threads::thread_id_type id)
+        struct wake_me_up
         {
-            threads::set_thread_state(id, threads::pending, threads::wait_timeout);
-        }
+            explicit wake_me_up(
+                threads::thread_id_type const& thread_id =
+                    threads::get_self_id()
+            ) : thread_id_(thread_id)
+            {}
+
+            void operator()() const
+            {
+                threads::set_thread_state(
+                    thread_id_, threads::pending, threads::wait_timeout);
+            }
+
+            threads::thread_id_type thread_id_;
+        };
 
         struct reset_cb
         {
@@ -178,10 +190,8 @@ namespace detail
         {
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
-                boost::intrusive_ptr<future_data_base> this_(this);
-                reset_cb r(*this, util::bind(
-                    &future_data_base::wake_me_up, this_, threads::get_self_id()),
-                    l);
+                wake_me_up callback(threads::get_self_id());
+                reset_cb r(*this, boost::ref(callback), l);
 
                 util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 this_thread::suspend(threads::suspended);
@@ -193,10 +203,8 @@ namespace detail
         {
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
-                boost::intrusive_ptr<future_data_base> this_(this);
-                reset_cb r(*this, util::bind(
-                    &future_data_base::wake_me_up, this_, threads::get_self_id()),
-                    l);
+                wake_me_up callback(threads::get_self_id());
+                reset_cb r(*this, boost::ref(callback), l);
 
                 util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(p) == threads::wait_signaled) ? //-V110
@@ -210,10 +218,8 @@ namespace detail
         {
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
-                boost::intrusive_ptr<future_data_base> this_(this);
-                reset_cb r(*this, util::bind(
-                    &future_data_base::wake_me_up, this_, threads::get_self_id()),
-                    l);
+                wake_me_up callback(threads::get_self_id());
+                reset_cb r(*this, boost::ref(callback), l);
 
                 util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(at) == threads::wait_signaled) ? //-V110
