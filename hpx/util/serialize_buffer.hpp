@@ -49,7 +49,7 @@ namespace hpx { namespace util
             }
         }
 
-        void const* data() const { return data_; }
+        T const* data() const { return data_.get(); }
         std::size_t size() const { return size_; }
 
     private:
