@@ -26,6 +26,8 @@ using boost::posix_time::milliseconds;
 using hpx::naming::id_type;
 using hpx::naming::get_management_type_name;
 
+using hpx::agas::garbage_collect;
+
 using hpx::test::simple_refcnt_monitor;
 using hpx::test::managed_refcnt_monitor;
 
