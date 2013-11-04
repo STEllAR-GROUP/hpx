@@ -89,7 +89,6 @@ namespace detail
     protected:
         future_data_refcnt_base() : count_(0) {}
 
-    private:
         // reference counting
         friend void intrusive_ptr_add_ref(future_data_refcnt_base* p);
         friend void intrusive_ptr_release(future_data_refcnt_base* p);

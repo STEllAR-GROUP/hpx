@@ -142,6 +142,12 @@ namespace hpx { namespace components
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
+    template <typename Result, typename RemoteResult>
+    class promise;
+
+    template <typename Result, typename RemoteResult>
+    void intrusive_ptr_release(promise<Result, RemoteResult>* p);
+
     ///////////////////////////////////////////////////////////////////////////
     /// A promise can be used by a single thread to invoke a (remote)
     /// action and wait for the result.
@@ -244,6 +250,23 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     private:
+        friend void intrusive_ptr_release(promise* p)
+        {
+            bool get_gid_was_called = (0 == naming::detail::get_credit_from_gid(p->gid_));
+            long counter = --p->count_;
+
+            // if this promise was never asked for its id we need to take
+            // special precautions for it to go out of scope
+            if (1 == counter && !get_gid_was_called)
+            {
+                p->get_gid();          // this will trigger normal destruction
+            }
+            else if (0 == counter)
+            {
+                delete p;
+            }
+        }
+
         template <typename>
         friend struct components::detail_adl_barrier::init;
 
@@ -356,6 +379,23 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     private:
+        friend void intrusive_ptr_release(promise* p)
+        {
+            bool get_gid_was_called = (0 == naming::detail::get_credit_from_gid(p->gid_));
+            long counter = --p->count_;
+
+            // if this promise was never asked for its id we need to take
+            // special precautions for it to go out of scope
+            if (1 == counter && !get_gid_was_called)
+            {
+                p->get_gid();          // this will trigger normal destruction
+            }
+            else if (0 == counter)
+            {
+                delete p;
+            }
+        }
+
         template <typename>
         friend struct components::detail_adl_barrier::init;
 
