@@ -452,7 +452,9 @@ endif()
 # If you want to run hpx applications without installing them, set this to
 # ${CMAKE_BINARY_DIR} when using Makefiles or
 # ${CMAKE_BINARY_DIR}/$(Configuration) when using Visual Studio
-if(HPX_NO_INSTALL)
+if("${HPX_PLATFORM}" STREQUAL "Android")
+  set(HPX_PREFIX "lib" CACHE PATH "Where the hpx applications look for component dlls" FORCE)
+elseif(HPX_NO_INSTALL)
   if(MSVC)
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" CACHE PATH "Prefix prepended to install directories." FORCE)
     set(HPX_PREFIX "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}" CACHE PATH "Where the hpx applications look for component dlls" FORCE)
@@ -1235,6 +1237,8 @@ else()
 
     hpx_use_flag_if_available(-Wno-strict-aliasing LANGUAGES CXX C Fortran)
     hpx_use_flag_if_available(-Wsign-promo LANGUAGES CXX)
+    #hpx_use_flag_if_available(-Wno-attributes LANGUAGES CXX)
+    hpx_use_flag_if_available(-Wno-cast-align LANGUAGES CXX)
   endif()
 
 
@@ -1282,6 +1286,8 @@ else()
       set(enable_visibility_hidden OFF)
     elseif(${GCC_VERSION} GREATER 040699 AND ${GCC_VERSION} LESS 040800)
       # visibility is broken for gcc 4.7.x
+      set(enable_visibility_hidden OFF)
+    elseif("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
       set(enable_visibility_hidden OFF)
     elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
       set(enable_visibility_hidden OFF)
@@ -1445,8 +1451,12 @@ else()
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} dl)
   endif()
 
-  if(NOT APPLE)
+  if(NOT APPLE AND NOT ("${HPX_PLATFORM}" STREQUAL "Android"))
     set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} rt)
+  endif()
+
+  if("${HPX_PLATFORM}" STREQUAL "Android")
+    set(hpx_RUNTIME_LIBRARIES ${hpx_RUNTIME_LIBRARIES} log)
   endif()
 
   hpx_check_for_pthread_affinity_np(HPX_PTHREAD_AFFINITY_NP
@@ -1861,9 +1871,10 @@ foreach(library ${BOOST_LIBRARIES})
   string(TOUPPER ${library} library_uc)
   string(REGEX REPLACE "([ ()])" "\\\\\\1" "BOOST_${library_uc}_LIBRARY" "${BOOST_${library_uc}_LIBRARY}")
   set(boost_library_info
-    "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY}\n")
-  set(boost_library_info
-    "${boost_library_info}    CACHE FILEPATH \"Boost ${library} shared library.\")\n")
+    "${boost_library_info}set(HPX_BOOST_${library_uc}_LIBRARY ${BOOST_${library_uc}_LIBRARY})\n")
+# FIXME: this doesn't work when used in external projects
+#  set(boost_library_info
+#    "${boost_library_info}    CACHE FILEPATH \"Boost ${library} shared library.\")\n")
 endforeach()
 
 set(external_definitions "")

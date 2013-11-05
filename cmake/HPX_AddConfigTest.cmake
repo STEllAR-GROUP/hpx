@@ -56,10 +56,14 @@ macro(add_hpx_config_test name variable)
     elseif("${${name}_RESULT}" STREQUAL "0")
       set(test_result 0)
 
-      execute_process(
-        COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${name}"
-                ${${name}_ARGS}
-        RESULT_VARIABLE test_result OUTPUT_QUIET ERROR_QUIET)
+      if(NOT CMAKE_CROSSCOMPILING)
+        execute_process(
+          COMMAND "${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/config_tests/${name}"
+                  ${${name}_ARGS}
+          RESULT_VARIABLE test_result OUTPUT_QUIET ERROR_QUIET)
+      else()
+        set(test_result "0")
+      endif()
 
       if("${test_result}" STREQUAL "0")
         set(${variable} ON CACHE STRING "${name} state.")

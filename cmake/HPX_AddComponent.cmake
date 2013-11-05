@@ -150,13 +150,20 @@ macro(add_hpx_component name)
   endif()
 
   # set properties of generated shared library
-  set_target_properties(${name}_component PROPERTIES
-    # create *nix style library versions + symbolic links
-    VERSION ${HPX_VERSION}
-    SOVERSION ${HPX_SOVERSION}
-    # allow creating static and shared libs without conflicts
-    CLEAN_DIRECT_OUTPUT 1
-    OUTPUT_NAME ${lib_name})
+  if("${HPX_PLATFORM}" STREQUAL "Android")
+    set_target_properties(${name}_component PROPERTIES
+      # allow creating static and shared libs without conflicts
+      CLEAN_DIRECT_OUTPUT 1
+      OUTPUT_NAME ${lib_name})
+  else()
+    set_target_properties(${name}_component PROPERTIES
+      # create *nix style library versions + symbolic links
+      VERSION ${HPX_VERSION}
+      SOVERSION ${HPX_SOVERSION}
+      # allow creating static and shared libs without conflicts
+      CLEAN_DIRECT_OUTPUT 1
+      OUTPUT_NAME ${lib_name})
+  endif()
 
   if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
     set_target_properties(${name}_component PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")

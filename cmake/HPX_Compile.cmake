@@ -45,55 +45,89 @@ macro(hpx_compile_object name)
   endif()
 endmacro()
 
+#macro(hpx_compile name)
+#  hpx_parse_arguments(${name}
+#    "SOURCE;LANGUAGE;FLAGS;OUTPUT" "QUIET" ${ARGN})
+#
+#  if(NOT MSVC)
+#    set(outflag "-o")
+#    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "${${name}_OUTPUT}")
+#  else()
+#    set(outflag "")
+#    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-Fo${${name}_OUTPUT}")
+#  endif()
+#
+#  if(${name}_QUIET)
+#    hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
+#        " ${${name}_FLAGS} ${${name}_SOURCE} "
+#        " ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
+#    execute_process(
+#      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
+#              "${${name}_SOURCE}"
+#              ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
+#              RESULT_VARIABLE ${name}_RESULT OUTPUT_QUIET ERROR_VARIABLE ${name}_ERROR_OUTPUT)
+#  else()
+#    hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
+#        " ${${name}_FLAGS} ${${name}_SOURCE}"
+#        " ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
+#    execute_process(
+#      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
+#              "${${name}_SOURCE}"
+#              ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
+#      RESULT_VARIABLE ${name}_RESULT
+#      ERROR_VARIABLE ${name}_STDERR
+#      OUTPUT_VARIABLE ${name}_STDOUT
+#      OUTPUT_STRIP_TRAILING_WHITESPACE
+#      ERROR_STRIP_TRAILING_WHITESPACE
+#      )
+#      if(${name}_STDERR)
+#        if("${CMAKE_${${name}_LANGUAGE}_COMPILER_ID}" STREQUAL "Intel")
+#          string(REGEX MATCH ".*command line warning #.*" ${name}_HAS_COMMAND_LINE_WARNING ${${name}_STDERR})
+#          if(${name}_HAS_COMMAND_LINE_WARNING)
+#            set(${name}_RESULT "1")
+#          endif()
+#        elseif("${CMAKE_${${name}_LANGUAGE}_COMPILER_ID}" STREQUAL "Clang")
+#          string(REGEX MATCH ".*(argument unused during compilation|unknown warning option).*" ${name}_HAS_UNUSED_ARGUMENT_WARNING ${${name}_STDERR})
+#        endif()
+#        file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.stderr ${${name}_STDERR})
+#      endif()
+#      if(${name}_STDOUT)
+#        file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.stdout ${${name}_STDOUT})
+#      endif()
+#  endif()
+#endmacro()
+
 macro(hpx_compile name)
   hpx_parse_arguments(${name}
     "SOURCE;LANGUAGE;FLAGS;OUTPUT" "QUIET" ${ARGN})
 
-  if(NOT MSVC)
-    set(outflag "-o")
-    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "${${name}_OUTPUT}")
-  else()
-    set(outflag "")
-    set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-Fo${${name}_OUTPUT}")
-  endif()
+  get_filename_component(${name}_OUTPUT_DIR ${${name}_OUTPUT} PATH)
 
-  if(${name}_QUIET)
-    hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
-        " ${${name}_FLAGS} ${${name}_SOURCE} "
-        " ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
-    execute_process(
-      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
-              "${${name}_SOURCE}"
-              ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
-              RESULT_VARIABLE ${name}_RESULT OUTPUT_QUIET ERROR_VARIABLE ${name}_ERROR_OUTPUT)
+  set(${name}_FLAGS_STRING "${CMAKE_${${name}_LANGUAGE}_FLAGS}")
+  foreach(flag ${${name}_FLAGS})
+    set(${name}_FLAGS_STRING "${${name}_FLAGS_STRING} ${flag}")
+  endforeach()
+
+  set(${name_RESULT} "test")
+  try_compile(
+    ${name}_RESULT ${${name}_OUTPUT_DIR} ${${name}_SOURCE}
+    COMPILE_DEFINITIONS "${${name}_FLAGS_STRING}"
+    OUTPUT_VARIABLE ${name}_OUT
+    COPY_FILE ${${name}_OUTPUT})
+  
+  hpx_debug("compile" "${${name}_OUT}")
+  if(${name}_RESULT)
+    set(${name}_RESULT "0")
+    if("${CMAKE_${${name}_LANGUAGE}_COMPILER_ID}" STREQUAL "Intel")
+      string(REGEX MATCH ".*command line warning #.*" ${name}_HAS_COMMAND_LINE_WARNING ${${name}_OUT})
+      if(${name}_HAS_COMMAND_LINE_WARNING)
+        set(${name}_RESULT "1")
+      endif()
+    elseif("${CMAKE_${${name}_LANGUAGE}_COMPILER_ID}" STREQUAL "Clang")
+      string(REGEX MATCH ".*(argument unused during compilation|unknown warning option).*" ${name}_HAS_UNUSED_ARGUMENT_WARNING ${${name}_OUT})
+    endif()
   else()
-    hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
-        " ${${name}_FLAGS} ${${name}_SOURCE}"
-        " ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}")
-    execute_process(
-      COMMAND "${CMAKE_${${name}_LANGUAGE}_COMPILER}" ${${name}_FLAGS}
-              "${${name}_SOURCE}"
-              ${outflag} ${${name}_${${name}_LANGUAGE}_COMPILEROUTNAME}
-      RESULT_VARIABLE ${name}_RESULT
-      ERROR_VARIABLE ${name}_STDERR
-      OUTPUT_VARIABLE ${name}_STDOUT
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-      ERROR_STRIP_TRAILING_WHITESPACE
-      )
-      if(${name}_STDERR)
-        if("${CMAKE_${${name}_LANGUAGE}_COMPILER_ID}" STREQUAL "Intel")
-          string(REGEX MATCH ".*command line warning #.*" ${name}_HAS_COMMAND_LINE_WARNING ${${name}_STDERR})
-          if(${name}_HAS_COMMAND_LINE_WARNING)
-            set(${name}_RESULT "1")
-          endif()
-        elseif("${CMAKE_${${name}_LANGUAGE}_COMPILER_ID}" STREQUAL "Clang")
-          string(REGEX MATCH ".*(argument unused during compilation|unknown warning option).*" ${name}_HAS_UNUSED_ARGUMENT_WARNING ${${name}_STDERR})
-        endif()
-        file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.stderr ${${name}_STDERR})
-      endif()
-      if(${name}_STDOUT)
-        file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.stdout ${${name}_STDOUT})
-      endif()
+    set(${name}_RESULT "1")
   endif()
 endmacro()
 
