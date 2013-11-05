@@ -346,11 +346,15 @@ namespace detail
             return d.move_value();
         }
 
+    private:
+        static bool always_false(data_type const&) { return false; }
+
+    public:
         result_type move_data(error_code& ec = throws)
         {
             // yields control if needed
             data_type d;
-            data_.read_and_empty(d, ec); // moves the data from the store
+            data_.read_and_empty_if(d, &always_false, ec); // moves the data from the store
             if (ec) return result_type();
 
             if (d.is_empty()) {

@@ -144,6 +144,30 @@ namespace hpx { namespace lcos { namespace detail
             data_.enqueue_full_empty(dest, ec);
         }
 
+        /// \brief  Waits for memory to become full and then reads it, sets
+        ///         memory to empty if the predicate is true. If the location
+        ///         is empty the calling thread will wait (block) for another
+        ///         thread to call either the function \a set or the function
+        ///         \a write.
+        ///
+        /// \param pred [in] this predicate will be invoked for the rerieved
+        ///           data value. I the predicate returns true, the memory
+        ///           will be set to empty.
+        /// \param ec [in,out] this represents the error status on exit,
+        ///           if this is pre-initialized to \a hpx#throws
+        ///           the function will throw on error instead. If the operation
+        ///           blocks and is aborted because the object went out of
+        ///           scope, the code \a hpx#yield_aborted is set or thrown.
+        ///
+        /// \note   When memory becomes empty, only one thread blocked like this
+        ///         will be queued to run (one thread waiting in a \a write
+        ///         function).
+        template <typename Target, typename F>
+        void read_and_empty_if(Target& dest, F const& f, error_code& ec = throws)
+        {
+            data_.enqueue_full_empty_if(dest, f, ec);
+        }
+
         /// \brief  Writes memory and atomically sets its state to full without
         ///         waiting for it to become empty.
         ///

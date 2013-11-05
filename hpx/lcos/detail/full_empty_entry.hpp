@@ -328,6 +328,78 @@ namespace hpx { namespace lcos { namespace detail
                 ec = make_success_code();
         }
 
+        template <typename T, typename F>
+        void enqueue_full_empty_if(T& dest, F const& f, error_code& ec = throws)
+        {
+            mutex_type::scoped_lock l(mtx_);
+
+            // block if this entry is empty
+            if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (0 == self || ec) return;
+
+                // enqueue the request and block this thread
+                queue_entry f(threads::get_self_id());
+                read_and_empty_queue_.push_back(f);
+
+                reset_queue_entry r(f, read_and_empty_queue_);
+
+                {
+                    // yield this thread
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                    this_thread::suspend(threads::suspended,
+                        "full_empty_entry::enqueue_full_empty", ec);
+                    if (ec) return;
+                }
+            }
+
+            // move the data to the destination
+            dest = boost::move(data_);
+
+            if (f(dest)) {
+                set_empty_locked(ec);   // state_ = empty;
+                if (ec) return;
+            }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+        }
+
+        // same as above, but for entries without associated data
+        template <typename T, typename F>
+        void enqueue_full_empty_if(F const& f, error_code& ec = throws)
+        {
+            mutex_type::scoped_lock l(mtx_);
+
+            // block if this entry is empty
+            if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (0 == self || ec) return;
+
+                // enqueue the request and block this thread
+                queue_entry f(threads::get_self_id());
+                read_and_empty_queue_.push_back(f);
+
+                reset_queue_entry r(f, read_and_empty_queue_);
+
+                {
+                    // yield this thread
+                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                    this_thread::suspend(threads::suspended,
+                        "full_empty_entry::enqueue_full_empty", ec);
+                    if (ec) return;
+                }
+            }
+
+            if (f()) {
+                set_empty_locked(ec);   // state_ = empty;
+                if (ec) return;
+            }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
         template <typename T>
