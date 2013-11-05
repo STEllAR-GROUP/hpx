@@ -330,13 +330,13 @@ int hpx_main(variables_map&)
                 return_non_movable_object_action, non_movable_object
             >(id)
         ),
-        is_local ? 8u : 11u, is_local ? 10u : 12u);
+        is_local ? 7u : 10u, is_local ? 10u : 12u);
 
         HPX_TEST_RANGE((
             return_move_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
-        ), is_local ? 8u : 11u, is_local ? 10u : 12u);
+        ), is_local ? 7u : 10u, is_local ? 10u : 12u);
     }
 
     finalize();
