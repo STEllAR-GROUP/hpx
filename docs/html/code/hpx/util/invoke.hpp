@@ -84,21 +84,21 @@ namespace hpx { namespace util
           : boost::result_of<F>
         {};
 
-#       define HPX_UTIL_INVOKE_RESULT_OF_IMPL(z, n, data)                     \
+#       define HPX_UTIL_INVOKE_RESULT_OF_IMPL(Z, N, D)                        \
         template <typename FD                                                 \
-          , typename F BOOST_PP_ENUM_TRAILING_PARAMS(n, typename Arg)>        \
-        struct invoke_result_of_impl<FD, F(BOOST_PP_ENUM_PARAMS(n, Arg))      \
+          , typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename Arg)>        \
+        struct invoke_result_of_impl<FD, F(BOOST_PP_ENUM_PARAMS(N, Arg))      \
           , typename boost::enable_if<boost::is_reference_wrapper<FD> >::type \
         > : boost::result_of<                                                 \
                 typename boost::unwrap_reference<FD>::type&                   \
-                    (BOOST_PP_ENUM_PARAMS(n, Arg))                            \
+                    (BOOST_PP_ENUM_PARAMS(N, Arg))                            \
             >                                                                 \
         {};                                                                   \
                                                                               \
         /* workaround for tricking result_of into using decltype */           \
         template <typename FD                                                 \
-          , typename F BOOST_PP_ENUM_TRAILING_PARAMS(n, typename Arg)>        \
-        struct invoke_result_of_impl<FD, F(BOOST_PP_ENUM_PARAMS(n, Arg))      \
+          , typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename Arg)>        \
+        struct invoke_result_of_impl<FD, F(BOOST_PP_ENUM_PARAMS(N, Arg))      \
           , typename boost::enable_if<                                        \
                 boost::mpl::or_<                                              \
                     boost::is_function<typename boost::remove_pointer<FD>::type>\
@@ -106,7 +106,7 @@ namespace hpx { namespace util
                 >                                                             \
             >::type                                                           \
         > : boost::result_of<                                                 \
-                FD(BOOST_PP_ENUM_PARAMS(n, Arg))                              \
+                FD(BOOST_PP_ENUM_PARAMS(N, Arg))                              \
             >                                                                 \
         {};                                                                   \
         /**/
@@ -131,12 +131,12 @@ namespace hpx { namespace util
     template <typename F>
     struct invoke_result_of;
 
-#   define HPX_UTIL_INVOKE_RESULT_OF(z, n, data)                              \
-    template <typename F BOOST_PP_ENUM_TRAILING_PARAMS(n, typename Arg)>      \
-    struct invoke_result_of<F(BOOST_PP_ENUM_PARAMS(n, Arg))>                  \
+#   define HPX_UTIL_INVOKE_RESULT_OF(Z, N, D)                                 \
+    template <typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename Arg)>      \
+    struct invoke_result_of<F(BOOST_PP_ENUM_PARAMS(N, Arg))>                  \
       : detail::invoke_result_of_impl<                                        \
             typename util::decay<F>::type                                     \
-          , F(BOOST_PP_ENUM_PARAMS(n, Arg))                                   \
+          , F(BOOST_PP_ENUM_PARAMS(N, Arg))                                   \
         >                                                                     \
     {};                                                                       \
     /**/

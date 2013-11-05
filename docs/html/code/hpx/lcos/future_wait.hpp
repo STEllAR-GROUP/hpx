@@ -41,7 +41,7 @@ namespace hpx { namespace lcos
             BOOST_MOVABLE_BUT_NOT_COPYABLE(when_all)
 
         protected:
-            void on_future_ready_(threads::thread_id_type id)
+            void on_future_ready_(threads::thread_id_type const& id)
             {
                 std::size_t oldcount = ready_count_.fetch_add(1);
                 BOOST_ASSERT(oldcount < lazy_values_.size());
@@ -55,7 +55,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Index>
-            void on_future_ready_(Index i, threads::thread_id_type id,
+            void on_future_ready_(Index i, threads::thread_id_type const& id,
                 boost::mpl::false_)
             {
                 if (lazy_values_[i].has_value()) {
@@ -70,7 +70,7 @@ namespace hpx { namespace lcos
             }
 
             template <typename Index>
-            void on_future_ready_(Index i, threads::thread_id_type id,
+            void on_future_ready_(Index i, threads::thread_id_type const& id,
                 boost::mpl::true_)
             {
                 if (lazy_values_[i].has_value()) {
@@ -84,7 +84,7 @@ namespace hpx { namespace lcos
                 on_future_ready_(id);
             }
 
-            void on_future_ready(std::size_t i, threads::thread_id_type id)
+            void on_future_ready(std::size_t i, threads::thread_id_type const& id)
             {
                 on_future_ready_(i, id, boost::is_same<void, T>());
             }

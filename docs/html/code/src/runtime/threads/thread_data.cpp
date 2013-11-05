@@ -14,9 +14,9 @@
 
 #include <boost/assert.hpp>
 
-#if HPX_DEBUG
-#  define HPX_DEBUG_THREAD_POOL 1
-#endif
+// #if HPX_DEBUG
+// #  define HPX_DEBUG_THREAD_POOL 1
+// #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads

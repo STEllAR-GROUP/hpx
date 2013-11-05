@@ -21,10 +21,9 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/tuple.hpp>
+#include <hpx/util/detail/result_of_or.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/identity.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
@@ -205,10 +204,9 @@ namespace hpx { namespace util
         >
         {
             typedef
-                typename boost::mpl::eval_if<
-                    traits::is_callable<F>
-                  , util::invoke_result_of<F()>
-                  , boost::mpl::identity<cannot_be_called>
+                typename util::detail::result_of_or<
+                    F()
+                  , cannot_be_called
                 >::type
                 type;
 
@@ -250,7 +248,7 @@ namespace hpx { namespace util
               : _called(false)
 #           endif
             {}
-            
+
             explicit one_shot_wrapper(F const& f)
               : _f(f)
 #           if !defined(BOOST_DISABLE_ASSERTS)
@@ -290,16 +288,9 @@ namespace hpx { namespace util
 #           endif
             }
 
-            template <typename>
-            struct result;
-            
-            template <typename This>
-            struct result<This()>
-              : boost::mpl::eval_if<
-                    traits::is_callable<F>
-                  , util::invoke_result_of<F()>
-                  , boost::mpl::identity<cannot_be_called>
-                >
+            template <typename T>
+            struct result
+              : util::detail::result_of_or<T, cannot_be_called>
             {};
 
             BOOST_FORCEINLINE
@@ -311,15 +302,6 @@ namespace hpx { namespace util
             }
 
 #           define HPX_UTIL_BIND_ONE_SHOT_WRAPPER_FUNCTION_OP(Z, N, D)        \
-            template <typename This, BOOST_PP_ENUM_PARAMS(N, typename T)>     \
-            struct result<This(BOOST_PP_ENUM_PARAMS(N, T))>                   \
-              : boost::mpl::eval_if<                                          \
-                    traits::is_callable<F, BOOST_PP_ENUM_PARAMS(N, T)>        \
-                  , util::invoke_result_of<F(BOOST_PP_ENUM_PARAMS(N, T))>     \
-                  , boost::mpl::identity<cannot_be_called>                    \
-                >                                                             \
-            {};                                                               \
-                                                                              \
             template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
             BOOST_FORCEINLINE                                                 \
             typename result<one_shot_wrapper(BOOST_PP_ENUM_PARAMS(N, T))>::type\
@@ -428,7 +410,7 @@ namespace hpx { namespace util
 
         return result_type(boost::forward<F>(f), util::forward_as_tuple());
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
     detail::one_shot_wrapper<typename util::decay<F>::type>
@@ -479,7 +461,7 @@ namespace boost { namespace serialization
         ar << bound._f;
         ar << bound._bound_args;
     }
-    
+
     // serialization of the bound object
     template <typename F>
     void serialize(
@@ -573,10 +555,9 @@ namespace hpx { namespace util
         >
         {
             typedef
-                typename boost::mpl::eval_if<
-                    traits::is_callable<F, BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL_TYPE, _)>
-                  , util::invoke_result_of<F(BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL_TYPE, _))>
-                  , boost::mpl::identity<cannot_be_called>
+                typename util::detail::result_of_or<
+                    F(BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL_TYPE, _))
+                  , cannot_be_called
                 >::type
                 type;
 

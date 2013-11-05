@@ -306,7 +306,7 @@ namespace hpx { namespace lcos
         Result move(error_code& ec = throws)
         {
             invalidate on_exit(*this);
-            return boost::move(future_data_->move_data(ec));
+            return future_data_->move_data(ec);
         }
 
         // state introspection

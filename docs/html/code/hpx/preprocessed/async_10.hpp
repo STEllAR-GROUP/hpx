@@ -15,7 +15,7 @@ namespace hpx
     
     template <typename F>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F>::value
+        traits::detail::is_callable_not_action<F()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
@@ -35,7 +35,7 @@ namespace hpx
     }
     template <typename F>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F>::value
+        traits::detail::is_callable_not_action<F()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
@@ -49,7 +49,7 @@ namespace hpx
     }
     template <typename F>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F>::value
+        traits::detail::is_callable_not_action<F()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
@@ -80,8 +80,8 @@ namespace hpx
     
     template <typename F, typename A0>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0)>::value
+        traits::detail::is_callable_not_action<
+            F(A0)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0)>
     >::type
@@ -106,8 +106,8 @@ namespace hpx
     }
     template <typename F, typename A0>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0)>::value
+        traits::detail::is_callable_not_action<
+            F(A0)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0)>
     >::type
@@ -124,8 +124,8 @@ namespace hpx
     }
     template <typename F, typename A0>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0)>::value
+        traits::detail::is_callable_not_action<
+            F(A0)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0)>
     >::type
@@ -160,8 +160,8 @@ namespace hpx
     
     template <typename F, typename A0 , typename A1>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1)>
     >::type
@@ -186,8 +186,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1)>
     >::type
@@ -204,8 +204,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1)>
     >::type
@@ -240,8 +240,8 @@ namespace hpx
     
     template <typename F, typename A0 , typename A1 , typename A2>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2)>
     >::type
@@ -266,8 +266,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2)>
     >::type
@@ -284,8 +284,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2)>
     >::type
@@ -320,8 +320,8 @@ namespace hpx
     
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3)>
     >::type
@@ -346,8 +346,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3)>
     >::type
@@ -364,8 +364,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3)>
     >::type
@@ -400,8 +400,8 @@ namespace hpx
     
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
     >::type
@@ -426,8 +426,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
     >::type
@@ -444,8 +444,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
     >::type
@@ -480,8 +480,8 @@ namespace hpx
     
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5)>
     >::type
@@ -506,8 +506,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5)>
     >::type
@@ -524,8 +524,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5)>
     >::type
@@ -560,8 +560,8 @@ namespace hpx
     
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
     >::type
@@ -586,8 +586,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
     >::type
@@ -604,8 +604,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
     >::type
@@ -640,8 +640,8 @@ namespace hpx
     
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6) , BOOST_FWD_REF(A7)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
     >::type
@@ -666,8 +666,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6) , BOOST_FWD_REF(A7)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
     >::type
@@ -684,8 +684,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6) , BOOST_FWD_REF(A7)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
     >::type
@@ -720,8 +720,8 @@ namespace hpx
     
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6) , BOOST_FWD_REF(A7) , BOOST_FWD_REF(A8)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
     >::type
@@ -746,8 +746,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6) , BOOST_FWD_REF(A7) , BOOST_FWD_REF(A8)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
     >::type
@@ -764,8 +764,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6) , BOOST_FWD_REF(A7) , BOOST_FWD_REF(A8)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
     >::type
@@ -800,8 +800,8 @@ namespace hpx
     
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6) , BOOST_FWD_REF(A7) , BOOST_FWD_REF(A8) , BOOST_FWD_REF(A9)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
     >::type
@@ -826,8 +826,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6) , BOOST_FWD_REF(A7) , BOOST_FWD_REF(A8) , BOOST_FWD_REF(A9)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
     >::type
@@ -844,8 +844,8 @@ namespace hpx
     }
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(A0) , BOOST_FWD_REF(A1) , BOOST_FWD_REF(A2) , BOOST_FWD_REF(A3) , BOOST_FWD_REF(A4) , BOOST_FWD_REF(A5) , BOOST_FWD_REF(A6) , BOOST_FWD_REF(A7) , BOOST_FWD_REF(A8) , BOOST_FWD_REF(A9)>::value
+        traits::detail::is_callable_not_action<
+            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
     >::type

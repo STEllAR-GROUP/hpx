@@ -38,7 +38,7 @@ namespace hpx { namespace lcos { namespace detail
             typename mutex_type::scoped_lock l(this->mtx_);
             return id_;
         }
-        void set_id(threads::thread_id_type id)
+        void set_id(threads::thread_id_type const& id)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
             id_ = id;
@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace detail
                     lcos::detail::make_future_from_data<ContResult>(this);
                 run(f, ec);
             }
-            return boost::move(this->get_data(ec));
+            return this->get_data(ec);
         }
 
         // moving out the value
@@ -83,7 +83,7 @@ namespace hpx { namespace lcos { namespace detail
                     lcos::detail::make_future_from_data<ContResult>(this);
                 run(f, ec);
             }
-            return boost::move(this->move_data(ec));
+            return this->move_data(ec);
         }
 
         template <typename Result>

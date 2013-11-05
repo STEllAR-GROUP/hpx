@@ -24,7 +24,6 @@
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
-#include <boost/preprocessor/facilities/intercept.hpp>
 #include <boost/type_traits/is_void.hpp>
 
 namespace hpx { namespace detail
@@ -83,7 +82,7 @@ namespace hpx
     // future allowing to synchronize with the returned result.
     template <typename F>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F>::value
+        traits::detail::is_callable_not_action<F()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
@@ -105,7 +104,7 @@ namespace hpx
 
     template <typename F>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F>::value
+        traits::detail::is_callable_not_action<F()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
@@ -121,7 +120,7 @@ namespace hpx
 
     template <typename F>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F>::value
+        traits::detail::is_callable_not_action<F()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
@@ -175,8 +174,8 @@ namespace hpx
     // future allowing to synchronize with the returned result.
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>::value
+        traits::detail::is_callable_not_action<
+            F(BOOST_PP_ENUM_PARAMS(N, A))>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
@@ -202,8 +201,8 @@ namespace hpx
 
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>::value
+        traits::detail::is_callable_not_action<
+            F(BOOST_PP_ENUM_PARAMS(N, A))>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
@@ -221,8 +220,8 @@ namespace hpx
 
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename A)>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , HPX_ENUM_FWD_ARGS(N, A, BOOST_PP_INTERCEPT)>::value
+        traits::detail::is_callable_not_action<
+            F(BOOST_PP_ENUM_PARAMS(N, A))>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type

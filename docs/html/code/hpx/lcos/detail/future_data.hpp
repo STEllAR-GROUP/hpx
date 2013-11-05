@@ -89,7 +89,6 @@ namespace detail
     protected:
         future_data_refcnt_base() : count_(0) {}
 
-    private:
         // reference counting
         friend void intrusive_ptr_add_ref(future_data_refcnt_base* p);
         friend void intrusive_ptr_release(future_data_refcnt_base* p);
@@ -149,10 +148,22 @@ namespace detail
         virtual completed_callback_type reset_on_completed_locked() = 0;
 
         // wait support
-        void wake_me_up(threads::thread_id_type id)
+        struct wake_me_up
         {
-            threads::set_thread_state(id, threads::pending, threads::wait_timeout);
-        }
+            explicit wake_me_up(
+                threads::thread_id_type const& thread_id =
+                    threads::get_self_id()
+            ) : thread_id_(thread_id)
+            {}
+
+            void operator()(lcos::future<Result>& /*f*/) const
+            {
+                threads::set_thread_state(
+                    thread_id_, threads::pending, threads::wait_timeout);
+            }
+
+            threads::thread_id_type thread_id_;
+        };
 
         struct reset_cb
         {
@@ -180,9 +191,8 @@ namespace detail
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
-                reset_cb r(*this, util::bind(
-                    &future_data_base::wake_me_up, this_, threads::get_self_id()),
-                    l);
+                wake_me_up callback(threads::get_self_id());
+                reset_cb r(*this, boost::ref(callback), l);
 
                 util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 this_thread::suspend(threads::suspended);
@@ -195,9 +205,8 @@ namespace detail
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
-                reset_cb r(*this, util::bind(
-                    &future_data_base::wake_me_up, this_, threads::get_self_id()),
-                    l);
+                wake_me_up callback(threads::get_self_id());
+                reset_cb r(*this, boost::ref(callback), l);
 
                 util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(p) == threads::wait_signaled) ? //-V110
@@ -212,9 +221,8 @@ namespace detail
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
-                reset_cb r(*this, util::bind(
-                    &future_data_base::wake_me_up, this_, threads::get_self_id()),
-                    l);
+                wake_me_up callback(threads::get_self_id());
+                reset_cb r(*this, boost::ref(callback), l);
 
                 util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(at) == threads::wait_signaled) ? //-V110
@@ -335,7 +343,7 @@ namespace detail
                 return handle_error(d, ec);
 
             // no error has been reported, return the result
-            return boost::move(d.get_value());
+            return d.move_value();
         }
 
         result_type move_data(error_code& ec = throws)
@@ -360,7 +368,7 @@ namespace detail
                 return handle_error(d, ec);
 
             // no error has been reported, return the result
-            return boost::move(d.get_value());
+            return d.move_value();
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -491,7 +499,7 @@ namespace detail
         set_on_completed(BOOST_RV_REF(completed_callback_type) data_sink)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
-            return boost::move(set_on_completed_locked(boost::move(data_sink), l));
+            return set_on_completed_locked(boost::move(data_sink), l);
         }
 
     private:
@@ -649,7 +657,7 @@ namespace detail
         {
             if (!was_started())
                 this->do_run();
-            return boost::move(this->future_data<Result>::get_data(ec));
+            return this->future_data<Result>::get_data(ec);
         }
 
         // moving out the value
@@ -657,7 +665,7 @@ namespace detail
         {
             if (!was_started())
                 this->do_run();
-            return boost::move(this->future_data<Result>::move_data(ec));
+            return this->future_data<Result>::move_data(ec);
         }
 
     private:

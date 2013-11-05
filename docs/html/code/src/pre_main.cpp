@@ -100,6 +100,11 @@ inline void register_counter_types()
 bool pre_main(runtime_mode mode);
 bool pre_main(runtime_mode mode)
 {
+    // Register pre-shutdown and shutdown functions to flush pending
+    // reference counting operations.
+    register_pre_shutdown_function(&::garbage_collect_non_blocking);
+    register_shutdown_function(&::garbage_collect);
+
     using components::stubs::runtime_support;
 
     naming::resolver_client& agas_client = naming::get_agas_client();
@@ -229,11 +234,6 @@ bool pre_main(runtime_mode mode)
     // pending log messages so far.
     components::activate_logging();
     LBT_(info) << "(4th stage) pre_main: activated logging";
-
-    // Register pre-shutdown and shutdown functions to flush pending
-    // reference counting operations.
-    register_pre_shutdown_function(&::garbage_collect_non_blocking);
-    register_shutdown_function(&::garbage_collect);
 
     // Any error in post-command line handling or any explicit --exit command
     // line option will cause the application to terminate at this point.

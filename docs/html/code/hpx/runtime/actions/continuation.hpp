@@ -38,8 +38,7 @@ namespace hpx
     // forward declaration
     template <typename F, typename Arg1, typename Arg2>
     inline typename boost::enable_if_c<
-        traits::detail::is_callable_not_action<F
-          , BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2)>::value
+        traits::detail::is_callable_not_action<F(Arg1, Arg2)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type

@@ -122,7 +122,7 @@ namespace hpx { namespace actions
             threads::thread_state_enum (*f)(threads::thread_state_ex_enum) =
                 &Derived::template thread_function<threads::thread_state_ex_enum>;
 
-            return boost::move(Derived::decorate_action(f, lva));
+            return Derived::decorate_action(f, lva);
         }
 
         /// \brief This static \a construct_thread_function allows to construct
@@ -134,9 +134,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 base_type::construct_continuation_thread_function(
-                    cont, F, boost::forward<Arguments>(args)), lva));
+                    cont, F, boost::forward<Arguments>(args)), lva);
         }
 
         // direct execution
@@ -288,7 +288,7 @@ namespace hpx { namespace actions
             threads::thread_state_enum (*f)(threads::thread_state_ex_enum) =
                 &Derived::template thread_function<threads::thread_state_ex_enum>;
 
-            return boost::move(Derived::decorate_action(f, lva));
+            return Derived::decorate_action(f, lva);
         }
 
         /// \brief This static \a construct_thread_function allows to construct
@@ -300,9 +300,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, boost::forward<Arguments>(args)), lva));
+                    cont, F, boost::forward<Arguments>(args)), lva);
         }
 
         // direct execution

@@ -90,9 +90,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -103,10 +103,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -300,9 +300,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -313,10 +313,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -525,9 +525,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -538,10 +538,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -735,9 +735,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -748,10 +748,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -960,9 +960,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -973,10 +973,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -1170,9 +1170,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -1183,10 +1183,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -1395,9 +1395,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -1408,10 +1408,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -1605,9 +1605,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -1618,10 +1618,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -1830,9 +1830,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -1843,10 +1843,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -2040,9 +2040,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -2053,10 +2053,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -2265,9 +2265,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -2278,10 +2278,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -2475,9 +2475,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -2488,10 +2488,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -2700,9 +2700,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -2713,10 +2713,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -2910,9 +2910,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -2923,10 +2923,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -3135,9 +3135,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -3148,10 +3148,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -3345,9 +3345,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -3358,10 +3358,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -3570,9 +3570,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -3583,10 +3583,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -3780,9 +3780,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -3793,10 +3793,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -4005,9 +4005,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -4018,10 +4018,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -4215,9 +4215,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -4228,10 +4228,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -4440,9 +4440,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -4453,10 +4453,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -4650,9 +4650,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -4663,10 +4663,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -4875,9 +4875,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -4888,10 +4888,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -5085,9 +5085,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -5098,10 +5098,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -5310,9 +5310,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -5323,10 +5323,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -5520,9 +5520,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -5533,10 +5533,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -5745,9 +5745,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -5758,10 +5758,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -5955,9 +5955,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -5968,10 +5968,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -6180,9 +6180,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -6193,10 +6193,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -6390,9 +6390,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -6403,10 +6403,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -6615,9 +6615,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -6628,10 +6628,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -6825,9 +6825,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -6838,10 +6838,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -7050,9 +7050,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -7063,10 +7063,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -7260,9 +7260,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -7273,10 +7273,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -7485,9 +7485,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -7498,10 +7498,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -7695,9 +7695,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -7708,10 +7708,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -7920,9 +7920,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args)) , util::get< 18>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args)) , util::get< 18>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -7933,10 +7933,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -8130,9 +8130,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args)) , util::get< 18>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args)) , util::get< 18>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -8143,10 +8143,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
@@ -8355,9 +8355,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args)) , util::get< 18>(boost::forward<Arguments>( args)) , util::get< 19>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args)) , util::get< 18>(boost::forward<Arguments>( args)) , util::get< 19>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -8368,10 +8368,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
@@ -8565,9 +8565,9 @@ namespace hpx { namespace actions
         {
             
             
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                 HPX_STD_BIND(typename Derived::thread_function(), lva,
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args)) , util::get< 18>(boost::forward<Arguments>( args)) , util::get< 19>(boost::forward<Arguments>( args))), lva));
+                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)) , util::get< 5>(boost::forward<Arguments>( args)) , util::get< 6>(boost::forward<Arguments>( args)) , util::get< 7>(boost::forward<Arguments>( args)) , util::get< 8>(boost::forward<Arguments>( args)) , util::get< 9>(boost::forward<Arguments>( args)) , util::get< 10>(boost::forward<Arguments>( args)) , util::get< 11>(boost::forward<Arguments>( args)) , util::get< 12>(boost::forward<Arguments>( args)) , util::get< 13>(boost::forward<Arguments>( args)) , util::get< 14>(boost::forward<Arguments>( args)) , util::get< 15>(boost::forward<Arguments>( args)) , util::get< 16>(boost::forward<Arguments>( args)) , util::get< 17>(boost::forward<Arguments>( args)) , util::get< 18>(boost::forward<Arguments>( args)) , util::get< 19>(boost::forward<Arguments>( args))), lva);
         }
         
         
@@ -8578,10 +8578,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
         {
-            return boost::move(Derived::decorate_action(
+            return Derived::decorate_action(
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
-                        boost::forward<Arguments>(args)), lva));
+                        boost::forward<Arguments>(args)), lva);
         }
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
