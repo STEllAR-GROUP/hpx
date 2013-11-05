@@ -149,13 +149,14 @@ void test_actions()
                     action_move_semantics::return_test_movable_action, movable_object
                 >(id)
             ), 1u); // call
+            //! should be: -
         } else {
             HPX_TEST_EQ((
                 return_object<
                     action_move_semantics::return_test_movable_action, movable_object
                 >(id)
             ), 2u); // transfer_action + bind
-            //! should_be: transfer_action
+            //! should_be: -
         }
         
         // test non_movable_object()

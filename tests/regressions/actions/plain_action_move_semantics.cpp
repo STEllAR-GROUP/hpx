@@ -275,6 +275,7 @@ void test_void_actions()
                 pass_movable_object_value_void_action, movable_object
             >()
         ), 1u); // call
+        //! should be: -
 
         HPX_TEST_EQ((
             move_object_void<
@@ -342,6 +343,7 @@ void test_void_direct_actions()
                 pass_movable_object_value_void_direct_action, movable_object
             >()
         ), 1u); // call
+        //! should be: -
 
         HPX_TEST_EQ((
             move_object_void<

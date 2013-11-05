@@ -325,35 +325,18 @@ int hpx_main(variables_map&)
             >(id)
         ), is_local ? 4u : 4u);
 
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 40500)
-        HPX_TEST_EQ((
+        HPX_TEST_RANGE((
             return_move_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
         ),
-        is_local ? 9u : 12u);      // gcc V4.4 is special
-#else
-        HPX_TEST_LTE((
-            return_move_object<
-                return_non_movable_object_action, non_movable_object
-            >(id)
-        ),
-        is_local ? 9u : 11u);
-#endif
-        
-#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION < 40500)
-        HPX_TEST_EQ((
+        is_local ? 8u : 11u, is_local ? 10u : 12u);
+
+        HPX_TEST_RANGE((
             return_move_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
-        ), is_local ? 10u : 12u);      // gcc V4.4 is special
-#else
-        HPX_TEST_LTE((
-            return_move_object<
-                return_non_movable_object_direct_action, non_movable_object
-            >(id)
-        ), is_local ? 9u : 11u);
-#endif
+        ), is_local ? 8u : 11u, is_local ? 10u : 12u);
     }
 
     finalize();
