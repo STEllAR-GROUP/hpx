@@ -38,7 +38,7 @@ namespace hpx { namespace lcos { namespace detail
             typename mutex_type::scoped_lock l(this->mtx_);
             return id_;
         }
-        void set_id(threads::thread_id_type id)
+        void set_id(threads::thread_id_type const& id)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
             id_ = id;

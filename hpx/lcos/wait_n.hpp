@@ -87,7 +87,7 @@ namespace hpx
         private:
             BOOST_MOVABLE_BUT_NOT_COPYABLE(when_n)
 
-            void on_future_ready(threads::thread_id_type id)
+            void on_future_ready(threads::thread_id_type const& id)
             {
                 if (count_.fetch_add(1) + 1 == needed_count_)
                 {
@@ -134,13 +134,14 @@ namespace hpx
             result_type operator()()
             {
                 // set callback functions to executed when future is ready
-                set_on_completed_callback(lazy_values_, util::bind(
+                set_on_completed_callback(lazy_values_,
+                    util::bind(
                         &when_n::on_future_ready, this->shared_from_this(),
                         threads::get_self_id()));
 
                 // if all of the requested futures are already set, our
-                // callback above has already been called, otherwise we suspend
-                // ourselves
+                // callback above has already been called often enough, otherwise
+                // we suspend ourselves
                 if (count_.load() < needed_count_)
                 {
                     // wait for any of the futures to return to become ready

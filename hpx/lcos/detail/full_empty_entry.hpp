@@ -70,7 +70,7 @@ namespace hpx { namespace lcos { namespace detail
                 boost::intrusive::link_mode<boost::intrusive::normal_link>
             > hook_type;
 
-            queue_entry(thread_id_type id)
+            queue_entry(thread_id_type const& id)
               : id_(id)
             {}
 

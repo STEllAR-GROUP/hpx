@@ -160,7 +160,7 @@ namespace hpx
         }
     }
 
-    static void resume_thread(threads::thread_id_type id)
+    static void resume_thread(threads::thread_id_type const& id)
     {
         threads::set_thread_state(id, threads::pending);
     }
@@ -233,7 +233,7 @@ namespace hpx
             typedef boost::intrusive_ptr<thread_task_base> future_base_type;
 
         public:
-            thread_task_base(threads::thread_id_type id)
+            thread_task_base(threads::thread_id_type const& id)
               : id_(thread::uninitialized)
             {
                 if (threads::add_thread_exit_callback(id,

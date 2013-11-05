@@ -41,7 +41,7 @@ namespace hpx
 
             enum { index_error = -1 };
 
-            void on_future_ready(std::size_t idx, threads::thread_id_type id)
+            void on_future_ready(std::size_t idx, threads::thread_id_type const& id)
             {
                 std::size_t index_not_initialized =
                     static_cast<std::size_t>(index_error);
