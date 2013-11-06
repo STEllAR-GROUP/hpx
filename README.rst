@@ -339,5 +339,11 @@ and 1240655 (STAR). Any opinions, findings, and conclusions or recommendations e
 in this material are those of the author(s) and do not necessarily reflect the views of
 the National Science Foundation.
 
+Additionally, this work is supported by the Department of Energy (DoE) 
+through the award DE-SC0008714 (XPRESS). Any opinions, findings, and conclusions 
+or recommendations expressed in this material are those of the author(s) and do not 
+necessarily reflect the views of the Department of Energy.
+
 This work is also supported by the Center of Computation and
-Technology at Louisiana State University and the Chair for Computer Science 3 at the University of Erlangen Nuremberg.
+Technology at Louisiana State University and the Chair for Computer Science 3 at 
+the University of Erlangen Nuremberg.
