@@ -124,6 +124,7 @@ namespace detail
         virtual result_type get_data(error_code& ec = throws) = 0;
         virtual result_type move_data(error_code& ec = throws) = 0;
         virtual bool is_ready() const = 0;
+        virtual bool is_ready_locked() const = 0;
         virtual bool has_value() const = 0;
         virtual bool has_exception() const = 0;
         virtual BOOST_SCOPED_ENUM(future_status) get_state() const = 0;
@@ -190,7 +191,7 @@ namespace detail
         void wait()
         {
             typename mutex_type::scoped_lock l(mtx_);
-            if (!is_ready()) {
+            if (!is_ready_locked()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 wake_me_up callback(threads::get_self_id());
                 reset_cb r(*this, boost::ref(callback), l);
@@ -204,7 +205,7 @@ namespace detail
         wait_for(boost::posix_time::time_duration const& p)
         {
             typename mutex_type::scoped_lock l(mtx_);
-            if (!is_ready()) {
+            if (!is_ready_locked()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 wake_me_up callback(threads::get_self_id());
                 reset_cb r(*this, boost::ref(callback), l);
@@ -220,7 +221,7 @@ namespace detail
         wait_until(boost::posix_time::ptime const& at)
         {
             typename mutex_type::scoped_lock l(mtx_);
-            if (!is_ready()) {
+            if (!is_ready_locked()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 wake_me_up callback(threads::get_self_id());
                 reset_cb r(*this, boost::ref(callback), l);
@@ -472,6 +473,11 @@ namespace detail
         bool is_ready() const
         {
             typename mutex_type::scoped_lock l(this->mtx_);
+            return is_ready_locked();
+        }
+
+        bool is_ready_locked() const
+        {
             return !data_.is_empty();
         }
 
@@ -802,7 +808,7 @@ namespace detail
                     return;
                 }
 
-                if (this->is_ready())
+                if (this->is_ready_locked())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {

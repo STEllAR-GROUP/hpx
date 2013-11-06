@@ -148,7 +148,7 @@ namespace hpx { namespace lcos { namespace local
             typename mutex_type::scoped_lock l(mtx_);
             if (task_)
             {
-                if (task_->is_ready() && !future_obtained_)
+                if (task_->is_ready_locked() && !future_obtained_)
                 {
                     task_->set_error(broken_promise,
                         "promise<Result>::~promise()",
@@ -176,7 +176,7 @@ namespace hpx { namespace lcos { namespace local
 
                 if (task_)
                 {
-                    if (task_->is_ready() && !future_obtained_)
+                    if (task_->is_ready_locked() && !future_obtained_)
                     {
                         task_->set_error(broken_promise,
                             "promise<Result>::operator=()",
@@ -259,7 +259,7 @@ namespace hpx { namespace lcos { namespace local
         bool is_ready() const
         {
             typename mutex_type::scoped_lock l(mtx_);
-            return task_->is_ready();
+            return task_->is_ready_locked();
         }
 
     protected:
@@ -291,7 +291,7 @@ namespace hpx { namespace lcos { namespace local
 
             if (task_)
             {
-                if (task_->is_ready() && !future_obtained_)
+                if (task_->is_ready_locked() && !future_obtained_)
                 {
                     task_->set_error(broken_promise,
                         "promise<Result>::operator=()",
@@ -320,7 +320,7 @@ namespace hpx { namespace lcos { namespace local
 
                 if (task_)
                 {
-                    if (task_->is_ready() && !future_obtained_)
+                    if (task_->is_ready_locked() && !future_obtained_)
                     {
                         task_->set_error(broken_promise,
                             "promise<void>::operator=()",
@@ -403,7 +403,7 @@ namespace hpx { namespace lcos { namespace local
         bool is_ready() const
         {
             mutex_type::scoped_lock l(mtx_);
-            return task_->is_ready();
+            return task_->is_ready_locked();
         }
 
     private:
