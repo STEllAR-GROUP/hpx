@@ -325,6 +325,8 @@ response locality_namespace::allocate(
         // Check for address space exhaustion.
         if (HPX_UNLIKELY(0xFFFFFFFE < partitions_.size()))
         {
+            l.unlock();
+
             HPX_THROWS_IF(ec, internal_server_error
               , "locality_namespace::allocate"
               , "primary namespace has been exhausted");
@@ -375,6 +377,8 @@ response locality_namespace::allocate(
             // If this branch is taken, then the partition table was updated
             // at some point after we first checked it, which would indicate
             // memory corruption or a locking failure.
+            l.unlock();
+
             HPX_THROWS_IF(ec, lock_error
               , "locality_namespace::allocate"
               , boost::str(boost::format(
@@ -390,6 +394,7 @@ response locality_namespace::allocate(
         if (HPX_UNLIKELY(!util::insert_checked(prefixes_.insert(prefix))))
         {
             partitions_.erase(pit);
+            l.unlock();
 
             HPX_THROWS_IF(ec, internal_server_error
               , "locality_namespace::allocate"

@@ -287,6 +287,8 @@ response component_namespace::bind_prefix(
         if (HPX_UNLIKELY(!util::insert_checked(component_ids_.left.insert(
                 std::make_pair(key, type_counter)), cit)))
         {
+            l.unlock();
+
             HPX_THROWS_IF(ec, lock_error
               , "component_namespace::bind_prefix"
               , "component id table insertion failed due to a locking "
@@ -310,6 +312,8 @@ response component_namespace::bind_prefix(
         if (pit != prefixes.end())
         {
             // Duplicate type registration for this locality.
+            l.unlock();
+
             HPX_THROWS_IF(ec, duplicate_component_id
               , "component_namespace::bind_prefix"
               , boost::str(boost::format(
@@ -344,6 +348,8 @@ response component_namespace::bind_prefix(
     if (HPX_UNLIKELY(!util::insert_checked(factories_.insert(
             std::make_pair(cit->second, prefixes_type())), fit)))
     {
+        l.unlock();
+
         HPX_THROWS_IF(ec, lock_error
             , "component_namespace::bind_prefix"
             , "factory table insertion failed due to a locking "
@@ -383,6 +389,8 @@ response component_namespace::bind_name(
         if (HPX_UNLIKELY(!util::insert_checked(component_ids_.left.insert(
                 std::make_pair(key, type_counter)), it)))
         {
+            l.unlock();
+
             HPX_THROWS_IF(ec, lock_error
               , "component_namespace::bind_name"
               , "component id table insertion failed due to a locking "

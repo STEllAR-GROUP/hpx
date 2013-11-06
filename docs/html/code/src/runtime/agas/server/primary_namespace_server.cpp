@@ -353,6 +353,8 @@ response primary_namespace::bind_gid(
             if (HPX_UNLIKELY(gaddr.count != g.count))
             {
                 // REVIEW: Is this the right error code to use?
+                l.unlock();
+
                 HPX_THROWS_IF(ec, bad_parameter
                   , "primary_namespace::bind_gid"
                   , "cannot change block size of existing binding");
@@ -361,6 +363,8 @@ response primary_namespace::bind_gid(
 
             if (HPX_UNLIKELY(components::component_invalid == g.type))
             {
+                l.unlock();
+
                 HPX_THROWS_IF(ec, bad_parameter
                   , "primary_namespace::bind_gid"
                   , boost::str(boost::format(
@@ -397,6 +401,8 @@ response primary_namespace::bind_gid(
             if (HPX_UNLIKELY((it->first + it->second.count) > id))
             {
                 // REVIEW: Is this the right error code to use?
+                l.unlock();
+
                 HPX_THROWS_IF(ec, bad_parameter
                   , "primary_namespace::bind_gid"
                   , "the new GID is contained in an existing range");
@@ -413,6 +419,8 @@ response primary_namespace::bind_gid(
         if ((it->first + it->second.count) > id)
         {
             // REVIEW: Is this the right error code to use?
+            l.unlock();
+
             HPX_THROWS_IF(ec, bad_parameter
               , "primary_namespace::bind_gid"
               , "the new GID is contained in an existing range");
@@ -424,6 +432,8 @@ response primary_namespace::bind_gid(
 
     if (HPX_UNLIKELY(id.get_msb() != upper_bound.get_msb()))
     {
+        l.unlock();
+
         HPX_THROWS_IF(ec, internal_server_error
           , "primary_namespace::bind_gid"
           , "MSBs of lower and upper range bound do not match");
@@ -432,6 +442,8 @@ response primary_namespace::bind_gid(
 
     if (HPX_UNLIKELY(components::component_invalid == g.type))
     {
+        l.unlock();
+
         HPX_THROWS_IF(ec, bad_parameter
           , "primary_namespace::bind_gid"
           , boost::str(boost::format(
@@ -445,6 +457,8 @@ response primary_namespace::bind_gid(
     if (HPX_UNLIKELY(!util::insert_checked(gvas_.insert(
             std::make_pair(id, g)))))
     {
+        l.unlock();
+
         HPX_THROWS_IF(ec, lock_error
           , "primary_namespace::bind_gid"
           , boost::str(boost::format(
@@ -521,6 +535,8 @@ response primary_namespace::unbind_gid(
     {
         if (HPX_UNLIKELY(it->second.count != count))
         {
+            l.unlock();
+
             HPX_THROWS_IF(ec, bad_parameter
               , "primary_namespace::unbind_gid"
               , "block sizes must match");
@@ -791,6 +807,8 @@ void primary_namespace::decrement_sweep(
         // This search should always succeed.
         if (matches.first == refcnts_.end() && matches.second == refcnts_.end())
         {
+            l.unlock();
+
             HPX_THROWS_IF(ec, lock_error
               , "primary_namespace::decrement_sweep"
               , boost::str(boost::format(
@@ -808,6 +826,8 @@ void primary_namespace::decrement_sweep(
             // Sanity check.
             if (matches.first->data_ < 0)
             {
+                l.unlock();
+
                 HPX_THROWS_IF(ec, invalid_data
                   , "primary_namespace::decrement_sweep"
                   , boost::str(boost::format(
@@ -885,6 +905,8 @@ void primary_namespace::decrement_sweep(
                 if (HPX_UNLIKELY(components::component_invalid
                                  == at_c<1>(r).type))
                 {
+                    l.unlock();
+
                     HPX_THROWS_IF(ec, internal_server_error
                       , "primary_namespace::decrement_sweep"
                       , boost::str(boost::format(
@@ -896,6 +918,8 @@ void primary_namespace::decrement_sweep(
 
                 else if (HPX_UNLIKELY(0 == at_c<1>(r).count))
                 {
+                    l.unlock();
+
                     HPX_THROWS_IF(ec, internal_server_error
                       , "primary_namespace::decrement_sweep"
                       , boost::str(boost::format(

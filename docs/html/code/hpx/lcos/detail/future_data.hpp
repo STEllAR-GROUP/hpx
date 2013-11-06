@@ -12,6 +12,7 @@
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/detail/full_empty_memory.hpp>
+#include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/scoped_unlock.hpp>
@@ -325,8 +326,11 @@ namespace detail
         {
             // yields control if needed
             data_type d;
-            data_.read(d, ec);      // copies the data out of the store
-            if (ec) return result_type();
+            {
+                typename mutex_type::scoped_lock l(this->mtx_);
+                data_.read(d, l, ec);      // copies the data out of the store
+                if (ec) return result_type();
+            }
 
             if (d.is_empty()) {
                 // the value has already been moved out of this future
@@ -346,12 +350,19 @@ namespace detail
             return d.move_value();
         }
 
+    private:
+        static bool always_false(data_type const&) { return false; }
+
+    public:
         result_type move_data(error_code& ec = throws)
         {
             // yields control if needed
             data_type d;
-            data_.read_and_empty(d, ec); // moves the data from the store
-            if (ec) return result_type();
+            {
+                typename mutex_type::scoped_lock l(this->mtx_);
+                data_.read_and_empty_if(d, &always_false, l, ec); // moves the data from the store
+                if (ec) return result_type();
+            }
 
             if (d.is_empty()) {
                 // the value has already been moved out of this future
@@ -460,6 +471,7 @@ namespace detail
         /// \a promise.
         bool is_ready() const
         {
+            typename mutex_type::scoped_lock l(this->mtx_);
             return !data_.is_empty();
         }
 
@@ -472,16 +484,19 @@ namespace detail
     public:
         bool has_value() const
         {
+            typename mutex_type::scoped_lock l(this->mtx_);
             return !data_.is_empty() && data_.peek(&has_data_helper);
         }
 
         bool has_exception() const
         {
+            typename mutex_type::scoped_lock l(this->mtx_);
             return !data_.is_empty() && !data_.peek(&has_data_helper);
         }
 
         BOOST_SCOPED_ENUM(future_status) get_state() const
         {
+            typename mutex_type::scoped_lock l(this->mtx_);
             return !data_.is_empty() ? future_status::ready : future_status::deferred; //-V110
         }
 
@@ -489,6 +504,7 @@ namespace detail
         /// operation. Allows any subsequent set_data operation to succeed.
         void reset(error_code& ec = throws)
         {
+            typename mutex_type::scoped_lock l(this->mtx_);
             data_.set_empty(ec);
         }
 
@@ -553,7 +569,7 @@ namespace detail
         }
 
     private:
-        detail::full_empty<data_type> data_;
+        detail::full_empty<data_type, lcos::local::no_mutex> data_;
         completed_callback_type on_completed_;
     };
 
