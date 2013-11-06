@@ -42,6 +42,11 @@ namespace hpx { namespace detail
         return util::trace_on_new_stack();
     }
 
+    std::string backtrace_direct()
+    {
+        return util::trace();
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     //  Figure out the size of the given environment
     inline std::size_t get_arraylen(char** array)

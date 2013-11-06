@@ -46,11 +46,15 @@ namespace hpx { namespace agas { namespace server
 
                     if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)
                     {
+                        id_type const id = ids[i];
+                        l.unlock();
+
                         HPX_THROWS_IF(ec, no_success,
                             "primary_namespace::route",
                             boost::str(boost::format(
                                     "can't route parcel to unknown gid: %s"
-                                ) % ids[i]));
+                                ) % id));
+
                         return response(primary_ns_route, naming::invalid_gid,
                             gva(), no_success);
                     }

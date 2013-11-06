@@ -299,6 +299,8 @@ response symbol_namespace::bind(
     if (HPX_UNLIKELY(!util::insert_checked(gids_.insert(
             std::make_pair(key, gid)))))
     {
+        l.unlock();
+
         HPX_THROWS_IF(ec, lock_error
           , "symbol_namespace::bind"
           , "GID table insertion failed due to a locking error or "

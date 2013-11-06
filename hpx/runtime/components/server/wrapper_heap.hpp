@@ -283,6 +283,7 @@ namespace hpx { namespace components { namespace detail
                 else
                 {
                     // unbind the range which is not needed anymore
+                    util::scoped_unlock<scoped_lock> ul(l);
                     applier::unbind_range(base_gid, step_);
                 }
             }
