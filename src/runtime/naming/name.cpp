@@ -197,6 +197,10 @@ namespace hpx { namespace naming
                 naming::gid_type newid = detail::split_credits_for_gid(
                     const_cast<id_type_impl&>(*this));
 
+                // none of the ids should be left without credits
+                BOOST_ASSERT(detail::get_credit_from_gid(*this) != 0);
+                BOOST_ASSERT(detail::get_credit_from_gid(newid) != 0);
+
                 // We now add new credits to the id which is left behind only.
                 // The credit for the newid will be handled upon arrival
                 // on the destination node.
