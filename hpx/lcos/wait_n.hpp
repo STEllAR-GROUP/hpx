@@ -39,22 +39,36 @@ namespace hpx
 {
     namespace detail
     {
-        template <typename Callback>
+        template <typename Sequence>
+        struct when_n;
+
+        template <typename Sequence, typename Callback>
         struct set_on_completed_callback_impl
         {
-            explicit set_on_completed_callback_impl(Callback const& callback)
-              : callback_(callback)
+            explicit set_on_completed_callback_impl(
+                    when_n<Sequence>& when, Callback const& callback)
+              : when_(when),
+                callback_(callback)
             {}
 
             template <typename R>
             void operator()(lcos::future<R>& future) const
             {
-                using lcos::detail::get_future_data;
+                std::size_t counter = when_.count_.load(boost::memory_order_acquire);
+                if (counter < when_.needed_count_ && !future.is_ready()) {
+                    // handle future only if not enough futures are ready yet
+                    // also, do not touch any futures which are already ready
 
-                lcos::detail::future_data_base<R>* future_data =
-                    get_future_data(future);
+                    using lcos::detail::get_future_data;
 
-                future_data->set_on_completed(Callback(callback_));
+                    lcos::detail::future_data_base<R>* future_data =
+                        get_future_data(future);
+
+                    future_data->set_on_completed(Callback(callback_));
+                }
+                else {
+                    ++when_.count_;
+                }
             }
 
             template <typename Sequence>
@@ -71,14 +85,17 @@ namespace hpx
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
 
+            when_n<Sequence>& when_;
             Callback const& callback_;
         };
 
         template <typename Sequence, typename Callback>
-        void set_on_completed_callback(Sequence& sequence, Callback const& callback)
+        void set_on_completed_callback(when_n<Sequence>& when,
+            Callback const& callback)
         {
-            set_on_completed_callback_impl<Callback> set_on_completed_callback_helper(callback);
-            set_on_completed_callback_helper(sequence);
+            set_on_completed_callback_impl<Sequence, Callback>
+                set_on_completed_callback_helper(when, callback);
+            set_on_completed_callback_helper(when.lazy_values_);
         }
 
         template <typename Sequence>
@@ -134,7 +151,7 @@ namespace hpx
             result_type operator()()
             {
                 // set callback functions to executed when future is ready
-                set_on_completed_callback(lazy_values_,
+                set_on_completed_callback(*this,
                     util::bind(
                         &when_n::on_future_ready, this->shared_from_this(),
                         threads::get_self_id()));
@@ -142,14 +159,14 @@ namespace hpx
                 // if all of the requested futures are already set, our
                 // callback above has already been called often enough, otherwise
                 // we suspend ourselves
-                if (count_.load() < needed_count_)
+                if (count_.load(boost::memory_order_acquire) < needed_count_)
                 {
                     // wait for any of the futures to return to become ready
                     this_thread::suspend(threads::suspended);
                 }
 
                 // at least N futures should be ready
-                BOOST_ASSERT(count_.load() >= needed_count_);
+                BOOST_ASSERT(count_.load(boost::memory_order_acquire) >= needed_count_);
 
                 return boost::move(lazy_values_);
             }
