@@ -71,16 +71,16 @@ namespace hpx
                 }
             }
 
-            template <typename Sequence>
-            void operator()(Sequence& sequence, typename boost::enable_if<
-                boost::fusion::traits::is_sequence<Sequence> >::type* = 0) const
+            template <typename Sequence_>
+            void operator()(Sequence_& sequence, typename boost::enable_if<
+                boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
             {
                 boost::fusion::for_each(sequence, *this);
             }
 
-            template <typename Sequence>
-            void operator()(Sequence& sequence, typename boost::disable_if<
-                boost::fusion::traits::is_sequence<Sequence> >::type* = 0) const
+            template <typename Sequence_>
+            void operator()(Sequence_& sequence, typename boost::disable_if<
+                boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
             {
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
