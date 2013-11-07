@@ -386,7 +386,7 @@ namespace hpx { namespace parcelset
         }
         else if (dest.get_type() == connection_mpi) {
             // fall back to TCP/IP if MPI is disabled
-            if (get_config_entry("hpx.parcel.mpi.enable", "0") == "0")
+            if (!util::mpi_environment::enabled())
             {
                 if (pports_[connection_tcpip])
                     return connection_tcpip;

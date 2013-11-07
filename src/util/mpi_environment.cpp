@@ -82,6 +82,9 @@ namespace hpx { namespace util
         if (!detail::detect_mpi_environment(cfg.rtcfg_) &&
             detail::get_cfg_entry(cfg, "hpx.parcel.tcpip.enable", 1))
         {
+            // explicitly disable mpi if not run by mpirun
+            cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
+
             enabled_ = false;
             return this_rank;
         }
@@ -95,6 +98,9 @@ namespace hpx { namespace util
         int retval = MPI_Init_thread(argc, argv, flag, &provided_threading_flag_);
         if (MPI_SUCCESS != retval)
         {
+            // explicitly disable mpi if not run by mpirun
+            cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
+
             enabled_ = false;
 
             int msglen = 0;
@@ -108,6 +114,9 @@ namespace hpx { namespace util
         }
         if (flag != provided_threading_flag_)
         {
+            // explicitly disable mpi if not run by mpirun
+            cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
+
             enabled_ = false;
             throw std::runtime_error("MPI_Init_thread: provided multi_threading "
                 "mode is different from requested mode");
