@@ -221,7 +221,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // retrieve the gid of this promise
-        naming::id_type get_gid() const
+        virtual naming::id_type get_gid() const
         {
             naming::gid_type::mutex_type::scoped_lock l(&gid_);
 
@@ -350,7 +350,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // retrieve the gid of this promise
-        naming::id_type get_gid() const
+        virtual naming::id_type get_gid() const
         {
             naming::gid_type::mutex_type::scoped_lock l(&gid_);
 
