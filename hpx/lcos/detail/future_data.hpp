@@ -152,10 +152,8 @@ namespace detail
         // wait support
         struct wake_me_up
         {
-            explicit wake_me_up(
-                threads::thread_id_type const& thread_id =
-                    threads::get_self_id()
-            ) : thread_id_(thread_id)
+            explicit wake_me_up(threads::thread_id_type const& thread_id)
+              : thread_id_(thread_id)
             {}
 
             void operator()(lcos::future<Result>& /*f*/) const
@@ -180,6 +178,7 @@ namespace detail
             }
             ~reset_cb()
             {
+                l_.lock();
                 target_.set_on_completed_locked(boost::move(oldcb_), l_);
             }
 
@@ -194,9 +193,8 @@ namespace detail
             if (!is_ready_locked()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 wake_me_up callback(threads::get_self_id());
-                reset_cb r(*this, boost::ref(callback), l);
+                set_on_completed_locked(boost::ref(callback), l);  // leaves 'l' unlocked
 
-                util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 this_thread::suspend(threads::suspended);
             }
         }
@@ -208,9 +206,8 @@ namespace detail
             if (!is_ready_locked()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 wake_me_up callback(threads::get_self_id());
-                reset_cb r(*this, boost::ref(callback), l);
+                reset_cb r(*this, boost::ref(callback), l);  // leaves 'l' unlocked
 
-                util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(p) == threads::wait_signaled) ? //-V110
                     future_status::ready : future_status::timeout;
             }
@@ -224,9 +221,8 @@ namespace detail
             if (!is_ready_locked()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
                 wake_me_up callback(threads::get_self_id());
-                reset_cb r(*this, boost::ref(callback), l);
+                reset_cb r(*this, boost::ref(callback), l);  // leaves 'l' unlocked
 
-                util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
                 return (this_thread::suspend(at) == threads::wait_signaled) ? //-V110
                     future_status::ready : future_status::timeout;
             }
@@ -538,6 +534,7 @@ namespace detail
         }
 
     public:
+        // note: leaves the given lock in unlocked state when returning
         completed_callback_type set_on_completed_locked(
             BOOST_RV_REF(completed_callback_type) data_sink,
             typename mutex_type::scoped_lock& l)
@@ -550,7 +547,7 @@ namespace detail
                     lcos::detail::make_future_from_data<Result>(this);
 
                 // invoke the callback (continuation) function right away
-                util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                l.unlock();
 
                 if (!retval.empty())
                     retval(f);
@@ -560,10 +557,14 @@ namespace detail
                 // store a combined callback wrapping the old and the new one
                 on_completed_ = boost::move(
                     compose_cb(boost::move(data_sink), retval));
+
+                l.unlock();
             }
             else {
                 // store the new callback
                 on_completed_ = boost::move(data_sink);
+
+                l.unlock();
             }
 
             return boost::move(retval);
