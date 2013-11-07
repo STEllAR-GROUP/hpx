@@ -13,9 +13,10 @@ set(tests
     future_unwrap_878
     lifetime_588
     lifetime_588_1
+    promise_leak_996
     set_hpx_limit_771
     set_hpx_limit_798
-    promise_leak_996
+    simulate_993
    )
 
 # MSVC 2010 is not able to cope with this test
