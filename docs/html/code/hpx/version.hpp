@@ -1,5 +1,6 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
+//  Copyright (c)      2013 Adrian Serio
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,13 +24,16 @@
 //  HPX_VERSION_FULL & 0x00FF00 is the minor version
 //  HPX_VERSION_FULL & 0xFF0000 is the major version
 //
-#define HPX_VERSION_FULL         0x000907
+//  HPX_VERSION_DATE   YYYYMMDD is the date of the release
+//                               (estimated release date for master branch)
+//
+#define HPX_VERSION_FULL         0x000908
 
 #define HPX_VERSION_MAJOR        0
 #define HPX_VERSION_MINOR        9
-#define HPX_VERSION_SUBMINOR     7
+#define HPX_VERSION_SUBMINOR     8
 
-#define HPX_VERSION_DATE         20131006
+#define HPX_VERSION_DATE         20140221
 
 #if !defined(HPX_AGAS_VERSION)
     #define HPX_AGAS_VERSION 0x30

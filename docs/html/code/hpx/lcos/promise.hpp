@@ -221,7 +221,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // retrieve the gid of this promise
-        naming::id_type get_gid() const
+        virtual naming::id_type get_gid() const
         {
             naming::gid_type::mutex_type::scoped_lock l(&gid_);
 
@@ -243,7 +243,7 @@ namespace hpx { namespace lcos { namespace detail
             return naming::id_type(gid, naming::id_type::managed);
         }
 
-        naming::gid_type get_base_gid() const
+        virtual naming::gid_type get_base_gid() const
         {
             BOOST_ASSERT(gid_ != naming::invalid_gid);
             return gid_;
@@ -252,7 +252,8 @@ namespace hpx { namespace lcos { namespace detail
     private:
         friend void intrusive_ptr_release(promise* p)
         {
-            bool get_gid_was_called = (0 == naming::detail::get_credit_from_gid(p->gid_));
+            bool get_gid_was_called = 
+                (0 == naming::detail::get_credit_from_gid(p->get_base_gid()));
             long counter = --p->count_;
 
             // if this promise was never asked for its id we need to take
@@ -350,7 +351,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         // retrieve the gid of this promise
-        naming::id_type get_gid() const
+        virtual naming::id_type get_gid() const
         {
             naming::gid_type::mutex_type::scoped_lock l(&gid_);
 
@@ -372,7 +373,7 @@ namespace hpx { namespace lcos { namespace detail
             return naming::id_type(gid, naming::id_type::managed);
         }
 
-        naming::gid_type get_base_gid() const
+        virtual naming::gid_type get_base_gid() const
         {
             BOOST_ASSERT(gid_ != naming::invalid_gid);
             return gid_;
@@ -381,7 +382,8 @@ namespace hpx { namespace lcos { namespace detail
     private:
         friend void intrusive_ptr_release(promise* p)
         {
-            bool get_gid_was_called = (0 == naming::detail::get_credit_from_gid(p->gid_));
+            bool get_gid_was_called = 
+                (0 == naming::detail::get_credit_from_gid(p->get_base_gid()));
             long counter = --p->count_;
 
             // if this promise was never asked for its id we need to take
