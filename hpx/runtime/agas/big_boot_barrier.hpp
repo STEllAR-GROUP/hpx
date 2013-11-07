@@ -84,6 +84,13 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
       , actions::base_action* act
         );
 
+    void apply_late(
+        boost::uint32_t source_prefix
+      , boost::uint32_t prefix
+      , naming::address const& addr
+      , actions::base_action* act
+        );
+
     void wait_bootstrap();
     void wait_hosted(std::string const& locality_name,
         void* primary_ns_ptr, void* symbol_ns_ptr);

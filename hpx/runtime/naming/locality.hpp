@@ -133,7 +133,7 @@ namespace hpx { namespace naming
         friend bool operator==(locality const& lhs, locality const& rhs)
         {
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-            if(util::mpi_environment::enabled())
+            if(util::mpi_environment::enabled() && lhs.rank_ != -1 && rhs.rank_ != -1)
                 return lhs.rank_ == rhs.rank_;
 #endif
             return lhs.port_ == rhs.port_ && lhs.address_ == rhs.address_;
@@ -147,7 +147,7 @@ namespace hpx { namespace naming
         friend bool operator< (locality const& lhs, locality const& rhs)
         {
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-            if(util::mpi_environment::enabled())
+            if(util::mpi_environment::enabled() && lhs.rank_ != -1 && rhs.rank_ != -1)
                 return lhs.rank_ < rhs.rank_;
 #endif
             return lhs.address_ < rhs.address_ ||

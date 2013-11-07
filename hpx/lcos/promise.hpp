@@ -413,8 +413,6 @@ namespace hpx { namespace components
     // for all promise types
     struct managed_promise : boost::noncopyable
     {
-        /// \brief Construct a managed_component instance holding a new wrapped
-        ///        instance
         managed_promise()
           : promise_(0)
         {

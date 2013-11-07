@@ -377,10 +377,19 @@ namespace hpx { namespace parcelset
         if (dest.get_type() == connection_tcpip) {
             if ((use_alternative_parcelports_ ||
                  get_config_entry("hpx.parcel.bootstrap", "tcpip") == "mpi") &&
-                 util::mpi_environment::enabled())
+                 util::mpi_environment::enabled() &&
+                 dest.get_rank() != -1)
             {
                 if (pports_[connection_mpi])
                     return connection_mpi;
+            }
+        }
+        else if (dest.get_type() == connection_mpi) {
+            // fall back to TCP/IP if MPI is disabled
+            if (get_config_entry("hpx.parcel.mpi.enable", "0") == "0")
+            {
+                if (pports_[connection_tcpip])
+                    return connection_tcpip;
             }
         }
 #endif
