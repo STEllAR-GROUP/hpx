@@ -430,7 +430,7 @@ void register_worker(registration_header const& header)
     {
         // We can just send the parcel now, the connecting locality isn't a part
         // of startup synchronization.
-        get_big_boot_barrier().apply(
+        get_big_boot_barrier().apply_late(
             0
           , naming::get_locality_id_from_gid(prefix)
           , naming::address(header.locality), p);
@@ -727,6 +727,18 @@ void big_boot_barrier::apply(
     if (!p.get_parcel_id())
         p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
     pp.send_early_parcel(p);
+} // }}}
+
+void big_boot_barrier::apply_late(
+    boost::uint32_t source_locality_id
+  , boost::uint32_t target_locality_id
+  , naming::address const& addr
+  , actions::base_action* act
+) { // {{{
+    parcelset::parcel p(naming::get_id_from_locality_id(target_locality_id), addr, act);
+    if (!p.get_parcel_id())
+        p.set_parcel_id(parcelset::parcel::generate_unique_id(source_locality_id));
+    get_runtime().get_parcel_handler().put_parcel(p);
 } // }}}
 
 void big_boot_barrier::wait_bootstrap()
