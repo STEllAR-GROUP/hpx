@@ -142,6 +142,42 @@ namespace hpx { namespace components
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result, typename RemoteResult>
+    class promise_base
+      : public lcos::base_lco_with_value<Result, RemoteResult>
+    {
+    public:
+        virtual void add_ref() = 0;
+        virtual void release() = 0;
+
+        // retrieve the gid of this promise
+        naming::id_type get_gid() const
+        {
+            naming::gid_type::mutex_type::scoped_lock l(&this->gid_);
+
+            // take all credits to avoid a self reference
+            naming::gid_type gid = gid_;
+            naming::detail::strip_credit_from_gid(
+                const_cast<naming::gid_type&>(this->gid_));
+
+            // we request the id of a future only once
+            BOOST_ASSERT(0 != naming::detail::get_credit_from_gid(gid));
+
+            return naming::id_type(gid, naming::id_type::managed);
+        }
+
+        naming::gid_type get_base_gid() const
+        {
+            BOOST_ASSERT(gid_ != naming::invalid_gid);
+            return gid_;
+        }
+
+    protected:
+        naming::gid_type gid_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
     class promise;
 
@@ -153,7 +189,7 @@ namespace hpx { namespace lcos { namespace detail
     /// action and wait for the result.
     template <typename Result, typename RemoteResult>
     class promise
-      : public lcos::base_lco_with_value<Result, RemoteResult>,
+      : public promise_base<Result, RemoteResult>,
         public lcos::detail::future_data<Result>
     {
     protected:
@@ -220,40 +256,21 @@ namespace hpx { namespace lcos { namespace detail
             return this->future_data_type::set_exception(e);
         }
 
-        // retrieve the gid of this promise
-        virtual naming::id_type get_gid() const
+        void add_ref()
         {
-            naming::gid_type::mutex_type::scoped_lock l(&gid_);
-
-            // take all credits to avoid a self reference
-            naming::gid_type gid = gid_;
-            naming::detail::strip_credit_from_gid(
-                const_cast<naming::gid_type&>(gid_));
-
-            // we request the id of a future only once
-            BOOST_ASSERT(0 != naming::detail::get_credit_from_gid(gid));
-
-            //naming::detail::set_credit_split_mask_for_gid(gid);
-            //if (0 == naming::detail::get_credit_from_gid(gid))
-            //{
-            //    naming::detail::retrieve_new_credits(gid, gid,
-            //        HPX_INITIAL_GLOBALCREDIT, 0, l);
-            //}
-
-            return naming::id_type(gid, naming::id_type::managed);
+            intrusive_ptr_add_ref(this);
         }
 
-        virtual naming::gid_type get_base_gid() const
+        void release()
         {
-            BOOST_ASSERT(gid_ != naming::invalid_gid);
-            return gid_;
+            intrusive_ptr_release(this);
         }
 
     private:
         friend void intrusive_ptr_release(promise* p)
         {
             bool get_gid_was_called = 
-                (0 == naming::detail::get_credit_from_gid(p->get_base_gid()));
+                (0 == naming::detail::get_credit_from_gid(p->gid_));
             long counter = --p->count_;
 
             // if this promise was never asked for its id we need to take
@@ -274,17 +291,15 @@ namespace hpx { namespace lcos { namespace detail
         void set_back_ptr(components::managed_component<promise>* bp)
         {
             BOOST_ASSERT(bp);
-            BOOST_ASSERT(gid_ == naming::invalid_gid);
-            gid_ = bp->get_base_gid();
+            BOOST_ASSERT(this->gid_ == naming::invalid_gid);
+            this->gid_ = bp->get_base_gid();
         }
-
-        naming::gid_type gid_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
     class promise<void, util::unused_type>
-      : public lcos::base_lco_with_value<void, util::unused_type>,
+      : public promise_base<void, util::unused_type>,
         public lcos::detail::future_data<void>
     {
     protected:
@@ -350,40 +365,21 @@ namespace hpx { namespace lcos { namespace detail
             return this->future_data_type::set_exception(e);
         }
 
-        // retrieve the gid of this promise
-        virtual naming::id_type get_gid() const
+        void add_ref()
         {
-            naming::gid_type::mutex_type::scoped_lock l(&gid_);
-
-            // take all credits to avoid a self reference
-            naming::gid_type gid = gid_;
-            naming::detail::strip_credit_from_gid(
-                const_cast<naming::gid_type&>(gid_));
-
-            // we request the id of a future only once
-            BOOST_ASSERT(0 != naming::detail::get_credit_from_gid(gid));
-
-            //naming::detail::set_credit_split_mask_for_gid(gid);
-            //if (0 == naming::detail::get_credit_from_gid(gid))
-            //{
-            //    naming::detail::retrieve_new_credits(gid, gid,
-            //        HPX_INITIAL_GLOBALCREDIT, 0, l);
-            //}
-
-            return naming::id_type(gid, naming::id_type::managed);
+            intrusive_ptr_add_ref(this);
         }
 
-        virtual naming::gid_type get_base_gid() const
+        void release()
         {
-            BOOST_ASSERT(gid_ != naming::invalid_gid);
-            return gid_;
+            intrusive_ptr_release(this);
         }
 
     private:
         friend void intrusive_ptr_release(promise* p)
         {
             bool get_gid_was_called = 
-                (0 == naming::detail::get_credit_from_gid(p->get_base_gid()));
+                (0 == naming::detail::get_credit_from_gid(p->gid_));
             long counter = --p->count_;
 
             // if this promise was never asked for its id we need to take
@@ -405,10 +401,8 @@ namespace hpx { namespace lcos { namespace detail
         {
             BOOST_ASSERT(bp);
             BOOST_ASSERT(gid_ == naming::invalid_gid);
-            gid_ = bp->get_base_gid();
+            this->gid_ = bp->get_base_gid();
         }
-
-        naming::gid_type gid_;
     };
 }}}
 
@@ -419,8 +413,6 @@ namespace hpx { namespace components
     // for all promise types
     struct managed_promise : boost::noncopyable
     {
-        /// \brief Construct a managed_component instance holding a new wrapped
-        ///        instance
         managed_promise()
           : promise_(0)
         {
@@ -429,20 +421,20 @@ namespace hpx { namespace components
 
         ~managed_promise()
         {
-            intrusive_ptr_release(this);
+            promise_->release();
         }
 
     private:
         friend void intrusive_ptr_add_ref(managed_promise* p)
         {
-            intrusive_ptr_add_ref(p->promise_);
+            p->promise_->add_ref();
         }
         friend void intrusive_ptr_release(managed_promise* p)
         {
-            intrusive_ptr_release(p->promise_);
+            p->promise_->release();
         }
 
-        lcos::detail::promise<void, util::unused_type>* promise_;
+        lcos::detail::promise_base<void, util::unused_type>* promise_;
     };
 }}
 
