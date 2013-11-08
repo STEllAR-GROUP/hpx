@@ -331,9 +331,9 @@ namespace detail
 
             if (d.is_empty()) {
                 // the value has already been moved out of this future
-                HPX_THROWS_IF(ec, future_uninitialized,
+                HPX_THROWS_IF(ec, no_state,
                     "future_data::get_data",
-                    "this future has not been initialized");
+                    "this future has no valid shared state");
                 return result_type();
             }
 
@@ -363,9 +363,9 @@ namespace detail
 
             if (d.is_empty()) {
                 // the value has already been moved out of this future
-                HPX_THROWS_IF(ec, future_uninitialized,
+                HPX_THROWS_IF(ec, no_state,
                     "future_data::move_data",
-                    "this future has not been initialized");
+                    "this future has no valid shared state");
                 return result_type();
             }
 
@@ -402,7 +402,7 @@ namespace detail
 
                     // check whether the data already has been set
                     if (!data_.is_empty()) {
-                        HPX_THROW_EXCEPTION(future_already_satisfied,
+                        HPX_THROW_EXCEPTION(promise_already_satisfied,
                             "packaged_task::set_data<Result>",
                             "data has already been set for this future");
                     }
@@ -437,7 +437,7 @@ namespace detail
 
                 // check whether the data already has been set
                 if (!data_.is_empty()) {
-                    HPX_THROW_EXCEPTION(future_already_satisfied,
+                    HPX_THROW_EXCEPTION(promise_already_satisfied,
                         "packaged_task::set_data<Result>",
                         "data has already been set for this future");
                 }

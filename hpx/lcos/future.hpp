@@ -268,9 +268,9 @@ namespace hpx { namespace lcos
         Result get() const
         {
             if (!future_data_) {
-                HPX_THROW_EXCEPTION(future_uninitialized,
+                HPX_THROW_EXCEPTION(no_state,
                     "future<Result>::get",
-                    "this future has not been initialized");
+                    "this future has no valid shared state");
             }
             return future_data_->get_data();
         }
@@ -278,9 +278,9 @@ namespace hpx { namespace lcos
         Result get(error_code& ec) const
         {
             if (!future_data_) {
-                HPX_THROWS_IF(ec, future_uninitialized,
+                HPX_THROWS_IF(ec, no_state,
                     "future<Result>::get",
-                    "this future has not been initialized");
+                    "this future has no valid shared state");
                 return Result();
             }
             return future_data_->get_data(ec);
