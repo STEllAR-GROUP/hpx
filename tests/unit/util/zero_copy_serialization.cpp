@@ -16,11 +16,20 @@ int test_function1(hpx::util::serialize_buffer<double> const& b)
 HPX_PLAIN_ACTION(test_function1, test_action1)
 
 int test_function2(hpx::util::serialize_buffer<double> const& b1,
-    hpx::util::serialize_buffer<double> const& b2)
+    hpx::util::serialize_buffer<int> const& b2)
 {
     return 42;
 }
 HPX_PLAIN_ACTION(test_function2, test_action2)
+
+int test_function3(double d,
+    hpx::util::serialize_buffer<double> const& b1,
+    std::string const& s, int i,
+    hpx::util::serialize_buffer<int> const& b2)
+{
+    return 42;
+}
+HPX_PLAIN_ACTION(test_function3, test_action3)
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_parcel_serialization(hpx::parcelset::parcel outp,
@@ -176,21 +185,60 @@ void test_zero_copy_serialization(T1& arg1, T2& arg2)
     test_parcel_serialization(outp, in_archive_flags, out_archive_flags, true);
 }
 
+template <typename T1, typename T2>
+void test_zero_copy_serialization(double d, T1& arg1, std::string const& s,
+    int i, T2& arg2)
+{
+    hpx::naming::id_type const here = hpx::find_here();
+    hpx::naming::address addr(hpx::get_locality(),
+        hpx::components::component_invalid,
+        reinterpret_cast<boost::uint64_t>(&test_function2));
+
+    // compose archive flags
+    int in_archive_flags = boost::archive::no_header;
+    int out_archive_flags = boost::archive::no_header;
+#ifdef BOOST_BIG_ENDIAN
+    out_archive_flags |= hpx::util::endian_big;
+#else
+    out_archive_flags |= hpx::util::endian_little;
+#endif
+
+    // create a parcel with/without continuation
+    hpx::parcelset::parcel outp(here, addr,
+        new hpx::actions::transfer_action<test_action3>(
+            hpx::threads::thread_priority_normal,
+                hpx::util::forward_as_tuple(d, arg1, s, i, arg2)),
+        new hpx::actions::typed_continuation<int>(here));
+
+    outp.set_parcel_id(hpx::parcelset::parcel::generate_unique_id());
+    outp.set_source(here);
+
+    test_parcel_serialization(outp, in_archive_flags, out_archive_flags, true);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map& vm)
 {
     std::size_t size = 1;
     for (std::size_t i = 0; i != 20; ++i) {
         // create argument for action
-        std::vector<double> data;
-        data.resize(size << i);
+        std::vector<double> data1;
+        data1.resize(size << i);
 
-        hpx::util::serialize_buffer<double> buffer(data.data(), data.size(),
+        hpx::util::serialize_buffer<double> buffer1(data1.data(), data1.size(),
             hpx::util::serialize_buffer<double>::reference);
 
-        test_normal_serialization(buffer);
-        test_zero_copy_serialization(buffer);
-        test_zero_copy_serialization(buffer, buffer);
+        test_normal_serialization(buffer1);
+        test_zero_copy_serialization(buffer1);
+
+        std::vector<int> data2;
+        data2.resize(size << i);
+
+        hpx::util::serialize_buffer<int> buffer2(data2.data(), data2.size(),
+            hpx::util::serialize_buffer<int>::reference);
+
+        test_zero_copy_serialization(buffer1, buffer2);
+        test_zero_copy_serialization(42.0, buffer1, "42.0", 42, buffer2);
     }
 
     return hpx::finalize();
