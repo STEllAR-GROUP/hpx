@@ -206,19 +206,20 @@ namespace hpx { namespace util
         std::size_t node)
     {
         // if somebody tries to enforce using MPI, bail out
-        if (detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) != 0)
+        if (detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) != 0 ||
+            cfg.rtcfg_.get_entry("hpx.parcel.bootstrap", "tcpip") == "mpi")
         {
             throw std::runtime_error("mpi_environment::init: "
                 "HPX is not compiled for MPI, but 'hpx.parcel.mpi.enable=1'. "
                 "Please set HPX_HAVE_PARCELPORT_MPI=ON while configuring using cmake.");
         }
 
-        // We disable the MPI parcelport if the application is not run using mpirun
-        // and the tcp/ip parcelport is not explicitly disabled
-        //
-        // The bottomline is that we use the MPI parcelport either when the application
-        // was executed using mpirun or if the tcp/ip parcelport was disabled.
-        if (detail::detect_mpi_environment(cfg.rtcfg_))
+        // Report error, if the application was run using mpirun or similar but no
+        // prcelport other then MPI is enabled.
+        if (detail::detect_mpi_environment(cfg.rtcfg_) &&
+            detail::get_cfg_entry(cfg, "hpx.parcel.tcpip.enable", 0) == 0 &&
+            detail::get_cfg_entry(cfg, "hpx.parcel.shmem.enable", 0) == 0 &&
+            detail::get_cfg_entry(cfg, "hpx.parcel.ibverbs.enable", 0) == 0)
         {
             throw std::runtime_error("mpi_environment::init: "
                 "HPX is not compiled for MPI, but the application was run using mpirun. "
