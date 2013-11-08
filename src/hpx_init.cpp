@@ -44,10 +44,6 @@
 #include <boost/assign/std/vector.hpp>
 #include <boost/foreach.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-#include <hpx/util/mpi_environment.hpp>
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
