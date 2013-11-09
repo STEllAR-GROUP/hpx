@@ -18,7 +18,7 @@ macro(hpx_make_python_list input output)
 endmacro()
 
 macro(add_hpx_test category name)
-  hpx_parse_arguments(${name} "TIMEOUT;LOCALITIES;THREADS_PER_LOCALITY;ARGS"
+  hpx_parse_arguments(${name} "EXECUTABLE;TIMEOUT;LOCALITIES;THREADS_PER_LOCALITY;ARGS"
                               "FAILURE_EXPECTED" ${ARGN})
 
   if(NOT ${name}_TIMEOUT)
@@ -31,6 +31,10 @@ macro(add_hpx_test category name)
 
   if(NOT ${name}_THREADS_PER_LOCALITY)
     set(${name}_THREADS_PER_LOCALITY 1)
+  endif()
+
+  if(NOT ${name}_EXECUTABLE)
+    set(${name}_EXECUTABLE ${name})
   endif()
 
   set(expected "True")
@@ -47,7 +51,7 @@ macro(add_hpx_test category name)
 
   hpx_make_python_list(args ${name}_ARGS)
 
-  set(test_input "'$<TARGET_FILE:${name}_test_exe>'"
+  set(test_input "'$<TARGET_FILE:${${name}_EXECUTABLE}_test_exe>'"
                  ${${name}_TIMEOUT}
                  ${expected}
                  ${${name}_LOCALITIES}
