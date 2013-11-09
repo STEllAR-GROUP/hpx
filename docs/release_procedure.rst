@@ -54,7 +54,9 @@ the lines as they are completed to avoid confusion.
         *   ``docs/hpx.qbk``
         *   ``CMakeLists.txt``
 
-#.  Update the logo size in ``docs/cmakelist.txt`` lines 115/116
+#.  Create new logos for documentation. Update the logo size accordingly in
+    ``docs/cmakelist.txt`` lines 124/125, remove '_draft' suffix in logo file
+    name in ``docs/cmakelist.txt`` line 111.
 
 #.  Checkout the release branch, and remove the ``-trunk`` tag from
     ``hpx/version.hpp`` (replace it with ``-rc1`` for the release candidate
