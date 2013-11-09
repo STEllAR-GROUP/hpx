@@ -48,7 +48,7 @@ int hpx_main()
         test_action act;
 
         std::size_t size = 1;
-        for (std::size_t i = 0; i != 14; ++i)
+        for (std::size_t i = 0; i != 20; ++i)
         {
             std::vector<int> data;
             data.resize(size << i);
