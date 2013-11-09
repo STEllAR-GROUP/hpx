@@ -804,7 +804,7 @@ namespace hpx { namespace parcelset { namespace tcp
             return;
         }
 
-        BOOST_ASSERT(client_connection );
+        BOOST_ASSERT(client_connection.get() != 0);
         client_connection->set_parcel(p);
         client_connection->async_write(early_write_handler,
             early_pending_parcel_handler);

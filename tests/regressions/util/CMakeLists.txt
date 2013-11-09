@@ -10,6 +10,7 @@ set(tests
     function_serialization_728
     protect_with_nullary_pfo
     tuple_serialization_803
+    zero_copy_parcels_1001
    )
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
@@ -28,6 +29,8 @@ if(HPX_USE_PARCEL_COALESCING)
     parcel_coalescing_lib)
 endif()
 set(function_serialization_728_FLAGS DEPENDENCIES ${function_serialization_728_dependencies})
+
+set(zero_copy_parcels_1001_PARAMETERS LOCALITIES 2)
 
 foreach(test ${tests})
   set(sources
