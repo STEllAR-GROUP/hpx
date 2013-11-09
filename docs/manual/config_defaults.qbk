@@ -225,6 +225,7 @@ sections, one for each component.
     max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:<hpx_parcel_max_connections_per_locality>}
     max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:<hpx_parcel_max_message_size>}
     array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}
+    zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
 ``
 [c++]
 
@@ -263,6 +264,10 @@ sections, one for each component.
     [[`hpx.parcel.array_optimization`]
      [This property defines whether this locality is allowed to utilize array
       optimizations during serialization of parcel data. The default is `1`.]]
+    [[`hpx.parcel.zero_copy_optimization`]
+     [This property defines whether this locality is allowed to utilize zero copy
+      optimizations during serialization of parcel data. The default is the same value
+      as set for `hpx.parcel.array_optimization`.]]
 ]
 
 [teletype]

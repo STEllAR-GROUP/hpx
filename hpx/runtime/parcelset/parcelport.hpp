@@ -353,6 +353,12 @@ namespace hpx { namespace parcelset
             return allow_array_optimizations_;
         }
 
+        /// Return whether it is allowed to apply zero copy optimizations
+        bool allow_zero_copy_optimizations() const
+        {
+            return allow_zero_copy_optimizations_;
+        }
+
     protected:
         void report_potential_connection_error(naming::locality const& locality_id,
             naming::gid_type const& parcel_id, error_code const& ec);
@@ -382,6 +388,7 @@ namespace hpx { namespace parcelset
 
         /// serialization is allowed to use array optimization
         bool allow_array_optimizations_;
+        bool allow_zero_copy_optimizations_;
     };
 }}
 
