@@ -25,7 +25,8 @@ namespace hpx { namespace util
 {
     namespace detail
     {
-        bool detect_mpi_environment(util::runtime_configuration const& cfg)
+        bool detect_mpi_environment(util::runtime_configuration const& cfg,
+            char const* default_env)
         {
 #if defined(__bgq__)
             // If running on BG/Q, we can safely assume to always run in an
@@ -33,7 +34,7 @@ namespace hpx { namespace util
             return true;
 #else
             std::string mpi_environment_strings = cfg.get_entry(
-                "hpx.parcel.mpi.env", HPX_PARCELPORT_MPI_ENV);
+                "hpx.parcel.mpi.env", default_env);
 
             typedef
                 boost::tokenizer<boost::char_separator<char> >
@@ -86,7 +87,7 @@ namespace hpx { namespace util
         //
         // The bottomline is that we use the MPI parcelport either when the application
         // was executed using mpirun or if the tcp/ip parcelport was disabled.
-        if (!detail::detect_mpi_environment(cfg.rtcfg_) &&
+        if (!detail::detect_mpi_environment(cfg.rtcfg_, HPX_PARCELPORT_MPI_ENV) &&
             detail::get_cfg_entry(cfg, "hpx.parcel.tcpip.enable", 1))
         {
             // explicitly disable mpi if not run by mpirun
@@ -216,7 +217,7 @@ namespace hpx { namespace util
 
         // Report error, if the application was run using mpirun or similar but no
         // prcelport other then MPI is enabled.
-        if (detail::detect_mpi_environment(cfg.rtcfg_) &&
+        if (detail::detect_mpi_environment(cfg.rtcfg_, "PMI_RANK,OMPI_COMM_WORLD_SIZE") &&
             detail::get_cfg_entry(cfg, "hpx.parcel.tcpip.enable", 0) == 0 &&
             detail::get_cfg_entry(cfg, "hpx.parcel.shmem.enable", 0) == 0 &&
             detail::get_cfg_entry(cfg, "hpx.parcel.ibverbs.enable", 0) == 0)
