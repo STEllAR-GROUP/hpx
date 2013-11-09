@@ -58,3 +58,15 @@ foreach(test ${tests})
                               ${test}_test_exe)
 endforeach()
 
+# run zero_copy_parcels_1001 with two additional configurations
+add_hpx_unit_test(
+    "util" zero_copy_parcels_1001_no_array_optimization
+    EXECUTABLE zero_copy_parcels_1001
+    ${zero_copy_parcels_1001_PARAMETERS}
+    ARGS --hpx:ini=hpx.parcel.array_optimization=0)
+
+add_hpx_unit_test(
+    "util" zero_copy_parcels_1001_no_zero_copy_optimization
+    EXECUTABLE zero_copy_parcels_1001
+    ${zero_copy_parcels_1001_PARAMETERS}
+    ARGS --hpx:ini=hpx.parcel.zero_copy_optimization=0)
