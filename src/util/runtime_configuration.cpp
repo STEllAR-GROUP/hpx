@@ -140,6 +140,8 @@ namespace hpx { namespace util
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
 #endif
             "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
+            "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
+                "$[hpx.parcel.array_optimization]}",
 
             // TCPIP related settings
             "[hpx.parcel.tcpip]",

@@ -296,7 +296,7 @@ namespace hpx { namespace parcelset { namespace mpi
         unsigned archive_flags = boost::archive::no_header;
         if (!pp.allow_array_optimizations())
             archive_flags |= util::disable_array_optimization;
-                
+
         archive_flags |= util::disable_data_chunking;
 
         // protect from un-handled exceptions bubbling up
