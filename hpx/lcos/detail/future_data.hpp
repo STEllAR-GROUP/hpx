@@ -347,9 +347,6 @@ namespace detail
             return d.move_value();
         }
 
-    private:
-        static bool always_false(data_type const&) { return false; }
-
     public:
         result_type move_data(error_code& ec = throws)
         {
@@ -357,7 +354,7 @@ namespace detail
             data_type d;
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
-                data_.read_and_empty_if(d, &always_false, l, ec); // moves the data from the store
+                data_.move(d, l, ec); // moves the data from the store
                 if (ec) return result_type();
             }
 

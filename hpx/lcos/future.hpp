@@ -169,8 +169,9 @@ namespace hpx { namespace lcos
         {}
 
         explicit future(BOOST_RV_REF(boost::intrusive_ptr<future_data_type>) p)
+          : future_data_(p)
         {
-            future_data_.swap(p);
+            p.reset();
         }
 
     public:
@@ -189,15 +190,16 @@ namespace hpx { namespace lcos
         }
 
         future(BOOST_RV_REF(future) other)
+          : future_data_(other.future_data_)
         {
-            future_data_.swap(other.future_data_);
+            other.future_data_.reset();
         }
 
         // accept wrapped future
         future(BOOST_RV_REF(future<future>) other)
         {
-            future f = boost::move(other.unwrap());
-            (*this).swap(f);
+            future f = other.unwrap();
+            future_data_ = boost::move(f.future_data_);
         }
 
         // extension: init from given value, set future to ready right away
@@ -206,7 +208,7 @@ namespace hpx { namespace lcos
             typedef lcos::detail::future_data<Result> impl_type;
             boost::intrusive_ptr<future_data_type> p(new impl_type());
             static_cast<impl_type*>(p.get())->set_data(init);
-            future_data_.swap(p);
+            future_data_ = boost::move(p);
         }
 
         explicit future(BOOST_RV_REF(Result) init)
@@ -214,7 +216,7 @@ namespace hpx { namespace lcos
             typedef lcos::detail::future_data<Result> impl_type;
             boost::intrusive_ptr<future_data_type> p(new impl_type());
             static_cast<impl_type*>(p.get())->set_data(boost::move(init));
-            future_data_.swap(p);
+            future_data_ = boost::move(p);
         }
 
         // extension: support timed future creation
@@ -236,10 +238,10 @@ namespace hpx { namespace lcos
                 d, boost::move(init)))
         {}
 
-#       ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this... defined at promise.hpp
         explicit future(promise_type& promise);
-#       endif
+#endif
 
         // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
@@ -253,7 +255,7 @@ namespace hpx { namespace lcos
         {
             if (this != &other)
             {
-                future_data_.swap(other.future_data_);
+                future_data_ = other.future_data_;
                 other.future_data_.reset();
             }
             return *this;
@@ -295,8 +297,7 @@ namespace hpx { namespace lcos
 
             ~invalidate()
             {
-                // This calls reset on the intrusive pointer, not the future_data_
-                // itself.
+                // This resets the intrusive pointer itself, not the future_data_.
                 f_.future_data_.reset();
             }
 
@@ -307,6 +308,12 @@ namespace hpx { namespace lcos
     public:
         Result move(error_code& ec = throws)
         {
+            if (!future_data_) {
+                HPX_THROW_EXCEPTION(no_state,
+                    "future<Result>::get",
+                    "this future has no valid shared state");
+            }
+
             invalidate on_exit(*this);
             return future_data_->move_data(ec);
         }
@@ -516,8 +523,9 @@ namespace hpx { namespace lcos
         {}
 
         explicit future(BOOST_RV_REF(boost::intrusive_ptr<future_data_type>) p)
+          : future_data_(p)
         {
-            future_data_.swap(p);
+            p.reset();
         }
 
         explicit future(int)
@@ -526,7 +534,7 @@ namespace hpx { namespace lcos
                 new lcos::detail::future_data<void>());
             static_cast<lcos::detail::future_data<void> *>(p.get())->
                 set_data(util::unused);
-            future_data_.swap(p);
+            future_data_ = boost::move(p);
         }
 
     public:
@@ -545,15 +553,16 @@ namespace hpx { namespace lcos
         }
 
         future(BOOST_RV_REF(future) other)
+          : future_data_(other.future_data_)
         {
-            future_data_.swap(other.future_data_);
+            other.future_data_.reset();
         }
 
         // extension: accept wrapped future
         future(BOOST_RV_REF(future<future>) other)
         {
-            future f = boost::move(other.unwrap());
-            (*this).swap(f);
+            future f = other.unwrap();
+            future_data_ = boost::move(f.future_data_);
         }
 
         // extension: support timed future creation
@@ -567,10 +576,10 @@ namespace hpx { namespace lcos
                 d, util::unused))
         {}
 
-#       ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this... defined at promise.hpp
         explicit future(promise_type& promise);
-#       endif
+#endif
 
         // assignment
         future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
@@ -584,7 +593,7 @@ namespace hpx { namespace lcos
         {
             if (this != &other)
             {
-                future_data_.swap(other.future_data_);
+                future_data_ = other.future_data_;
                 other.future_data_.reset();
             }
             return *this;
@@ -598,13 +607,26 @@ namespace hpx { namespace lcos
         // retrieving the value
         void get(error_code& ec = throws) const
         {
+            if (!future_data_) {
+                HPX_THROW_EXCEPTION(no_state,
+                    "future<void>::get",
+                    "this future has no valid shared state");
+            }
             future_data_->get_data(ec);
         }
 
         void move(error_code& ec = throws)
         {
+            if (!future_data_) {
+                HPX_THROW_EXCEPTION(no_state,
+                    "future<void>::get",
+                    "this future has no valid shared state");
+            }
+
             future_data_->move_data(ec);
-            future_data_.reset();
+
+            // This resets the intrusive pointer itself, not the future_data_
+            future_data_.reset(); 
         }
 
         // state introspection
@@ -693,7 +715,7 @@ namespace hpx { namespace lcos
             return wait_for(util::to_time_duration(rel_time));
         }
 
-    private:
+    protected:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
 
