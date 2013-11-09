@@ -295,6 +295,8 @@ namespace hpx { namespace lcos
 
             ~invalidate()
             {
+                // This calls reset on the intrusive pointer, not the future_data_
+                // itself.
                 f_.future_data_.reset();
             }
 
@@ -407,7 +409,7 @@ namespace hpx { namespace lcos
         void on_outer_ready(
             boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p);
 
-    private:
+    protected:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
 
