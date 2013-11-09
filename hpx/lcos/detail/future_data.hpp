@@ -205,11 +205,11 @@ namespace detail
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready_locked()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
-                wake_me_up callback(threads::get_self_id());
-                reset_cb r(*this, boost::ref(callback), l);  // leaves 'l' unlocked
+                reset_cb r(*this, wake_me_up(threads::get_self_id()), l);  // leaves 'l' unlocked
 
+                // if the timer has hit, the waiting period timed out
                 return (this_thread::suspend(p) == threads::wait_signaled) ? //-V110
-                    future_status::ready : future_status::timeout;
+                    future_status::timeout : future_status::ready;
             }
             return future_status::ready; //-V110
         }
@@ -220,11 +220,11 @@ namespace detail
             typename mutex_type::scoped_lock l(mtx_);
             if (!is_ready_locked()) {
                 boost::intrusive_ptr<future_data_base> this_(this);
-                wake_me_up callback(threads::get_self_id());
-                reset_cb r(*this, boost::ref(callback), l);  // leaves 'l' unlocked
+                reset_cb r(*this, wake_me_up(threads::get_self_id()), l);  // leaves 'l' unlocked
 
+                // if the timer has hit, the waiting period timed out
                 return (this_thread::suspend(at) == threads::wait_signaled) ? //-V110
-                    future_status::ready : future_status::timeout;
+                    future_status::timeout : future_status::ready;
             }
             return future_status::ready; //-V110
         }
