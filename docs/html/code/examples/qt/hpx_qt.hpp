@@ -15,7 +15,7 @@
 namespace hpx {
     namespace threads
     {
-        class threadmanager_base;
+        struct threadmanager_base;
     }
 
     namespace qt {

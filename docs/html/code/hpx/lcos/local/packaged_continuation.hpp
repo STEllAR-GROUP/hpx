@@ -621,7 +621,7 @@ namespace hpx { namespace lcos
         typedef lcos::detail::future_data<result_type> future_data_type;
 
         if (!valid()) {
-            HPX_THROWS_IF(ec, future_uninitialized,
+            HPX_THROWS_IF(ec, no_state,
                 "future<Result>::unwrap",
                 "this future has not been initialized");
             return future<result_type>();

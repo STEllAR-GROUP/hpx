@@ -7,6 +7,8 @@
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <mpi.h>
+#endif
+
 #include <hpx/config.hpp>
 
 #include <hpx/hpx_fwd.hpp>
@@ -23,7 +25,8 @@ namespace hpx { namespace util
 {
     namespace detail
     {
-        bool detect_mpi_environment(util::runtime_configuration const& cfg)
+        bool detect_mpi_environment(util::runtime_configuration const& cfg,
+            char const* default_env)
         {
 #if defined(__bgq__)
             // If running on BG/Q, we can safely assume to always run in an
@@ -31,7 +34,7 @@ namespace hpx { namespace util
             return true;
 #else
             std::string mpi_environment_strings = cfg.get_entry(
-                "hpx.parcel.mpi.env", HPX_PARCELPORT_MPI_ENV);
+                "hpx.parcel.mpi.env", default_env);
 
             typedef
                 boost::tokenizer<boost::char_separator<char> >
@@ -60,11 +63,16 @@ namespace hpx { namespace util
             return dflt;
         }
     }
+}}
 
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+namespace hpx { namespace util
+{
     bool mpi_environment::enabled_ = false;
     int mpi_environment::provided_threading_flag_ = MPI_THREAD_SINGLE;
 
-    int mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg)
+    std::size_t mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg,
+        std::size_t /*node*/)
     {
         using namespace boost::assign;
 
@@ -72,21 +80,21 @@ namespace hpx { namespace util
 
         // We assume to use the MPI parcelport if it is not explicitly disabled
         enabled_ = detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) != 0;
-        if (!enabled_) return this_rank;
+        if (!enabled_) return std::size_t(this_rank);
 
         // We disable the MPI parcelport if the application is not run using mpirun
         // and the tcp/ip parcelport is not explicitly disabled
         //
         // The bottomline is that we use the MPI parcelport either when the application
         // was executed using mpirun or if the tcp/ip parcelport was disabled.
-        if (!detail::detect_mpi_environment(cfg.rtcfg_) &&
+        if (!detail::detect_mpi_environment(cfg.rtcfg_, HPX_PARCELPORT_MPI_ENV) &&
             detail::get_cfg_entry(cfg, "hpx.parcel.tcpip.enable", 1))
         {
             // explicitly disable mpi if not run by mpirun
             cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
 
             enabled_ = false;
-            return this_rank;
+            return std::size_t(this_rank);
         }
 
         cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
@@ -108,7 +116,7 @@ namespace hpx { namespace util
             MPI_Error_string(retval, message, &msglen);
             message[msglen] = '\0';
 
-            std::string msg("MPI_Init_thread failed: ");
+            std::string msg("mpi_environment::init: MPI_Init_thread failed: ");
             msg = msg + message + ".";
             throw std::runtime_error(msg.c_str());
         }
@@ -118,8 +126,8 @@ namespace hpx { namespace util
             cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
 
             enabled_ = false;
-            throw std::runtime_error("MPI_Init_thread: provided multi_threading "
-                "mode is different from requested mode");
+            throw std::runtime_error("mpi_environment::init: MPI_Init_thread: "
+                "provided multi_threading mode is different from requested mode");
         }
 
         this_rank = rank();
@@ -139,7 +147,7 @@ namespace hpx { namespace util
         cfg.ini_config_ += std::string("hpx.parcel.mpi.processorname!=") +
             get_processor_name();
 
-        return this_rank;
+        return std::size_t(this_rank);
     }
 
     std::string mpi_environment::get_processor_name()
@@ -183,6 +191,43 @@ namespace hpx { namespace util
         if(enabled())
             MPI_Comm_rank(MPI_COMM_WORLD, &res);
         return res;
+    }
+}}
+
+#else
+
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/command_line_handling.hpp>
+#include <hpx/util/mpi_environment.hpp>
+
+namespace hpx { namespace util
+{
+    std::size_t mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg,
+        std::size_t node)
+    {
+        // if somebody tries to enforce using MPI, bail out
+        if (detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) != 0 ||
+            cfg.rtcfg_.get_entry("hpx.parcel.bootstrap", "tcpip") == "mpi")
+        {
+            throw std::runtime_error("mpi_environment::init: "
+                "HPX is not compiled for MPI, but 'hpx.parcel.mpi.enable=1'. "
+                "Please set HPX_HAVE_PARCELPORT_MPI=ON while configuring using cmake.");
+        }
+
+        // Report error, if the application was run using mpirun or similar but no
+        // prcelport other then MPI is enabled.
+        if (detail::detect_mpi_environment(cfg.rtcfg_, "PMI_RANK,OMPI_COMM_WORLD_SIZE") &&
+            detail::get_cfg_entry(cfg, "hpx.parcel.tcpip.enable", 0) == 0 &&
+            detail::get_cfg_entry(cfg, "hpx.parcel.shmem.enable", 0) == 0 &&
+            detail::get_cfg_entry(cfg, "hpx.parcel.ibverbs.enable", 0) == 0)
+        {
+            throw std::runtime_error("mpi_environment::init: "
+                "HPX is not compiled for MPI, but the application was run using mpirun. "
+                "Please set HPX_HAVE_PARCELPORT_MPI=ON while configuring using cmake.");
+        }
+
+        return node;
     }
 }}
 

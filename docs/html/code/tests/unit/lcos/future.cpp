@@ -115,7 +115,7 @@ void test_initial_state()
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
-        HPX_TEST(e.get_error() == hpx::future_uninitialized);
+        HPX_TEST(e.get_error() == hpx::no_state);
     }
     catch (...) {
         HPX_TEST(false);

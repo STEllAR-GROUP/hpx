@@ -63,10 +63,10 @@ namespace hpx
         task_moved = 35,                            ///< The task associated with this future object has been moved
         task_already_started = 36,                  ///< The task associated with this future object has already been started
         future_already_retrieved = 37,              ///< The future object has already been retrieved
-        future_already_satisfied = 38,              ///< The value for this future object has already been set
+        promise_already_satisfied = 38,             ///< The value for this future object has already been set
         future_does_not_support_cancellation = 39,  ///< The future object does not support cancellation
         future_can_not_be_cancelled = 40,           ///< The future can't be canceled at this time
-        future_uninitialized = 41,                  ///< The future object has not been initialized
+        no_state = 41,                              ///< The future object has no valid shared state
         broken_promise = 42,                        ///< The promise has been deleted
         thread_resource_error = 43,                 ///<
         thread_interrupted = 44,                    ///<
@@ -125,10 +125,10 @@ namespace hpx
         /* 35 */ "task_moved",
         /* 36 */ "task_already_started",
         /* 37 */ "future_already_retrieved",
-        /* 38 */ "future_already_satisfied",
+        /* 38 */ "promise_already_satisfied",
         /* 39 */ "future_does_not_support_cancellation",
         /* 40 */ "future_can_not_be_cancelled",
-        /* 41 */ "future_uninitialized",
+        /* 41 */ "no_state",
         /* 42 */ "broken_promise",
         /* 43 */ "thread_resource_error",
         /* 44 */ "thread_interrupted",

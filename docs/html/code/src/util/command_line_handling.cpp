@@ -15,10 +15,7 @@
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/topology.hpp>
-
-#if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/util/mpi_environment.hpp>
-#endif
 
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
@@ -783,10 +780,8 @@ namespace hpx { namespace util
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.
 
-#if defined(HPX_HAVE_PARCELPORT_MPI)
         node = static_cast<std::size_t>(
-            util::mpi_environment::init(&argc, &argv, *this));
-#endif
+            util::mpi_environment::init(&argc, &argv, *this, node));
 
         // minimally assume one locality and this is the console
         if (node == std::size_t(-1))

@@ -42,16 +42,16 @@
              <a class="link" href="error.html#hpx.error.serialization_error">serialization_error</a> =  31, <a class="link" href="error.html#hpx.error.unhandled_exception">unhandled_exception</a> =  32, 
              <a class="link" href="error.html#hpx.error.kernel_error">kernel_error</a> =  33, <a class="link" href="error.html#hpx.error.broken_task">broken_task</a> =  34, <a class="link" href="error.html#hpx.error.task_moved">task_moved</a> =  35, 
              <a class="link" href="error.html#hpx.error.task_already_started">task_already_started</a> =  36, <a class="link" href="error.html#hpx.error.future_already_retrieved">future_already_retrieved</a> =  37, 
-             <a class="link" href="error.html#hpx.error.future_already_satisfied">future_already_satisfied</a> =  38, 
+             <a class="link" href="error.html#hpx.error.promise_already_satisfied">promise_already_satisfied</a> =  38, 
              <a class="link" href="error.html#hpx.error.future_does_not_support_cancellation">future_does_not_support_cancellation</a> =  39, 
-             <a class="link" href="error.html#hpx.error.future_can_not_be_cancelled">future_can_not_be_cancelled</a> =  40, <a class="link" href="error.html#hpx.error.future_uninitialized">future_uninitialized</a> =  41, 
+             <a class="link" href="error.html#hpx.error.future_can_not_be_cancelled">future_can_not_be_cancelled</a> =  40, <a class="link" href="error.html#hpx.error.no_state">no_state</a> =  41, 
              <a class="link" href="error.html#hpx.error.broken_promise">broken_promise</a> =  42, thread_resource_error =  43, 
              thread_interrupted =  44, thread_not_interruptable =  45, 
              <a class="link" href="error.html#hpx.error.duplicate_component_id">duplicate_component_id</a> =  46, <a class="link" href="error.html#hpx.error.unknown_error">unknown_error</a> =  47, 
              <a class="link" href="error.html#hpx.error.bad_plugin_type">bad_plugin_type</a> =  48, <a class="link" href="error.html#hpx.error.security_error">security_error</a> =  49, 
              <a class="link" href="error.html#hpx.error.filesystem_error">filesystem_error</a> =  50, <a class="link" href="error.html#hpx.error.bad_function_call">bad_function_call</a> =  51 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idp74904736"></a><h2>Description</h2>
+<a name="idp14543232"></a><h2>Description</h2>
 <p>This enumeration lists all possible error conditions which can be reported from any of the API functions. </p>
 <div class="variablelist"><dl class="variablelist compact">
 <dt><span class="term"><code class="computeroutput">success</code><a name="hpx.error.success"></a></span></dt>
@@ -102,14 +102,14 @@
 <dd>The task associated with this future object has already been started. </dd>
 <dt><span class="term"><code class="computeroutput">future_already_retrieved</code><a name="hpx.error.future_already_retrieved"></a></span></dt>
 <dd>The future object has already been retrieved. </dd>
-<dt><span class="term"><code class="computeroutput">future_already_satisfied</code><a name="hpx.error.future_already_satisfied"></a></span></dt>
+<dt><span class="term"><code class="computeroutput">promise_already_satisfied</code><a name="hpx.error.promise_already_satisfied"></a></span></dt>
 <dd>The value for this future object has already been set. </dd>
 <dt><span class="term"><code class="computeroutput">future_does_not_support_cancellation</code><a name="hpx.error.future_does_not_support_cancellation"></a></span></dt>
 <dd>The future object does not support cancellation. </dd>
 <dt><span class="term"><code class="computeroutput">future_can_not_be_cancelled</code><a name="hpx.error.future_can_not_be_cancelled"></a></span></dt>
 <dd>The future can't be canceled at this time. </dd>
-<dt><span class="term"><code class="computeroutput">future_uninitialized</code><a name="hpx.error.future_uninitialized"></a></span></dt>
-<dd>The future object has not been initialized. </dd>
+<dt><span class="term"><code class="computeroutput">no_state</code><a name="hpx.error.no_state"></a></span></dt>
+<dd>The future object has no valid shared state. </dd>
 <dt><span class="term"><code class="computeroutput">broken_promise</code><a name="hpx.error.broken_promise"></a></span></dt>
 <dd>The promise has been deleted. </dd>
 <dt><span class="term"><code class="computeroutput">duplicate_component_id</code><a name="hpx.error.duplicate_component_id"></a></span></dt>
