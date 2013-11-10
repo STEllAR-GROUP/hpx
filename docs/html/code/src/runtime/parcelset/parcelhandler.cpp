@@ -432,6 +432,19 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    namespace detail
+    {
+        // The original parcel-sent handler is wrapped to keep the parcel alive
+        // until after the data has been reliably sent (which is needed for zero
+        // copy serialization).
+        void parcel_sent_handler(boost::system::error_code const& ec,
+            std::size_t size, parcelhandler::write_handler_type const& f,
+            parcel const&)
+        {
+            f(ec, size);    // invoke the original handler
+        }
+    }
+
     void parcelhandler::put_parcel(parcel& p, write_handler_type const& f)
     {
         rethrow_exception();
@@ -472,6 +485,12 @@ namespace hpx { namespace parcelset
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.
         if (resolved_locally) {
+            // rewrap the given parcel-sent handler
+            using util::placeholders::_1;
+            using util::placeholders::_2;
+            write_handler_type wrapped_f =
+                util::bind(&detail::parcel_sent_handler, _1, _2, f, p);
+
             // dispatch to the message handler which is associated with the
             // encapsulated action
             connection_type t = find_appropriate_connection_type(addrs[0].locality_);
@@ -479,11 +498,11 @@ namespace hpx { namespace parcelset
                 p.get_message_handler(this, addrs[0].locality_, t);
 
             if (mh) {
-                mh->put_parcel(p, f);
+                mh->put_parcel(p, wrapped_f);
                 return;
             }
 
-            find_parcelport(t)->put_parcel(p, f);
+            find_parcelport(t)->put_parcel(p, wrapped_f);
             return;
         }
 

@@ -58,7 +58,7 @@ namespace hpx { namespace parcelset { namespace mpi
     parcelport::parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
-      : parcelset::parcelport(ini),
+      : parcelset::parcelport(ini, "mpi"),
         io_service_pool_(1, on_start_thread, on_stop_thread, "parcel_pool_mpi", "-mpi"),
         max_requests_(ini.get_max_mpi_requests()),
         parcel_cache_(ini.get_os_thread_count(), this->get_max_message_size()),
@@ -71,6 +71,9 @@ namespace hpx { namespace parcelset { namespace mpi
                 "this parcelport was instantiated to represent an unexpected "
                 "locality type: " + get_connection_type_name(here_.get_type()));
         }
+
+        // we never do zero copy optimization for this parcelport
+        allow_zero_copy_optimizations_ = false;
     }
 
     parcelport::~parcelport()
@@ -296,7 +299,7 @@ namespace hpx { namespace parcelset { namespace mpi
         unsigned archive_flags = boost::archive::no_header;
         if (!pp.allow_array_optimizations())
             archive_flags |= util::disable_array_optimization;
-                
+
         archive_flags |= util::disable_data_chunking;
 
         // protect from un-handled exceptions bubbling up

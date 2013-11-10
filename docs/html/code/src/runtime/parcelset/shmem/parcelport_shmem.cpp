@@ -29,13 +29,15 @@ namespace hpx { namespace parcelset { namespace shmem
     parcelport::parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
-      : parcelset::parcelport(ini),
+      : parcelset::parcelport(ini, "shmem"),
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_shmem", "-shmem"),
         acceptor_(NULL), connection_count_(0),
         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc()),
         data_buffer_cache_(ini.get_shmem_data_buffer_cache_size())
     {
+        // we never do zero copy optimization for this parcelport
+        allow_zero_copy_optimizations_ = false;
     }
 
     parcelport::~parcelport()
@@ -519,6 +521,12 @@ namespace hpx { namespace parcelset { namespace shmem
         parcelset::shmem::data_buffer parcel_data,
         performance_counters::parcels::data_point receive_data)
     {
+        unsigned archive_flags = boost::archive::no_header;
+        if (!pp.allow_array_optimizations())
+            archive_flags |= util::disable_array_optimization;
+
+        archive_flags |= util::disable_data_chunking;
+
         // protect from un-handled exceptions bubbling up
         try {
             try {
@@ -531,7 +539,7 @@ namespace hpx { namespace parcelset { namespace shmem
                     data_buffer::data_buffer_type const& buffer =
                         parcel_data.get_buffer();
                     util::portable_binary_iarchive archive(
-                        buffer, buffer.size(), boost::archive::no_header);
+                        buffer, buffer.size(), archive_flags);
 
                     std::size_t parcel_count = 0;
 

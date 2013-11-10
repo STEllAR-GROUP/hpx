@@ -49,10 +49,23 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     std::string array_optimization =
         hpx::get_config_entry("hpx.parcel.array_optimization", "1");
+
     if (boost::lexical_cast<int>(array_optimization) == 0)
     {
         in_archive_flags |= hpx::util::disable_array_optimization;
         out_archive_flags |= hpx::util::disable_array_optimization;
+        in_archive_flags |= hpx::util::disable_data_chunking;
+        out_archive_flags |= hpx::util::disable_data_chunking;
+    }
+    else
+    {
+        std::string zero_copy_optimization =
+            hpx::get_config_entry("hpx.parcel.zero_copy_optimization", "1");
+        if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
+        {
+            in_archive_flags |= hpx::util::disable_data_chunking;
+            out_archive_flags |= hpx::util::disable_data_chunking;
+        }
     }
 
     // create argument for action

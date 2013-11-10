@@ -28,13 +28,22 @@ namespace hpx { namespace parcelset { namespace shmem
             performance_counters::parcels::gatherer& parcels_sent,
             std::size_t connection_count)
       : window_(io_service), there_(there),
-        parcels_sent_(parcels_sent), cache_(cache)
+        parcels_sent_(parcels_sent), cache_(cache),
+      , archive_flags_(boost::archive::no_header)
     {
         std::string fullname(here.get_address() + "." +
             boost::lexical_cast<std::string>(here.get_port()) + "." +
             boost::lexical_cast<std::string>(connection_count));
 
         window_.set_option(data_window::bound_to(fullname));
+
+        std::string array_optimization =
+            get_config_entry("hpx.parcel.shmem.array_optimization", "1");
+
+        if (boost::lexical_cast<int>(array_optimization) == 0)
+            archive_flags_ |= util::disable_array_optimization;
+
+        archive_flags_ |= util::disable_data_chunking;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -72,7 +81,7 @@ namespace hpx { namespace parcelset { namespace shmem
             {
                 // Serialize the data
                 util::portable_binary_oarchive archive(
-                    out_buffer_.get_buffer(), 0, boost::archive::no_header);
+                    out_buffer_.get_buffer(), 0, archive_flags);
 
                 std::size_t count = pv.size();
                 archive << count;

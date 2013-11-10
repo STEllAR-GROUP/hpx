@@ -4,6 +4,10 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
+
 #if (defined(__linux) || defined(linux) || defined(__linux__)) && !defined(__bgq__)
 
 #if defined(__x86_64__) || defined(__amd64__)
@@ -12,6 +16,8 @@
 #include "swapcontext32.ipp"
 #else
 #error Unsupported platform
+#endif
+
 #endif
 
 #endif

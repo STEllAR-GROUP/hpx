@@ -31,12 +31,14 @@ namespace hpx { namespace parcelset { namespace ibverbs
     parcelport::parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
-      : parcelset::parcelport(ini),
+      : parcelset::parcelport(ini, "ibverbs"),
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_ibverbs", "-ibverbs"),
         acceptor_(NULL),
         connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
     {
+        // we never do zero copy optimization for this parcelport
+        allow_zero_copy_optimizations_ = false;
     }
 
     parcelport::~parcelport()
@@ -552,6 +554,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
         unsigned archive_flags = boost::archive::no_header;
         if (!pp.allow_array_optimizations())
             archive_flags |= util::disable_array_optimization;
+
+        archive_flags |= util::disable_data_chunking;
 
         // protect from un-handled exceptions bubbling up
         try {

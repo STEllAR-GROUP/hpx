@@ -572,65 +572,39 @@ void test_wait_callback()
     HPX_TEST_EQ(callback_called, 1U);
 }
 
-// void do_nothing_callback(hpx::lcos::local::promise<int>& /*pi*/)
-// {
-//     boost::lock_guard<hpx::lcos::local::mutex> lk(callback_mutex);
-//     ++callback_called;
-// }
-//
-// void test_wait_callback_with_timed_wait()
-// {
-//     callback_called = 0;
-//     hpx::lcos::local::promise<int> pi;
-//     hpx::lcos::future<int> fi = pi.get_future();
-//
-//     fi.then(hpx::util::bind(&do_nothing_callback, boost::ref(pi)));
-//
-//     BOOST_SCOPED_ENUM(hpx::lcos::future_status) state =
-//         fi.wait_for(boost::posix_time::milliseconds(10));
-//     HPX_TEST_EQ(state, hpx::lcos::future_status::timeout);
-//     HPX_TEST_EQ(callback_called, 0U);
-//
-//     state = fi.wait_for(boost::posix_time::milliseconds(10));
-//     HPX_TEST_EQ(state, hpx::lcos::future_status::timeout);
-//     state = fi.wait_for(boost::posix_time::milliseconds(10));
-//     HPX_TEST_EQ(state, hpx::lcos::future_status::timeout);
-//     HPX_TEST_EQ(callback_called, 0U);
-//
-//     pi.set_value(42);
-//
-//     state = fi.wait_for(boost::posix_time::milliseconds(10));
-//     HPX_TEST_EQ(state, hpx::lcos::future_status::ready);
-//
-//     HPX_TEST_EQ(callback_called, 1U);
-//     HPX_TEST_EQ(fi.get(), 42);
-//     HPX_TEST_EQ(callback_called, 1U);
-// }
+void do_nothing_callback(hpx::lcos::local::promise<int>& /*pi*/)
+{
+    boost::lock_guard<hpx::lcos::local::mutex> lk(callback_mutex);
+    ++callback_called;
+}
 
-// void wait_callback_for_task(hpx::lcos::local::packaged_task<int()>& pt)
-// {
-//     boost::lock_guard<hpx::lcos::local::mutex> lk(callback_mutex);
-//     ++callback_called;
-//     try {
-//         pt();
-//     }
-//     catch (...) {
-//     }
-// }
+void test_wait_callback_with_timed_wait()
+{
+    callback_called = 0;
+    hpx::lcos::local::promise<int> pi;
+    hpx::lcos::future<int> fi = pi.get_future();
 
-// void test_wait_callback_for_packaged_task()
-// {
-//     callback_called=0;
-//     hpx::lcos::local::packaged_task<int()> pt(make_int);
-//     hpx::lcos::future<int> fi = pt.get_future();
-//     pt.set_wait_callback(wait_callback_for_task);
-//     fi.wait();
-//     HPX_TEST(callback_called);
-//     HPX_TEST_EQ(fi.get(), 42);
-//     fi.wait();
-//     fi.wait();
-//     HPX_TEST_EQ(callback_called, 1U);
-// }
+    hpx::lcos::future<void> fv =
+        fi.then(hpx::util::bind(&do_nothing_callback, boost::ref(pi)));
+
+    int state = int(fv.wait_for(boost::posix_time::milliseconds(10)));
+    HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
+    HPX_TEST_EQ(callback_called, 0U);
+
+    state = int(fv.wait_for(boost::posix_time::milliseconds(10)));
+    HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
+    state = int(fv.wait_for(boost::posix_time::milliseconds(10)));
+    HPX_TEST_EQ(state, int(hpx::lcos::future_status::timeout));
+    HPX_TEST_EQ(callback_called, 0U);
+
+    pi.set_value(42);
+
+    state = int(fv.wait_for(boost::posix_time::milliseconds(10)));
+    HPX_TEST_EQ(state, int(hpx::lcos::future_status::ready));
+
+    HPX_TEST_EQ(callback_called, 1U);
+}
+
 
 void test_packaged_task_can_be_moved()
 {
@@ -1768,8 +1742,7 @@ int hpx_main(variables_map&)
 //         test_unique_future_for_move_only_udt();
         test_unique_future_for_string();
         test_wait_callback();
-//         test_wait_callback_with_timed_wait();
-//         test_wait_callback_for_packaged_task();
+        test_wait_callback_with_timed_wait();
         test_packaged_task_can_be_moved();
         test_destroying_a_promise_stores_broken_promise();
         test_destroying_a_packaged_task_stores_broken_task();

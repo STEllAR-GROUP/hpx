@@ -15,7 +15,7 @@ namespace hpx { namespace util { namespace hardware
 
 inline boost::uint64_t timestamp()
 {
-    boost::uint32_t lo, hi;
+    boost::uint32_t lo = 0, hi = 0;
     #if defined(HPX_HAVE_RDTSCP)
         __asm__ __volatile__ (
             "rdtscp ;\n"

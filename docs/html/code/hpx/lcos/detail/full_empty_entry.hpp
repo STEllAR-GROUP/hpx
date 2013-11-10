@@ -259,6 +259,49 @@ namespace hpx { namespace lcos { namespace detail
                 ec = make_success_code();
         }
 
+        // enqueue a move operation if full/full queue if entry is empty
+        template <typename T>
+        void enqueue_full_full_move(T& dest, error_code& ec = throws)
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+
+            // block if this entry is empty
+            if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (0 == self || ec) return;
+
+                // enqueue the request and block this thread
+                queue_entry f(threads::get_self_id());
+                read_queue_.push_back(f);
+
+                ++full_empty_counter_data_.read_enqueued_;
+
+                reset_queue_entry r(f, read_queue_);
+
+                {
+                    // yield this thread
+                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    this_thread::suspend(threads::suspended,
+                        "full_empty_entry::enqueue_full_full", ec);
+                    if (ec) return;
+                }
+
+                ++full_empty_counter_data_.read_dequeued_;
+            }
+
+            // move the data to the destination
+            dest = boost::move(data_);
+
+            if (&ec != &throws)
+                ec = make_success_code();
+        }
+
+        // same as above, but for entries without associated data
+        void enqueue_full_full_move(error_code& ec = throws)
+        {
+            enqueue_full_full(ec);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation in full/empty queue if entry is empty
         template <typename T>
@@ -323,78 +366,6 @@ namespace hpx { namespace lcos { namespace detail
 
             set_empty_locked(ec);   // state_ = empty
             if (ec) return;
-
-            if (&ec != &throws)
-                ec = make_success_code();
-        }
-
-        template <typename T, typename F>
-        void enqueue_full_empty_if(T& dest, F const& f, error_code& ec = throws)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-
-            // block if this entry is empty
-            if (state_ == empty) {
-                threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (0 == self || ec) return;
-
-                // enqueue the request and block this thread
-                queue_entry f(threads::get_self_id());
-                read_and_empty_queue_.push_back(f);
-
-                reset_queue_entry r(f, read_and_empty_queue_);
-
-                {
-                    // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
-                    this_thread::suspend(threads::suspended,
-                        "full_empty_entry::enqueue_full_empty", ec);
-                    if (ec) return;
-                }
-            }
-
-            // move the data to the destination
-            dest = boost::move(data_);
-
-            if (f(dest)) {
-                set_empty_locked(ec);   // state_ = empty;
-                if (ec) return;
-            }
-
-            if (&ec != &throws)
-                ec = make_success_code();
-        }
-
-        // same as above, but for entries without associated data
-        template <typename F>
-        void enqueue_full_empty_if(F const& f, error_code& ec = throws)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-
-            // block if this entry is empty
-            if (state_ == empty) {
-                threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (0 == self || ec) return;
-
-                // enqueue the request and block this thread
-                queue_entry f(threads::get_self_id());
-                read_and_empty_queue_.push_back(f);
-
-                reset_queue_entry r(f, read_and_empty_queue_);
-
-                {
-                    // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
-                    this_thread::suspend(threads::suspended,
-                        "full_empty_entry::enqueue_full_empty", ec);
-                    if (ec) return;
-                }
-            }
-
-            if (f()) {
-                set_empty_locked(ec);   // state_ = empty;
-                if (ec) return;
-            }
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -770,6 +741,48 @@ namespace hpx { namespace lcos { namespace detail
                 ec = make_success_code();
         }
 
+        // enqueue a move operation if full/full queue if entry is empty
+        template <typename T, typename Lock>
+        void enqueue_full_full_move(T& dest, Lock& l, error_code& ec = throws)
+        {
+            // block if this entry is empty
+            if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (0 == self || ec) return;
+
+                // enqueue the request and block this thread
+                queue_entry f(threads::get_self_id());
+                read_queue_.push_back(f);
+
+                ++full_empty_counter_data_.read_enqueued_;
+
+                reset_queue_entry r(f, read_queue_);
+
+                {
+                    // yield this thread
+                    util::scoped_unlock<Lock> ul(l);
+                    this_thread::suspend(threads::suspended,
+                        "full_empty_entry::enqueue_full_full", ec);
+                    if (ec) return;
+                }
+
+                ++full_empty_counter_data_.read_dequeued_;
+            }
+
+            // move the data to the destination
+            dest = boost::move(data_);
+
+            if (&ec != &throws)
+                ec = make_success_code();
+        }
+
+        // same as above, but for entries without associated data
+        template <typename Lock>
+        void enqueue_full_full_move(Lock& l, error_code& ec = throws)
+        {
+            enqueue_full_full(l, ec);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // enqueue a get operation in full/empty queue if entry is empty
         template <typename T, typename Lock>
@@ -831,74 +844,6 @@ namespace hpx { namespace lcos { namespace detail
 
             set_empty_locked(ec);   // state_ = empty
             if (ec) return;
-
-            if (&ec != &throws)
-                ec = make_success_code();
-        }
-
-        template <typename T, typename F, typename Lock>
-        void enqueue_full_empty_if(T& dest, F const& f, Lock& l, error_code& ec = throws)
-        {
-            // block if this entry is empty
-            if (state_ == empty) {
-                threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (0 == self || ec) return;
-
-                // enqueue the request and block this thread
-                queue_entry f(threads::get_self_id());
-                read_and_empty_queue_.push_back(f);
-
-                reset_queue_entry r(f, read_and_empty_queue_);
-
-                {
-                    // yield this thread
-                    util::scoped_unlock<Lock> ul(l);
-                    this_thread::suspend(threads::suspended,
-                        "full_empty_entry::enqueue_full_empty", ec);
-                    if (ec) return;
-                }
-            }
-
-            // move the data to the destination
-            dest = boost::move(data_);
-
-            if (f(dest)) {
-                set_empty_locked(ec);   // state_ = empty;
-                if (ec) return;
-            }
-
-            if (&ec != &throws)
-                ec = make_success_code();
-        }
-
-        // same as above, but for entries without associated data
-        template <typename F, typename Lock>
-        void enqueue_full_empty_if(F const& f, Lock& l, error_code& ec = throws)
-        {
-            // block if this entry is empty
-            if (state_ == empty) {
-                threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (0 == self || ec) return;
-
-                // enqueue the request and block this thread
-                queue_entry f(threads::get_self_id());
-                read_and_empty_queue_.push_back(f);
-
-                reset_queue_entry r(f, read_and_empty_queue_);
-
-                {
-                    // yield this thread
-                    util::scoped_unlock<Lock> ul(l);
-                    this_thread::suspend(threads::suspended,
-                        "full_empty_entry::enqueue_full_empty", ec);
-                    if (ec) return;
-                }
-            }
-
-            if (f()) {
-                set_empty_locked(ec);   // state_ = empty;
-                if (ec) return;
-            }
 
             if (&ec != &throws)
                 ec = make_success_code();

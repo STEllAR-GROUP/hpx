@@ -589,6 +589,7 @@ max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:&lt;hpx_parcel_max_connections&gt
 max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:&lt;hpx_parcel_max_connections_per_locality&gt;}
 max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:&lt;hpx_parcel_max_message_size&gt;}
 array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}
+zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
 </pre>
 <div class="informaltable">
 <a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel"></a><table class="table">
@@ -721,11 +722,27 @@ array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}
                     </p>
                   </td>
 </tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">zero_copy_optimization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to utilize
+                      zero copy optimizations during serialization of parcel data.
+                      The default is the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">array_optimization</span></code>.
+                    </p>
+                  </td>
+</tr>
 </tbody>
 </table>
 </div>
 <pre class="programlisting">[hpx.parcel.tcpip]
 enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}
+array_optimization = ${HPX_PARCEL_TCPIP_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+zero_copy_optimization = ${HPX_PARCEL_TCPIP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
 </pre>
 <div class="informaltable">
 <a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_tcpip"></a><table class="table">
@@ -745,7 +762,8 @@ enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}
                     </p>
                   </th>
 </tr></thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>
                     <p>
                       <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcpip</span><span class="special">.</span><span class="identifier">enable</span></code>
@@ -760,7 +778,36 @@ enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}
                       if MPI is enabled (see below).
                     </p>
                   </td>
-</tr></tbody>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcpip</span><span class="special">.</span><span class="identifier">array_optimization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to utilize
+                      array optimizations in the TCP/IP parcelport during serialization
+                      of parcel data. The default is the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">array_optimization</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcpip</span><span class="special">.</span><span class="identifier">zero_copy_optimization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to utilize
+                      zero copy optimizations in the TC{/IP parcelport during serialization
+                      of parcel data. The default is the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">zero_copy_optimization</span></code>.
+                    </p>
+                  </td>
+</tr>
+</tbody>
 </table>
 </div>
 <p>
@@ -773,6 +820,7 @@ enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}
 <pre class="programlisting">[hpx.parcel.shmem]
 enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}
 data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}
+array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
 </pre>
 <div class="informaltable">
 <a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_shmem"></a><table class="table">
@@ -825,6 +873,21 @@ data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}
                     </p>
                   </td>
 </tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">shmem</span><span class="special">.</span><span class="identifier">array_optimization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to utilize
+                      array optimizations in the shared memory parcelport during
+                      serialization of parcel data. The default is the same value
+                      as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">array_optimization</span></code>.
+                    </p>
+                  </td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -837,6 +900,7 @@ data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}
 <pre class="programlisting">[hpx.parcel.ibverbs]
 enable = ${HPX_HAVE_PARCELPORT_IBVERBS:0}
 buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}
+array_optimization = ${HPX_PARCEL_IBVERBS_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
 </pre>
 <div class="informaltable">
 <a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_ibverbs"></a><table class="table">
@@ -889,6 +953,20 @@ buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}
                     </p>
                   </td>
 </tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">ibverbs</span><span class="special">.</span><span class="identifier">array_optimization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to utilize
+                      array optimizations in the ibverbs parcelport during serialization
+                      of parcel data. The default is the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">array_optimization</span></code>.
+                    </p>
+                  </td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -904,6 +982,7 @@ env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}
 multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}
 rank = &lt;MPI_rank&gt;
 processor_name = &lt;MPI_processor_name&gt;
+array_optimization = ${HPX_PARCEL_MPI_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
 </pre>
 <div class="informaltable">
 <a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_mpi"></a><table class="table">
@@ -993,6 +1072,20 @@ processor_name = &lt;MPI_processor_name&gt;
                     <p>
                       This property will be initialized to the MPI processor name
                       of the locality.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">mpi</span><span class="special">.</span><span class="identifier">array_optimization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to utilize
+                      array optimizations in the MPI parcelport during serialization
+                      of parcel data. The default is the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">array_optimization</span></code>.
                     </p>
                   </td>
 </tr>

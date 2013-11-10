@@ -92,6 +92,7 @@ add_hpx_library_sources(hpx
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/lcos/*.cpp"
   APPEND)
+  
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
@@ -125,6 +126,10 @@ if(MSVC)
       CACHE INTERNAL "External object files for HPX." FORCE)
     hpx_add_config_define(HPX_HAVE_SWAP_CONTEXT_EMULATION 1)
   endif()
+endif()
+
+if("${HPX_PLATFORM}" STREQUAL "Android")
+  add_hpx_library_sources(hpx_external GLOB GLOBS "${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c")
 endif()
 
 if(OPENCL_FOUND)
@@ -255,13 +260,21 @@ if(HPX_HAVE_PARCELPORT_MPI AND MPI_FOUND)
   set(hpx_serialization_link_flag_properties "${hpx_serialization_link_flag_properties} ${MPI_CXX_LINK_FLAGS}")
 endif()
 
-set_target_properties(hpx_serialization PROPERTIES
-  VERSION ${HPX_VERSION}
-  SOVERSION ${HPX_SOVERSION}
-  CLEAN_DIRECT_OUTPUT 1
-  OUTPUT_NAME hpx_serialization
-  LINK_FLAGS "${hpx_serialization_link_flag_properties}"
-  FOLDER "Core")
+if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
+  set_target_properties(hpx_serialization PROPERTIES
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME hpx_serialization
+    LINK_FLAGS "${hpx_serialization_link_flag_properties}"
+    FOLDER "Core")
+else()
+  set_target_properties(hpx_serialization PROPERTIES
+    VERSION ${HPX_VERSION}
+    SOVERSION ${HPX_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME hpx_serialization
+    LINK_FLAGS "${hpx_serialization_link_flag_properties}"
+    FOLDER "Core")
+endif()
 
 if(MSVC)
   set_target_properties(hpx_serialization PROPERTIES
@@ -318,12 +331,20 @@ else()
     ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 endif()
 
-set_target_properties(hpx PROPERTIES
-  VERSION ${HPX_VERSION}
-  SOVERSION ${HPX_SOVERSION}
-  CLEAN_DIRECT_OUTPUT 1
-  OUTPUT_NAME hpx
-  FOLDER "Core")
+if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
+  set_target_properties(hpx PROPERTIES
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME hpx
+    FOLDER "Core")
+else()
+  set_target_properties(hpx PROPERTIES
+    VERSION ${HPX_VERSION}
+    SOVERSION ${HPX_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1
+    OUTPUT_NAME hpx
+    FOLDER "Core")
+endif()
+
 
 set(hpx_link_flag_properties)
 if(MSVC)
@@ -375,6 +396,7 @@ target_link_libraries(hpx
   ${hpx_MALLOC_LIBRARY}
   ${hpx_RUNTIME_LIBRARIES}
   ${BOOST_FOUND_LIBRARIES})
+
 
 hpx_get_target_file(name hpx)
 

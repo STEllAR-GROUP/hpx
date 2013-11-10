@@ -327,7 +327,7 @@ void register_worker(registration_header const& header)
         HPX_THROW_EXCEPTION(
             internal_server_error
           , "agas::register_worker"
-          , "runtime_mode_connect can't find running application.");
+          , "a locality in connect mode cannot be an AGAS server.");
     }
 
     if (HPX_UNLIKELY(!agas_client.is_bootstrap()))
@@ -533,7 +533,7 @@ void notify_worker(notification_header const& header)
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.
     naming::gid_type parcel_lower, parcel_upper;
-    agas_client.get_id_range(here, 1000 , parcel_lower, parcel_upper);
+    agas_client.get_id_range(here, 1000, parcel_lower, parcel_upper);
 
     rt.get_id_pool().set_range(parcel_lower, parcel_upper);
 

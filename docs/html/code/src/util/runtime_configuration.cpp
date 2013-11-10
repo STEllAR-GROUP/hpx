@@ -140,6 +140,8 @@ namespace hpx { namespace util
             "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
 #endif
             "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
+            "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
+                "$[hpx.parcel.array_optimization]}",
 
             // TCPIP related settings
             "[hpx.parcel.tcpip]",
@@ -148,16 +150,24 @@ namespace hpx { namespace util
 #else
             "enable = ${HPX_HAVE_PARCELPORT_TCPIP:0}",
 #endif
+            "array_optimization = ${HPX_PARCEL_TCPIP_ARRAY_OPTIMIZATION:"
+                "$[hpx.parcel.array_optimization]}",
+            "zero_copy_optimization = ${HPX_PARCEL_TCPIP_ZERO_COPY_OPTIMIZATION:"
+                "$[hpx.parcel.zero_copy_optimization]}",
 
             // shmem related settings
             "[hpx.parcel.shmem]",
             "enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}",
             "data_buffer_cache_size = ${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
+            "array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:"
+                "$[hpx.parcel.array_optimization]}",
 
             // ibverbs related settings
             "[hpx.parcel.ibverbs]",
             "enable = ${HPX_HAVE_PARCELPORT_IBVERBS:0}",
             "buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
+            "array_optimization = ${HPX_PARCEL_IBVERBS_ARRAY_OPTIMIZATION:"
+                "$[hpx.parcel.array_optimization]}",
 
             // MPI related settings
             "[hpx.parcel.mpi]",
@@ -173,6 +183,8 @@ namespace hpx { namespace util
 #else
             "enable = ${HPX_HAVE_PARCELPORT_MPI:0}",
 #endif
+            "array_optimization = ${HPX_PARCEL_MPI_ARRAY_OPTIMIZATION:"
+                "$[hpx.parcel.array_optimization]}",
 
             // predefine command line aliases
             "[hpx.commandline]",

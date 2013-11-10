@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset
     /// The parcelport is the lowest possible representation of the parcelset
     /// inside a locality. It provides the minimal functionality to send and
     /// to receive parcels.
-    class HPX_EXPORT parcelport 
+    class HPX_EXPORT parcelport
       : public boost::enable_shared_from_this<parcelport>,
         boost::noncopyable
     {
@@ -59,7 +59,7 @@ namespace hpx { namespace parcelset
         > read_handler_type;
 
         /// Construct the parcelport on the given locality.
-        parcelport(util::runtime_configuration const& ini);
+        parcelport(util::runtime_configuration const& ini, std::string const& type);
 
         /// Start the parcelport I/O thread pool.
         ///
@@ -353,6 +353,12 @@ namespace hpx { namespace parcelset
             return allow_array_optimizations_;
         }
 
+        /// Return whether it is allowed to apply zero copy optimizations
+        bool allow_zero_copy_optimizations() const
+        {
+            return allow_zero_copy_optimizations_;
+        }
+
     protected:
         void report_potential_connection_error(naming::locality const& locality_id,
             naming::gid_type const& parcel_id, error_code const& ec);
@@ -382,6 +388,7 @@ namespace hpx { namespace parcelset
 
         /// serialization is allowed to use array optimization
         bool allow_array_optimizations_;
+        bool allow_zero_copy_optimizations_;
     };
 }}
 

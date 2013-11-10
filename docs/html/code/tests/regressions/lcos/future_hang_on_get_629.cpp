@@ -10,6 +10,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/include/plain_actions.hpp>
+#include <hpx/util/high_resolution_timer.hpp>
 
 #include <boost/random.hpp>
 #include <boost/format.hpp>
@@ -155,6 +156,8 @@ int hpx_main(
             ; (test_runs == 0) || (i < test_runs)
             ; ++i) 
         {
+            hpx::util::high_resolution_timer local_clock;
+
             d += hpx::async<null_tree_action>(here, 0, 1
                                             , max_depth
                                             , children
@@ -163,8 +166,16 @@ int hpx_main(
                                               ).get(); 
 
             if (verbose)
-                std::cout << (boost::format("%016u : %f\n") % i % d)
+            {
+                double step_speed = (1 / local_clock.elapsed()); 
+
+                char const* fmt =
+                    "%016u, %.7g,%|31t| %.7g%|41t| [steps/second]\n";
+
+                std::cout << (boost::format(fmt) % i % d % step_speed)
                           << std::flush;
+
+            }
         }
     }
 

@@ -53,7 +53,7 @@ namespace hpx { namespace parcelset { namespace tcp
     parcelport::parcelport(util::runtime_configuration const& ini,
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
-      : parcelset::parcelport(ini),
+      : parcelset::parcelport(ini, "tcpip"),
         io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
             on_start_thread, on_stop_thread, "parcel_pool_tcp", "-tcp"),
         acceptor_(NULL),
@@ -649,8 +649,13 @@ namespace hpx { namespace parcelset { namespace tcp
         bool first_message)
     {
         unsigned archive_flags = boost::archive::no_header;
-        if (!pp.allow_array_optimizations())
+        if (!pp.allow_array_optimizations()) {
             archive_flags |= util::disable_array_optimization;
+            archive_flags |= util::disable_data_chunking;
+        }
+        else if (!pp.allow_zero_copy_optimizations()) {
+            archive_flags |= util::disable_data_chunking;
+        }
 
         // protect from un-handled exceptions bubbling up
         try {

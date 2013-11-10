@@ -73,9 +73,18 @@ namespace hpx { namespace parcelset { namespace tcp
         }
 
         std::string array_optimization =
-            get_config_entry("hpx.parcel.array_optimization", "1");
-        if (boost::lexical_cast<int>(array_optimization) == 0)
+            get_config_entry("hpx.parcel.tcpip.array_optimization", "1");
+
+        if (boost::lexical_cast<int>(array_optimization) == 0) {
             archive_flags_ |= util::disable_array_optimization;
+            archive_flags_ |= util::disable_data_chunking;
+        }
+        else {
+            std::string zero_copy_optimization =
+                get_config_entry("hpx.parcel.tcpip.zero_copy_optimization", "1");
+            if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
+                archive_flags_ |= util::disable_data_chunking;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
