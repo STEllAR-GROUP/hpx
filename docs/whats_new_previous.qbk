@@ -1,0 +1,1217 @@
+[/==============================================================================
+    Copyright (C) 2007-2013 Hartmut Kaiser
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+===============================================================================/]
+
+[section:hpx_previous Previous __hpx__ Releases]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_9_7 __hpx__ V0.9.7]
+
+We have had over 1000 commits since the last release and we have closed
+over 180 tickets (bugs, feature requests, etc.).
+
+[heading General Changes]
+
+* Ported HPX to BlueGene/Q
+* Improved HPX support for Xeon/Phi accelerators
+* Reimplemented `hpx::bind`, `hpx::tuple`, and `hpx::function` for better
+  performance and better compliance with the C++11 Standard. Added `hpx::mem_fn`.
+* Reworked `hpx::when_all` and `hpx::when_any` for better compliance with the
+  ongoing C++ standardization effort, added heterogeneous version for those
+  functions. Added `hpx::when_any_swapped`.
+* Added `hpx::copy` as a precursor for a migrate functionality
+* Added `hpx::get_ptr` allowing to directly access the memory underlying a given
+  component
+* Added the `hpx::lcos::broadcast`, `hpx::lcos::reduce`, and `hpx::lcos::fold`
+  collective operations
+* Added `hpx::get_locality_name` allowing to retrieve the name of any of the
+  localities for the application.
+* Added support for more flexible thread affinity control from the HPX command
+  line, such as new modes for `--hpx:bind` (`balanced`, `scattered`, `compact`),
+  improved default settings when running multiple localities on the same node.
+* Added experimental executors for simpler thread pooling and scheduling. This API
+  may change in the future as it will stay aligned with the ongoing C++ 
+  standardization efforts.
+* Massively improved the performance of the HPX serialization code. Added partial
+  support for zero copy serialization of array and bitwise-copyable types.
+* General performance improvements of the code related to threads and futures.
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release.
+
+* [issue 1005] - Allow to disable array optimizations and zero copy optimizations
+                 for each parcelport
+* [issue 1004] - Generate new HPX logo image for the docs
+* [issue 1002] - If MPI parcelport is not available, running HPX under mpirun
+                 should fail
+* [issue 1001] - Zero copy serialization raises assert
+* [issue 1000] - Can't connect to a HPX application running with the MPI
+                 parcelport from a non MPI parcelport locality
+* [issue 999] - Optimize `hpx::when_n`
+* [issue 998] - Fixed const-correctness
+* [issue 997] - Making serialize_buffer::data() type save
+* [issue 996] - Memory leak in hpx::lcos::promise 
+* [issue 995] - Race while registering pre-shutdown functions
+* [issue 994] - thread_rescheduling regression test does not compile
+* [issue 992] - Correct comments and messages
+* [issue 991] - setcap cap_sys_rawio=ep for power profiling causes an HPX
+                application to abort
+* [issue 989] - Jacobi hangs during execution
+* [issue 988] - multiple_init test is failing
+* [issue 986] - Can't call a function called "init" from "main" when using
+                `<hpx/hpx_main.hpp>`
+* [issue 984] - Reference counting tests are failing
+* [issue 983] - thread_suspension_executor test fails
+* [issue 980] - Terminating HPX threads don't leave stack in virgin state
+* [issue 979] - Static scheduler not in documents
+* [issue 978] - Preprocessing limits are broken
+* [issue 977] - Make tests.regressions.lcos.future_hang_on_get shorter
+* [issue 976] - Wrong library order in pkgconfig
+* [issue 975] - Please reopen #963
+* [issue 974] - Option pu-offset ignored in fixing_588 branch
+* [issue 972] - Cannot use MKL with HPX
+* [issue 969] - Non-existent INI files requested on the command line via
+                `--hpx:config` do not cause warnings or errors.
+* [issue 968] - Cannot build examples in fixing_588 branch
+* [issue 967] - Command line description of `--hpx:queuing` seems wrong
+* [issue 966] - `--hpx:print-bind` physical core numbers are wrong
+* [issue 965] - Deadlock when building in Release mode
+* [issue 963] - Not all worker threads are working
+* [issue 962] - Problem with SLURM integration 
+* [issue 961] - `--hpx:print-bind` outputs incorrect information
+* [issue 960] - Fix cut and paste error in documentation of get_thread_priority
+* [issue 959] - Change link to boost.atomic in documentation to point to
+                boost.org
+* [issue 958] - Undefined reference to intrusive_ptr_release
+* [issue 957] - Make tuple standard compliant
+* [issue 956] - Segfault with a3382fb
+* [issue 955] - `--hpx:nodes` and `--hpx:nodefiles` do not work with foreign
+                nodes
+* [issue 954] - Make order of arguments for hpx::async and hpx::broadcast
+                consistent
+* [issue 953] - Cannot use MKL with HPX
+* [issue 952] - register_[pre_]shutdown_function never throw
+* [issue 951] - Assert when number of threads is greater than hardware
+                concurrency
+* [issue 948] - `HPX_HAVE_GENERIC_CONTEXT_COROUTINES` conflicts with
+                `HPX_HAVE_FIBER_BASED_COROUTINES`
+* [issue 947] - Need MPI_THREAD_MULTIPLE for backward compatibility
+* [issue 946] - HPX does not call `MPI_Finalize`
+* [issue 945] - Segfault with `hpx::lcos::broadcast`
+* [issue 944] - OS X: assertion 'pu_offset_ < hardware_concurrency' failed
+* [issue 943] - #include <hpx/hpx_main.hpp> does not work
+* [issue 942] - Make the BG/Q work with -O3
+* [issue 940] - Use separator when concatenating locality name
+* [issue 939] - Refactor MPI parcelport to use `MPI_Wait` instead of multiple
+                `MPI_Test` calls
+* [issue 938] - Want to officially access client_base::gid_
+* [issue 937] - client_base::gid_ should be private
+* [issue 936] - Want doxygen-like source code index
+* [issue 935] - Build error with gcc 4.6 and Boost 1.54.0 on hpx trunk and
+                0.9.6
+* [issue 933] - Cannot build HPX with Boost 1.54.0
+* [issue 932] - Components are destructed too early
+* [issue 931] - Make HPX work on BG/Q
+* [issue 930] - make git-docs is broken
+* [issue 929] - Generating index in docs broken
+* [issue 928] - Optimize hpx::util::static_ for C++11 compilers supporting
+                magic statics
+* [issue 924] - Make kill_process_tree (in process.py) more robust on Mac OSX
+* [issue 923] - Correct BLAS and RNPL cmake tests
+* [issue 922] - Cannot link against BLAS
+* [issue 921] - Implement `hpx::mem_fn`
+* [issue 920] - Output locality with `--hpx:print-bind`
+* [issue 919] - Correct grammar; simplify boolean expressions
+* [issue 918] - Link to hello_world.cpp is broken
+* [issue 917] - adapt cmake file to new boostbook version
+* [issue 916] - fix problem building documentation with xsltproc >= 1.1.27
+* [issue 915] - Add another TBBMalloc library search path
+* [issue 914] - Build problem with Intel compiler on Stampede (TACC)
+* [issue 913] - fix error messages in fibonacci examples
+* [issue 911] - Update OS X build instructions
+* [issue 910] - Want like to specify MPI_ROOT instead of compiler wrapper script
+* [issue 909] - Warning about void* arithmetic
+* [issue 908] - Buildbot for MIC is broken
+* [issue 906] - Can't use `--hpx:bind=balanced` with multiple MPI processes
+* [issue 905] - `--hpx:bind` documentation should describe full grammar
+* [issue 904] - Add hpx::lcos::fold and hpx::lcos::inverse_fold collective
+                operation
+* [issue 903] - Add `hpx::when_any_swapped()`
+* [issue 902] - Add `hpx::lcos::reduce` collective operation
+* [issue 901] - Web documentation is not searchable
+* [issue 900] - Web documentation for trunk has no index
+* [issue 898] - Some tests fail with GCC 4.8.1 and MPI parcel port
+* [issue 897] - HWLOC causes failures on Mac
+* [issue 896] - pu-offset leads to startup error
+* [issue 895] - `hpx::get_locality_name` not defined
+* [issue 894] - Race condition at shutdown
+* [issue 893] - `--hpx:print-bind` switches std::cout to hexadecimal mode
+* [issue 892] - `hwloc_topology_load` can be expensive -- don't call multiple times 
+* [issue 891] - The documentation for `get_locality_name` is wrong
+* [issue 890] - `--hpx:print-bind` should not exit
+* [issue 889] - `--hpx:debug-hpx-log=FILE` does not work
+* [issue 888] - MPI parcelport does not exit cleanly for --hpx:print-bind
+* [issue 887] - Choose thread affinities more cleverly
+* [issue 886] - Logging documentation is confusing
+* [issue 885] - Two threads are slower than one
+* [issue 884] - is_callable failing with member pointers in C++11
+* [issue 883] - Need help with is_callable_test
+* [issue 882] - tests.regressions.lcos.future_hang_on_get does not terminate
+* [issue 881] - tests/regressions/block_matrix/matrix.hh won't compile with GCC
+                4.8.1 
+* [issue 880] - HPX does not work on OS X
+* [issue 878] - `future::unwrap` triggers assertion
+* [issue 877] - "make tests" has build errors on Ubuntu 12.10 
+* [issue 876] - tcmalloc is used by default, even if it is not present
+* [issue 875] - global_fixture is defined in a header file
+* [issue 874] - Some tests take very long
+* [issue 873] - Add block-matrix code as regression test
+* [issue 872] - HPX documentation does not say how to run tests with detailed
+                output
+* [issue 871] - All tests fail with "make test"
+* [issue 870] - Please explicitly disable serialization in classes that don't
+                support it
+* [issue 868] - boost_any test failing
+* [issue 867] - Reduce the number of copies of `hpx::function` arguments
+* [issue 863] - Futures should not require a default constructor
+* [issue 862] - value_or_error shall not default construct its result
+* [issue 861] - `HPX_UNUSED` macro
+* [issue 860] - Add functionality to copy construct a component
+* [issue 859] - `hpx::endl` should flush
+* [issue 858] - Create `hpx::get_ptr<>` allowing to access component implementation
+* [issue 855] - Implement `hpx::INVOKE`
+* [issue 854] - `hpx/hpx.hpp` does not include `hpx/include/iostreams.hpp`
+* [issue 853] - Feature request: null future
+* [issue 852] - Feature request: Locality names
+* [issue 851] - `hpx::cout` output does not appear on screen
+* [issue 849] - All tests fail on OS X after installing
+* [issue 848] - Update OS X build instructions
+* [issue 846] - Update hpx_external_example
+* [issue 845] - Issues with having both debug and release modules in the same
+                directory
+* [issue 844] - Create configuration header
+* [issue 843] - Tests should use CTest
+* [issue 842] - Remove buffer_pool from MPI parcelport
+* [issue 841] - Add possibility to broadcast an index with hpx::lcos::broadcast
+* [issue 838] - Simplify `util::tuple`
+* [issue 837] - Adopt boost::tuple tests for `util::tuple`
+* [issue 836] - Adopt boost::function tests for `util::function`
+* [issue 835] - Tuple interface missing pieces
+* [issue 833] - Partially preprocessing files not working
+* [issue 832] - Native papi counters do not work with wild cards
+* [issue 831] - Arithmetics counter fails if only one parameter is given
+* [issue 830] - Convert hpx::util::function to use new scheme for serializing its base
+                pointer
+* [issue 829] - Consistently use `decay<T>` instead of `remove_const< remove_reference<T>>`
+* [issue 828] - Update future implementation to N3721 and N3722
+* [issue 827] - Enable MPI parcelport for bootstrapping whenever application
+                was started using mpirun
+* [issue 826] - Support command line option `--hpx:print-bind` even if
+                `--hpx::bind` was not used
+* [issue 825] - Memory counters give segfault when attempting to use thread
+                wild cards or numbers only total works
+* [issue 824] - Enable lambda functions to be used with hpx::async/hpx::apply
+* [issue 823] - Using a hashing filter
+* [issue 822] - Silence unused variable warning
+* [issue 821] - Detect if a function object is callable with given arguments
+* [issue 820] - Allow wildcards to be used for performance counter names
+* [issue 819] - Make the AGAS symbolic name registry distributed
+* [issue 818] - Add future::then() overload taking an executor
+* [issue 817] - Fixed typo
+* [issue 815] - Create an lco that is performing an efficient broadcast of
+                actions
+* [issue 814] - Papi counters cannot specify thread#* to get the counts for
+                all threads
+* [issue 813] - Scoped unlock
+* [issue 811] - simple_central_tuplespace_client run error
+* [issue 810] - ostream error when << any objects
+* [issue 809] - Optimize parcel serialization
+* [issue 808] - HPX applications throw exception when executed from the build
+                directory
+* [issue 807] - Create performance counters exposing overall AGAS statistics
+* [issue 795] - Create timed make_ready_future
+* [issue 794] - Create heterogeneous `when_all`/`when_any`/etc.
+* [issue 721] - Make HPX usable for Xeon Phi
+* [issue 694] - CMake should complain if you attempt to build an example without
+                its dependencies
+* [issue 692] - SLURM support broken
+* [issue 683] - python/hpx/process.py imports epoll on all platforms
+* [issue 619] - Automate the doc building process
+* [issue 600] - GTC performance broken
+* [issue 577] - Allow for zero copy serialization/networking
+* [issue 551] - Change executable names to have debug postfix in Debug builds
+* [issue 544] - Write a custom .lib file on Windows pulling in hpx_init and
+                hpx.dll, phase out hpx_init
+* [issue 534] - `hpx::init` should take functions by `std::function` and should
+                accept all forms of hpx_main
+* [issue 508] - FindPackage fails to set FOO_LIBRARY_DIR
+* [issue 506] - Add cmake support to generate ini files for external applications
+* [issue 470] - Changing build-type after configure does not update boost
+                library names
+* [issue 453] - Document `hpx_run_tests.py`
+* [issue 445] - Significant performance mismatch between MPI and HPX in SMP
+                for allgather example
+* [issue 443] - Make docs viewable from build directory
+* [issue 421] - Support multiple HPX instances per node in a batch environment
+                like PBS or SLURM
+* [issue 316] - Add message size limitation
+* [issue 249] - Clean up locking code in big boot barrier
+* [issue 136] - Persistent CMake variables need to be marked as cache variables
+
+[endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_9_6 __hpx__ V0.9.6]
+
+We have had over 1200 commits since the last release and we have closed
+roughly 140 tickets (bugs, feature requests, etc.).
+
+[heading General Changes]
+
+The major new fetures in this release are:
+
+* We further consolidated the API exposed by __hpx__. We aligned our APIs as much as
+  possible with the existing C++11 Standard and related proposals to the
+  C++ standardization committee (such as __cpp11_n3632__ and __cpp11_n3634__).
+* We implemented a first version of a distributed AGAS service which essentially
+  eliminates all explicit AGAS network traffic.
+* We created a native ibverbs parcelport allowing to take advantage of the
+  superior latency and bandwidth characteristics of Infiniband networks.
+* We successfully ported __hpx__ to the Xeon Phi platform.
+* Support for the SLURM scheduling system was implemented.
+* Major efforts have been dedicated to improving the performance counter
+  framework, numerous new counters were implemented and new APIs were added.
+* We added a modular parcel compression system allowing to improve bandwidth
+  utilization (by reducing the overall size of the tranferred data).
+* We added a modular parcel coalescing system allowing to combine several
+  parcels into larger messages. This reduces latencies introduced by the
+  communication layer.
+* Added an experimental executors API allowing to use different scheduling
+  policies for different parts of the code. This API has been modelled after
+  the Standards proposal __cpp11_n3562__. This API is bound to change in
+  the future, though.
+* Added minimal security support for localities which is enforced on the
+  parcelport level. This support is preliminary and experimental and might
+  change in the future.
+* We created a parcelport using low level MPI functions. This is in support
+  of legacy applications which are to be gradually ported and to support
+  platforms where MPI is the only available portable networking layer.
+* We added a preliminary and experimental implementation of a tuple-space
+  object which exposes an interface similar to such systems described in the
+  literature (see for instance __linda__).
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release. This is again
+a very long list of newly implemented features and fixed issues.
+
+* [issue 806] - make (all) in examples folder does nothing
+* [issue 805] - Adding the introduction and fixing DOCBOOK dependencies for
+                Windows use
+* [issue 804] - Add stackless (non-suspendable) thread type
+* [issue 803] - Create proper serialization support functions for util::tuple
+* [issue 800] - Add possibility to disable array optimizations during serialization
+* [issue 798] - HPX_LIMIT does not work for local dataflow
+* [issue 797] - Create a parcelport which uses MPI
+* [issue 796] - Problem with Large Numbers of Threads
+* [issue 793] - Changing dataflow test case to hang consistently
+* [issue 792] - CMake Error
+* [issue 791] - Problems with local::dataflow
+* [issue 790] - wait_for() doesn't compile
+* [issue 789] - HPX with Intel compiler segfaults
+* [issue 788] - Intel compiler support
+* [issue 787] - Fixed SFINAEd specializations
+* [issue 786] - Memory issues during benchmarking.
+* [issue 785] - Create an API allowing to register external threads with HPX
+* [issue 784] - util::plugin is throwing an error when a symbol is not found
+* [issue 783] - How does hpx:bind work?
+* [issue 782] - Added quotes around STRING REPLACE potentially empty arguments
+* [issue 781] - Make sure no exceptions propagate into the thread manager
+* [issue 780] - Allow arithmetics performance counters to expand its parameters
+* [issue 779] - Test case for 778
+* [issue 778] - Swapping futures segfaults
+* [issue 777] - hpx::lcos::details::when_xxx don't restore completion handlers
+* [issue 776] - Compiler chokes on dataflow overload with launch policy
+* [issue 775] - Runtime error with local dataflow (copying futures?)
+* [issue 774] - Using local dataflow without explicit namespace
+* [issue 773] - Local dataflow with unwrap: functor operators need to be const
+* [issue 772] - Allow (remote) actions to return a future
+* [issue 771] - Setting HPX_LIMIT gives huge boost MPL errors
+* [issue 770] - Add launch policy to (local) dataflow
+* [issue 769] - Make compile time configuration information available
+* [issue 768] - Const correctness problem in local dataflow
+* [issue 767] - Add launch policies to async
+* [issue 766] - Mark data structures for optimized (array based) serialization
+* [issue 765] - Align hpx::any with N3508: Any Library Proposal (Revision 2)
+* [issue 764] - Align hpx::future with newest N3558: A Standardized Representation
+                of Asynchronous Operations
+* [issue 762] - added a human readable output for the ping pong example
+* [issue 761] - Ambiguous typename when constructing derived component
+* [issue 760] - Simple components can not be derived
+* [issue 759] - make install doesn't give a complete install
+* [issue 758] - Stack overflow when using locking_hook<>
+* [issue 757] - copy paste error; unsupported function overloading
+* [issue 756] - GTCX runtime issue in Gordon
+* [issue 755] - Papi counters don't work with reset and evaluate API's
+* [issue 753] - cmake bugfix and improved component action docs
+* [issue 752] - hpx simple component docs
+* [issue 750] - Add hpx::util::any
+* [issue 749] - Thread phase counter is not reset
+* [issue 748] - Memory performance counter are not registered
+* [issue 747] - Create performance counters exposing arithmetic operations
+* [issue 745] - apply_callback needs to invoke callback when applied locally
+* [issue 744] - CMake fixes
+* [issue 743] - Problem Building github version of HPX
+* [issue 742] - Remove HPX_STD_BIND
+* [issue 741] - assertion 'px != 0' failed: HPX(assertion_failure) for low
+                numbers of OS threads
+* [issue 739] - Performance counters do not count to the end of the program
+                or evalution
+* [issue 738] - Dedicated AGAS server runs don't work; console ignores -a option.
+* [issue 737] - Missing bind overloads
+* [issue 736] - Performance counter wildcards do not always work
+* [issue 735] - Create native ibverbs parcelport based on rdma operations
+* [issue 734] - Threads stolen performance counter total is incorrect
+* [issue 733] - Test benchmarks need to be checked and fixed
+* [issue 732] - Build fails with Mac, using mac ports clang-3.3 on latest git
+                branch
+* [issue 731] - Add global start/stop API for performance counters
+* [issue 730] - Performance counter values are apparently incorrect
+* [issue 729] - Unhandled switch
+* [issue 728] - Serialization of hpx::util::function between two localities
+                causes seg faults
+* [issue 727] - Memory counters on Mac OS X
+* [issue 725] - Restore original thread priority on resume
+* [issue 724] - Performance benchmarks do not depend on main HPX libraries
+* [issue 723] - [teletype]--hpx:nodes=`cat $PBS_NODEFILE` works; --hpx:nodefile=$PBS_NODEFILE
+                does not.[c++]
+* [issue 722] - Fix binding const member functions as actions
+* [issue 719] - Create performance counter exposing compression ratio
+* [issue 718] - Add possibility to compress parcel data
+* [issue 717] - strip_credit_from_gid has misleading semantics
+* [issue 716] - Non-option arguments to programs run using `pbsdsh` must be
+                before `--hpx:nodes`, contrary to directions
+* [issue 715] - Re-thrown exceptions should retain the original call site
+* [issue 714] - failed assertion in debug mode
+* [issue 713] - Add performance counters monitoring connection caches
+* [issue 712] - Adjust parcel related performance counters to be connection type
+                specific
+* [issue 711] - configuration failure
+* [issue 710] - Error "timed out while trying to find room in the connection
+                cache" when trying to start multiple localities on a single
+                computer
+* [issue 709] - Add new thread state 'staged' referring to task descriptions
+* [issue 708] - Detect/mitigate bad non-system installs of GCC on Redhat systems
+* [issue 707] - Many examples do not link with Git HEAD version
+* [issue 706] - `hpx::init` removes portions of non-option command line
+                arguments before last `=` sign
+* [issue 705] - Create rolling average and median aggregating performance
+                counters
+* [issue 704] - Create performance counter to expose thread queue waiting time
+* [issue 703] - Add support to HPX build system to find librcrtool.a and
+                related headers
+* [issue 699] - Generalize instrumentation support
+* [issue 698] - compilation failure with hwloc absent
+* [issue 697] - Performance counter counts should be zero indexed
+* [issue 696] - Distributed problem
+* [issue 695] - Bad perf counter time printed
+* [issue 693] - `--help` doesn't print component specific command line options
+* [issue 692] - SLURM support broken
+* [issue 691] - exception while executing any application linked with hwloc
+* [issue 690] - thread_id_test and thread_launcher_test failing
+* [issue 689] - Make the buildbots use hwloc
+* [issue 687] - compilation error fix (hwloc_topology)
+* [issue 686] - Linker Error for Applications
+* [issue 684] - Pinning of service thread fails when number of worker threads
+                equals the number of cores
+* [issue 682] - Add performance counters exposing number of stolen threads
+* [issue 681] - Add apply_continue for asynchronous chaining of actions
+* [issue 679] - Remove obsolete async_callback API functions
+* [issue 678] - Add new API for setting/triggering LCOs
+* [issue 677] - Add async_continue for true continuation style actions
+* [issue 676] - Buildbot for gcc 4.4 broken
+* [issue 675] - Partial preprocessing broken
+* [issue 674] - HPX segfaults when built with gcc 4.7
+* [issue 673] - `use_guard_pages` has inconsistent preprocessor guards
+* [issue 672] - External build breaks if library path has spaces
+* [issue 671] - release tarballs are tarbombs
+* [issue 670] - CMake won't find Boost headers in layout=versioned install
+* [issue 669] - Links in docs to source files broken if not installed
+* [issue 667] - Not reading ini file properly
+* [issue 664] - Adapt new meanings of 'const' and 'mutable'
+* [issue 661] - Implement BTL Parcel port
+* [issue 655] - Make HPX work with the "decltype" result_of
+* [issue 647] - documentation for specifying the number of high priority threads
+                `--hpx:high-priority-threads`
+* [issue 643] - Error parsing host file
+* [issue 642] - HWLoc issue with TAU
+* [issue 639] - Logging potentially suspends a running thread
+* [issue 634] - Improve error reporting from parcel layer
+* [issue 627] - Add tests for async and apply overloads that accept regular
+                C++ functions
+* [issue 626] - hpx/future.hpp header
+* [issue 601] - Intel support
+* [issue 557] - Remove action codes
+* [issue 531] - AGAS request and response classes should use switch statements
+* [issue 529] - Investigate the state of hwloc support
+* [issue 526] - Make HPX aware of hyper-threading
+* [issue 518] - Create facilities allowing to use plain arrays as action
+                arguments
+* [issue 473] - hwloc thread binding is broken on CPUs with hyperthreading
+* [issue 383] - Change result type detection for hpx::util::bind to use
+                result_of protocol
+* [issue 341] - Consolidate route code
+* [issue 219] - Only copy arguments into actions once
+* [issue 177] - Implement distributed AGAS
+* [issue 43]  - Support for Darwin (Xcode + Clang)
+
+[endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_9_5 __hpx__ V0.9.5]
+
+We have had over 1000 commits since the last release and we have closed
+roughly 150 tickets (bugs, feature requests, etc.).
+
+[heading General Changes]
+
+This release is continuing along the lines of code and API consolidation, and
+overall usability inprovements. We dedicated much attention to performance and
+we were able to significantly improve the threading and networking subsystems.
+
+We successfully ported __hpx__ to the Android platform. __hpx__ applications now not
+only can run on mobile devices, but we support heterogeneous applications running
+across architecture boundaries. At the Supercomputing Conference 2012 we
+demonstrated connecting Android tablets to simulations running on a Linux cluster.
+The Android tablet was used to query performance counters from the Linux simulation
+and to steer its parameters.
+
+We successfully ported __hpx__ to Mac OSX (using the Clang compiler). Thanks to
+Pyry Jahkola for contributing the corresponding patches. Please see the section
+__macos_installation__ for more details.
+
+We made a special effort to make HPX usable in highly concurrent use cases. Many
+of the HPX API functions which possibly take longer than 100 microseconds to
+execute now can be invoked asynchronously. We added uniform support for composing
+futures which simplifies to write asynchronous code. HPX actions (function objects
+encapsulating possibly concurrent remote function invocations) are now well
+integrated with all other API facilities such like `hpx::bind`.
+
+All of the API has been aligned as much as possible with established paradigms.
+HPX now mirrors many of the facilities as defined in the C++11 Standard, such
+as `hpx::thread`, `hpx::function`, `hpx::future`, etc.
+
+A lot of work has been put into improving the documentation. Many of the API
+functions are documented now, concepts are explained in detail, and examples
+are better described than before. The new documentation index
+enables finding information with lesser effort.
+
+This is the first release of HPX we perform after the move to __stellar_hpx_github__.
+This step has enabled a wider participation from the community and further encourages
+us in our decision to release HPX as a true open source library (HPX is licensed
+under the very liberal __boost_license__).
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release. This is by
+far the longest list of newly implemented features and fixed issues for any of
+HPX' releases so far.
+
+* [issue 666] - Segfault on calling hpx::finalize twice
+* [issue 665] - Adding declaration num_of_cores
+* [issue 662] - pkgconfig is building wrong
+* [issue 660] - Need uninterrupt function
+* [issue 659] - Move our logging library into a different namespace
+* [issue 658] - Dynamic performance counter types are broken
+* [issue 657] - HPX v0.9.5 (RC1) hello_world example segfaulting
+* [issue 656] - Define the affinity of parcel-pool, io-pool, and timer-pool
+                threads
+* [issue 654] - Integrate the Boost auto_index tool with documentation
+* [issue 653] - Make HPX build on OS X + Clang + libc++
+* [issue 651] - Add fine-grained control for thread pinning
+* [issue 650] - Command line no error message when using -hpx:(anything)
+* [issue 645] - Command line aliases don't work in [teletype]`@file`[c++]
+* [issue 644] - Terminated threads are not always properly cleaned up
+* [issue 640] - `future_data<T>::set_on_completed_` used without locks
+* [issue 638] - hpx build with intel compilers fails on linux
+* [issue 637] - --copy-dt-needed-entries breaks with gold
+* [issue 635] - Boost V1.53 will add Boost.Lockfree and Boost.Atomic
+* [issue 633] - Re-add examples to final 0.9.5 release
+* [issue 632] - Example `thread_aware_timer` is broken
+* [issue 631] - FFT application throws error in parcellayer
+* [issue 630] - Event synchronization example is broken
+* [issue 629] - Waiting on futures hangs
+* [issue 628] - Add an `HPX_ALWAYS_ASSERT` macro
+* [issue 625] - Port coroutines context switch benchmark
+* [issue 621] - New INI section for stack sizes
+* [issue 618] - pkg_config support does not work with a HPX debug build
+* [issue 617] - hpx/external/logging/boost/logging/detail/cache_before_init.hpp:139:67:
+                error: 'get_thread_id' was not declared in this scope
+* [issue 616] - Change wait_xxx not to use locking
+* [issue 615] - Revert visibility 'fix' (fb0b6b8245dad1127b0c25ebafd9386b3945cca9)
+* [issue 614] - Fix Dataflow linker error
+* [issue 613] - find_here should throw an exception on failure
+* [issue 612] - Thread phase doesn't show up in debug mode
+* [issue 611] - Make stack guard pages configurable at runtime (initialization time)
+* [issue 610] - Co-Locate Components
+* [issue 609] - future_overhead
+* [issue 608] - `--hpx:list-counter-infos` problem
+* [issue 607] - Update Boost.Context based backend for coroutines
+* [issue 606] - 1d_wave_equation is not working
+* [issue 605] - Any C++ function that has serializable arguments and a
+                serializable return type should be remotable
+* [issue 604] - Connecting localities isn't working anymore
+* [issue 603] - Do not verify any ini entries read from a file
+* [issue 602] - Rename argument_size to type_size/ added implementation to get
+                parcel size
+* [issue 599] - Enable locality specific command line options
+* [issue 598] - Need an API that accesses the performance counter reporting the
+                system uptime
+* [issue 597] - compiling on ranger
+* [issue 595] - I need a place to store data in a thread self pointer
+* [issue 594] - 32/64 interoperability
+* [issue 593] - Warn if logging is disabled at compile time but requested at runtime
+* [issue 592] - Add optional argument value to `--hpx:list-counters` and
+                `--hpx:list-counter-infos`
+* [issue 591] - Allow for wildcards in performance counter names specified with
+                `--hpx:print-counter`
+* [issue 590] - Local promise semantic differences
+* [issue 589] - Create API to query performance counter names
+* [issue 587] - Add get_num_localities and get_num_threads to AGAS API
+* [issue 586] - Adjust local AGAS cache size based on number of localities
+* [issue 585] - Error while using counters in HPX
+* [issue 584] - counting argument size of actions, initial pass.
+* [issue 581] - Remove `RemoteResult` template parameter for `future<>`
+* [issue 580] - Add possibility to hook into actions
+* [issue 578] - Use angle brackets in HPX error dumps
+* [issue 576] - Exception incorrectly thrown when `--help` is used
+* [issue 575] - HPX(bad_component_type) with gcc 4.7.2 and boost 1.51
+* [issue 574] - `--hpx:connect` command line parameter not working correctly
+* [issue 571] - `hpx::wait()` (callback version) should pass the future to the
+                callback function
+* [issue 570] - `hpx::wait` should operate on `boost::arrays` and `std::lists`
+* [issue 569] - Add a logging sink for Android
+* [issue 568] - 2-argument version of `HPX_DEFINE_COMPONENT_ACTION`
+* [issue 567] - Connecting to a running HPX application works only once
+* [issue 565] - HPX doesn't shutdown properly
+* [issue 564] - Partial preprocessing of new component creation interface
+* [issue 563] - Add `hpx::start`/`hpx::stop` to avoid blocking main thread
+* [issue 562] - All command line arguments swallowed by hpx
+* [issue 561] - Boost.Tuple is not move aware
+* [issue 558] - `boost::shared_ptr<>` style semantics/syntax for client classes
+* [issue 556] - Creation of partially preprocessed headers should be enabled for
+                Boost newer than V1.50
+* [issue 555] - `BOOST_FORCEINLINE` does not name a type
+* [issue 554] - Possible race condition in thread `get_id()`
+* [issue 552] - Move enable client_base
+* [issue 550] - Add stack size category 'huge'
+* [issue 549] - ShenEOS run seg-faults on single or distributed runs
+* [issue 545] - `AUTOGLOB` broken for add_hpx_component
+* [issue 542] - FindHPX_HDF5 still searches multiple times
+* [issue 541] - Quotes around application name in hpx::init
+* [issue 539] - Race conditition occuring with new lightweight threads
+* [issue 535] - hpx_run_tests.py exits with no error code when tests are missing
+* [issue 530] - Thread description(<unknown>) in logs
+* [issue 523] - Make thread objects more lightweight
+* [issue 521] - `hpx::error_code` is not usable for lightweight error handling
+* [issue 520] - Add full user environment to HPX logs
+* [issue 519] - Build succeeds, running fails
+* [issue 517] - Add a guard page to linux coroutine stacks
+* [issue 516] - hpx::thread::detach suspends while holding locks, leads to hang in debug
+* [issue 514] - Preprocessed headers for <hpx/apply.hpp> don't compile
+* [issue 513] - Buildbot configuration problem
+* [issue 512] - Implement action based stack size customization
+* [issue 511] - Move action priority into a separate type trait
+* [issue 510] - trunk broken
+* [issue 507] - no matching function for call to
+                `boost::scoped_ptr<hpx::threads::topology>::scoped_ptr(hpx::threads::linux_topology*)`
+* [issue 505] - undefined_symbol regression test currently failing
+* [issue 502] - Adding OpenCL and OCLM support to HPX for Windows and Linux
+* [issue 501] - find_package(HPX) sets cmake output variables
+* [issue 500] - wait_any/wait_all are badly named
+* [issue 499] - Add support for disabling pbs support in pbs runs
+* [issue 498] - Error during no-cache runs
+* [issue 496] - Add partial preprocessing support to cmake
+* [issue 495] - Support HPX modules exporting startup/shutdown functions only
+* [issue 494] - Allow modules to specify when to run startup/shutdown functions
+* [issue 493] - Avoid constructing a string in make_success_code
+* [issue 492] - Performance counter creation is no longer synchronized at startup
+* [issue 491] - Performance counter creation is no longer synchronized at startup
+* [issue 490] - Sheneos on_completed_bulk seg fault in distributed
+* [issue 489] - compiling issue with g++44
+* [issue 488] - Adding OpenCL and OCLM support to HPX for the MSVC platform
+* [issue 487] - FindHPX.cmake problems
+* [issue 485] - Change distributing_factory and binpacking_factory to use bulk creation
+* [issue 484] - Change `HPX_DONT_USE_PREPROCESSED_FILES` to `HPX_USE_PREPROCESSED_FILES`
+* [issue 483] - Memory counter for Windows
+* [issue 479] - strange errors appear when requesting performance counters on
+                multiple nodes
+* [issue 477] - Create (global) timer for multi-threaded measurements
+* [issue 472] - Add partial preprocessing using Wave
+* [issue 471] - Segfault stack traces don't show up in release
+* [issue 468] - External projects need to link with internal components
+* [issue 462] - Startup/shutdown functions are called more than once
+* [issue 458] - Consolidate hpx::util::high_resolution_timer and
+                `hpx::util::high_resolution_clock`
+* [issue 457] - index out of bounds in `allgather_and_gate` on 4 cores or more
+* [issue 448] - Make HPX compile with clang
+* [issue 447] - 'make tests' should execute tests on local installation
+* [issue 446] - Remove SVN-related code from the codebase
+* [issue 444] - race condition in smp
+* [issue 441] - Patched Boost.Serialization headers should only be installed if needed
+* [issue 439] - Components using `HPX_REGISTER_STARTUP_MODULE` fail to compile with MSVC
+* [issue 436] - Verify that no locks are being held while threads are suspended
+* [issue 435] - Installing HPX should not clobber existing Boost installation
+* [issue 434] - Logging external component failed (Boost 1.50)
+* [issue 433] - Runtime crash when building all examples
+* [issue 432] - Dataflow hangs on 512 cores/64 nodes
+* [issue 430] - Problem with distributing factory
+* [issue 424] - File paths referring to XSL-files need to be properly escaped
+* [issue 417] - Make dataflow LCOs work out of the box by using partial preprocessing
+* [issue 413] - hpx_svnversion.py fails on Windows
+* [issue 412] - Make hpx::error_code equivalent to hpx::exception
+* [issue 398] - HPX clobbers out-of-tree application specific CMake variables
+                (specifically `CMAKE_BUILD_TYPE`)
+* [issue 394] - Remove code generating random port numbers for network
+* [issue 378] - ShenEOS scaling issues
+* [issue 354] - Create a coroutines wrapper for Boost.Context
+* [issue 349] - Commandline option `--localities=N/-lN` should be necessary
+                only on AGAS locality
+* [issue 334] - Add auto_index support to cmake based documentation toolchain
+* [issue 318] - Network benchmarks
+* [issue 317] - Implement network performance counters
+* [issue 310] - Duplicate logging entries
+* [issue 230] - Add compile time option to disable thread debugging info
+* [issue 171] - Add an INI option to turn off deadlock detection independently of
+                logging
+* [issue 170] - OSHL internal counters are incorrect
+* [issue 103] - Better diagnostics for multiple component/action registerations
+                under the same name
+* [issue 48]  - Support for Darwin (Xcode + Clang)
+* [issue 21]  - Build fails with GCC 4.6
+
+[endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_9_0 __hpx__ V0.9.0]
+
+We have had roughly 800 commits since the last release and we have closed
+approximately 80 tickets (bugs, feature requests, etc.).
+
+[heading General Changes]
+
+* Significant improvements made to the usability of __hpx__ in large-scale,
+  distributed environments.
+* Renamed [classref hpx::lcos::packaged_task]`<>` to [classref hpx::lcos::packaged_action]`<>` to
+  reflect the semantic differences to a packaged_task as defined by the C++11
+  standard.
+* __hpx__ now exposes [classref hpx::thread] which is compliant to the C++11 std::thread
+  type except that it (purely locally) represents an __hpx__ thread. This new type
+  does not expose any of the remote capabilities of the underlying __hpx__-thread
+  implementation.
+* The type [classref hpx::lcos::future]`<>` is now compliant to the C++11 std::future<>
+  type. This type can be used to synchronize both, local and remote operations.
+  In both cases the control flow will 'return' to the future in order to
+  trigger any continuation.
+* The types [classref hpx::lcos::local::promise]`<>` and [classref hpx::lcos::local::packaged_task]`<>`
+  are now compliant to the C++11 `std::promise<>`  and `std::packaged_task<>` types.
+  These can be used to create a future representing local work only. Use the
+  types [classref hpx::lcos::promise]`<>` and [classref hpx::lcos::packaged_action]`<>` to wrap any
+  (possibly remote) action into a future.
+* [classref hpx::thread] and [classref hpx::lcos::future]`<>` are now cancelable.
+* Added support for sequential and logic composition of [classref hpx::lcos::future]`<>`'s.
+  The member function [memberref hpx::lcos::future::when]`()` permits futures to
+  be sequentially composed. The helper functions [funcref hpx::wait_all], [funcref hpx::wait_any],
+  and [funcref hpx::wait_n] can be used to wait for more than one future at a time.
+* __hpx__ now exposes [funcref hpx::apply]`()` and [funcref hpx::async]`()` as the preferred way of
+  creating (or invoking) any deferred work. These functions are usable with
+  various types of functions, function objects, and actions and provide a
+  uniform way to spawn deferred tasks.
+* __hpx__ now utilizes [funcref hpx::util::bind] to (partially) bind
+  local functions and function objects, and also actions. Remote bound actions
+  can have placeholders as well.
+* __hpx__ continuations are now fully polymorphic. The class
+  [classref hpx::actions::forwarding_continuation] is an example of how the user can
+  write is own types of continuations. It can be used to execute any function
+  as an continuation of a particular action.
+* Reworked the action invocation API to be fully conformant to normal functions.
+  Actions can now be invoked using [funcref hpx::apply]`()`, [funcref hpx::async]`()`, or using the
+  `operator()` implemented on actions. Actions themselves can now be cheaply
+  instantiated as they do not have any members anymore.
+* Reworked the lazy action invocation API. Actions can now be directly bound
+  using [funcref hpx::util::bind]`()` by passing an action instance as the first argument.
+* A minimal __hpx__ program now looks like this:
+``
+      #include <hpx/hpx_init.hpp>
+
+      int hpx_main()
+      {
+          return hpx::finalize();
+      }
+
+      int main()
+      {
+          return hpx::init();
+      }
+``
+  This removes the immediate dependency on the __boost_program_options__ library.
+
+[note This minimal version of an __hpx__ program does not support any of the
+      default command line arguments (such as --help, or command line options
+      related to PBS). It is suggested to always pass `argc` and `argv` to
+      __hpx__ as shown in the example below.]
+
+* In order to support those, but still not to depend on __boost_program_options__,
+  the minimal program can be written as:
+``
+      #include <hpx/hpx_init.hpp>
+
+      // The arguments for hpx_main can be left off, which very similar to the
+      // behavior of `main()` as defined by C++.
+      int hpx_main(int argc, char* argv[])
+      {
+          return hpx::finalize();
+      }
+
+      int main(int argc, char* argv[])
+      {
+          return hpx::init(argc, argv);
+      }
+``
+* Added performance counters exposing the number of component instances which
+  are alive on a given locality.
+* Added performance counters exposing then number of messages sent and received,
+  the number of parcels sent and received, the number of bytes sent and
+  received, the overall time required to send and receive data, and the overall
+  time required to serialize and deserialize the data.
+* Added a new component: [classref hpx::components::binpacking_factory] which is equivalent to the existing
+  [classref hpx::components::distributing_factory] component, except that it equalizes the overall
+  population of the components to create. It exposes two factory methods, one
+  based on the number of existing instances of the component type to create,
+  and one based on an arbitrary performance counter which will be queried for
+  all relevant localities.
+* Added API functions allowing to access elements of the diagnostic information
+  embedded in the given exception: [funcref hpx::get_locality_id]`()`, [funcref hpx::get_host_name]`()`,
+  [funcref hpx::get_process_id]`()`, [funcref hpx::get_function_name]`()`, [funcref hpx::get_file_name]`()`,
+  [funcref hpx::get_line_number]`()`, [funcref hpx::get_os_thread]`()`, [funcref hpx::get_thread_id]`()`, and
+  [funcref hpx::get_thread_description]`()`.
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release:
+
+* [issue 71]  - GIDs that are not serialized via `handle_gid<>` should raise an exception
+* [issue 105] - Allow for [classref hpx::util::function]s to be registered in the AGAS symbolic
+                namespace
+* [issue 107] - Nasty threadmanger race condition (reproducible in sheneos_test)
+* [issue 108] - Add millisecond resolution to __hpx__ logs on Linux
+* [issue 110] - Shutdown hang in distributed with release build
+* [issue 116] - Don't use TSS for the applier and runtime pointers
+* [issue 162] - Move local synchronous execution shortcut from hpx::function to the
+                applier
+* [issue 172] - Cache sources in CMake and check if they change manually
+* [issue 178] - Add an INI option to turn off ranged-based AGAS caching
+* [issue 187] - Support for disabling performance counter deployment
+* [issue 202] - Support for sending performance counter data to a specific file
+* [issue 218] - boost.coroutines allows different stack sizes, but stack pool is
+                unaware of this
+* [issue 231] - Implement movable `boost::bind`
+* [issue 232] - Implement movable `boost::function`
+* [issue 236] - Allow binding [classref hpx::util::function] to actions
+* [issue 239] - Replace [^hpx::function] with [classref hpx::util::function]
+* [issue 240] - Can't specify RemoteResult with lcos::async
+* [issue 242] - REGISTER_TEMPLATE support for plain actions
+* [issue 243] - `handle_gid<>` support for [classref hpx::util::function]
+* [issue 245] - `*_c_cache code` throws an exception if the queried GID is not in the
+                local cache
+* [issue 246] - Undefined references in dataflow/adaptive1d example
+* [issue 252] - Problems configuring sheneos with CMake
+* [issue 254] - Lifetime of components doesn't end when client goes out of scope
+* [issue 259] - CMake does not detect that MSVC10 has lambdas
+* [issue 260] - io_service_pool segfault
+* [issue 261] - Late parcel executed outside of pxthread
+* [issue 263] - Cannot select allocator with CMake
+* [issue 264] - Fix allocator select
+* [issue 267] - Runtime error for hello_world
+* [issue 269] - pthread_affinity_np test fails to compile
+* [issue 270] - Compiler noise due to -Wcast-qual
+* [issue 275] - Problem with configuration tests/include paths on Gentoo
+* [issue 325] - Sheneos is 200-400 times slower than the fortran equivalent
+* [issue 331] - [funcref hpx::init]`()` and hpx_main() should not depend on program_options
+* [issue 333] - Add doxygen support to CMake for doc toolchain
+* [issue 340] - Performance counters for parcels
+* [issue 346] - Component loading error when running hello_world in distributed on
+                MSVC2010
+* [issue 362] - Missing initializer error
+* [issue 363] - Parcel port serialization error
+* [issue 366] - Parcel buffering leads to types incompatible exception
+* [issue 368] - Scalable alternative to rand() needed for __hpx__
+* [issue 369] - IB over IP is substantially slower than just using standard TCP/IP
+* [issue 374] - [funcref hpx::lcos::wait] should work with dataflows and arbitrary classes
+                meeting the future interface
+* [issue 375] - Conflicting/ambiguous overloads of [funcref hpx::lcos::wait]
+* [issue 376] - Find_HPX.cmake should set CMake variable HPX_FOUND for out of tree builds
+* [issue 377] - ShenEOS interpolate bulk and interpolate_one_bulk are broken
+* [issue 379] - Add support for distributed runs under SLURM
+* [issue 382] - _Unwind_Word not declared in boost.backtrace
+* [issue 387] - Doxygen should look only at list of specified files
+* [issue 388] - Running `make install` on an out-of-tree application is broken
+* [issue 391] - Out-of-tree application segfaults when running in qsub
+* [issue 392] - Remove HPX_NO_INSTALL option from cmake build system
+* [issue 396] - Pragma related warnings when compiling with older gcc versions
+* [issue 399] - Out of tree component build problems
+* [issue 400] - Out of source builds on Windows: linker should not receive compiler flags
+* [issue 401] - Out of source builds on Windows: components need to be linked with
+                hpx_serialization
+* [issue 404] - gfortran fails to link automatically when fortran files are present
+* [issue 405] - Inability to specify linking order for external libraries
+* [issue 406] - Adapt action limits such that dataflow applications work without additional defines
+* [issue 415] - `locality_results` is not a member of `hpx::components::server`
+* [issue 425] - Breaking changes to `traits::*result` wrt `std::vector<id_type>`
+* [issue 426] - AUTOGLOB needs to be updated to support fortran
+
+[endsect]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_8_1 __hpx__ V0.8.1]
+
+This is a point release including important bug fixes for __0_8_0__.
+
+[heading General Changes]
+
+* __hpx__ does not need to be installed anymore to be functional.
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this point release:
+
+* [issue 295] - Don't require install path to be known at compile time.
+* [issue 371] - Add hpx iostreams to standard build.
+* [issue 384] - Fix compilation with GCC 4.7.
+* [issue 390] - Remove keep_factory_alive startup call from ShenEOS; add shutdown call
+                to H5close.
+* [issue 393] - Thread affinity control is broken.
+
+[heading Bug Fixes (Commits)]
+
+Here is a list of the important commits included in this point release:
+
+* r7642 - External: Fix backtrace memory violation.
+* r7775 - Components: Fix symbol visibility bug with component startup
+          providers. This prevents one components providers from overriding
+          another components.
+* r7778 - Components: Fix startup/shutdown provider shadowing issues.
+
+[endsect]
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
+[/Phillip LeBlanc 3-13-12]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_8_0 __hpx__ V0.8.0]
+
+We have had roughly 1000 commits since the last release and we have closed
+approximately 70 tickets (bugs, feature requests, etc.).
+
+[heading General Changes]
+
+* Improved PBS support, allowing for arbitrary naming schemes of node-hostnames.
+* Finished verification of the reference counting framework.
+* Implemented decrement merging logic to optimize the distributed reference
+  counting system.
+* Restructured the LCO framework. Renamed [^hpx::lcos::eager_future<>] and
+  [^hpx::lcos::lazy_future<>] into [classref hpx::lcos::packaged_task]`<>` and
+  [classref hpx::lcos::deferred_packaged_task]`<>`. Split
+  [classref hpx::lcos::promise]`<>` into [classref hpx::lcos::packaged_task]`<>`
+  and [classref hpx::lcos::future]`<>`. Added 'local' futures
+  (in namespace [^hpx::lcos::local]).
+* Improved the general performance of local and remote action invocations.
+  This (under certain circumstances) drastically reduces the number of copies
+  created for each of the parameters and return values.
+* Reworked the performance counter framework. Performance counters are now
+  created only when needed, which reduces the overall resource requirements.
+  The new framework allows for much more flexible creation and management
+  of performance counters. The new sine example application demonstrates some
+  of the capabilities of the new infrastructure.
+* Added a buildbot-based continuous build system which gives instant, automated
+  feedback on each commit to SVN.
+* Added more automated tests to verify proper functioning of __hpx__.
+* Started to create documentation for __hpx__ and its API.
+* Added documentation toolchain to the build system.
+* Added dataflow LCO.
+* Changed default __hpx__ command line options to have [^hpx:] prefix. For
+  instance, the former option [^--threads] is now [hpx_cmdline [^--hpx:threads]].
+  This has been done to make ambiguities with possible application specific
+  command line options as unlikely as possible. See the section __commandline__
+  for a full list of available options.
+* Added the possibility to define command line aliases. The former short
+  (one-letter) command line options have been predefined as aliases for
+  backwards compatibility. See the section __commandline__ for a detailed
+  description of command line option aliasing.
+* Network connections are now cached based on the connected host. The number of
+  simultaneous connections to a particular host is now limited. Parcels are
+  buffered and bundled if all connections are in use.
+* Added more refined thread affinity control. This is based on the external
+  library __hwloc__.
+* Improved support for Windows builds with CMake.
+* Added support for components to register their own command line options.
+* Added the possibility to register custom startup/shutdown functions for
+  any component. These functions are guaranteed to be executed by an __hpx__
+  thread.
+* Added two new experimental thread schedulers: hierarchy_scheduler and
+  periodic_priority_scheduler. These can be activated by using the command line
+  options [hpx_cmdline [^--hpx:queueing=hierarchy]] or
+  [hpx_cmdline [^--hpx:queueing=periodic]].
+
+[heading Example Applications]
+
+* [@http://www.graph500.org/ Graph500 performance benchmark] (thanks to Matthew
+  Anderson for contributing this application).
+* [@http://www.nersc.gov/research-and-development/benchmarking-and-workload-characterization/nersc-6-benchmarks/gtc/ GTC (Gyrokinetic Toroidal Code)]:
+  a skeleton for particle in cell type codes.
+* Random Memory Access: an example demonstrating random memory accesses in a
+  large array
+* [@http://stellarcollapse.org/equationofstate ShenEOS example], demonstrating
+  partitioning of large read-only data structures and exposing an interpolation
+  API.
+* Sine performance counter demo.
+* Accumulator examples demonstrating how to write and use __hpx__ components.
+* Quickstart examples (like hello_world, fibonacci, quicksort, factorial, etc.)
+  demonstrating simple __hpx__ concepts which introduce some of the concepts in
+  __hpx__.
+* Load balancing and work stealing demos.
+
+[heading API Changes]
+
+* Moved all local LCOs into a separate namespace `hpx::lcos::local` (for
+  instance, `hpx::lcos::local_mutex` is now [classref hpx::lcos::local::mutex]).
+* Replaced `hpx::actions::function` with [classref hpx::util::function]. Cleaned
+  up related code.
+* Removed `hpx::traits::handle_gid` and moved handling of global reference
+  counts into the corresponding serialization code.
+* Changed terminology: `prefix` is now called `locality_id`, renamed the
+  corresponding API functions (such as `hpx::get_prefix`, which is now called
+  `hpx::get_locality_id`).
+* Adding [funcref hpx::find_remote_localities]`()`,
+  and [funcref hpx::get_num_localities]`()`.
+* Changed performance counter naming scheme to make it more bash friendly.
+  The new performance counter naming scheme is now
+
+[teletype]
+``
+    /object{parentname#parentindex/instance#index}/counter#parameters
+``
+[c++]
+
+* Added `hpx::get_worker_thread_num` replacing `hpx::threadmanager_base::get_thread_num`.
+* Renamed `hpx::get_num_os_threads` to `hpx::get_os_threads_count`.
+* Added `hpx::threads::get_thread_count`.
+* Restructured the Futures sub-system, renaming types in accordance with the
+  terminology used by the C++11 ISO standard.
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release:
+
+* [issue 31]  - Specialize handle_gid<> for examples and tests
+* [issue 72]  - Fix AGAS reference counting
+* [issue 104] - heartbeat throws an exception when decrefing the performance counter it's watching
+* [issue 111] - throttle causes an exception on the target application
+* [issue 142] - One failed component loading causes an unrelated component to fail
+* [issue 165] - Remote exception propagation bug in AGAS reference counting test
+* [issue 186] - Test credit exhaustion/splitting (e.g. prepare_gid and symbol NS)
+* [issue 188] - Implement remaining AGAS reference counting test cases
+* [issue 258] - No type checking of GIDs in stubs classes
+* [issue 271] - Seg fault/shared pointer assertion in distributed code
+* [issue 281] - CMake options need descriptive text
+* [issue 283] - AGAS caching broken (gva_cache needs to be rewritten with ICL)
+* [issue 285] - HPX_INSTALL root directory not the same as CMAKE_INSTALL_PREFIX
+* [issue 286] - New segfault in dataflow applications
+* [issue 289] - Exceptions should only be logged if not handled
+* [issue 290] - c++11 tests failure
+* [issue 293] - Build target for component libraries
+* [issue 296] - Compilation error with Boost V1.49rc1
+* [issue 298] - Illegal instructions on termination
+* [issue 299] - gravity aborts with multiple threads
+* [issue 301] - Build error with Boost trunk
+* [issue 303] - Logging assertion failure in distributed runs
+* [issue 304] - Exception 'what' strings are lost when exceptions from decode_parcel are reported
+* [issue 306] - Performance counter user interface issues
+* [issue 307] - Logging exception in distributed runs
+* [issue 308] - Logging deadlocks in distributed
+* [issue 309] - Reference counting test failures and exceptions
+* [issue 311] - Merge AGAS remote_interface with the runtime_support object
+* [issue 314] - Object tracking for id_types
+* [issue 315] - Remove handle_gid and handle credit splitting in id_type serialization
+* [issue 320] - applier::get_locality_id() should return an error value (or throw an exception)
+* [issue 321] - Optimization for id_types which are never split should be restored
+* [issue 322] - Command line processing ignored with Boost 1.47.0
+* [issue 323] - Credit exhaustion causes object to stay alive
+* [issue 324] - Duplicate exception messages
+* [issue 326] - Integrate Quickbook with CMake
+* [issue 329] - --help and --version should still work
+* [issue 330] - Create pkg-config files
+* [issue 337] - Improve usability of performance counter timestamps
+* [issue 338] - Non-std exceptions deriving from std::exceptions in tfunc may be sliced
+* [issue 339] - Decrease the number of send_pending_parcels threads
+* [issue 343] - Dynamically setting the stack size doesn't work
+* [issue 351] - 'make install' does not update documents
+* [issue 353] - Disable FIXMEs in the docs by default; add a doc developer CMake option to enable FIXMEs
+* [issue 355] - 'make' doesn't do anything after correct configuration
+* [issue 356] - Don't use hpx::util::static_ in topology code
+* [issue 359] - Infinite recursion in hpx::tuple serialization
+* [issue 361] - Add compile time option to disable logging completely
+* [issue 364] - Installation seriously broken in r7443
+
+[endsect]
+
+[/Proofread by:]
+[/Adrian Serio 3-13-12]
+
+[/////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_7_0 __hpx__ V0.7.0]
+
+We have had roughly 1000 commits since the last release and we have closed
+approximately 120 tickets (bugs, feature requests, etc.).
+
+[heading General Changes]
+
+* Completely removed code related to deprecated AGAS V1, started to work on
+  AGAS V2.1.
+* Started to clean up and streamline the exposed APIs (see 'API changes' below
+  for more details).
+* Revamped and unified performance counter framework, added a lot of new
+  performance counter instances for monitoring of a diverse set of internal
+  __hpx__ parameters (queue lengths, access statistics, etc.).
+* Improved general error handling and logging support.
+* Fixed several race conditions, improved overall stability, decreased memory
+  footprint, improved overall performance (major optimizations include native
+  TLS support and ranged-based AGAS caching).
+* Added support for running __hpx__ applications with PBS.
+* Many updates to the build system, added support for gcc 4.5.x and 4.6.x,
+  added C++11 support.
+* Many updates to default command line options.
+* Added many tests, set up buildbot for continuous integration testing.
+* Better shutdown handling of distributed applications.
+
+[heading Example Applications]
+
+* quickstart/factorial and quickstart/fibonacci, future-recursive parallel
+  algorithms.
+* quickstart/hello_world, distributed hello world example.
+* quickstart/rma, simple remote memory access example
+* quickstart/quicksort, parallel quicksort implementation.
+* gtc, gyrokinetic torodial code.
+* bfs, breadth-first-search, example code for a graph application.
+* sheneos, partitioning of large data sets.
+* accumulator, simple component example.
+* balancing/os_thread_num, balancing/px_thread_phase, examples demonstrating
+  load balancing and work stealing.
+
+[heading API Changes]
+
+* Added `hpx::find_all_localities`.
+* Added `hpx::terminate` for non-graceful termination of applications.
+* Added `hpx::lcos::async` functions for simpler asynchronous programming.
+* Added new AGAS interface for handling of symbolic namespace (`hpx::agas::*`).
+* Renamed `hpx::components::wait` to `hpx::lcos::wait`.
+* Renamed `hpx::lcos::future_value` to `hpx::lcos::promise`.
+* Renamed `hpx::lcos::recursive_mutex` to `hpx::lcos::local_recursive_mutex`,
+  `hpx::lcos::mutex` to `hpx::lcos::local_mutex`
+* Removed support for Boost versions older than V1.38, recommended Boost version
+  is now V1.47 and newer.
+* Removed `hpx::process` (this will be replaced by a real process implementation
+  in the future).
+* Removed non-functional LCO code (`hpx::lcos::dataflow`, `hpx::lcos::thunk`,
+  `hpx::lcos::dataflow_variable`).
+* Removed deprecated `hpx::naming::full_address`.
+
+[heading Bug Fixes (Closed Tickets)]
+
+Here is a list of the important tickets we closed for this release:
+
+* [issue 28]  - Integrate Windows/Linux CMake code for __hpx__ core
+* [issue 32]  - hpx::cout() should be hpx::cout
+* [issue 33]  - AGAS V2 legacy client does not properly handle error_code
+* [issue 60]  - AGAS: allow for registerid to optionally take ownership of the gid
+* [issue 62]  - adaptive1d compilation failure in Fusion
+* [issue 64]  - Parcel subsystem doesn't resolve domain names
+* [issue 83]  - No error handling if no console is available
+* [issue 84]  - No error handling if a hosted locality is treated as the bootstrap server
+* [issue 90]  - Add general commandline option -N
+* [issue 91]  - Add possibility to read command line arguments from file
+* [issue 92]  - Always log exceptions/errors to the log file
+* [issue 93]  - Log the command line/program name
+* [issue 95]  - Support for distributed launches
+* [issue 97]  - Attempt to create a bad component type in AMR examples
+* [issue 100] - factorial and factorial_get examples trigger AGAS component type assertions
+* [issue 101] - Segfault when hpx::process::here() is called in fibonacci2
+* [issue 102] - unknown_component_address in int_object_semaphore_client
+* [issue 114] - marduk raises assertion with default parameters
+* [issue 115] - Logging messages for SMP runs (on the console) shouldn't be buffered
+* [issue 119] - marduk linking strategy breaks other applications
+* [issue 121] - pbsdsh problem
+* [issue 123] - marduk, dataflow and adaptive1d fail to build
+* [issue 124] - Lower default preprocessing arity
+* [issue 125] - Move hpx::detail::diagnostic_information out of the detail namespace
+* [issue 126] - Test definitions for AGAS reference counting
+* [issue 128] - Add averaging performance counter
+* [issue 129] - Error with endian.hpp while building adaptive1d
+* [issue 130] - Bad initialization of performance counters
+* [issue 131] - Add global startup/shutdown functions to component modules
+* [issue 132] - Avoid using auto_ptr
+* [issue 133] - On Windows hpx.dll doesn't get installed
+* [issue 134] - HPX_LIBRARY does not reflect real library name (on Windows)
+* [issue 135] - Add detection of unique_ptr to build system
+* [issue 137] - Add command line option allowing to repeatedly evaluate performance counters
+* [issue 139] - Logging is broken
+* [issue 140] - CMake problem on windows
+* [issue 141] - Move all non-component libraries into $PREFIX/lib/hpx
+* [issue 143] - adaptive1d throws an exception with the default command line options
+* [issue 146] - Early exception handling is broken
+* [issue 147] - Sheneos doesn't link on Linux
+* [issue 149] - sheneos_test hangs
+* [issue 154] - Compilation fails for r5661
+* [issue 155] - Sine performance counters example chokes on chrono headers
+* [issue 156] - Add build type to --version
+* [issue 157] - Extend AGAS caching to store gid ranges
+* [issue 158] - r5691 doesn't compile
+* [issue 160] - Re-add AGAS function for resolving a locality to its prefix
+* [issue 168] - Managed components should be able to access their own GID
+* [issue 169] - Rewrite AGAS future pool
+* [issue 179] - Complete switch to request class for AGAS server interface
+* [issue 182] - Sine performance counter is loaded by other examples
+* [issue 185] - Write tests for symbol namespace reference counting
+* [issue 191] - Assignment of read-only variable in point_geometry
+* [issue 200] - Seg faults when querying performance counters
+* [issue 204] - --ifnames and suffix stripping needs to be more generic
+* [issue 205] - --list-* and --print-counter-* options do not work together and produce no warning
+* [issue 207] - Implement decrement entry merging
+* [issue 208] - Replace the spinlocks in AGAS with hpx::lcos::local_mutexes
+* [issue 210] - Add an --ifprefix option
+* [issue 214] - Performance test for PX-thread creation
+* [issue 216] - VS2010 compilation
+* [issue 222] - r6045 context_linux_x86.hpp
+* [issue 223] - fibonacci hangs when changing the state of an active thread
+* [issue 225] - Active threads end up in the FEB wait queue
+* [issue 226] - VS Build Error for Accumulator Client
+* [issue 228] - Move all traits into namespace hpx::traits
+* [issue 229] - Invalid initialization of reference in thread_init_data
+* [issue 235] - Invalid GID in iostreams
+* [issue 238] - Demangle type names for the default implementation of get_action_name
+* [issue 241] - C++11 support breaks GCC 4.5
+* [issue 247] - Reference to temporary with GCC 4.4
+* [issue 248] - Seg fault at shutdown with GCC 4.4
+* [issue 253] - Default component action registration kills compiler
+* [issue 272] - G++ unrecognized command line option
+* [issue 273] - quicksort example doesn't compile
+* [issue 277] - Invalid CMake logic for Windows
+
+[endsect]
+
+[endsect] [/ Previous HPX Releases]
