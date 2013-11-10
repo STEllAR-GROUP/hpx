@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset
     /// The parcelport is the lowest possible representation of the parcelset
     /// inside a locality. It provides the minimal functionality to send and
     /// to receive parcels.
-    class HPX_EXPORT parcelport 
+    class HPX_EXPORT parcelport
       : public boost::enable_shared_from_this<parcelport>,
         boost::noncopyable
     {
@@ -59,7 +59,7 @@ namespace hpx { namespace parcelset
         > read_handler_type;
 
         /// Construct the parcelport on the given locality.
-        parcelport(util::runtime_configuration const& ini);
+        parcelport(util::runtime_configuration const& ini, std::string const& type);
 
         /// Start the parcelport I/O thread pool.
         ///

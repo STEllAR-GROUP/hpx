@@ -142,22 +142,30 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    parcelport::parcelport(util::runtime_configuration const& ini)
+    parcelport::parcelport(util::runtime_configuration const& ini,
+            std::string const& type)
       : parcels_(),
         here_(ini.get_parcelport_address()),
         max_message_size_(ini.get_max_message_size()),
         allow_array_optimizations_(true),
         allow_zero_copy_optimizations_(true)
     {
-        std::string array_optimization =
-            ini.get_entry("hpx.parcel.array_optimization", "1");
-        if (boost::lexical_cast<int>(array_optimization) == 0)
-            allow_array_optimizations_ = false;
+        std::string key("hpx.parcel.");
+        key += type;
 
-        std::string zero_copy_optimization =
-            ini.get_entry("hpx.parcel.zero_copy_optimization", array_optimization);
-        if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
+        std::string array_optimization =
+            ini.get_entry(key + ".array_optimization", "1");
+
+        if (boost::lexical_cast<int>(array_optimization) == 0) {
+            allow_array_optimizations_ = false;
             allow_zero_copy_optimizations_ = false;
+        }
+        else {
+            std::string zero_copy_optimization =
+                ini.get_entry(key + ".zero_copy_optimization", "1");
+            if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
+                allow_zero_copy_optimizations_ = false;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
