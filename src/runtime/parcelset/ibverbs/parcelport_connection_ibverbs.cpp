@@ -50,9 +50,11 @@ namespace hpx { namespace parcelset { namespace ibverbs
         }
 
         std::string array_optimization =
-            get_config_entry("hpx.parcel.array_optimization", "1");
+            get_config_entry("hpx.parcel.ibverbs.array_optimization", "1");
         if (boost::lexical_cast<int>(array_optimization) == 0)
             archive_flags_ |= util::disable_array_optimization;
+
+        archive_flags_ |= util::disable_data_chunking;
 
         boost::system::error_code ec;
         std::string buffer_size_str = get_config_entry("hpx.parcel.ibverbs.buffer_size", "4096");

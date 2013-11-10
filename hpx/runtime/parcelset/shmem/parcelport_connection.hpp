@@ -164,6 +164,9 @@ namespace hpx { namespace parcelset { namespace shmem
 
         // data buffer cache
         data_buffer_cache& cache_;
+
+        // archive flags
+        int archive_flags_;
     };
 
     typedef boost::shared_ptr<parcelport_connection> parcelport_connection_ptr;
