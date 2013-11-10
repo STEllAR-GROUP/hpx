@@ -10,8 +10,8 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_7 __hpx__ V0.9.7]
 
-We have had over 900 commits since the last release and we have closed
-roughly 160 tickets (bugs, feature requests, etc.).
+We have had over 1000 commits since the last release and we have closed
+over 180 tickets (bugs, feature requests, etc.).
 
 [heading General Changes]
 
@@ -37,12 +37,41 @@ roughly 160 tickets (bugs, feature requests, etc.).
   standardization efforts.
 * Massively improved the performance of the HPX serialization code. Added partial
   support for zero copy serialization of array and bitwise-copyable types.
+* General performance improvements of the code related to threads and futures.
 
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1005] - Allow to disable array optimizations and zero copy optimizations
+                 for each parcelport
+* [issue 1004] - Generate new HPX logo image for the docs
+* [issue 1002] - If MPI parcelport is not available, running HPX under mpirun
+                 should fail
+* [issue 1001] - Zero copy serialization raises assert
+* [issue 1000] - Can't connect to a HPX application running with the MPI
+                 parcelport from a non MPI parcelport locality
+* [issue 999] - Optimize `hpx::when_n`
+* [issue 998] - Fixed const-correctness
+* [issue 997] - Making serialize_buffer::data() type save
+* [issue 996] - Memory leak in hpx::lcos::promise 
+* [issue 995] - Race while registering pre-shutdown functions
+* [issue 994] - thread_rescheduling regression test does not compile
+* [issue 992] - Correct comments and messages
+* [issue 991] - setcap cap_sys_rawio=ep for power profiling causes an HPX
+                application to abort
+* [issue 989] - Jacobi hangs during execution
+* [issue 988] - multiple_init test is failing
+* [issue 986] - Can't call a function called "init" from "main" when using
+                `<hpx/hpx_main.hpp>`
+* [issue 984] - Reference counting tests are failing
+* [issue 983] - thread_suspension_executor test fails
+* [issue 980] - Terminating HPX threads don't leave stack in virgin state
+* [issue 979] - Static scheduler not in documents
+* [issue 978] - Preprocessing limits are broken
+* [issue 977] - Make tests.regressions.lcos.future_hang_on_get shorter
 * [issue 976] - Wrong library order in pkgconfig
+* [issue 975] - Please reopen #963
 * [issue 974] - Option pu-offset ignored in fixing_588 branch
 * [issue 972] - Cannot use MKL with HPX
 * [issue 969] - Non-existent INI files requested on the command line via
