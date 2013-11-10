@@ -173,7 +173,8 @@ namespace hpx { namespace util
             "[hpx.parcel.mpi]",
 #if defined(HPX_HAVE_PARCELPORT_MPI)
             "enable = ${HPX_HAVE_PARCELPORT_MPI:1}",
-            "max_requests = ${HPX_PARCEL_MPI_MAX_REQUESTS:100}",
+            "max_requests = ${HPX_PARCEL_MPI_MAX_REQUESTS:"
+                BOOST_PP_STRINGIZE(HPX_PARCEL_MPI_MAX_REQUESTS) "}",
 # if defined(HPX_PARCELPORT_MPI_ENV)
             "env = ${HPX_PARCELPORT_MPI_ENV:" HPX_PARCELPORT_MPI_ENV "}",
 # else
