@@ -12,7 +12,51 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 
-namespace hpx { namespace lcos { namespace local
+namespace hpx { namespace lcos { namespace detail
+{
+
+template <typename Result>
+struct channel_future_data : future_data<Result>
+{
+  public:
+    typedef typename future_data<Result>::mutex_type mutex_type;
+    typedef typename future_data<Result>::result_type result_type;
+    typedef typename future_data<Result>::data_type data_type;
+
+  public:
+    result_type move_data(error_code& ec = throws)
+    {
+        // yields control if needed
+        data_type d;
+        {
+            typename mutex_type::scoped_lock l(this->mtx_);
+            // moves the data from the store
+            this->data_.read_and_empty(d, l, ec);
+            if (ec) return result_type();
+        }
+
+        if (d.is_empty()) {
+            // the value has already been moved out of this future
+            HPX_THROWS_IF(ec, no_state,
+                "future_data::move_data",
+                "this future has not been initialized");
+            return result_type();
+        }
+
+        // the thread has been re-activated by one of the actions
+        // supported by this promise (see \a promise::set_event
+        // and promise::set_exception).
+        if (d.stores_error())
+            return handle_error(d, ec);
+
+        // no error has been reported, return the result
+        return d.move_value();
+    }
+};
+
+} // namespace detail
+
+namespace local
 {
 
 /// An asynchronous, single value channel
@@ -20,7 +64,7 @@ template <typename T>
 struct channel
 {
   private:
-    typedef hpx::lcos::detail::future_data<T> future_data;
+    typedef hpx::lcos::detail::channel_future_data<T> future_data;
 
     boost::intrusive_ptr<future_data> data_;
 
@@ -95,6 +139,12 @@ struct channel
         data_->reset();
    }
 
+    hpx::future<T> get_future()
+    {
+        BOOST_ASSERT(data_);
+        return lcos::detail::make_future_from_data<T>(data_);
+    }
+
     T get(hpx::error_code& ec = hpx::throws) const
     {
         BOOST_ASSERT(data_);
@@ -107,12 +157,6 @@ struct channel
         BOOST_ASSERT(data_);
         T tmp = data_->move_data(ec);
         return boost::move(tmp);
-    }
-
-    hpx::future<T> get_future()
-    {
-        BOOST_ASSERT(data_);
-        return lcos::detail::make_future_from_data<T>(data_);
     }
 
     void post(BOOST_RV_REF(T) result)
@@ -151,7 +195,7 @@ template <>
 struct channel<void>
 {
   private:
-    typedef hpx::lcos::detail::future_data<void> future_data;
+    typedef hpx::lcos::detail::channel_future_data<void> future_data;
 
     boost::intrusive_ptr<future_data> data_;
 
@@ -216,6 +260,12 @@ struct channel<void>
         data_->reset();
    }
 
+    hpx::future<void> get_future()
+    {
+        BOOST_ASSERT(data_);
+        return lcos::detail::make_future_from_data<void>(data_);
+    }
+
     void get(hpx::error_code& ec = hpx::throws) const
     {
         BOOST_ASSERT(data_);
@@ -226,12 +276,6 @@ struct channel<void>
     {
         BOOST_ASSERT(data_);
         hpx::util::unused_type tmp = data_->move_data(ec);
-    }
-
-    hpx::future<void> get_future()
-    {
-        BOOST_ASSERT(data_);
-        return lcos::detail::make_future_from_data<void>(data_);
     }
 
     void post()
