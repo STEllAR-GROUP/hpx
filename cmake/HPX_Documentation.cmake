@@ -196,6 +196,7 @@ else()
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
+                "--stringparam" "callout.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
                 "--stringparam" "html.stylesheet" "src/boostbook.css"
                 "--xinclude" "-o" ${name}.dbk
@@ -209,6 +210,7 @@ else()
                 ${${name}_XSLTPROC_ARGS}
                 "--stringparam" "boost.graphics.root" "images/"
                 "--stringparam" "admon.graphics.path" "images/"
+                "--stringparam" "callout.graphics.path" "images/"
                 "--stringparam" "boost.root" "${BOOST_ROOT_FOR_DOCS}"
                 "--stringparam" "html.stylesheet" "src/boostbook.css"
                 "--xinclude" "-o" ${name}.dbk
@@ -233,7 +235,12 @@ else()
       add_custom_command(OUTPUT ${name}.fo
         COMMAND set XML_CATALOG_FILES=${${name}_CATALOG}
         COMMAND ${XSLTPROC_PROGRAM} ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "paper.type" "USLetter"
+                "--stringparam" "admon.graphics.extension" ".png"
                 "--stringparam" "img.src.path" "${hpx_SOURCE_DIR}/docs/html/"
+                "--stringparam" "boost.graphics.root" "${hpx_SOURCE_DIR}/docs/html/images/"
+                "--stringparam" "admon.graphics.path" "${hpx_SOURCE_DIR}/docs/html/images/"
+                "--stringparam" "callout.graphics.path" "${hpx_SOURCE_DIR}/docs/html/images/"
                 "--xinclude" "-o" ${name}.fo
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/fo.xsl ${${name}_SOURCE}
@@ -243,7 +250,12 @@ else()
       add_custom_command(OUTPUT ${name}.fo
         COMMAND "XML_CATALOG_FILES=${${name}_CATALOG}" ${XSLTPROC_PROGRAM}
                 ${${name}_XSLTPROC_ARGS}
+                "--stringparam" "paper.type" "USLetter"
+                "--stringparam" "admon.graphics.extension" ".png"
                 "--stringparam" "img.src.path" "${hpx_SOURCE_DIR}/docs/html/"
+                "--stringparam" "boost.graphics.root" "${hpx_SOURCE_DIR}/docs/html/images/"
+                "--stringparam" "admon.graphics.path" "${hpx_SOURCE_DIR}/docs/html/images/"
+                "--stringparam" "callout.graphics.path" "${hpx_SOURCE_DIR}/docs/html/images/"
                 "--xinclude" "-o" ${name}.fo
                 "--path" ${CMAKE_CURRENT_BINARY_DIR}
                 ${BOOSTBOOK_XSL_PATH}/fo.xsl ${${name}_SOURCE}

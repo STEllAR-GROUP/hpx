@@ -61,9 +61,6 @@ These icons precede some text to indicate:
     [[__caution__]      [Caution]       [Take special care with this - it may
                                         not be what you expect and may cause bad
                                         results]]
-
-    [[__danger__]       [Danger]        [This is likely to cause serious
-                                        trouble if ignored]]
 ]
 
 The following table describes the syntax that will be used to refer to
