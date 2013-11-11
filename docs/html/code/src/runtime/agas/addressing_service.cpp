@@ -1769,7 +1769,7 @@ bool addressing_service::register_name(
 } // }}}
 
 static void correct_credit_on_failure(future<bool> f, naming::id_type id,
-    boost::uint16_t mutable_gid_credit, boost::uint16_t new_gid_credit)
+    boost::int16_t mutable_gid_credit, boost::int16_t new_gid_credit)
 {
     // Return the credit to the GID if the operation failed
     if (f.has_exception() && mutable_gid_credit != 0)

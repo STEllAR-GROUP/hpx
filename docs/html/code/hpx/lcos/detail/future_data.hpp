@@ -572,7 +572,7 @@ namespace detail
             return boost::move(on_completed_);
         }
 
-    private:
+    protected:
         detail::full_empty<data_type, lcos::local::no_mutex> data_;
         completed_callback_type on_completed_;
     };

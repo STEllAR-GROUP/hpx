@@ -8,6 +8,7 @@ set(tests
     after_588
     async_callback_non_deduced_context
     future_hang_on_get_629
+    future_hang_on_then_629
     dataflow_launch_775
     future_790
     future_unwrap_878
