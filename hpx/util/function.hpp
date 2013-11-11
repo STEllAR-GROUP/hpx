@@ -89,6 +89,20 @@
 /**/
 
 // default register empty functions
+namespace hpx { namespace traits {
+    template <typename Sig, typename IArchive, typename OArchive>
+    struct needs_automatic_registration<
+        hpx::util::detail::vtable_ptr<
+            Sig
+          , IArchive
+          , OArchive
+          , hpx::util::detail::empty_vtable<Sig, IArchive, OArchive>
+        >
+    >
+      : boost::mpl::false_
+    {};
+}}
+
 namespace hpx { namespace util { namespace detail {
     template <typename Sig, typename IArchive, typename OArchive>
     struct get_function_name_impl<
