@@ -345,7 +345,7 @@ namespace hpx { namespace naming
         {
             BOOST_ASSERT(0 == (credit & ~gid_type::credit_base_mask));
             id.set_msb((id.get_msb() & ~gid_type::credit_mask) |
-                (boost::int16_t(credit & gid_type::credit_base_mask) << 16));
+                (boost::int32_t(credit << 16) & gid_type::credit_mask));
         }
 
         // has side effects, can't be pure
@@ -417,11 +417,11 @@ namespace hpx { namespace naming
 
             msb &= ~gid_type::credit_mask;
             id.set_msb(msb |
-                (boost::int16_t((credits - newcredits) & gid_type::credit_base_mask) << 16) |
+                (boost::int32_t((credits - newcredits) << 16) & gid_type::credit_mask) |
                 gid_type::was_split_mask);
 
             return gid_type(msb |
-                    (boost::int16_t(newcredits & gid_type::credit_base_mask) << 16) |
+                    (boost::int32_t(newcredits << 16) & gid_type::credit_mask) |
                     gid_type::was_split_mask,
                 id.get_lsb());
         }
