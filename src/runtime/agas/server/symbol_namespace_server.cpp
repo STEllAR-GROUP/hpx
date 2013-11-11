@@ -262,7 +262,7 @@ response symbol_namespace::bind(
 
     if (it != end)
     {
-        boost::uint16_t const credits = naming::detail::get_credit_from_gid(gid);
+        boost::int16_t const credits = naming::detail::get_credit_from_gid(gid);
         naming::gid_type raw_gid = it->second;
         naming::detail::strip_credit_from_gid(raw_gid);
         naming::detail::strip_credit_from_gid(gid);

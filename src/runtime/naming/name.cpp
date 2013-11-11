@@ -57,7 +57,7 @@ namespace hpx { namespace naming
                 // guard for wait_abort and other shutdown issues
                 try {
                     // decrement global reference count for the given gid,
-                    boost::uint32_t credits = detail::get_credit_from_gid(*p);
+                    boost::int32_t credits = detail::get_credit_from_gid(*p);
                     BOOST_ASSERT(0 != credits);
 
                     if (get_runtime_ptr())
@@ -111,7 +111,7 @@ namespace hpx { namespace naming
         {
             // a credit of zero means the component is not (globally) reference
             // counted
-            boost::uint32_t credits = detail::get_credit_from_gid(*p);
+            boost::int32_t credits = detail::get_credit_from_gid(*p);
             if (0 != credits)
             {
                 // We take over the ownership of the gid_type object here
@@ -189,7 +189,7 @@ namespace hpx { namespace naming
 
             // If the initial credit is zero the gid is 'unmanaged' and no
             // additional action needs to be performed.
-            boost::uint16_t oldcredits = detail::get_credit_from_gid(*this);
+            boost::int16_t oldcredits = detail::get_credit_from_gid(*this);
             if (0 != oldcredits)
             {
                 // Request new credits from AGAS if needed (i.e. the remainder
@@ -229,7 +229,7 @@ namespace hpx { namespace naming
 
             // If the initial credit after deserialization is 1 we need to
             // add more global credits.
-            boost::uint16_t credits = detail::get_credit_from_gid(*this);
+            boost::int16_t credits = detail::get_credit_from_gid(*this);
             if (1 == credits)
             {
                 // note: the future returned by retrieve_new_credits()

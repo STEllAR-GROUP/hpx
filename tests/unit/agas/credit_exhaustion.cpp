@@ -52,14 +52,14 @@ using hpx::find_here;
 void split(
     id_type const& from
   , id_type const& target
-  , boost::uint16_t old_credit
+  , boost::int16_t old_credit
     );
 
 HPX_PLAIN_ACTION(split);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions.
-inline boost::uint32_t get_credit(id_type const& id)
+inline boost::int32_t get_credit(id_type const& id)
 {
     return get_credit_from_gid(id.get_gid());
 }
@@ -68,7 +68,7 @@ inline boost::uint32_t get_credit(id_type const& id)
 void split(
     id_type const& from
   , id_type const& target
-  , boost::uint16_t old_credit
+  , boost::int16_t old_credit
     )
 {
     cout << "[" << find_here() << "/" << target << "]: "
