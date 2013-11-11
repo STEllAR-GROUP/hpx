@@ -1387,9 +1387,12 @@ else()
   # GCC's -march=native will automatically tune generated code for the host
   # environment. This is available on newish versions of GCC only (4.3ish). If
   # this flag is used, the generated binaries will be less portable.
-  # -xHost is the equivalent Intel flag.
+  # -xHost is the equivalent Intel flag, only set it when compiling for regular
+  # x86 cores.
   hpx_use_flag_if_available(-march=native LANGUAGES CXX C Fortran)
-  hpx_use_flag_if_available(-xHost LANGUAGES CXX C Fortran)
+  if(NOT HPX_NATIVE_MIC)
+    hpx_use_flag_if_available(-xHost LANGUAGES CXX C Fortran)
+  endif()
 
   # cmpxchg16b is an x86-64 extension present on most newer x86-64 machines.
   # It allows us to do double quadword (128bit) atomic compare and swap
