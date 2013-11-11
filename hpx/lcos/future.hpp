@@ -793,6 +793,10 @@ namespace hpx { namespace lcos
     }
 }}
 
+HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(
+    hpx::lcos::future<void>,
+    hpx_lcos_future_void_typed_continuation)
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
 {

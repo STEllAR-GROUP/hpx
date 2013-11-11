@@ -88,4 +88,24 @@
       , Name)                                                                 \
 /**/
 
+// default register empty functions
+namespace hpx { namespace util { namespace detail {
+    template <typename Sig, typename IArchive, typename OArchive>
+    struct get_function_name_impl<
+        vtable_ptr<
+            Sig
+          , IArchive
+          , OArchive
+          , empty_vtable<Sig, IArchive, OArchive>
+        >
+    >
+    {
+        static const char* call()
+        {
+            BOOST_ASSERT(false);
+            return "empty_vtable";
+        }
+    };
+}}}
+
 #endif
