@@ -28,7 +28,7 @@
             
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>( arg0 ));
         }
@@ -52,7 +52,7 @@
             
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>( arg0 ));
         }
@@ -89,7 +89,7 @@
             
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
@@ -113,7 +113,7 @@
             
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
@@ -150,7 +150,7 @@
             
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
@@ -174,7 +174,7 @@
             
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
@@ -211,7 +211,7 @@
             
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
@@ -235,7 +235,7 @@
             
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
@@ -272,7 +272,7 @@
             
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
@@ -296,7 +296,7 @@
             
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
-                HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+                HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }

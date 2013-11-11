@@ -14,7 +14,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ));
     }
@@ -24,7 +24,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ));
     }
@@ -34,7 +34,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ));
     }
@@ -45,7 +45,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ));
     }
@@ -82,7 +82,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
@@ -92,7 +92,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
@@ -102,7 +102,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
@@ -113,7 +113,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
@@ -150,7 +150,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
@@ -160,7 +160,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
@@ -170,7 +170,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
@@ -181,7 +181,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
@@ -218,7 +218,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
@@ -228,7 +228,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
@@ -238,7 +238,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
@@ -249,7 +249,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
@@ -286,7 +286,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
@@ -296,7 +296,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
@@ -306,7 +306,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
@@ -317,7 +317,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
@@ -354,7 +354,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
     }
@@ -364,7 +364,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
     }
@@ -374,7 +374,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
     }
@@ -385,7 +385,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
     }
@@ -422,7 +422,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
     }
@@ -432,7 +432,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
     }
@@ -442,7 +442,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
     }
@@ -453,7 +453,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
     }
@@ -490,7 +490,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
     }
@@ -500,7 +500,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
     }
@@ -510,7 +510,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
     }
@@ -521,7 +521,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
     }
@@ -558,7 +558,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
     }
@@ -568,7 +568,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
     }
@@ -578,7 +578,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
     }
@@ -589,7 +589,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
     }
@@ -626,7 +626,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
     }
@@ -636,7 +636,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
     }
@@ -646,7 +646,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
     }
@@ -657,7 +657,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
-            HPX_STD_BIND(&packaged_action::parcel_write_handler, this,
+            HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                 HPX_STD_PLACEHOLDERS::_1),
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
     }
