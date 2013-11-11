@@ -71,7 +71,8 @@ namespace hpx { namespace lcos
 
         struct profiler_tag {};
 
-        static void parcel_write_handler(boost::intrusive_ptr<wrapping_type> impl,
+        static void parcel_write_handler(
+            boost::intrusive_ptr<typename base_type::wrapping_type> impl,
             boost::system::error_code const& ec)
         {
             // any error in the parcel layer will be stored in the future object
@@ -207,7 +208,8 @@ namespace hpx { namespace lcos
 
         struct profiler_tag {};
 
-        static void parcel_write_handler(boost::intrusive_ptr<wrapping_type> impl,
+        static void parcel_write_handler(
+            boost::intrusive_ptr<typename base_type::wrapping_type> impl,
             boost::system::error_code const& ec)
         {
             // any error in the parcel layer will be stored in the future object
