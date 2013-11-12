@@ -734,6 +734,28 @@ response primary_namespace::allocate(
       , naming::get_locality_id_from_gid(next_id_), success);
 } // }}}
 
+void primary_namespace::log_credit_counts( 
+    naming::gid_type const& lower
+  , naming::gid_type const& upper
+  , mutex_type::scoped_lock& l
+  , const char* func_name
+    )
+{
+    BOOST_ASSERT(l.owns_lock());
+
+    typedef refcnt_table_type::iterator iterator;
+
+    // Find the mappings that we just added or modified.
+    std::pair<iterator, iterator> matches = refcnts_.find(lower, upper);
+
+    for (/**/; matches.first != matches.second; ++matches.first)
+    {
+        LAGAS_(debug) << (boost::format(
+            "%1%, reporting credit count, lower(%2%), upper(%2%), credits(%3%)")
+             % lower % upper % matches.first->data_); 
+    }
+}
+
 void primary_namespace::increment(
     naming::gid_type const& lower
   , naming::gid_type const& upper
@@ -742,6 +764,9 @@ void primary_namespace::increment(
     )
 { // {{{ increment implementation
     mutex_type::scoped_lock l(mutex_);
+
+    if (LAGAS_ENABLED(debug))
+        log_credit_counts(lower, upper, l, "primary_namespace::increment"); 
 
     // TODO: Whine loudly if a reference count overflows. We reserve ~0 for
     // internal bookkeeping in the decrement algorithm, so the maximum global
@@ -757,7 +782,8 @@ void primary_namespace::increment(
                  , boost::int64_t(HPX_INITIAL_GLOBALCREDIT));
 
     LAGAS_(info) << (boost::format(
-        "primary_namespace::increment, lower(%1%), upper(%2%), credits(%3%)")
+        "primary_namespace::increment, lower(%1%), upper(%2%), credits(%3%), "
+        "added(%3%)")
         % lower % upper % credits);
 
     if (&ec != &throws)
@@ -783,6 +809,10 @@ void primary_namespace::decrement_sweep(
 
     {
         mutex_type::scoped_lock l(mutex_);
+
+        if (LAGAS_ENABLED(debug))
+            log_credit_counts(lower, upper, l,
+                "primary_namespace::decrement_sweep"); 
 
         ///////////////////////////////////////////////////////////////////////
         // Apply the decrement across the entire keyspace (e.g. [lower, upper]).
