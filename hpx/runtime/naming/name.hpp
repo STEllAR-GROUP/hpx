@@ -160,36 +160,44 @@ namespace hpx { namespace naming
 
         friend bool operator< (gid_type const& lhs, gid_type const& rhs)
         {
-            if (lhs.id_msb_ < rhs.id_msb_)
+            if (detail::strip_credit_from_gid(lhs.id_msb_)
+               < detail::strip_credit_from_gid(rhs.id_msb_))
                 return true;
-            if (lhs.id_msb_ > rhs.id_msb_)
+            if (detail::strip_credit_from_gid(lhs.id_msb_)
+               > detail::strip_credit_from_gid(rhs.id_msb_))
                 return false;
             return lhs.id_lsb_ < rhs.id_lsb_;
         }
 
         friend bool operator<= (gid_type const& lhs, gid_type const& rhs)
         {
-            if (lhs.id_msb_ < rhs.id_msb_)
+            if (detail::strip_credit_from_gid(lhs.id_msb_)
+               < detail::strip_credit_from_gid(rhs.id_msb_))
                 return true;
-            if (lhs.id_msb_ > rhs.id_msb_)
+            if (detail::strip_credit_from_gid(lhs.id_msb_)
+               > detail::strip_credit_from_gid(rhs.id_msb_))
                 return false;
             return lhs.id_lsb_ <= rhs.id_lsb_;
         }
 
         friend bool operator> (gid_type const& lhs, gid_type const& rhs)
         {
-            if (lhs.id_msb_ > rhs.id_msb_)
+            if (detail::strip_credit_from_gid(lhs.id_msb_)
+               > detail::strip_credit_from_gid(rhs.id_msb_))
                 return true;
-            if (lhs.id_msb_ < rhs.id_msb_)
+            if (detail::strip_credit_from_gid(lhs.id_msb_)
+               < detail::strip_credit_from_gid(rhs.id_msb_))
                 return false;
             return lhs.id_lsb_ > rhs.id_lsb_;
         }
 
         friend bool operator>= (gid_type const& lhs, gid_type const& rhs)
         {
-            if (lhs.id_msb_ > rhs.id_msb_)
+            if (detail::strip_credit_from_gid(lhs.id_msb_)
+               > detail::strip_credit_from_gid(rhs.id_msb_))
                 return true;
-            if (lhs.id_msb_ < rhs.id_msb_)
+            if (detail::strip_credit_from_gid(lhs.id_msb_)
+               < detail::strip_credit_from_gid(rhs.id_msb_))
                 return false;
             return lhs.id_lsb_ >= rhs.id_lsb_;
         }
