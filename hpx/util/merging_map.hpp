@@ -1070,9 +1070,9 @@ struct decrementer
     {
         // We don't worry about removing entries when they're at 0. The AGAS
         // server code handles this after all the counts have been updated.
-        if (amount_ >= v)
-            v = 0;
-        else
+//        if (amount_ >= v)
+//            v = 0;
+//        else
             v -= amount_;
     }
 };
