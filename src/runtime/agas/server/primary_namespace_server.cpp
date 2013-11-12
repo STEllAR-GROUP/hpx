@@ -761,7 +761,7 @@ response primary_namespace::allocate(
             naming::gid_type const upper = boost::icl::upper(match.first->key_);
     
             naming::gid_type const length_gid = (upper - lower); 
-            BOOST_ASSERT(length.get_msb() == 0);
+            BOOST_ASSERT(length_gid.get_msb() == 0);
             boost::uint64_t const length = length_gid.get_lsb() + 1;
     
             // The [server] tag is in there to make it easier to filter

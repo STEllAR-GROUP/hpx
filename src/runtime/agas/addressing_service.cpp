@@ -1299,6 +1299,7 @@ bool addressing_service::resolve_cached(
         if (&ec != &throws)
             ec = make_success_code();
 
+/*
         LAGAS_(debug) <<
             ( boost::format(
                 "addressing_service::resolve_cached, "
@@ -1307,6 +1308,7 @@ bool addressing_service::resolve_cached(
             % reinterpret_cast<void*>(addr.address_)
             % idbase.get_gid()
             % reinterpret_cast<void*>(g.lva()));
+*/
 
         return true;
     }
@@ -2413,7 +2415,7 @@ void addressing_service::send_refcnt_requests(
             naming::gid_type const upper = boost::icl::upper(e.key());
     
             naming::gid_type const length_gid = (upper - lower); 
-            BOOST_ASSERT(length.get_msb() == 0);
+            BOOST_ASSERT(length_gid.get_msb() == 0);
             boost::uint64_t const length = length_gid.get_lsb() + 1;
     
             // The [client] tag is in there to make it easier to filter
