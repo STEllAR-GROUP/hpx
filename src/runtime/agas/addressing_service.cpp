@@ -419,7 +419,7 @@ void addressing_service::adjust_local_cache_size()
         if (cache_size > gva_cache_->capacity())
             gva_cache_->reserve(cache_size);
 
-        LAGAS_(info) << (boost::format(
+        LAS_(info) << (boost::format(
             "addressing_service::adjust_local_cache_size, local_cache_size(%1%), "
             "local_cache_size_per_thread(%2%), cache_size(%3%)")
             % local_cache_size % local_cache_size_per_thread % cache_size);
@@ -1703,7 +1703,7 @@ lcos::future<void> addressing_service::decref_async(
   , boost::int64_t credit
   , naming::id_type const& keep_alive
     )
-{ // {{{ incref implementation
+{ // {{{ decref implementation
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
@@ -1731,13 +1731,18 @@ lcos::future<void> addressing_service::decref_async(
         refcnt_requests_->apply(lower, upper
           , util::incrementer<boost::int64_t>(-credit));
 
-        std::vector<hpx::future<response> > results = 
-            send_refcnt_requests_async(l);
-
-        using HPX_STD_PLACEHOLDERS::_1;
-        return when_all(results).then(
-                HPX_STD_BIND(synchronize_with_async_decref, _1, keep_alive)
-            );
+        if (max_refcnt_requests_ == ++refcnt_requests_count_)
+        {
+            std::vector<hpx::future<response> > results = 
+                send_refcnt_requests_async(l);
+    
+            using HPX_STD_PLACEHOLDERS::_1;
+            return when_all(results).then(
+                    HPX_STD_BIND(synchronize_with_async_decref, _1, keep_alive)
+                );
+        }
+        else
+            return make_ready_future();
     }
     catch (hpx::exception const& e) {
         HPX_RETHROW_EXCEPTION(e, "addressing_service::decref");
