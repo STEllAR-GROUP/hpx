@@ -734,27 +734,50 @@ response primary_namespace::allocate(
       , naming::get_locality_id_from_gid(next_id_), success);
 } // }}}
 
-void primary_namespace::log_credit_counts( 
-    naming::gid_type const& lower
-  , naming::gid_type const& upper
-  , mutex_type::scoped_lock& l
-  , const char* func_name
-    )
-{
-    BOOST_ASSERT(l.owns_lock());
-
-    typedef refcnt_table_type::iterator iterator;
-
-    // Find the mappings that we just added or modified.
-    std::pair<iterator, iterator> matches = refcnts_.find(lower, upper);
-
-    for (/**/; matches.first != matches.second; ++matches.first)
-    {
-        LAGAS_(debug) << (boost::format(
-            "%1%, reporting credit count, lower(%2%), upper(%2%), credits(%3%)")
-             % lower % upper % matches.first->data_); 
-    }
-}
+#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+    void primary_namespace::dump_refcnt_matches( 
+        refcnt_match match
+      , naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , mutex_type::scoped_lock& l
+      , const char* func_name
+        )
+    { // dump_refcnt_matches implementation
+        BOOST_ASSERT(l.owns_lock());
+    
+        if (match.first == refcnts_.end() && match.second == refcnts_.end())
+            // We got nothing, bail - our caller is probably about to throw.
+            return;
+    
+        std::stringstream ss;
+        ss << (boost::format(
+              "%1%, dumping server-side refcnt table matches, lower(%2%), "
+              "upper(%3%):")
+              % func_name % lower % upper); 
+    
+        for (/**/; match.first != match.second; ++match.first)
+        {
+            naming::gid_type const lower = boost::icl::lower(match.first->key_);
+            naming::gid_type const upper = boost::icl::upper(match.first->key_);
+    
+            naming::gid_type const length_gid = (upper - lower); 
+            BOOST_ASSERT(length.get_msb() == 0);
+            boost::uint64_t const length = length_gid.get_lsb() + 1;
+    
+            // The [server] tag is in there to make it easier to filter
+            // through the logs.
+            ss << (boost::format(
+                   "\n  [server] lower(%1%), upper(%2%), length(%3%), "
+                   "credits(%4%)")
+                   % lower 
+                   % upper 
+                   % length 
+                   % match.first->data_); 
+        }
+    
+        LAGAS_(debug) << ss.str();
+    } // dump_refcnt_matches implementation
+#endif
 
 void primary_namespace::increment(
     naming::gid_type const& lower
@@ -765,8 +788,18 @@ void primary_namespace::increment(
 { // {{{ increment implementation
     mutex_type::scoped_lock l(mutex_);
 
+#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
     if (LAGAS_ENABLED(debug))
-        log_credit_counts(lower, upper, l, "primary_namespace::increment"); 
+    {
+        typedef refcnt_table_type::iterator iterator;
+
+        // Find the mappings that we're about to touch.
+        std::pair<iterator, iterator> match = refcnts_.find(lower, upper);
+
+        dump_refcnt_matches(match, lower, upper, l,
+            "primary_namespace::increment"); 
+    }
+#endif
 
     // TODO: Whine loudly if a reference count overflows. We reserve ~0 for
     // internal bookkeeping in the decrement algorithm, so the maximum global
@@ -782,8 +815,7 @@ void primary_namespace::increment(
                  , boost::int64_t(HPX_INITIAL_GLOBALCREDIT));
 
     LAGAS_(info) << (boost::format(
-        "primary_namespace::increment, lower(%1%), upper(%2%), credits(%3%), "
-        "added(%3%)")
+        "primary_namespace::increment, lower(%1%), upper(%2%), credits(%3%)")
         % lower % upper % credits);
 
     if (&ec != &throws)
@@ -810,9 +842,18 @@ void primary_namespace::decrement_sweep(
     {
         mutex_type::scoped_lock l(mutex_);
 
+#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
         if (LAGAS_ENABLED(debug))
-            log_credit_counts(lower, upper, l,
+        {
+            typedef refcnt_table_type::iterator iterator;
+
+            // Find the mappings that we just added or modified.
+            std::pair<iterator, iterator> match = refcnts_.find(lower, upper);
+
+            dump_refcnt_matches(match, lower, upper, l,
                 "primary_namespace::decrement_sweep"); 
+        }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // Apply the decrement across the entire keyspace (e.g. [lower, upper]).
@@ -832,10 +873,10 @@ void primary_namespace::decrement_sweep(
         typedef refcnt_table_type::iterator iterator;
 
         // Find the mappings that we just added or modified.
-        std::pair<iterator, iterator> matches = refcnts_.find(lower, upper);
+        std::pair<iterator, iterator> match = refcnts_.find(lower, upper);
 
         // This search should always succeed.
-        if (matches.first == refcnts_.end() && matches.second == refcnts_.end())
+        if (match.first == refcnts_.end() && match.second == refcnts_.end())
         {
             l.unlock();
 
@@ -851,10 +892,10 @@ void primary_namespace::decrement_sweep(
         // Ranges containing dead objects.
         std::list<iterator> dead_list;
 
-        for (/**/; matches.first != matches.second; ++matches.first)
+        for (/**/; match.first != match.second; ++match.first)
         {
             // Sanity check.
-            if (matches.first->data_ < 0)
+            if (match.first->data_ < 0)
             {
                 l.unlock();
 
@@ -863,15 +904,15 @@ void primary_namespace::decrement_sweep(
                   , boost::str(boost::format(
                         "negative entry in reference count table, lower(%1%) "
                         "upper(%2%), count(%3%)")
-                        % boost::icl::lower(matches.first->key_)
-                        % boost::icl::upper(matches.first->key_)
-                        % matches.first->data_));
+                        % boost::icl::lower(match.first->key_)
+                        % boost::icl::upper(match.first->key_)
+                        % match.first->data_));
                 return;
             }
 
             // Any object with a reference count of 0 is dead.
-            if (matches.first->data_ == 0)
-                dead_list.push_back(matches.first);
+            if (match.first->data_ == 0)
+                dead_list.push_back(match.first);
         }
 
         ///////////////////////////////////////////////////////////////////////

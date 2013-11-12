@@ -116,6 +116,9 @@ struct HPX_EXPORT primary_namespace
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_table_type;
+
+    typedef std::pair<refcnt_table_type::iterator, refcnt_table_type::iterator>
+        refcnt_match;
     // }}}
 
   private:
@@ -210,14 +213,17 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t& t_;
     };
 
-    /// Displays the credit counts of all matching ranges. Expects that \p l
+#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+    /// Dump the credit counts of all matching ranges. Expects that \p l
     /// is locked. 
-    void log_credit_counts( 
-        naming::gid_type const& lower
+    void dump_refcnt_matches( 
+        refcnt_match match
+      , naming::gid_type const& lower
       , naming::gid_type const& upper
       , mutex_type::scoped_lock& l
       , const char* func_name
         );
+#endif
 
   public:
     primary_namespace()
