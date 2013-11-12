@@ -379,6 +379,14 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+/// We do not enable dumps of the AGAS refcnt tables by default. These
+/// diagnostics are very verbose, even for HPX logs, and most users will not
+/// need to look at this data.
+#if !defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+#  define HPX_AGAS_DUMP_REFCNT_ENTRIES 0
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 /// By default, enable guard pages.
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
 #  if !defined(HPX_THREAD_GUARD_PAGE)
