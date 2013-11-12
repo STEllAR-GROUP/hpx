@@ -71,7 +71,9 @@ namespace hpx { namespace lcos
 
         struct profiler_tag {};
 
-        void parcel_write_handler(boost::system::error_code const& ec)
+        static void parcel_write_handler(
+            boost::intrusive_ptr<typename base_type::wrapping_type> impl,
+            boost::system::error_code const& ec)
         {
             // any error in the parcel layer will be stored in the future object
             if (ec) {
@@ -79,7 +81,7 @@ namespace hpx { namespace lcos
                     hpx::detail::get_exception(hpx::exception(ec),
                         "packaged_action::parcel_write_handler",
                         __FILE__, __LINE__);
-                this->base_type::set_exception(exception);
+                (*impl)->set_exception(exception);
             }
         }
 
@@ -115,7 +117,7 @@ namespace hpx { namespace lcos
 
             hpx::apply_c_cb<action_type>(this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                    this, HPX_STD_PLACEHOLDERS::_1));
+                    this->impl_, HPX_STD_PLACEHOLDERS::_1));
         }
 
         void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
@@ -125,7 +127,7 @@ namespace hpx { namespace lcos
 
             hpx::apply_c_cb<action_type>(this->get_gid(), addr, gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                    this, HPX_STD_PLACEHOLDERS::_1));
+                    this->impl_, HPX_STD_PLACEHOLDERS::_1));
         }
 
         void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
@@ -135,7 +137,7 @@ namespace hpx { namespace lcos
 
             hpx::apply_c_p_cb<action_type>(this->get_gid(), gid, priority,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                    this, HPX_STD_PLACEHOLDERS::_1));
+                    this->impl_, HPX_STD_PLACEHOLDERS::_1));
         }
 
         void apply_p(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
@@ -145,7 +147,7 @@ namespace hpx { namespace lcos
 
             hpx::apply_c_p_cb<action_type>(this->get_gid(), addr, gid, priority,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                    this, HPX_STD_PLACEHOLDERS::_1));
+                    this->impl_, HPX_STD_PLACEHOLDERS::_1));
         }
 
         /// Construct a new \a packaged_action instance. The \a thread
@@ -206,7 +208,9 @@ namespace hpx { namespace lcos
 
         struct profiler_tag {};
 
-        void parcel_write_handler(boost::system::error_code const& ec)
+        static void parcel_write_handler(
+            boost::intrusive_ptr<typename base_type::wrapping_type> impl,
+            boost::system::error_code const& ec)
         {
             // any error in the parcel layer will be stored in the future object
             if (ec) {
@@ -214,7 +218,7 @@ namespace hpx { namespace lcos
                     hpx::detail::get_exception(hpx::exception(ec),
                         "packaged_action::parcel_write_handler",
                         __FILE__, __LINE__);
-                this->base_type::set_exception(exception);
+                (*impl)->set_exception(exception);
             }
         }
 
@@ -256,7 +260,7 @@ namespace hpx { namespace lcos
                 hpx::applier::detail::apply_c_cb<action_type>(
                     addr, this->get_gid(), gid,
                     HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                        this, HPX_STD_PLACEHOLDERS::_1));
+                        this->impl_, HPX_STD_PLACEHOLDERS::_1));
             }
         }
 
@@ -281,7 +285,7 @@ namespace hpx { namespace lcos
                 hpx::applier::detail::apply_c_cb<action_type>(
                     addr, this->get_gid(), gid,
                     HPX_STD_BIND(&packaged_action::parcel_write_handler,
-                        this, HPX_STD_PLACEHOLDERS::_1));
+                        this->impl_, HPX_STD_PLACEHOLDERS::_1));
             }
         }
 

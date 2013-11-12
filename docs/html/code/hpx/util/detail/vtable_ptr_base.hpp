@@ -42,25 +42,34 @@ namespace hpx { namespace util { namespace detail {
         virtual void load_object(void **, IArchive & ar, unsigned) = 0;
     };
 
+    template <typename Function>
+    struct get_function_name_impl
+    {
+        static char const* call()
+#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
+        ;
+#else
+        {
+            // If you encounter this assert while compiling code, that means that
+            // you have a HPX_UTIL_REGISTER_FUNCTION macro somewhere in a
+            // source file, but the header in which the continuation is defined
+            // misses a HPX_UTIL_REGISTER_FUNCTION_DECLARATION
+            BOOST_MPL_ASSERT_MSG(
+                traits::needs_automatic_registration<Function>::value
+                , HPX_UTIL_REGISTER_FUNCTION_DECLARATION_MISSING
+                , (Function)
+            );
+            return util::type_id<Function>::typeid_.type_id();
+        }
+#endif
+    };
+
     /////////////////////////////////////////////////////////////////////////////
     template <typename Function>
     char const* get_function_name()
-#ifdef HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION
-    ;
-#else
     {
-        // If you encounter this assert while compiling code, that means that
-        // you have a HPX_UTIL_REGISTER_FUNCTION macro somewhere in a
-        // source file, but the header in which the continuation is defined
-        // misses a HPX_UTIL_REGISTER_FUNCTION_DECLARATION
-        BOOST_MPL_ASSERT_MSG(
-            traits::needs_automatic_registration<Function>::value
-            , HPX_UTIL_REGISTER_FUNCTION_DECLARATION_MISSING
-            , (Function)
-        );
-        return util::type_id<Function>::typeid_.type_id();
+        return get_function_name_impl<Function>::call();
     }
-#endif
 
     /////////////////////////////////////////////////////////////////////////////
     template <typename Function>

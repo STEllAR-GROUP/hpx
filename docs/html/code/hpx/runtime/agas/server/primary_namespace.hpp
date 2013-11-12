@@ -61,7 +61,10 @@ char const* const primary_namespace_service_name = "primary/";
 ///                  locality is assigned a prefix. This creates a 96-bit
 ///                  address space for each locality.
 ///     RC         - Bit 80 to bit 95 of the MSB. This is the number of
-///                  reference counting credits on the GID.
+///                  reference counting credits on the GID. Bit 95 is not part
+///                  of this value; instead, it is a flag that is set if a GID's
+///                  credit count is ever split (e.g. if the GID is ever passed
+///                  to another locality).
 ///     identifier - Bit 64 to bit 80 of the MSB, and the entire LSB. The
 ///                  content of these bits depends on the component type of
 ///                  the underlying object. For all user-defined components,
@@ -113,6 +116,9 @@ struct HPX_EXPORT primary_namespace
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_table_type;
+
+    typedef std::pair<refcnt_table_type::iterator, refcnt_table_type::iterator>
+        refcnt_match;
     // }}}
 
   private:
@@ -207,6 +213,18 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t& t_;
     };
 
+#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+    /// Dump the credit counts of all matching ranges. Expects that \p l
+    /// is locked. 
+    void dump_refcnt_matches( 
+        refcnt_match match
+      , naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , mutex_type::scoped_lock& l
+      , const char* func_name
+        );
+#endif
+
   public:
     primary_namespace()
       : base_type(HPX_AGAS_PRIMARY_NS_MSB, HPX_AGAS_PRIMARY_NS_LSB)
@@ -247,7 +265,7 @@ struct HPX_EXPORT primary_namespace
       , error_code& ec
         );
 
-    // register all performance counter types exposed by this component
+    /// Register all performance counter types exposed by this component.
     static void register_counter_types(
         error_code& ec = throws
         );

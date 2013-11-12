@@ -636,8 +636,10 @@ bool addressing_service::get_console_locality(
                 }
             }
 
-            LAS_(debug) <<
-                ( boost::format("caching console locality, prefix(%1%)")
+            LAGAS_(debug) <<
+                ( boost::format(
+                  "addressing_server::get_console_locality, "
+                  "caching console locality, prefix(%1%)")
                 % console);
 
             return true;
@@ -1297,13 +1299,16 @@ bool addressing_service::resolve_cached(
         if (&ec != &throws)
             ec = make_success_code();
 
-        LAS_(debug) <<
+/*
+        LAGAS_(debug) <<
             ( boost::format(
+                "addressing_service::resolve_cached, "
                 "cache hit for address %1%, lva %2% (base %3%, lva %4%)")
             % id
             % reinterpret_cast<void*>(addr.address_)
             % idbase.get_gid()
             % reinterpret_cast<void*>(g.lva()));
+*/
 
         return true;
     }
@@ -1311,7 +1316,11 @@ bool addressing_service::resolve_cached(
     if (&ec != &throws)
         ec = make_success_code();
 
-    LAS_(debug) << (boost::format("cache miss for address %1%") % id);
+    LAGAS_(debug) <<
+        ( boost::format(
+            "addressing_service::resolve_cached, "
+            "cache miss for address %1%")
+        % id);
 
     return false;
 } // }}}
@@ -1677,8 +1686,11 @@ void addressing_service::decref(
     try {
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
-        refcnt_requests_->apply(lower, upper
-          , util::incrementer<boost::int64_t>(-credit));
+        naming::gid_type lower_raw = naming::detail::get_stripped_gid(lower);
+        naming::gid_type upper_raw = naming::detail::get_stripped_gid(lower);
+
+        refcnt_requests_->apply(lower_raw, upper_raw
+          , util::decrementer<boost::int64_t>(credit));
 
         send_refcnt_requests(l, ec);
     }
@@ -1703,7 +1715,7 @@ lcos::future<void> addressing_service::decref_async(
   , boost::int64_t credit
   , naming::id_type const& keep_alive
     )
-{ // {{{ incref implementation
+{ // {{{ decref implementation
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
@@ -1731,13 +1743,18 @@ lcos::future<void> addressing_service::decref_async(
         refcnt_requests_->apply(lower, upper
           , util::incrementer<boost::int64_t>(-credit));
 
-        std::vector<hpx::future<response> > results = 
-            send_refcnt_requests_async(l);
-
-        using HPX_STD_PLACEHOLDERS::_1;
-        return when_all(results).then(
-                HPX_STD_BIND(synchronize_with_async_decref, _1, keep_alive)
-            );
+        if (max_refcnt_requests_ == ++refcnt_requests_count_)
+        {
+            std::vector<hpx::future<response> > results = 
+                send_refcnt_requests_async(l);
+    
+            using HPX_STD_PLACEHOLDERS::_1;
+            return when_all(results).then(
+                    HPX_STD_BIND(synchronize_with_async_decref, _1, keep_alive)
+                );
+        }
+        else
+            return make_ready_future();
     }
     catch (hpx::exception const& e) {
         HPX_RETHROW_EXCEPTION(e, "addressing_service::decref");
@@ -1964,8 +1981,9 @@ void addressing_service::insert_cache_entry(
         // so we convert it to 1 here so that the cache doesn't break.
         const boost::uint64_t count = (g.count ? g.count : 1);
 
-        LAS_(debug) <<
-            ( boost::format("inserting entry into cache, gid(%1%), count(%2%)")
+        LAGAS_(debug) <<
+            ( boost::format(
+            "addressing_service::insert_cache_entry, gid(%1%), count(%2%)")
             % gid % count);
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
@@ -1984,8 +2002,9 @@ void addressing_service::insert_cache_entry(
                   , "addressing_service::insert_cache_entry"
                   , "data corruption or lock error occurred in cache");
 
-            LAS_(warning) <<
+            LAGAS_(warning) <<
                 ( boost::format(
+                    "addressing_service::insert_cache_entry, "
                     "aborting insert due to key collision in cache, "
                     "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
                 ) % gid % count % idbase.get_gid() % idbase.get_count());
@@ -2025,9 +2044,9 @@ void addressing_service::update_cache_entry(
         // so we convert it to 1 here so that the cache doesn't break.
         const boost::uint64_t count = (g.count ? g.count : 1);
 
-        LAS_(debug) <<
+        LAGAS_(debug) <<
             ( boost::format(
-                "updating cache entry: gid(%1%), count(%2%)"
+            "addressing_service::update_cache_entry, gid(%1%), count(%2%)"
             ) % gid % count);
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
@@ -2049,8 +2068,9 @@ void addressing_service::update_cache_entry(
                 return;
             }
 
-            LAS_(warning) <<
+            LAGAS_(warning) <<
                 ( boost::format(
+                    "addressing_service::update_cache_entry, "
                     "aborting update due to key collision in cache, "
                     "new_gid(%1%), new_count(%2%), old_gid(%3%), old_count(%4%)"
                 ) % gid % count % idbase.get_gid() % idbase.get_count());
@@ -2075,7 +2095,7 @@ void addressing_service::clear_cache(
     }
 
     try {
-        LAS_(warning) << "clearing cache";
+        LAGAS_(warning) << "addressing_service::clear_cache, clearing cache";
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
 
@@ -2374,6 +2394,45 @@ void addressing_service::send_refcnt_requests(
         ec = make_success_code();
 }
 
+#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+    void dump_refcnt_requests(
+        addressing_service::mutex_type::scoped_lock& l
+      , addressing_service::refcnt_requests_type const& requests
+      , const char* func_name
+        )
+    {
+        std::stringstream ss;
+        ss << ( boost::format(
+              "%1%, dumping client-side refcnt table, requests(%2%):")
+              % func_name % requests.size());
+    
+        typedef addressing_service::refcnt_requests_type::const_reference
+            const_reference;
+    
+        BOOST_FOREACH(const_reference e, requests)
+        {
+            naming::gid_type const lower = boost::icl::lower(e.key());
+            naming::gid_type const upper = boost::icl::upper(e.key());
+    
+            naming::gid_type const length_gid = (upper - lower); 
+            BOOST_ASSERT(length_gid.get_msb() == 0);
+            boost::uint64_t const length = length_gid.get_lsb() + 1;
+    
+            // The [client] tag is in there to make it easier to filter
+            // through the logs.
+            ss << ( boost::format(
+                  "\n  [client] lower(%1%), upper(%2%), length(%3%), "
+                  "credits(%4%)")
+                  % lower
+                  % upper
+                  % length
+                  % e.data());
+        }
+    
+        LAGAS_(debug) << ss.str();
+    }
+#endif
+
 void addressing_service::send_refcnt_requests_non_blocking(
     addressing_service::mutex_type::scoped_lock& l
   , error_code& ec
@@ -2386,6 +2445,17 @@ void addressing_service::send_refcnt_requests_non_blocking(
         refcnt_requests_count_ = 0;
 
         l.unlock();
+
+        LAGAS_(info) << (boost::format(
+            "addressing_service::send_refcnt_requests_non_blocking, "
+            "requests(%1%)") 
+            % p->size()); 
+
+#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+        if (LAGAS_ENABLED(debug))
+            dump_refcnt_requests(l, *p,
+                "addressing_service::send_refcnt_requests_non_blocking");
+#endif
 
         BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
         {
@@ -2408,7 +2478,8 @@ void addressing_service::send_refcnt_requests_non_blocking(
             ec = make_success_code();
     }
     catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::send_refcnt_requests");
+        HPX_RETHROWS_IF(ec, e,
+            "addressing_service::send_refcnt_requests_non_blocking");
     }
 }
 
@@ -2423,6 +2494,17 @@ addressing_service::send_refcnt_requests_async(
     refcnt_requests_count_ = 0;
 
     l.unlock();
+
+    LAGAS_(info) << (boost::format(
+        "addressing_service::send_refcnt_requests_async, "
+        "requests(%1%)") 
+        % p->size()); 
+
+#if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
+    if (LAGAS_ENABLED(debug))
+        dump_refcnt_requests(l, *p,
+            "addressing_service::send_refcnt_requests_non_blocking");
+#endif
 
     std::vector<hpx::future<response> > lazy_results;
     BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
