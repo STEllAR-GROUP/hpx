@@ -367,10 +367,6 @@ namespace hpx { namespace util
 
             // general options definitions
             hpx_options.add_options()
-#if defined(_POSIX_VERSION)
-                ("hpx:attach-gdb",
-                  "wait for gdb to be attached")
-#endif
                 ("hpx:run-agas-server",
                   "run AGAS server as part of this runtime instance")
                 ("hpx:run-hpx-main",
