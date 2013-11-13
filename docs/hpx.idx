@@ -134,6 +134,9 @@ filesystem_error                      "" "hpx\.error"
 bad_function_call                     "" "hpx\.error"
 security_error                        "" "hpx\.error"
 
+# hpx/runtime/naming/unmanaged.hpp
+unmanaged                             "" "header\.hpx\.runtime\.naming\.unmanaged.*"
+
 # hpx/runtime/get_ptr.hpp
 get_ptr                               "" "hpx\.get_ptr.*"
 
