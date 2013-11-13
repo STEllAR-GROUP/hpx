@@ -53,7 +53,7 @@ namespace hpx { namespace util
 
         ///////////////////////////////////////////////////////////////////////
         // All command line options which are normally formatted as --hpx:foo
-        // should be usable as --hpx:N:foo, where N is the node number this 
+        // should be usable as --hpx:N:foo, where N is the node number this
         // option should be exclusively used for.
         bool handle_node_specific_option(std::string const& s, std::size_t node, 
             std::pair<std::string, std::string>& opt)
@@ -113,7 +113,7 @@ namespace hpx { namespace util
             if (NULL == sec)
                 return result;     // no alias mappings are defined
 
-            // we found a shortcut option, try to find mapping
+            // we found shortcut option definitions, try to find mapping
             std::string expand_to;
             std::string::size_type start_at = 2;
             bool long_option = false;
@@ -173,7 +173,7 @@ namespace hpx { namespace util
 
             std::pair<std::string, std::string> operator()(std::string const& s) const
             {
-                // handle special syntax for  configuration files @filename
+                // handle special syntax for configuration files @filename
                 if ('@' == s[0])
                     return std::make_pair(std::string("hpx:options-file"), s.substr(1));
 
@@ -216,11 +216,11 @@ namespace hpx { namespace util
                 if (pos == std::string::npos)
                     continue;
 
-                // skip comment lines
-                if ('#' != line[pos]) {
-                    // strip leading and trailing whitespace
-                    line = trim_whitespace(line);
+                // strip leading and trailing whitespace
+                line = trim_whitespace(line);
 
+                // skip comment lines
+                if ('#' != line[0]) {
                     std::string::size_type p1 = line.find_first_of(" \t");
                     if (p1 != std::string::npos) {
                         // rebuild the line connecting the parts with a '='
@@ -249,7 +249,7 @@ namespace hpx { namespace util
         }
 
         // try to find a config file somewhere up the filesystem hierarchy
-        // starting with the input file path. This allows to use a general wave.cfg
+        // starting with the input file path. This allows to use a general <app_name>.cfg
         // file for all files in a certain project.
         void handle_generic_config_options(std::string appname,
             boost::program_options::variables_map& vm,
@@ -438,7 +438,7 @@ namespace hpx { namespace util
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are 'global', "
                   "'local', 'priority_local', 'abp', 'priority_abp', "
-                  "'hierarchy', static and 'periodic' (default: priority_local); "
+                  "'hierarchy', 'static' and 'periodic' (default: priority_local); "
                   "all option values can be abbreviated.")
                 ("hpx:hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
