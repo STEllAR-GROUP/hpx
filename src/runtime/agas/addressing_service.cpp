@@ -1931,6 +1931,21 @@ HPX_REGISTER_BROADCAST_ACTION(symbol_namespace_service_action)
 
 namespace hpx { namespace agas
 {
+    namespace detail
+    {
+        std::vector<hpx::id_type> find_all_symbol_namespace_services()
+        {
+            std::vector<hpx::id_type> ids;
+            BOOST_FOREACH(hpx::id_type const& id, hpx::find_all_localities())
+            {
+                ids.push_back(hpx::id_type(
+                    agas::stubs::symbol_namespace::get_service_instance(id),
+                    id_type::unmanaged));
+            }
+            return ids;
+        }
+    }
+
 /// Invoke the supplied hpx::function for every registered global name
 bool addressing_service::iterate_ids(
     iterate_names_function_type const& f
@@ -1942,7 +1957,7 @@ bool addressing_service::iterate_ids(
 
 #if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
         symbol_namespace_service_action act;
-        lcos::broadcast(act, hpx::find_all_localities(), req).get(ec);
+        lcos::broadcast(act, detail::find_all_symbol_namespace_services(), req).get(ec);
 #else
         BOOST_FOREACH(naming::id_type id, hpx::find_all_localities())
         {
