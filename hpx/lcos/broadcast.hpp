@@ -260,7 +260,7 @@ namespace hpx { namespace lcos {
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
           , std::size_t)
         {
@@ -279,7 +279,7 @@ namespace hpx { namespace lcos {
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
           , std::size_t global_idx)
         {
@@ -301,7 +301,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
           , std::size_t)
         {
@@ -323,7 +323,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
           , std::size_t global_idx)
         {

@@ -17,7 +17,7 @@ namespace hpx { namespace lcos {
            
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
            
           , std::size_t)
         {
@@ -35,7 +35,7 @@ namespace hpx { namespace lcos {
            
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
            
           , std::size_t global_idx)
         {
@@ -56,7 +56,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
            
           , std::size_t)
         {
@@ -77,7 +77,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
            
           , std::size_t global_idx)
         {
@@ -379,7 +379,7 @@ namespace hpx { namespace lcos {
           , typename A0
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0
           , std::size_t)
         {
@@ -397,7 +397,7 @@ namespace hpx { namespace lcos {
           , typename A0
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0
           , std::size_t global_idx)
         {
@@ -418,7 +418,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0
           , std::size_t)
         {
@@ -439,7 +439,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0
           , std::size_t global_idx)
         {
@@ -741,7 +741,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1
           , std::size_t)
         {
@@ -759,7 +759,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1
           , std::size_t global_idx)
         {
@@ -780,7 +780,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1
           , std::size_t)
         {
@@ -801,7 +801,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1
           , std::size_t global_idx)
         {
@@ -1103,7 +1103,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2
           , std::size_t)
         {
@@ -1121,7 +1121,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2
           , std::size_t global_idx)
         {
@@ -1142,7 +1142,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2
           , std::size_t)
         {
@@ -1163,7 +1163,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2
           , std::size_t global_idx)
         {
@@ -1465,7 +1465,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
           , std::size_t)
         {
@@ -1483,7 +1483,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
           , std::size_t global_idx)
         {
@@ -1504,7 +1504,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
           , std::size_t)
         {
@@ -1525,7 +1525,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
           , std::size_t global_idx)
         {
@@ -1827,7 +1827,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
           , std::size_t)
         {
@@ -1845,7 +1845,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
           , std::size_t global_idx)
         {
@@ -1866,7 +1866,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
           , std::size_t)
         {
@@ -1887,7 +1887,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
           , std::size_t global_idx)
         {
@@ -2189,7 +2189,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
           , std::size_t)
         {
@@ -2207,7 +2207,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
           , std::size_t global_idx)
         {
@@ -2228,7 +2228,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
           , std::size_t)
         {
@@ -2249,7 +2249,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
           , std::size_t global_idx)
         {
@@ -2551,7 +2551,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
           , std::size_t)
         {
@@ -2569,7 +2569,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
           , std::size_t global_idx)
         {
@@ -2590,7 +2590,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
           , std::size_t)
         {
@@ -2611,7 +2611,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
           , std::size_t global_idx)
         {
@@ -2913,7 +2913,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
           , std::size_t)
         {
@@ -2931,7 +2931,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
           , std::size_t global_idx)
         {
@@ -2952,7 +2952,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
           , std::size_t)
         {
@@ -2973,7 +2973,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
           , std::size_t global_idx)
         {
@@ -3275,7 +3275,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
           , std::size_t)
         {
@@ -3293,7 +3293,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
           , std::size_t global_idx)
         {
@@ -3314,7 +3314,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
           , std::size_t)
         {
@@ -3335,7 +3335,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
           , std::size_t global_idx)
         {
@@ -3637,7 +3637,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
           , std::size_t)
         {
@@ -3655,7 +3655,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
           , std::size_t global_idx)
         {
@@ -3676,7 +3676,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
           , std::size_t)
         {
@@ -3697,7 +3697,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
           , std::size_t global_idx)
         {
@@ -3999,7 +3999,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10
           , std::size_t)
         {
@@ -4017,7 +4017,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10
           , std::size_t global_idx)
         {
@@ -4038,7 +4038,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10
           , std::size_t)
         {
@@ -4059,7 +4059,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10
           , std::size_t global_idx)
         {
@@ -4361,7 +4361,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11
           , std::size_t)
         {
@@ -4379,7 +4379,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11
           , std::size_t global_idx)
         {
@@ -4400,7 +4400,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11
           , std::size_t)
         {
@@ -4421,7 +4421,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11
           , std::size_t global_idx)
         {
@@ -4723,7 +4723,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12
           , std::size_t)
         {
@@ -4741,7 +4741,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12
           , std::size_t global_idx)
         {
@@ -4762,7 +4762,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12
           , std::size_t)
         {
@@ -4783,7 +4783,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12
           , std::size_t global_idx)
         {
@@ -5085,7 +5085,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13
           , std::size_t)
         {
@@ -5103,7 +5103,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13
           , std::size_t global_idx)
         {
@@ -5124,7 +5124,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13
           , std::size_t)
         {
@@ -5145,7 +5145,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13
           , std::size_t global_idx)
         {
@@ -5447,7 +5447,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14
           , std::size_t)
         {
@@ -5465,7 +5465,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14
           , std::size_t global_idx)
         {
@@ -5486,7 +5486,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14
           , std::size_t)
         {
@@ -5507,7 +5507,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14
           , std::size_t global_idx)
         {
@@ -5809,7 +5809,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15
           , std::size_t)
         {
@@ -5827,7 +5827,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15
           , std::size_t global_idx)
         {
@@ -5848,7 +5848,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15
           , std::size_t)
         {
@@ -5869,7 +5869,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15
           , std::size_t global_idx)
         {
@@ -6171,7 +6171,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16
           , std::size_t)
         {
@@ -6189,7 +6189,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16
           , std::size_t global_idx)
         {
@@ -6210,7 +6210,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16
           , std::size_t)
         {
@@ -6231,7 +6231,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16
           , std::size_t global_idx)
         {
@@ -6533,7 +6533,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17
           , std::size_t)
         {
@@ -6551,7 +6551,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17
           , std::size_t global_idx)
         {
@@ -6572,7 +6572,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17
           , std::size_t)
         {
@@ -6593,7 +6593,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17
           , std::size_t global_idx)
         {
@@ -6895,7 +6895,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18
           , std::size_t)
         {
@@ -6913,7 +6913,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18
           , std::size_t global_idx)
         {
@@ -6934,7 +6934,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18
           , std::size_t)
         {
@@ -6955,7 +6955,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18
           , std::size_t global_idx)
         {
@@ -7257,7 +7257,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
         >
         void
-        broadcast_invoke(Action act, Futures& futures, hpx::id_type id
+        broadcast_invoke(Action act, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18 , A19 const & a19
           , std::size_t)
         {
@@ -7275,7 +7275,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19
         >
         void
-        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type id
+        broadcast_invoke(broadcast_with_index<Action>, Futures& futures, hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18 , A19 const & a19
           , std::size_t global_idx)
         {
@@ -7296,7 +7296,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18 , A19 const & a19
           , std::size_t)
         {
@@ -7317,7 +7317,7 @@ namespace hpx { namespace lcos {
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
           , BOOST_FWD_REF(Cont) cont
-          , hpx::id_type id
+          , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9 , A10 const & a10 , A11 const & a11 , A12 const & a12 , A13 const & a13 , A14 const & a14 , A15 const & a15 , A16 const & a16 , A17 const & a17 , A18 const & a18 , A19 const & a19
           , std::size_t global_idx)
         {
