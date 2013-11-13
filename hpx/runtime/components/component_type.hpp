@@ -53,9 +53,9 @@ namespace hpx { namespace components
         if (component_invalid == rhs || component_invalid == lhs)
             return true;    // no way of telling, so we assume the best :-P
 
-        // if one is runtime support, the other has to be as well
+        // don't compare types if one of them is component_runtime_support
         if (component_runtime_support == rhs || component_runtime_support == lhs)
-            return rhs == lhs;
+            return true;
 
         component_type lhs_base = get_base_type(lhs);
         component_type rhs_base = get_base_type(rhs);
