@@ -25,11 +25,11 @@
 #pragma warning ( disable : 4355)
 #endif
 
-
-
+#include <hpx/util/spinlock.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/destination/convert_destination.hpp>
+
 #include <fstream>
 #include <boost/config.hpp>
 #include <boost/shared_ptr.hpp>
@@ -95,8 +95,11 @@ namespace detail {
 /**
     @brief Writes the string to a file
 */
-template<class convert_dest = do_convert_destination > struct file_t : is_generic, non_const_context<detail::file_info> {
+template <class convert_dest = do_convert_destination >
+struct file_t : is_generic, non_const_context<detail::file_info>
+{
     typedef non_const_context<detail::file_info> non_const_context_base;
+    typedef util::spinlock mutex_type;
 
     /**
         @brief constructs the file destination
@@ -104,8 +107,15 @@ template<class convert_dest = do_convert_destination > struct file_t : is_generi
         @param file_name name of the file
         @param set [optional] file settings - see file_settings class, and @ref dealing_with_flags
     */
-    file_t(const std::string & file_name, file_settings set = file_settings() ) : non_const_context_base(file_name,set) {}
-    template<class msg_type> void operator()(const msg_type & msg) const {
+    file_t(const std::string & file_name, file_settings set = file_settings() ) 
+      : non_const_context_base(file_name,set)
+    {}
+
+    template <class msg_type>
+    void operator()(const msg_type & msg) const
+    {
+        typename mutex_type::scoped_lock l(mtx_);
+
         if (!non_const_context_base::context().out)
             non_const_context_base::context().open();   // make sure file is opened
         convert_dest::write(msg, *( non_const_context_base::context().out) );
@@ -125,6 +135,8 @@ template<class convert_dest = do_convert_destination > struct file_t : is_generi
         non_const_context_base::context().close();
         non_const_context_base::context().name.assign( str.begin(), str.end() );
     }
+
+    static mutex_type mtx_;
 };
 
 /** @brief file_t with default values. See file_t
