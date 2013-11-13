@@ -7,7 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/util/ini.hpp>
-#include <hpx/util/reinitializable_static.hpp>
+#include <hpx/util/static.hpp>
 #include <hpx/util/spinlock.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/serialize_sequence.hpp>
@@ -40,16 +40,16 @@ HPX_REGISTER_PLAIN_ACTION(
     hpx::components::server::console_logging_action<>,
     console_logging_action, hpx::components::factory_enabled)
 
-namespace {
+namespace hpx { namespace util { namespace detail
+{
     struct log_lock_tag {};
 
     hpx::util::spinlock& get_log_lock()
     {
-        hpx::util::reinitializable_static<hpx::util::spinlock, log_lock_tag> lock;
+        hpx::util::static_<hpx::util::spinlock, log_lock_tag> lock;
         return lock.get();
     }
-}
-
+}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
@@ -58,7 +58,7 @@ namespace hpx { namespace components { namespace server
     // implementation of console based logging
     void console_logging(messages_type const& msgs)
     {
-        util::spinlock::scoped_lock l(::get_log_lock());
+        util::spinlock::scoped_lock l(util::detail::get_log_lock());
 
         using boost::fusion::at_c;
 
