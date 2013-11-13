@@ -563,7 +563,8 @@ namespace hpx { namespace util
 
         if (vm.count("hpx:debug-hpx-log")) {
             ini_config += "hpx.logging.console.destination=" +
-                vm["hpx:debug-hpx-log"].as<std::string>();
+                detail::convert_to_log_file(
+                    vm["hpx:debug-hpx-log"].as<std::string>());
             ini_config += "hpx.logging.destination=" +
                 detail::convert_to_log_file(
                     vm["hpx:debug-hpx-log"].as<std::string>());
@@ -573,7 +574,8 @@ namespace hpx { namespace util
 
         if (vm.count("hpx:debug-agas-log")) {
             ini_config += "hpx.logging.console.agas.destination=" +
-                vm["hpx:debug-agas-log"].as<std::string>();
+                detail::convert_to_log_file(
+                    vm["hpx:debug-agas-log"].as<std::string>());
             ini_config += "hpx.logging.agas.destination=" +
                 detail::convert_to_log_file(
                     vm["hpx:debug-agas-log"].as<std::string>());
