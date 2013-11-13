@@ -139,6 +139,9 @@ struct file_t : is_generic, non_const_context<detail::file_info>
     static mutex_type mtx_;
 };
 
+template <typename convert_dest>
+typename file_t<convert_dest>::mutex_type file_t<convert_dest>::mtx_;
+
 /** @brief file_t with default values. See file_t
 
 @copydoc file_t
