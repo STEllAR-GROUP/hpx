@@ -210,7 +210,7 @@ namespace hpx { namespace detail
         print("Information about available counter instances");
         if (skeleton)
             print("(replace '*' below with the appropriate sequence number)");
-        print(std::string(78, '-'));
+        print("--------------------------------------------------------");
     }
 
     void list_counter_infos_minimal()
@@ -243,7 +243,7 @@ namespace hpx { namespace detail
     void list_symbolic_names()
     {
         print(std::string("List of all registered symbolic names:"));
-        print(std::string(78, '-'));
+        print(std::string("--------------------------------------"));
 
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
@@ -264,7 +264,7 @@ namespace hpx { namespace detail
     void list_component_types()
     {
         print(std::string("List of all registered component types:"));
-        print(std::string(78, '-'));
+        print(std::string("---------------------------------------"));
 
         using hpx::util::placeholders::_1;
         using hpx::util::placeholders::_2;
