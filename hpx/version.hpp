@@ -114,6 +114,15 @@ namespace hpx
     // Return the HPX configuration information
     HPX_EXPORT std::string configuration_string();
 
+    // Return the HPX runtime configuration information
+    namespace util
+    {
+        struct command_line_handling;
+    }
+
+    HPX_EXPORT std::string runtime_configuration_string(
+        util::command_line_handling const& cfg);
+
     // Helper data structures allowing to automatically detect version problems
     // between applications and the core libraries.
     HPX_EXPORT extern char const HPX_CHECK_VERSION[];

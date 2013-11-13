@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/manage_config.hpp>
+#include <hpx/util/runtime_configuration.hpp>
 
 #include <boost/program_options.hpp>
 

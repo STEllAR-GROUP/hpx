@@ -1,14 +1,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2012 Hartmut Kaiser
+//  Copyright (c) 2011-2013 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/config.hpp>
+#include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <hpx/util/command_line_handling.hpp>
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>
@@ -305,6 +306,28 @@ namespace hpx
     std::string build_date_time()
     {
         return std::string(__DATE__)  + " " + __TIME__;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::string runtime_configuration_string(
+        util::command_line_handling const& cfg)
+    {
+        hpx::util::osstream strm;
+
+        // runtime mode
+        strm << "  {mode}: " << get_runtime_mode_name(cfg.mode_) << "\n";
+
+        if (cfg.num_localities_ != 1)
+            strm << "  {localities}: " << cfg.num_localities_ << "\n";
+
+        // default scheduler used for this run
+        strm << "  {scheduler}: " << cfg.queuing_ << "\n";
+
+        // amount of threads and cores configured for this run
+        strm << "  {os-threads}: " << cfg.num_threads_ << "\n";
+        strm << "  {cores}: " << cfg.num_cores_ << "\n";
+
+        return util::osstream_get_string(strm);
     }
 
     ///////////////////////////////////////////////////////////////////////////
