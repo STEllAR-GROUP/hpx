@@ -12,23 +12,9 @@
 
 namespace hpx { namespace traits
 {
-    namespace detail
-    {
-        template <typename Action, typename Enable = void>
-        struct is_action_embedded
-          : boost::mpl::false_
-        {};
-
-        template <typename Action>
-        struct is_action_embedded<Action
-          , typename util::always_void<typename Action::type>::type>
-          : is_action<typename Action::type>
-        {};
-    }
-
     template <typename Action, typename Enable>
     struct is_action
-      : detail::is_action_embedded<Action>
+      : boost::mpl::false_
     {};
 
     template <typename Action>

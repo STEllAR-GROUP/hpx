@@ -101,6 +101,7 @@ namespace hpx { namespace util
             "localities = 1",
             "first_pu = 0",
             "runtime_mode = console",
+            "scheduler = priority_local",
 
             "[hpx.stacks]",
             "small_size = ${HPX_SMALL_STACK_SIZE:"

@@ -40,9 +40,14 @@ namespace hpx { namespace util
             return 1;
         }
 
-        int print_info(std::ostream& out)
+        int print_info(std::ostream& out, util::command_line_handling const& cfg)
         {
+            out << "Static configuration:\n---------------------\n";
             out << hpx::configuration_string() << std::endl;
+
+            out << "Runtime configuration:\n----------------------\n";
+            out << hpx::runtime_configuration_string(cfg) << std::endl;
+
             return 1;
         }
 
@@ -477,6 +482,8 @@ namespace hpx { namespace util
         if (vm.count("hpx:queuing"))
             queuing_ = vm["hpx:queuing"].as<std::string>();
 
+        ini_config += "hpx.scheduler=" + queuing_;
+
         // map host names to ip addresses, if requested
         hpx_host = mapnames.map(hpx_host, hpx_port);
         agas_host = mapnames.map(agas_host, agas_port);
@@ -556,7 +563,8 @@ namespace hpx { namespace util
 
         if (vm.count("hpx:debug-hpx-log")) {
             ini_config += "hpx.logging.console.destination=" +
-                vm["hpx:debug-hpx-log"].as<std::string>();
+                detail::convert_to_log_file(
+                    vm["hpx:debug-hpx-log"].as<std::string>());
             ini_config += "hpx.logging.destination=" +
                 detail::convert_to_log_file(
                     vm["hpx:debug-hpx-log"].as<std::string>());
@@ -566,7 +574,8 @@ namespace hpx { namespace util
 
         if (vm.count("hpx:debug-agas-log")) {
             ini_config += "hpx.logging.console.agas.destination=" +
-                vm["hpx:debug-agas-log"].as<std::string>();
+                detail::convert_to_log_file(
+                    vm["hpx:debug-agas-log"].as<std::string>());
             ini_config += "hpx.logging.agas.destination=" +
                 detail::convert_to_log_file(
                     vm["hpx:debug-agas-log"].as<std::string>());
@@ -818,14 +827,12 @@ namespace hpx { namespace util
         rtcfg_.reconfigure(ini_config_);
 
         // print version/copyright information
-        if (vm_.count("hpx:version") || vm_.count("hpx:info"))
-        {
-            if (vm_.count("hpx:version"))
-                detail::print_version(std::cout);
-            if (vm_.count("hpx:info"))
-                detail::print_info(std::cout);
-            return 1;
-        }
+        if (vm_.count("hpx:version"))
+            detail::print_version(std::cout);
+
+        // print configuration information (static and dynamic)
+        if (vm_.count("hpx:info"))
+            detail::print_info(std::cout, *this);
 
         // all is good
         return 0;

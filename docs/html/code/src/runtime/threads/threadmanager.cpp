@@ -1304,8 +1304,8 @@ namespace hpx { namespace threads
     bool threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         run(std::size_t num_threads)
     {
-        LTM_(info) << "run: " << threads::hardware_concurrency() //-V128
-                   << " number of cores available";
+        LTM_(info) << "run: number of processing units available: "
+            << threads::hardware_concurrency(); //-V128;
         LTM_(info) << "run: creating " << num_threads << " OS thread(s)"; //-V128
 
         if (0 == num_threads) {

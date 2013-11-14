@@ -37,8 +37,6 @@ namespace hpx
         struct when_any_swapped : boost::enable_shared_from_this<when_any_swapped<T> >
         {
         private:
-            BOOST_MOVABLE_BUT_NOT_COPYABLE(when_any_swapped)
-
             enum { index_error = -1 };
 
             void on_future_ready(std::size_t idx, threads::thread_id_type const& id)
@@ -66,24 +64,6 @@ namespace hpx
               : lazy_values_(boost::move(lazy_values))
               , index_(static_cast<std::size_t>(index_error))
             {}
-
-            when_any_swapped(BOOST_RV_REF(when_any_swapped) rhs)
-              : lazy_values_(boost::move(rhs.lazy_values_))
-              , index_(rhs.index_.load())
-            {
-                rhs.needed_count_ = 0;
-            }
-
-            when_any_swapped& operator=(BOOST_RV_REF(when_any_swapped) rhs)
-            {
-                if (this != &rhs) {
-                    lazy_values_ = boost::move(rhs.lazy_values_);
-
-                    index_ = rhs.index_;
-                    rhs.index_.store(static_cast<std::size_t>(index_error));
-                }
-                return *this;
-            }
 
             result_type operator()()
             {
