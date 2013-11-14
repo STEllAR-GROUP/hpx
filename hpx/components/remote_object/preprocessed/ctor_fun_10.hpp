@@ -43,20 +43,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0);
@@ -86,20 +72,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1);
@@ -129,20 +101,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2);
@@ -172,20 +130,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2)) , a3(boost::move(rhs. a3))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2; a3 = rhs.a3;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2); a3 = boost::move(rhs.a3);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2 , a3);
@@ -215,20 +159,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2)) , a3(boost::move(rhs. a3)) , a4(boost::move(rhs. a4))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2; a3 = rhs.a3; a4 = rhs.a4;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2); a3 = boost::move(rhs.a3); a4 = boost::move(rhs.a4);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2 , a3 , a4);
@@ -258,20 +188,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2)) , a3(boost::move(rhs. a3)) , a4(boost::move(rhs. a4)) , a5(boost::move(rhs. a5))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2; a3 = rhs.a3; a4 = rhs.a4; a5 = rhs.a5;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2); a3 = boost::move(rhs.a3); a4 = boost::move(rhs.a4); a5 = boost::move(rhs.a5);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2 , a3 , a4 , a5);
@@ -301,20 +217,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2)) , a3(boost::move(rhs. a3)) , a4(boost::move(rhs. a4)) , a5(boost::move(rhs. a5)) , a6(boost::move(rhs. a6))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2; a3 = rhs.a3; a4 = rhs.a4; a5 = rhs.a5; a6 = rhs.a6;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2); a3 = boost::move(rhs.a3); a4 = boost::move(rhs.a4); a5 = boost::move(rhs.a5); a6 = boost::move(rhs.a6);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2 , a3 , a4 , a5 , a6);
@@ -344,20 +246,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2)) , a3(boost::move(rhs. a3)) , a4(boost::move(rhs. a4)) , a5(boost::move(rhs. a5)) , a6(boost::move(rhs. a6)) , a7(boost::move(rhs. a7))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2; a3 = rhs.a3; a4 = rhs.a4; a5 = rhs.a5; a6 = rhs.a6; a7 = rhs.a7;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2); a3 = boost::move(rhs.a3); a4 = boost::move(rhs.a4); a5 = boost::move(rhs.a5); a6 = boost::move(rhs.a6); a7 = boost::move(rhs.a7);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7);
@@ -387,20 +275,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2)) , a3(boost::move(rhs. a3)) , a4(boost::move(rhs. a4)) , a5(boost::move(rhs. a5)) , a6(boost::move(rhs. a6)) , a7(boost::move(rhs. a7)) , a8(boost::move(rhs. a8))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2; a3 = rhs.a3; a4 = rhs.a4; a5 = rhs.a5; a6 = rhs.a6; a7 = rhs.a7; a8 = rhs.a8;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2); a3 = boost::move(rhs.a3); a4 = boost::move(rhs.a4); a5 = boost::move(rhs.a5); a6 = boost::move(rhs.a6); a7 = boost::move(rhs.a7); a8 = boost::move(rhs.a8);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8);
@@ -430,20 +304,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2)) , a3(boost::move(rhs. a3)) , a4(boost::move(rhs. a4)) , a5(boost::move(rhs. a5)) , a6(boost::move(rhs. a6)) , a7(boost::move(rhs. a7)) , a8(boost::move(rhs. a8)) , a9(boost::move(rhs. a9))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2; a3 = rhs.a3; a4 = rhs.a4; a5 = rhs.a5; a6 = rhs.a6; a7 = rhs.a7; a8 = rhs.a8; a9 = rhs.a9;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2); a3 = boost::move(rhs.a3); a4 = boost::move(rhs.a4); a5 = boost::move(rhs.a5); a6 = boost::move(rhs.a6); a7 = boost::move(rhs.a7); a8 = boost::move(rhs.a8); a9 = boost::move(rhs.a9);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9);
@@ -473,20 +333,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2)) , a3(boost::move(rhs. a3)) , a4(boost::move(rhs. a4)) , a5(boost::move(rhs. a5)) , a6(boost::move(rhs. a6)) , a7(boost::move(rhs. a7)) , a8(boost::move(rhs. a8)) , a9(boost::move(rhs. a9)) , a10(boost::move(rhs. a10))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2; a3 = rhs.a3; a4 = rhs.a4; a5 = rhs.a5; a6 = rhs.a6; a7 = rhs.a7; a8 = rhs.a8; a9 = rhs.a9; a10 = rhs.a10;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2); a3 = boost::move(rhs.a3); a4 = boost::move(rhs.a4); a5 = boost::move(rhs.a5); a6 = boost::move(rhs.a6); a7 = boost::move(rhs.a7); a8 = boost::move(rhs.a8); a9 = boost::move(rhs.a9); a10 = boost::move(rhs.a10);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10);
@@ -516,20 +362,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2)) , a3(boost::move(rhs. a3)) , a4(boost::move(rhs. a4)) , a5(boost::move(rhs. a5)) , a6(boost::move(rhs. a6)) , a7(boost::move(rhs. a7)) , a8(boost::move(rhs. a8)) , a9(boost::move(rhs. a9)) , a10(boost::move(rhs. a10)) , a11(boost::move(rhs. a11))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2; a3 = rhs.a3; a4 = rhs.a4; a5 = rhs.a5; a6 = rhs.a6; a7 = rhs.a7; a8 = rhs.a8; a9 = rhs.a9; a10 = rhs.a10; a11 = rhs.a11;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2); a3 = boost::move(rhs.a3); a4 = boost::move(rhs.a4); a5 = boost::move(rhs.a5); a6 = boost::move(rhs.a6); a7 = boost::move(rhs.a7); a8 = boost::move(rhs.a8); a9 = boost::move(rhs.a9); a10 = boost::move(rhs.a10); a11 = boost::move(rhs.a11);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11);
@@ -559,20 +391,6 @@
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : a0(boost::move(rhs. a0)) , a1(boost::move(rhs. a1)) , a2(boost::move(rhs. a2)) , a3(boost::move(rhs. a3)) , a4(boost::move(rhs. a4)) , a5(boost::move(rhs. a5)) , a6(boost::move(rhs. a6)) , a7(boost::move(rhs. a7)) , a8(boost::move(rhs. a8)) , a9(boost::move(rhs. a9)) , a10(boost::move(rhs. a10)) , a11(boost::move(rhs. a11)) , a12(boost::move(rhs. a12))
         {}
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = rhs.a0; a1 = rhs.a1; a2 = rhs.a2; a3 = rhs.a3; a4 = rhs.a4; a5 = rhs.a5; a6 = rhs.a6; a7 = rhs.a7; a8 = rhs.a8; a9 = rhs.a9; a10 = rhs.a10; a11 = rhs.a11; a12 = rhs.a12;
-            }
-            return *this;
-        }
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                a0 = boost::move(rhs.a0); a1 = boost::move(rhs.a1); a2 = boost::move(rhs.a2); a3 = boost::move(rhs.a3); a4 = boost::move(rhs.a4); a5 = boost::move(rhs.a5); a6 = boost::move(rhs.a6); a7 = boost::move(rhs.a7); a8 = boost::move(rhs.a8); a9 = boost::move(rhs.a9); a10 = boost::move(rhs.a10); a11 = boost::move(rhs.a11); a12 = boost::move(rhs.a12);
-            }
-            return *this;
-        }
         void operator()(void ** p) const
         {
             T * t = new T(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12);

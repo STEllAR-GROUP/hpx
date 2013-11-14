@@ -102,8 +102,6 @@ namespace hpx
         struct when_n : boost::enable_shared_from_this<when_n<Sequence> >
         {
         private:
-            BOOST_MOVABLE_BUT_NOT_COPYABLE(when_n)
-
             void on_future_ready(threads::thread_id_type const& id)
             {
                 if (count_.fetch_add(1) + 1 == needed_count_)
@@ -129,24 +127,6 @@ namespace hpx
               , count_(0)
               , needed_count_(n)
             {}
-
-            when_n(BOOST_RV_REF(when_n) rhs)
-              : lazy_values_(boost::move(rhs.lazy_values_))
-              , needed_count_(rhs.needed_count_)
-            {
-                rhs.needed_count_ = 0;
-            }
-
-            when_n& operator=(BOOST_RV_REF(when_n) rhs)
-            {
-                if (this != &rhs) {
-                    lazy_values_ = boost::move(rhs.lazy_values_);
-
-                    needed_count_ = rhs.needed_count_;
-                    rhs.needed_count_ = 0;
-                }
-                return *this;
-            }
 
             result_type operator()()
             {

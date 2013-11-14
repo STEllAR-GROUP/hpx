@@ -34,14 +34,6 @@ namespace hpx { namespace components { namespace remote_object
     BOOST_RV_REF(BOOST_PP_CAT(A, N)) BOOST_PP_CAT(a, N)                         \
 /**/
 
-#define HPX_REMOTE_OBJECT_COPY(Z, N, D)                                         \
-    BOOST_PP_CAT(a, N) = rhs.BOOST_PP_CAT(a, N);                                \
-/**/
-
-#define HPX_REMOTE_OBJECT_MOVE(Z, N, D)                                         \
-    BOOST_PP_CAT(a, N) = boost::move(rhs.BOOST_PP_CAT(a, N));                   \
-/**/
-
 #define HPX_REMOTE_OBJECT_M1(Z, N, D)                                           \
     ar & BOOST_PP_CAT(a, N);                                                    \
 /**/
@@ -104,8 +96,6 @@ namespace hpx { namespace components { namespace remote_object
 #undef HPX_REMOTE_OBJECT_M1
 #undef HPX_REMOTE_OBJECT_M2
 #undef HPX_REMOTE_OBJECT_RV
-#undef HPX_REMOTE_OBJECT_MOVE
-#undef HPX_REMOTE_OBJECT_COPY
 
 }}}
 
@@ -134,22 +124,6 @@ namespace hpx { namespace components { namespace remote_object
         ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
             : BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_MOVE_CTOR, _)
         {}
-
-        ctor_fun& operator=(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                BOOST_PP_REPEAT(N, HPX_REMOTE_OBJECT_COPY, _)
-            }
-            return *this;
-        }
-
-        ctor_fun& operator=(BOOST_RV_REF(ctor_fun) rhs)
-        {
-            if (this != &rhs) {
-                BOOST_PP_REPEAT(N, HPX_REMOTE_OBJECT_MOVE, _)
-            }
-            return *this;
-        }
 
         void operator()(void ** p) const
         {
