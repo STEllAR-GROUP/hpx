@@ -207,7 +207,7 @@ void locality_namespace::register_counter_types(
         }
 
         performance_counters::install_counter_type(
-            agas::service_name + name
+            agas::performance_counter_basename + name
           , performance_counters::counter_raw
           , help
           , creator
@@ -647,18 +647,13 @@ response locality_namespace::statistics_counter(
         return response();
     }
 
-    // be prepared for aggregating counter (named 'locality/<...>')
-    std::string countername = p.countername_;
-    if (countername.find(locality_namespace_service_name) == 0)
-        countername = countername.substr(9);    // sizeof(locality_namespace_service_name) == 9
-
     namespace_action_code code = invalid_request;
     detail::counter_target target = detail::counter_target_invalid;
     for (std::size_t i = 0;
           i != detail::num_locality_namespace_services;
           ++i)
     {
-        if (countername == detail::locality_namespace_services[i].name_)
+        if (p.countername_ == detail::locality_namespace_services[i].name_)
         {
             code = detail::locality_namespace_services[i].code_;
             target = detail::locality_namespace_services[i].target_;

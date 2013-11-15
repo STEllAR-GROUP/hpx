@@ -208,7 +208,7 @@ void primary_namespace::register_counter_types(
         }
 
         performance_counters::install_counter_type(
-            agas::service_name + name
+            agas::performance_counter_basename + name
           , performance_counters::counter_raw
           , help
           , creator
@@ -1303,18 +1303,13 @@ response primary_namespace::statistics_counter(
         return response();
     }
 
-    // be prepared for aggregating counter (named 'primary/<...>')
-    std::string countername = p.countername_;
-    if (countername.find(primary_namespace_service_name) == 0)
-        countername = countername.substr(8);    // sizeof(primary_namespace_service_name) == 8
-
     namespace_action_code code = invalid_request;
     detail::counter_target target = detail::counter_target_invalid;
     for (std::size_t i = 0;
           i != detail::num_primary_namespace_services;
           ++i)
     {
-        if (countername == detail::primary_namespace_services[i].name_)
+        if (p.countername_ == detail::primary_namespace_services[i].name_)
         {
             code = detail::primary_namespace_services[i].code_;
             target = detail::primary_namespace_services[i].target_;

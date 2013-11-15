@@ -278,15 +278,18 @@ namespace hpx { namespace performance_counters
         {
             // find the referenced AGAS instance and dispatch the request there
             std::string service(agas::service_name);
-            service += service_name + paths.parentinstancename_;
+            service += paths.parentinstancename_;
+
             if (-1 == paths.parentinstanceindex_) {
                 HPX_THROWS_IF(ec, bad_parameter, "agas_raw_counter_creator",
                     "invalid parent instance index: -1");
                 return naming::invalid_gid;
             }
-
             service += "#";
             service += boost::lexical_cast<std::string>(paths.parentinstanceindex_);
+
+            service += "/";
+            service += service_name;
 
             naming::id_type id;
             bool result = agas::resolve_name_sync(service, id, ec);

@@ -203,7 +203,7 @@ void component_namespace::register_counter_types(
         }
 
         performance_counters::install_counter_type(
-            agas::service_name + name
+            agas::performance_counter_basename + name
           , performance_counters::counter_raw
           , help
           , creator
@@ -652,18 +652,13 @@ response component_namespace::statistics_counter(
         return response();
     }
 
-    // be prepared for aggregating counter (named 'component/<...>')
-    std::string countername = p.countername_;
-    if (countername.find(component_namespace_service_name) == 0)
-        countername = countername.substr(10);    // sizeof(component_namespace_service_name) == 10
-
     namespace_action_code code = invalid_request;
     detail::counter_target target = detail::counter_target_invalid;
     for (std::size_t i = 0;
           i != detail::num_component_namespace_services;
           ++i)
     {
-        if (countername == detail::component_namespace_services[i].name_)
+        if (p.countername_ == detail::component_namespace_services[i].name_)
         {
             code = detail::component_namespace_services[i].code_;
             target = detail::component_namespace_services[i].target_;

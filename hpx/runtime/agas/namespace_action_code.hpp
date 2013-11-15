@@ -16,6 +16,7 @@ namespace hpx { namespace agas
 
 // Base name used to register AGAS service instances
 char const* const service_name = "/0/agas/";
+char const* const performance_counter_basename = "/agas/";
 
 enum namespace_action_code
 {
@@ -85,12 +86,12 @@ namespace detail
     static counter_service_data const component_namespace_services[] =
     {
         // counters exposing overall API invocation count and timings
-        {   "count"
+        {   "component/count"
           , ""
           , counter_target_count
           , component_ns_statistics_counter
           , component_ns_statistics_counter }
-      , {   "time"
+      , {   "component/time"
           , "ns"
           , counter_target_time
           , component_ns_statistics_counter
@@ -175,12 +176,12 @@ namespace detail
     static counter_service_data const locality_namespace_services[] =
     {
         // counters exposing overall API invocation count and timings
-        {   "count"
+        {   "locality/count"
           , ""
           , counter_target_count
           , locality_ns_statistics_counter
           , locality_ns_statistics_counter }
-      , {   "time"
+      , {   "locality/time"
           , "ns"
           , counter_target_time
           , locality_ns_statistics_counter
@@ -255,12 +256,12 @@ namespace detail
     static counter_service_data const primary_namespace_services[] =
     {
         // counters exposing overall API invocation count and timings
-        {   "count"
+        {   "primary/count"
           , ""
           , counter_target_count
           , primary_ns_statistics_counter
           , primary_ns_statistics_counter }
-      , {   "time"
+      , {   "primary/time"
           , "ns"
           , counter_target_time
           , primary_ns_statistics_counter
@@ -335,12 +336,12 @@ namespace detail
     static counter_service_data const symbol_namespace_services[] =
     {
         // counters exposing overall API invocation count and timings
-        {   "count"
+        {   "symbol/count"
           , ""
           , counter_target_count
           , symbol_ns_statistics_counter
           , symbol_ns_statistics_counter }
-      , {   "time"
+      , {   "symbol/time"
           , "ns"
           , counter_target_time
           , symbol_ns_statistics_counter
