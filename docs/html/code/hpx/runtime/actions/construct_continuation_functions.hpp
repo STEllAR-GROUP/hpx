@@ -167,7 +167,7 @@
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(HPX_ENUM_MOVE_ARGS(N, arg))
                 ));
             }
@@ -196,7 +196,7 @@
                 // bound functor. In order to do true perfect forwarding in an
                 // asynchronous operation. These bound variables must be moved
                 // out of the bound object.
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(HPX_ENUM_MOVE_ARGS(N, arg))
                 ));
             }

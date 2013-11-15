@@ -81,7 +81,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func()
                 ));
             }
@@ -181,7 +181,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0))
                 ));
             }
@@ -281,7 +281,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1))
                 ));
             }
@@ -381,7 +381,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2))
                 ));
             }
@@ -481,7 +481,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3))
                 ));
             }
@@ -581,7 +581,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4))
                 ));
             }
@@ -681,7 +681,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5))
                 ));
             }
@@ -781,7 +781,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6))
                 ));
             }
@@ -881,7 +881,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7))
                 ));
             }
@@ -981,7 +981,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8))
                 ));
             }
@@ -1081,7 +1081,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9))
                 ));
             }
@@ -1181,7 +1181,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10))
                 ));
             }
@@ -1281,7 +1281,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11))
                 ));
             }
@@ -1381,7 +1381,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12))
                 ));
             }
@@ -1481,7 +1481,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12) , boost::move(arg13))
                 ));
             }
@@ -1581,7 +1581,7 @@ namespace detail
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<typename Action::result_type>(
                     func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12) , boost::move(arg13) , boost::move(arg14))
                 ));
             }
