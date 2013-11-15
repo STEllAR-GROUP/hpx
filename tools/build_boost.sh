@@ -100,7 +100,6 @@ if ! [[ $DIRECTORY ]]; then
     exit 1
 fi
 
-
 if ! [[ $DOT_VERSION && $US_VERSION ]]; then
     echo "ERROR: no version specified"; echo
     usage
