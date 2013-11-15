@@ -113,7 +113,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)()
                 ));
             }
@@ -140,7 +140,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)()
                 ));
             }
@@ -284,7 +284,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0))
                 ));
             }
@@ -311,7 +311,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0))
                 ));
             }
@@ -455,7 +455,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1))
                 ));
             }
@@ -482,7 +482,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1))
                 ));
             }
@@ -626,7 +626,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2))
                 ));
             }
@@ -653,7 +653,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2))
                 ));
             }
@@ -797,7 +797,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3))
                 ));
             }
@@ -824,7 +824,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3))
                 ));
             }
@@ -968,7 +968,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4))
                 ));
             }
@@ -995,7 +995,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4))
                 ));
             }
@@ -1139,7 +1139,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5))
                 ));
             }
@@ -1166,7 +1166,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5))
                 ));
             }
@@ -1310,7 +1310,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6))
                 ));
             }
@@ -1337,7 +1337,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6))
                 ));
             }
@@ -1481,7 +1481,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7))
                 ));
             }
@@ -1508,7 +1508,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7))
                 ));
             }
@@ -1652,7 +1652,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8))
                 ));
             }
@@ -1679,7 +1679,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8))
                 ));
             }
@@ -1823,7 +1823,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9))
                 ));
             }
@@ -1850,7 +1850,7 @@
                 
                 
                 
-                cont->trigger(boost::move(
+                cont->trigger(boost::forward<Result>(
                     (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9))
                 ));
             }
