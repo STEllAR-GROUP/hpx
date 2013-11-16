@@ -137,7 +137,9 @@ namespace boost { namespace container { namespace container_detail
         allocator_type &a_;
         size_type count_;
     };
-#else
+
+#elif BOOST_VERSION < 105500
+
     template <>
     struct insert_default_constructed_n_proxy<
         hpx::parcelset::shmem::shmem_allocator_type, char*>
