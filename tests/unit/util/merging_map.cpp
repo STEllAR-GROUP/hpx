@@ -431,7 +431,16 @@ int main()
 
         table.bind(2, 3, 50U); // [2, 3]
 
+        std::cout << "-- initial\n";
+
+        BOOST_FOREACH(map_type::const_reference e, table)
+        {
+            std::cout << e.key_ << " -> " << e.data_ << "\n";
+        }
+
         table.apply(3, 3, incrementer<boost::uint32_t>(35)); // [3, 3]
+
+        std::cout << "-- [3, 3] += 35";
 
         BOOST_FOREACH(map_type::const_reference e, table)
         {
