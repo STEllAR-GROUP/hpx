@@ -1,0 +1,116 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Function install_counter_type</title>
+<link rel="stylesheet" href="../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../index.html" title="HPX 0.9.8">
+<link rel="up" href="../../header/hpx/performance_counters/manage_counter_type_hpp.html" title="Header &lt;hpx/performance_counters/manage_counter_type.hpp&gt;">
+<link rel="prev" href="install_counte_idp17335696.html" title="Function install_counter_type">
+<link rel="next" href="install_counte_idp17366016.html" title="Function install_counter_type">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="../../images/hpx_0_9_8_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="install_counte_idp17335696.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../header/hpx/performance_counters/manage_counter_type_hpp.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="install_counte_idp17366016.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="hpx.performance_counters.install_counte_idp17348784"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Function install_counter_type</span></h2>
+<p>hpx::performance_counters::install_counter_type &#8212; Install a new performance counter type in a way, which will uninstall it automatically during shutdown. </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../header/hpx/performance_counters/manage_counter_type_hpp.html" title="Header &lt;hpx/performance_counters/manage_counter_type.hpp&gt;">hpx/performance_counters/manage_counter_type.hpp</a>&gt;
+
+</span>
+<span class="identifier">counter_status</span> 
+<span class="identifier">install_counter_type</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span> name<span class="special">,</span> <span class="identifier">counter_type</span> type<span class="special">,</span> 
+                     <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span> helptext<span class="special">,</span> 
+                     <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span> uom <span class="special">=</span> <span class="string">""</span><span class="special">,</span> 
+                     <span class="identifier">boost</span><span class="special">::</span><span class="identifier">uint32_t</span> version <span class="special">=</span> <span class="identifier">HPX_PERFORMANCE_COUNTER_V1</span><span class="special">,</span> 
+                     <a class="link" href="../error_code.html" title="Class error_code">error_code</a> <span class="special">&amp;</span> ec <span class="special">=</span> <span class="identifier">throws</span><span class="special">)</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp20766096"></a><h2>Description</h2>
+<p>The function <span class="emphasis"><em>install_counter_type</em></span> will register a new counter type based on the provided <span class="emphasis"><em>counter_type_info</em></span>. The counter type will be automatically unregistered during system shutdown.</p>
+<p>
+
+</p>
+<div class="note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="../../images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>The counter type registry is a locality based service. You will have to register each counter type on every locality where a corresponding performance counter will be created.</p>
+<p>As long as <span class="emphasis"><em>ec</em></span> is not pre-initialized to <span class="emphasis"><em>hpx::throws</em></span> this function doesn't throw but returns the result code using the parameter <span class="emphasis"><em>ec</em></span>. Otherwise it throws an instance of <code class="computeroutput"><a class="link" href="../exception.html" title="Class exception">hpx::exception</a></code>. </p>
+</td></tr>
+</table></div>
+<p>
+</p>
+<div class="variablelist"><table border="0" class="variablelist compact">
+<colgroup>
+<col align="left" valign="top">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td><p><span class="term">Parameters:</span></p></td>
+<td><div class="variablelist"><table border="0" class="variablelist compact">
+<colgroup>
+<col align="left" valign="top">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td><p><span class="term"><code class="computeroutput">ec</code></span></p></td>
+<td><p>[in,out] this represents the error status on exit, if this is pre-initialized to <span class="emphasis"><em>hpx::throws</em></span> the function will throw on error instead.</p></td>
+</tr>
+<tr>
+<td><p><span class="term"><code class="computeroutput">helptext</code></span></p></td>
+<td><p>[in] A longer descriptive text shown to the user to explain the nature of the counters created from this type. </p></td>
+</tr>
+<tr>
+<td><p><span class="term"><code class="computeroutput">name</code></span></p></td>
+<td><p>[in] The global virtual name of the counter type. This name is expected to have the format /objectname/countername. </p></td>
+</tr>
+<tr>
+<td><p><span class="term"><code class="computeroutput">type</code></span></p></td>
+<td><p>[in] The type of the counters of this counter_type. </p></td>
+</tr>
+<tr>
+<td><p><span class="term"><code class="computeroutput">uom</code></span></p></td>
+<td><p>[in] The unit of measure for the new performance counter type. </p></td>
+</tr>
+<tr>
+<td><p><span class="term"><code class="computeroutput">version</code></span></p></td>
+<td><p>[in] The version of the counter type. This is currently expected to be set to HPX_PERFORMANCE_COUNTER_V1. </p></td>
+</tr>
+</tbody>
+</table></div></td>
+</tr>
+<tr>
+<td><p><span class="term">Returns:</span></p></td>
+<td><p>If successful, this function returns <span class="emphasis"><em>status_valid_data</em></span>, otherwise it will either throw an exception or return an <a class="link" href="../error_code.html" title="Class error_code">error_code</a> from the enum <span class="emphasis"><em>counter_status</em></span> (also, see note related to parameter <span class="emphasis"><em>ec</em></span>).</p></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="install_counte_idp17335696.html"><img src="../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../../header/hpx/performance_counters/manage_counter_type_hpp.html"><img src="../../images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../images/home.png" alt="Home"></a><a accesskey="n" href="install_counte_idp17366016.html"><img src="../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
