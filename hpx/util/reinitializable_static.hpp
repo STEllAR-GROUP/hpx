@@ -91,7 +91,7 @@ namespace hpx { namespace util
         {
             value_construct(*pv);
             reinit_register(boost::bind(
-                &reinitializable_static::value_construct<U>, *pv),
+                &reinitializable_static::template value_construct<U>, *pv),
                 &reinitializable_static::destruct);
         }
 
@@ -111,7 +111,8 @@ namespace hpx { namespace util
         {
             // do not rely on ADL to find the proper call_once
             boost::call_once(constructed_,
-                boost::bind(&reinitializable_static::value_constructor<U>,
+                boost::bind(
+                    &reinitializable_static::template value_constructor<U>,
                     const_cast<U const *>(boost::addressof(val))));
         }
 
