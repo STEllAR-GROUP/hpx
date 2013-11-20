@@ -6,7 +6,8 @@
 set(example_programs
     async_io
     async_io_action
-    async_io_external)
+    async_io_external
+    async_io_low_level)
 
 foreach(example_program ${example_programs})
 
