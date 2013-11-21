@@ -13,41 +13,43 @@
 #include <hpx/include/thread_executors.hpp>
 
 // this function will be executed by a dedicated OS thread
-void do_async_io(char const* string_to_write,
-    boost::shared_ptr<hpx::lcos::local::promise<int> > p)
+void do_async_io(char const* string_to_write, int& result)
 {
     // This IO operation will possibly block the IO thread in the
     // kernel.
     std::cout << "OS-thread: " << string_to_write << std::endl;
 
-    p->set_value(0);    // notify the waiting HPX thread and return a value
+    result = 0;
 }
 
 // This function will be executed by an HPX thread
-hpx::lcos::future<int> async_io(char const* string_to_write)
+int async_io(char const* string_to_write)
 {
-    boost::shared_ptr<hpx::lcos::local::promise<int> > p =
-        boost::make_shared<hpx::lcos::local::promise<int> >();
+    int result = 0;
 
-    // Get a reference to one of the IO specific HPX io_service objects ...
-    hpx::threads::executors::io_pool_executor scheduler;
+    {
+        // Get a reference to one of the IO specific HPX io_service objects ...
+        hpx::threads::executors::io_pool_executor scheduler;
 
-    // ... and schedule the handler to run on one of its OS-threads.
-    scheduler.add(hpx::util::bind(&do_async_io, string_to_write, p));
+        // ... and schedule the handler to run on one of its OS-threads.
+        scheduler.add(hpx::util::bind(&do_async_io, 
+            string_to_write, boost::ref(result)));
 
-    return p->get_future();
+    // Note that the destructor of the scheduler object will wait for
+    // the scheduled task to finish executing. This might be 
+    // undesireable, in which case the technique demonstrated in
+    // the example async_io_low_level.cpp is preferrable.
+    }
+
+    return result;   // this will be executed only after result has been set
 }
 
 int hpx_main()
 {
     {
-        // Initiate an asynchronous IO operation wait for it to complete without
+        // Execute an asynchronous IO operation wait for it to complete without
         // blocking any of the HPX thread-manager threads.
-        hpx::lcos::future<int> f = async_io("Write this string to std::cout");
-
-        // This will suspend the current HPX thread until the IO operation is
-        // finished.
-        int result = f.get();
+        int result = async_io("Write this string to std::cout");
 
         // Print the returned result.
         hpx::cout << "HPX-thread: The asynchronous IO operation returned: "
