@@ -76,7 +76,7 @@ Version 1.0 (See accompanying file LICENSE_1_0.txt or an online copy available
 `here <http://www.boost.org/LICENSE_1_0.txt>`_).
 
 Before starting to build HPX, please read about the
-`prerequisites <http://stellar.cct.lsu.edu/files/hpx_0.9.5/docs/hpx/tutorial/getting_started.html>`_.
+`prerequisites <http://stellar-group.github.io/hpx/docs/html/hpx/tutorial/getting_started/prereqs.html>`_.
 
 Linux
 -----
