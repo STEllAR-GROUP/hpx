@@ -1083,7 +1083,7 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    lcos::future<void> incref_async(
+    lcos::future<bool> incref_async(
         naming::gid_type const& lower
       , naming::gid_type const& upper
       , boost::int64_t credits = 1
@@ -1096,23 +1096,23 @@ public:
       , boost::int64_t credits = 1
         );
 
-    void incref(
+    bool incref(
         naming::gid_type const& lower
       , naming::gid_type const& upper
       , boost::int64_t credits = 1
       , error_code& ec = throws
         )
     {
-        incref_async(lower, upper, credits).get(ec);
+        return incref_async(lower, upper, credits).get(ec);
     }
 
-    void incref(
+    bool incref(
         naming::gid_type const& id
       , boost::int64_t credits = 1
       , error_code& ec = throws
         )
     {
-        incref(id, id, credits, ec);
+        return incref(id, id, credits, ec);
     }
 
     /// \brief Decrement the global reference count for the given id

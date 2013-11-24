@@ -159,7 +159,7 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Lock>
-        hpx::future<void> retrieve_new_credits(naming::gid_type& id,
+        hpx::future<bool> retrieve_new_credits(naming::gid_type& id,
             boost::uint16_t credit, naming::id_type const& keep_alive,
             Lock& l)
         {

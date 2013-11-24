@@ -402,7 +402,7 @@ void incref_apply(
     resolver.incref_apply(lower, upper, credits);
 }
 
-hpx::future<void> incref_async(
+hpx::future<bool> incref_async(
     naming::gid_type const& lower
   , naming::gid_type const& upper
   , boost::int64_t credits

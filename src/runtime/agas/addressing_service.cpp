@@ -1614,14 +1614,18 @@ void addressing_service::incref_apply(
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-static void synchronize_with_async_incref(
-    hpx::future<std::vector<hpx::future<response> > >& f
+static bool synchronize_with_async_incref(
+    hpx::future<std::vector<hpx::future<bool> > >& futures
   , naming::id_type const& keep_alive
     )
 {
-    // do nothing, this is just to be able to keep alive the given id long enough
-    // we just rethrow any exception stored of f
-    f.get();
+    std::vector<hpx::future<bool> > results = futures.get();
+
+    for (boost::uint64_t i = 0; i < results.size(); ++i)
+        if (!results[i].get())
+            return false;
+
+    return true;
 }
 
 template <
@@ -1655,7 +1659,7 @@ struct incrementer
     }
 };
 
-lcos::future<void> addressing_service::incref_async(
+lcos::future<bool> addressing_service::incref_async(
     naming::gid_type const& lower
   , naming::gid_type const& upper
   , boost::int64_t credit
@@ -1667,7 +1671,7 @@ lcos::future<void> addressing_service::incref_async(
         HPX_THROW_EXCEPTION(bad_parameter
           , "addressing_service::incref_async"
           , boost::str(boost::format("invalid credit count of %1%") % credit));
-        return lcos::future<void>();
+        return lcos::future<bool>();
     }
 
     typedef refcnt_requests_type::value_type mapping;
@@ -1703,13 +1707,15 @@ lcos::future<void> addressing_service::incref_async(
 
             if (HPX_UNLIKELY(0 > match_data))
             {
-                // TODO: throw.
+                HPX_THROW_EXCEPTION(bad_parameter
+                  , "addressing_service::incref_async"
+                  , boost::str(boost::format("invalid credit count of %1%") % credit));
+                return lcos::future<bool>();
             } 
         }
     }
 
-    std::vector<lcos::future<response> > f;
-    boost::uint64_t i = 0;
+    std::vector<lcos::future<bool> > futures;
     // FIXME: Use bulk requests.
     BOOST_FOREACH(mapping const& e, incref_list)  
     {
@@ -1722,14 +1728,12 @@ lcos::future<void> addressing_service::incref_async(
             stubs::primary_namespace::get_service_instance(e_lower)
           , naming::id_type::unmanaged);
 
-        f[i++] = stubs::primary_namespace::service_async<response>(target, req);
+        futures.push_back(
+            stubs::primary_namespace::service_async<bool>(target, req));
     }
 
-    if (!keep_alive)
-        return make_ready_future();
-
     using HPX_STD_PLACEHOLDERS::_1;
-    return when_all(f).then
+    return when_all(futures).then
         (HPX_STD_BIND(synchronize_with_async_incref, _1, keep_alive));
 } // }}}
 
