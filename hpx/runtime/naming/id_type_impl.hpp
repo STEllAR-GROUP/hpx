@@ -25,7 +25,8 @@ namespace hpx { namespace naming
         : gid_(new detail::id_type_impl(gid,
             static_cast<detail::id_type_management>(t)))
     {
-        BOOST_ASSERT(detail::get_credit_from_gid(*gid_) || t == unmanaged);
+        if (t == unmanaged)
+            detail::strip_credit_from_gid(*gid_);
     }
 
     inline id_type::id_type(boost::uint64_t msb_id, boost::uint64_t lsb_id,
@@ -33,7 +34,8 @@ namespace hpx { namespace naming
         : gid_(new detail::id_type_impl(msb_id, lsb_id,
             static_cast<detail::id_type_management>(t)))
     {
-        BOOST_ASSERT(detail::get_credit_from_gid(*gid_) || t == unmanaged);
+        if (t == unmanaged)
+            detail::strip_credit_from_gid(*gid_);
     }
 
     inline gid_type& id_type::get_gid() { return *gid_; }
