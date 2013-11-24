@@ -26,7 +26,7 @@
 
 </span>HPX_THROWS_IF(ec, errcode, f, msg)</pre></div>
 <div class="refsect1">
-<a name="idp16630224"></a><h2>Description</h2>
+<a name="idp16780912"></a><h2>Description</h2>
 <p>The macro <span class="emphasis"><em>HPX_THROWS_IF</em></span> can be used to either throw a <span class="emphasis"><em><a class="link" href="hpx/exception.html" title="Class exception">hpx::exception</a></em></span> or to initialize a <span class="emphasis"><em><a class="link" href="hpx/error_code.html" title="Class error_code">hpx::error_code</a></em></span> from the given parameters. If &amp;ec == &amp;hpx::throws, the semantics of this macro are equivalent to <span class="emphasis"><em>HPX_THROW_EXCEPTION</em></span>. If &amp;ec != &amp;hpx::throws, the <span class="emphasis"><em><a class="link" href="hpx/error_code.html" title="Class error_code">hpx::error_code</a></em></span> instance <code class="computeroutput">ec</code> is initialized instead.</p>
 <p>The parameter <code class="computeroutput">errcode</code> holds the hpx::error code from which the new exception should be initialized. The parameter <code class="computeroutput">f</code> is expected to hold the name of the function exception is thrown from and the parameter <code class="computeroutput">msg</code> holds the error message the new exception should encapsulate. </p>
 </div>
