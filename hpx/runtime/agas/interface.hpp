@@ -272,7 +272,7 @@ HPX_API_EXPORT void incref_apply(
   , boost::int64_t credits
   );
 
-HPX_API_EXPORT hpx::future<bool> incref_async(
+HPX_API_EXPORT hpx::future<void> incref_async(
     naming::gid_type const& lower
   , naming::gid_type const& upper
   , boost::int64_t credits

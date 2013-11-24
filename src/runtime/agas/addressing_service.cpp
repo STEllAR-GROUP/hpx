@@ -1614,15 +1614,48 @@ void addressing_service::incref_apply(
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-static bool synchronize_with_async_incref(
-    hpx::future<bool>& f, naming::id_type const& keep_alive)
+static void synchronize_with_async_incref(
+    hpx::future<std::vector<hpx::future<response> > >& f
+  , naming::id_type const& keep_alive
+    )
 {
     // do nothing, this is just to be able to keep alive the given id long enough
     // we just rethrow any exception stored of f
-    return f.get();
+    f.get();
 }
 
-lcos::future<bool> addressing_service::incref_async(
+template <
+    typename T
+>
+struct incrementer
+{
+  private:
+    T const amount_;
+
+  public:
+    explicit incrementer(
+        T const& amount
+        )
+      : amount_(amount)
+    {
+        BOOST_ASSERT(amount);
+    }
+
+    incrementer(
+        incrementer const& other
+        )
+      : amount_(other.amount_)
+    {}
+
+    void operator()(
+        T& v
+        ) const
+    {
+        v += amount_;
+    }
+};
+
+lcos::future<void> addressing_service::incref_async(
     naming::gid_type const& lower
   , naming::gid_type const& upper
   , boost::int64_t credit
@@ -1634,20 +1667,70 @@ lcos::future<bool> addressing_service::incref_async(
         HPX_THROW_EXCEPTION(bad_parameter
           , "addressing_service::incref_async"
           , boost::str(boost::format("invalid credit count of %1%") % credit));
-        return lcos::future<bool>();
+        return lcos::future<void>();
     }
 
-    request req(primary_ns_change_credit_non_blocking, lower, upper, credit);
-    naming::id_type target(
-        stubs::primary_namespace::get_service_instance(lower)
-      , naming::id_type::unmanaged);
+    typedef refcnt_requests_type::value_type mapping;
 
-    lcos::future<bool> f = stubs::primary_namespace::service_async<bool>(target, req);
+    std::list<mapping> incref_list;
+
+    {
+        mutex_type::scoped_lock l(refcnt_requests_mtx_);
+
+        naming::gid_type lower_raw = naming::detail::get_stripped_gid(lower);
+        naming::gid_type upper_raw = naming::detail::get_stripped_gid(lower);
+
+        refcnt_requests_->apply(lower_raw, upper_raw
+          , util::incrementer<boost::int64_t>(credit));
+
+        typedef refcnt_requests_type::key_type key_type;
+        typedef refcnt_requests_type::data_type data_type;
+        typedef refcnt_requests_type::iterator iterator;
+
+        std::pair<iterator, iterator> matches
+            = refcnt_requests_->find(lower_raw, upper_raw);
+
+        for (; matches.first != matches.second; matches.first++)
+        {
+            key_type& match_key = matches.first->key_;
+            data_type& match_data = matches.first->data_;
+
+            if (0 < match_data)
+            {        
+                incref_list.push_back(mapping(match_key, match_data)); 
+                refcnt_requests_->erase(matches.first++); 
+            }
+
+            if (HPX_UNLIKELY(0 > match_data))
+            {
+                // TODO: throw.
+            } 
+        }
+    }
+
+    std::vector<lcos::future<response> > f;
+    boost::uint64_t i = 0;
+    // FIXME: Use bulk requests.
+    BOOST_FOREACH(mapping const& e, incref_list)  
+    {
+        naming::gid_type const e_lower = boost::icl::lower(e.key());
+        naming::gid_type const e_upper = boost::icl::upper(e.key());
+    
+        request req(primary_ns_change_credit_non_blocking,
+            e_lower, e_upper, e.data());
+        naming::id_type target(
+            stubs::primary_namespace::get_service_instance(e_lower)
+          , naming::id_type::unmanaged);
+
+        f[i++] = stubs::primary_namespace::service_async<response>(target, req);
+    }
+
     if (!keep_alive)
-        return f;
+        return make_ready_future();
 
     using HPX_STD_PLACEHOLDERS::_1;
-    return f.then(HPX_STD_BIND(synchronize_with_async_incref, _1, keep_alive));
+    return when_all(f).then
+        (HPX_STD_BIND(synchronize_with_async_incref, _1, keep_alive));
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
