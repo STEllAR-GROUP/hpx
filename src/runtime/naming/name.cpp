@@ -24,6 +24,62 @@
 
 #include <boost/mpl/bool.hpp>
 
+///////////////////////////////////////////////////////////////////////////////
+//
+//          Here is how our distributed garbage collection works
+//
+// Each id_type instance - while always referring to some (possibly remote)
+// entity - can either be 'managed' or 'unmanaged'. If an id_type instance is
+// 'unmanaged' it does not perform any garbage collection. Otherwise (if it's 
+// 'managed'), all of its copies are globally tracked which allows to
+// automatically delete the entity a particular id_type instance is referring
+// to after the last reference to it goes out of scope.
+//
+// An id_type instance is essentially a shared_ptr<> maintaining two reference
+// counts: a local reference count and a global one. The local reference count
+// is incremented whenever the id_type instance is copied locally, and decremented
+// whenever one of the local copies goes out of scope. At the point when the last
+// local copy goes out of scope, it returns its current share of the global
+// reference count back to AGAS. The share of the global reference count owned
+// by all copies of an id_type instance on a single locality is called its
+// credit. Credits are issued in chunks which allows to create a global copy
+// of an id_type instance (like passing it to another locality) without needing
+// to talk to AGAS to request a global reference count increment. The referenced
+// entity is free'd when the global reference count falls to zero.
+//
+// Any newly created object assumes an initial credit. This credit is not
+// accounted for by AGAS as long as no global increment or decrement requests
+// are received. It is important to understand that there is no way to distingish
+// whether an object has already been deleted (and therefore no entry exists in
+// the table storing the global reference count for this object) or whether the
+// object is still alive but no increment/decrement requests have been received
+// by AGAS yet. While this is a pure optimization to avoid storing global
+// reference counts for all objects, it has implications for the implemented
+// garbage collection algorithms at large.
+//
+// As long as an id_type instance is not sent to another locality (a locality
+// different from the initial locality creating the referenced entity), all
+// lifetime management for this entity can be handled purely local without
+// even talking to AGAS.
+//
+// Sending an id_type instance to another locality (which includes using an
+// id_type as the destination for an action) splits the current credit into
+// two parts. One part stays with the id_type on the sending locality, the
+// part is sent along to the destination locality where it turns into the
+// global credit associated with the remote copy of the id_type. As stated
+// above, this allows to avoid talking to AGAS for incrementing the global
+// reference count as long as there is sufficient global credit left in order
+// to be split.
+//
+// The current share of the global credit associated with an id_type instance
+// is encoded in the bits 80..95 of the underlying gid_type. The most
+// significant bit of this bit range (bit 95) encodes whether the given id_type
+// has been split at any time. This information is needed to be able to decide
+// whether a garbage collection can be assumed to be a purely local operation.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming { namespace detail
 {
     struct gid_serialization_data;
