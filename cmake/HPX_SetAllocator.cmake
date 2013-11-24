@@ -73,7 +73,7 @@ if("${HPX_MALLOC_UPPER}" STREQUAL "TBBMALLOC")
   hpx_add_config_define(HPX_TBBMALLOC)
 endif()
 
-if("${HPX_MALLOC}" MATCHES "system")
+if("${HPX_MALLOC_UPPER}" MATCHES "SYSTEM")
   hpx_info("malloc" "Using system allocator.")
 
   hpx_warn("malloc"
