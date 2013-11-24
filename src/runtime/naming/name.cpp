@@ -77,6 +77,36 @@
 // has been split at any time. This information is needed to be able to decide
 // whether a garbage collection can be assumed to be a purely local operation.
 //
+// Credit splitting is performed without any additional AGAS traffic as long as
+// sufficient credit is available. If the credit of the id_type to be split is
+// exhausted (reaches the value '2') it has to be replenished. This operation
+// is performed asynchronously. This is done for performance reasons and to
+// avoid that an outgoing parcel has to wait for the message acknowledging
+// that AGAS has accounted for the requested credit increase. While this seems
+// to be the sensible thing to do, it can easily lead to the situation where
+// global reference count decrement requests arrive at the AGAS server before
+// the increment request.
+//
+// Note that the id_type instance staying behind is replenished independently
+// from the id_type instance which is sent along to the destination. The former
+// is replenished at the sending locality, while the latter is replenished upon
+// receive at the destination locality.
+//
+// Replenishing the credit for an id_type instance is performed by:
+//
+//   a) asynchronously sending an increment request to AGAS
+//   b) adding the requested credit to the local instance
+//   c) asynchronously keeping the local instance alive until the request
+//      is acknowledged by AGAS
+//   d) making sure that none of the requested credits is given back to
+//      AGAS before the request was acknowledged (only at that point it is
+//      guaranteed that the decrement request is received after the increment
+//      request)
+//
+// It is the last item (d) which is the most difficult to implement. This is
+// because part of the requested credit may already have been split again and
+// sent to any of the other localities.
+//
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
