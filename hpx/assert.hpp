@@ -1,14 +1,12 @@
+//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2011      Bryce Lelbach
 //
-//  hpx/assert.hpp - HPX_ASSERT(expr)
-//                     HPX_ASSERT_MSG(expr, msg)
-//                     HPX_VERIFY(expr)
-//
-//
-//
-// Stop inspect complaining about use of 'assert':
-//
-// boostinspect:naassert_macro
-//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+/// \file assert.hpp
+
+#include <hpx/config/branch_hints.hpp>
 
 //--------------------------------------------------------------------------------------//
 //                                     HPX_ASSERT                                     //
@@ -31,7 +29,7 @@ namespace hpx
                         char const * function, char const * file, long line); // user defined
 } // namespace hpx
 
-#define HPX_ASSERT(expr) (BOOST_LIKELY(!!(expr)) \
+#define HPX_ASSERT(expr) (HPX_LIKELY(!!(expr)) \
   ? ((void)0) \
   : ::hpx::assertion_failed(#expr, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
 
@@ -61,7 +59,7 @@ namespace hpx
                               char const * function, char const * file, long line); // user defined
   } // namespace hpx
 
-  #define HPX_ASSERT_MSG(expr, msg) (BOOST_LIKELY(!!(expr)) \
+  #define HPX_ASSERT_MSG(expr, msg) (HPX_LIKELY(!!(expr)) \
     ? ((void)0) \
     : ::hpx::assertion_failed_msg(#expr, msg, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
 
@@ -106,7 +104,7 @@ namespace hpx
     } // detail
   #endif
 
-  #define HPX_ASSERT_MSG(expr, msg) (BOOST_LIKELY(!!(expr)) \
+  #define HPX_ASSERT_MSG(expr, msg) (HPX_LIKELY(!!(expr)) \
     ? ((void)0) \
     : ::hpx::assertion::detail::assertion_failed_msg(#expr, msg, \
           BOOST_CURRENT_FUNCTION, __FILE__, __LINE__))
