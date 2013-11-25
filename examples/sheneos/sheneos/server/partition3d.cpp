@@ -13,7 +13,7 @@
 #include <cmath>
 #include <memory>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/move/move.hpp>
 
 #include "partition3d.hpp"
@@ -118,7 +118,7 @@ namespace sheneos { namespace server
 
         // Either the index has to be inside bounds or the requested value
         // corresponds to the right end edge of the managed data range.
-        BOOST_ASSERT(index < dim_[d].count_ ||
+        HPX_ASSERT(index < dim_[d].count_ ||
             (index == dim_[d].count_ && value == max_value_[d]));
 
         return index;
@@ -131,7 +131,7 @@ namespace sheneos { namespace server
         std::size_t idx = z + (y + x * dim[dimension::temp].count_) *
             dim[dimension::rho].count_;
 
-        BOOST_ASSERT(idx < dim[dimension::ye].count_ *
+        HPX_ASSERT(idx < dim[dimension::ye].count_ *
             dim[dimension::temp].count_ * dim[dimension::rho].count_);
 
         return idx;

@@ -323,7 +323,7 @@ namespace boost { namespace serialization
 
         // boost exceptions
         case hpx::util::boost_exception:
-            BOOST_ASSERT(false);    // shouldn't happen
+            HPX_ASSERT(false);    // shouldn't happen
             break;
 
         // boost::system::system_error

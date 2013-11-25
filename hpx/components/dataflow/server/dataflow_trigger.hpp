@@ -55,14 +55,14 @@ namespace hpx { namespace lcos { namespace server
         dataflow_trigger()
             : slots_complete(0)
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
         }
 
         dataflow_trigger(component_type * back_ptr)
             : base_type(back_ptr)
             , slots_complete(0)
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
         }
 
         static boost::uint64_t calc_complete_mask(std::size_t N)
@@ -126,10 +126,10 @@ namespace hpx { namespace lcos { namespace server
             BOOST_FOREACH(naming::id_type const & target, tmp)
             {
                 typedef hpx::lcos::base_lco::set_event_action action_type;
-                BOOST_ASSERT(target);
+                HPX_ASSERT(target);
                 hpx::apply<action_type>(target);
             }
-            BOOST_ASSERT(targets.empty());
+            HPX_ASSERT(targets.empty());
         }
 
         template <typename T>
@@ -153,10 +153,10 @@ namespace hpx { namespace lcos { namespace server
                 BOOST_FOREACH(naming::id_type const & target, tmp)
                 {
                     typedef hpx::lcos::base_lco::set_event_action action_type;
-                    BOOST_ASSERT(target);
+                    HPX_ASSERT(target);
                     hpx::apply<action_type>(target);
                 }
-                BOOST_ASSERT(targets.empty());
+                HPX_ASSERT(targets.empty());
             }
         }
 
@@ -169,7 +169,7 @@ namespace hpx { namespace lcos { namespace server
                 if(!data.is_empty())
                 {
                     typedef hpx::lcos::base_lco::set_event_action action_type;
-                    BOOST_ASSERT(target);
+                    HPX_ASSERT(target);
                     hpx::apply<action_type>(target);
                 }
                 else

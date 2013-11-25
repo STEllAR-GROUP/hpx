@@ -14,7 +14,7 @@ Many thanks to Howard for making his code available under the Boost license.
 
 #include <boost/chrono/chrono_io.hpp>
 #include <sstream>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 int main()
 {
@@ -23,14 +23,14 @@ int main()
     std::istringstream in("5000 milliseconds 4000 ms 3001 ms");
     seconds d(0);
     in >> d;
-    BOOST_ASSERT(in.good());
-    BOOST_ASSERT(d == seconds(5));
+    HPX_ASSERT(in.good());
+    HPX_ASSERT(d == seconds(5));
     in >> d;
-    BOOST_ASSERT(in.good());
-    BOOST_ASSERT(d == seconds(4));
+    HPX_ASSERT(in.good());
+    HPX_ASSERT(d == seconds(4));
     in >> d;
-    BOOST_ASSERT(in.fail());
-    BOOST_ASSERT(d == seconds(4));
+    HPX_ASSERT(in.fail());
+    HPX_ASSERT(d == seconds(4));
     return 0;
 }
 

@@ -13,7 +13,7 @@
 #include <iostream>
 
 #include <boost/io/ios_state.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/current_function.hpp>
 #include <boost/preprocessor/stringize.hpp>
@@ -62,7 +62,7 @@ struct fixture
             case counter_test:
                 ++test_failures_; return;
             default:
-                { BOOST_ASSERT(false); return; }
+                { HPX_ASSERT(false); return; }
         }
     }
 
@@ -75,7 +75,7 @@ struct fixture
             case counter_test:
                 return test_failures_;
             default:
-                { BOOST_ASSERT(false); return 0; }
+                { HPX_ASSERT(false); return 0; }
         }
     }
 

@@ -15,7 +15,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/intrusive/slist.hpp>
 
 #if defined(BOOST_MSVC)
@@ -84,7 +84,7 @@ namespace hpx { namespace lcos { namespace local
         public:
             /// \brief Construct a new event semaphore
             event()
-              : event_(false) 
+              : event_(false)
             {}
 
             ~event()
@@ -160,7 +160,7 @@ namespace hpx { namespace lcos { namespace local
         private:
             void wait_locked(typename mutex_type::scoped_lock& l)
             {
-                BOOST_ASSERT(l.owns_lock());
+                HPX_ASSERT(l.owns_lock());
 
                 while (!event_.load(boost::memory_order_acquire))
                 {
@@ -179,7 +179,7 @@ namespace hpx { namespace lcos { namespace local
 
             void set_locked(typename mutex_type::scoped_lock& l)
             {
-                BOOST_ASSERT(l.owns_lock());
+                HPX_ASSERT(l.owns_lock());
 
                 // swap the list
                 queue_type queue;

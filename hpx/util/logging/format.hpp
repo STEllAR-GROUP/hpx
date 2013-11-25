@@ -28,7 +28,7 @@
 #include <vector>
 #include <set>
 #include <boost/shared_ptr.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include <boost/type_traits/is_base_of.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>
@@ -405,11 +405,11 @@ In the above case:
             struct item {
                 item() : m_fmt(0), m_dest(0), m_type(is_clear) {}
                 item& fmt(formatter_ptr f) {
-                    BOOST_ASSERT(f);
+                    HPX_ASSERT(f);
                     m_fmt = f; m_type = is_fmt; return *this;
                 }
                 item &dest(destination_ptr d) {
-                    BOOST_ASSERT(d);
+                    HPX_ASSERT(d);
                     m_dest = d; m_type = is_dest; return *this;
                 }
                 formatter_ptr m_fmt;

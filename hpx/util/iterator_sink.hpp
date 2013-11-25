@@ -13,7 +13,7 @@
 #include <algorithm>                       // copy
 #include <iosfwd>                          // streamsize
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/iostreams/categories.hpp>  // sink_tag
 
 ///////////////////////////////////////////////////////////////////////////////

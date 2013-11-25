@@ -27,7 +27,7 @@
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio/deadline_timer.hpp>
@@ -1294,7 +1294,7 @@ namespace hpx { namespace threads
 
 #if HPX_DEBUG != 0
         // the OS thread is allowed to exit only if no more HPX threads exist
-        BOOST_ASSERT(!scheduler_.get_thread_count(
+        HPX_ASSERT(!scheduler_.get_thread_count(
             unknown, thread_priority_default, num_thread));
 #endif
     }
@@ -1326,7 +1326,7 @@ namespace hpx { namespace threads
 
         try {
             // run threads and wait for initialization to complete
-            BOOST_ASSERT (NULL == startup_);
+            HPX_ASSERT (NULL == startup_);
             startup_ = new boost::barrier(static_cast<unsigned>(num_threads+1));
 
             state_.store(running);

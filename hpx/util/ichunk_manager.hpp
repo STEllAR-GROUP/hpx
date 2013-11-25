@@ -135,10 +135,10 @@ namespace hpx { namespace util { namespace detail
                 this->icontainer_type::load_binary(address, count);
             }
             else {
-                BOOST_ASSERT(current_chunk_ != std::size_t(-1));
-                BOOST_ASSERT(get_chunk_type(current_chunk_) == chunk_type_pointer);
+                HPX_ASSERT(current_chunk_ != std::size_t(-1));
+                HPX_ASSERT(get_chunk_type(current_chunk_) == chunk_type_pointer);
 
-                if (get_chunk_size(current_chunk_) != count) 
+                if (get_chunk_size(current_chunk_) != count)
                 {
                     BOOST_THROW_EXCEPTION(
                         boost::archive::archive_exception(

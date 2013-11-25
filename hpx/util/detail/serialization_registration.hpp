@@ -17,7 +17,7 @@
 #include <boost/serialization/extended_type_info_typeid.hpp>
 #include <boost/uuid/sha1.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include <typeinfo>
 
@@ -55,13 +55,13 @@ namespace hpx { namespace util { namespace detail
         return static_cast<char>(number_tmp - 10 + 'A');
     }
 
-#if defined(BOOST_DISABLE_ASSERTS)
+#if defined(HPX_DISABLE_ASSERTS)
     inline void convert_byte(boost::uint8_t b, char*& buffer, char const* /*end*/)
 #else
     inline void convert_byte(boost::uint8_t b, char*& buffer, char const* end)
 #endif
     {
-        BOOST_ASSERT(buffer < end-1);
+        HPX_ASSERT(buffer < end-1);
         *buffer++ = to_digit((b & 0xF0) >> 4);
         *buffer++ = to_digit(b & 0x0F);
     }
@@ -96,7 +96,7 @@ namespace hpx { namespace util { namespace detail
         for (int i = 0; i < 5; ++i)
             convert_unsigned(digest[i], buffer, &buf[sizeof(buf)]);
 
-        BOOST_ASSERT(buffer == &buf[sizeof(buf)-1]);
+        HPX_ASSERT(buffer == &buf[sizeof(buf)-1]);
         *buffer = '\0';
 
         return buf;

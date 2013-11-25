@@ -54,7 +54,7 @@ namespace hpx { namespace parcelset { namespace shmem
         BOOST_FOREACH(parcel const& p, pv)
         {
             naming::locality const locality_id = p.get_destination_locality();
-            BOOST_ASSERT(locality_id == destination());
+            HPX_ASSERT(locality_id == destination());
         }
 #endif
 

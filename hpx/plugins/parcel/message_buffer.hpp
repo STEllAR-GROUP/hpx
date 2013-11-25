@@ -78,7 +78,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
         message_buffer_append_state append(parcelset::parcel const& p,
             parcelset::parcelport::write_handler_type const& f)
         {
-            BOOST_ASSERT(messages_.size() == handlers_.size());
+            HPX_ASSERT(messages_.size() == handlers_.size());
 
             int result = normal;
             if (messages_.empty())
@@ -95,7 +95,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
 
         bool empty() const
         {
-            BOOST_ASSERT(messages_.size() == handlers_.size());
+            HPX_ASSERT(messages_.size() == handlers_.size());
             return messages_.empty();
         }
 
@@ -107,7 +107,7 @@ namespace hpx { namespace plugins { namespace parcel { namespace detail
 
         std::size_t size() const
         {
-            BOOST_ASSERT(messages_.size() == handlers_.size());
+            HPX_ASSERT(messages_.size() == handlers_.size());
             return messages_.size();
         }
 

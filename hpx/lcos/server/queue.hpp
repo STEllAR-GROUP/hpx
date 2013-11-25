@@ -148,7 +148,7 @@ namespace hpx { namespace lcos { namespace server
                     }
                 }
             }
-            BOOST_ASSERT(value_queue_.empty());
+            HPX_ASSERT(value_queue_.empty());
         }
 
         // disambiguate base classes

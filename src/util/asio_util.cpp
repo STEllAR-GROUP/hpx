@@ -75,7 +75,7 @@ namespace hpx { namespace util
 
             boost::asio::ip::tcp::resolver::iterator it =
                 resolver.resolve(query);
-            BOOST_ASSERT(it != boost::asio::ip::tcp::resolver::iterator());
+            HPX_ASSERT(it != boost::asio::ip::tcp::resolver::iterator());
             return *it;
         }
         catch (boost::system::system_error const& e) {

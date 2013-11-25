@@ -17,7 +17,7 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/serialization/vector.hpp>
 
@@ -182,12 +182,12 @@ namespace hpx { namespace components
                     naming::get_agas_client().get_console_locality(raw_prefix);
                 }
 
-                BOOST_ASSERT(naming::invalid_gid != raw_prefix);
+                HPX_ASSERT(naming::invalid_gid != raw_prefix);
                 if (!prefix_) {
                     prefix_ = naming::id_type(raw_prefix, naming::id_type::unmanaged);
                 }
                 else {
-                    BOOST_ASSERT(prefix_.get_gid() == raw_prefix);
+                    HPX_ASSERT(prefix_.get_gid() == raw_prefix);
                 }
             }
 
@@ -202,7 +202,7 @@ namespace hpx { namespace components
     void pending_logs::send()
     {
         // WARNING: Never, ever call this outside of a HPX-thread.
-        BOOST_ASSERT(threads::get_self_ptr());
+        HPX_ASSERT(threads::get_self_ptr());
 
         bool expected = false;
         if (!is_sending_.compare_exchange_strong(expected, true))

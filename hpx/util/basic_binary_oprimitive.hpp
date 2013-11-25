@@ -26,7 +26,7 @@
 #include <cstddef> // size_t
 #include <vector>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/integer.hpp>
@@ -109,7 +109,7 @@ namespace hpx { namespace util
         // on load.
         void save(bool const& t)
         {
-            BOOST_ASSERT(0 == static_cast<int>(t) || 1 == static_cast<int>(t));
+            HPX_ASSERT(0 == static_cast<int>(t) || 1 == static_cast<int>(t));
             save_binary(&t, sizeof(t));
         }
 

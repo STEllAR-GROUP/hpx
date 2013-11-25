@@ -30,7 +30,7 @@
 //
 // Each id_type instance - while always referring to some (possibly remote)
 // entity - can either be 'managed' or 'unmanaged'. If an id_type instance is
-// 'unmanaged' it does not perform any garbage collection. Otherwise (if it's 
+// 'unmanaged' it does not perform any garbage collection. Otherwise (if it's
 // 'managed'), all of its copies are globally tracked which allows to
 // automatically delete the entity a particular id_type instance is referring
 // to after the last reference to it goes out of scope.
@@ -144,7 +144,7 @@ namespace hpx { namespace naming
                 try {
                     // decrement global reference count for the given gid,
                     boost::int32_t credits = detail::get_credit_from_gid(*p);
-                    BOOST_ASSERT(0 != credits);
+                    HPX_ASSERT(0 != credits);
 
                     if (get_runtime_ptr())
                     {
@@ -166,7 +166,7 @@ namespace hpx { namespace naming
                 // that the referenced object is fully local.
                 components::component_type t = addr.type_;
 
-                BOOST_ASSERT(t != components::component_invalid);
+                HPX_ASSERT(t != components::component_invalid);
 
                 // Third parameter is the count of how many components to destroy.
                 // FIXME: The address should still be in the cache, but it could
@@ -237,7 +237,7 @@ namespace hpx { namespace naming
             case managed:
                 return &detail::gid_managed_deleter;
             default:
-                BOOST_ASSERT(false);          // invalid management type
+                HPX_ASSERT(false);          // invalid management type
                 return &detail::gid_unmanaged_deleter;
             }
             return 0;
@@ -284,15 +284,15 @@ namespace hpx { namespace naming
                     const_cast<id_type_impl&>(*this));
 
                 // none of the ids should be left without credits
-                BOOST_ASSERT(detail::get_credit_from_gid(*this) != 0);
-                BOOST_ASSERT(detail::get_credit_from_gid(newid) != 0);
+                HPX_ASSERT(detail::get_credit_from_gid(*this) != 0);
+                HPX_ASSERT(detail::get_credit_from_gid(newid) != 0);
 
                 // We now add new credits to the id which is left behind only.
                 // The credit for the newid will be handled upon arrival
                 // on the destination node.
                 if (1 == detail::get_credit_from_gid(newid))
                 {
-                    BOOST_ASSERT(detail::get_credit_from_gid(*this) >= 1);
+                    HPX_ASSERT(detail::get_credit_from_gid(*this) >= 1);
 
                     // note: the future returned by retrieve_new_credits()
                     //       keeps this instance alive as it is passed along
@@ -304,7 +304,7 @@ namespace hpx { namespace naming
                 return newid;
             }
 
-            BOOST_ASSERT(unmanaged == type_);
+            HPX_ASSERT(unmanaged == type_);
             return *this;
         }
 
@@ -447,7 +447,7 @@ namespace hpx { namespace naming
     ///////////////////////////////////////////////////////////////////////////
     inline naming::id_type get_colocation_id_sync(naming::id_type const& id, error_code& ec)
     {
-        // FIXME: Resolve the locality instead of deducing it from the target 
+        // FIXME: Resolve the locality instead of deducing it from the target
         //        GID, otherwise this will break once we start moving objects.
         boost::uint32_t locality_id = get_locality_id_from_gid(id.get_gid());
         return get_id_from_locality_id(locality_id);

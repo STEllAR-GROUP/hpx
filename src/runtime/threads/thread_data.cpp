@@ -12,7 +12,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 // #if HPX_DEBUG
 // #  define HPX_DEBUG_THREAD_POOL 1
@@ -42,7 +42,7 @@ namespace hpx { namespace threads
     ///////////////////////////////////////////////////////////////////////////
     void* thread_data::operator new(std::size_t size, thread_pool& pool)
     {
-        BOOST_ASSERT(sizeof(thread_data) == size);
+        HPX_ASSERT(sizeof(thread_data) == size);
 
         void *ret = reinterpret_cast<void*>(pool.allocate());
         if (0 == ret)
@@ -61,13 +61,13 @@ namespace hpx { namespace threads
 
     void thread_data::operator delete(void *p, std::size_t size)
     {
-        BOOST_ASSERT(sizeof(thread_data) == size);
+        HPX_ASSERT(sizeof(thread_data) == size);
 
         if (0 != p)
         {
             thread_data* pt = static_cast<thread_data*>(p);
             thread_pool* pool = pt->pool_;
-            BOOST_ASSERT(pool);
+            HPX_ASSERT(pool);
 
 #if HPX_DEBUG_THREAD_POOL != 0
             using namespace std;    // some systems have memset in namespace std
@@ -122,7 +122,7 @@ namespace hpx { namespace threads
         mutex_type::scoped_lock l(this);
 
         // Exit functions should have been executed.
-        BOOST_ASSERT(!exit_funcs_ || ran_exit_funcs_);
+        HPX_ASSERT(!exit_funcs_ || ran_exit_funcs_);
 
         while (exit_funcs_)
         {

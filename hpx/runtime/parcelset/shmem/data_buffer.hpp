@@ -3,10 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Part of the code below has been taken directly from Boost.Container. The 
+// Part of the code below has been taken directly from Boost.Container. The
 // original copyright is:
 //
-// (C) Copyright Ion Gaztanaga 2008-2012. 
+// (C) Copyright Ion Gaztanaga 2008-2012.
 
 
 #if !defined(HPX_PARCELSET_SHMEM_DATA_BUFFER_NOV_25_2012_0854PM)
@@ -23,7 +23,7 @@
 #endif
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include <string>
 
@@ -42,13 +42,13 @@ namespace hpx { namespace parcelset { namespace shmem
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace boost { namespace container { namespace container_detail 
+namespace boost { namespace container { namespace container_detail
 {
 #if BOOST_VERSION < 105300
-    // This class template will adapt default construction insertions to 
+    // This class template will adapt default construction insertions to
     // advanced_insert_aux_int
     //
-    // We provide the specialization for 'char' to implement proper 
+    // We provide the specialization for 'char' to implement proper
     // uninitialized expansion of the vectors we use below.
     template <>
     struct default_construct_aux_proxy<hpx::parcelset::shmem::shmem_allocator_type, char*>
@@ -72,7 +72,7 @@ namespace boost { namespace container { namespace container_detail
         virtual void copy_remaining_to(iterator_type)
         {
             // This should never be called with any count
-            BOOST_ASSERT(this->count_ == 0);
+            HPX_ASSERT(this->count_ == 0);
         }
 
         virtual void uninitialized_copy_remaining_to(iterator_type p)
@@ -80,7 +80,7 @@ namespace boost { namespace container { namespace container_detail
             this->priv_uninitialized_copy(p, this->count_);
         }
 
-        virtual void uninitialized_copy_some_and_update(iterator_type pos, 
+        virtual void uninitialized_copy_some_and_update(iterator_type pos,
             difference_type division_count, bool first_n)
         {
             size_type new_count;
@@ -88,35 +88,35 @@ namespace boost { namespace container { namespace container_detail
                 new_count = division_count;
             }
             else {
-                BOOST_ASSERT(difference_type(this->count_)>= division_count);
+                HPX_ASSERT(difference_type(this->count_)>= division_count);
                 new_count = this->count_ - division_count;
             }
             this->priv_uninitialized_copy(pos, new_count);
         }
 
-        virtual void copy_some_and_update(iterator_type, 
+        virtual void copy_some_and_update(iterator_type,
             difference_type division_count, bool first_n)
         {
-            BOOST_ASSERT(this->count_ == 0);
+            HPX_ASSERT(this->count_ == 0);
             size_type new_count;
             if(first_n) {
                 new_count = division_count;
             }
             else {
-                BOOST_ASSERT(difference_type(this->count_) >= division_count);
+                HPX_ASSERT(difference_type(this->count_) >= division_count);
                 new_count = this->count_ - division_count;
             }
             //This function should never called with a count different to zero
-            BOOST_ASSERT(new_count == 0);
+            HPX_ASSERT(new_count == 0);
             HPX_UNUSED(new_count);
         }
 
     private:
         void priv_uninitialized_copy(iterator_type p, const size_type n)
         {
-            BOOST_ASSERT(n <= this->count_);
+            HPX_ASSERT(n <= this->count_);
 
-            // We leave memory uninitialized here, which is what should have 
+            // We leave memory uninitialized here, which is what should have
             // happened for 'char' in the first place.
 //             iterator_type orig_p = p;
 //             size_type i = 0;
@@ -158,7 +158,7 @@ namespace boost { namespace container { namespace container_detail
 
         void uninitialized_copy_n_and_update(iterator_type p, size_type n)
         {
-            // We leave memory uninitialized here, which is what should have 
+            // We leave memory uninitialized here, which is what should have
             // happened for 'char' in the first place.
 //             Iterator orig_p = p;
 //             size_type n_left = n;
@@ -178,7 +178,7 @@ namespace boost { namespace container { namespace container_detail
 
         void copy_n_and_update(iterator_type, size_type)
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
         }
 
     private:

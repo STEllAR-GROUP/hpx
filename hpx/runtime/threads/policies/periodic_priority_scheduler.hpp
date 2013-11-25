@@ -116,14 +116,14 @@ namespace hpx { namespace threads { namespace policies
             numa_sensitive_(init.numa_sensitive_),
             topology_(get_topology())
         {
-            BOOST_ASSERT(init.num_queues_ != 0);
+            HPX_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
             {
                 queues_[i] = new thread_queue<>(init.max_queue_thread_count_);
             }
 
-            BOOST_ASSERT(init.num_high_priority_queues_ != 0);
-            BOOST_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
+            HPX_ASSERT(init.num_high_priority_queues_ != 0);
+            HPX_ASSERT(init.num_high_priority_queues_ <= init.num_queues_);
             for (std::size_t i = 0; i < init.num_high_priority_queues_; ++i) {
                 high_priority_queues_[i] =
                     new thread_queue<>(init.max_queue_thread_count_);
@@ -215,7 +215,7 @@ namespace hpx { namespace threads { namespace policies
 
             // now create the thread
             if (data.priority == thread_priority_critical) {
-                BOOST_ASSERT(run_now == true);
+                HPX_ASSERT(run_now == true);
                 std::size_t num = num_thread % high_priority_queues_.size();
                 return high_priority_queues_[num]->create_thread(data,
                     initial_state, run_now, queues_.size(), ec);
@@ -225,7 +225,7 @@ namespace hpx { namespace threads { namespace policies
                     run_now, queues_.size()+high_priority_queues_.size(), ec);
             }
 
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
             return queues_[num_thread]->create_thread(data, initial_state,
                 run_now, num_thread, ec);
         }
@@ -244,7 +244,7 @@ namespace hpx { namespace threads { namespace policies
             }
 
             // try to get the next thread from our own queue
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
             if (queues_[num_thread]->get_next_thread(thrd, num_thread))
                 return true;
 
@@ -293,7 +293,7 @@ namespace hpx { namespace threads { namespace policies
                     queues_.size()+high_priority_queues_.size());
             }
             else {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
                 queues_[num_thread]->schedule_thread(thrd, num_thread);
             }
         }
@@ -330,7 +330,7 @@ namespace hpx { namespace threads { namespace policies
         {
             // Return queue length of one specific queue.
             if (std::size_t(-1) != num_thread) {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
 
                 boost::int64_t count = 0;
 
@@ -368,7 +368,7 @@ namespace hpx { namespace threads { namespace policies
             boost::int64_t result = 0;
             if (std::size_t(-1) != num_thread)
             {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
 
                 switch (priority) {
                 case thread_priority_default:
@@ -460,7 +460,7 @@ namespace hpx { namespace threads { namespace policies
             // Return average thread wait time of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
 
                 boost::int64_t result = 0;
                 boost::int64_t count = 0;
@@ -506,7 +506,7 @@ namespace hpx { namespace threads { namespace policies
             // Return average task wait time of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
 
                 boost::int64_t result = 0;
                 boost::int64_t count = 0;
@@ -554,7 +554,7 @@ namespace hpx { namespace threads { namespace policies
         bool wait_or_add_new(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count)
         {
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
             std::size_t added = 0;
             bool result = queues_[num_thread]->wait_or_add_new(
                 num_thread, running, idle_loop_count, added);
@@ -767,7 +767,7 @@ namespace hpx { namespace threads { namespace policies
         void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
             if (std::size_t(-1) != num_thread) {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
 
                 if (num_thread < high_priority_queues_.size())
                     high_priority_queues_[num_thread]->do_some_work();

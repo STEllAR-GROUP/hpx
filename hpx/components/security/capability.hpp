@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace security
 
         void set(std::size_t position, bool value = true)
         {
-            BOOST_ASSERT(position < security::traits::capability<>::size);
+            HPX_ASSERT(position < security::traits::capability<>::size);
 
             if (value)
             {
@@ -84,7 +84,7 @@ namespace hpx { namespace components { namespace security
 
         bool test(std::size_t position) const
         {
-            BOOST_ASSERT(position < security::traits::capability<>::size);
+            HPX_ASSERT(position < security::traits::capability<>::size);
 
             return (bits_[position / CHAR_BIT] & (1ull << (position % CHAR_BIT))) != 0;
         }

@@ -120,7 +120,7 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
 
@@ -137,7 +137,7 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
 
@@ -164,7 +164,7 @@ namespace hpx
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -256,7 +256,7 @@ namespace hpx
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    template <typename Component, typename Result, typename Arguments, 
+    template <typename Component, typename Result, typename Arguments,
         typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply (
@@ -313,7 +313,7 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -342,7 +342,7 @@ namespace hpx
         threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -454,7 +454,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& contgid, naming::id_type const& gid, 
+        > /*act*/, naming::id_type const& contgid, naming::id_type const& gid,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef

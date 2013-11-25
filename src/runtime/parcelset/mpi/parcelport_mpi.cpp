@@ -130,7 +130,7 @@ namespace hpx { namespace parcelset { namespace mpi
         io_service.post(HPX_STD_BIND(&parcelport::handle_messages, this->shared_from_this()));
     }
 
-    /// Return the name of this locality 
+    /// Return the name of this locality
     std::string parcelport::get_locality_name() const
     {
         return util::mpi_environment::get_processor_name();
@@ -270,7 +270,7 @@ namespace hpx { namespace parcelset { namespace mpi
         // make sure all parcels go to the same locality
         for (std::size_t i = 1; i != parcels.size(); ++i)
         {
-            BOOST_ASSERT(locality_id.get_rank() == parcels[i].get_destination_locality().get_rank());
+            HPX_ASSERT(locality_id.get_rank() == parcels[i].get_destination_locality().get_rank());
         }
 #endif
 
@@ -316,7 +316,7 @@ namespace hpx { namespace parcelset { namespace mpi
                 std::size_t parcel_count = 0;
                 archive >> parcel_count; //-V128
 
-                BOOST_ASSERT(parcel_count > 0);
+                HPX_ASSERT(parcel_count > 0);
                 for(std::size_t i = 0; i != parcel_count; ++i)
                 {
                     // de-serialize parcel and add it to incoming parcel queue
@@ -324,7 +324,7 @@ namespace hpx { namespace parcelset { namespace mpi
                     archive >> p;
 
                     // make sure this parcel ended up on the right locality
-                    BOOST_ASSERT(p.get_destination_locality().get_rank() == pp.here().get_rank());
+                    HPX_ASSERT(p.get_destination_locality().get_rank() == pp.here().get_rank());
 
                     // be sure not to measure add_parcel as serialization time
                     boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();

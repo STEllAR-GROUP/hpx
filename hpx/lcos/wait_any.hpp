@@ -93,7 +93,7 @@ namespace hpx
                 }
 
                 // that should not happen
-                BOOST_ASSERT(index_.load() != static_cast<std::size_t>(index_error));
+                HPX_ASSERT(index_.load() != static_cast<std::size_t>(index_error));
 
                 boost::swap(lazy_values_[index_], lazy_values_.back());
                 return boost::move(lazy_values_);

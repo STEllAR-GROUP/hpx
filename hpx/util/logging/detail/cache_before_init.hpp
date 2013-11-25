@@ -30,7 +30,7 @@
 #include <vector>
 //#include <boost/thread/detail/config.hpp>
 #include <boost/config.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace detail {
 
@@ -106,7 +106,7 @@ public:
         return m_is_caching_off;
     }
 
-    template<class writer_type> 
+    template<class writer_type>
     void turn_cache_off(const writer_type & writer_) {
         if ( is_cache_turned_off() )
             return; // already turned off
@@ -167,12 +167,12 @@ private:
 // Messages that were logged before initializing the log - NOT Caching them
 
 template<class msg_type> struct cache_before_init {
-    template<class writer_type> 
+    template<class writer_type>
     void on_do_write(msg_type & msg, const writer_type & writer) const {
         writer(msg);
     }
 
-    template<class writer_type> 
+    template<class writer_type>
     void turn_cache_off(const writer_type & writer) {
     }
 

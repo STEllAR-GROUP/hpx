@@ -263,7 +263,7 @@ template<> struct assert_intrinsic_wchar_t<unsigned short> {};
 //
 // last known and checked version:
 #if (BOOST_INTEL_CXX_VERSION > 1200)
-#  if defined(BOOST_ASSERT_CONFIG)
+#  if defined(HPX_ASSERT_CONFIG)
 #     error "Unknown compiler version - please run the configure tests and report the results"
 #  elif defined(_MSC_VER)
 //

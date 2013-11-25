@@ -41,7 +41,7 @@ namespace chrono_detail
     if ( (nanosecs_per_tic <= 0.0L) ||
             (!boost::detail::win32::QueryPerformanceCounter( &pcount )) )
     {
-      BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+      HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
       return steady_clock::time_point();
     }
 

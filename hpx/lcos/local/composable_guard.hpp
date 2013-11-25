@@ -14,7 +14,7 @@ namespace hpx { namespace lcos { namespace local {
 
 #include <boost/atomic.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include <vector>
 
@@ -25,7 +25,7 @@ struct DebugObject {
 #if HPX_DEBUG
     int magic;
 #endif
-    DebugObject() 
+    DebugObject()
 #if HPX_DEBUG
     : magic(DEBUG_MAGIC)
 #endif
@@ -38,8 +38,8 @@ struct DebugObject {
     }
     void check() {
 #if HPX_DEBUG
-        BOOST_ASSERT(magic != ~DEBUG_MAGIC);
-        BOOST_ASSERT(magic == DEBUG_MAGIC);
+        HPX_ASSERT(magic != ~DEBUG_MAGIC);
+        HPX_ASSERT(magic == DEBUG_MAGIC);
 #endif
     }
 };

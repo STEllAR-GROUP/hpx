@@ -11,7 +11,7 @@
 #endif
 #include <boost/chrono/chrono.hpp>
 #include <boost/chrono/process_cpu_clocks.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 namespace hpx { namespace util
 {
@@ -26,7 +26,7 @@ namespace hpx { namespace util
 #else
             boost::chrono::nanoseconds ns =
                 boost::chrono::steady_clock::now().time_since_epoch();
-            BOOST_ASSERT(ns.count() >= 0);
+            HPX_ASSERT(ns.count() >= 0);
             return static_cast<boost::uint64_t>(ns.count());
 #endif
         }

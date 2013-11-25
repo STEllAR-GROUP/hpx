@@ -15,7 +15,7 @@ Many thanks to Howard for making his code available under the Boost license.
 #include <boost/chrono/chrono_io.hpp>
 #include <sstream>
 #include <iostream>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 int main()
 {
@@ -25,12 +25,12 @@ int main()
     high_resolution_clock::time_point t0 = high_resolution_clock::now();
     std::stringstream io;
     io << t0;
-    BOOST_ASSERT(!io.fail());
+    HPX_ASSERT(!io.fail());
     cout << io.str() << '\n';
-    BOOST_ASSERT(!io.fail());
+    HPX_ASSERT(!io.fail());
     high_resolution_clock::time_point t1;
     io >> t1;
-    BOOST_ASSERT(!io.fail());
+    HPX_ASSERT(!io.fail());
     cout << io.str() << '\n';
     cout << t0 << '\n';
     cout << t1 << '\n';

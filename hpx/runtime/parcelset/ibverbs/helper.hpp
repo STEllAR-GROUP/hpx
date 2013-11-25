@@ -77,7 +77,7 @@ namespace hpx { namespace parcelset { namespace ibverbs {
 
             return false;
         }
-        BOOST_ASSERT(false);
+        HPX_ASSERT(false);
         return false;
     }
 

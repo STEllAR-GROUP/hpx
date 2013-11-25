@@ -97,7 +97,7 @@ namespace hpx { namespace lcos
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_binary_params.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -156,7 +156,7 @@ namespace hpx { namespace lcos
             {
                 std::vector<hpx::future<Result> > fres = boost::move(r.move());
 
-                BOOST_ASSERT(!fres.empty());
+                HPX_ASSERT(!fres.empty());
 
                 if (fres.size() == 1)
                     return fres[0].move();

@@ -56,7 +56,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             // local, direct execution
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))));

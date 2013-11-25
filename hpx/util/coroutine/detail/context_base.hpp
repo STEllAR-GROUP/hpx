@@ -41,7 +41,7 @@
 #include <algorithm> //for swap
 
 #include <boost/atomic.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/version.hpp>
 #include <boost/intrusive_ptr.hpp>
 
@@ -142,7 +142,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     boost::int64_t count() const
     {
 #if HPX_COROUTINE_IS_REFERENCE_COUNTED
-      BOOST_ASSERT(m_counter < static_cast<std::size_t>(
+      HPX_ASSERT(m_counter < static_cast<std::size_t>(
           (std::numeric_limits<boost::int64_t>::max)()));
       return static_cast<boost::int64_t>(m_counter);
 #else
@@ -160,7 +160,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     void release()
     {
 #if HPX_COROUTINE_IS_REFERENCE_COUNTED
-      BOOST_ASSERT(m_counter);
+      HPX_ASSERT(m_counter);
       if(--m_counter == 0) {
         m_deleter(this);
       }
@@ -182,7 +182,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
     void count_down() throw()
     {
-      BOOST_ASSERT(m_operation_counter) ;
+      HPX_ASSERT(m_operation_counter) ;
       --m_operation_counter;
     }
 
@@ -221,8 +221,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
      */
     bool signal () throw()
     {
-      BOOST_ASSERT(!running() && !exited());
-      BOOST_ASSERT(m_wait_counter) ;
+      HPX_ASSERT(!running() && !exited());
+      HPX_ASSERT(m_wait_counter) ;
 
       --m_wait_counter;
       if(!m_wait_counter && m_state == ctx_waiting)
@@ -249,7 +249,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
      */
     bool wake_up()
     {
-      BOOST_ASSERT(is_ready());
+      HPX_ASSERT(is_ready());
       do_invoke();
       // TODO: could use a binary 'or' here to eliminate
       // shortcut evaluation (and a branch), but maybe the compiler is
@@ -267,7 +267,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         } else if(m_exit_status == ctx_exited_exit)
           return false;
         else {
-          BOOST_ASSERT(0 && "unknown exit status");
+          HPX_ASSERT(0 && "unknown exit status");
         }
       }
       return true;
@@ -313,7 +313,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // on return.
     void invoke()
     {
-      BOOST_ASSERT(is_ready());
+      HPX_ASSERT(is_ready());
       do_invoke();
       // TODO: could use a binary or here to eliminate
       // shortcut evaluation (and a branch), but maybe the compiler is
@@ -331,7 +331,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         } else if(m_exit_status == ctx_exited_exit)
           boost::throw_exception(coroutine_exited());
         else {
-          BOOST_ASSERT(0 && "unknown exit status");
+          HPX_ASSERT(0 && "unknown exit status");
         }
       }
     }
@@ -346,14 +346,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     //         resumed.
     void yield()
     {
-      BOOST_ASSERT(m_exit_state < ctx_exit_signaled); //prevent infinite loops
-      BOOST_ASSERT(running());
-      BOOST_ASSERT(!pending());
+      HPX_ASSERT(m_exit_state < ctx_exit_signaled); //prevent infinite loops
+      HPX_ASSERT(running());
+      HPX_ASSERT(!pending());
 
       m_state = ctx_ready;
       do_yield();
 
-      BOOST_ASSERT(running());
+      HPX_ASSERT(running());
       check_exit_state();
     }
 
@@ -379,10 +379,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // bound to the future in fact hold a reference to it. If the coroutine
     // is exited the callback cannot be called.
     void wait(int n) {
-      BOOST_ASSERT(!(n<0));
-      BOOST_ASSERT(m_exit_state < ctx_exit_signaled); //prevent infinite loop
-      BOOST_ASSERT(running());
-      BOOST_ASSERT(!(pending() < n));
+      HPX_ASSERT(!(n<0));
+      HPX_ASSERT(m_exit_state < ctx_exit_signaled); //prevent infinite loop
+      HPX_ASSERT(running());
+      HPX_ASSERT(!(pending() < n));
 
       if(n == 0) return;
       m_wait_counter = n;
@@ -390,25 +390,25 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       m_state = ctx_waiting;
       do_yield();
 
-      BOOST_ASSERT(m_state == ctx_running);
+      HPX_ASSERT(m_state == ctx_running);
       check_exit_state();
-      BOOST_ASSERT(m_wait_counter == 0);
+      HPX_ASSERT(m_wait_counter == 0);
     }
 #endif
 
     // Throws: exit_exception.
     void yield_to(context_base& to)
     {
-      BOOST_ASSERT(m_exit_state < ctx_exit_signaled); //prevent infinite loops
-      BOOST_ASSERT(m_state == ctx_running);
-      BOOST_ASSERT(to.is_ready());
-      BOOST_ASSERT(!to.pending());
+      HPX_ASSERT(m_exit_state < ctx_exit_signaled); //prevent infinite loops
+      HPX_ASSERT(m_state == ctx_running);
+      HPX_ASSERT(to.is_ready());
+      HPX_ASSERT(!to.pending());
 
       std::swap(m_caller, to.m_caller);
       std::swap(m_state, to.m_state);
       swap_context(*this, to, detail::yield_to_hint());
 
-      BOOST_ASSERT(m_state == ctx_running);
+      HPX_ASSERT(m_state == ctx_running);
       check_exit_state();
     }
 
@@ -419,20 +419,20 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // Nothrow.
     void exit() throw()
     {
-      BOOST_ASSERT(!pending());
-      BOOST_ASSERT(is_ready()) ;
+      HPX_ASSERT(!pending());
+      HPX_ASSERT(is_ready()) ;
       if(m_exit_state < ctx_exit_pending)
         m_exit_state = ctx_exit_pending;
       do_invoke();
-      BOOST_ASSERT(exited()); // at this point the coroutine MUST have exited.
+      HPX_ASSERT(exited()); // at this point the coroutine MUST have exited.
     }
 
     // Always throw exit_exception.
     // Never returns from standard control flow.
     BOOST_ATTRIBUTE_NORETURN void exit_self()
     {
-      BOOST_ASSERT(!pending());
-      BOOST_ASSERT(running());
+      HPX_ASSERT(!pending());
+      HPX_ASSERT(running());
       m_exit_state = ctx_exit_pending;
       boost::throw_exception(exit_exception());
     }
@@ -440,11 +440,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // Nothrow.
     ~context_base() throw()
     {
-      BOOST_ASSERT(!running());
+      HPX_ASSERT(!running());
       try {
         if(!exited())
           exit();
-        BOOST_ASSERT(exited());
+        HPX_ASSERT(exited());
         m_thread_id = 0;
       }
       catch(...) {
@@ -516,9 +516,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     void rebind(thread_id_repr_type id)
     {
 #if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
-      BOOST_ASSERT(exited() && 0 == m_wait_counter && !pending());
+      HPX_ASSERT(exited() && 0 == m_wait_counter && !pending());
 #else
-      BOOST_ASSERT(exited() && !pending());
+      HPX_ASSERT(exited() && !pending());
 #endif
 
       m_thread_id = id;
@@ -526,10 +526,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       m_exit_state = ctx_exit_not_requested;
       m_exit_status = ctx_not_exited;
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
-      BOOST_ASSERT(m_phase == 0);
+      HPX_ASSERT(m_phase == 0);
 #endif
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
-      BOOST_ASSERT(m_thread_data == 0);
+      HPX_ASSERT(m_thread_data == 0);
 #endif
 #if BOOST_VERSION <= 104200 || BOOST_VERSION >= 104600
       m_type_info = boost::exception_ptr();
@@ -543,7 +543,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // Throws: exit_exception if an exit request is pending.
     void check_exit_state()
     {
-      BOOST_ASSERT(running());
+      HPX_ASSERT(running());
       if(!m_exit_state) return;
       boost::throw_exception(exit_exception());
     }
@@ -551,8 +551,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // Nothrow.
     void do_return(context_exit_status status, boost::exception_ptr& info) throw()
     {
-      BOOST_ASSERT(status != ctx_not_exited);
-      BOOST_ASSERT(m_state == ctx_running);
+      HPX_ASSERT(status != ctx_not_exited);
+      HPX_ASSERT(m_state == ctx_running);
       m_type_info = info;
       m_state = ctx_exited;
       m_exit_status = status;
@@ -570,7 +570,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     // Nothrow.
     void do_invoke() throw ()
     {
-      BOOST_ASSERT(is_ready() || waiting());
+      HPX_ASSERT(is_ready() || waiting());
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
       ++m_phase;
 #endif

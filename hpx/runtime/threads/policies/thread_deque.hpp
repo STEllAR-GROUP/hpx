@@ -31,7 +31,7 @@ namespace hpx { namespace threads { namespace policies
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
 ///////////////////////////////////////////////////////////////////////////////
 // We control whether to collect queue wait times using this global bool.
-// It will be set by any of the related performance counters. Once set it 
+// It will be set by any of the related performance counters. Once set it
 // stays set, thus no race conditions will occur.
 extern bool maintain_queue_wait_times;
 #endif
@@ -437,7 +437,7 @@ struct thread_deque
         mutex_type::scoped_lock lk(mtx_);
         if (unknown == state)
         {
-            BOOST_ASSERT((thread_map_.size()  + new_tasks_count_) <
+            HPX_ASSERT((thread_map_.size()  + new_tasks_count_) <
                 static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
             return static_cast<boost::int64_t>(thread_map_.size() + new_tasks_count_);
         }

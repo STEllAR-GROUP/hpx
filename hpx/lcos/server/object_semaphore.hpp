@@ -93,7 +93,7 @@ struct object_semaphore
         {
             ValueType value = value_queue_.front().val_;
 
-            BOOST_ASSERT(0 != value_queue_.front().count_);
+            HPX_ASSERT(0 != value_queue_.front().count_);
 
             if (1 == value_queue_.front().count_)
             {
@@ -183,7 +183,7 @@ struct object_semaphore
             }
         }
 
-        BOOST_ASSERT(thread_queue_.empty());
+        HPX_ASSERT(thread_queue_.empty());
     } // }}}
 
     void wait()

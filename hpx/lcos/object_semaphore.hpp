@@ -35,7 +35,7 @@ struct object_semaphore
         ValueType const& val
       , boost::uint64_t count = 1)
     {
-        BOOST_ASSERT(this->get_gid());
+        HPX_ASSERT(this->get_gid());
         return this->base_type::signal_async(this->get_gid(), val, count);
     }
 
@@ -43,7 +43,7 @@ struct object_semaphore
         ValueType const& val
       , boost::uint64_t count = 1)
     {
-        BOOST_ASSERT(this->get_gid());
+        HPX_ASSERT(this->get_gid());
         return this->base_type::signal_sync(this->get_gid(), val, count);
     }
 
@@ -57,13 +57,13 @@ struct object_semaphore
     ///////////////////////////////////////////////////////////////////////////
     lcos::future<ValueType> get_async()
     {
-        BOOST_ASSERT(this->get_gid());
+        HPX_ASSERT(this->get_gid());
         return this->base_type::get_async(this->get_gid());
     }
 
     ValueType get_sync()
     {
-        BOOST_ASSERT(this->get_gid());
+        HPX_ASSERT(this->get_gid());
         return this->base_type::get_sync(this->get_gid());
     }
 
@@ -73,13 +73,13 @@ struct object_semaphore
     ///////////////////////////////////////////////////////////////////////////
     void abort_pending_async(error ec = no_success)
     {
-        BOOST_ASSERT(this->get_gid());
+        HPX_ASSERT(this->get_gid());
         this->base_type::abort_pending_sync(this->get_gid(), ec);
     }
 
     void abort_pending_sync(error ec = no_success)
     {
-        BOOST_ASSERT(this->get_gid());
+        HPX_ASSERT(this->get_gid());
         this->base_type::abort_pending_sync(this->get_gid(), ec);
     }
 
@@ -89,13 +89,13 @@ struct object_semaphore
     ///////////////////////////////////////////////////////////////////////////
     void wait_async()
     {
-        BOOST_ASSERT(this->get_gid());
+        HPX_ASSERT(this->get_gid());
         this->base_type::wait_sync(this->get_gid());
     }
 
     void wait_sync()
     {
-        BOOST_ASSERT(this->get_gid());
+        HPX_ASSERT(this->get_gid());
         this->base_type::wait_sync(this->get_gid());
     }
 

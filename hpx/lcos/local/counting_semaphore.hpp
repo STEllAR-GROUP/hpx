@@ -14,7 +14,7 @@
 #include <hpx/util/stringstream.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/intrusive/slist.hpp>
 
 #if defined(BOOST_MSVC)

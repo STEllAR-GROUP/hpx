@@ -118,7 +118,7 @@ namespace hpx { namespace parcelset
         ///                 id (if not already set).
         virtual void send_early_parcel(parcel& p)
         {
-            BOOST_ASSERT(false);    // is implemented in tcp::parcelport only
+            HPX_ASSERT(false);    // is implemented in tcp::parcelport only
         }
 
         /// Cache specific functionality
@@ -165,7 +165,7 @@ namespace hpx { namespace parcelset
             return 0;
         }
 
-        /// Return the name of this locality 
+        /// Return the name of this locality
         virtual std::string get_locality_name() const
         {
             return "<unknown>";

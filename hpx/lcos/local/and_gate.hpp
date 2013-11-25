@@ -13,7 +13,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/move/move.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/foreach.hpp>
 
 #include <list>
@@ -71,7 +71,7 @@ namespace hpx { namespace lcos { namespace local
             BOOST_FOREACH(conditional_trigger* c, conditions_)
             {
                 triggered |= c->set(rc);
-                if (rc && (&ec != &throws)) 
+                if (rc && (&ec != &throws))
                     ec = rc;
             }
             return triggered;
@@ -85,12 +85,12 @@ namespace hpx { namespace lcos { namespace local
             typename mutex_type::scoped_lock l(mtx_);
             init_locked(count, ec);
             if (!ec) {
-                BOOST_ASSERT(generation_ != std::size_t(-1));
+                HPX_ASSERT(generation_ != std::size_t(-1));
                 ++generation_;
 
                 trigger_conditions(ec);   // re-check/trigger condition, if needed
                 if (!ec) {
-                    if (generation) 
+                    if (generation)
                         *generation = generation_;
                     return promise_.get_future(ec);
                 }
@@ -183,7 +183,7 @@ namespace hpx { namespace lcos { namespace local
             char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
-            BOOST_ASSERT(l.owns_lock());
+            HPX_ASSERT(l.owns_lock());
 
             if (generation < generation_)
             {
@@ -215,7 +215,7 @@ namespace hpx { namespace lcos { namespace local
         std::size_t next_generation()
         {
             typename mutex_type::scoped_lock l(mtx_);
-            BOOST_ASSERT(generation_ != std::size_t(-1));
+            HPX_ASSERT(generation_ != std::size_t(-1));
             std::size_t retval = ++generation_;
 
             trigger_conditions();   // re-check/trigger condition, if needed
@@ -257,8 +257,8 @@ namespace hpx { namespace lcos { namespace local
 
 
     ///////////////////////////////////////////////////////////////////////////
-    // Note: This type is not thread-safe. It has to be protected from 
-    //       concurrent access by different threads by the code using instances 
+    // Note: This type is not thread-safe. It has to be protected from
+    //       concurrent access by different threads by the code using instances
     //       of this type.
     struct and_gate : public base_and_gate<no_mutex>
     {

@@ -44,7 +44,7 @@
 #include <new>
 #include <iostream>
 #include <boost/type_traits.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #include <sys/mman.h>
@@ -103,7 +103,7 @@ HPX_EXPORT extern bool use_guard_pages;
 
   inline
   void watermark_stack(void* stack, std::size_t size) {
-    BOOST_ASSERT(size > EXEC_PAGESIZE);
+    HPX_ASSERT(size > EXEC_PAGESIZE);
 
     // Fill the bottom 8 bytes of the first page with 1s.
     void** watermark = static_cast<void**>(stack) + ((size - EXEC_PAGESIZE) / sizeof(void*));

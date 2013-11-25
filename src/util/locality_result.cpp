@@ -53,7 +53,7 @@ namespace hpx { namespace util
 
     naming::id_type const& locality_result_iterator::data::dereference() const
     {
-        BOOST_ASSERT(!is_at_end_);
+        HPX_ASSERT(!is_at_end_);
         return *current_gid_;
     }
 

@@ -112,7 +112,7 @@ namespace hpx { namespace util
             return true;
         }
 
-        BOOST_ASSERT(id_ == 0);
+        HPX_ASSERT(id_ == 0);
         return false;
     }
 
@@ -164,7 +164,7 @@ namespace hpx { namespace util
 
             // some other thread might already have started the timer
             if (0 == id_ && result) {
-                BOOST_ASSERT(!is_started_);
+                HPX_ASSERT(!is_started_);
                 schedule_thread();        // wait and repeat
             }
         }

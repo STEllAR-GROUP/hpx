@@ -12,7 +12,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/vector.hpp>

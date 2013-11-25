@@ -10,7 +10,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include "partition.hpp"
 #include "../read_values.hpp"
@@ -57,7 +57,7 @@ namespace interpolate1d { namespace server
         }
 
         std::size_t index = static_cast<std::size_t>((value - min_value_) / delta_);
-        BOOST_ASSERT(0 <= index && index < dim_.count_);
+        HPX_ASSERT(0 <= index && index < dim_.count_);
 
         return values_[index];
     }

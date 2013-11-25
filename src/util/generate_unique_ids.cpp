@@ -13,7 +13,7 @@
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/logging.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/swap.hpp>
 #include <boost/format.hpp>
 

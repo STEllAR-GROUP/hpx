@@ -19,7 +19,7 @@
 #include <hpx/util/filesystem_compatibility.hpp>
 
 #include <boost/cstdint.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/current_function.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/throw_exception.hpp>
@@ -424,7 +424,7 @@ namespace hpx
         explicit exception(error e)
           : boost::system::system_error(make_error_code(e, plain))
         {
-            BOOST_ASSERT(e >= success && e < last_error);
+            HPX_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
 
@@ -449,7 +449,7 @@ namespace hpx
         exception(error e, char const* msg, throwmode mode = plain)
           : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
-            BOOST_ASSERT(e >= success && e < last_error);
+            HPX_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
 
@@ -467,7 +467,7 @@ namespace hpx
         exception(error e, std::string const& msg, throwmode mode = plain)
           : boost::system::system_error(make_system_error_code(e, mode), msg)
         {
-            BOOST_ASSERT(e >= success && e < last_error);
+            HPX_ASSERT(e >= success && e < last_error);
             LERR_(error) << "created exception: " << this->what();
         }
 
@@ -702,12 +702,12 @@ namespace hpx
         void throw_exception(Exception const& e,
             std::string const& func, std::string const& file, long line);
 
-        // BOOST_ASSERT handler
+        // HPX_ASSERT handler
         BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
         void assertion_failed(char const* expr, char const* function,
             char const* file, long line);
 
-        // BOOST_ASSERT_MSG handler
+        // HPX_ASSERT_MSG handler
         BOOST_ATTRIBUTE_NORETURN HPX_EXPORT
         void assertion_failed_msg(char const* msg, char const* expr,
             char const* function, char const* file, long line);
@@ -1410,26 +1410,26 @@ namespace hpx
         }
         return *this;
     }
-    // \endcond
-}
 
-/// \cond NOEXTERNAL
-namespace boost
-{
-    // forwarder for BOOST_ASSERT handler
+        // forwarder for HPX_ASSERT handler
     inline void assertion_failed(char const* expr, char const* function,
         char const* file, long line)
     {
         hpx::detail::assertion_failed(expr, function, file, line);
     }
 
-    // forwarder for BOOST_ASSERT_MSG handler
+    // forwarder for HPX_ASSERT_MSG handler
     inline void assertion_failed_msg(char const* msg, char const* expr,
         char const* function, char const* file, long line)
     {
         hpx::detail::assertion_failed_msg(msg, expr, function, file, line);
     }
+    // \endcond
+}
 
+/// \cond NOEXTERNAL
+namespace boost
+{
     namespace system
     {
         // make sure our errors get recognized by the Boost.System library

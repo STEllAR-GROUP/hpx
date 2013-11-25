@@ -14,7 +14,7 @@
 #include <boost/chrono/config.hpp>
 #include <boost/chrono/io/time_point_units.hpp>
 #include <boost/chrono/io/duration_put.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <locale>
 
 namespace boost
@@ -135,7 +135,7 @@ namespace boost
               break;
             }
             default:
-              BOOST_ASSERT(false && "Boost::Chrono internal error.");
+              HPX_ASSERT(false && "Boost::Chrono internal error.");
               break;
             }
           }

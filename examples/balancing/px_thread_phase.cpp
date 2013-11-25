@@ -139,7 +139,7 @@ int hpx_main(variables_map& vm)
 
         while (pxthreads.dequeue(entry))
         {
-            BOOST_ASSERT(entry);
+            HPX_ASSERT(entry);
             std::cout << "  " << entry->first << "," << entry->second << "\n";
             delete entry;
         }
@@ -148,7 +148,7 @@ int hpx_main(variables_map& vm)
         // Destroy the mutexes.
         for (std::size_t j = 0; j < mutex_count; ++j)
         {
-            BOOST_ASSERT(m[j]);
+            HPX_ASSERT(m[j]);
             delete m[j];
         }
     }

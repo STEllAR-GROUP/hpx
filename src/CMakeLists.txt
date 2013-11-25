@@ -92,7 +92,7 @@ add_hpx_library_sources(hpx
 add_hpx_library_sources(hpx
   GLOB_RECURSE GLOBS "${hpx_SOURCE_DIR}/src/lcos/*.cpp"
   APPEND)
-  
+
 
 # libhpx_init sources
 add_hpx_library_sources(hpx_init
@@ -406,7 +406,7 @@ set_property(TARGET hpx APPEND
   "HPX_COMPONENT_NAME=hpx"
   "HPX_EXPORTS"
   "HPX_LIMIT=4"
-  "BOOST_ENABLE_ASSERT_HANDLER"
+  "HPX_ENABLE_ASSERT_HANDLER"
   "HPX_COROUTINE_EXPORTS") # Do we still need this?
 
 if(NOT HPX_NO_INSTALL)
@@ -427,7 +427,7 @@ set_property(TARGET hpx_init APPEND
   PROPERTY COMPILE_DEFINITIONS
   "HPX_APPLICATION_EXPORTS"
   "HPX_LIMIT=4"
-  "BOOST_ENABLE_ASSERT_HANDLER")
+  "HPX_ENABLE_ASSERT_HANDLER")
 
 if(MSVC)
   set_target_properties(hpx_init PROPERTIES

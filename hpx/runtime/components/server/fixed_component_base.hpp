@@ -49,7 +49,7 @@ public:
 
     /// \brief finalize() will be called just before the instance gets
     ///        destructed
-    void finalize() 
+    void finalize()
     {
         /// Unbind the GID if it's not this instantiations fixed gid and is
         /// is not invalid.
@@ -150,12 +150,12 @@ namespace detail
     {
         static Component* alloc(std::size_t count)
         {
-            BOOST_ASSERT(false);        // this shouldn't ever be called
+            HPX_ASSERT(false);        // this shouldn't ever be called
             return 0;
         }
         static void free(void* p, std::size_t count)
         {
-            BOOST_ASSERT(false);        // this shouldn't ever be called
+            HPX_ASSERT(false);        // this shouldn't ever be called
         }
     };
 }
@@ -174,7 +174,7 @@ class fixed_component : public Component
     ///         initialization of instances of the derived components.
     static Component* create(std::size_t count)
     {
-        BOOST_ASSERT(false);        // this shouldn't ever be called
+        HPX_ASSERT(false);        // this shouldn't ever be called
         return 0;
     }
 
@@ -182,7 +182,7 @@ class fixed_component : public Component
     ///         de-allocation of instances of the derived components.
     static void destroy(Component* p, std::size_t count = 1)
     {
-        BOOST_ASSERT(false);        // this shouldn't ever be called
+        HPX_ASSERT(false);        // this shouldn't ever be called
     }
 };
 

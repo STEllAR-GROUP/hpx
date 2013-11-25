@@ -124,7 +124,7 @@ namespace hpx { namespace threads
                 ++punits_[i].use_count_;
             }
         }
-        BOOST_ASSERT(punit <= max_punits);
+        HPX_ASSERT(punit <= max_punits);
 
         if (ec) {
             // on error, remove the already assigned virtual cores
@@ -174,7 +174,7 @@ namespace hpx { namespace threads
         // adjust resource usage count
         BOOST_FOREACH(coreids_type coreids, (*it).second.core_ids_)
         {
-            BOOST_ASSERT(punits_[coreids.first].use_count_ != 0);
+            HPX_ASSERT(punits_[coreids.first].use_count_ != 0);
             --punits_[coreids.first].use_count_;
         }
 

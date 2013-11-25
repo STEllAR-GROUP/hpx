@@ -36,7 +36,7 @@
 #endif
 
 #include <cstddef>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/optional.hpp>
 #include <boost/config.hpp>
 #include <boost/move/move.hpp>
@@ -95,13 +95,13 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
 #if HPX_COROUTINE_ARG_MAX > 1
     result_slot_type * result() {
-      BOOST_ASSERT(m_result);
-      BOOST_ASSERT(*m_result);
+      HPX_ASSERT(m_result);
+      HPX_ASSERT(*m_result);
       return *this->m_result;
     }
 
     arg_slot_type * args() {
-      BOOST_ASSERT(m_arg);
+      HPX_ASSERT(m_arg);
       return m_arg;
     };
 
@@ -125,14 +125,14 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #else
     result_type * result()
     {
-      BOOST_ASSERT(m_result);
+      HPX_ASSERT(m_result);
       return *this->m_result;
     }
 
     typedef typename arg_slot_traits::template at<0>::type arg0_type;
     arg0_type * args()
     {
-      BOOST_ASSERT(m_arg);
+      HPX_ASSERT(m_arg);
       return m_arg;
     };
 
@@ -280,8 +280,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     ~coroutine_impl_wrapper()
     {
-        BOOST_ASSERT(!m_fun);   // functor should have been reset by now
-        BOOST_ASSERT(!target_);
+        HPX_ASSERT(!m_fun);   // functor should have been reset by now
+        HPX_ASSERT(!target_);
     }
 
     void operator()()
@@ -299,7 +299,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if defined(HPX_GENERIC_COROUTINES)
           do_call<result_type>();
 #else
-          BOOST_ASSERT(this->count() > 0);
+          HPX_ASSERT(this->count() > 0);
 
           typedef typename coroutine_type::self self_type;
           {
@@ -348,7 +348,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       } while (this->m_state == super_type::ctx_running);
 
       // should not get here, never
-      BOOST_ASSERT(this->m_state == super_type::ctx_running);
+      HPX_ASSERT(this->m_state == super_type::ctx_running);
     }
 
   protected:
@@ -384,7 +384,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typename boost::enable_if<boost::is_void<ResultType> >::type
     do_call(dummy<0> = 0)
     {
-      BOOST_ASSERT(this->count() > 0);
+      HPX_ASSERT(this->count() > 0);
 
       typedef typename coroutine_type::self self_type;
 
@@ -409,7 +409,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typename boost::disable_if<boost::is_void<ResultType> >::type
     do_call(dummy<1> = 1)
     {
-      BOOST_ASSERT(this->count() > 0);
+      HPX_ASSERT(this->count() > 0);
 
       typedef typename coroutine_type::self self_type;
       typedef typename coroutine_type::arg_slot_traits traits;

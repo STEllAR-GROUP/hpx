@@ -12,7 +12,7 @@
 #include <hpx/runtime/parcelset/mpi/allocator.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/move/move.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -64,7 +64,7 @@ namespace hpx { namespace parcelset { namespace mpi
             buffer_->send_data_.time_ = util::high_resolution_clock::now();
 
             header_.assert_valid();
-            BOOST_ASSERT(header_.rank() != util::mpi_environment::rank());
+            HPX_ASSERT(header_.rank() != util::mpi_environment::rank());
 
             MPI_Isend(
                 header_.data(),         // Data pointer
@@ -106,7 +106,7 @@ namespace hpx { namespace parcelset { namespace mpi
                 }
             case sent_header:
                 {
-                    BOOST_ASSERT(static_cast<std::size_t>(header_.size()) ==
+                    HPX_ASSERT(static_cast<std::size_t>(header_.size()) ==
                         buffer_->buffer_->size());
                     state_ = sending_data;
                     return done(pp);
@@ -143,7 +143,7 @@ namespace hpx { namespace parcelset { namespace mpi
             default:
             case invalid:
                 {
-                    BOOST_ASSERT(false);
+                    HPX_ASSERT(false);
                 }
                 return false;
             }

@@ -15,7 +15,7 @@
 #include <hpx/runtime/parcelset/parcelhandler_queue_base.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 namespace hpx { namespace parcelset { namespace policies
 {
@@ -53,7 +53,7 @@ namespace hpx { namespace parcelset { namespace policies
             }
 
             // do some work (notify event handlers)
-            BOOST_ASSERT(ph_ != 0);
+            HPX_ASSERT(ph_ != 0);
             notify_(*ph_, id);
             return true;
         }
@@ -101,7 +101,7 @@ namespace hpx { namespace parcelset { namespace policies
 
         void set_parcelhandler(parcelhandler* ph)
         {
-            BOOST_ASSERT(ph_ == 0);
+            HPX_ASSERT(ph_ == 0);
             ph_ = ph;
         }
 

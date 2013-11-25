@@ -152,7 +152,7 @@ namespace hpx { namespace util {
             typename result<unwrapped_param_value(Tuple, Future)>::type
             invoke(Tuple t, Future & f, boost::mpl::false_, boost::mpl::false_) const
             {
-                BOOST_ASSERT(f.is_ready());
+                HPX_ASSERT(f.is_ready());
                 typename lcos::detail::future_traits<Future>::type
                     val(boost::move(f.get()));
                 f = Future();
@@ -169,7 +169,7 @@ namespace hpx { namespace util {
             typename result<unwrapped_param_value(Tuple, Future)>::type
             invoke(Tuple t, Future & f, boost::mpl::false_, boost::mpl::true_) const
             {
-                BOOST_ASSERT(f.is_ready());
+                HPX_ASSERT(f.is_ready());
                 f.get();
                 f = Future();
                 return boost::move(t);
@@ -185,7 +185,7 @@ namespace hpx { namespace util {
 
                 BOOST_FOREACH(typename Range::value_type & f, r)
                 {
-                    BOOST_ASSERT(f.is_ready());
+                    HPX_ASSERT(f.is_ready());
                     res.push_back(boost::move(f.get()));
                 }
                 r = Range();
@@ -205,7 +205,7 @@ namespace hpx { namespace util {
             {
                 BOOST_FOREACH(typename Range::value_type const & f, r)
                 {
-                    BOOST_ASSERT(f.is_ready());
+                    HPX_ASSERT(f.is_ready());
                     f.get();
                 }
                 r = Range();

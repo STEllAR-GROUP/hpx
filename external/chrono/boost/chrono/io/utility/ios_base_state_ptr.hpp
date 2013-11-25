@@ -11,7 +11,7 @@
 #define BOOST_CHRONO_UTILITY_IOS_BASE_STATE_PTR_HPP
 
 #include <ios>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 /**
  *
@@ -313,7 +313,7 @@ namespace boost
 
       void reset(T* new_value) BOOST_NOEXCEPT
       {
-        BOOST_ASSERT(new_value!=0);
+        HPX_ASSERT(new_value!=0);
         this->base_type::reset(new_value);
       }
 

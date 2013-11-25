@@ -49,7 +49,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const& gid,
                 naming::address const& addr)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
 
@@ -187,7 +187,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, HPX_ENUM_FWD_ARGS(N, Arg, arg))
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
 

@@ -83,7 +83,7 @@ struct abp_queue_scheduler : public scheduler_base
         topology_(get_topology()),
         stolen_threads_(0)
     {
-        BOOST_ASSERT(init.num_queues_ != 0);
+        HPX_ASSERT(init.num_queues_ != 0);
         for (std::size_t i = 0; i < init.num_queues_; ++i)
             queues_[i] = new thread_deque(init.max_queue_thread_count_);
     }
@@ -126,7 +126,7 @@ struct abp_queue_scheduler : public scheduler_base
         // Return queue length of one specific queue.
         if (std::size_t(-1) != num_thread)
         {
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
             return queues_[num_thread]->get_queue_length();
         }
 
@@ -146,7 +146,7 @@ struct abp_queue_scheduler : public scheduler_base
         // Return thread count of one specific queue.
         if (std::size_t(-1) != num_thread)
         {
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
             return queues_[num_thread]->get_thread_count(state);
         }
 
@@ -165,7 +165,7 @@ struct abp_queue_scheduler : public scheduler_base
         //  Return average thread wait time of one specific queue.
         if (std::size_t(-1) != num_thread)
         {
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
             return queues_[num_thread]->get_average_thread_wait_time();
         }
 
@@ -183,7 +183,7 @@ struct abp_queue_scheduler : public scheduler_base
         //  Return average task wait time of one specific queue.
         if (std::size_t(-1) != num_thread)
         {
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
             return queues_[num_thread]->get_average_task_wait_time();
         }
 
@@ -241,7 +241,7 @@ struct abp_queue_scheduler : public scheduler_base
     bool get_next_thread(std::size_t num_thread, bool running,
          boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
     {
-        BOOST_ASSERT(num_thread < queues_.size());
+        HPX_ASSERT(num_thread < queues_.size());
 
         // first try to get the next thread from our own queue
         std::size_t queue_size = queues_.size();
@@ -266,7 +266,7 @@ struct abp_queue_scheduler : public scheduler_base
         thread_priority /*priority*/ = thread_priority_normal)
     {
         if (std::size_t(-1) != num_thread) {
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
             queues_[num_thread]->schedule_thread(thrd);
         }
         else {
@@ -278,7 +278,7 @@ struct abp_queue_scheduler : public scheduler_base
         thread_priority /*priority*/ = thread_priority_normal)
     {
         if (std::size_t(-1) != num_thread) {
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
             queues_[num_thread]->schedule_thread_last(thrd);
         }
         else {
@@ -300,7 +300,7 @@ struct abp_queue_scheduler : public scheduler_base
     bool wait_or_add_new(std::size_t num_thread, bool running,
                          boost::int64_t& idle_loop_count)
     {
-        BOOST_ASSERT(num_thread < queues_.size());
+        HPX_ASSERT(num_thread < queues_.size());
 
         std::size_t added = 0;
         bool result = queues_[num_thread]->add_new_or_terminate(

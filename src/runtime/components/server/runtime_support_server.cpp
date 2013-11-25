@@ -41,7 +41,7 @@
 #include <set>
 
 #include <boost/foreach.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/path.hpp>
@@ -581,7 +581,7 @@ namespace hpx { namespace components { namespace server
     {
         // re-acquire pointer to self as it might have changed
         threads::thread_self* self = threads::get_self_ptr();
-        BOOST_ASSERT(0 != self);    // needs to be executed by a PX thread
+        HPX_ASSERT(0 != self);    // needs to be executed by a PX thread
 
         // give the scheduler some time to work on remaining tasks
         {
@@ -601,7 +601,7 @@ namespace hpx { namespace components { namespace server
             // push pending logs
             components::cleanup_logging();
 
-            BOOST_ASSERT(!terminated_);
+            HPX_ASSERT(!terminated_);
 
             stopped_ = true;
 
@@ -817,7 +817,7 @@ namespace hpx { namespace components { namespace server
     }
 
     util::binary_filter* runtime_support::create_binary_filter(
-        char const* binary_filter_type, bool compress, 
+        char const* binary_filter_type, bool compress,
         util::binary_filter* next_filter, error_code& ec)
     {
         // locate the factory for the requested plugin type

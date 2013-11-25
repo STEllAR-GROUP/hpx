@@ -79,7 +79,7 @@ namespace hpx { namespace parcelset { namespace tcp
         }
     }
 
-    /// Return the name of this locality 
+    /// Return the name of this locality
     std::string parcelport::get_locality_name() const
     {
         return boost::asio::ip::host_name();
@@ -267,7 +267,7 @@ namespace hpx { namespace parcelset { namespace tcp
         // make sure all parcels go to the same locality
         for (std::size_t i = 1; i != parcels.size(); ++i)
         {
-            BOOST_ASSERT(locality_id == parcels[i].get_destination_locality());
+            HPX_ASSERT(locality_id == parcels[i].get_destination_locality());
         }
 #endif
 
@@ -362,7 +362,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
             if (it != pending_parcels_.end() && !it->second.first.empty())
             {
-                BOOST_ASSERT(it->first == locality_id);
+                HPX_ASSERT(it->first == locality_id);
                 std::swap(parcels, it->second.first);
                 std::swap(handlers, it->second.second);
 
@@ -370,8 +370,8 @@ namespace hpx { namespace parcelset { namespace tcp
                 {
                     // if no parcels are pending re-add the connection to
                     // the cache
-                    BOOST_ASSERT(handlers.empty());
-                    BOOST_ASSERT(locality_id == client_connection->destination());
+                    HPX_ASSERT(handlers.empty());
+                    HPX_ASSERT(locality_id == client_connection->destination());
                     connection_cache_.reclaim(locality_id, client_connection);
                     return;
                 }
@@ -380,7 +380,7 @@ namespace hpx { namespace parcelset { namespace tcp
             {
                 // Give this connection back to the cache as it's not
                 // needed anymore.
-                BOOST_ASSERT(locality_id == client_connection->destination());
+                HPX_ASSERT(locality_id == client_connection->destination());
                 connection_cache_.reclaim(locality_id, client_connection);
                 return;
             }
@@ -402,7 +402,7 @@ namespace hpx { namespace parcelset { namespace tcp
             lcos::local::spinlock::scoped_lock l(mtx_);
 
             // Give this connection back to the cache as it's not  needed anymore.
-            BOOST_ASSERT(locality_id == client_connection->destination());
+            HPX_ASSERT(locality_id == client_connection->destination());
             connection_cache_.reclaim(locality_id, client_connection);
 
             pending_parcels_map::iterator it = pending_parcels_.find(locality_id);
@@ -432,10 +432,10 @@ namespace hpx { namespace parcelset { namespace tcp
         BOOST_FOREACH(parcel const& p, parcels)
         {
             naming::locality const parcel_locality_id = p.get_destination_locality();
-            BOOST_ASSERT(parcel_locality_id == client_connection->destination());
-            BOOST_ASSERT(parcel_locality_id.get_address() ==
+            HPX_ASSERT(parcel_locality_id == client_connection->destination());
+            HPX_ASSERT(parcel_locality_id.get_address() ==
                 s.remote_endpoint().address().to_string());
-            BOOST_ASSERT(parcel_locality_id.get_port() ==
+            HPX_ASSERT(parcel_locality_id.get_port() ==
                 s.remote_endpoint().port());
         }
 #endif
@@ -554,12 +554,12 @@ namespace hpx { namespace parcelset { namespace tcp
         }
 #endif
 #if defined(HPX_DEBUG)
-        BOOST_ASSERT(l == client_connection->destination());
+        HPX_ASSERT(l == client_connection->destination());
 
         std::string connection_addr = s.remote_endpoint().address().to_string();
         boost::uint16_t connection_port = s.remote_endpoint().port();
-        BOOST_ASSERT(l.get_address() == connection_addr);
-        BOOST_ASSERT(l.get_port() == connection_port);
+        HPX_ASSERT(l.get_address() == connection_addr);
+        HPX_ASSERT(l.get_port() == connection_port);
 #endif
 
         if (&ec != &throws)
@@ -698,7 +698,7 @@ namespace hpx { namespace parcelset { namespace tcp
                         archive >> p;
 #endif
                         // make sure this parcel ended up on the right locality
-                        BOOST_ASSERT(p.get_destination_locality() == pp.here());
+                        HPX_ASSERT(p.get_destination_locality() == pp.here());
 
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();
@@ -809,7 +809,7 @@ namespace hpx { namespace parcelset { namespace tcp
             return;
         }
 
-        BOOST_ASSERT(client_connection.get() != 0);
+        HPX_ASSERT(client_connection.get() != 0);
         client_connection->set_parcel(p);
         client_connection->async_write(early_write_handler,
             early_pending_parcel_handler);

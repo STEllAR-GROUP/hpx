@@ -15,7 +15,7 @@
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/config/emulate_deleted.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/atomic.hpp>
 #include <boost/config.hpp>
 #include <boost/noncopyable.hpp>

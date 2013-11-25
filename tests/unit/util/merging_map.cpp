@@ -25,7 +25,7 @@ struct incrementer
         )
       : amount_(amount)
     {
-        BOOST_ASSERT(amount);
+        HPX_ASSERT(amount);
     }
 
     incrementer(
@@ -57,7 +57,7 @@ struct decrementer
         )
       : amount_(amount)
     {
-        BOOST_ASSERT(amount);
+        HPX_ASSERT(amount);
     }
 
     decrementer(

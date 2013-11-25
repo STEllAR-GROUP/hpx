@@ -26,7 +26,7 @@ time2_demo contained this comment:
                    Anthony Williams.
 */
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/chrono/chrono.hpp>
 #include <boost/type_traits.hpp>
 
@@ -106,14 +106,14 @@ void test_duration_multiply()
 void f(duration<double> d, double res)  // accept floating point seconds
 {
     // d.count() == 3.e-6 when passed microseconds(3)
-    BOOST_ASSERT(d.count()==res);
+    HPX_ASSERT(d.count()==res);
 }
 
 void g(nanoseconds d, boost::intmax_t res)
 {
     // d.count() == 3000 when passed microseconds(3)
     std::cout << d.count() << " " <<res << std::endl;
-    BOOST_ASSERT(d.count()==res);
+    HPX_ASSERT(d.count()==res);
 }
 
 template <class Rep, class Period>
@@ -124,7 +124,7 @@ void tmpl(duration<Rep, Period> d, boost::intmax_t res)
     if (ns < d)
         ++ns;
     // ns.count() == 333333334 when passed 1/3 of a floating point second
-    BOOST_ASSERT(ns.count()==res);
+    HPX_ASSERT(ns.count()==res);
 }
 
 template <class Period>
@@ -135,7 +135,7 @@ void tmpl2(duration<long long, Period> d, boost::intmax_t res)
     if (ns < d)
         ++ns;
     // ns.count() == 333333334 when passed 333333333333 picoseconds
-    BOOST_ASSERT(ns.count()==res);
+    HPX_ASSERT(ns.count()==res);
 }
 
 
@@ -145,26 +145,26 @@ int main()
     minutes m1(3);                 // m1 stores 3
     minutes m2(2);                 // m2 stores 2
     minutes m3 = m1 + m2;          // m3 stores 5
-    BOOST_ASSERT(m3.count()==5);
+    HPX_ASSERT(m3.count()==5);
 
     microseconds us1(3);           // us1 stores 3
     microseconds us2(2);           // us2 stores 2
     microseconds us3 = us1 + us2;  // us3 stores 5
-    BOOST_ASSERT(us3.count()==5);
+    HPX_ASSERT(us3.count()==5);
 
     microseconds us4 = m3 + us3;   // us4 stores 300000005
-    BOOST_ASSERT(us4.count()==300000005);
+    HPX_ASSERT(us4.count()==300000005);
     microseconds us5 = m3;   // us4 stores 300000000
-    BOOST_ASSERT(us5.count()==300000000);
+    HPX_ASSERT(us5.count()==300000000);
 
     //minutes m4 = m3 + us3; // won't compile
 
     minutes m4 = duration_cast<minutes>(m3 + us3);  // m4.count() == 5
-    BOOST_ASSERT(m4.count()==5);
+    HPX_ASSERT(m4.count()==5);
 
     typedef duration<double, boost::ratio<60> > dminutes;
     dminutes dm4 = m3 + us3;  // dm4.count() == 5.000000083333333
-    BOOST_ASSERT(dm4.count()==5.000000083333333);
+    HPX_ASSERT(dm4.count()==5.000000083333333);
 
     f(microseconds(3), 0.000003);
     g(microseconds(3), 3000);

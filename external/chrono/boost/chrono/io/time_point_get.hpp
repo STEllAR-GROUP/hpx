@@ -12,7 +12,7 @@
 #include <boost/chrono/detail/scan_keyword.hpp>
 #include <boost/chrono/io/time_point_units.hpp>
 #include <boost/chrono/io/duration_get.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <locale>
 #include <string>
 
@@ -175,7 +175,7 @@ namespace boost
               break;
             }
             default:
-              BOOST_ASSERT(false && "Boost::Chrono internal error.");
+              HPX_ASSERT(false && "Boost::Chrono internal error.");
               break;
             }
 

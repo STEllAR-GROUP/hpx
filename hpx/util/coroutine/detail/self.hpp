@@ -30,17 +30,17 @@
 #define HPX_COROUTINE_DETAIL_SELF_HPP_20060809
 
 #include <boost/noncopyable.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/move/move.hpp>
 
 #include <hpx/util/coroutine/detail/fix_result.hpp>
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/util/function.hpp>
 
-namespace hpx { namespace util { namespace coroutines { namespace detail 
+namespace hpx { namespace util { namespace coroutines { namespace detail
 {
   template <typename Coroutine>
-  class coroutine_self : boost::noncopyable 
+  class coroutine_self : boost::noncopyable
   {
     // store the current this and write it to the TSS on exit
     struct reset_self_on_exit
@@ -86,7 +86,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
                 BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()           \
 /**/
 
-    yield_result_type yield(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX, 
+    yield_result_type yield(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX,
         HPX_COROUTINE_PARAM_WITH_DEFAULT, typename yield_traits::arg))
     {
         return yield_impl(typename coroutine_type::result_slot_type(
@@ -95,7 +95,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     template <typename Target>
     yield_result_type yield_to(Target& target
-        BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX, 
+        BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX,
             HPX_COROUTINE_PARAM_WITH_DEFAULT, typename Target::arg))
     {
         typedef typename Target::arg_slot_type slot_type;
@@ -108,7 +108,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #else
 
     typedef typename yield_traits::arg0_type arg0_type;
-    typedef util::function_nonser<yield_result_type(arg0_type)> 
+    typedef util::function_nonser<yield_result_type(arg0_type)>
         yield_decorator_type;
 
     yield_result_type yield(arg0_type arg0 = arg0_type())
@@ -118,7 +118,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     yield_result_type yield_impl(arg0_type arg0)
     {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
 
       this->m_pimpl->bind_result(&arg0);
       {
@@ -169,22 +169,22 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         typename coroutine_type::arg_slot_traits>(*m_pimpl->args());
     }
 
-    bool pending() const 
+    bool pending() const
     {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
       return m_pimpl->pending();
     }
 
-    thread_id_repr_type get_thread_id() const 
+    thread_id_repr_type get_thread_id() const
     {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
       return m_pimpl->get_thread_id();
     }
 
-    std::size_t get_thread_phase() const 
+    std::size_t get_thread_phase() const
     {
 #if HPX_THREAD_MAINTAIN_PHASE_INFORMATION
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
       return m_pimpl->get_thread_phase();
 #else
       return 0;
@@ -198,26 +198,26 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
     std::size_t get_thread_data() const
     {
-        BOOST_ASSERT(m_pimpl);
+        HPX_ASSERT(m_pimpl);
         return m_pimpl->get_thread_data();
     }
     std::size_t set_thread_data(std::size_t data)
     {
-        BOOST_ASSERT(m_pimpl);
+        HPX_ASSERT(m_pimpl);
         return m_pimpl->set_thread_data(data);
     }
 #endif
 
 #if defined(HPX_GENERIC_COROUTINES)
   private:
-    coroutine_self(impl_type * pimpl, detail::init_from_impl_tag) 
+    coroutine_self(impl_type * pimpl, detail::init_from_impl_tag)
       : m_pimpl(pimpl), next_self_(0)
     {}
 
     yield_result_type yield_impl(
         typename coroutine_type::result_slot_type result_)
     {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
 
       this->m_pimpl->bind_result(&result_);
       {
@@ -233,7 +233,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     yield_result_type yield_to_impl(TargetCoroutine& target,
         typename TargetCoroutine::arg_slot_type args)
     {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
 
       coroutine_accessor::get_impl(target)->bind_args(&args);
       coroutine_accessor::get_impl(target)->bind_result_pointer(m_pimpl->result_pointer());
@@ -254,7 +254,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
 #endif
 
-    impl_ptr get_impl() 
+    impl_ptr get_impl()
     {
       return m_pimpl;
     }

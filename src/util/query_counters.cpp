@@ -15,7 +15,7 @@
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
@@ -93,8 +93,8 @@ namespace hpx { namespace util
             }
         }
 
-        BOOST_ASSERT(ids_.size() == names_.size());
-        BOOST_ASSERT(ids_.size() == uoms_.size());
+        HPX_ASSERT(ids_.size() == names_.size());
+        HPX_ASSERT(ids_.size() == uoms_.size());
     }
 
     void query_counters::start()

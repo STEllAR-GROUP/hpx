@@ -293,7 +293,7 @@ namespace hpx { namespace threads { namespace detail
         default:
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping1_unknown",
                 boost::str(boost::format("unexpected specification type at "
-                    "index two: %x (%s)") % 
+                    "index two: %x (%s)") %
                         static_cast<unsigned>(m[1].type_) %
                         spec_type::type_name(m[1].type_)));
             break;
@@ -364,7 +364,7 @@ namespace hpx { namespace threads { namespace detail
         default:
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping0_unknown",
                 boost::str(boost::format("unexpected specification type at "
-                    "index one: %x (%s)") % 
+                    "index one: %x (%s)") %
                         static_cast<unsigned>(m[1].type_) %
                         spec_type::type_name(m[1].type_)));
             break;
@@ -473,7 +473,7 @@ namespace hpx { namespace threads { namespace detail
         default:
             HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
                 boost::str(boost::format("unexpected specification type at "
-                    "index zero: %x (%s)") % 
+                    "index zero: %x (%s)") %
                         static_cast<unsigned>(m[0].type_) %
                         spec_type::type_name(m[0].type_)));
             return mask_type();
@@ -546,7 +546,7 @@ namespace hpx { namespace threads { namespace detail
             if (ec) return;
 
             // set each thread affinity only once
-            BOOST_ASSERT(*it < static_cast<boost::int64_t>(affinities.size()));
+            HPX_ASSERT(*it < static_cast<boost::int64_t>(affinities.size()));
             if (any(affinities[*it]))
             {
                 HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
@@ -698,7 +698,7 @@ namespace hpx { namespace threads { namespace detail
             break;
 
         default:
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
         }
     }
 }}}

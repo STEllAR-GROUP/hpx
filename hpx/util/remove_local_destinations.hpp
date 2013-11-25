@@ -14,7 +14,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/move/move.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -27,7 +27,7 @@ namespace hpx { namespace util
         std::vector<naming::address>& addrs,
         boost::dynamic_bitset<> const& locals)
     {
-        BOOST_ASSERT(gids.size() == addrs.size());
+        HPX_ASSERT(gids.size() == addrs.size());
 
         std::vector<naming::gid_type>::iterator gids_it = gids.begin();
         std::vector<naming::gid_type>::iterator gids_end = gids.end();

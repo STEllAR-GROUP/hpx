@@ -8,7 +8,7 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <boost/foreach.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include "read_values.hpp"
 #include "partition.hpp"
@@ -66,7 +66,7 @@ namespace interpolate1d
             partitions_.push_back(id);
 
         std::size_t num_localities = partitions_.size();
-        BOOST_ASSERT(0 != num_localities);
+        HPX_ASSERT(0 != num_localities);
 
         std::size_t partition_size = num_elements_ / num_localities;
         std::size_t last_partition_size =
@@ -99,7 +99,7 @@ namespace interpolate1d
 
         if (index == partitions_.size())
             --index;
-        BOOST_ASSERT(index < partitions_.size());
+        HPX_ASSERT(index < partitions_.size());
 
         return partitions_[index];
     }

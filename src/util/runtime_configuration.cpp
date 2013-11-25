@@ -360,12 +360,12 @@ namespace hpx { namespace util
 #if HPX_HAVE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        BOOST_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
+        HPX_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
 
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
-        BOOST_ASSERT(init_huge_stack_size() <= HPX_HUGE_STACK_SIZE);
+        HPX_ASSERT(init_huge_stack_size() <= HPX_HUGE_STACK_SIZE);
         huge_stacksize = init_huge_stack_size();
 
 #if defined(__linux) || defined(linux) || defined(__linux__) || defined(__FreeBSD__)
@@ -411,7 +411,7 @@ namespace hpx { namespace util
 #if HPX_HAVE_ITTNOTIFY != 0
         use_ittnotify_api = get_itt_notify_mode();
 #endif
-        BOOST_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
+        HPX_ASSERT(init_small_stack_size() >= HPX_SMALL_STACK_SIZE);
 
         small_stacksize = init_small_stack_size();
         medium_stacksize = init_medium_stack_size();
@@ -597,14 +597,14 @@ namespace hpx { namespace util
             }
         }
 
-        BOOST_ASSERT(num_localities != 0);
+        HPX_ASSERT(num_localities != 0);
         return num_localities;
     }
 
     void runtime_configuration::set_num_localities(boost::uint32_t num_localities_)
     {
         // this function should not be called on the AGAS server
-        BOOST_ASSERT(agas::service_mode_bootstrap != get_agas_service_mode());
+        HPX_ASSERT(agas::service_mode_bootstrap != get_agas_service_mode());
         num_localities = num_localities_;
 
         if (has_section("hpx")) {

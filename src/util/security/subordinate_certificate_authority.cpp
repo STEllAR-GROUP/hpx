@@ -44,14 +44,14 @@ namespace hpx { namespace util { namespace security
             dll.get<function_type, deleter_type>(
                 "new_subordinate_certificate_authority");
 
-        BOOST_ASSERT(0 == subordinate_certificate_authority_);
+        HPX_ASSERT(0 == subordinate_certificate_authority_);
         subordinate_certificate_authority_ = (*function.first)(key_pair_);
     }
 
     components::security::signed_certificate_signing_request
         subordinate_certificate_authority::get_certificate_signing_request() const
     {
-        BOOST_ASSERT(0 != subordinate_certificate_authority_);
+        HPX_ASSERT(0 != subordinate_certificate_authority_);
 
         // Bind the certificate_authority_sign_certificate_signing_request symbol dynamically and invoke it.
         typedef void (*function_type)(
@@ -77,7 +77,7 @@ namespace hpx { namespace util { namespace security
         subordinate_certificate_authority::sign_certificate_signing_request(
             components::security::signed_certificate_signing_request const & signed_csr) const
     {
-        BOOST_ASSERT(0 != subordinate_certificate_authority_);
+        HPX_ASSERT(0 != subordinate_certificate_authority_);
 
         // Bind the certificate_authority_sign_certificate_signing_request symbol dynamically and invoke it.
         typedef void (*function_type)(
@@ -106,7 +106,7 @@ namespace hpx { namespace util { namespace security
     void subordinate_certificate_authority::set_certificate(
         components::security::signed_certificate const & signed_certificate)
     {
-        BOOST_ASSERT(0 != subordinate_certificate_authority_);
+        HPX_ASSERT(0 != subordinate_certificate_authority_);
 
         // Bind the subordinate_certificate_authority_set_certificate symbol dynamically and invoke it.
         typedef void (*function_type)(
@@ -159,7 +159,7 @@ namespace hpx { namespace util { namespace security
 
     naming::gid_type subordinate_certificate_authority::get_gid() const
     {
-        BOOST_ASSERT(0 != subordinate_certificate_authority_);
+        HPX_ASSERT(0 != subordinate_certificate_authority_);
 
         // Bind the certificate_authority_get_gid symbol dynamically and invoke it.
         typedef void (*function_type)(
@@ -183,7 +183,7 @@ namespace hpx { namespace util { namespace security
 
     bool subordinate_certificate_authority::is_valid() const
     {
-        BOOST_ASSERT(0 != subordinate_certificate_authority_);
+        HPX_ASSERT(0 != subordinate_certificate_authority_);
 
         // Bind the certificate_authority_is_valid symbol dynamically and invoke it.
         typedef void (*function_type)(

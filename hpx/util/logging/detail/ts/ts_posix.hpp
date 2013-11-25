@@ -40,7 +40,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <stdexcept>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 namespace hpx { namespace util { namespace logging {
 
@@ -58,16 +58,16 @@ public:
     mutex_posix() : m_mutex(), m_count(0) {
         pthread_mutexattr_t attr;
         int res = pthread_mutexattr_init(&attr);
-        BOOST_ASSERT(res == 0);
+        HPX_ASSERT(res == 0);
 
         res = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-        BOOST_ASSERT(res == 0);
+        HPX_ASSERT(res == 0);
 
         res = pthread_mutex_init(&m_mutex, &attr);
         {
             int r = 0;
             r = pthread_mutexattr_destroy(&attr);
-            BOOST_ASSERT(r == 0);
+            HPX_ASSERT(r == 0);
         }
         if (res != 0)
             throw std::runtime_error("could not create mutex_posix");
@@ -75,17 +75,17 @@ public:
     ~mutex_posix() {
         int res = 0;
         res = pthread_mutex_destroy(&m_mutex);
-        BOOST_ASSERT(res == 0);
+        HPX_ASSERT(res == 0);
     }
 
     void Lock() {
         int res = 0;
         res = pthread_mutex_lock(&m_mutex);
-        BOOST_ASSERT(res == 0);
+        HPX_ASSERT(res == 0);
         if (++m_count > 1)
         {
             res = pthread_mutex_unlock(&m_mutex);
-            BOOST_ASSERT(res == 0);
+            HPX_ASSERT(res == 0);
         }
     }
     void Unlock() {
@@ -93,7 +93,7 @@ public:
         {
             int res = 0;
             res = pthread_mutex_unlock(&m_mutex);
-            BOOST_ASSERT(res == 0);
+            HPX_ASSERT(res == 0);
         }
     }
 private:

@@ -40,7 +40,7 @@ namespace hpx { namespace performance_counters
     ///////////////////////////////////////////////////////////////////////////
     inline void counter_shutdown(boost::shared_ptr<manage_counter> const& p)
     {
-        BOOST_ASSERT(p);
+        HPX_ASSERT(p);
         p->uninstall();
     }
 

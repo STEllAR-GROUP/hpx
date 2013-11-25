@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/throw_exception.hpp>
@@ -118,7 +118,7 @@ namespace hpx { namespace util
         {
             load_binary(&t, sizeof(t));
             int i = t;
-            BOOST_ASSERT(0 == i || 1 == i);
+            HPX_ASSERT(0 == i || 1 == i);
             HPX_UNUSED(i);    // warning suppression for release builds.
         }
 

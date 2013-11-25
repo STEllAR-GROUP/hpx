@@ -119,7 +119,7 @@ namespace hpx { namespace applier
 
         threads::thread_init_data data(
             HPX_STD_BIND(&thread_function, boost::move(func)),
-            desc ? desc : "<unknown>", 0, priority, os_thread, 
+            desc ? desc : "<unknown>", 0, priority, os_thread,
             threads::get_stack_size(threads::thread_stacksize_nostack));
         return app->get_thread_manager().
             register_thread(data, state, run_now, ec);
@@ -438,7 +438,7 @@ namespace hpx { namespace applier
 
         // if the parcel carries a continuation it should be directed to a
         // single destination
-        BOOST_ASSERT(!cont || size == 1);
+        HPX_ASSERT(!cont || size == 1);
 
         // schedule a thread for each of the destinations
         threads::threadmanager_base& tm = get_thread_manager();
@@ -447,7 +447,7 @@ namespace hpx { namespace applier
             naming::address const& addr = addrs[i];
 
             // make sure this parcel destination matches the proper locality
-            BOOST_ASSERT(dest == addr.locality_);
+            HPX_ASSERT(dest == addr.locality_);
 
             // decode the local virtual address of the parcel
             naming::address::address_type lva = addr.address_;
@@ -511,7 +511,7 @@ namespace hpx { namespace applier
 
     applier& get_applier()
     {
-        BOOST_ASSERT(NULL != applier::applier_.get());   // should have been initialized
+        HPX_ASSERT(NULL != applier::applier_.get());   // should have been initialized
         return **applier::applier_;
     }
 

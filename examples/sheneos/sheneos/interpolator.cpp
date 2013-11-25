@@ -14,7 +14,7 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 
 #include <boost/foreach.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/move/move.hpp>
 
@@ -180,7 +180,7 @@ namespace sheneos
 
         // Initialize all attached partition objects.
         std::size_t num_localities = partitions_.size();
-        BOOST_ASSERT(0 != num_localities);
+        HPX_ASSERT(0 != num_localities);
 
         num_partitions_per_dim_ = static_cast<std::size_t>(
             std::exp(std::log(double(num_localities)) / 3));
@@ -231,7 +231,7 @@ namespace sheneos
 
                     std::size_t index =
                         x + (y + z * num_partitions_per_dim_) * num_partitions_per_dim_;
-                    BOOST_ASSERT(index < partitions_.size());
+                    HPX_ASSERT(index < partitions_.size());
 
                     lazy_sync.push_back(stubs::partition3d::init_async(
                         partitions_[index], datafilename, dim_x, dim_y, dim_z));
@@ -273,7 +273,7 @@ namespace sheneos
 
         std::size_t index =
             x + (y + z * num_partitions_per_dim_) * num_partitions_per_dim_;
-        BOOST_ASSERT(index < partitions_.size());
+        HPX_ASSERT(index < partitions_.size());
 
         return partitions_[index];
     }
@@ -286,7 +286,7 @@ namespace sheneos
             (value - minval_[d]) / (delta_[d] * partition_size));
         if (partition_index == num_partitions_per_dim_)
             --partition_index;
-        BOOST_ASSERT(partition_index < num_partitions_per_dim_);
+        HPX_ASSERT(partition_index < num_partitions_per_dim_);
         return partition_index;
     }
 

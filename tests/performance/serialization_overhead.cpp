@@ -44,7 +44,7 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     else if (endian_out == "big")
         out_archive_flags |= hpx::util::endian_big;
     else {
-        BOOST_ASSERT(endian_out =="little" || endian_out == "big");
+        HPX_ASSERT(endian_out =="little" || endian_out == "big");
     }
 
     std::string array_optimization =

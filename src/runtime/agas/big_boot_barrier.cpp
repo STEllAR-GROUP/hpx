@@ -38,7 +38,7 @@
 
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
@@ -83,10 +83,10 @@ void early_parcel_sink(
         actions::action_type act = p.get_action();
 
         // early parcels should only be plain actions
-        BOOST_ASSERT(actions::base_action::plain_action == act->get_action_type());
+        HPX_ASSERT(actions::base_action::plain_action == act->get_action_type());
 
         // early parcels can't have continuations
-        BOOST_ASSERT(!p.get_continuation());
+        HPX_ASSERT(!p.get_continuation());
 
         // We should not allow any exceptions to escape the execution of the
         // action as this would bring down the ASIO thread we execute in.
@@ -743,7 +743,7 @@ void big_boot_barrier::apply_late(
 
 void big_boot_barrier::wait_bootstrap()
 { // {{{
-    BOOST_ASSERT(service_mode_bootstrap == service_type);
+    HPX_ASSERT(service_mode_bootstrap == service_type);
 
     // the root just waits until all localities have connected
     spin();
@@ -773,11 +773,11 @@ namespace detail
 void big_boot_barrier::wait_hosted(std::string const& locality_name,
     void* primary_ns_server, void* symbol_ns_server)
 { // {{{
-    BOOST_ASSERT(service_mode_bootstrap != service_type);
+    HPX_ASSERT(service_mode_bootstrap != service_type);
 
     // any worker sends a request for registration and waits
-    BOOST_ASSERT(0 != primary_ns_server);
-    BOOST_ASSERT(0 != symbol_ns_server);
+    HPX_ASSERT(0 != primary_ns_server);
+    HPX_ASSERT(0 != symbol_ns_server);
 
     runtime& rt = get_runtime();
     // get the number of cores we need for our locality. This respects the

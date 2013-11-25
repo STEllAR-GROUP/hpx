@@ -9,7 +9,7 @@
 #define HPX_05A1C29B_DB73_463A_8C9D_B8EDC3B69F5E
 
 #include <boost/config.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
@@ -24,7 +24,7 @@
 namespace hpx { namespace performance_counters { namespace parcels
 {
 
-class count_time_stats 
+class count_time_stats
 {
     typedef hpx::util::spinlock mutex_type;
     typedef mutex_type::scoped_lock lock;

@@ -12,7 +12,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 
@@ -24,7 +24,7 @@ namespace throttle { namespace server
     throttle::throttle()
     {
         const std::size_t num_threads = hpx::get_os_thread_count();
-        BOOST_ASSERT(num_threads != std::size_t(-1));
+        HPX_ASSERT(num_threads != std::size_t(-1));
         blocked_os_threads_.resize(num_threads);
 
         std::cerr << "Created throttle component!" << std::endl;

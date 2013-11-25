@@ -185,7 +185,7 @@ namespace hpx { namespace lcos
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_binary_params.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -243,7 +243,7 @@ namespace hpx { namespace lcos
             Result operator()(hpx::future<std::vector<hpx::future<Result> > >& r) const
             {
                 std::vector<hpx::future<Result> > fres = boost::move(r.move());
-                BOOST_ASSERT(!fres.empty());
+                HPX_ASSERT(!fres.empty());
 
                 // we're at the beginning of the folding chain, incroporate the initial
                 // value
@@ -252,7 +252,7 @@ namespace hpx { namespace lcos
 
                 // in the middle of the folding chain we simply apply the folding
                 // operation to the two values we received.
-                BOOST_ASSERT(fres.size() == 2);
+                HPX_ASSERT(fres.size() == 2);
                 return fold_op_(fres[1].move(), fres[2].move());
             }
 
@@ -730,7 +730,7 @@ namespace hpx { namespace lcos
             typename detail::fold_result<Action>::type
             action_result;
 
-        if (ids.empty()) 
+        if (ids.empty())
         {
             return make_error_future<action_result>(
                 HPX_GET_EXCEPTION(bad_parameter,

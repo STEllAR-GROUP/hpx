@@ -8,7 +8,7 @@
 
 #include "read_values.hpp"
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation helper functions related to hdf5

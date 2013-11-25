@@ -86,7 +86,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         }
         else if (data.pu_offset_ == std::size_t(-1))
         {
-            // calculate the pu offset based on the used cores, but only if its 
+            // calculate the pu offset based on the used cores, but only if its
             // not explicitly specified
             for(std::size_t num_core = 0; num_core != data.used_cores_; ++num_core)
             {
@@ -168,7 +168,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
 
         // The affinity domain is 'machine', return a bit mask corresponding
         // to all processing units of the machine.
-        BOOST_ASSERT(0 == std::string("machine").find(affinity_domain_));
+        HPX_ASSERT(0 == std::string("machine").find(affinity_domain_));
         return topology.get_machine_affinity_mask();
     }
 
@@ -177,10 +177,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail
     {
         // The offset shouldn't be larger than the number of available
         // processing units.
-        BOOST_ASSERT(pu_offset_ < hardware_concurrency);
+        HPX_ASSERT(pu_offset_ < hardware_concurrency);
 
         // The distance between assigned processing units shouldn't be zero
-        BOOST_ASSERT(pu_step_ > 0 && pu_step_ < hardware_concurrency);
+        HPX_ASSERT(pu_step_ > 0 && pu_step_ < hardware_concurrency);
 
         // We 'scale' the thread number to compute the corresponding
         // processing unit number.

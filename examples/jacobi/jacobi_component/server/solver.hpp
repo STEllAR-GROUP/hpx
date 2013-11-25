@@ -39,15 +39,15 @@ namespace jacobi
 
             solver(component_type * back_ptr)
             {
-                BOOST_ASSERT(false);
+                HPX_ASSERT(false);
             }
 
             ~solver()
             {
-                BOOST_ASSERT(stencil_iterators.size() == ny);
+                HPX_ASSERT(stencil_iterators.size() == ny);
                 for(std::size_t y = 0; y < ny; ++y)
                 {
-                    BOOST_ASSERT(stencil_iterators[y].id);
+                    HPX_ASSERT(stencil_iterators[y].id);
                 }
             }
 
@@ -81,7 +81,7 @@ namespace jacobi
                     stencil_iterators.push_back(r);
                     ++y;
                 }
-                BOOST_ASSERT(y == ny);
+                HPX_ASSERT(y == ny);
 
                 std::vector<hpx::lcos::future<void> > boundary_futures;
                 hpx::lcos::wait(
@@ -90,9 +90,9 @@ namespace jacobi
                     {
                         if(y > 0 && y < ny-1)
                         {
-                            BOOST_ASSERT(stencil_iterators[y-1].id);
-                            BOOST_ASSERT(stencil_iterators[y].id);
-                            BOOST_ASSERT(stencil_iterators[y+1].id);
+                            HPX_ASSERT(stencil_iterators[y-1].id);
+                            HPX_ASSERT(stencil_iterators[y].id);
+                            HPX_ASSERT(stencil_iterators[y+1].id);
                             hpx::lcos::wait(init_futures[y-1]);
                             hpx::lcos::wait(init_futures[y+1]);
                             boundary_futures.push_back(
@@ -104,14 +104,14 @@ namespace jacobi
                         }
                     }
                 );
-                BOOST_ASSERT(stencil_iterators[0].id);
+                HPX_ASSERT(stencil_iterators[0].id);
                 hpx::lcos::wait(boundary_futures);
-                BOOST_ASSERT(stencil_iterators[0].id);
+                HPX_ASSERT(stencil_iterators[0].id);
             }
 
             void run(std::size_t max_iterations)
             {
-                BOOST_ASSERT(stencil_iterators[0].id);
+                HPX_ASSERT(stencil_iterators[0].id);
 
                 hpx::util::high_resolution_timer t;
 
@@ -121,9 +121,9 @@ namespace jacobi
                 {
                     run_futures.push_back(stencil_iterators[y].run(max_iterations));
                 }
-                BOOST_ASSERT(stencil_iterators[0].id);
+                HPX_ASSERT(stencil_iterators[0].id);
                 hpx::lcos::wait(run_futures);
-                BOOST_ASSERT(stencil_iterators[0].id);
+                HPX_ASSERT(stencil_iterators[0].id);
                 */
 
                 for(std::size_t iter = 0; iter < max_iterations; ++iter)

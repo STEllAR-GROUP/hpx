@@ -24,7 +24,7 @@
 #include <boost/serialization/is_bitwise_serializable.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -128,7 +128,7 @@ namespace hpx { namespace parcelset
 
             threads::thread_priority get_thread_priority() const
             {
-                BOOST_ASSERT(action_);
+                HPX_ASSERT(action_);
                 return action_->get_thread_priority();
             }
 
@@ -203,7 +203,7 @@ namespace hpx { namespace parcelset
                 dest_ = apply_to;
                 addr_ = addr;
 
-                BOOST_ASSERT(components::types_are_compatible(
+                HPX_ASSERT(components::types_are_compatible(
                     act->get_component_type(), addr.type_));
             }
 
@@ -220,7 +220,7 @@ namespace hpx { namespace parcelset
                 dest_ = apply_to;
                 addr_ = addr;
 
-                BOOST_ASSERT(components::types_are_compatible(
+                HPX_ASSERT(components::types_are_compatible(
                     act->get_component_type(), addr.type_));
             }
 
@@ -237,7 +237,7 @@ namespace hpx { namespace parcelset
                 dest_ = apply_to;
                 addr_ = addr;
 
-                BOOST_ASSERT(components::types_are_compatible(
+                HPX_ASSERT(components::types_are_compatible(
                     act->get_component_type(), addr.type_));
             }
 
@@ -276,7 +276,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
             void set_destinations(std::vector<naming::id_type> const& dests)
             {
-                BOOST_ASSERT(false);
+                HPX_ASSERT(false);
             }
 #endif
             /// get and set the destination address
@@ -295,7 +295,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
             void set_destination_addrs(std::vector<naming::address> const& addrs)
             {
-                BOOST_ASSERT(false);
+                HPX_ASSERT(false);
             }
 #endif
             ///
@@ -392,21 +392,21 @@ namespace hpx { namespace parcelset
                 addrs_ = addrs;
 
 #if defined(HPX_DEBUG)
-                BOOST_ASSERT(dests_.size() == addrs_.size());
+                HPX_ASSERT(dests_.size() == addrs_.size());
                 if (!dests_.empty() && addrs[0].locality_)
                 {
                     // all destinations have to be on the same locality
                     naming::locality dest = get_destination_locality();
                     for (std::size_t i = 1; i != addrs.size(); ++i)
                     {
-                        BOOST_ASSERT(dest == addrs[i].locality_);
+                        HPX_ASSERT(dest == addrs[i].locality_);
                     }
 
                     // all destination component types are properly matched
                     int comptype = act->get_component_type();
                     for (std::size_t i = 0; i != addrs.size(); ++i)
                     {
-                        BOOST_ASSERT(components::types_are_compatible(
+                        HPX_ASSERT(components::types_are_compatible(
                             comptype, addrs[i].type_));
                     }
                     HPX_UNUSED(comptype);
@@ -444,7 +444,7 @@ namespace hpx { namespace parcelset
             }
             void set_destination(naming::id_type const& dest)
             {
-                BOOST_ASSERT(false);
+                HPX_ASSERT(false);
             }
             void set_destinations(std::vector<naming::id_type> const& dests)
             {
@@ -462,7 +462,7 @@ namespace hpx { namespace parcelset
             }
             void set_destination_addr(naming::address const& addr)
             {
-                BOOST_ASSERT(false);
+                HPX_ASSERT(false);
             }
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
             void set_destination_addrs(std::vector<naming::address> const& addrs)
@@ -470,10 +470,10 @@ namespace hpx { namespace parcelset
                 addrs_ = addrs;
             }
 #endif
-            /// 
+            ///
             naming::locality const& get_destination_locality() const
             {
-                BOOST_ASSERT(!addrs_.empty());
+                HPX_ASSERT(!addrs_.empty());
                 return addrs_[0].locality_;
             }
 
@@ -488,7 +488,7 @@ namespace hpx { namespace parcelset
 
             std::size_t get_type_size() const
             {
-                return sizeof(parcel_buffer) + 
+                return sizeof(parcel_buffer) +
                     traits::type_size<std::vector<naming::id_type> >::call(dests_) +
                     traits::type_size<std::vector<naming::address> >::call(addrs_) +
                     this->get_action()->get_type_size();      // action
@@ -621,7 +621,7 @@ namespace hpx { namespace parcelset
                 data_->set_destinations(dests);
             }
             else {
-                BOOST_ASSERT(dests.size() == 1);
+                HPX_ASSERT(dests.size() == 1);
                 data_->set_destination(dests[0]);
             }
         }
@@ -647,7 +647,7 @@ namespace hpx { namespace parcelset
                 data_->set_destination_addrs(addrs);
             }
             else {
-                BOOST_ASSERT(addrs.size() == 1);
+                HPX_ASSERT(addrs.size() == 1);
                 data_->set_destination_addr(addrs[0]);
             }
         }
@@ -719,7 +719,7 @@ namespace hpx { namespace parcelset
     };
 }}
 
-namespace hpx { namespace traits 
+namespace hpx { namespace traits
 {
     template<>
     struct type_size<hpx::parcelset::parcel>

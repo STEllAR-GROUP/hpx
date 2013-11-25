@@ -10,7 +10,7 @@
 - v0.22.7 - the version that is Boost Reviewed
 - updated batches for building with bjam
 - made mul_levels_mul_logers run successfully on Fedora8
-- ts_posix.hpp - use BOOST_ASSERT instead of assert
+- ts_posix.hpp - use HPX_ASSERT instead of assert
 - solved bug in using_tags - delete_array used after logger destroyed
 - solved bug in no_levels_with_route - care about formatter::spacer
 - solved gcc warning - m_writer initialized before m_original_logger

@@ -21,7 +21,7 @@
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>
 #include <vector>
@@ -108,7 +108,7 @@ namespace optimize {
                 resize_string( new_reserve_prepend, m_reserve_append);
             }
 
-            BOOST_ASSERT(m_reserve_prepend >= len );
+            HPX_ASSERT(m_reserve_prepend >= len );
 
             typename string_type::difference_type start_idx = static_cast<typename string_type::difference_type>(m_reserve_prepend - len);
             m_reserve_prepend -= len;
@@ -123,7 +123,7 @@ namespace optimize {
                 resize_string( m_reserve_prepend, new_reserve_append);
             }
 
-            BOOST_ASSERT(m_reserve_append >= len );
+            HPX_ASSERT(m_reserve_append >= len );
 
             typename string_type::difference_type start_idx = static_cast<typename string_type::difference_type>(m_str.size() - m_reserve_append);
 
@@ -143,7 +143,7 @@ namespace optimize {
                 resize_string( new_reserve_prepend, m_reserve_append);
             }
 
-            BOOST_ASSERT(m_reserve_prepend >= str.size() );
+            HPX_ASSERT(m_reserve_prepend >= str.size() );
 
             typename string_type::difference_type start_idx = static_cast<typename string_type::difference_type>(m_reserve_prepend - str.size());
             m_reserve_prepend -= str.size();
@@ -161,7 +161,7 @@ namespace optimize {
                 resize_string( m_reserve_prepend, new_reserve_append);
             }
 
-            BOOST_ASSERT(m_reserve_append >= str.size());
+            HPX_ASSERT(m_reserve_append >= str.size());
 
             typename string_type::difference_type start_idx = static_cast<typename string_type::difference_type>(m_str.size() - m_reserve_append);
 
@@ -195,7 +195,7 @@ namespace optimize {
             if ( is_string_set() ) {
                 std::size_t to_add = reserve_prepend_ + reserve_append_ - m_reserve_prepend - m_reserve_append ;
                 std::size_t new_size = m_str.size() + to_add;
-                
+
                 // I'm creating a new string instead of resizing the existing one
                 // this is because the new string could be of lower size
                 string_type new_str(reserve_prepend_, 0);
@@ -204,7 +204,7 @@ namespace optimize {
                         static_cast<typename string_type::difference_type>(m_reserve_prepend), m_str.begin() +
                         static_cast<typename string_type::difference_type>(m_reserve_prepend + used_size));
 
-                BOOST_ASSERT(new_size == reserve_prepend_ + used_size + reserve_append_);
+                HPX_ASSERT(new_size == reserve_prepend_ + used_size + reserve_append_);
 
                 new_str.resize( new_size, 0);
                 std::swap(new_str, m_str);
@@ -332,7 +332,7 @@ namespace optimize {
         void reuse(ptr_type id ) {
             // make sure you first call restart() before reusing a formatter.
             // In your code - this means calling set_route(). .... .clear(), and the writing to destinations
-            BOOST_ASSERT( m_cached.find(id) != m_cached.end() );
+            HPX_ASSERT( m_cached.find(id) != m_cached.end() );
 
             m_cur_msg.push_back( m_cached[id] );
             m_cur_msg.back().is_new = false;
@@ -389,8 +389,8 @@ namespace optimize {
         array m_cur_msg;
     };
 
-    template<class stream, class string, class ptr_type> 
-    inline stream& operator <<(stream & out, const cache_string_several_str<string,ptr_type> & val) 
+    template<class stream, class string, class ptr_type>
+    inline stream& operator <<(stream & out, const cache_string_several_str<string,ptr_type> & val)
     {
         out << val.full_string();
         return out;

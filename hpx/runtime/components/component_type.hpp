@@ -15,7 +15,7 @@
 #include <hpx/components/security/capability.hpp>
 #endif
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
 
@@ -156,7 +156,7 @@ namespace hpx { namespace components
             { return type; }                                                  \
         template <> HPX_ALWAYS_EXPORT                                         \
         void component_type_database<component>::set(components::component_type) \
-            { BOOST_ASSERT(false); }                                          \
+            { HPX_ASSERT(false); }                                          \
     }}                                                                        \
 /**/
 

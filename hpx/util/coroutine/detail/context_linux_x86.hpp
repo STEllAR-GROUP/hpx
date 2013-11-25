@@ -20,7 +20,7 @@
 
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/atomic.hpp>
 
 #include <hpx/config/forceinline.hpp>
@@ -58,7 +58,7 @@ extern "C" void swapcontext_stack3 (void***, void**) throw()__attribute((regparm
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace coroutines 
+namespace hpx { namespace util { namespace coroutines
 {
 
   // some platforms need special preparation of the main thread
@@ -70,7 +70,7 @@ namespace hpx { namespace util { namespace coroutines
 
   namespace detail { namespace lx
   {
-    template <typename TO, typename FROM> 
+    template <typename TO, typename FROM>
     TO nasty_cast(FROM f)
     {
       union {
@@ -100,9 +100,9 @@ namespace hpx { namespace util { namespace coroutines
       void prefetch() const
       {
 #if defined(__x86_64__)
-        BOOST_ASSERT(sizeof(void*) == 8);
+        HPX_ASSERT(sizeof(void*) == 8);
 #else
-        BOOST_ASSERT(sizeof(void*) == 4);
+        HPX_ASSERT(sizeof(void*) == 4);
 #endif
 
         __builtin_prefetch (m_sp, 1, 3);
@@ -174,9 +174,9 @@ namespace hpx { namespace util { namespace coroutines
         }
 
         m_stack = posix::alloc_stack(static_cast<std::size_t>(m_stack_size));
-        BOOST_ASSERT(m_stack);
+        HPX_ASSERT(m_stack);
         posix::watermark_stack(m_stack, static_cast<std::size_t>(m_stack_size));
-        
+
         typedef void fun(Functor*);
         fun * funp = trampoline;
 
@@ -350,7 +350,7 @@ namespace hpx { namespace util { namespace coroutines
     inline void swap_context(x86_linux_context_impl_base& from,
         x86_linux_context_impl const& to, default_hint)
     {
-//        BOOST_ASSERT(*(void**)to.m_stack == (void*)~0);
+//        HPX_ASSERT(*(void**)to.m_stack == (void*)~0);
         to.prefetch();
         swapcontext_stack(&from.m_sp, to.m_sp);
     }
@@ -358,7 +358,7 @@ namespace hpx { namespace util { namespace coroutines
     inline void swap_context(x86_linux_context_impl& from,
         x86_linux_context_impl_base const& to, yield_hint)
     {
-//        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
+//        HPX_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
 #ifndef HPX_COROUTINE_NO_SEPARATE_CALL_SITES
         swapcontext_stack2(&from.m_sp, to.m_sp);
@@ -370,7 +370,7 @@ namespace hpx { namespace util { namespace coroutines
     inline void swap_context(x86_linux_context_impl& from,
         x86_linux_context_impl_base const& to, yield_to_hint)
     {
-//        BOOST_ASSERT(*(void**)from.m_stack == (void*)~0);
+//        HPX_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();
 #ifndef HPX_COROUTINE_NO_SEPARATE_CALL_SITES
         swapcontext_stack3(&from.m_sp, to.m_sp);

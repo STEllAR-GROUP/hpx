@@ -23,7 +23,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/result_of_or.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
@@ -244,45 +244,45 @@ namespace hpx { namespace util
         public:
             // default constructor is needed for serialization
             one_shot_wrapper()
-#           if !defined(BOOST_DISABLE_ASSERTS)
+#           if !defined(HPX_DISABLE_ASSERTS)
               : _called(false)
 #           endif
             {}
 
             explicit one_shot_wrapper(F const& f)
               : _f(f)
-#           if !defined(BOOST_DISABLE_ASSERTS)
+#           if !defined(HPX_DISABLE_ASSERTS)
               , _called(false)
 #           endif
             {}
             explicit one_shot_wrapper(BOOST_RV_REF(F) f)
               : _f(boost::move(f))
-#           if !defined(BOOST_DISABLE_ASSERTS)
+#           if !defined(HPX_DISABLE_ASSERTS)
               , _called(false)
 #           endif
             {}
 
             one_shot_wrapper(one_shot_wrapper const& other)
               : _f(other._f)
-#           if !defined(BOOST_DISABLE_ASSERTS)
+#           if !defined(HPX_DISABLE_ASSERTS)
               , _called(other._called)
 #           endif
             {}
             one_shot_wrapper(BOOST_RV_REF(one_shot_wrapper) other)
               : _f(boost::move(other._f))
-#           if !defined(BOOST_DISABLE_ASSERTS)
+#           if !defined(HPX_DISABLE_ASSERTS)
               , _called(other._called)
 #           endif
             {
-#           if !defined(BOOST_DISABLE_ASSERTS)
+#           if !defined(HPX_DISABLE_ASSERTS)
                 other._called = true;
 #           endif
             }
 
             void check_call()
             {
-#           if !defined(BOOST_DISABLE_ASSERTS)
-                BOOST_ASSERT(!_called);
+#           if !defined(HPX_DISABLE_ASSERTS)
+                HPX_ASSERT(!_called);
 
                 _called = true;
 #           endif
@@ -321,7 +321,7 @@ namespace hpx { namespace util
 
         public: // exposition-only
             F _f;
-#           if !defined(BOOST_DISABLE_ASSERTS)
+#           if !defined(HPX_DISABLE_ASSERTS)
             bool _called;
 #           endif
         };

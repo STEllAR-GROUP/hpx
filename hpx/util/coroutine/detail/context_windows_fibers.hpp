@@ -34,7 +34,7 @@
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/system/system_error.hpp>
@@ -51,7 +51,7 @@
 extern "C" void switch_to_fiber(void* lpFiber) throw();
 #endif
 
-namespace hpx { namespace util { namespace coroutines 
+namespace hpx { namespace util { namespace coroutines
 {
   // On Windows we need a special preparation for the main coroutines thread
   struct prepare_main_thread
@@ -59,13 +59,13 @@ namespace hpx { namespace util { namespace coroutines
       prepare_main_thread()
       {
           LPVOID result = ConvertThreadToFiber(0);
-          BOOST_ASSERT(0 != result);
+          HPX_ASSERT(0 != result);
           HPX_UNUSED(result);
       }
       ~prepare_main_thread()
       {
           BOOL result = ConvertFiberToThread();
-          BOOST_ASSERT(FALSE != result);
+          HPX_ASSERT(FALSE != result);
           HPX_UNUSED(result);
       }
   };
@@ -133,9 +133,9 @@ namespace hpx { namespace util { namespace coroutines
                    default_hint)
       {
         if(!is_fiber()) {
-          BOOST_ASSERT(from.m_ctx == 0);
+          HPX_ASSERT(from.m_ctx == 0);
           from.m_ctx = ConvertThreadToFiber(0);
-          BOOST_ASSERT(from.m_ctx != 0);
+          HPX_ASSERT(from.m_ctx != 0);
 
 #if HPX_HAVE_SWAP_CONTEXT_EMULATION != 0
           switch_to_fiber(to.m_ctx);
@@ -143,7 +143,7 @@ namespace hpx { namespace util { namespace coroutines
           SwitchToFiber(to.m_ctx);
 #endif
           BOOL result = ConvertFiberToThread();
-          BOOST_ASSERT(result);
+          HPX_ASSERT(result);
           HPX_UNUSED(result);
           from.m_ctx = 0;
         } else {
@@ -174,7 +174,7 @@ namespace hpx { namespace util { namespace coroutines
     BOOST_FORCEINLINE VOID CALLBACK
     trampoline(LPVOID pv) {
       T* fun = static_cast<T*>(pv);
-      BOOST_ASSERT(fun);
+      HPX_ASSERT(fun);
       (*fun)();
     }
 

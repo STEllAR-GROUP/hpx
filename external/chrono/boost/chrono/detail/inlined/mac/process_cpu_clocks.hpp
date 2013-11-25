@@ -12,7 +12,7 @@
 
 #include <boost/chrono/config.hpp>
 #include <boost/chrono/process_cpu_clocks.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 #include <sys/time.h> //for gettimeofday and timeval
 #include <sys/times.h> //for times
@@ -35,7 +35,7 @@ namespace boost
             factor = -1;
           else
           {
-            BOOST_ASSERT(factor <= 1000000000l); // doesn't handle large ticks
+            HPX_ASSERT(factor <= 1000000000l); // doesn't handle large ticks
             factor = 1000000000l / factor; // compute factor
             if (!factor)
               factor = -1;
@@ -53,7 +53,7 @@ namespace boost
       clock_t c = ::times(&tm);
       if (c == clock_t(-1)) // error
       {
-        BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+        HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
       } else
       {
         long factor = chrono_detail::tick_factor();
@@ -62,7 +62,7 @@ namespace boost
           return time_point(nanoseconds(c * factor));
         } else
         {
-          BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+          HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
         }
       }
       return time_point();
@@ -70,7 +70,7 @@ namespace boost
       clock_t c = ::clock();
       if (c == clock_t(-1)) // error
       {
-        BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+        HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
       }
       return time_point(
           duration(c*(1000000000l/CLOCKS_PER_SEC))
@@ -185,7 +185,7 @@ namespace boost
       clock_t c = ::times(&tm);
       if (c == clock_t(-1)) // error
       {
-        BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+        HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
       } else
       {
         long factor = chrono_detail::tick_factor();
@@ -195,7 +195,7 @@ namespace boost
               * factor));
         } else
         {
-          BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+          HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
         }
       }
       return time_point();
@@ -206,7 +206,7 @@ namespace boost
       clock_t c = ::times(&tm);
       if (c == clock_t(-1)) // error
       {
-        BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+        HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
       } else
       {
         long factor = chrono_detail::tick_factor();
@@ -216,7 +216,7 @@ namespace boost
               * factor));
         } else
         {
-          BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+          HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
         }
       }
       return time_point();
@@ -268,7 +268,7 @@ namespace boost
       clock_t c = ::times(&tm);
       if (c == clock_t(-1)) // error
       {
-        BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+        HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
       } else
       {
         long factor = chrono_detail::tick_factor();
@@ -280,7 +280,7 @@ namespace boost
           return time_point(duration(r));
         } else
         {
-          BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+          HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
         }
       }
       return time_point();

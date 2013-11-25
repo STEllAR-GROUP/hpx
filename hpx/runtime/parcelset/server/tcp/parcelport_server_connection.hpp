@@ -299,7 +299,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                         transmission_chunk_type& c = in_transmission_chunks_[i];
                         boost::uint64_t first = c.first, second = c.second;
 
-                        BOOST_ASSERT((*in_chunks_)[i].size() == second);
+                        HPX_ASSERT((*in_chunks_)[i].size() == second);
 
                         (*chunks)[first] = util::create_pointer_chunk(
                             (*in_chunks_)[i].data(), second);
@@ -321,7 +321,7 @@ namespace hpx { namespace parcelset { namespace server { namespace tcp
                         (*chunks)[index] = util::create_index_chunk(first, second);
                         ++index;
                     }
-                    BOOST_ASSERT(index == num_zero_copy_chunks + num_non_zero_copy_chunks);
+                    HPX_ASSERT(index == num_zero_copy_chunks + num_non_zero_copy_chunks);
 
 #if defined(HPX_HAVE_SECURITY)
                     first_message_ = decode_message(parcelport_, data, chunks.get(),

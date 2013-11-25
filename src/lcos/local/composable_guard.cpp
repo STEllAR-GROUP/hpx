@@ -56,7 +56,7 @@ struct stage_data : public DebugObject {
 };
 
 void run_guarded(guard& g,guard_task *task) {
-    BOOST_ASSERT(task != NULL);
+    HPX_ASSERT(task != NULL);
     task->check();
     guard_task *prev = g.task.exchange(task);
     if(prev != NULL) {
@@ -84,10 +84,10 @@ struct stage_task_cleanup {
         for(std::size_t k=0;k<n;k++) {
             guard_task *lt = sd->stages[k];
             lt->check();
-            BOOST_ASSERT(!lt->single_guard);
+            HPX_ASSERT(!lt->single_guard);
             zero = NULL;
             if(!lt->next.compare_exchange_strong(zero,lt)) {
-                BOOST_ASSERT(zero != lt);
+                HPX_ASSERT(zero != lt);
                 run_async(zero);
                 free(lt);
             }
@@ -105,15 +105,15 @@ void stage_task(stage_data *sd,std::size_t i,std::size_t n) {
         std::size_t k = i + 1;
         guard_task *stage = sd->stages[k];
         stage->run = boost::bind(stage_task,sd,k,n);
-        BOOST_ASSERT(!stage->single_guard);
+        HPX_ASSERT(!stage->single_guard);
         run_guarded(*sd->gs.get(k),stage);
     }
 }
 
 
 stage_data::stage_data(boost::function<void()> task_,
-        std::vector<boost::shared_ptr<guard> >& guards) 
-  : task(task_), stages(new guard_task*[guards.size()]) 
+        std::vector<boost::shared_ptr<guard> >& guards)
+  : task(task_), stages(new guard_task*[guards.size()])
 {
     const std::size_t n = guards.size();
     for(std::size_t i=0;i<n;i++) {
@@ -147,7 +147,7 @@ void run_guarded(guard& guard,boost::function<void()> task) {
 }
 
 void run_async(guard_task *task) {
-    BOOST_ASSERT(task != NULL);
+    HPX_ASSERT(task != NULL);
     task->check();
     hpx::apply(&run_composable,task);
 }
@@ -165,10 +165,10 @@ struct run_composable_cleanup {
         // setup tasks for a multi-guarded task. By not setting
         // the next field, we halt processing on items queued
         // to this guard.
-        BOOST_ASSERT(task != NULL);
+        HPX_ASSERT(task != NULL);
         task->check();
         if(!task->next.compare_exchange_strong(zero,task)) {
-            BOOST_ASSERT(task->next.load()!=NULL);
+            HPX_ASSERT(task->next.load()!=NULL);
             run_async(zero);
             free(task);
         }
@@ -176,7 +176,7 @@ struct run_composable_cleanup {
 };
 
 void run_composable(guard_task *task) {
-    BOOST_ASSERT(task != NULL);
+    HPX_ASSERT(task != NULL);
     task->check();
     if(task->single_guard) {
         run_composable_cleanup rcc(task);

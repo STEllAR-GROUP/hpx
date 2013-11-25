@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/parcelset/mpi/header.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/noncopyable.hpp>
 
 #include <vector>
@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset { namespace mpi {
             MPI_Test(&request_, &completed, &status);
             if(completed)
             {
-                BOOST_ASSERT(header_.rank() == -1);
+                HPX_ASSERT(header_.rank() == -1);
                 header h = header_;
                 h.rank() = status.MPI_SOURCE;
                 h.assert_valid();
@@ -56,8 +56,8 @@ namespace hpx { namespace parcelset { namespace mpi {
         void irecv_header()
         {
             /*
-            BOOST_ASSERT(source_ != -1);
-            BOOST_ASSERT(source_ != util::mpi_environment::rank());
+            HPX_ASSERT(source_ != -1);
+            HPX_ASSERT(source_ != util::mpi_environment::rank());
             */
             MPI_Irecv(
                 header_.data(), // data pointer

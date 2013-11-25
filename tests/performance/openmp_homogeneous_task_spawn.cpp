@@ -38,7 +38,7 @@
 #include <stdexcept>
 #include <iostream>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
@@ -118,7 +118,7 @@ int main(
     cmdline.add_options()
         ( "help,h"
         , "print out program usage (this message)")
-        
+
         ( "threads,t"
         , value<int>()->default_value(1),
          "number of OS-threads to use")
@@ -130,7 +130,7 @@ int main(
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
-       
+
         ( "no-header"
         , "do not print out the csv header row")
         ;

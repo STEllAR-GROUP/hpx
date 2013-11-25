@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 #include <hpx/util/register_locks.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
@@ -124,14 +124,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         // all resources should have been stopped at this point
         for (std::size_t i = 0; i != states_.size(); ++i)
         {
-            BOOST_ASSERT(states_[i].load() == stopping);
+            HPX_ASSERT(states_[i].load() == stopping);
         }
 
         // all scheduled tasks should have completed executing
-        BOOST_ASSERT(tasks_completed_ == tasks_scheduled_);
+        HPX_ASSERT(tasks_completed_ == tasks_scheduled_);
 
         // all driver threads should have stopped executing
-        BOOST_ASSERT(current_concurrency_ == 0);
+        HPX_ASSERT(current_concurrency_ == 0);
 #endif
     }
 
@@ -200,7 +200,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_id_type id = threads::detail::create_thread(
             &scheduler_, data, suspended, true, ec);
         if (ec) return;
-        BOOST_ASSERT(invalid_thread_id != id);    // would throw otherwise
+        HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
 
         // update statistics
         ++tasks_scheduled_;
@@ -234,7 +234,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         thread_id_type id = threads::detail::create_thread(
             &scheduler_, data, suspended, true, ec);
         if (ec) return;
-        BOOST_ASSERT(invalid_thread_id != id);    // would throw otherwise
+        HPX_ASSERT(invalid_thread_id != id);    // would throw otherwise
 
         // update statistics
         ++tasks_scheduled_;
@@ -312,9 +312,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
                 thread_times, &suspend_back_into_calling_context);
 
 #if HPX_DEBUG != 0
-            // the scheduling_loop is allowed to exit only if no more HPX 
+            // the scheduling_loop is allowed to exit only if no more HPX
             // threads exist
-            BOOST_ASSERT(!scheduler_.get_thread_count(
+            HPX_ASSERT(!scheduler_.get_thread_count(
                 unknown, thread_priority_default, thread_num));
 #endif
         }

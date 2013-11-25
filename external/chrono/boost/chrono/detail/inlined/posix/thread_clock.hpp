@@ -36,7 +36,7 @@ namespace boost { namespace chrono {
         if ( ::clock_gettime( clock_id, &ts ) )
 #endif
         {
-          BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+          HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
         }
 
         // transform to nanoseconds

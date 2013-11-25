@@ -25,7 +25,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
@@ -279,7 +279,7 @@ namespace hpx { namespace util
             else {
                 // Key should already exist in the cache. FIXME: This should
                 // probably throw as could easily be triggered by caller error.
-                BOOST_ASSERT(shutting_down_);
+                HPX_ASSERT(shutting_down_);
             }
         }
 
@@ -301,7 +301,7 @@ namespace hpx { namespace util
                 return false || (connections_ >= max_connections_);
 
             typename cache_type::const_iterator ct = cache_.find(l);
-            BOOST_ASSERT(ct != cache_.end());
+            HPX_ASSERT(ct != cache_.end());
             return (boost::get<1>(ct->second) >= max_connections_per_locality_)
                 || (connections_ >= max_connections_);
         }
@@ -405,11 +405,11 @@ namespace hpx { namespace util
 
                 // The separate item counter has to properly count all the
                 // existing the elements, not only those in the cache entry.
-                BOOST_ASSERT(boost::get<0>(val).size() <= boost::get<1>(val));
+                HPX_ASSERT(boost::get<0>(val).size() <= boost::get<1>(val));
 
                 // The overall number of connections in each entry (for each
                 // locality) should not be larger than the allowed number.
-                BOOST_ASSERT(boost::get<1>(val) <= max_connections_per_locality_);
+                HPX_ASSERT(boost::get<1>(val) <= max_connections_per_locality_);
 
                 // Count all connections (both those in the cache and those
                 // checked out of the cache).
@@ -419,14 +419,14 @@ namespace hpx { namespace util
 
             // Overall connection count should be larger than or equal to the
             // number of entries in the cache.
-            BOOST_ASSERT(in_cache_count <= connections_);
+            HPX_ASSERT(in_cache_count <= connections_);
 
             // Overall connection count should be equal to the sum of connection
             // counts for all localities.
-            BOOST_ASSERT(total_count == connections_);
+            HPX_ASSERT(total_count == connections_);
 
             // The list of key trackers should have the same size as the cache.
-            BOOST_ASSERT(key_tracker_.size() == cache_.size());
+            HPX_ASSERT(key_tracker_.size() == cache_.size());
 #endif
         }
 
@@ -448,7 +448,7 @@ namespace hpx { namespace util
             {
                 // Find the least recently used keys data.
                 const typename cache_type::iterator ct = cache_.find(*kt);
-                BOOST_ASSERT(ct != cache_.end());
+                HPX_ASSERT(ct != cache_.end());
 
                 // If the entry is empty, ignore it and try the next least
                 // recently used entry.

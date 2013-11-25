@@ -156,7 +156,7 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
 
@@ -183,7 +183,7 @@ namespace hpx
     apply_p (naming::id_type const& gid, threads::thread_priority priority)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -336,7 +336,7 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
 
@@ -360,7 +360,7 @@ namespace hpx
         threads::thread_priority priority)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));

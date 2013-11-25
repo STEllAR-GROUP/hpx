@@ -145,7 +145,7 @@ namespace hpx { namespace plugins { namespace parcel
 
         l.unlock();
 
-        BOOST_ASSERT(NULL != pp_);
+        HPX_ASSERT(NULL != pp_);
         buff(pp_);                   // 'invoke' the buffer
     }
 }}}

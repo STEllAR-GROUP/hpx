@@ -46,7 +46,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         else if (endian_out == "big")
             archive_flags_ |= util::endian_big;
         else {
-            BOOST_ASSERT(endian_out =="little" || endian_out == "big");
+            HPX_ASSERT(endian_out =="little" || endian_out == "big");
         }
 
         std::string array_optimization =
@@ -73,7 +73,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         BOOST_FOREACH(parcel const& p, pv)
         {
             naming::locality const locality_id = p.get_destination_locality();
-            BOOST_ASSERT(locality_id == destination());
+            HPX_ASSERT(locality_id == destination());
         }
 #endif
         // we choose the highest priority of all parcels for this message

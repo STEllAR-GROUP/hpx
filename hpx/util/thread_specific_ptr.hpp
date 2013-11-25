@@ -31,7 +31,7 @@
 #  error "Native thread local storage is not supported for this platform, please undefine HPX_HAVE_NATIVE_TLS"
 #endif
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 
 namespace hpx { namespace util
 {
@@ -52,7 +52,7 @@ namespace hpx { namespace util
 
         T& operator*() const
         {
-            BOOST_ASSERT(0 != ptr_);
+            HPX_ASSERT(0 != ptr_);
             return *ptr_;
         }
 
@@ -77,7 +77,7 @@ namespace hpx { namespace util
 #else
 
 #include <pthread.h>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/util/static.hpp>
 
 namespace hpx { namespace util
@@ -129,7 +129,7 @@ namespace hpx { namespace util
 
             ptr = reinterpret_cast<T *>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
-            BOOST_ASSERT(0 != ptr);
+            HPX_ASSERT(0 != ptr);
             return *ptr;
         }
 

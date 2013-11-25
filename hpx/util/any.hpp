@@ -35,7 +35,7 @@
 #include <boost/throw_exception.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/mpl/bool.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>
 
@@ -419,7 +419,7 @@ namespace hpx { namespace util
             // value of the required type to the any instance you want to
             // stream to. This assignment has to be executed before the actual
             // call to the operator>>().
-            BOOST_ASSERT(false &&
+            HPX_ASSERT(false &&
                 "Tried to insert from a std istream into an empty "
                 "any instance");
             return i;
@@ -1107,7 +1107,7 @@ namespace hpx { namespace util
                 char const* data = static_cast<char const*>(src);
                 boost::hash_range(hash, data, data + src_count);
             }
-            bool flush(void* dst, std::size_t dst_count, 
+            bool flush(void* dst, std::size_t dst_count,
                 std::size_t& written)
             {
                 return true;

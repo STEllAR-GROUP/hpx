@@ -95,9 +95,9 @@ namespace hpx { namespace util
         // Create a pool of threads to run all of the io_services.
         if (!threads_.empty())   // should be called only once
         {
-            BOOST_ASSERT(pool_size_ == io_services_.size());
-            BOOST_ASSERT(threads_.size() == io_services_.size());
-            BOOST_ASSERT(work_.size() == io_services_.size());
+            HPX_ASSERT(pool_size_ == io_services_.size());
+            HPX_ASSERT(threads_.size() == io_services_.size());
+            HPX_ASSERT(work_.size() == io_services_.size());
 
             if (join_threads)
                 join_locked();
@@ -131,9 +131,9 @@ namespace hpx { namespace util
         next_io_service_ = 0;
         stopped_ = false;
 
-        BOOST_ASSERT(pool_size_ == io_services_.size());
-        BOOST_ASSERT(threads_.size() == io_services_.size());
-        BOOST_ASSERT(work_.size() == io_services_.size());
+        HPX_ASSERT(pool_size_ == io_services_.size());
+        HPX_ASSERT(threads_.size() == io_services_.size());
+        HPX_ASSERT(work_.size() == io_services_.size());
 
         if (join_threads)
             join_locked();

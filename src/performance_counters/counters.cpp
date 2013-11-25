@@ -715,7 +715,7 @@ namespace hpx { namespace performance_counters
 
         inline std::string get_thread_kind(std::string const& pattern)
         {
-            BOOST_ASSERT(is_thread_kind(pattern));
+            HPX_ASSERT(is_thread_kind(pattern));
             return pattern.substr(0, pattern.find_last_of('-'));
         }
 
@@ -797,7 +797,7 @@ namespace hpx { namespace performance_counters
             // name at all.
             if (p.parentinstancename_ == "*")
             {
-                BOOST_ASSERT(p.parentinstanceindex_ == -1);
+                HPX_ASSERT(p.parentinstanceindex_ == -1);
                 p.parentinstancename_.clear();
             }
 

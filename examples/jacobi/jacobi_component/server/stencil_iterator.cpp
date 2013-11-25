@@ -22,11 +22,11 @@ namespace jacobi
             jacobi::row top = top_future[src].get();
             jacobi::row bottom = bottom_future[src].get();
 
-            BOOST_ASSERT(top.id);
-            BOOST_ASSERT(bottom.id);
-            BOOST_ASSERT(top.id != bottom.id);
-            BOOST_ASSERT(this->get_gid() != top.id);
-            BOOST_ASSERT(this->get_gid() != bottom.id);
+            HPX_ASSERT(top.id);
+            HPX_ASSERT(bottom.id);
+            HPX_ASSERT(top.id != bottom.id);
+            HPX_ASSERT(this->get_gid() != top.id);
+            HPX_ASSERT(this->get_gid() != bottom.id);
 
             std::vector<hpx::lcos::future<void> > fs;
             for(std::size_t x = 1; x < nx-1; x += line_block)
@@ -66,23 +66,23 @@ namespace jacobi
             row_range b = bottom.get();
             std::vector<double>::iterator bottom_ptr = b.begin();
 
-            BOOST_ASSERT(
+            HPX_ASSERT(
                 d.end() - d.begin() + 2 == s.end() - s.begin()
             );
-            BOOST_ASSERT(
+            HPX_ASSERT(
                 d.end() - d.begin() == t.end() - t.begin()
             );
-            BOOST_ASSERT(
+            HPX_ASSERT(
                 d.end() - d.begin() == b.end() - b.begin()
             );
 
             ++src_ptr;
             while(dst_ptr < d.end())
             {
-                BOOST_ASSERT(dst_ptr < d.end());
-                BOOST_ASSERT(src_ptr < s.end());
-                BOOST_ASSERT(top_ptr < t.end());
-                BOOST_ASSERT(bottom_ptr < b.end());
+                HPX_ASSERT(dst_ptr < d.end());
+                HPX_ASSERT(src_ptr < s.end());
+                HPX_ASSERT(top_ptr < t.end());
+                HPX_ASSERT(bottom_ptr < b.end());
                 *dst_ptr
                     =(
                         *(src_ptr - 1) + *(src_ptr + 1)
@@ -97,7 +97,7 @@ namespace jacobi
 
         jacobi::row stencil_iterator::get(std::size_t idx)
         {
-            BOOST_ASSERT(rows[idx].id);
+            HPX_ASSERT(rows[idx].id);
             return rows[idx];
         }
     }

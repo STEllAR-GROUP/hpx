@@ -249,7 +249,7 @@ namespace hpx { namespace util { namespace plugin {
 #if !defined(__AIX__)
             // AIX seems to return different handle values for the second and
             // any following call
-            BOOST_ASSERT(handle == dll_handle);
+            HPX_ASSERT(handle == dll_handle);
 #endif
 
             init_library(handle);   // initialize library

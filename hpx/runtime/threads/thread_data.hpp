@@ -14,7 +14,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
 
@@ -38,7 +38,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads 
+namespace hpx { namespace threads
 {
     class thread_data;
 
@@ -162,7 +162,7 @@ namespace hpx { namespace threads
             scheduler_base_(init_data.scheduler_base),
             count_(0)
         {
-            LTM_(debug) << "thread::thread(" << this << "), description(" 
+            LTM_(debug) << "thread::thread(" << this << "), description("
                         << get_description() << ")";
 
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
@@ -523,7 +523,7 @@ namespace hpx { namespace threads
         mutable boost::atomic<thread_state_ex> current_state_ex_;
 
         ///////////////////////////////////////////////////////////////////////
-        // Debugging/logging information 
+        // Debugging/logging information
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
         naming::address::address_type const component_id_;
 #endif
@@ -573,15 +573,15 @@ namespace hpx { namespace threads
     public:
         typedef boost::lockfree::caching_freelist<thread_data> pool_type;
 
-        thread_data(thread_init_data& init_data, 
+        thread_data(thread_init_data& init_data,
                pool_type& pool, thread_state_enum newstate)
           : thread_data_base(init_data, newstate),
             coroutine_(boost::move(init_data.func), boost::move(init_data.target),
                 this_(), init_data.stacksize),
             pool_(&pool)
         {
-            BOOST_ASSERT(init_data.stacksize != 0);
-            BOOST_ASSERT(coroutine_.is_ready());
+            HPX_ASSERT(init_data.stacksize != 0);
+            HPX_ASSERT(coroutine_.is_ready());
         }
 
         ~thread_data()
@@ -600,7 +600,7 @@ namespace hpx { namespace threads
         // Won't be called.
         static void* operator new(std::size_t) throw()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return NULL;
         }
 
@@ -621,7 +621,7 @@ namespace hpx { namespace threads
             current_state_ex_.store(thread_state_ex(wait_signaled,
                 current_state_ex.get_tag() + 1), boost::memory_order_release);
 
-            BOOST_ASSERT(this_() == coroutine_.get_thread_id());
+            HPX_ASSERT(this_() == coroutine_.get_thread_id());
             return coroutine_(current_state_ex);
         }
 
@@ -679,7 +679,7 @@ namespace hpx { namespace threads
             coroutine_(boost::move(init_data.func), boost::move(init_data.target), this_()),
             pool_(pool)
         {
-            BOOST_ASSERT(init_data.stacksize == 0);
+            HPX_ASSERT(init_data.stacksize == 0);
         }
 
         ~stackless_thread_data()

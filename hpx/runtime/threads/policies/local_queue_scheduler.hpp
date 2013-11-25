@@ -78,7 +78,7 @@ namespace hpx { namespace threads { namespace policies
             numa_sensitive_(init.numa_sensitive_),
             topology_(get_topology())
         {
-            BOOST_ASSERT(init.num_queues_ != 0);
+            HPX_ASSERT(init.num_queues_ != 0);
             for (std::size_t i = 0; i < init.num_queues_; ++i)
                 queues_[i] = new thread_queue<Mutex>(init.max_queue_thread_count_);
         }
@@ -111,7 +111,7 @@ namespace hpx { namespace threads { namespace policies
         std::size_t get_num_stolen_threads(std::size_t num_thread, bool reset)
         {
             std::size_t num_stolen_threads = 0;
-            if (num_thread == std::size_t(-1)) 
+            if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i < queues_.size(); ++i)
                     num_stolen_threads += queues_[i]->get_num_stolen_threads(reset);
@@ -128,7 +128,7 @@ namespace hpx { namespace threads { namespace policies
             // Return queue length of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
                 return queues_[num_thread]->get_queue_length();
             }
 
@@ -148,7 +148,7 @@ namespace hpx { namespace threads { namespace policies
             // Return thread count of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
                 return queues_[num_thread]->get_thread_count(state);
             }
 
@@ -167,7 +167,7 @@ namespace hpx { namespace threads { namespace policies
             // Return average thread wait time of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
                 return queues_[num_thread]->get_average_thread_wait_time();
             }
 
@@ -185,7 +185,7 @@ namespace hpx { namespace threads { namespace policies
             // Return average task wait time of one specific queue.
             if (std::size_t(-1) != num_thread)
             {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
                 return queues_[num_thread]->get_average_task_wait_time();
             }
 
@@ -227,7 +227,7 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread >= queue_size)
                 num_thread %= queue_size;
 
-            BOOST_ASSERT(num_thread < queue_size);
+            HPX_ASSERT(num_thread < queue_size);
             return queues_[num_thread]->create_thread(data, initial_state,
                 run_now, num_thread, ec);
         }
@@ -238,7 +238,7 @@ namespace hpx { namespace threads { namespace policies
             boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
         {
             // first try to get the next thread from our own queue
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
             if (queues_[num_thread]->get_next_thread(thrd, num_thread))
                 return true;
 
@@ -271,7 +271,7 @@ namespace hpx { namespace threads { namespace policies
             thread_priority /*priority*/ = thread_priority_normal)
         {
             if (std::size_t(-1) != num_thread) {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
                 queues_[num_thread]->schedule_thread(thrd, num_thread);
             }
             else {
@@ -302,7 +302,7 @@ namespace hpx { namespace threads { namespace policies
         bool wait_or_add_new(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count)
         {
-            BOOST_ASSERT(num_thread < queues_.size());
+            HPX_ASSERT(num_thread < queues_.size());
 
             std::size_t added = 0;
             bool result = queues_[num_thread]->wait_or_add_new(
@@ -384,7 +384,7 @@ namespace hpx { namespace threads { namespace policies
         void do_some_work(std::size_t num_thread = std::size_t(-1))
         {
             if (std::size_t(-1) != num_thread) {
-                BOOST_ASSERT(num_thread < queues_.size());
+                HPX_ASSERT(num_thread < queues_.size());
                 queues_[num_thread]->do_some_work();
             }
             else {

@@ -68,7 +68,7 @@ template<class convert_dest = do_convert_destination > struct shared_memory_t : 
             non_const_context_base::context().segment.construct<char_type>("shared_log_object")[mem_size](0);
 
         res = non_const_context_base::context().segment.find<char_type>("shared_log_object");
-        BOOST_ASSERT( res.first); // should be created by now
+        HPX_ASSERT( res.first); // should be created by now
         non_const_context_base::context().memory = res.first;
         }
 
@@ -80,7 +80,7 @@ template<class convert_dest = do_convert_destination > struct shared_memory_t : 
             non_const_context_base::context().segment.construct<long>("shared_occupied_size")[1](0);
 
         res = non_const_context_base::context().segment.find<long>("shared_occupied_size");
-        BOOST_ASSERT( res.first); // should be created by now
+        HPX_ASSERT( res.first); // should be created by now
         non_const_context_base::context().occupied_size = res.first;
         }
     }

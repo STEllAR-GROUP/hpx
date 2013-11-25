@@ -18,18 +18,18 @@ namespace jacobi
       , std::size_t l
     )
     {
-        BOOST_ASSERT(id);
+        HPX_ASSERT(id);
         return hpx::async<server::stencil_iterator::init_action>(id, r, y, nx, ny, l);
     }
-        
+
     hpx::lcos::future<void> stencil_iterator::setup_boundary(
         stencil_iterator const & top
       , stencil_iterator const & bottom
     )
     {
-        BOOST_ASSERT(id);
-        BOOST_ASSERT(top.id);
-        BOOST_ASSERT(bottom.id);
+        HPX_ASSERT(id);
+        HPX_ASSERT(top.id);
+        HPX_ASSERT(bottom.id);
         return
             hpx::async<server::stencil_iterator::setup_boundary_action>(
                 id
@@ -37,17 +37,17 @@ namespace jacobi
               , bottom
             );
     }
-        
+
     hpx::lcos::future<void> stencil_iterator::step()
     {
-        BOOST_ASSERT(id);
+        HPX_ASSERT(id);
         return
             hpx::async<server::stencil_iterator::step_action>(id);
     }
-    
+
     hpx::lcos::future<jacobi::row> stencil_iterator::get(std::size_t idx) const
     {
-        BOOST_ASSERT(id);
+        HPX_ASSERT(id);
         return hpx::async<server::stencil_iterator::get_action>(id, idx);
     }
 }

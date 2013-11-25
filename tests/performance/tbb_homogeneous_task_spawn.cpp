@@ -40,7 +40,7 @@
 #include <stdexcept>
 #include <iostream>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
@@ -145,7 +145,7 @@ int main(
     cmdline.add_options()
         ( "help,h"
         , "print out program usage (this message)")
-        
+
         ( "threads,t"
         , value<boost::uint64_t>()->default_value(1),
          "number of OS-threads to use")

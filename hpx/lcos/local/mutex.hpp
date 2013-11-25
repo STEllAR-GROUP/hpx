@@ -232,7 +232,7 @@ namespace hpx { namespace lcos { namespace local
                 // wait for lock to get available
                 bool lock_acquired = false;
                 do {
-                    BOOST_VERIFY(!wait_for_single_object());
+                    HPX_VERIFY(!wait_for_single_object());
                     clear_waiting_and_try_lock(old_count);
                     lock_acquired = !(old_count & lock_flag_value);
                 } while (!lock_acquired);
@@ -281,8 +281,8 @@ namespace hpx { namespace lcos { namespace local
         void unlock()
         {
             // We unregister ourselves before the actual unlock is executed as
-            // the spinlock below might be there might be contention for the 
-            // spinlock and the HPX-thread executing this unlock will be 
+            // the spinlock below might be there might be contention for the
+            // spinlock and the HPX-thread executing this unlock will be
             // suspended.
             util::unregister_lock(this);
 
@@ -290,7 +290,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 mutex_type::scoped_lock l(mtx_);
 
-                BOOST_ASSERT(active_count_ & lock_flag_value);
+                HPX_ASSERT(active_count_ & lock_flag_value);
                 active_count_ += lock_flag_value;
                 set_event();
             }

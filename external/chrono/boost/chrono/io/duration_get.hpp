@@ -18,7 +18,7 @@
 #include <boost/chrono/detail/scan_keyword.hpp>
 #include <boost/chrono/detail/no_warning/signed_unsigned_cmp.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <locale>
 
 /**
@@ -240,7 +240,7 @@ namespace boost
               break;
             }
             default:
-              BOOST_ASSERT(false && "Boost::Chrono internal error.");
+              HPX_ASSERT(false && "Boost::Chrono internal error.");
               break;
             }
 

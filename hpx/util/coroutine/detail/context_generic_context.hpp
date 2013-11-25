@@ -15,7 +15,7 @@
 #endif
 
 #include <boost/config.hpp>
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <boost/context/all.hpp>
@@ -83,8 +83,8 @@ namespace hpx { namespace util { namespace coroutines
 
             void* allocate(std::size_t size) const
             {
-                BOOST_ASSERT(minimum_stacksize() <= size);
-                BOOST_ASSERT(maximum_stacksize() >= size);
+                HPX_ASSERT(minimum_stacksize() <= size);
+                HPX_ASSERT(maximum_stacksize() >= size);
 
                 void* limit = std::calloc(size, sizeof(char));
                 if (!limit) boost::throw_exception(std::bad_alloc());
@@ -94,9 +94,9 @@ namespace hpx { namespace util { namespace coroutines
 
             void deallocate(void* vp, std::size_t size) const
             {
-                BOOST_ASSERT(vp);
-                BOOST_ASSERT(minimum_stacksize() <= size);
-                BOOST_ASSERT(maximum_stacksize() >= size);
+                HPX_ASSERT(vp);
+                HPX_ASSERT(minimum_stacksize() <= size);
+                HPX_ASSERT(maximum_stacksize() >= size);
 
                 void* limit = static_cast<char*>(vp) - size;
                 std::free(limit);
@@ -109,7 +109,7 @@ namespace hpx { namespace util { namespace coroutines
 
             static std::size_t maximum_stacksize()
             {
-                BOOST_ASSERT_MSG( false, "segmented stack is unbound");
+                HPX_ASSERT_MSG( false, "segmented stack is unbound");
                 return 0;
             }
 
@@ -121,7 +121,7 @@ namespace hpx { namespace util { namespace coroutines
 
             void* allocate(std::size_t size) const
             {
-                BOOST_ASSERT(default_stacksize() <= size);
+                HPX_ASSERT(default_stacksize() <= size);
 
                 void* limit = __splitstack_makecontext(size, segments_ctx_, &size);
                 if (!limit) boost::throw_exception(std::bad_alloc());
@@ -147,7 +147,7 @@ namespace hpx { namespace util { namespace coroutines
         BOOST_FORCEINLINE void trampoline(intptr_t pv)
         {
             T* fun = reinterpret_cast<T*>(pv);
-            BOOST_ASSERT(fun);
+            HPX_ASSERT(fun);
             (*fun)();
             std::abort();
         }

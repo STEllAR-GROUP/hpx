@@ -17,7 +17,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/shmem/data_buffer.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -79,7 +79,7 @@ namespace hpx { namespace parcelset { namespace shmem
             mutex_type::scoped_lock lock(mtx_);
 
             if (key_tracker_.empty()) {
-                BOOST_ASSERT(cache_.empty());
+                HPX_ASSERT(cache_.empty());
             }
             else {
                 // eviction strategy implemented here ...
@@ -92,14 +92,14 @@ namespace hpx { namespace parcelset { namespace shmem
                 {
                     // find it ...
                     cache_type::iterator const kt = cache_.find(*it);
-                    BOOST_ASSERT(kt != cache_.end());
+                    HPX_ASSERT(kt != cache_.end());
 
                     // ... remove it
                     cache_.erase(kt);
                     key_tracker_.erase(it);
 
                     it = key_tracker_.begin();
-                    BOOST_ASSERT(it != key_tracker_.end());
+                    HPX_ASSERT(it != key_tracker_.end());
                 }
             }
 
@@ -131,7 +131,7 @@ namespace hpx { namespace parcelset { namespace shmem
         void check_invariants() const
         {
             // the list of key trackers should have the right size
-            BOOST_ASSERT(key_tracker_.size() == cache_.size());
+            HPX_ASSERT(key_tracker_.size() == cache_.size());
         }
 
     private:

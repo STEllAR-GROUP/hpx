@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include <iostream>
 
-#include <boost/assert.hpp>
+#include <hpx/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 
@@ -69,10 +69,10 @@ extern "C" void worker_func(
 
 ///////////////////////////////////////////////////////////////////////////////
 extern "C" void finish(
-    void* p 
+    void* p
     )
 {
-    BOOST_ASSERT(p);
+    HPX_ASSERT(p);
 
     high_resolution_timer* t = static_cast<high_resolution_timer*>(p);
 
@@ -85,10 +85,10 @@ extern "C" void finish(
 
 ///////////////////////////////////////////////////////////////////////////////
 extern "C" void spawner(
-    void* p 
+    void* p
     )
 {
-    BOOST_ASSERT(p);
+    HPX_ASSERT(p);
 
     swarm_dependency_init(&flag, tasks, finish, p);
 
@@ -125,7 +125,7 @@ int main(
     cmdline.add_options()
         ( "help,h"
         , "print out program usage (this message)")
-        
+
         ( "threads,t"
         , value<boost::uint32_t>()->default_value(1),
          "number of OS-threads to use")
@@ -159,7 +159,7 @@ int main(
 
     // Setup the SWARM environment.
     params.maxThreadCount = vm["threads"].as<boost::uint32_t>();
- 
+
     return swarm_main(vm);
 }
 
