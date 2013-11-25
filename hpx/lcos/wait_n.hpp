@@ -19,7 +19,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/atomic.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/fusion/include/for_each.hpp>

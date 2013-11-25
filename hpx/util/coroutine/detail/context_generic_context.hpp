@@ -15,7 +15,7 @@
 #endif
 
 #include <boost/config.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <boost/context/all.hpp>

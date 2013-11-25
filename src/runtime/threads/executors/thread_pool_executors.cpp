@@ -15,7 +15,7 @@
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 #include <hpx/util/register_locks.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {

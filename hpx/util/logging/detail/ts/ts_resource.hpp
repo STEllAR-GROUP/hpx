@@ -24,7 +24,7 @@
 #include <hpx/util/logging/detail/ts/ts.hpp>
 #include <hpx/util/logging/detail/tss/tss.hpp>
 #include <time.h>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace util { namespace logging {
 

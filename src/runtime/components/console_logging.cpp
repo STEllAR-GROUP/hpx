@@ -17,7 +17,7 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/serialization/vector.hpp>
 

@@ -8,7 +8,7 @@
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 
 #include <boost/foreach.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #include "read_values.hpp"
 #include "partition.hpp"

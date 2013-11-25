@@ -15,7 +15,7 @@
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 

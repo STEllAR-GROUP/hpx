@@ -15,7 +15,7 @@
 #include <hpx/components/security/capability.hpp>
 #endif
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
 

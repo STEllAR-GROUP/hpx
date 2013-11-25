@@ -44,7 +44,7 @@
 #include <new>
 #include <iostream>
 #include <boost/type_traits.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #include <sys/mman.h>

@@ -14,7 +14,7 @@ namespace hpx { namespace lcos { namespace local {
 
 #include <boost/atomic.hpp>
 #include <boost/shared_ptr.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <vector>
 

@@ -41,7 +41,7 @@
 #include <set>
 
 #include <boost/foreach.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/path.hpp>

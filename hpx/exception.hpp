@@ -19,7 +19,7 @@
 #include <hpx/util/filesystem_compatibility.hpp>
 
 #include <boost/cstdint.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/current_function.hpp>
 #include <boost/exception_ptr.hpp>
 #include <boost/throw_exception.hpp>

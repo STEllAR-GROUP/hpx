@@ -10,7 +10,7 @@
 #include <hpx/util/function.hpp>
 
 #include <boost/move/move.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {

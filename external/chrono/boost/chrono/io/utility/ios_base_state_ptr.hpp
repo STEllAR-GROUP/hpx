@@ -11,7 +11,7 @@
 #define BOOST_CHRONO_UTILITY_IOS_BASE_STATE_PTR_HPP
 
 #include <ios>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 /**
  *

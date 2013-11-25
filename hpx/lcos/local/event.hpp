@@ -15,7 +15,7 @@
 
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/intrusive/slist.hpp>
 
 #if defined(BOOST_MSVC)

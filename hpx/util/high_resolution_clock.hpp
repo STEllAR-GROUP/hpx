@@ -11,7 +11,7 @@
 #endif
 #include <boost/chrono/chrono.hpp>
 #include <boost/chrono/process_cpu_clocks.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace util
 {

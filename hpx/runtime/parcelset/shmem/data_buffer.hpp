@@ -23,7 +23,7 @@
 #endif
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <string>
 

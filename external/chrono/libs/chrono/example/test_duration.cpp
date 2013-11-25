@@ -26,7 +26,7 @@ time2_demo contained this comment:
                    Anthony Williams.
 */
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/chrono/chrono.hpp>
 #include <boost/type_traits.hpp>
 

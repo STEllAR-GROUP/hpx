@@ -24,7 +24,7 @@
 #include <boost/serialization/is_bitwise_serializable.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>

@@ -12,7 +12,7 @@
 
 #include <boost/chrono/config.hpp>
 #include <boost/chrono/process_cpu_clocks.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <sys/time.h> //for gettimeofday and timeval
 #include <sys/times.h> //for times

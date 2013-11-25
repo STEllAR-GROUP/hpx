@@ -14,7 +14,7 @@
 #include <list>
 
 #include <hpx/util/move.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/integer.hpp>
 #include <boost/icl/interval_set.hpp>
 #include <boost/intrusive/set.hpp>

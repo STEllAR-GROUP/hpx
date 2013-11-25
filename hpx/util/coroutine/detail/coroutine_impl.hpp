@@ -36,7 +36,7 @@
 #endif
 
 #include <cstddef>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/optional.hpp>
 #include <boost/config.hpp>
 #include <boost/move/move.hpp>

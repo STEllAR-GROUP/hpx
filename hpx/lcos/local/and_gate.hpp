@@ -13,7 +13,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/move/move.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/foreach.hpp>
 
 #include <list>

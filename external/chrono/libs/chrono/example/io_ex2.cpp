@@ -14,7 +14,7 @@ Many thanks to Howard for making his code available under the Boost license.
 
 #include <boost/chrono/chrono_io.hpp>
 #include <sstream>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 int main()
 {

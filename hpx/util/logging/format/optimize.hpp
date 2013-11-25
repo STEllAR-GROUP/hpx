@@ -21,7 +21,7 @@
 #endif
 
 #include <hpx/util/logging/detail/fwd.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>
 #include <vector>

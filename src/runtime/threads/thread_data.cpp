@@ -12,7 +12,7 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 // #if HPX_DEBUG
 // #  define HPX_DEBUG_THREAD_POOL 1

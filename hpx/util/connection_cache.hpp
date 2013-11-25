@@ -25,7 +25,7 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>

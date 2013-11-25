@@ -10,7 +10,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #include "partition.hpp"
 #include "../read_values.hpp"

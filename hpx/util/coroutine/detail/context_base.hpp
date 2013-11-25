@@ -41,7 +41,7 @@
 #include <algorithm> //for swap
 
 #include <boost/atomic.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/version.hpp>
 #include <boost/intrusive_ptr.hpp>
 

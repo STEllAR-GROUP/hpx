@@ -27,7 +27,7 @@
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio/deadline_timer.hpp>

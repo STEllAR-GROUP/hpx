@@ -30,7 +30,7 @@
 #define HPX_COROUTINE_DETAIL_SELF_HPP_20060809
 
 #include <boost/noncopyable.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/move/move.hpp>
 
 #include <hpx/util/coroutine/detail/fix_result.hpp>

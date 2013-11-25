@@ -18,7 +18,7 @@
 #include <boost/chrono/detail/scan_keyword.hpp>
 #include <boost/chrono/detail/no_warning/signed_unsigned_cmp.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <locale>
 
 /**

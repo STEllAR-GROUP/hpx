@@ -17,7 +17,7 @@
 #include <boost/serialization/extended_type_info_typeid.hpp>
 #include <boost/uuid/sha1.hpp>
 #include <boost/cstdint.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <typeinfo>
 

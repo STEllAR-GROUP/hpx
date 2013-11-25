@@ -13,7 +13,7 @@
 
 #include <boost/chrono/config.hpp>
 #include <boost/chrono/io/duration_units.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <locale>
 
 namespace boost

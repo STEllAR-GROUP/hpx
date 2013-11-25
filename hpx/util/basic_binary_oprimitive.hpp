@@ -26,7 +26,7 @@
 #include <cstddef> // size_t
 #include <vector>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/integer.hpp>

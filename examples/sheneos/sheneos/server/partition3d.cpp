@@ -13,7 +13,7 @@
 #include <cmath>
 #include <memory>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/move/move.hpp>
 
 #include "partition3d.hpp"

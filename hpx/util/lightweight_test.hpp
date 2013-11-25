@@ -13,7 +13,7 @@
 #include <iostream>
 
 #include <boost/io/ios_state.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/current_function.hpp>
 #include <boost/preprocessor/stringize.hpp>

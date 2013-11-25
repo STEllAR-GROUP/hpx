@@ -8,7 +8,7 @@
 #define HPX_UTIL_GENERATE_UNIQUE_IDS_MAR_24_2008_1014AM
 
 #include <boost/thread.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/cstdint.hpp>
 
 #include <hpx/hpx_fwd.hpp>

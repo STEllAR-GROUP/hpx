@@ -22,7 +22,7 @@
 
 #include <vector>
 #include <memory>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #   include <windef.h>
 

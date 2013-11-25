@@ -23,7 +23,7 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/result_of_or.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>

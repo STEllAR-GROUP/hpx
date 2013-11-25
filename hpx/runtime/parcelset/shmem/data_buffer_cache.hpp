@@ -17,7 +17,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/parcelset/shmem/data_buffer.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/noncopyable.hpp>
 

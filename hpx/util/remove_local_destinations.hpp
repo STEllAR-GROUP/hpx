@@ -14,7 +14,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/move/move.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

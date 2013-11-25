@@ -7,7 +7,7 @@
 #ifndef HPX_COROUTINE_COROUTINE_IMPL_IMPL_HPP_20081127
 #define HPX_COROUTINE_COROUTINE_IMPL_IMPL_HPP_20081127
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl.hpp>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail

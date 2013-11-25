@@ -12,7 +12,7 @@
 #include <hpx/components/security/key_pair.hpp>
 #include <hpx/components/security/server/subordinate_certificate_authority.hpp>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace util { namespace security
 {

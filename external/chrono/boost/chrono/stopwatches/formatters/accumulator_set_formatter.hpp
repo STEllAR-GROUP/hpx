@@ -20,7 +20,7 @@
 #include <boost/format.hpp>
 #include <boost/format/group.hpp>
 #include <boost/cstdint.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <string>
 #include <iostream>
 #include <cassert>

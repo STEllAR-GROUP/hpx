@@ -38,7 +38,7 @@
 #include <stdexcept>
 #include <iostream>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 

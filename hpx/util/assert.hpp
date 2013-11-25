@@ -6,6 +6,9 @@
 
 /// \file assert.hpp
 
+#if !defined(HPX_UTIL_ASSERT_MAR_24_2008_0929AM)
+#define HPX_UTIL_ASSERT_MAR_24_2008_0929AM
+
 #include <hpx/config/branch_hints.hpp>
 
 //--------------------------------------------------------------------------------------//
@@ -123,5 +126,7 @@ namespace hpx
 #else
 
 # define HPX_VERIFY(expr) HPX_ASSERT(expr)
+
+#endif
 
 #endif

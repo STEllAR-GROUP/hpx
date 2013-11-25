@@ -14,7 +14,7 @@
 #include <boost/chrono/config.hpp>
 #include <boost/chrono/io/time_point_units.hpp>
 #include <boost/chrono/io/duration_put.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <locale>
 
 namespace boost

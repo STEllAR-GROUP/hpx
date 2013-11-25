@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/throw_exception.hpp>

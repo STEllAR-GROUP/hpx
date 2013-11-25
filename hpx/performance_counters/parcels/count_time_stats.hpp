@@ -9,7 +9,7 @@
 #define HPX_05A1C29B_DB73_463A_8C9D_B8EDC3B69F5E
 
 #include <boost/config.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 #include <boost/accumulators/statistics/mean.hpp>

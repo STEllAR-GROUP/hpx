@@ -31,7 +31,7 @@
 #  error "Native thread local storage is not supported for this platform, please undefine HPX_HAVE_NATIVE_TLS"
 #endif
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace util
 {
@@ -77,7 +77,7 @@ namespace hpx { namespace util
 #else
 
 #include <pthread.h>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/static.hpp>
 
 namespace hpx { namespace util

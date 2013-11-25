@@ -40,7 +40,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <stdexcept>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace util { namespace logging {
 

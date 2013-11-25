@@ -12,7 +12,7 @@
 
 #include <boost/chrono/config.hpp>
 #include <boost/chrono/process_cpu_clocks.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <sys/times.h>
 #include <unistd.h>

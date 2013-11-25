@@ -30,7 +30,7 @@
 #include <vector>
 //#include <boost/thread/detail/config.hpp>
 #include <boost/config.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace util { namespace logging { namespace detail {
 

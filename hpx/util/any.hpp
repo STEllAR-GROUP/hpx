@@ -35,7 +35,7 @@
 #include <boost/throw_exception.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/mpl/bool.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>
 

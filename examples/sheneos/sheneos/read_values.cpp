@@ -8,7 +8,7 @@
 
 #include "read_values.hpp"
 
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation helper functions related to HDF5.

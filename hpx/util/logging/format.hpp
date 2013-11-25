@@ -28,7 +28,7 @@
 #include <vector>
 #include <set>
 #include <boost/shared_ptr.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/type_traits/is_base_of.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp>

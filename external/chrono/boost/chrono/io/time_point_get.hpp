@@ -12,7 +12,7 @@
 #include <boost/chrono/detail/scan_keyword.hpp>
 #include <boost/chrono/io/time_point_units.hpp>
 #include <boost/chrono/io/duration_get.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <locale>
 #include <string>
 

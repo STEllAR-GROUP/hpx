@@ -14,7 +14,7 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 
 #include <boost/foreach.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/util/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/move/move.hpp>
 
