@@ -1846,4 +1846,8 @@ namespace hpx
     using lcos::make_ready_future_after;
 }
 
+#define HPX_MAKE_ERROR_FUTURE(T, errorcode, f, msg)                    \
+    lcos::make_error_future<T>(HPX_GET_EXCEPTION(errorcode, f, msg))   \
+    /**/
+
 #endif
