@@ -6,11 +6,12 @@
 
 set(tests
     after_588
+    dataflow_launch_775
     async_callback_non_deduced_context
+    future_790
     future_hang_on_get_629
     future_hang_on_then_629
-    dataflow_launch_775
-    future_790
+    future_timed_wait_1025
     future_unwrap_878
     lifetime_588
     lifetime_588_1
