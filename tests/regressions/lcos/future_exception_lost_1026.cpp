@@ -10,13 +10,19 @@
 #include <hpx/util/lightweight_test.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<void> test_async(/* ... */)
+hpx::future<void> test_async0(/* ... */)
 {
     // if (... some logic ...)
         return hpx::make_error_future<void>(HPX_GET_EXCEPTION(
             hpx::unknown_error, "test", "Something horrible happened"));
     // else
     //    return hpx::async
+}
+
+void test1()
+{
+    HPX_THROW_EXCEPTION(
+        hpx::unknown_error, "test", "Something horrible happened");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,8 +37,9 @@ int hpx_main()
         try
         {
             {
-                future<void> f = test_async();
+                future<void> f = test_async0();
             }
+
         }
 
         catch (hpx::exception&) 
@@ -40,7 +47,30 @@ int hpx_main()
             caught_exception = true;
         }
 
-        HPX_TEST(caught_exception);
+        HPX_TEST_MSG(caught_exception, "test_async0 exception wasn't caught");
+
+    }
+
+    {
+        bool caught_exception = false;
+
+
+        try
+        {
+
+            {
+                future<void> f = async(test1);
+            }
+
+        }
+
+        catch (hpx::exception&) 
+        {
+            caught_exception = true;
+        }
+
+
+        HPX_TEST_MSG(caught_exception, "async(test1) exception wasn't caught");
     }
 
     hpx::finalize();
