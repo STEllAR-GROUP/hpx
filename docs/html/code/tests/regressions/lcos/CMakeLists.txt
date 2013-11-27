@@ -6,17 +6,19 @@
 
 set(tests
     after_588
+    dataflow_launch_775
     async_callback_non_deduced_context
+    future_790
     future_hang_on_get_629
     future_hang_on_then_629
-    dataflow_launch_775
-    future_790
+    future_timed_wait_1025
     future_unwrap_878
     lifetime_588
     lifetime_588_1
     promise_leak_996
     set_hpx_limit_771
     set_hpx_limit_798
+    future_exception_lost_1026
    )
 
 # MSVC 2010 is not able to cope with this test
