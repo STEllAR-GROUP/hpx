@@ -17,11 +17,11 @@
 
 #undef HPX_ASSERT
 
-#if defined(HPX_DISABLE_ASSERTS)
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS)
 
 # define HPX_ASSERT(expr) ((void)0)
 
-#elif defined(HPX_ENABLE_ASSERT_HANDLER)
+#elif defined(HPX_ENABLE_ASSERT_HANDLER) || defined(BOOST_ENABLE_ASSERT_HANDLER)
 
 #include <boost/config.hpp>
 #include <boost/current_function.hpp>
@@ -47,11 +47,11 @@ namespace hpx
 
 # undef HPX_ASSERT_MSG
 
-#if defined(HPX_DISABLE_ASSERTS) || defined(NDEBUG)
+#if defined(HPX_DISABLE_ASSERTS) || defined(BOOST_DISABLE_ASSERTS) || defined(NDEBUG)
 
   #define HPX_ASSERT_MSG(expr, msg) ((void)0)
 
-#elif defined(HPX_ENABLE_ASSERT_HANDLER)
+#elif defined(HPX_ENABLE_ASSERT_HANDLER) || defined(BOOST_ENABLE_ASSERT_HANDLER)
 
   #include <boost/config.hpp>
   #include <boost/current_function.hpp>
@@ -119,7 +119,8 @@ namespace hpx
 
 #undef HPX_VERIFY
 
-#if defined(HPX_DISABLE_ASSERTS) || ( !defined(HPX_ENABLE_ASSERT_HANDLER) && defined(NDEBUG) )
+#if defined(HPX_DISABLE_ASSERTS) || ( !defined(HPX_ENABLE_ASSERT_HANDLER) && defined(NDEBUG) ) \
+ || defined(BOOST_DISABLE_ASSERTS) || ( !defined(BOOST_ENABLE_ASSERT_HANDLER) && defined(NDEBUG) )
 
 # define HPX_VERIFY(expr) ((void)(expr))
 
