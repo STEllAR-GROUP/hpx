@@ -15,7 +15,7 @@ namespace hpx { namespace lcos { namespace local
     struct no_mutex
     {
         typedef boost::unique_lock<no_mutex> scoped_lock;
-        typedef boost::detail::try_lock_wrapper<spinlock> scoped_try_lock;
+        typedef boost::detail::try_lock_wrapper<no_mutex> scoped_try_lock;
 
         void lock() {}
         void unlock() {}
