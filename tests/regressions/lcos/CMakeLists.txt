@@ -18,6 +18,7 @@ set(tests
     promise_leak_996
     set_hpx_limit_771
     set_hpx_limit_798
+    future_exception_lost_1026
    )
 
 # MSVC 2010 is not able to cope with this test
