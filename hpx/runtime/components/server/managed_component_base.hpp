@@ -237,7 +237,7 @@ namespace hpx { namespace components
         managed_component_base(managed_component<Component, Wrapper>* back_ptr)
           : back_ptr_(back_ptr)
         {
-            BOOST_ASSERT(back_ptr);
+            HPX_ASSERT(back_ptr);
         }
 
         // The implementation of the component is responsible for deleting the
@@ -271,9 +271,9 @@ namespace hpx { namespace components
 
         naming::gid_type get_base_gid() const;
 
-        /// This is the default hook implementation for decorate_action which 
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
@@ -285,8 +285,8 @@ namespace hpx { namespace components
 
         void set_back_ptr(components::managed_component<Component, Wrapper>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
 
@@ -666,7 +666,7 @@ namespace hpx { namespace components
     inline naming::id_type
     managed_component_base<Component, Wrapper, CtorPolicy, DtorPolicy>::get_gid() const
     {
-        BOOST_ASSERT(back_ptr_);
+        HPX_ASSERT(back_ptr_);
         return back_ptr_->get_gid();
     }
 
@@ -675,7 +675,7 @@ namespace hpx { namespace components
     inline naming::gid_type
     managed_component_base<Component, Wrapper, CtorPolicy, DtorPolicy>::get_base_gid() const
     {
-        BOOST_ASSERT(back_ptr_);
+        HPX_ASSERT(back_ptr_);
         return back_ptr_->get_base_gid();
     }
 }}

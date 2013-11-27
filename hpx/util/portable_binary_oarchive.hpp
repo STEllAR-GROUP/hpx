@@ -345,8 +345,8 @@ namespace boost { namespace archive { namespace detail
                 // make sure call is routed through the highest interface that might
                 // be specialized by the user.
                 boost::serialization::serialize_adl(
-                    ar, 
-                    const_cast<T &>(t), 
+                    ar,
+                    const_cast<T &>(t),
                     ::boost::serialization::version< T >::value
                 );
             }
@@ -360,7 +360,7 @@ namespace boost { namespace archive { namespace detail
             static void invoke(archive_type &ar, const T & t)
             {
                 ar.save_object(
-                    & t, 
+                    & t,
                     boost::serialization::singleton<
                         oserializer<archive_type, T>
                     >::get_const_instance()
@@ -386,7 +386,7 @@ namespace boost { namespace archive { namespace detail
         template <typename T>
         static void invoke(archive_type & ar, const T & t)
         {
-            typedef 
+            typedef
                 BOOST_DEDUCED_TYPENAME mpl::eval_if<
                 // if its primitive
                     mpl::equal_to<
@@ -415,7 +415,7 @@ namespace boost { namespace archive { namespace detail
                 // else
                     // do a fast save only tracking is turned off
                     mpl::identity<save_conditional>
-                > > >::type typex; 
+                > > >::type typex;
             check_object_versioning< T >();
             typex::invoke(ar, t);
         }
@@ -449,7 +449,7 @@ namespace boost { namespace archive { namespace detail
         struct non_abstract
         {
             template <typename T>
-            static const basic_pointer_oserializer* 
+            static const basic_pointer_oserializer*
             register_type(archive_type& ar)
             {
                 return ar.register_type(static_cast<T*>(NULL));
@@ -503,7 +503,7 @@ namespace boost { namespace archive { namespace detail
 
                 // retrieve the true type of the object pointed to
                 // if this assertion fails its an error in this library
-                BOOST_ASSERT(NULL != this_type);
+                HPX_ASSERT(NULL != this_type);
 
                 const boost::serialization::extended_type_info * true_type =
                     i.get_derived_extended_type_info(t);
@@ -552,7 +552,7 @@ namespace boost { namespace archive { namespace detail
                             archive_serializer_map<archive_type>
                         >::get_const_instance().find(*true_type)
                     );
-                BOOST_ASSERT(NULL != bpos);
+                HPX_ASSERT(NULL != bpos);
                 if(NULL == bpos)
                     boost::serialization::throw_exception(
                         archive_exception(

@@ -30,13 +30,13 @@ namespace jacobi
 
         double & operator[](std::size_t i)
         {
-            BOOST_ASSERT(i < v_.size());
+            HPX_ASSERT(i < v_.size());
             return v_[i];
         }
 
         double const & operator[](std::size_t i) const
         {
-            BOOST_ASSERT(i < v_.size());
+            HPX_ASSERT(i < v_.size());
             return v_[i];
         }
 
@@ -75,30 +75,30 @@ namespace jacobi
             , end_(e)
             , values_(values)
         {
-            BOOST_ASSERT(end_ > begin_);
+            HPX_ASSERT(end_ > begin_);
         }
 
         std::vector<double>::iterator begin()
         {
-            BOOST_ASSERT(values_);
+            HPX_ASSERT(values_);
             return values_->v_.begin() + begin_;
         }
-        
+
         std::vector<double>::const_iterator begin() const
         {
-            BOOST_ASSERT(values_);
+            HPX_ASSERT(values_);
             return values_->v_.begin() + begin_;
         }
 
         std::vector<double>::iterator end()
         {
-            BOOST_ASSERT(values_);
+            HPX_ASSERT(values_);
             return values_->v_.begin() + end_;
         }
-        
+
         std::vector<double>::const_iterator end() const
         {
-            BOOST_ASSERT(values_);
+            HPX_ASSERT(values_);
             return values_->v_.begin() + end_;
         }
 
@@ -109,13 +109,13 @@ namespace jacobi
             ar & values_->v_;
             begin_ = 0;
             end_ = values_->v_.size();
-            BOOST_ASSERT(end_ > begin_);
+            HPX_ASSERT(end_ > begin_);
         }
 
         template <typename Archive>
         void save(Archive & ar, unsigned) const
         {
-            BOOST_ASSERT(values_);
+            HPX_ASSERT(values_);
             std::vector<double> tmp(values_->v_.begin() + begin_, values_->v_.begin() + end_);
             ar & tmp;
         }
@@ -152,7 +152,7 @@ namespace boost
     {
         typedef std::vector<double>::iterator type;
     };
-    
+
     template <>
     struct range_const_iterator<jacobi::row_range>
     {

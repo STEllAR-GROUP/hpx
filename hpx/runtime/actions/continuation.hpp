@@ -165,14 +165,14 @@ namespace hpx { namespace actions
           : gid_(gid)
         {
             // continuations with invalid id do not make sense
-            BOOST_ASSERT(gid_);
+            HPX_ASSERT(gid_);
         }
 
         explicit continuation(BOOST_RV_REF(naming::id_type) gid)
           : gid_(boost::move(gid))
         {
             // continuations with invalid id do not make sense
-            BOOST_ASSERT(gid_);
+            HPX_ASSERT(gid_);
         }
 
         virtual ~continuation() {}

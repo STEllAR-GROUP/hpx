@@ -174,7 +174,7 @@ namespace hpx { namespace threads { namespace detail
             case suspended:
                 break;      // fine, just setthe new state
             default:
-                BOOST_ASSERT(false);    // should not happen
+                HPX_ASSERT(false);    // should not happen
                 break;
             }
 
@@ -226,7 +226,7 @@ namespace hpx { namespace threads { namespace detail
         thread_state_enum newstate = pending,
         thread_state_ex_enum newstate_ex = wait_timeout,
         thread_priority priority = thread_priority_normal,
-        std::size_t thread_num = std::size_t(-1), 
+        std::size_t thread_num = std::size_t(-1),
         error_code& ec = throws);
 
     template <typename SchedulingPolicy>
@@ -235,7 +235,7 @@ namespace hpx { namespace threads { namespace detail
         thread_state_enum newstate = pending,
         thread_state_ex_enum newstate_ex = wait_timeout,
         thread_priority priority = thread_priority_normal,
-        std::size_t thread_num = std::size_t(-1), 
+        std::size_t thread_num = std::size_t(-1),
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -361,7 +361,7 @@ namespace hpx { namespace threads { namespace detail
         boost::posix_time::ptime const& expire_at, thread_id_type const& id,
         error_code& ec)
     {
-        return set_thread_state_timed(scheduler, expire_at, id, pending, 
+        return set_thread_state_timed(scheduler, expire_at, id, pending,
             wait_timeout, thread_priority_normal, std::size_t(-1), ec);
     }
 
@@ -397,7 +397,7 @@ namespace hpx { namespace threads { namespace detail
         boost::posix_time::time_duration const& from_now, thread_id_type const& thrd,
         error_code& ec)
     {
-        return set_thread_state_timed(scheduler, from_now, thrd, pending, 
+        return set_thread_state_timed(scheduler, from_now, thrd, pending,
             wait_timeout, thread_priority_normal, std::size_t(-1), ec);
     }
 }}}

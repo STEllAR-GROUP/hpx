@@ -204,7 +204,7 @@ namespace hpx
 
                 root_ca.initialize();
 
-                BOOST_ASSERT(security_data_->cert_store_.get() == 0);
+                HPX_ASSERT(security_data_->cert_store_.get() == 0);
                 security_data_->cert_store_.reset(
                     new components::security::certificate_store(
                         root_ca.get_certificate()));
@@ -285,7 +285,7 @@ namespace hpx
             // initialize our certificate store
             lcos::local::spinlock::scoped_lock l(security_mtx_);
 
-            BOOST_ASSERT(security_data_->cert_store_.get() == 0);
+            HPX_ASSERT(security_data_->cert_store_.get() == 0);
             security_data_->cert_store_.reset(
                 new components::security::certificate_store(root_cert));
         }
@@ -330,7 +330,7 @@ namespace hpx
         }
 
         lcos::local::spinlock::scoped_lock l(security_mtx_);
-        BOOST_ASSERT(security_data_.get() != 0);
+        HPX_ASSERT(security_data_.get() != 0);
         return security_data_->root_certificate_authority_.get_certificate(ec);
     }
 
@@ -338,7 +338,7 @@ namespace hpx
         runtime::get_certificate(error_code& ec) const
     {
         lcos::local::spinlock::scoped_lock l(security_mtx_);
-        BOOST_ASSERT(security_data_.get() != 0);
+        HPX_ASSERT(security_data_.get() != 0);
         return security_data_->subordinate_certificate_authority_.get_certificate(ec);
     }
 
@@ -347,21 +347,21 @@ namespace hpx
     void runtime::add_locality_certificate(
         components::security::signed_certificate const& cert)
     {
-        BOOST_ASSERT(security_data_.get() != 0);
+        HPX_ASSERT(security_data_.get() != 0);
 
         LSEC_(debug) << (boost::format(
             "runtime::add_locality_certificate: locality(%1%): adding locality "
             "certificate: %2%") % here() % cert);
 
         lcos::local::spinlock::scoped_lock l(security_mtx_);
-        BOOST_ASSERT(0 != security_data_->cert_store_.get());     // should have been created
+        HPX_ASSERT(0 != security_data_->cert_store_.get());     // should have been created
         security_data_->cert_store_->insert(cert);
     }
 
     components::security::signed_certificate const&
         runtime::get_locality_certificate(error_code& ec) const
     {
-        BOOST_ASSERT(security_data_.get() != 0);
+        HPX_ASSERT(security_data_.get() != 0);
         if (0 == security_data_->cert_store_.get())     // should have been created
         {
             HPX_THROWS_IF(ec, invalid_status,
@@ -378,7 +378,7 @@ namespace hpx
         runtime::get_locality_certificate(boost::uint32_t locality_id,
             error_code& ec) const
     {
-        BOOST_ASSERT(security_data_.get() != 0);
+        HPX_ASSERT(security_data_.get() != 0);
         if (0 == security_data_->cert_store_.get())     // should have been created
         {
             HPX_THROWS_IF(ec, invalid_status,
@@ -401,7 +401,7 @@ namespace hpx
         components::security::signed_parcel_suffix& signed_suffix,
         error_code& ec) const
     {
-        BOOST_ASSERT(security_data_.get() != 0);
+        HPX_ASSERT(security_data_.get() != 0);
         if (0 == security_data_->cert_store_.get())     // should have been created
         {
             HPX_THROWS_IF(ec, invalid_status,
@@ -418,7 +418,7 @@ namespace hpx
     bool runtime::verify_parcel_suffix(std::vector<char> const& data,
         naming::gid_type& parcel_id, error_code& ec) const
     {
-        BOOST_ASSERT(security_data_.get() != 0);
+        HPX_ASSERT(security_data_.get() != 0);
         if (0 == security_data_->cert_store_.get())     // should have been created
         {
             HPX_THROWS_IF(ec, invalid_status,
@@ -475,7 +475,7 @@ namespace hpx
         // initialize our TSS
         if (NULL == runtime::runtime_.get())
         {
-            BOOST_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
+            HPX_ASSERT(NULL == threads::coroutine_type::impl_type::get_self());
 
             runtime::runtime_.reset(new runtime* (this));
             runtime::uptime_.reset(new boost::uint64_t);
@@ -752,7 +752,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     runtime& get_runtime()
     {
-        BOOST_ASSERT(NULL != runtime::runtime_.get());   // should have been initialized
+        HPX_ASSERT(NULL != runtime::runtime_.get());   // should have been initialized
         return **runtime::runtime_;
     }
 

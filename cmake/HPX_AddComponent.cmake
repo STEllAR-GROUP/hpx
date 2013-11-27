@@ -131,7 +131,7 @@ macro(add_hpx_component name)
 
     set_property(TARGET ${name}_component APPEND
                  PROPERTY COMPILE_DEFINITIONS
-                 "BOOST_ENABLE_ASSERT_HANDLER")
+                 "HPX_ENABLE_ASSERT_HANDLER")
 
     if(HPX_EXTERNAL_CMAKE AND "${HPX_BUILD_TYPE}" STREQUAL "Debug")
       set(hpx_libs hpx${HPX_DEBUG_POSTFIX} hpx_serialization${HPX_DEBUG_POSTFIX} ${hpx_libs})

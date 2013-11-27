@@ -317,7 +317,7 @@ namespace hpx { namespace util
             // retrieve/create section [hpx.components]
             if (!ini.has_section("hpx.components")) {
                 util::section* hpx_sec = ini.get_section("hpx");
-                BOOST_ASSERT(NULL != hpx_sec);
+                HPX_ASSERT(NULL != hpx_sec);
 
                 util::section comp_sec;
                 hpx_sec->add_section("components", comp_sec);

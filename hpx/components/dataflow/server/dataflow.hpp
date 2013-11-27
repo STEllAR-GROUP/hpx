@@ -61,7 +61,7 @@ namespace hpx { namespace lcos { namespace server
         {
             LLCO_(info) << "~server::dataflow::dataflow()";
 
-            BOOST_ASSERT(component_ptr);
+            HPX_ASSERT(component_ptr);
             if (component_ptr) {
                 component_ptr->finalize();
                 delete component_ptr;
@@ -93,18 +93,18 @@ namespace hpx { namespace lcos { namespace server
             }
             (*w)->init();
 
-            detail::update_initialized_count(); 
+            detail::update_initialized_count();
         }
 
         dataflow()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
         }
 
         dataflow(component_type * back_ptr)
             : base_type(back_ptr)
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
         }
 
         template <typename Action>

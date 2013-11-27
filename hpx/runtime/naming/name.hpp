@@ -351,7 +351,7 @@ namespace hpx { namespace naming
 
         inline void set_credit_for_gid(gid_type& id, boost::int16_t credit)
         {
-            BOOST_ASSERT(0 == (credit & ~gid_type::credit_base_mask));
+            HPX_ASSERT(0 == (credit & ~gid_type::credit_base_mask));
             id.set_msb((id.get_msb() & ~gid_type::credit_mask) |
                 ((boost::int32_t(credit) << 16) & gid_type::credit_mask));
         }
@@ -359,32 +359,32 @@ namespace hpx { namespace naming
         // has side effects, can't be pure
         inline boost::int16_t add_credit_to_gid(gid_type& id, boost::int16_t credit)
         {
-            BOOST_ASSERT(credit < (std::numeric_limits<boost::int16_t>::max)());
+            HPX_ASSERT(credit < (std::numeric_limits<boost::int16_t>::max)());
 
             boost::int32_t c = get_credit_from_gid(id);
 
             c += credit;
-            BOOST_ASSERT(0 == (c & ~gid_type::credit_base_mask));
+            HPX_ASSERT(0 == (c & ~gid_type::credit_base_mask));
 
             set_credit_for_gid(id, c);
 
-            BOOST_ASSERT(c < (std::numeric_limits<boost::int16_t>::max)());
+            HPX_ASSERT(c < (std::numeric_limits<boost::int16_t>::max)());
             return static_cast<boost::uint16_t>(c);
         }
 
         inline boost::int16_t remove_credit_from_gid(gid_type& id, boost::int16_t debit)
         {
-            BOOST_ASSERT(debit < (std::numeric_limits<boost::int16_t>::max)());
+            HPX_ASSERT(debit < (std::numeric_limits<boost::int16_t>::max)());
 
             boost::int32_t c = get_credit_from_gid(id);
-            BOOST_ASSERT(c > debit);
+            HPX_ASSERT(c > debit);
 
             c = static_cast<boost::int32_t>(c - debit);
-            BOOST_ASSERT(0 == (c & ~gid_type::credit_base_mask));
+            HPX_ASSERT(0 == (c & ~gid_type::credit_base_mask));
 
             set_credit_for_gid(id, c);
 
-            BOOST_ASSERT(c < (std::numeric_limits<boost::uint16_t>::max)());
+            HPX_ASSERT(c < (std::numeric_limits<boost::uint16_t>::max)());
             return static_cast<boost::uint16_t>(c);
         }
 
@@ -420,7 +420,7 @@ namespace hpx { namespace naming
             boost::uint64_t msb = id.get_msb();
             boost::int32_t credits = get_credit_from_gid(id);
 
-            BOOST_ASSERT(fraction > 0);
+            HPX_ASSERT(fraction > 0);
             boost::int32_t newcredits = static_cast<boost::int32_t>(credits / fraction);
 
             msb &= ~gid_type::credit_mask;

@@ -130,7 +130,7 @@ macro(add_hpx_library name)
         ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES} ${hpx_lib})
       set_property(TARGET ${name}_lib APPEND
                    PROPERTY COMPILE_DEFINITIONS
-                   "BOOST_ENABLE_ASSERT_HANDLER")
+                   "HPX_ENABLE_ASSERT_HANDLER")
     else()
       target_link_libraries(${name}_lib
         ${${name}_DEPENDENCIES} ${${name}_COMPONENT_DEPENDENCIES})

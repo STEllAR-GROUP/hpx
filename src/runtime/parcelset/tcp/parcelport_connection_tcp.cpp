@@ -69,7 +69,7 @@ namespace hpx { namespace parcelset { namespace tcp
         else if (endian_out == "big")
             archive_flags_ |= util::endian_big;
         else {
-            BOOST_ASSERT(endian_out =="little" || endian_out == "big");
+            HPX_ASSERT(endian_out =="little" || endian_out == "big");
         }
 
         std::string array_optimization =
@@ -102,7 +102,7 @@ namespace hpx { namespace parcelset { namespace tcp
         boost::uint32_t this_locality_id = get_locality_id(ec);
         if (ec) {
             // this should only happen during bootstrap
-            BOOST_ASSERT(hpx::is_starting());
+            HPX_ASSERT(hpx::is_starting());
             this_locality_id = locality_id;
         }
 
@@ -111,7 +111,7 @@ namespace hpx { namespace parcelset { namespace tcp
             localities.find(locality_id) == localities.end())
         {
             // the first message must originate from this locality
-            BOOST_ASSERT(!first_message_ || locality_id == this_locality_id);
+            HPX_ASSERT(!first_message_ || locality_id == this_locality_id);
 
             components::security::signed_certificate const& certificate =
                 hpx::get_locality_certificate(locality_id, ec);
@@ -128,7 +128,7 @@ namespace hpx { namespace parcelset { namespace tcp
             else {
                 // if the certificate is not available we have to still be on
                 // the 'first' message (it's too early for a certificate)
-                BOOST_ASSERT(first_message_);
+                HPX_ASSERT(first_message_);
                 archive << has_certificate;
             }
         }
@@ -177,7 +177,7 @@ namespace hpx { namespace parcelset { namespace tcp
         BOOST_FOREACH(parcel const& p, pv)
         {
             naming::locality const locality_id = p.get_destination_locality();
-            BOOST_ASSERT(locality_id == destination());
+            HPX_ASSERT(locality_id == destination());
         }
 #endif
         // we choose the highest priority of all parcels for this message

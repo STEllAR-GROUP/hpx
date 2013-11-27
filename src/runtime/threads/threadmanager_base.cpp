@@ -18,10 +18,10 @@ namespace hpx { namespace threads
 
     void threadmanager_base::init_tss(std::size_t thread_num, bool numa_sensitive)
     {
-        BOOST_ASSERT(NULL == threadmanager_base::thread_num_.get());    // shouldn't be initialized yet
+        HPX_ASSERT(NULL == threadmanager_base::thread_num_.get());    // shouldn't be initialized yet
         threadmanager_base::thread_num_.reset(new std::size_t);
         if (numa_sensitive) {
-            *threadmanager_base::thread_num_.get() = 
+            *threadmanager_base::thread_num_.get() =
                 thread_num | (std::size_t(0x1) << 31);
         }
         else {
@@ -58,7 +58,7 @@ namespace hpx { namespace threads
     std::size_t get_numa_node_number()
     {
         bool numa_sensitive = false;
-        std::size_t thread_num = 
+        std::size_t thread_num =
             threadmanager_base::get_worker_thread_num(&numa_sensitive);
         return get_topology().get_numa_node_number(
             get_thread_manager().get_pu_num(thread_num));
@@ -70,7 +70,7 @@ namespace hpx { namespace threads
         return get_thread_manager().get_thread_count(state);
     }
 
-    boost::int64_t get_thread_count(thread_priority priority, 
+    boost::int64_t get_thread_count(thread_priority priority,
         thread_state_enum state)
     {
         return get_thread_manager().get_thread_count(state, priority);

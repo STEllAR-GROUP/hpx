@@ -48,7 +48,7 @@ namespace hpx { namespace components { namespace server { namespace detail
           : count_(0), size_(size), wrapper_(wrapper),
             managing_object_(act.get_instance())
         {
-            BOOST_ASSERT(act.construct());
+            HPX_ASSERT(act.construct());
             act.construct()(this->get_ptr(), size);
         }
 
@@ -58,7 +58,7 @@ namespace hpx { namespace components { namespace server { namespace detail
           : count_(0), size_(size), wrapper_(wrapper),
             managing_object_(act.get_instance())
         {
-            BOOST_ASSERT(act.clone());
+            HPX_ASSERT(act.clone());
             act.clone()(this->get_ptr(), rhs->get_ptr(), size);
         }
 
@@ -69,21 +69,21 @@ namespace hpx { namespace components { namespace server { namespace detail
           : count_(0), size_(size), wrapper_(NULL),
             managing_object_(act.get_instance())
         {
-            BOOST_ASSERT(act.construct());
+            HPX_ASSERT(act.construct());
             act.construct()(this->get_ptr(), size);
         }
 
         ~memory_block_header()
         {
             // invoke destructor, if needed
-            BOOST_ASSERT(this->managing_object_.destruct());
+            HPX_ASSERT(this->managing_object_.destruct());
             this->managing_object_.destruct()(this->get_ptr());
         }
 
         memory_block_header& operator= (memory_block_header const& rhs)
         {
             if (this != &rhs) {
-                BOOST_ASSERT(this->managing_object_.assign());
+                HPX_ASSERT(this->managing_object_.assign());
                 this->managing_object_.assign()(
                     this->get_ptr(), rhs.get_ptr(), size_);
             }
@@ -284,12 +284,12 @@ namespace hpx { namespace components
                 const_cast<actions::manage_object_action_base*>(
                     &data->get_managing_object().get_instance());
 
-            BOOST_ASSERT(act);
+            HPX_ASSERT(act);
 
             ar << size; //-V128
             ar << act;
 
-            BOOST_ASSERT(act->save());
+            HPX_ASSERT(act->save());
             if (config) {
                 act->save()(data->get_ptr(), data->get_size(), ar, version,
                     config->get_ptr());
@@ -326,7 +326,7 @@ namespace hpx { namespace components
                 new (server::detail::allocate_block<alloc_type>(size))
                     alloc_type(size, act->get_instance());
 
-            BOOST_ASSERT(act->load());
+            HPX_ASSERT(act->load());
             if (config) {
                 act->load()(p->get_ptr(), size, ar, version,
                     config->get_ptr());
@@ -678,7 +678,7 @@ namespace hpx { namespace components { namespace server
 
         inline naming::gid_type memory_block_header::get_base_gid() const
         {
-            BOOST_ASSERT(wrapper_);
+            HPX_ASSERT(wrapper_);
             return wrapper_->get_base_gid();
         }
     }

@@ -44,7 +44,7 @@ namespace hpx { namespace lcos
             void on_future_ready_(threads::thread_id_type const& id)
             {
                 std::size_t oldcount = ready_count_.fetch_add(1);
-                BOOST_ASSERT(oldcount < lazy_values_.size());
+                HPX_ASSERT(oldcount < lazy_values_.size());
 
                 if (oldcount + 1 == lazy_values_.size())
                 {
@@ -161,7 +161,7 @@ namespace hpx { namespace lcos
                 }
 
                 // all futures should be ready
-                BOOST_ASSERT(ready_count_ == size);
+                HPX_ASSERT(ready_count_ == size);
 
                 return lazy_values_;
             }

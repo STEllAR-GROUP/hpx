@@ -9,7 +9,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <boost/assert.hpp>
+#include <hpx/util/assert.hpp>
 
 #include "configuration.hpp"
 

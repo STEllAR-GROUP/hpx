@@ -32,7 +32,7 @@ process_real_cpu_clock::time_point process_real_cpu_clock::now() BOOST_NOEXCEPT
     clock_t c = ::clock();
     if ( c == clock_t(-1) ) // error
     {
-      BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+      HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
     }
     typedef ratio_divide<giga, ratio<CLOCKS_PER_SEC> >::type R;
     return time_point(
@@ -81,7 +81,7 @@ process_user_cpu_clock::time_point process_user_cpu_clock::now() BOOST_NOEXCEPT
     }
     else
     {
-        BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+        HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
         return time_point();
     }
 
@@ -146,7 +146,7 @@ process_system_cpu_clock::time_point process_system_cpu_clock::now() BOOST_NOEXC
     }
     else
     {
-      BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+      HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
       return time_point();
     }
 
@@ -217,7 +217,7 @@ process_cpu_clock::time_point process_cpu_clock::now()  BOOST_NOEXCEPT
     }
     else
     {
-      BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+      HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
       return time_point();
     }
 

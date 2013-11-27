@@ -22,7 +22,7 @@ namespace chrono
     timespec ts;
     if ( ::clock_gettime( CLOCK_REALTIME, &ts ) )
     {
-      BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+      HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
     }
 
     return time_point(duration(
@@ -38,9 +38,9 @@ namespace chrono
         if (BOOST_CHRONO_IS_THROWS(ec))
         {
             boost::throw_exception(
-                    system::system_error( 
-                            errno, 
-                            BOOST_CHRONO_SYSTEM_CATEGORY, 
+                    system::system_error(
+                            errno,
+                            BOOST_CHRONO_SYSTEM_CATEGORY,
                             "chrono::system_clock" ));
         }
         else
@@ -50,7 +50,7 @@ namespace chrono
         }
     }
 
-    if (!BOOST_CHRONO_IS_THROWS(ec)) 
+    if (!BOOST_CHRONO_IS_THROWS(ec))
     {
         ec.clear();
     }
@@ -76,7 +76,7 @@ namespace chrono
     timespec ts;
     if ( ::clock_gettime( CLOCK_MONOTONIC, &ts ) )
     {
-      BOOST_ASSERT(0 && "Boost::Chrono - Internal Error");
+      HPX_ASSERT(0 && "Boost::Chrono - Internal Error");
     }
 
     return time_point(duration(
@@ -92,9 +92,9 @@ namespace chrono
         if (BOOST_CHRONO_IS_THROWS(ec))
         {
             boost::throw_exception(
-                    system::system_error( 
-                            errno, 
-                            BOOST_CHRONO_SYSTEM_CATEGORY, 
+                    system::system_error(
+                            errno,
+                            BOOST_CHRONO_SYSTEM_CATEGORY,
                             "chrono::steady_clock" ));
         }
         else
@@ -104,7 +104,7 @@ namespace chrono
         }
     }
 
-    if (!BOOST_CHRONO_IS_THROWS(ec)) 
+    if (!BOOST_CHRONO_IS_THROWS(ec))
     {
         ec.clear();
     }

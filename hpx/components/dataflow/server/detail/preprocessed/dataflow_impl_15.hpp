@@ -10,12 +10,12 @@
 
     template <
         typename Action
-         
+
       , typename Result
     >
     struct dataflow_impl<
         Action
-         
+
         ,
         void , void , void , void , void , void , void , void , void , void , void , void , void , void , void
       , Result
@@ -38,14 +38,14 @@
         typedef
             dataflow_impl<
                 Action
-                 
+
             >
             wrapped_type;
         typedef
             components::managed_component<
                 dataflow_impl<
                     Action
-                     
+
                 >
             >
             wrapping_type;
@@ -95,7 +95,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -104,8 +104,8 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -114,9 +114,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             remote_result tmp(r);
@@ -130,9 +130,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -140,8 +140,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -163,7 +163,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -180,7 +180,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -193,7 +193,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -201,8 +201,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -259,7 +259,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | 0);
         dataflow_impl(
@@ -303,7 +303,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -312,9 +312,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -323,9 +323,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -344,9 +344,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -354,8 +354,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -377,7 +377,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -388,7 +388,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -405,7 +405,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -423,7 +423,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -478,7 +478,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -491,7 +491,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -499,8 +499,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -560,7 +560,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | 0);
         dataflow_impl(
@@ -604,7 +604,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -613,9 +613,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -624,9 +624,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -645,9 +645,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -655,8 +655,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -678,7 +678,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -689,7 +689,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -706,7 +706,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -724,7 +724,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -779,7 +779,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -792,7 +792,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -800,8 +800,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -861,7 +861,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | 0);
         dataflow_impl(
@@ -905,7 +905,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -914,9 +914,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -925,9 +925,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -946,9 +946,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -956,8 +956,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -979,7 +979,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -990,7 +990,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -1007,7 +1007,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -1025,7 +1025,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -1080,7 +1080,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -1093,7 +1093,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -1101,8 +1101,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -1162,7 +1162,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | 0);
         dataflow_impl(
@@ -1206,7 +1206,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -1215,9 +1215,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -1226,9 +1226,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -1247,9 +1247,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -1257,8 +1257,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -1280,7 +1280,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -1291,7 +1291,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -1308,7 +1308,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -1326,7 +1326,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -1381,7 +1381,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -1394,7 +1394,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -1402,8 +1402,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -1463,7 +1463,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | 0);
         dataflow_impl(
@@ -1507,7 +1507,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -1516,9 +1516,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -1527,9 +1527,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -1548,9 +1548,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -1558,8 +1558,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -1581,7 +1581,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -1592,7 +1592,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -1609,7 +1609,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -1627,7 +1627,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -1682,7 +1682,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -1695,7 +1695,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -1703,8 +1703,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -1764,7 +1764,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | 0);
         dataflow_impl(
@@ -1808,7 +1808,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -1817,9 +1817,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -1828,9 +1828,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -1849,9 +1849,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -1859,8 +1859,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -1882,7 +1882,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -1893,7 +1893,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -1910,7 +1910,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -1928,7 +1928,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -1983,7 +1983,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -1996,7 +1996,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -2004,8 +2004,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -2065,7 +2065,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | 0);
         dataflow_impl(
@@ -2109,7 +2109,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -2118,9 +2118,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -2129,9 +2129,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -2150,9 +2150,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -2160,8 +2160,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -2183,7 +2183,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -2194,7 +2194,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -2211,7 +2211,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -2229,7 +2229,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -2284,7 +2284,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -2297,7 +2297,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -2305,8 +2305,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -2366,7 +2366,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | 0);
         dataflow_impl(
@@ -2410,7 +2410,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -2419,9 +2419,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -2430,9 +2430,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -2451,9 +2451,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -2461,8 +2461,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -2484,7 +2484,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -2495,7 +2495,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -2512,7 +2512,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -2530,7 +2530,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -2585,7 +2585,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -2598,7 +2598,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -2606,8 +2606,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -2667,7 +2667,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | 0);
         dataflow_impl(
@@ -2711,7 +2711,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -2720,9 +2720,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -2731,9 +2731,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -2752,9 +2752,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -2762,8 +2762,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -2785,7 +2785,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -2796,7 +2796,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -2813,7 +2813,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -2831,7 +2831,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -2886,7 +2886,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -2899,7 +2899,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -2907,8 +2907,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -2968,7 +2968,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | 0);
         dataflow_impl(
@@ -3012,7 +3012,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3021,9 +3021,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -3032,9 +3032,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -3053,9 +3053,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -3063,8 +3063,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3086,7 +3086,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -3097,7 +3097,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -3114,7 +3114,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -3132,7 +3132,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -3187,7 +3187,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -3200,7 +3200,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -3208,8 +3208,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -3269,7 +3269,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | 0);
         dataflow_impl(
@@ -3313,7 +3313,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3322,9 +3322,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -3333,9 +3333,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -3354,9 +3354,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -3364,8 +3364,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3387,7 +3387,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -3398,7 +3398,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -3415,7 +3415,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -3433,7 +3433,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -3488,7 +3488,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -3501,7 +3501,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -3509,8 +3509,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -3570,7 +3570,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | 0);
         dataflow_impl(
@@ -3614,7 +3614,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3623,9 +3623,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -3634,9 +3634,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -3655,9 +3655,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -3665,8 +3665,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3688,7 +3688,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -3699,7 +3699,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -3716,7 +3716,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -3734,7 +3734,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -3789,7 +3789,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -3802,7 +3802,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -3810,8 +3810,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -3871,7 +3871,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | 0);
         dataflow_impl(
@@ -3915,7 +3915,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3924,9 +3924,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -3935,9 +3935,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -3956,9 +3956,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -3966,8 +3966,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3989,7 +3989,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -4000,7 +4000,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -4017,7 +4017,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -4035,7 +4035,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -4090,7 +4090,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -4103,7 +4103,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -4111,8 +4111,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -4172,7 +4172,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | (1<< 13) | 0);
         dataflow_impl(
@@ -4216,7 +4216,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -4225,9 +4225,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -4236,9 +4236,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -4257,9 +4257,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -4267,8 +4267,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -4290,7 +4290,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -4301,7 +4301,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -4318,7 +4318,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -4336,7 +4336,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -4391,7 +4391,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -4404,7 +4404,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -4412,8 +4412,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;
@@ -4433,8 +4433,8 @@
     struct dataflow_impl<
         Action
         , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14
-        
-        
+
+
       , Result
     >
         : ::hpx::lcos::base_lco_with_value<
@@ -4473,7 +4473,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-        
+
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | (1<< 13) | (1<< 14) | 0);
         dataflow_impl(
@@ -4517,7 +4517,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -4526,9 +4526,9 @@
         }
         ~dataflow_impl()
         {
-            BOOST_ASSERT(!result.is_empty());
-            BOOST_ASSERT(targets.empty());
-            BOOST_ASSERT(slots_set == slots_completed);
+            HPX_ASSERT(!result.is_empty());
+            HPX_ASSERT(targets.empty());
+            HPX_ASSERT(slots_set == slots_completed);
             LLCO_(info)
                 << "~dataflow_impl<"
                 << hpx::actions::detail::get_action_name<Action>()
@@ -4537,9 +4537,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-        
-        
-        
+
+
+
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -4558,9 +4558,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-            
-            
-            
+
+
+
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -4568,8 +4568,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-        
-        
+
+
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -4591,7 +4591,7 @@
                 }
                 else
                 {
-                    BOOST_ASSERT(d.stores_value()); 
+                    HPX_ASSERT(d.stores_value());
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -4602,7 +4602,7 @@
                 targets.push_back(target);
             }
         }
-        
+
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -4619,7 +4619,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -4637,7 +4637,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-        
+
         template <
             int Slot
           , typename A
@@ -4692,7 +4692,7 @@
         }
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
         naming::id_type get_gid() const
@@ -4705,7 +4705,7 @@
         }
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
     private:
@@ -4713,8 +4713,8 @@
         friend struct components::detail_adl_barrier::init;
         void set_back_ptr(components::managed_component<dataflow_impl>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
         components::managed_component<dataflow_impl>* back_ptr_;

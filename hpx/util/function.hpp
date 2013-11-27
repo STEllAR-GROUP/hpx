@@ -116,7 +116,7 @@ namespace hpx { namespace util { namespace detail {
     {
         static const char* call()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return "empty_vtable";
         }
     };

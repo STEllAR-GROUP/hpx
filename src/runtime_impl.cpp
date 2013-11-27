@@ -649,7 +649,7 @@ namespace hpx {
     runtime_impl<SchedulingPolicy, NotificationPolicy>::
         get_thread_pool(char const* name)
     {
-        BOOST_ASSERT(name != 0);
+        HPX_ASSERT(name != 0);
 
         if (0 == std::strncmp(name, "io", 2))
             return &io_pool_;

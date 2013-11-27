@@ -30,10 +30,10 @@ namespace hpx { namespace components { namespace server
         {}
         ~remote_object()
         {
-            BOOST_ASSERT(dtor);
+            HPX_ASSERT(dtor);
             dtor(&object);
         }
-        
+
         template <typename F>
         typename F::result_type apply1(F const & f);
         template <typename F, typename A>

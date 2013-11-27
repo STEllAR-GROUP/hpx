@@ -15,14 +15,14 @@
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))));
         }
         else {
-            
+
             hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
         }
@@ -75,14 +75,14 @@ public:
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))));
         }
         else {
-            
+
             hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
         }
@@ -135,14 +135,14 @@ public:
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))));
         }
         else {
-            
+
             hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
         }
@@ -195,14 +195,14 @@ public:
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))));
         }
         else {
-            
+
             hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
         }
@@ -255,14 +255,14 @@ public:
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ))));
         }
         else {
-            
+
             hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
         }
@@ -315,14 +315,14 @@ public:
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ))));
         }
         else {
-            
+
             hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
         }
@@ -375,14 +375,14 @@ public:
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ))));
         }
         else {
-            
+
             hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
         }
@@ -435,14 +435,14 @@ public:
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ))));
         }
         else {
-            
+
             hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
         }
@@ -495,14 +495,14 @@ public:
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-            
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ))));
         }
         else {
-            
+
             hpx::applier::detail::apply_c<Action>(addr, this->get_gid(), gid,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
         }

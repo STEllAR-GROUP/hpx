@@ -46,7 +46,7 @@ namespace examples
         ///       immediately after the action has has been dispatched.
         void reset_non_blocking()
         {
-            BOOST_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_gid());
             this->base_type::reset_non_blocking(this->get_gid());
         }
 
@@ -55,7 +55,7 @@ namespace examples
         /// \note This function is fully synchronous.
         void reset_sync()
         {
-            BOOST_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_gid());
             this->base_type::reset_sync(this->get_gid());
         }
 
@@ -67,7 +67,7 @@ namespace examples
         ///       immediately after the action has has been dispatched.
         void add_non_blocking(argument_type arg)
         {
-            BOOST_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_gid());
             this->base_type::add_non_blocking(this->get_gid(), arg);
         }
 
@@ -76,7 +76,7 @@ namespace examples
         /// \note This function is fully synchronous.
         void add_sync(argument_type arg)
         {
-            BOOST_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_gid());
             this->base_type::add_sync(this->get_gid(), arg);
         }
 
@@ -90,7 +90,7 @@ namespace examples
         ///          until the value is ready.
         hpx::lcos::future<argument_type> query_async()
         {
-            BOOST_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_gid());
             return this->base_type::query_async(this->get_gid());
         }
 
@@ -99,7 +99,7 @@ namespace examples
         /// \note This function is fully synchronous.
         argument_type query_sync()
         {
-            BOOST_ASSERT(this->get_gid());
+            HPX_ASSERT(this->get_gid());
             return this->base_type::query_sync(this->get_gid());
         }
     };

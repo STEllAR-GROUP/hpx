@@ -777,13 +777,13 @@ namespace detail
         template <typename T>
         void set_data(BOOST_FWD_REF(T) result)
         {
-            BOOST_ASSERT(started_);
+            HPX_ASSERT(started_);
             this->future_data<Result>::set_data(boost::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
         {
-            BOOST_ASSERT(started_);
+            HPX_ASSERT(started_);
             this->future_data<Result>::set_exception(e);
         }
 

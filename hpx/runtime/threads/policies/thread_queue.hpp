@@ -153,7 +153,7 @@ namespace hpx { namespace threads { namespace policies
 #if defined(HPX_DEBUG)
             // make sure our mutex is locked at this point
             typename mutex_type::scoped_try_lock l(mtx_);
-            BOOST_ASSERT(!l);
+            HPX_ASSERT(!l);
 #endif
 
             if (HPX_UNLIKELY(0 == add_count))
@@ -213,8 +213,8 @@ namespace hpx { namespace threads { namespace policies
                 }
 
                 // this thread has to be in the map now
-                BOOST_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
-                BOOST_ASSERT(thrd->is_created_from(&memory_pool_));
+                HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
+                HPX_ASSERT(thrd->is_created_from(&memory_pool_));
             }
 
             if (added) {
@@ -238,7 +238,7 @@ namespace hpx { namespace threads { namespace policies
             if (HPX_LIKELY(max_count_)) {
                 std::size_t count = thread_map_.size();
                 if (max_count_ >= count + min_add_new_count) { //-V104
-                    BOOST_ASSERT(max_count_ - count <
+                    HPX_ASSERT(max_count_ - count <
                         static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
                     add_count = static_cast<boost::int64_t>(max_count_ - count);
                     if (add_count < min_add_new_count)
@@ -269,7 +269,7 @@ namespace hpx { namespace threads { namespace policies
             if (HPX_LIKELY(max_count_)) {
                 std::size_t count = thread_map_.size();
                 if (max_count_ >= count + min_add_new_count) { //-V104
-                    BOOST_ASSERT(max_count_ - count <
+                    HPX_ASSERT(max_count_ - count <
                         static_cast<std::size_t>((std::numeric_limits<boost::int64_t>::max)()));
                     add_count = static_cast<boost::int64_t>(max_count_ - count);
                     if (add_count < min_add_new_count)
@@ -308,11 +308,11 @@ namespace hpx { namespace threads { namespace policies
                 while (terminated_items_.dequeue(todelete))
                 {
                     // this thread has to be in this map
-                    BOOST_ASSERT(thread_map_.find(todelete) != thread_map_.end());
+                    HPX_ASSERT(thread_map_.find(todelete) != thread_map_.end());
 
                     --terminated_items_count_;
                     bool deleted = thread_map_.erase(todelete) != 0;
-                    BOOST_ASSERT(deleted);
+                    HPX_ASSERT(deleted);
                     if (deleted)
                         --thread_map_count_;
                 }
@@ -329,11 +329,11 @@ namespace hpx { namespace threads { namespace policies
                 while (delete_count && terminated_items_.dequeue(todelete))
                 {
                     // this thread has to be in this map
-                    BOOST_ASSERT(thread_map_.find(todelete) != thread_map_.end());
+                    HPX_ASSERT(thread_map_.find(todelete) != thread_map_.end());
 
                     --terminated_items_count_;
                     bool deleted = thread_map_.erase(todelete) != 0;
-                    BOOST_ASSERT(deleted);
+                    HPX_ASSERT(deleted);
                     if (deleted) {
                         --thread_map_count_;
                         --delete_count;
@@ -497,8 +497,8 @@ namespace hpx { namespace threads { namespace policies
                     schedule_thread(thrd.get(), num_thread);
 
                 // this thread has to be in the map now
-                BOOST_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
-                BOOST_ASSERT(thrd->is_created_from(&memory_pool_));
+                HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
+                HPX_ASSERT(thrd->is_created_from(&memory_pool_));
 
                 do_some_work();       // try to execute the new work item
 

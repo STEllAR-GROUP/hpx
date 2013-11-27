@@ -112,7 +112,7 @@ namespace performance_counters { namespace sine
                 return false;
         }
         else if(p.instancename_ == "instance#*") {
-            BOOST_ASSERT(mode == hpx::performance_counters::discover_counters_full);
+            HPX_ASSERT(mode == hpx::performance_counters::discover_counters_full);
 
             // FIXME: expand for all instances
             p.instancename_ = "instance";

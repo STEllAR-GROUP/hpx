@@ -168,7 +168,7 @@ namespace hpx { namespace util { namespace plugin {
                     "plugin::get", HPX_PLUGIN_OSSTREAM_GETSTRING(str));
                 return std::pair<SymbolType, Deleter>();
             }
-            BOOST_ASSERT(handle == dll_handle);
+            HPX_ASSERT(handle == dll_handle);
 
             return std::make_pair(address, detail::free_dll<SymbolType>(handle));
         }

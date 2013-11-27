@@ -277,7 +277,7 @@ namespace hpx { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     void print_counters(boost::shared_ptr<util::query_counters> const& qc)
     {
-        BOOST_ASSERT(qc);
+        HPX_ASSERT(qc);
         qc->start();
     }
 }}

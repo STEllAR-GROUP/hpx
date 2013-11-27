@@ -157,7 +157,7 @@ namespace hpx { namespace parcelset
 
     void parcelhandler::initialize(boost::shared_ptr<parcelport> pp)
     {
-        BOOST_ASSERT(parcels_);
+        HPX_ASSERT(parcels_);
 
         // AGAS v2 registers itself in the client before the parcelhandler
         // is booted.
@@ -181,7 +181,7 @@ namespace hpx { namespace parcelset
 #else
         pool = pports_[connection_tcpip]->get_thread_pool("parcel_pool_tcp");
 #endif
-        BOOST_ASSERT(0 != pool);
+        HPX_ASSERT(0 != pool);
 
 
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)

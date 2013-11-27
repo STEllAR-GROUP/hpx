@@ -39,7 +39,7 @@ namespace hpx { namespace util
                 held_locks_.reset(new held_locks_map());
             }
 
-            BOOST_ASSERT(NULL != held_locks_.get());
+            HPX_ASSERT(NULL != held_locks_.get());
             return *held_locks_.get();
         }
     };

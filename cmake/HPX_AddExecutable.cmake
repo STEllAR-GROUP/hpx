@@ -231,7 +231,7 @@ macro(add_hpx_executable name)
     endif()
     set_property(TARGET ${name}_exe APPEND
                  PROPERTY COMPILE_DEFINITIONS
-                 "BOOST_ENABLE_ASSERT_HANDLER")
+                 "HPX_ENABLE_ASSERT_HANDLER")
   else()
     target_link_libraries(${name}_exe ${${name}_DEPENDENCIES})
   endif()

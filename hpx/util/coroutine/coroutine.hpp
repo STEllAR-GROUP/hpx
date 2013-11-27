@@ -55,7 +55,7 @@
 #include <hpx/util/coroutine/detail/self.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 
-namespace hpx { namespace util { namespace coroutines 
+namespace hpx { namespace util { namespace coroutines
 {
   namespace detail {
     template<typename T>
@@ -146,7 +146,7 @@ namespace hpx { namespace util { namespace coroutines
       : m_pimpl(impl_type::create(boost::forward<Functor>(f),
             boost::move(target), id, stack_size))
     {
-        BOOST_ASSERT(m_pimpl->is_ready());
+        HPX_ASSERT(m_pimpl->is_ready());
     }
 
     //coroutine (impl_ptr p)
@@ -202,13 +202,13 @@ namespace hpx { namespace util { namespace coroutines
     //template <typename Functor>
     //void rebind(Functor f, thread_id_repr_type id = 0)
     //{
-    //    BOOST_ASSERT(exited());
+    //    HPX_ASSERT(exited());
     //    impl_type::rebind(m_pimpl, f, id);
     //}
 
     //void reset()
     //{
-    //    BOOST_ASSERT(exited());
+    //    HPX_ASSERT(exited());
     //    m_pimpl->reset();
     //}
 
@@ -241,15 +241,15 @@ namespace hpx { namespace util { namespace coroutines
                 BOOST_PP_CAT(BOOST_PP_CAT(type_prefix, n), _type)()           \
 /**/
 
-    BOOST_FORCEINLINE result_type operator()(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX, 
-        HPX_COROUTINE_PARAM_WITH_DEFAULT, arg)) 
+    BOOST_FORCEINLINE result_type operator()(BOOST_PP_ENUM(HPX_COROUTINE_ARG_MAX,
+        HPX_COROUTINE_PARAM_WITH_DEFAULT, arg))
     {
       return call_impl(arg_slot_type(BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
     }
 
     BOOST_FORCEINLINE typename detail::optional_result_type<result_type>::type
-    operator()(const std::nothrow_t& 
-        BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX, HPX_COROUTINE_PARAM_WITH_DEFAULT, arg)) 
+    operator()(const std::nothrow_t&
+        BOOST_PP_ENUM_TRAILING(HPX_COROUTINE_ARG_MAX, HPX_COROUTINE_PARAM_WITH_DEFAULT, arg))
     {
       return call_impl_nothrow(arg_slot_type(BOOST_PP_ENUM_PARAMS(HPX_COROUTINE_ARG_MAX, arg)));
     }
@@ -260,8 +260,8 @@ namespace hpx { namespace util { namespace coroutines
 
     BOOST_FORCEINLINE result_type operator()(arg0_type arg0 = arg0_type())
     {
-      BOOST_ASSERT(m_pimpl);
-      BOOST_ASSERT(m_pimpl->is_ready());
+      HPX_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl->is_ready());
 
       result_type* ptr;
       m_pimpl->bind_args(&arg0);
@@ -287,31 +287,31 @@ namespace hpx { namespace util { namespace coroutines
 
     void exit()
     {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
       m_pimpl->exit();
     }
 
     bool waiting() const
     {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
       return m_pimpl->waiting();
     }
 
     bool pending() const
     {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
       return m_pimpl->pending();
     }
 
     bool exited() const
     {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
       return m_pimpl->exited();
     }
 
     bool is_ready() const
     {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
       return m_pimpl->is_ready();
     }
 
@@ -323,8 +323,8 @@ namespace hpx { namespace util { namespace coroutines
   protected:
     // The second parameter is used to avoid calling this constructor
     // by mistake from other member functions (specifically operator=).
-    //coroutine(impl_type * pimpl, detail::init_from_impl_tag) 
-    //  : m_pimpl(pimpl) 
+    //coroutine(impl_type * pimpl, detail::init_from_impl_tag)
+    //  : m_pimpl(pimpl)
     //{}
 
     void bool_type_f() {}
@@ -336,7 +336,7 @@ namespace hpx { namespace util { namespace coroutines
 
 #if defined(HPX_GENERIC_COROUTINES)
     result_type call_impl(arg_slot_type args) {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
       m_pimpl->bind_args(&args);
       result_slot_type * ptr;
       m_pimpl->bind_result_pointer(&ptr);
@@ -347,7 +347,7 @@ namespace hpx { namespace util { namespace coroutines
 
     typename detail::optional_result_type<result_type>::type
     call_impl_nothrow(arg_slot_type args) {
-      BOOST_ASSERT(m_pimpl);
+      HPX_ASSERT(m_pimpl);
       m_pimpl->bind_args(&args);
       result_slot_type * ptr;
       m_pimpl->bind_result_pointer(&ptr);

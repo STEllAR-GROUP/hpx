@@ -56,7 +56,7 @@ namespace hpx { namespace threads
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t socket = init_socket_number(i);
-            BOOST_ASSERT(socket < num_of_sockets);
+            HPX_ASSERT(socket < num_of_sockets);
             socket_numbers_.push_back(socket);
         }
 
@@ -65,7 +65,7 @@ namespace hpx { namespace threads
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t numa_node = init_numa_node_number(i);
-            BOOST_ASSERT(numa_node < num_of_nodes);
+            HPX_ASSERT(numa_node < num_of_nodes);
             numa_node_numbers_.push_back(numa_node);
         }
 
@@ -74,7 +74,7 @@ namespace hpx { namespace threads
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
             std::size_t core_number = init_core_number(i);
-            BOOST_ASSERT(core_number < num_of_cores);
+            HPX_ASSERT(core_number < num_of_cores);
             core_numbers_.push_back(core_number);
         }
 
@@ -409,23 +409,23 @@ namespace hpx { namespace threads
 //             scoped_lock lk(topo_mtx);
 //             int ret = hwloc_get_area_membind_nodeset(topo,
 //                 reinterpret_cast<void const*>(lva), 1, nodeset, &policy, 0);
-// 
+//
 //             if (-1 != ret)
 //             {
 //                 hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 //                 hwloc_cpuset_from_nodeset(topo, cpuset, nodeset);
 //                 lk.unlock();
-// 
+//
 //                 hwloc_bitmap_free(nodeset);
-// 
+//
 //                 mask_type mask = mask_type();
 //                 resize(mask, get_number_of_pus());
-// 
+//
 //                 for (unsigned int i = 0; i != num_of_pus_; ++i)
 //                 {
 //                     set(mask, hwloc_bitmap_isset(cpuset, i) != 0);
 //                 }
-// 
+//
 //                 hwloc_bitmap_free(cpuset);
 //                 return mask;
 //             }
@@ -745,7 +745,7 @@ namespace hpx { namespace threads
                   , "object not found");
                 return;
             }
-            
+
             unsigned idx = (obj->os_index != ~0x0u) ? obj->os_index : obj->logical_index;
             if(!test(m, idx))
                 continue;

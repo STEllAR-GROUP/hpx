@@ -197,7 +197,7 @@ void locality_namespace::register_counter_types(
                 help = boost::str(help_time % name.substr(p+1));
         }
         else {
-            BOOST_ASSERT(detail::locality_namespace_services[i].code_ ==
+            HPX_ASSERT(detail::locality_namespace_services[i].code_ ==
                 locality_ns_statistics_counter);
             name = locality_namespace_service_name + name;
             if (detail::locality_namespace_services[i].target_ == detail::counter_target_count)
@@ -707,7 +707,7 @@ response locality_namespace::statistics_counter(
         }
     }
     else {
-        BOOST_ASSERT(detail::counter_target_time == target);
+        HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case locality_ns_allocate:
             get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);

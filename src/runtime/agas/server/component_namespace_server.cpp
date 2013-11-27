@@ -193,7 +193,7 @@ void component_namespace::register_counter_types(
                 help = boost::str(help_time % name.substr(p+1));
         }
         else {
-            BOOST_ASSERT(detail::component_namespace_services[i].code_ ==
+            HPX_ASSERT(detail::component_namespace_services[i].code_ ==
                 component_ns_statistics_counter);
             name = component_namespace_service_name + name;
             if (detail::component_namespace_services[i].target_ == detail::counter_target_count)
@@ -712,7 +712,7 @@ response component_namespace::statistics_counter(
         }
     }
     else {
-        BOOST_ASSERT(detail::counter_target_time == target);
+        HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case component_ns_bind_prefix:
             get_data_func = boost::bind(&cd::get_bind_prefix_time, &counter_data_, ::_1);

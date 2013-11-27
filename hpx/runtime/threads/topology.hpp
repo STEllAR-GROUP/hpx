@@ -31,7 +31,7 @@ namespace hpx { namespace threads
 
     inline boost::uint64_t bits(std::size_t idx)
     {
-       BOOST_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
+       HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
        return boost::uint64_t(1) << idx;
     }
 
@@ -47,13 +47,13 @@ namespace hpx { namespace threads
 
     inline bool test(mask_cref_type mask, std::size_t idx)
     {
-        BOOST_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
+        HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
         return (bits(idx) & mask) != 0;
     }
 
     inline void set(mask_type& mask, std::size_t idx)
     {
-        BOOST_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
+        HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
         mask |= bits(idx);
     }
 
@@ -64,7 +64,7 @@ namespace hpx { namespace threads
 
     inline void resize(mask_type& mask, std::size_t s)
     {
-        BOOST_ASSERT(s <= CHAR_BIT * sizeof(mask_type));
+        HPX_ASSERT(s <= CHAR_BIT * sizeof(mask_type));
     }
 
     inline std::size_t find_first(mask_cref_type mask)
@@ -118,7 +118,7 @@ namespace hpx { namespace threads
     inline void resize(mask_type& mask, std::size_t s)
     {
 # if defined(HPX_MAX_CPU_COUNT)
-        BOOST_ASSERT(s <= mask.size());
+        HPX_ASSERT(s <= mask.size());
 # else
         return mask.resize(s);
 # endif
@@ -258,7 +258,7 @@ namespace hpx { namespace threads
         ///                   the function will throw on error instead.
         virtual mask_cref_type get_thread_affinity_mask_from_lva(
             naming::address::address_type, error_code& ec = throws) const = 0;
-        
+
         /// \brief Prints the \param m to os in a human readable form
         virtual void print_affinity_mask(std::ostream& os, std::size_t num_thread, mask_type const& m) const = 0;
 
@@ -320,7 +320,7 @@ namespace hpx { namespace threads
                     }
                     else if (min != all_entities()) {
                         // all entities between min and -max, or just min,max
-                        BOOST_ASSERT(min >= 0);
+                        HPX_ASSERT(min >= 0);
                         index_bounds_.push_back(min);
                         index_bounds_.push_back(max);
                     }

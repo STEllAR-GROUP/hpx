@@ -270,7 +270,7 @@ namespace hpx { namespace parcelset
     template <typename Archive>
     void parcel::save(Archive& ar, const unsigned int version) const
     {
-        BOOST_ASSERT(data_.get() != 0);
+        HPX_ASSERT(data_.get() != 0);
 
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         bool is_multi_destination = data_->is_multi_destination();
@@ -337,7 +337,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     std::ostream& operator<< (std::ostream& os, parcel const& p)
     {
-        BOOST_ASSERT(p.data_.get() != 0);
+        HPX_ASSERT(p.data_.get() != 0);
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         if (p.data_->is_multi_destination()) {
             os << *static_cast<detail::multi_destination_parcel_data const*>(p.data_.get());

@@ -31,7 +31,7 @@ void handle_interruption_using_exception()
     }
     catch (hpx::exception const& e) {
         // we should get an error reporting hpx::thread_interrupted
-        BOOST_ASSERT(e.get_error() == hpx::thread_interrupted);
+        HPX_ASSERT(e.get_error() == hpx::thread_interrupted);
     }
 
     // wait for the cancellation thread to exit
@@ -53,7 +53,7 @@ void handle_interruption_using_error_code()
     ca.do_it(ec);
 
     // we should get an error reporting hpx::thread_interrupted
-    BOOST_ASSERT(ec && ec.value() == hpx::thread_interrupted);
+    HPX_ASSERT(ec && ec.value() == hpx::thread_interrupted);
 
     // wait for the cancellation thread to exit
     t.join();
