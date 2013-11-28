@@ -16,7 +16,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))));
@@ -76,7 +76,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))));
@@ -136,7 +136,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))));
@@ -196,7 +196,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))));
@@ -256,7 +256,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ))));
@@ -316,7 +316,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ))));
@@ -376,7 +376,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ))));
@@ -436,7 +436,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ))));
@@ -496,7 +496,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ))));
@@ -556,7 +556,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ))));
@@ -616,7 +616,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ))));
@@ -676,7 +676,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ))));
@@ -736,7 +736,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ))));
@@ -796,7 +796,7 @@ public:
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
             (*this->impl_)->set_data(Action::execute_function(addr.address_,
                 util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ))));

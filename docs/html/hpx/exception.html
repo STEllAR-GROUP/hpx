@@ -7,13 +7,13 @@
 <link rel="home" href="../index.html" title="HPX 0.9.8">
 <link rel="up" href="../header/hpx/exception_hpp.html" title="Header &lt;hpx/exception.hpp&gt;">
 <link rel="prev" href="error_code.html" title="Class error_code">
-<link rel="next" href="throws.html" title="Global throws">
+<link rel="next" href="thread_interrupted.html" title="Struct thread_interrupted">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="../images/hpx_0_9_8_draft.png"></td></tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="error_code.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/exception_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="throws.html"><img src="../images/next.png" alt="Next"></a>
+<a accesskey="p" href="error_code.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/exception_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="thread_interrupted.html"><img src="../images/next.png" alt="Next"></a>
 </div>
 <div class="refentry">
 <a name="hpx.exception"></a><div class="titlepage"></div>
@@ -28,27 +28,27 @@
 <span class="keyword">class</span> <a class="link" href="exception.html" title="Class exception">exception</a> <span class="special">{</span>
 <span class="keyword">public</span><span class="special">:</span>
   <span class="comment">// <a class="link" href="exception.html#hpx.exceptionconstruct-copy-destruct">construct/copy/destruct</a></span>
-  <span class="keyword">explicit</span> <a class="link" href="exception.html#idp15434272-bb"><span class="identifier">exception</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">)</span><span class="special">;</span>
-  <span class="keyword">explicit</span> <a class="link" href="exception.html#idp15438144-bb"><span class="identifier">exception</span></a><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">system</span><span class="special">::</span><span class="identifier">system_error</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="exception.html#idp15440272-bb"><span class="identifier">exception</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="exception.html#idp15449888-bb"><span class="identifier">exception</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
-  <a class="link" href="exception.html#idp15459504-bb"><span class="special">~</span><span class="identifier">exception</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">explicit</span> <a class="link" href="exception.html#idp15179040-bb"><span class="identifier">exception</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">)</span><span class="special">;</span>
+  <span class="keyword">explicit</span> <a class="link" href="exception.html#idp15182912-bb"><span class="identifier">exception</span></a><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">system</span><span class="special">::</span><span class="identifier">system_error</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="exception.html#idp15185040-bb"><span class="identifier">exception</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="exception.html#idp15194656-bb"><span class="identifier">exception</span></a><span class="special">(</span><span class="identifier">error</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span><span class="special">,</span> <span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span>
+  <a class="link" href="exception.html#idp15204272-bb"><span class="special">~</span><span class="identifier">exception</span></a><span class="special">(</span><span class="special">)</span><span class="special">;</span>
 
-  <span class="comment">// <a class="link" href="exception.html#idp15422096-bb">public member functions</a></span>
-  <span class="identifier">error</span> <a class="link" href="exception.html#idp15422496-bb"><span class="identifier">get_error</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
-  <a class="link" href="error_code.html" title="Class error_code">error_code</a> <a class="link" href="exception.html#idp15426144-bb"><span class="identifier">get_error_code</span></a><span class="special">(</span><span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="comment">// <a class="link" href="exception.html#idp15166864-bb">public member functions</a></span>
+  <span class="identifier">error</span> <a class="link" href="exception.html#idp15167264-bb"><span class="identifier">get_error</span></a><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <a class="link" href="error_code.html" title="Class error_code">error_code</a> <a class="link" href="exception.html#idp15170912-bb"><span class="identifier">get_error_code</span></a><span class="special">(</span><span class="identifier">throwmode</span> <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idp16333408"></a><h2>Description</h2>
+<a name="idp15676048"></a><h2>Description</h2>
 <p>The <a class="link" href="exception.html" title="Class exception">hpx::exception</a> type is the main exception type used by HPX to report errors. Any exceptions thrown by functions in the HPX library are either of this type or of a type derived from it. This implies that it is always safe to use this type only in catch statements guarding HPX library calls. </p>
 <div class="refsect2">
-<a name="idp16335200"></a><h3>
+<a name="idp15677840"></a><h3>
 <a name="hpx.exceptionconstruct-copy-destruct"></a><code class="computeroutput">exception</code> 
         public
        construct/copy/destruct</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp15434272-bb"></a><span class="identifier">exception</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp15179040-bb"></a><span class="identifier">exception</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">)</span><span class="special">;</span></pre>
 <p>Construct a <code class="computeroutput"><a class="link" href="exception.html" title="Class exception">hpx::exception</a></code> from a <span class="emphasis"><em>hpx::error</em></span>.</p>
 <p>
 </p>
@@ -73,9 +73,9 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp15438144-bb"></a><span class="identifier">exception</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">system</span><span class="special">::</span><span class="identifier">system_error</span> <span class="keyword">const</span> <span class="special">&amp;</span> e<span class="special">)</span><span class="special">;</span></pre>Construct a <code class="computeroutput"><a class="link" href="exception.html" title="Class exception">hpx::exception</a></code> from a boost::system_error. </li>
+<pre class="literallayout"><span class="keyword">explicit</span> <a name="idp15182912-bb"></a><span class="identifier">exception</span><span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">system</span><span class="special">::</span><span class="identifier">system_error</span> <span class="keyword">const</span> <span class="special">&amp;</span> e<span class="special">)</span><span class="special">;</span></pre>Construct a <code class="computeroutput"><a class="link" href="exception.html" title="Class exception">hpx::exception</a></code> from a boost::system_error. </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp15440272-bb"></a><span class="identifier">exception</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> msg<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><a name="idp15185040-bb"></a><span class="identifier">exception</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="keyword">char</span> <span class="keyword">const</span> <span class="special">*</span> msg<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Construct a <code class="computeroutput"><a class="link" href="exception.html" title="Class exception">hpx::exception</a></code> from a <span class="emphasis"><em>hpx::error</em></span> and an error message.</p>
 <p>
 </p>
@@ -110,7 +110,7 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp15449888-bb"></a><span class="identifier">exception</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span> msg<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><a name="idp15194656-bb"></a><span class="identifier">exception</span><span class="special">(</span><span class="identifier">error</span> e<span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="keyword">const</span> <span class="special">&amp;</span> msg<span class="special">,</span> <span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Construct a <code class="computeroutput"><a class="link" href="exception.html" title="Class exception">hpx::exception</a></code> from a <span class="emphasis"><em>hpx::error</em></span> and an error message.</p>
 <p>
 </p>
@@ -145,7 +145,7 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a name="idp15459504-bb"></a><span class="special">~</span><span class="identifier">exception</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
+<pre class="literallayout"><a name="idp15204272-bb"></a><span class="special">~</span><span class="identifier">exception</span><span class="special">(</span><span class="special">)</span><span class="special">;</span></pre>
 <p>Destruct a <code class="computeroutput"><a class="link" href="exception.html" title="Class exception">hpx::exception</a></code></p>
 <p>
 </p>
@@ -163,11 +163,11 @@
 </ol></div>
 </div>
 <div class="refsect2">
-<a name="idp16411488"></a><h3>
-<a name="idp15422096-bb"></a><code class="computeroutput">exception</code> public member functions</h3>
+<a name="idp15754096"></a><h3>
+<a name="idp15166864-bb"></a><code class="computeroutput">exception</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
-<pre class="literallayout"><span class="identifier">error</span> <a name="idp15422496-bb"></a><span class="identifier">get_error</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="identifier">error</span> <a name="idp15167264-bb"></a><span class="identifier">get_error</span><span class="special">(</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
 <p>The function <span class="emphasis"><em>get_error()</em></span> returns the hpx::error code stored in the referenced instance of a <code class="computeroutput"><a class="link" href="exception.html" title="Class exception">hpx::exception</a></code>. It returns the hpx::error code this exception instance was constructed from.</p>
 <p>
 </p>
@@ -183,7 +183,7 @@
 </table></div>
 </li>
 <li class="listitem">
-<pre class="literallayout"><a class="link" href="error_code.html" title="Class error_code">error_code</a> <a name="idp15426144-bb"></a><span class="identifier">get_error_code</span><span class="special">(</span><span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<pre class="literallayout"><a class="link" href="error_code.html" title="Class error_code">error_code</a> <a name="idp15170912-bb"></a><span class="identifier">get_error_code</span><span class="special">(</span><span class="identifier">throwmode</span> mode <span class="special">=</span> <span class="identifier">plain</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
 <p>The function <span class="emphasis"><em>get_error_code()</em></span> returns a <code class="computeroutput"><a class="link" href="error_code.html" title="Class error_code">hpx::error_code</a></code> which represents the same error condition as this <code class="computeroutput"><a class="link" href="exception.html" title="Class exception">hpx::exception</a></code> instance.</p>
 <p>
 </p>
@@ -223,7 +223,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="error_code.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/exception_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="throws.html"><img src="../images/next.png" alt="Next"></a>
+<a accesskey="p" href="error_code.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/exception_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="thread_interrupted.html"><img src="../images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

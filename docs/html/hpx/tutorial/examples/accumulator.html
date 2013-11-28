@@ -424,19 +424,19 @@
         </p>
 <pre class="programlisting"><span class="keyword">void</span> <span class="identifier">reset_non_blocking</span><span class="special">()</span>
 <span class="special">{</span>
-    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">get_gid</span><span class="special">());</span>
+    <span class="identifier">HPX_ASSERT</span><span class="special">(</span><span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">get_gid</span><span class="special">());</span>
     <span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">base_type</span><span class="special">::</span><span class="identifier">reset_non_blocking</span><span class="special">(</span><span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">get_gid</span><span class="special">());</span>
 <span class="special">}</span>
 </pre>
 <pre class="programlisting"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">lcos</span><span class="special">::</span><span class="identifier">future</span><span class="special">&lt;</span><span class="identifier">argument_type</span><span class="special">&gt;</span> <span class="identifier">query_async</span><span class="special">()</span>
 <span class="special">{</span>
-    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">get_gid</span><span class="special">());</span>
+    <span class="identifier">HPX_ASSERT</span><span class="special">(</span><span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">get_gid</span><span class="special">());</span>
     <span class="keyword">return</span> <span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">base_type</span><span class="special">::</span><span class="identifier">query_async</span><span class="special">(</span><span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">get_gid</span><span class="special">());</span>
 <span class="special">}</span>
 </pre>
 <pre class="programlisting"><span class="keyword">void</span> <span class="identifier">add_sync</span><span class="special">(</span><span class="identifier">argument_type</span> <span class="identifier">arg</span><span class="special">)</span>
 <span class="special">{</span>
-    <span class="identifier">BOOST_ASSERT</span><span class="special">(</span><span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">get_gid</span><span class="special">());</span>
+    <span class="identifier">HPX_ASSERT</span><span class="special">(</span><span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">get_gid</span><span class="special">());</span>
     <span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">base_type</span><span class="special">::</span><span class="identifier">add_sync</span><span class="special">(</span><span class="keyword">this</span><span class="special">-&gt;</span><span class="identifier">get_gid</span><span class="special">(),</span> <span class="identifier">arg</span><span class="special">);</span>
 <span class="special">}</span>
 </pre>

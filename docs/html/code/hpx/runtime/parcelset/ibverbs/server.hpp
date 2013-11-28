@@ -26,10 +26,10 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
         {
             int ret = 0;
             ret = posix_memalign(reinterpret_cast<void **>(&server_msg_), EXEC_PAGESIZE, sizeof(message));
-            BOOST_ASSERT(ret == 0);
-            
+            HPX_ASSERT(ret == 0);
+
             ret = posix_memalign(reinterpret_cast<void **>(&client_msg_), EXEC_PAGESIZE, sizeof(message));
-            BOOST_ASSERT(ret == 0);
+            HPX_ASSERT(ret == 0);
         }
 
         ~server()
@@ -54,11 +54,11 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
         char * set_buffer_size(std::size_t buffer_size, boost::system::error_code &ec)
         {
-            BOOST_ASSERT(buffer_ == 0);
+            HPX_ASSERT(buffer_ == 0);
             int ret = 0;
             buffer_size_ = buffer_size;
             ret = posix_memalign(reinterpret_cast<void **>(&buffer_), EXEC_PAGESIZE, buffer_size_);
-            BOOST_ASSERT(ret == 0);
+            HPX_ASSERT(ret == 0);
             boost::uint64_t header[2] = {0};
             std::memcpy(buffer_, header, sizeof(header));
             return buffer_;
@@ -105,7 +105,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
             std::memset(&wr, 0, sizeof(ibv_recv_wr));
 
-            BOOST_ASSERT(id_);
+            HPX_ASSERT(id_);
             wr.wr_id = (uintptr_t)id_;
             wr.sg_list = &sge;
             wr.num_sge = 1;
@@ -115,7 +115,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             sge.lkey = client_msg_mr_->lkey;
 
             int ret = 0;
-            BOOST_ASSERT(id_);
+            HPX_ASSERT(id_);
             ret = ibv_post_recv(id_->qp, &wr, &bad_wr);
             if(ret)
             {
@@ -139,10 +139,10 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
             struct ibv_send_wr wr, *bad_wr = NULL;
             struct ibv_sge sge;
-                
+
             std::memset(&wr, 0, sizeof(ibv_recv_wr));
-            
-            BOOST_ASSERT(id_);
+
+            HPX_ASSERT(id_);
             wr.wr_id = (uintptr_t)id_;
             wr.opcode = IBV_WR_SEND;
             wr.sg_list = &sge;
@@ -155,7 +155,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
             sge.lkey = server_msg_mr_->lkey;
 
             int ret = 0;
-            BOOST_ASSERT(id_);
+            HPX_ASSERT(id_);
             ret = ibv_post_send(id_->qp, &wr, &bad_wr);
             if(ret)
             {
@@ -177,13 +177,13 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
         {
             send_message(MSG_SHUTDOWN, ec);
         }
-        
+
         void on_preconnect(rdma_cm_id * id, ibv_pd * pd, boost::system::error_code &ec)
         {
             close();
             {
                 util::spinlock::scoped_lock lk(mtx_);
-                BOOST_ASSERT(buffer_);
+                HPX_ASSERT(buffer_);
                 buffer_mr_ = ibv_reg_mr(
                     pd
                   , buffer_
@@ -247,7 +247,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
             send_message(MSG_MR, ec);
         }
-        
+
         message_type on_completion(ibv_wc * wc, boost::system::error_code &ec)
         {
             util::spinlock::scoped_lock lk(mtx_);
@@ -290,11 +290,11 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
             return MSG_RETRY;
         }
-        
+
         void on_disconnect(rdma_cm_id * id)
         {
         }
-        
+
         util::spinlock mtx_;
 
         char *buffer_;

@@ -16,7 +16,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -40,7 +40,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -77,7 +77,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -101,7 +101,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -138,7 +138,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -162,7 +162,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -199,7 +199,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -223,7 +223,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -260,7 +260,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -284,7 +284,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -321,7 +321,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -345,7 +345,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -382,7 +382,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -406,7 +406,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -443,7 +443,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -467,7 +467,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -504,7 +504,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -528,7 +528,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -565,7 +565,7 @@
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
@@ -589,7 +589,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(

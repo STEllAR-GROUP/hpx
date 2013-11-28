@@ -1,0 +1,106 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Struct thread_interrupted</title>
+<link rel="stylesheet" href="../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../index.html" title="HPX 0.9.8">
+<link rel="up" href="../header/hpx/exception_hpp.html" title="Header &lt;hpx/exception.hpp&gt;">
+<link rel="prev" href="exception.html" title="Class exception">
+<link rel="next" href="throws.html" title="Global throws">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="../images/hpx_0_9_8_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="exception.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/exception_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="throws.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="hpx.thread_interrupted"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Struct thread_interrupted</span></h2>
+<p>hpx::thread_interrupted &#8212; A <a class="link" href="thread_interrupted.html" title="Struct thread_interrupted">hpx::thread_interrupted</a> is the exception type used by HPX to interrupt a running HPX thread. </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../header/hpx/exception_hpp.html" title="Header &lt;hpx/exception.hpp&gt;">hpx/exception.hpp</a>&gt;
+
+</span>
+<span class="keyword">struct</span> <a class="link" href="thread_interrupted.html" title="Struct thread_interrupted">thread_interrupted</a> <span class="special">{</span>
+<span class="special">}</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idp15790432"></a><h2>Description</h2>
+<p>   The \a hpx::thread_interrupted type is the exception type used by HPX to
+   interrupt a running thread.
+
+   A running thread can be interrupted by invoking the interrupt() member
+   function of the corresponding hpx::thread object. When the interrupted
+   thread next executes one of the specified interruption points (or if it
+   is currently blocked whilst executing one) with interruption enabled,
+   then a hpx::thread_interrupted exception will be thrown in the interrupted
+   thread. If not caught, this will cause the execution of the interrupted
+   thread to terminate. As with any other exception, the stack will be
+   unwound, and destructors for objects of automatic storage duration will
+   be executed.
+
+   If a thread wishes to avoid being interrupted, it can create an instance
+   of \a hpx::this_thread::disable_interruption. Objects of this class disable
+   interruption for the thread that created them on construction, and
+   restore the interruption state to whatever it was before on destruction.
+
+   @code 
+void f()
+{
+    // interruption enabled here
+    {
+        hpx::this_thread::disable_interruption di;
+        // interruption disabled
+        {
+            hpx::this_thread::disable_interruption di2;
+            // interruption still disabled
+        } // di2 destroyed, interruption state restored
+        // interruption still disabled
+    } // di destroyed, interruption state restored
+    // interruption now enabled
+}
+     The effects of an instance of \a hpx::this_thread::disable_interruption can be
+   temporarily reversed by constructing an instance of
+   \a hpx::this_thread::restore_interruption, passing in the
+   \a hpx::this_thread::disable_interruption object in question. This will restore
+   the interruption state to what it was when the \a hpx::this_thread::disable_interruption
+   object was constructed, and then disable interruption again when the
+   \a hpx::this_thread::restore_interruption object is destroyed.
+
+   @code 
+void g()
+{
+    // interruption enabled here
+    {
+        hpx::this_thread::disable_interruption di;
+        // interruption disabled
+        {
+            hpx::this_thread::restore_interruption ri(di);
+            // interruption now enabled
+        } // ri destroyed, interruption disable again
+    } // di destroyed, interruption state restored
+    // interruption now enabled
+}
+     At any point, the interruption state for the current thread can be
+   queried by calling \a hpx::this_thread::interruption_enabled().   </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
+      Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="exception.html"><img src="../images/prev.png" alt="Prev"></a><a accesskey="u" href="../header/hpx/exception_hpp.html"><img src="../images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../images/home.png" alt="Home"></a><a accesskey="n" href="throws.html"><img src="../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

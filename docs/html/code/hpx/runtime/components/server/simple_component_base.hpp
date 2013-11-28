@@ -119,9 +119,9 @@ namespace hpx { namespace components
             return factory_none;
         }
 
-        /// This is the default hook implementation for decorate_action which 
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
+        static HPX_STD_FUNCTION<threads::thread_function_type>
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
@@ -148,13 +148,13 @@ namespace hpx { namespace components
         {
             static Component* alloc(std::size_t count)
             {
-                BOOST_ASSERT(1 == count);
+                HPX_ASSERT(1 == count);
                 return static_cast<Component*>
                     (::operator new(sizeof(Component)));
             }
             static void free(void* p, std::size_t count)
             {
-                BOOST_ASSERT(1 == count);
+                HPX_ASSERT(1 == count);
                 ::operator delete(p);
             }
         };
@@ -184,27 +184,27 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.
-#if defined(NDEBUG) && defined(BOOST_DISABLE_ASSERTS)
+#if defined(NDEBUG) && defined(HPX_DISABLE_ASSERTS)
         static component_type* create(std::size_t)
 #else
         static component_type* create(std::size_t count)
 #endif
         {
             // simple components can be created individually only
-            BOOST_ASSERT(1 == count);
+            HPX_ASSERT(1 == count);
             return static_cast<component_type*>(new Component()); //-V572
         }
 
         /// \brief  The function \a destroy is used for destruction and
         ///         de-allocation of instances of the derived components.
-#if defined(NDEBUG) && defined(BOOST_DISABLE_ASSERTS)
+#if defined(NDEBUG) && defined(HPX_DISABLE_ASSERTS)
         static void destroy(Component* p, std::size_t /*count*/ = 1)
 #else
         static void destroy(Component* p, std::size_t count = 1)
 #endif
         {
             // simple components can be deleted individually only
-            BOOST_ASSERT(1 == count);
+            HPX_ASSERT(1 == count);
             p->finalize();
             delete p;
         }

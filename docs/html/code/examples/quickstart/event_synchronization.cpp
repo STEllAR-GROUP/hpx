@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -24,7 +24,7 @@ struct data
     void initialize(char const* p)
     {
         // We can only be called once.
-        BOOST_ASSERT(!init.occurred());
+        HPX_ASSERT(!init.occurred());
         msg = p;
         init.set();
     }

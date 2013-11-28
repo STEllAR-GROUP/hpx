@@ -86,8 +86,8 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                 << hpx::actions::detail::get_action_name<SinkAction>()
                 << ">::connect() from "
                 << get_gid();
-            
-            BOOST_ASSERT(get_gid());
+
+            HPX_ASSERT(get_gid());
 
             if(dataflow_source.valid())
             {
@@ -106,7 +106,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
         result_type get_value()
         {
-            BOOST_ASSERT(false);
+            HPX_ASSERT(false);
             return result_type();
         }
 
@@ -121,7 +121,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
         naming::gid_type get_base_gid() const
         {
-            BOOST_ASSERT(back_ptr_);
+            HPX_ASSERT(back_ptr_);
             return back_ptr_->get_base_gid();
         }
 
@@ -131,8 +131,8 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 
         void set_back_ptr(components::managed_component<dataflow_slot>* bp)
         {
-            BOOST_ASSERT(0 == back_ptr_);
-            BOOST_ASSERT(bp);
+            HPX_ASSERT(0 == back_ptr_);
+            HPX_ASSERT(bp);
             back_ptr_ = bp;
         }
 

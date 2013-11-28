@@ -141,7 +141,7 @@ namespace hpx { namespace util
 
         static pointer get_address(std::size_t item)
         {
-            BOOST_ASSERT(item < N);
+            HPX_ASSERT(item < N);
             return static_cast<pointer>(data_[item].address());
         }
 

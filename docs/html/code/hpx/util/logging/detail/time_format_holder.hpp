@@ -66,7 +66,7 @@ public:
 
     void set_format(const hold_string_type & format) {
         // format too big
-        BOOST_ASSERT( format.size() < 64);
+        HPX_ASSERT( format.size() < 64);
         m_format.clear();
 
         m_day = -1; m_month = -1; m_yy = -1; m_yyyy = -1; m_hour = -1; m_min = -1; m_sec = -1;m_millisec = -1;m_microsec = -1;m_nanosec = -1;

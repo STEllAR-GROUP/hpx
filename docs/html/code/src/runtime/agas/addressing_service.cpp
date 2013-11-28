@@ -134,7 +134,7 @@ struct addressing_service::gva_cache_key
       : key_(naming::detail::get_stripped_gid(id_)
            , naming::detail::get_stripped_gid(id_) + (count_ - 1))
     {
-        BOOST_ASSERT(count_);
+        HPX_ASSERT(count_);
     }
 
     naming::gid_type get_gid() const
@@ -145,7 +145,7 @@ struct addressing_service::gva_cache_key
     boost::uint64_t get_count() const
     {
         naming::gid_type const size = boost::icl::length(key_);
-        BOOST_ASSERT(size.get_msb() == 0);
+        HPX_ASSERT(size.get_msb() == 0);
         return size.get_lsb();
     }
 
@@ -251,7 +251,7 @@ naming::locality const& addressing_service::get_here() const
 {
     if (!here_) {
         runtime* rt = get_runtime_ptr();
-        BOOST_ASSERT(rt &&
+        HPX_ASSERT(rt &&
             rt->get_state() >= runtime::state_initialized &&
             rt->get_state() < runtime::state_stopped);
         here_ = rt->here();
@@ -261,37 +261,37 @@ naming::locality const& addressing_service::get_here() const
 
 void* addressing_service::get_hosted_primary_ns_ptr() const
 {
-    BOOST_ASSERT(0 != hosted.get());
+    HPX_ASSERT(0 != hosted.get());
     return &hosted->primary_ns_server_;
 }
 
 void* addressing_service::get_hosted_symbol_ns_ptr() const
 {
-    BOOST_ASSERT(0 != hosted.get());
+    HPX_ASSERT(0 != hosted.get());
     return &hosted->symbol_ns_server_;
 }
 
 void* addressing_service::get_bootstrap_locality_ns_ptr() const
 {
-    BOOST_ASSERT(0 != bootstrap.get());
+    HPX_ASSERT(0 != bootstrap.get());
     return &bootstrap->locality_ns_server_;
 }
 
 void* addressing_service::get_bootstrap_primary_ns_ptr() const
 {
-    BOOST_ASSERT(0 != bootstrap.get());
+    HPX_ASSERT(0 != bootstrap.get());
     return &bootstrap->primary_ns_server_;
 }
 
 void* addressing_service::get_bootstrap_component_ns_ptr() const
 {
-    BOOST_ASSERT(0 != bootstrap.get());
+    HPX_ASSERT(0 != bootstrap.get());
     return &bootstrap->component_ns_server_;
 }
 
 void* addressing_service::get_bootstrap_symbol_ns_ptr() const
 {
-    BOOST_ASSERT(0 != bootstrap.get());
+    HPX_ASSERT(0 != bootstrap.get());
     return &bootstrap->symbol_ns_server_;
 }
 
@@ -632,7 +632,7 @@ bool addressing_service::get_console_locality(
                     console_cache_ = console;
                 }
                 else {
-                    BOOST_ASSERT(console_cache_ == console);
+                    HPX_ASSERT(console_cache_ == console);
                 }
             }
 
@@ -1460,7 +1460,7 @@ bool addressing_service::resolve_full(
             if (addrs[i] || locals.test(i))
                 continue;
 
-            BOOST_ASSERT(j < reps.size());
+            HPX_ASSERT(j < reps.size());
             if (success != reps[j].get_status())
                 return false;
 
@@ -1745,9 +1745,9 @@ lcos::future<void> addressing_service::decref_async(
 
         if (max_refcnt_requests_ == ++refcnt_requests_count_)
         {
-            std::vector<hpx::future<response> > results = 
+            std::vector<hpx::future<response> > results =
                 send_refcnt_requests_async(l);
-    
+
             using HPX_STD_PLACEHOLDERS::_1;
             return when_all(results).then(
                     HPX_STD_BIND(synchronize_with_async_decref, _1, keep_alive)
@@ -1810,7 +1810,7 @@ lcos::future<bool> addressing_service::register_name_async(
         // Credit exhaustion - we need to get more.
         if (0 == naming::detail::get_credit_from_gid(new_gid))
         {
-            BOOST_ASSERT(1 == naming::detail::get_credit_from_gid(mutable_gid));
+            HPX_ASSERT(1 == naming::detail::get_credit_from_gid(mutable_gid));
             naming::get_agas_client().incref(new_gid, 2 * HPX_INITIAL_GLOBALCREDIT);
 
             naming::detail::add_credit_to_gid(new_gid, HPX_INITIAL_GLOBALCREDIT);
@@ -2420,19 +2420,19 @@ void addressing_service::send_refcnt_requests(
         ss << ( boost::format(
               "%1%, dumping client-side refcnt table, requests(%2%):")
               % func_name % requests.size());
-    
+
         typedef addressing_service::refcnt_requests_type::const_reference
             const_reference;
-    
+
         BOOST_FOREACH(const_reference e, requests)
         {
             naming::gid_type const lower = boost::icl::lower(e.key());
             naming::gid_type const upper = boost::icl::upper(e.key());
-    
-            naming::gid_type const length_gid = (upper - lower); 
-            BOOST_ASSERT(length_gid.get_msb() == 0);
+
+            naming::gid_type const length_gid = (upper - lower);
+            HPX_ASSERT(length_gid.get_msb() == 0);
             boost::uint64_t const length = length_gid.get_lsb() + 1;
-    
+
             // The [client] tag is in there to make it easier to filter
             // through the logs.
             ss << ( boost::format(
@@ -2443,7 +2443,7 @@ void addressing_service::send_refcnt_requests(
                   % length
                   % e.data());
         }
-    
+
         LAGAS_(debug) << ss.str();
     }
 #endif
@@ -2463,8 +2463,8 @@ void addressing_service::send_refcnt_requests_non_blocking(
 
         LAGAS_(info) << (boost::format(
             "addressing_service::send_refcnt_requests_non_blocking, "
-            "requests(%1%)") 
-            % p->size()); 
+            "requests(%1%)")
+            % p->size());
 
 #if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
         if (LAGAS_ENABLED(debug))
@@ -2512,8 +2512,8 @@ addressing_service::send_refcnt_requests_async(
 
     LAGAS_(info) << (boost::format(
         "addressing_service::send_refcnt_requests_async, "
-        "requests(%1%)") 
-        % p->size()); 
+        "requests(%1%)")
+        % p->size());
 
 #if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
     if (LAGAS_ENABLED(debug))

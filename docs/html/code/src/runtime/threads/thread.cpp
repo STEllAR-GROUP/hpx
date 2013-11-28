@@ -93,17 +93,15 @@ namespace hpx
             func();
         }
         catch (hpx::exception const& e) {
-            if (e.get_error() != hpx::thread_interrupted) {
-                // Verify that there are no more registered locks for this
-                // OS-thread. This will throw if there are still any locks
-                // held.
-                util::force_error_on_lock();
+            // Verify that there are no more registered locks for this
+            // OS-thread. This will throw if there are still any locks
+            // held.
+            util::force_error_on_lock();
 
-                // run all callbacks attached to the exit event for this thread
-                run_thread_exit_callbacks();
+            // run all callbacks attached to the exit event for this thread
+            run_thread_exit_callbacks();
 
-                throw;    // rethrow any exception except 'thread_interrupted'
-            }
+            throw;    // rethrow any exception except 'thread_interrupted'
         }
 
         // Verify that there are no more registered locks for this
@@ -180,7 +178,7 @@ namespace hpx
         if (handle != threads::invalid_thread_id)
         {
             // the thread object should have been initialized at this point
-            BOOST_ASSERT(uninitialized != handle);
+            HPX_ASSERT(uninitialized != handle);
 
             // register callback function to be called when thread exits
             native_handle_type this_id = threads::get_self_id();
@@ -258,7 +256,7 @@ namespace hpx
 
             bool valid() const
             {
-                return id_ != threads::invalid_thread_id && 
+                return id_ != threads::invalid_thread_id &&
                        id_ != thread::uninitialized;
             }
 
@@ -273,7 +271,7 @@ namespace hpx
                 mutex_type::scoped_lock l(this->mtx_);
                 if (!this->is_ready()) {
                     threads::interrupt_thread(id_);
-                    this->set_error(thread_interrupted,
+                    this->set_error(thread_cancelled,
                         "thread_task_base::cancel",
                         "future has been canceled");
                     id_ = threads::invalid_thread_id;
@@ -297,7 +295,7 @@ namespace hpx
 
     lcos::future<void> thread::get_future(error_code& ec)
     {
-        if (id_ == threads::invalid_thread_id || id_ == thread::uninitialized) 
+        if (id_ == threads::invalid_thread_id || id_ == thread::uninitialized)
         {
             HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
                 "NULL thread id encountered");
@@ -364,7 +362,7 @@ namespace hpx
           : interruption_was_enabled_(interruption_enabled())
         {
             if (interruption_was_enabled_) {
-                interruption_was_enabled_ = 
+                interruption_was_enabled_ =
                     threads::set_thread_interruption_enabled(
                         threads::get_self_id(), false);
             }

@@ -17,7 +17,7 @@ namespace hpx { namespace parcelset { namespace mpi {
         header(int rank, value_type tag_, value_type size_, value_type numbytes_)
           : rank_(rank)
         {
-            BOOST_ASSERT(rank_ != util::mpi_environment::rank());
+            HPX_ASSERT(rank_ != util::mpi_environment::rank());
             data_[0] = tag_;
             data_[1] = size_;
             data_[2] = numbytes_;
@@ -33,11 +33,11 @@ namespace hpx { namespace parcelset { namespace mpi {
 
         void assert_valid() const
         {
-            BOOST_ASSERT(rank_ != util::mpi_environment::rank());
-            BOOST_ASSERT(rank() != -1);
-            BOOST_ASSERT(tag() != -1);
-            BOOST_ASSERT(size() != -1);
-            BOOST_ASSERT(numbytes() != -1);
+            HPX_ASSERT(rank_ != util::mpi_environment::rank());
+            HPX_ASSERT(rank() != -1);
+            HPX_ASSERT(tag() != -1);
+            HPX_ASSERT(size() != -1);
+            HPX_ASSERT(numbytes() != -1);
         }
 
         value_type *data()

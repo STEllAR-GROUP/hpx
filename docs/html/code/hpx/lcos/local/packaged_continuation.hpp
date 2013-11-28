@@ -205,12 +205,8 @@ namespace hpx { namespace lcos { namespace detail
         {
             typename mutex_type::scoped_lock l(this->mtx_);
             try {
-                if (!this->started_) {
-                    HPX_THROW_EXCEPTION(thread_interrupted,
-                        "continuation_base<Result>::cancel",
-                        "future has been canceled");
-                    return;
-                }
+                if (!this->started_)
+                    boost::throw_exception(hpx::thread_interrupted());
 
                 if (this->is_ready_locked())
                     return;   // nothing we can do
@@ -222,7 +218,7 @@ namespace hpx { namespace lcos { namespace detail
                     this->started_ = true;
 
                     l.unlock();
-                    this->set_error(thread_interrupted,
+                    this->set_error(future_cancelled,
                         "continuation_base<Result>::cancel",
                         "future has been canceled");
                 }

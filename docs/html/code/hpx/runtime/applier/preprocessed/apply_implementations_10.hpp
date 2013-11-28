@@ -43,7 +43,7 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -57,7 +57,7 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -81,7 +81,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -151,7 +151,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -177,7 +177,7 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -276,7 +276,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        > , naming::id_type const& contgid, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0)
     {
         typedef
@@ -323,7 +323,7 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -337,7 +337,7 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -361,7 +361,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -431,7 +431,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -457,7 +457,7 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -556,7 +556,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        > , naming::id_type const& contgid, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
     {
         typedef
@@ -603,7 +603,7 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -617,7 +617,7 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -641,7 +641,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -711,7 +711,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -737,7 +737,7 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -836,7 +836,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        > , naming::id_type const& contgid, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
     {
         typedef
@@ -883,7 +883,7 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -897,7 +897,7 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -921,7 +921,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -991,7 +991,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -1017,7 +1017,7 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -1116,7 +1116,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        > , naming::id_type const& contgid, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
     {
         typedef
@@ -1163,7 +1163,7 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -1177,7 +1177,7 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -1201,7 +1201,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -1271,7 +1271,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -1297,7 +1297,7 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -1396,7 +1396,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        > , naming::id_type const& contgid, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
     {
         typedef
@@ -1443,7 +1443,7 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -1457,7 +1457,7 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -1481,7 +1481,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -1551,7 +1551,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -1577,7 +1577,7 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -1676,7 +1676,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        > , naming::id_type const& contgid, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
     {
         typedef
@@ -1723,7 +1723,7 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -1737,7 +1737,7 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -1761,7 +1761,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -1831,7 +1831,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -1857,7 +1857,7 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -1956,7 +1956,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        > , naming::id_type const& contgid, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
     {
         typedef
@@ -2003,7 +2003,7 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -2017,7 +2017,7 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -2041,7 +2041,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -2111,7 +2111,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -2137,7 +2137,7 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -2236,7 +2236,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        > , naming::id_type const& contgid, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
     {
         typedef
@@ -2283,7 +2283,7 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -2297,7 +2297,7 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -2321,7 +2321,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -2391,7 +2391,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -2417,7 +2417,7 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -2516,7 +2516,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        > , naming::id_type const& contgid, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
     {
         typedef
@@ -2563,7 +2563,7 @@ namespace hpx
             threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -2577,7 +2577,7 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             apply_helper<action_type>::call(target, addr.address_, priority,
@@ -2601,7 +2601,7 @@ namespace hpx
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -2671,7 +2671,7 @@ namespace hpx
             BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            BOOST_ASSERT(components::types_are_compatible(addr.type_,
+            HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
             actions::continuation_type cont(c);
@@ -2697,7 +2697,7 @@ namespace hpx
         threads::thread_priority priority, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
     {
         if (!Action::is_target_valid(gid)) {
-            HPX_THROW_EXCEPTION(bad_parameter, "apply_p", 
+            HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
                 ) % hpx::actions::detail::get_action_name<Action>()));
@@ -2796,7 +2796,7 @@ namespace hpx
     apply_c (
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& contgid, naming::id_type const& gid, 
+        > , naming::id_type const& contgid, naming::id_type const& gid,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
     {
         typedef

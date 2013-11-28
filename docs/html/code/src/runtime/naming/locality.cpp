@@ -111,8 +111,8 @@ namespace hpx { namespace naming
             // resolve the given address
             tcp::resolver resolver(io_service);
             tcp::resolver::query query(
-                !loc.get_address().empty() ? 
-                    loc.get_address() : 
+                !loc.get_address().empty() ?
+                    loc.get_address() :
                     boost::asio::ip::host_name(),
                 port_str);
 
@@ -141,7 +141,7 @@ namespace hpx { namespace naming
         ar.save(port_);
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-        BOOST_ASSERT(HPX_LOCALITY_VERSION_MPI == version);
+        HPX_ASSERT(HPX_LOCALITY_VERSION_MPI == version);
         ar.save(rank_);
 #endif
     }

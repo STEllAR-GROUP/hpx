@@ -40,7 +40,7 @@ namespace hpx { namespace util
 
     namespace detail
     {
-        hpx::util::logging::level::type 
+        hpx::util::logging::level::type
         get_log_level(std::string const& env, bool allow_always = false)
         {
             try {
@@ -195,7 +195,7 @@ namespace hpx { namespace util
                 threads::thread_id_type id = threads::get_self_id();
                 if (id != threads::invalid_thread_id) {
                     std::stringstream out;
-                    out << std::hex << std::setw(sizeof(void*)*2) 
+                    out << std::hex << std::setw(sizeof(void*)*2)
                         << std::setfill('0')
                         << reinterpret_cast<std::ptrdiff_t>(id.get());
                     str.prepend_string(out.str());
@@ -272,7 +272,7 @@ namespace hpx { namespace util
             if (0 != parent_id && threads::invalid_thread_id != parent_id) {
                 // called from inside a HPX thread
                 std::stringstream out;
-                out << std::hex << std::setw(sizeof(void*)*2) 
+                out << std::hex << std::setw(sizeof(void*)*2)
                     << std::setfill('0')
                     << reinterpret_cast<std::ptrdiff_t>(parent_id);
                 str.prepend_string(out.str());
@@ -407,7 +407,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.agas")) {
             util::section const* logini = ini.get_section("hpx.logging.agas");
-            BOOST_ASSERT(NULL != logini);
+            HPX_ASSERT(NULL != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -426,7 +426,7 @@ namespace hpx { namespace util
 #if defined(ANDROID) || defined(__ANDROID__)
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
-            agas_logger()->writer().add_destination("android_log", 
+            agas_logger()->writer().add_destination("android_log",
                 android_log("hpx.agas"));
 #else
             if (logdest.empty())      // ensure minimal defaults
@@ -457,7 +457,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.timing")) {
             util::section const* logini = ini.get_section("hpx.logging.timing");
-            BOOST_ASSERT(NULL != logini);
+            HPX_ASSERT(NULL != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -477,7 +477,7 @@ namespace hpx { namespace util
             if (logdest.empty())      // ensure minimal defaults
                 logdest = isconsole ? "android_log" : "console";
 
-            writer.add_destination("android_log", 
+            writer.add_destination("android_log",
                 android_log("hpx.timing"));
 #else
             if (logdest.empty())      // ensure minimal defaults
@@ -510,7 +510,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging")) {
             util::section const* logini = ini.get_section("hpx.logging");
-            BOOST_ASSERT(NULL != logini);
+            HPX_ASSERT(NULL != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -593,7 +593,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.application")) {
             util::section const* logini = ini.get_section("hpx.logging.application");
-            BOOST_ASSERT(NULL != logini);
+            HPX_ASSERT(NULL != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -640,7 +640,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.console.agas")) {
             util::section const* logini = ini.get_section("hpx.logging.console.agas");
-            BOOST_ASSERT(NULL != logini);
+            HPX_ASSERT(NULL != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -686,7 +686,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.console.timing")) {
             util::section const* logini = ini.get_section("hpx.logging.console.timing");
-            BOOST_ASSERT(NULL != logini);
+            HPX_ASSERT(NULL != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -732,7 +732,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.console")) {
             util::section const* logini = ini.get_section("hpx.logging.console");
-            BOOST_ASSERT(NULL != logini);
+            HPX_ASSERT(NULL != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
@@ -778,7 +778,7 @@ namespace hpx { namespace util
 
         if (ini.has_section("hpx.logging.console.application")) {
             util::section const* logini = ini.get_section("hpx.logging.console.application");
-            BOOST_ASSERT(NULL != logini);
+            HPX_ASSERT(NULL != logini);
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);

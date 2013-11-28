@@ -198,7 +198,7 @@ void primary_namespace::register_counter_types(
                 help = boost::str(help_time % name.substr(p+1));
         }
         else {
-            BOOST_ASSERT(detail::primary_namespace_services[i].code_ ==
+            HPX_ASSERT(detail::primary_namespace_services[i].code_ ==
                 primary_ns_statistics_counter);
             name = primary_namespace_service_name + name;
             if (detail::primary_namespace_services[i].target_ == detail::counter_target_count)
@@ -735,7 +735,7 @@ response primary_namespace::allocate(
 } // }}}
 
 #if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
-    void primary_namespace::dump_refcnt_matches( 
+    void primary_namespace::dump_refcnt_matches(
         refcnt_match match
       , naming::gid_type const& lower
       , naming::gid_type const& upper
@@ -743,38 +743,38 @@ response primary_namespace::allocate(
       , const char* func_name
         )
     { // dump_refcnt_matches implementation
-        BOOST_ASSERT(l.owns_lock());
-    
+        HPX_ASSERT(l.owns_lock());
+
         if (match.first == refcnts_.end() && match.second == refcnts_.end())
             // We got nothing, bail - our caller is probably about to throw.
             return;
-    
+
         std::stringstream ss;
         ss << (boost::format(
               "%1%, dumping server-side refcnt table matches, lower(%2%), "
               "upper(%3%):")
-              % func_name % lower % upper); 
-    
+              % func_name % lower % upper);
+
         for (/**/; match.first != match.second; ++match.first)
         {
             naming::gid_type const lower = boost::icl::lower(match.first->key_);
             naming::gid_type const upper = boost::icl::upper(match.first->key_);
-    
-            naming::gid_type const length_gid = (upper - lower); 
-            BOOST_ASSERT(length_gid.get_msb() == 0);
+
+            naming::gid_type const length_gid = (upper - lower);
+            HPX_ASSERT(length_gid.get_msb() == 0);
             boost::uint64_t const length = length_gid.get_lsb() + 1;
-    
+
             // The [server] tag is in there to make it easier to filter
             // through the logs.
             ss << (boost::format(
                    "\n  [server] lower(%1%), upper(%2%), length(%3%), "
                    "credits(%4%)")
-                   % lower 
-                   % upper 
-                   % length 
-                   % match.first->data_); 
+                   % lower
+                   % upper
+                   % length
+                   % match.first->data_);
         }
-    
+
         LAGAS_(debug) << ss.str();
     } // dump_refcnt_matches implementation
 #endif
@@ -797,7 +797,7 @@ void primary_namespace::increment(
         std::pair<iterator, iterator> match = refcnts_.find(lower, upper);
 
         dump_refcnt_matches(match, lower, upper, l,
-            "primary_namespace::increment"); 
+            "primary_namespace::increment");
     }
 #endif
 
@@ -851,7 +851,7 @@ void primary_namespace::decrement_sweep(
             std::pair<iterator, iterator> match = refcnts_.find(lower, upper);
 
             dump_refcnt_matches(match, lower, upper, l,
-                "primary_namespace::decrement_sweep"); 
+                "primary_namespace::decrement_sweep");
         }
 #endif
 
@@ -1010,7 +1010,7 @@ void primary_namespace::decrement_sweep(
                 if (sub_upper > boost::icl::upper(super))
                     sub_upper = boost::icl::upper(super);
 
-                BOOST_ASSERT(query <= sub_upper);
+                HPX_ASSERT(query <= sub_upper);
 
                 // We don't use the base GID returned by resolve_gid_locked, but
                 // instead we use the GID that we queried the GVA table with.
@@ -1098,7 +1098,7 @@ void primary_namespace::kill_non_blocking(
         components::component_type const type_ =
             components::component_type(at_c<0>(e).type);
 
-        BOOST_ASSERT(naming::invalid_locality_id != locality_id_);
+        HPX_ASSERT(naming::invalid_locality_id != locality_id_);
         if (locality_id_ == naming::get_locality_id_from_gid(at_c<1>(e)))
         {
             naming::address rts_addr(at_c<0>(e).endpoint,
@@ -1361,7 +1361,7 @@ response primary_namespace::statistics_counter(
         }
     }
     else {
-        BOOST_ASSERT(detail::counter_target_time == target);
+        HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case primary_ns_route:
             get_data_func = boost::bind(&cd::get_route_time, &counter_data_, ::_1);

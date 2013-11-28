@@ -29,7 +29,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, BOOST_FWD_REF(Arg0) arg0)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
@@ -130,7 +130,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
@@ -231,7 +231,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
@@ -332,7 +332,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
@@ -433,7 +433,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
@@ -534,7 +534,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
@@ -635,7 +635,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
@@ -736,7 +736,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
@@ -837,7 +837,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
@@ -938,7 +938,7 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9)
             {
-                BOOST_ASSERT(components::types_are_compatible(addr.type_,
+                HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,

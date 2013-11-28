@@ -109,7 +109,7 @@ namespace hpx { namespace components { namespace detail
         {
             util::itt::heap_internal_access hia;
 
-            BOOST_ASSERT(sizeof(storage_type) == heap_size);
+            HPX_ASSERT(sizeof(storage_type) == heap_size);
 
         // adjust step to reasonable value
             if (static_cast<std::size_t>(-1) == step_ || step_ < heap_step) //-V104
@@ -133,7 +133,7 @@ namespace hpx { namespace components { namespace detail
         {
             util::itt::heap_internal_access hia; HPX_UNUSED(hia);
 
-            BOOST_ASSERT(sizeof(storage_type) == heap_size);
+            HPX_ASSERT(sizeof(storage_type) == heap_size);
             if (!init_pool())
                 throw std::bad_alloc();
         }
@@ -181,11 +181,11 @@ namespace hpx { namespace components { namespace detail
 #endif
 
             value_type* p = static_cast<value_type*>(first_free_->address());
-            BOOST_ASSERT(p != NULL);
+            HPX_ASSERT(p != NULL);
 
             first_free_ += count;
 
-            BOOST_ASSERT(free_size_ >= count);
+            HPX_ASSERT(free_size_ >= count);
             free_size_ -= count;
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
@@ -202,19 +202,19 @@ namespace hpx { namespace components { namespace detail
             util::itt::heap_free heap_free(heap_free_function_, p);
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
-            BOOST_ASSERT(did_alloc(p));
+            HPX_ASSERT(did_alloc(p));
 #endif
             scoped_lock l(mtx_);
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
             storage_type* p1 = static_cast<storage_type*>(p);
 
-            BOOST_ASSERT(NULL != pool_ && p1 >= pool_);
-            BOOST_ASSERT(NULL != pool_ && p1 + count <= pool_ + size_);
-            BOOST_ASSERT(first_free_ == NULL || p1 != first_free_);
-            BOOST_ASSERT(free_size_ + count <= size_);
+            HPX_ASSERT(NULL != pool_ && p1 >= pool_);
+            HPX_ASSERT(NULL != pool_ && p1 + count <= pool_ + size_);
+            HPX_ASSERT(first_free_ == NULL || p1 != first_free_);
+            HPX_ASSERT(free_size_ + count <= size_);
             // make sure this has not been freed yet
-            BOOST_ASSERT(!debug::test_fill_bytes(p1->address(), freed_value,
+            HPX_ASSERT(!debug::test_fill_bytes(p1->address(), freed_value,
                 count*sizeof(storage_type)));
 
             // give memory back to pool
@@ -249,7 +249,7 @@ namespace hpx { namespace components { namespace detail
         {
             util::itt::heap_internal_access hia; HPX_UNUSED(hia);
 
-            BOOST_ASSERT(did_alloc(p));
+            HPX_ASSERT(did_alloc(p));
 
             scoped_lock l(mtx_);
             value_type* addr = static_cast<value_type*>(pool_->address());
@@ -315,7 +315,7 @@ namespace hpx { namespace components { namespace detail
         {
             if (pool_ == NULL || free_size_ < size_ || first_free_ < pool_+size_)
                 return false;
-            BOOST_ASSERT(free_size_ == size_);
+            HPX_ASSERT(free_size_ == size_);
 
             // unbind in AGAS service
             if (base_gid_) {
@@ -340,8 +340,8 @@ namespace hpx { namespace components { namespace detail
 
         bool init_pool()
         {
-            BOOST_ASSERT(size_ == 0);
-            BOOST_ASSERT(first_free_ == NULL);
+            HPX_ASSERT(size_ == 0);
+            HPX_ASSERT(first_free_ == NULL);
 
             std::size_t s = step_ * heap_size; //-V104
             pool_ = static_cast<storage_type*>(Allocator::alloc(s));

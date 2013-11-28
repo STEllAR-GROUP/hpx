@@ -13,14 +13,13 @@
 
 void wait_for(hpx::lcos::future<int> f)
 {
-    try
-    {
+    try {
         f.wait_for(boost::chrono::nanoseconds(1));
-
         hpx::this_thread::suspend(hpx::threads::suspended);
-    } catch(hpx::exception const& e) {
+    }
+    catch (hpx::thread_interrupted const&) {
         // we should get an error reporting hpx::thread_interrupted
-        HPX_TEST(e.get_error() == hpx::thread_interrupted);
+        HPX_TEST(true);
         return;
     }
     HPX_TEST(false);
@@ -28,14 +27,13 @@ void wait_for(hpx::lcos::future<int> f)
 
 void wait_until(hpx::lcos::future<int> f)
 {
-    try
-    {
+    try {
         f.wait_until(boost::chrono::system_clock::now() + boost::chrono::nanoseconds(1));
-
         hpx::this_thread::suspend(hpx::threads::suspended);
-    } catch(hpx::exception const& e) {
+    }
+    catch (hpx::thread_interrupted const&) {
         // we should get an error reporting hpx::thread_interrupted
-        HPX_TEST(e.get_error() == hpx::thread_interrupted);
+        HPX_TEST(true);
         return;
     }
     HPX_TEST(false);

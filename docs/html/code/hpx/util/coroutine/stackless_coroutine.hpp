@@ -164,7 +164,7 @@ namespace hpx { namespace util { namespace coroutines
         void rebind(BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
             thread_id_repr_type id = 0)
         {
-            BOOST_ASSERT(exited());
+            HPX_ASSERT(exited());
 
             f_ = boost::forward<Functor>(f);
             id_ = id;
@@ -176,7 +176,7 @@ namespace hpx { namespace util { namespace coroutines
 
         void reset()
         {
-            BOOST_ASSERT(exited());
+            HPX_ASSERT(exited());
             target_ = naming::invalid_id;
             util::detail::reset_function(f_);
         }
@@ -217,7 +217,7 @@ namespace hpx { namespace util { namespace coroutines
             result_type result = f_(arg0);   // invoke wrapped function
 
             // we always have to run to completion
-            BOOST_ASSERT(result == 5);       // threads::terminated == 5
+            HPX_ASSERT(result == 5);       // threads::terminated == 5
             reset();
             return result;
         }

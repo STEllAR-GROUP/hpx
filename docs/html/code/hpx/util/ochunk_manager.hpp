@@ -91,14 +91,14 @@ namespace hpx { namespace util { namespace detail
                 cont_.resize(current_);         // truncate container
             }
             else if (chunks_) {
-                BOOST_ASSERT(
+                HPX_ASSERT(
                     get_chunk_type(current_chunk_) == chunk_type_index ||
                     get_chunk_size(current_chunk_) != 0);
 
                 // complement current serialization_chunk by setting its length
                 if (get_chunk_type(current_chunk_) == chunk_type_index)
                 {
-                    BOOST_ASSERT(get_chunk_size(current_chunk_) == 0);
+                    HPX_ASSERT(get_chunk_size(current_chunk_) == 0);
 
                     set_chunk_size(current_chunk_,
                         current_ - get_chunk_data(current_chunk_).index_);
@@ -108,19 +108,19 @@ namespace hpx { namespace util { namespace detail
 
         void set_filter(binary_filter* filter)
         {
-            BOOST_ASSERT(0 == filter_);
+            HPX_ASSERT(0 == filter_);
             filter_ = filter;
             start_compressing_at_ = current_;
 
             if (chunks_) {
-                BOOST_ASSERT(get_num_chunks() == 1 && get_chunk_size(0) == 0);
+                HPX_ASSERT(get_num_chunks() == 1 && get_chunk_size(0) == 0);
                 chunks_->clear();
             }
         }
 
         void save_binary(void const* address, std::size_t count)
         {
-            BOOST_ASSERT(count != 0);
+            HPX_ASSERT(count != 0);
             {
                 if (filter_) {
                     filter_->save(address, count);
@@ -154,14 +154,14 @@ namespace hpx { namespace util { namespace detail
                 this->ocontainer_type::save_binary(address, count);
             }
             else {
-                BOOST_ASSERT(
+                HPX_ASSERT(
                     get_chunk_type(current_chunk_) == chunk_type_index ||
                     get_chunk_size(current_chunk_) != 0);
 
                 // complement current serialization_chunk by setting its length
                 if (get_chunk_type(current_chunk_) == chunk_type_index)
                 {
-                    BOOST_ASSERT(get_chunk_size(current_chunk_) == 0);
+                    HPX_ASSERT(get_chunk_size(current_chunk_) == 0);
 
                     set_chunk_size(current_chunk_,
                         current_ - get_chunk_data(current_chunk_).index_);

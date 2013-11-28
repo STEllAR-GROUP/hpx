@@ -243,7 +243,7 @@ private:
     struct parse_destination {
         bool has_manipulator_name() const { return !m_manipulator.empty(); }
         string_type get_manipulator_name() const {
-            BOOST_ASSERT( has_manipulator_name() );
+            HPX_ASSERT( has_manipulator_name() );
             if ( m_manipulator[0] == '-' || m_manipulator[0] == '+')
                 // + or - -> turning on or off a destination
                 return m_manipulator.substr(1);
@@ -276,7 +276,7 @@ private:
         }
 
         string_type get_manipulator_name() const {
-            BOOST_ASSERT( has_manipulator_name() );
+            HPX_ASSERT( has_manipulator_name() );
             // ignore starting and ending %
             return m_manipulator.substr( 1, m_manipulator.size() - 2);
         }
@@ -299,7 +299,7 @@ private:
                 m_manipulator += c;
             else
                 // manipulator should always start with %
-                BOOST_ASSERT(false);
+                HPX_ASSERT(false);
         }
     private:
         string_type m_manipulator;
@@ -323,7 +323,7 @@ private:
                 }
             }
             else if ( (*b == ')') && parsing_params) {
-                BOOST_ASSERT ( parser.has_manipulator_name() );
+                HPX_ASSERT ( parser.has_manipulator_name() );
                 manip.configure_inner( parser.get_manipulator_name(), params);
                 parser.clear();
                 parsing_params = false;

@@ -130,6 +130,11 @@ namespace boost { namespace serialization
         try {
             boost::rethrow_exception(ep);
         }
+        catch (hpx::thread_interrupted const&) {
+            type = hpx::util::hpx_thread_interrupted_exception;
+            what = "hpx::thread_interrupted";
+            err_value = hpx::thread_cancelled;
+        }
         catch (hpx::exception const& e) {
             type = hpx::util::hpx_exception;
             what = e.what();
@@ -323,7 +328,7 @@ namespace boost { namespace serialization
 
         // boost exceptions
         case hpx::util::boost_exception:
-            BOOST_ASSERT(false);    // shouldn't happen
+            HPX_ASSERT(false);    // shouldn't happen
             break;
 
         // boost::system::system_error
@@ -352,6 +357,11 @@ namespace boost { namespace serialization
                     throw_locality_, throw_hostname_, throw_pid_,
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
                     throw_env_, throw_config_);
+            break;
+
+        // hpx::thread_interrupted
+        case hpx::util::hpx_thread_interrupted_exception:
+            e = hpx::detail::construct_lightweight_exception(hpx::thread_interrupted());
             break;
         }
     }

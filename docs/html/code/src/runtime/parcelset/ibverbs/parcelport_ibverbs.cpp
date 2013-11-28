@@ -84,7 +84,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 acceptor_->bind(ep);
 
                 acceptor_->async_accept(conn->context(),
-                    boost::bind(&parcelport::handle_accept, 
+                    boost::bind(&parcelport::handle_accept,
                         this->shared_from_this(),
                         boost::asio::placeholders::error, conn));
             }
@@ -157,7 +157,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 io_service_pool_.get_io_service(), *this));
 
             acceptor_->async_accept(conn->context(),
-                boost::bind(&parcelport::handle_accept, 
+                boost::bind(&parcelport::handle_accept,
                     this->shared_from_this(),
                     boost::asio::placeholders::error, conn));
 
@@ -219,7 +219,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         // make sure all parcels go to the same locality
         for (std::size_t i = 1; i != parcels.size(); ++i)
         {
-            BOOST_ASSERT(locality_id == parcels[i].get_destination_locality());
+            HPX_ASSERT(locality_id == parcels[i].get_destination_locality());
         }
 #endif
 
@@ -316,7 +316,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
             if (it != pending_parcels_.end())
             {
-                BOOST_ASSERT(it->first == locality_id);
+                HPX_ASSERT(it->first == locality_id);
                 std::swap(parcels, it->second.first);
                 std::swap(handlers, it->second.second);
 
@@ -324,17 +324,17 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 {
                     // if no parcels are pending re-add the connection to
                     // the cache
-                    BOOST_ASSERT(handlers.empty());
-                    BOOST_ASSERT(locality_id == client_connection->destination());
+                    HPX_ASSERT(handlers.empty());
+                    HPX_ASSERT(locality_id == client_connection->destination());
                     connection_cache_.reclaim(locality_id, client_connection);
                     return;
                 }
             }
-            else 
+            else
             {
                 // Give this connection back to the cache as it's not
                 // needed anymore.
-                BOOST_ASSERT(locality_id == client_connection->destination());
+                HPX_ASSERT(locality_id == client_connection->destination());
                 connection_cache_.reclaim(locality_id, client_connection);
                 return;
             }
@@ -353,7 +353,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             lcos::local::spinlock::scoped_lock l(mtx_);
 
             // Give this connection back to the cache as it's not  needed anymore.
-            BOOST_ASSERT(locality_id == client_connection->destination());
+            HPX_ASSERT(locality_id == client_connection->destination());
             connection_cache_.reclaim(locality_id, client_connection);
 
             pending_parcels_map::iterator it = pending_parcels_.find(locality_id);
@@ -363,7 +363,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         // Create a new HPX thread which sends parcels that are still pending.
         hpx::applier::register_thread_nullary(
-            HPX_STD_BIND(&parcelport::retry_sending_parcels, 
+            HPX_STD_BIND(&parcelport::retry_sending_parcels,
                 this->shared_from_this(), locality_id), "retry_sending_parcels",
                 threads::pending, true, threads::thread_priority_critical);
     }
@@ -381,7 +381,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         // ... start an asynchronous write operation now.
         client_connection->async_write(
             hpx::parcelset::detail::call_for_each(handlers),
-            boost::bind(&parcelport::send_pending_parcels_trampoline, 
+            boost::bind(&parcelport::send_pending_parcels_trampoline,
                 this->shared_from_this(),
                 boost::asio::placeholders::error, ::_2, ::_3));
     }
@@ -579,7 +579,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                         archive >> p;
 
                         // make sure this parcel ended up on the right locality
-                        BOOST_ASSERT(p.get_destination_locality() == pp.here());
+                        HPX_ASSERT(p.get_destination_locality() == pp.here());
 
                         // be sure not to measure add_parcel as serialization time
                         boost::int64_t add_parcel_time = timer.elapsed_nanoseconds();

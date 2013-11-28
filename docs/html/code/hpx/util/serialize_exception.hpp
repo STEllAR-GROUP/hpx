@@ -41,7 +41,8 @@ namespace hpx { namespace util
         boost_system_error = 11,
 
         // hpx::exception
-        hpx_exception = 12
+        hpx_exception = 12,
+        hpx_thread_interrupted_exception = 13
     };
 }}  // namespace hpx::util
 

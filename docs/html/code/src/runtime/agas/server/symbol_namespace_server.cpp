@@ -166,7 +166,7 @@ void symbol_namespace::register_counter_types(
                 help = boost::str(help_time % name.substr(p+1));
         }
         else {
-            BOOST_ASSERT(detail::symbol_namespace_services[i].code_ ==
+            HPX_ASSERT(detail::symbol_namespace_services[i].code_ ==
                 symbol_ns_statistics_counter);
             name = symbol_namespace_service_name + name;
             if (detail::symbol_namespace_services[i].target_ == detail::counter_target_count)
@@ -363,7 +363,7 @@ response symbol_namespace::resolve(
         // Credit exhaustion - we need to get more.
         if (0 == naming::detail::get_credit_from_gid(gid))
         {
-            BOOST_ASSERT(1 == naming::detail::get_credit_from_gid(it->second));
+            HPX_ASSERT(1 == naming::detail::get_credit_from_gid(it->second));
 
             // Since we have to give up the lock for the actual incref, we add
             // the credit tentatively to the map entry to avoid that it is deleted
@@ -577,7 +577,7 @@ response symbol_namespace::statistics_counter(
         }
     }
     else {
-        BOOST_ASSERT(detail::counter_target_time == target);
+        HPX_ASSERT(detail::counter_target_time == target);
         switch (code) {
         case symbol_ns_bind:
             get_data_func = boost::bind(&cd::get_bind_time, &counter_data_, ::_1);
