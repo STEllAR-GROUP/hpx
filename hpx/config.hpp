@@ -653,6 +653,16 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Older Boost versions do not have BOOST_NOINLINE defined
+#if !defined(BOOST_NOINLINE)
+#  if defined(BOOST_MSVC)
+#    define BOOST_NOINLINE __declspec(noinline)
+#  else
+#    define BOOST_NOINLINE
+#  endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // Make sure Chrono is handled properly
 #if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700 && !defined(BOOST_CHRONO_NO_LIB)
 #  define BOOST_CHRONO_NO_LIB

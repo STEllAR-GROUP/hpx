@@ -14,12 +14,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-#if defined(BOOST_MSVC)
-#define HPX_NO_INLINE __declspec(noinline)
-#else
-#define HPX_NO_INLINE
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t threshold = 2;
 boost::uint64_t distribute_at = 2;
@@ -56,7 +50,7 @@ struct when_all_wrapper
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_NO_INLINE boost::uint64_t fibonacci_serial_sub(boost::uint64_t n)
+BOOST_NOINLINE boost::uint64_t fibonacci_serial_sub(boost::uint64_t n)
 {
     if (n < 2)
         return n;

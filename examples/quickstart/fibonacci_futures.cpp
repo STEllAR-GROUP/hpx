@@ -16,17 +16,11 @@
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
-#if defined(BOOST_MSVC)
-#define HPX_NO_INLINE __declspec(noinline)
-#else
-#define HPX_NO_INLINE
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t threshold = 2;
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_NO_INLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
+BOOST_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
 {
     if (n < 2)
         return n;
