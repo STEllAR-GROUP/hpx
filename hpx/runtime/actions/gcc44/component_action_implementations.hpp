@@ -103,16 +103,14 @@ namespace hpx { namespace actions
                         HPX_ENUM_MOVE_ARGS(N, arg));
                 }
                 catch (hpx::exception const& e) {
-                    if (e.get_error() != hpx::thread_interrupted) {
-                        LTM_(error)
-                            << "Unhandled exception while executing component action("
-                            << detail::get_action_name<Derived>()
-                            << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << "): " << e.what();
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << "): " << e.what();
 
-                        // report this error to the console in any case
-                        hpx::report_error(boost::current_exception());
-                    }
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
                 }
                 catch (...) {
                     LTM_(error)
@@ -341,16 +339,14 @@ namespace hpx { namespace actions
                         HPX_ENUM_MOVE_ARGS(N, arg));
                 }
                 catch (hpx::exception const& e) {
-                    if (e.get_error() != hpx::thread_interrupted) {
-                        LTM_(error)
-                            << "Unhandled exception while executing component action("
-                            << detail::get_action_name<Derived>()
-                            << ") lva(" << reinterpret_cast<void const*>
-                                (get_lva<Component>::call(lva)) << "): " << e.what();
+                    LTM_(error)
+                        << "Unhandled exception while executing component action("
+                        << detail::get_action_name<Derived>()
+                        << ") lva(" << reinterpret_cast<void const*>
+                            (get_lva<Component>::call(lva)) << "): " << e.what();
 
-                        // report this error to the console in any case
-                        hpx::report_error(boost::current_exception());
-                    }
+                    // report this error to the console in any case
+                    hpx::report_error(boost::current_exception());
                 }
 
                 // Verify that there are no more registered locks for this

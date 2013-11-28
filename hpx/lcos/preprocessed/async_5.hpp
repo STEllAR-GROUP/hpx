@@ -37,7 +37,7 @@ namespace hpx
             }
         };
     }
-
+    
     template <typename Action, typename Arg0>
     lcos::future<
         typename traits::promise_local_result<
@@ -79,7 +79,7 @@ namespace hpx
         return async<Action>(launch::all, gid,
             boost::forward<Arg0>( arg0 ));
     }
-
+    
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0>
     lcos::future<
@@ -138,7 +138,7 @@ namespace hpx
             }
         };
     }
-
+    
     template <typename Action, typename Arg0 , typename Arg1>
     lcos::future<
         typename traits::promise_local_result<
@@ -180,7 +180,7 @@ namespace hpx
         return async<Action>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
     }
-
+    
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1>
     lcos::future<
@@ -239,7 +239,7 @@ namespace hpx
             }
         };
     }
-
+    
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
     lcos::future<
         typename traits::promise_local_result<
@@ -281,7 +281,7 @@ namespace hpx
         return async<Action>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
     }
-
+    
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
     lcos::future<
@@ -340,7 +340,7 @@ namespace hpx
             }
         };
     }
-
+    
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     lcos::future<
         typename traits::promise_local_result<
@@ -382,7 +382,7 @@ namespace hpx
         return async<Action>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
     }
-
+    
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     lcos::future<
@@ -441,7 +441,7 @@ namespace hpx
             }
         };
     }
-
+    
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     lcos::future<
         typename traits::promise_local_result<
@@ -483,7 +483,7 @@ namespace hpx
         return async<Action>(launch::all, gid,
             boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
     }
-
+    
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     lcos::future<

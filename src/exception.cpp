@@ -150,6 +150,22 @@ namespace hpx { namespace detail
         }
     }
 
+    template <typename Exception>
+    HPX_EXPORT boost::exception_ptr construct_lightweight_exception(Exception const& e)
+    {
+        // create a boost::exception_ptr object encapsulating the Exception to
+        // be thrown and annotate it with all the local information we have
+        try {
+            boost::throw_exception(e);
+        }
+        catch (...) {
+            return boost::current_exception();
+        }
+    }
+
+    template HPX_EXPORT boost::exception_ptr
+        construct_lightweight_exception(hpx::thread_interrupted const&);
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
     inline bool is_of_lightweight_hpx_category(Exception const& e)
@@ -573,6 +589,9 @@ namespace hpx
     {
         try {
             boost::rethrow_exception(e);
+        }
+        catch (hpx::thread_interrupted const&) {
+            return hpx::thread_cancelled;
         }
         catch (hpx::exception const& he) {
             return he.get_error();

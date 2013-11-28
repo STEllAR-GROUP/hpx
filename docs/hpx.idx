@@ -54,6 +54,7 @@ HPX_THROWS_IF                         "" "HPX_THROWS_IF"
 
 error_code                            "" "hpx\.error_code"
 exception                             "" "hpx\.exception"
+thread_interrupted                    "" "hpx\.thread_interrupted"
 
 throwmode                             "" "header\.hpx\.exception_hpp"
 throws                                "" "header\.hpx\.exception_hpp"

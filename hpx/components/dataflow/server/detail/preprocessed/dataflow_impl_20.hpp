@@ -10,12 +10,12 @@
 
     template <
         typename Action
-
+         
       , typename Result
     >
     struct dataflow_impl<
         Action
-
+         
         ,
         void , void , void , void , void , void , void , void , void , void , void , void , void , void , void , void , void , void , void , void
       , Result
@@ -38,14 +38,14 @@
         typedef
             dataflow_impl<
                 Action
-
+                 
             >
             wrapped_type;
         typedef
             components::managed_component<
                 dataflow_impl<
                     Action
-
+                     
                 >
             >
             wrapping_type;
@@ -95,7 +95,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -114,9 +114,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             remote_result tmp(r);
@@ -130,9 +130,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -140,8 +140,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -163,7 +163,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -259,7 +259,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | 0);
         dataflow_impl(
@@ -303,7 +303,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -323,9 +323,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -344,9 +344,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -354,8 +354,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -377,7 +377,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -388,7 +388,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -405,7 +405,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -423,7 +423,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -560,7 +560,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | 0);
         dataflow_impl(
@@ -604,7 +604,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -624,9 +624,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -645,9 +645,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -655,8 +655,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -678,7 +678,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -689,7 +689,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -706,7 +706,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -724,7 +724,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -861,7 +861,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | 0);
         dataflow_impl(
@@ -905,7 +905,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -925,9 +925,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -946,9 +946,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -956,8 +956,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -979,7 +979,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -990,7 +990,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -1007,7 +1007,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -1025,7 +1025,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -1162,7 +1162,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | 0);
         dataflow_impl(
@@ -1206,7 +1206,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -1226,9 +1226,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -1247,9 +1247,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -1257,8 +1257,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -1280,7 +1280,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -1291,7 +1291,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -1308,7 +1308,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -1326,7 +1326,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -1463,7 +1463,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | 0);
         dataflow_impl(
@@ -1507,7 +1507,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -1527,9 +1527,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -1548,9 +1548,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -1558,8 +1558,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -1581,7 +1581,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -1592,7 +1592,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -1609,7 +1609,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -1627,7 +1627,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -1764,7 +1764,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | 0);
         dataflow_impl(
@@ -1808,7 +1808,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -1828,9 +1828,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -1849,9 +1849,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -1859,8 +1859,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -1882,7 +1882,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -1893,7 +1893,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -1910,7 +1910,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -1928,7 +1928,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -2065,7 +2065,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | 0);
         dataflow_impl(
@@ -2109,7 +2109,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -2129,9 +2129,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -2150,9 +2150,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -2160,8 +2160,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -2183,7 +2183,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -2194,7 +2194,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -2211,7 +2211,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -2229,7 +2229,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -2366,7 +2366,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | 0);
         dataflow_impl(
@@ -2410,7 +2410,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -2430,9 +2430,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -2451,9 +2451,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -2461,8 +2461,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -2484,7 +2484,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -2495,7 +2495,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -2512,7 +2512,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -2530,7 +2530,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -2667,7 +2667,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | 0);
         dataflow_impl(
@@ -2711,7 +2711,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -2731,9 +2731,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -2752,9 +2752,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -2762,8 +2762,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -2785,7 +2785,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -2796,7 +2796,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -2813,7 +2813,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -2831,7 +2831,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -2968,7 +2968,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | 0);
         dataflow_impl(
@@ -3012,7 +3012,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3032,9 +3032,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -3053,9 +3053,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -3063,8 +3063,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3086,7 +3086,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -3097,7 +3097,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -3114,7 +3114,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -3132,7 +3132,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -3269,7 +3269,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | 0);
         dataflow_impl(
@@ -3313,7 +3313,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3333,9 +3333,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -3354,9 +3354,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -3364,8 +3364,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3387,7 +3387,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -3398,7 +3398,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -3415,7 +3415,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -3433,7 +3433,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -3570,7 +3570,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | 0);
         dataflow_impl(
@@ -3614,7 +3614,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3634,9 +3634,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -3655,9 +3655,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -3665,8 +3665,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3688,7 +3688,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -3699,7 +3699,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -3716,7 +3716,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -3734,7 +3734,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -3871,7 +3871,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | 0);
         dataflow_impl(
@@ -3915,7 +3915,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -3935,9 +3935,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -3956,9 +3956,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -3966,8 +3966,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -3989,7 +3989,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -4000,7 +4000,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -4017,7 +4017,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -4035,7 +4035,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -4172,7 +4172,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | (1<< 13) | 0);
         dataflow_impl(
@@ -4216,7 +4216,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -4236,9 +4236,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -4257,9 +4257,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -4267,8 +4267,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -4290,7 +4290,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -4301,7 +4301,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -4318,7 +4318,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -4336,7 +4336,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -4473,7 +4473,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | (1<< 13) | (1<< 14) | 0);
         dataflow_impl(
@@ -4517,7 +4517,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -4537,9 +4537,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -4558,9 +4558,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -4568,8 +4568,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -4591,7 +4591,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -4602,7 +4602,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -4619,7 +4619,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -4637,7 +4637,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -4774,7 +4774,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | (1<< 13) | (1<< 14) | (1<< 15) | 0);
         dataflow_impl(
@@ -4818,7 +4818,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -4838,9 +4838,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -4859,9 +4859,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -4869,8 +4869,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -4892,7 +4892,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -4903,7 +4903,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -4920,7 +4920,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -4938,7 +4938,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -5075,7 +5075,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | (1<< 13) | (1<< 14) | (1<< 15) | (1<< 16) | 0);
         dataflow_impl(
@@ -5119,7 +5119,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -5139,9 +5139,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -5160,9 +5160,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -5170,8 +5170,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -5193,7 +5193,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -5204,7 +5204,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -5221,7 +5221,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -5239,7 +5239,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -5376,7 +5376,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | (1<< 13) | (1<< 14) | (1<< 15) | (1<< 16) | (1<< 17) | 0);
         dataflow_impl(
@@ -5420,7 +5420,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -5440,9 +5440,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -5461,9 +5461,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -5471,8 +5471,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -5494,7 +5494,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -5505,7 +5505,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -5522,7 +5522,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -5540,7 +5540,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -5677,7 +5677,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | (1<< 13) | (1<< 14) | (1<< 15) | (1<< 16) | (1<< 17) | (1<< 18) | 0);
         dataflow_impl(
@@ -5721,7 +5721,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -5741,9 +5741,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -5762,9 +5762,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -5772,8 +5772,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -5795,7 +5795,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -5806,7 +5806,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -5823,7 +5823,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -5841,7 +5841,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -5938,8 +5938,8 @@
     struct dataflow_impl<
         Action
         , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19
-
-
+        
+        
       , Result
     >
         : ::hpx::lcos::base_lco_with_value<
@@ -5978,7 +5978,7 @@
             passed_args;
         typedef typename passed_args::results_type args_type;
         typedef typename passed_args::slot_to_args_map slot_to_args_map;
-
+        
         static const boost::uint32_t
             slots_completed = ((1<< 0) | (1<< 1) | (1<< 2) | (1<< 3) | (1<< 4) | (1<< 5) | (1<< 6) | (1<< 7) | (1<< 8) | (1<< 9) | (1<< 10) | (1<< 11) | (1<< 12) | (1<< 13) | (1<< 14) | (1<< 15) | (1<< 16) | (1<< 17) | (1<< 18) | (1<< 19) | 0);
         dataflow_impl(
@@ -6022,7 +6022,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(t[i], boost::move(r));
@@ -6042,9 +6042,9 @@
                 ;
         }
         typedef typename Action::result_type remote_result;
-
-
-
+        
+        
+        
         void set_value(BOOST_RV_REF(remote_result) r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
@@ -6063,9 +6063,9 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 std::swap(targets, t);
             }
-
-
-
+            
+            
+            
             for (std::size_t i = 0; i < t.size(); ++i)
             {
                 typedef typename lco_type::set_value_action action_type;
@@ -6073,8 +6073,8 @@
                 hpx::apply<action_type>(t[i], boost::move(tmp));
             }
         }
-
-
+        
+        
         void connect(naming::id_type const & target)
         {
             LLCO_(info)
@@ -6096,7 +6096,7 @@
                 }
                 else
                 {
-                    HPX_ASSERT(d.stores_value());
+                    HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
                     hpx::apply<action_type>(target, boost::move(r));
@@ -6107,7 +6107,7 @@
                 targets.push_back(target);
             }
         }
-
+        
         template <int Slot, typename A>
         void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
         {
@@ -6124,7 +6124,7 @@
             future_slots.push_back(c);
             (*c)->connect_();
         };
-
+        
         template <
             int Slot
           , typename A
@@ -6142,7 +6142,7 @@
             >(slots) = boost::forward<A>(a);
             maybe_apply<Slot>();
         };
-
+        
         template <
             int Slot
           , typename A

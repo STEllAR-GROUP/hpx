@@ -93,17 +93,15 @@ namespace hpx
             func();
         }
         catch (hpx::exception const& e) {
-            if (e.get_error() != hpx::thread_interrupted) {
-                // Verify that there are no more registered locks for this
-                // OS-thread. This will throw if there are still any locks
-                // held.
-                util::force_error_on_lock();
+            // Verify that there are no more registered locks for this
+            // OS-thread. This will throw if there are still any locks
+            // held.
+            util::force_error_on_lock();
 
-                // run all callbacks attached to the exit event for this thread
-                run_thread_exit_callbacks();
+            // run all callbacks attached to the exit event for this thread
+            run_thread_exit_callbacks();
 
-                throw;    // rethrow any exception except 'thread_interrupted'
-            }
+            throw;    // rethrow any exception except 'thread_interrupted'
         }
 
         // Verify that there are no more registered locks for this
@@ -273,7 +271,7 @@ namespace hpx
                 mutex_type::scoped_lock l(this->mtx_);
                 if (!this->is_ready()) {
                     threads::interrupt_thread(id_);
-                    this->set_error(thread_interrupted,
+                    this->set_error(thread_cancelled,
                         "thread_task_base::cancel",
                         "future has been canceled");
                     id_ = threads::invalid_thread_id;

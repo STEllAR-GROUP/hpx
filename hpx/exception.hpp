@@ -505,6 +505,73 @@ namespace hpx
         }
     };
 
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief A hpx::thread_interrupted is the exception type used by HPX to
+    ///        interrupt a running HPX thread.
+    ///
+    /// The \a hpx::thread_interrupted type is the exception type used by HPX to
+    /// interrupt a running thread.
+    ///
+    /// A running thread can be interrupted by invoking the interrupt() member
+    /// function of the corresponding hpx::thread object. When the interrupted
+    /// thread next executes one of the specified interruption points (or if it
+    /// is currently blocked whilst executing one) with interruption enabled,
+    /// then a hpx::thread_interrupted exception will be thrown in the interrupted
+    /// thread. If not caught, this will cause the execution of the interrupted
+    /// thread to terminate. As with any other exception, the stack will be
+    /// unwound, and destructors for objects of automatic storage duration will
+    /// be executed.
+    ///
+    /// If a thread wishes to avoid being interrupted, it can create an instance
+    /// of \a hpx::this_thread::disable_interruption. Objects of this class disable
+    /// interruption for the thread that created them on construction, and
+    /// restore the interruption state to whatever it was before on destruction.
+    ///
+    /// \code
+    ///     void f()
+    ///     {
+    ///         // interruption enabled here
+    ///         {
+    ///             hpx::this_thread::disable_interruption di;
+    ///             // interruption disabled
+    ///             {
+    ///                 hpx::this_thread::disable_interruption di2;
+    ///                 // interruption still disabled
+    ///             } // di2 destroyed, interruption state restored
+    ///             // interruption still disabled
+    ///         } // di destroyed, interruption state restored
+    ///         // interruption now enabled
+    ///     }
+    /// \endcode
+    ///
+    /// The effects of an instance of \a hpx::this_thread::disable_interruption can be
+    /// temporarily reversed by constructing an instance of
+    /// \a hpx::this_thread::restore_interruption, passing in the
+    /// \a hpx::this_thread::disable_interruption object in question. This will restore
+    /// the interruption state to what it was when the \a hpx::this_thread::disable_interruption
+    /// object was constructed, and then disable interruption again when the
+    /// \a hpx::this_thread::restore_interruption object is destroyed.
+    ///
+    /// \code
+    ///     void g()
+    ///     {
+    ///         // interruption enabled here
+    ///         {
+    ///             hpx::this_thread::disable_interruption di;
+    ///             // interruption disabled
+    ///             {
+    ///                 hpx::this_thread::restore_interruption ri(di);
+    ///                 // interruption now enabled
+    ///             } // ri destroyed, interruption disable again
+    ///         } // di destroyed, interruption state restored
+    ///         // interruption now enabled
+    ///     }
+    /// \endcode
+    ///
+    /// At any point, the interruption state for the current thread can be
+    /// queried by calling \a hpx::this_thread::interruption_enabled().
+    struct HPX_EXCEPTION_EXPORT thread_interrupted : std::exception {};
+
     /// \cond NODETAIL
     namespace detail
     {
@@ -690,11 +757,15 @@ namespace hpx
         HPX_EXPORT boost::exception_ptr
             construct_exception(Exception const& e,
                 std::string const& func, std::string const& file, long line,
-                std::string const& back_trace, boost::uint32_t node = 0,
+                std::string const& back_trace = "", boost::uint32_t node = 0,
                 std::string const& hostname = "", boost::int64_t pid = -1,
                 std::size_t shepherd = ~0, std::size_t thread_id = 0,
                 std::string const& thread_name = "",
                 std::string const& env = "", std::string const& config = "");
+
+        template <typename Exception>
+        HPX_EXPORT boost::exception_ptr
+            construct_lightweight_exception(Exception const& e);
 
         // main function for throwing exceptions
         template <typename Exception>

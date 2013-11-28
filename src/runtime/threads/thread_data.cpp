@@ -146,12 +146,7 @@ namespace hpx { namespace threads
 
             // now interrupt this thread
             if (throw_on_interrupt)
-            {
-                boost::throw_exception(
-                    hpx::exception(thread_interrupted,
-                        "thread aborts itself due to requested thread interruption",
-                        hpx::lightweight));
-            }
+                boost::throw_exception(hpx::thread_interrupted());
 
             return true;
         }

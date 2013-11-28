@@ -15,7 +15,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -25,7 +25,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -39,7 +39,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -49,7 +49,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -76,7 +76,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -86,7 +86,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -100,7 +100,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -110,7 +110,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -137,7 +137,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -147,7 +147,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -161,7 +161,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -171,7 +171,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -198,7 +198,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -208,7 +208,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -222,7 +222,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -232,7 +232,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -259,7 +259,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -269,7 +269,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -283,7 +283,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -293,7 +293,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -320,7 +320,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -330,7 +330,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -344,7 +344,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -354,7 +354,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -381,7 +381,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -391,7 +391,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -405,7 +405,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -415,7 +415,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -442,7 +442,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -452,7 +452,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -466,7 +466,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -476,7 +476,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -503,7 +503,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -513,7 +513,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -527,7 +527,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -537,7 +537,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -564,7 +564,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -574,7 +574,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -588,7 +588,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -598,7 +598,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -625,7 +625,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -635,7 +635,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -649,7 +649,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -659,7 +659,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -686,7 +686,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -696,7 +696,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -710,7 +710,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -720,7 +720,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -747,7 +747,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -757,7 +757,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -771,7 +771,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -781,7 +781,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -808,7 +808,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -818,7 +818,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -832,7 +832,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -842,7 +842,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -869,7 +869,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -879,7 +879,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -893,7 +893,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -903,7 +903,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -930,7 +930,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -940,7 +940,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -954,7 +954,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -964,7 +964,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -991,7 +991,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -1001,7 +1001,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -1015,7 +1015,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -1025,7 +1025,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -1052,7 +1052,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -1062,7 +1062,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -1076,7 +1076,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -1086,7 +1086,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -1113,7 +1113,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -1123,7 +1123,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -1137,7 +1137,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -1147,7 +1147,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -1174,7 +1174,7 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
         if (agas::is_local_address(gid, addr)) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -1184,7 +1184,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
@@ -1198,7 +1198,7 @@
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
-
+            
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
                     typename action_type::component_type>()));
@@ -1208,7 +1208,7 @@
             );
         }
         else {
-
+            
             hpx::applier::detail::apply_c_cb<action_type>(
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,

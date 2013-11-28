@@ -69,14 +69,15 @@ namespace hpx
         no_state = 41,                              ///< The future object has no valid shared state
         broken_promise = 42,                        ///< The promise has been deleted
         thread_resource_error = 43,                 ///<
-        thread_interrupted = 44,                    ///<
-        thread_not_interruptable = 45,              ///<
-        duplicate_component_id = 46,                ///< The component type has already been registered
-        unknown_error = 47,                         ///< An unknown error occurred
-        bad_plugin_type = 48,                       ///< The specified plugin type is not known or otherwise invalid
-        security_error = 49,                        ///< An error occurred in the security component
-        filesystem_error = 50,                      ///< The specified file does not exist or other filesystem related error
-        bad_function_call = 51,                     ///< equivalent of std::bad_function_call
+        future_cancelled = 44,                      ///<
+        thread_cancelled = 45,                      ///<
+        thread_not_interruptable = 46,              ///<
+        duplicate_component_id = 47,                ///< The component type has already been registered
+        unknown_error = 48,                         ///< An unknown error occurred
+        bad_plugin_type = 49,                       ///< The specified plugin type is not known or otherwise invalid
+        security_error = 50,                        ///< An error occurred in the security component
+        filesystem_error = 51,                      ///< The specified file does not exist or other filesystem related error
+        bad_function_call = 52,                     ///< equivalent of std::bad_function_call
 
         /// \cond NOINTERNAL
         last_error,
@@ -131,14 +132,15 @@ namespace hpx
         /* 41 */ "no_state",
         /* 42 */ "broken_promise",
         /* 43 */ "thread_resource_error",
-        /* 44 */ "thread_interrupted",
-        /* 45 */ "thread_not_interruptable",
-        /* 46 */ "duplicate_component_id",
-        /* 47 */ "unknown_error",
-        /* 48 */ "bad_plugin_type",
-        /* 49 */ "security_error",
-        /* 50 */ "filesystem_error",
-        /* 51 */ "bad_function_call",
+        /* 44 */ "future_cancelled",
+        /* 45 */ "thread_cancelled",
+        /* 46 */ "thread_not_interruptable",
+        /* 47 */ "duplicate_component_id",
+        /* 48 */ "unknown_error",
+        /* 49 */ "bad_plugin_type",
+        /* 50 */ "security_error",
+        /* 51 */ "filesystem_error",
+        /* 52 */ "bad_function_call",
 
         /*    */ ""
     };
