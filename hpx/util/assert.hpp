@@ -29,7 +29,7 @@
 
 namespace hpx
 {
-  void assertion_failed(char const * expr,
+  HPX_EXPORT void assertion_failed(char const * expr,
                         char const * function, char const * file, long line); // user defined
 } // namespace hpx
 
@@ -59,7 +59,7 @@ namespace hpx
 
   namespace hpx
   {
-    void assertion_failed_msg(char const * expr, char const * msg,
+    HPX_EXPORT void assertion_failed_msg(char const * expr, char const * msg,
                               char const * function, char const * file, long line); // user defined
   } // namespace hpx
 
