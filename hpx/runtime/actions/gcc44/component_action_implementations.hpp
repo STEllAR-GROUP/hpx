@@ -102,6 +102,9 @@ namespace hpx { namespace actions
                     (get_lva<Component>::call(lva)->*F)(
                         HPX_ENUM_MOVE_ARGS(N, arg));
                 }
+                catch (hpx::thread_interrupted const&) {
+                    /* swallow this exception */
+                }
                 catch (hpx::exception const& e) {
                     LTM_(error)
                         << "Unhandled exception while executing component action("
@@ -337,6 +340,9 @@ namespace hpx { namespace actions
                     // out of the bound object.
                     (get_lva<Component>::call(lva)->*F)(
                         HPX_ENUM_MOVE_ARGS(N, arg));
+                }
+                catch (hpx::thread_interrupted const&) {
+                    /* swallow this exception */
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)

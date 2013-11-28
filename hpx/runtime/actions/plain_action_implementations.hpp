@@ -112,6 +112,9 @@ namespace hpx { namespace actions
                     // call the function, ignoring the return value
                     F(HPX_ENUM_MOVE_ARGS(N, arg));
                 }
+                catch (hpx::thread_interrupted const&) {
+                    /* swallow this exception */
+                }
                 catch (hpx::exception const& e) {
                     LTM_(error)
                         << "Unhandled exception while executing plain action("
@@ -306,6 +309,9 @@ namespace hpx { namespace actions
 
                     // call the function, ignoring the return value
                     F(HPX_ENUM_MOVE_ARGS(N, arg));
+                }
+                catch (hpx::thread_interrupted const&) {
+                    /* swallow this exception */
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)
