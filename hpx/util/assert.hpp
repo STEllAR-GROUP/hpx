@@ -1,18 +1,19 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
-//  Copyright (c) 2011      Bryce Lelbach
+//  Copyright (c) 2013 Antoine Tran Tan
+//  Copyright (c) 2001, 2002 Peter Dimov and Multi Media Ltd.
+//  Copyright (c) 2007 Peter Dimov
+//  Copyright (c) Beman Dawes 2011
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file assert.hpp
+//  Note: There are no include guards. This is intentional.
 
-#if !defined(HPX_UTIL_ASSERT_MAR_24_2008_0929AM)
-#define HPX_UTIL_ASSERT_MAR_24_2008_0929AM
+/// \file assert.hpp
 
 #include <hpx/config/branch_hints.hpp>
 
 //--------------------------------------------------------------------------------------//
-//                                     HPX_ASSERT                                     //
+//                                     HPX_ASSERT                                       //
 //--------------------------------------------------------------------------------------//
 
 #undef HPX_ASSERT
@@ -23,7 +24,7 @@
 
 #elif defined(HPX_ENABLE_ASSERT_HANDLER) || defined(BOOST_ENABLE_ASSERT_HANDLER)
 
-#include <boost/config.hpp>
+#include <hpx/config.hpp>
 #include <boost/current_function.hpp>
 
 namespace hpx
@@ -42,7 +43,7 @@ namespace hpx
 #endif
 
 //--------------------------------------------------------------------------------------//
-//                                   HPX_ASSERT_MSG                                   //
+//                                   HPX_ASSERT_MSG                                     //
 //--------------------------------------------------------------------------------------//
 
 # undef HPX_ASSERT_MSG
@@ -53,7 +54,7 @@ namespace hpx
 
 #elif defined(HPX_ENABLE_ASSERT_HANDLER) || defined(BOOST_ENABLE_ASSERT_HANDLER)
 
-  #include <boost/config.hpp>
+  #include <hpx/config.hpp>
   #include <boost/current_function.hpp>
 
   namespace hpx
@@ -71,7 +72,7 @@ namespace hpx
     #define HPX_ASSERT_HPP
     #include <cstdlib>
     #include <iostream>
-    #include <boost/config.hpp>
+    #include <hpx/config.hpp>
     #include <boost/current_function.hpp>
 
     //  IDE's like Visual Studio perform better if output goes to std::cout or
@@ -114,7 +115,7 @@ namespace hpx
 #endif
 
 //--------------------------------------------------------------------------------------//
-//                                     HPX_VERIFY                                     //
+//                                     HPX_VERIFY                                       //
 //--------------------------------------------------------------------------------------//
 
 #undef HPX_VERIFY
@@ -130,4 +131,3 @@ namespace hpx
 
 #endif
 
-#endif
