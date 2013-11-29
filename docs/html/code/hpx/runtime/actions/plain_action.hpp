@@ -79,6 +79,9 @@ namespace hpx { namespace actions
                             << ").";
                 F();      // call the function, ignoring the return value
             }
+            catch (hpx::thread_interrupted const&) {
+                /* swallow this exception */
+            }
             catch (hpx::exception const& e) {
                 LTM_(error)
                     << "Unhandled exception while executing plain action("
@@ -243,6 +246,9 @@ namespace hpx { namespace actions
                             << detail::get_action_name<Derived>()
                             << ").";
                 F();      // call the function, ignoring the return value
+            }
+            catch (hpx::thread_interrupted const&) {
+                /* swallow this exception */
             }
             catch (hpx::exception const& e) {
                 LTM_(error)

@@ -52,6 +52,9 @@ namespace hpx { namespace actions
                     (get_lva<Component>::call(lva)->*F)(
                         boost::move(arg0));
                 }
+                catch (hpx::thread_interrupted const&) {
+                     
+                }
                 catch (hpx::exception const& e) {
                     LTM_(error)
                         << "Unhandled exception while executing component action("
@@ -268,6 +271,9 @@ namespace hpx { namespace actions
                     (get_lva<Component>::call(lva)->*F)(
                         boost::move(arg0));
                 }
+                catch (hpx::thread_interrupted const&) {
+                     
+                }
                 catch (hpx::exception const& e) {
                     LTM_(error)
                         << "Unhandled exception while executing component action("
@@ -482,6 +488,9 @@ namespace hpx { namespace actions
                     
                     (get_lva<Component>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1));
+                }
+                catch (hpx::thread_interrupted const&) {
+                     
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)
@@ -699,6 +708,9 @@ namespace hpx { namespace actions
                     (get_lva<Component>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1));
                 }
+                catch (hpx::thread_interrupted const&) {
+                     
+                }
                 catch (hpx::exception const& e) {
                     LTM_(error)
                         << "Unhandled exception while executing component action("
@@ -913,6 +925,9 @@ namespace hpx { namespace actions
                     
                     (get_lva<Component>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
+                }
+                catch (hpx::thread_interrupted const&) {
+                     
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)
@@ -1130,6 +1145,9 @@ namespace hpx { namespace actions
                     (get_lva<Component>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
                 }
+                catch (hpx::thread_interrupted const&) {
+                     
+                }
                 catch (hpx::exception const& e) {
                     LTM_(error)
                         << "Unhandled exception while executing component action("
@@ -1344,6 +1362,9 @@ namespace hpx { namespace actions
                     
                     (get_lva<Component>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
+                }
+                catch (hpx::thread_interrupted const&) {
+                     
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)
@@ -1561,6 +1582,9 @@ namespace hpx { namespace actions
                     (get_lva<Component>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
                 }
+                catch (hpx::thread_interrupted const&) {
+                     
+                }
                 catch (hpx::exception const& e) {
                     LTM_(error)
                         << "Unhandled exception while executing component action("
@@ -1775,6 +1799,9 @@ namespace hpx { namespace actions
                     
                     (get_lva<Component>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
+                }
+                catch (hpx::thread_interrupted const&) {
+                     
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)
@@ -1991,6 +2018,9 @@ namespace hpx { namespace actions
                     
                     (get_lva<Component>::call(lva)->*F)(
                         boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
+                }
+                catch (hpx::thread_interrupted const&) {
+                     
                 }
                 catch (hpx::exception const& e) {
                     LTM_(error)

@@ -53,6 +53,9 @@ namespace hpx { namespace actions
                                 (get_lva<Component const>::call(lva)) << ")";
                 (get_lva<Component const>::call(lva)->*F)();      // just call the function
             }
+            catch (hpx::thread_interrupted const&) {
+                /* swallow this exception */
+            }
             catch (hpx::exception const& e) {
                 LTM_(error)
                     << "Unhandled exception while executing component action("
@@ -246,6 +249,9 @@ namespace hpx { namespace actions
                             << ") lva(" << reinterpret_cast<void const*>
                                 (get_lva<Component const>::call(lva)) << ")";
                 (get_lva<Component const>::call(lva)->*F)();      // just call the function
+            }
+            catch (hpx::thread_interrupted const&) {
+                /* swallow this exception */
             }
             catch (hpx::exception const& e) {
                 LTM_(error)

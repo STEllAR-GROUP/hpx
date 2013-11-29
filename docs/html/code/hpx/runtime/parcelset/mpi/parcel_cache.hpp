@@ -82,7 +82,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             }
 
             std::string array_optimization =
-                get_config_entry("hpx.parcel.array_optimization", "1");
+                get_config_entry("hpx.parcel.mpi.array_optimization", "1");
             if (boost::lexical_cast<int>(array_optimization) == 0)
                 archive_flags_ |= util::disable_array_optimization;
 

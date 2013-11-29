@@ -116,15 +116,6 @@ if(NOT MSVC)
   set(boost_library_dependencies ${boost_library_dependencies} ${BOOST_THREAD_LIBRARY})
 endif()
 
-set(boost_tls_overhead_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies})
-
-set(native_tls_overhead_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies})
-
-set(hpx_tls_overhead_FLAGS NOLIBS
-    DEPENDENCIES ${boost_library_dependencies})
-
 set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
 set(hpx_homogeneous_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
 set(hpx_homogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_timed_lib)

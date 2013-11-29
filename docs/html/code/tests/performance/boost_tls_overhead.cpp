@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+#include <hpx/config.hpp>
+
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>

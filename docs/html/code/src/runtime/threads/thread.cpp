@@ -92,7 +92,10 @@ namespace hpx
         try {
             func();
         }
-        catch (hpx::exception const& e) {
+        catch (hpx::thread_interrupted const&) {
+            /* swallow this exception */
+        }
+        catch (hpx::exception const&) {
             // Verify that there are no more registered locks for this
             // OS-thread. This will throw if there are still any locks
             // held.
