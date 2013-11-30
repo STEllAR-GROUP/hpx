@@ -105,7 +105,8 @@
 //
 // It is the last item (d) which is the most difficult to implement. This is
 // because part of the requested credit may already have been split again and
-// sent to any of the other localities.
+// sent to any of the other localities before the acknowledgement from AGAS
+// arrives.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -296,7 +297,7 @@ namespace hpx { namespace naming
                     //       keeps this instance alive as it is passed along
                     //       as the keep_alive parameter
                     retrieve_new_credits(
-                        const_cast<id_type_impl&>(*this), HPX_INITIAL_GLOBALCREDIT,
+                        const_cast<id_type_impl&>(*this), HPX_GLOBALCREDIT_INITIAL,
                         id_type(const_cast<id_type_impl*>(this)), l);
                 }
                 return newid;
@@ -319,7 +320,7 @@ namespace hpx { namespace naming
                 // note: the future returned by retrieve_new_credits()
                 //       keeps this instance alive as it is passed along
                 //       as the keep_alive parameter
-                retrieve_new_credits(*this, HPX_INITIAL_GLOBALCREDIT,
+                retrieve_new_credits(*this, HPX_GLOBALCREDIT_INITIAL,
                     id_type(this), l);
             }
         }
