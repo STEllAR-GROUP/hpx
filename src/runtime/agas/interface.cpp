@@ -392,16 +392,6 @@ void decref(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void incref_apply(
-    naming::gid_type const& lower
-  , naming::gid_type const& upper
-  , boost::int64_t credits
-  )
-{
-    naming::resolver_client& resolver = naming::get_agas_client();
-    resolver.incref_apply(lower, upper, credits);
-}
-
 hpx::future<bool> incref_async(
     naming::gid_type const& lower
   , naming::gid_type const& upper

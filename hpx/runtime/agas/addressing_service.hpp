@@ -1090,12 +1090,6 @@ public:
       , naming::id_type const& keep_alive = naming::invalid_id
         );
 
-    void incref_apply(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
-      , boost::int64_t credits = 1
-        );
-
     bool incref(
         naming::gid_type const& lower
       , naming::gid_type const& upper

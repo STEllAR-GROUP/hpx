@@ -266,12 +266,6 @@ inline void decref(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT void incref_apply(
-    naming::gid_type const& lower
-  , naming::gid_type const& upper
-  , boost::int64_t credits
-  );
-
 HPX_API_EXPORT hpx::future<bool> incref_async(
     naming::gid_type const& lower
   , naming::gid_type const& upper

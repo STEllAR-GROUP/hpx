@@ -1591,29 +1591,6 @@ void addressing_service::route(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void addressing_service::incref_apply(
-    naming::gid_type const& lower
-  , naming::gid_type const& upper
-  , boost::int64_t credit
-    )
-{ // {{{ incref implementation
-    if (HPX_UNLIKELY(0 >= credit))
-    {
-        HPX_THROW_EXCEPTION(bad_parameter
-          , "addressing_service::incref_apply"
-          , boost::str(boost::format("invalid credit count of %1%") % credit));
-        return;
-    }
-
-    request req(primary_ns_change_credit_non_blocking, lower, upper, credit);
-    naming::id_type target(
-        stubs::primary_namespace::get_service_instance(lower)
-      , naming::id_type::unmanaged);
-
-    stubs::primary_namespace::service_non_blocking(target, req, action_priority_);
-} // }}}
-
-///////////////////////////////////////////////////////////////////////////////
 static bool synchronize_with_async_incref(
     hpx::future<std::vector<hpx::future<bool> > >& futures
   , naming::id_type const& keep_alive
