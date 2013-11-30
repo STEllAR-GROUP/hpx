@@ -1605,37 +1605,6 @@ static bool synchronize_with_async_incref(
     return true;
 }
 
-template <
-    typename T
->
-struct incrementer
-{
-  private:
-    T const amount_;
-
-  public:
-    explicit incrementer(
-        T const& amount
-        )
-      : amount_(amount)
-    {
-        BOOST_ASSERT(amount);
-    }
-
-    incrementer(
-        incrementer const& other
-        )
-      : amount_(other.amount_)
-    {}
-
-    void operator()(
-        T& v
-        ) const
-    {
-        v += amount_;
-    }
-};
-
 lcos::future<bool> addressing_service::incref_async(
     naming::gid_type const& lower
   , naming::gid_type const& upper
@@ -1659,7 +1628,7 @@ lcos::future<bool> addressing_service::incref_async(
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
         naming::gid_type lower_raw = naming::detail::get_stripped_gid(lower);
-        naming::gid_type upper_raw = naming::detail::get_stripped_gid(lower);
+        naming::gid_type upper_raw = naming::detail::get_stripped_gid(upper);
 
         refcnt_requests_->apply(lower_raw, upper_raw
           , util::incrementer<boost::int64_t>(credit));
@@ -1671,16 +1640,11 @@ lcos::future<bool> addressing_service::incref_async(
         std::pair<iterator, iterator> matches
             = refcnt_requests_->find(lower_raw, upper_raw);
 
-        for (; matches.first != matches.second; matches.first++)
+        // Collect all entries which require to increment the refcnt, those
+        // need ot be handled immediately.
+        while (matches.first != matches.second)
         {
-            key_type& match_key = matches.first->key_;
             data_type& match_data = matches.first->data_;
-
-            if (0 < match_data)
-            {        
-                incref_list.push_back(mapping(match_key, match_data)); 
-                refcnt_requests_->erase(matches.first++); 
-            }
 
             if (HPX_UNLIKELY(0 > match_data))
             {
@@ -1688,19 +1652,31 @@ lcos::future<bool> addressing_service::incref_async(
                   , "addressing_service::incref_async"
                   , boost::str(boost::format("invalid credit count of %1%") % credit));
                 return lcos::future<bool>();
-            } 
+            }
+
+            if (0 < match_data)
+            {
+                iterator current = matches.first++;
+
+                incref_list.push_back(mapping(current->key_, match_data));
+                refcnt_requests_->erase(current);
+            }
+            else
+            {
+                ++matches.first;
+            }
         }
     }
 
     std::vector<lcos::future<bool> > futures;
+
     // FIXME: Use bulk requests.
-    BOOST_FOREACH(mapping const& e, incref_list)  
+    BOOST_FOREACH(mapping const& e, incref_list)
     {
         naming::gid_type const e_lower = boost::icl::lower(e.key());
-        naming::gid_type const e_upper = boost::icl::upper(e.key());
-    
+
         request req(primary_ns_change_credit_non_blocking,
-            e_lower, e_upper, e.data());
+            e_lower, boost::icl::upper(e.key()), e.data());
         naming::id_type target(
             stubs::primary_namespace::get_service_instance(e_lower)
           , naming::id_type::unmanaged);
@@ -1710,8 +1686,8 @@ lcos::future<bool> addressing_service::incref_async(
     }
 
     using HPX_STD_PLACEHOLDERS::_1;
-    return when_all(futures).then
-        (HPX_STD_BIND(synchronize_with_async_incref, _1, keep_alive));
+    return when_all(futures).then(
+        HPX_STD_BIND(synchronize_with_async_incref, _1, keep_alive));
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1751,7 +1727,7 @@ void addressing_service::decref(
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
         naming::gid_type lower_raw = naming::detail::get_stripped_gid(lower);
-        naming::gid_type upper_raw = naming::detail::get_stripped_gid(lower);
+        naming::gid_type upper_raw = naming::detail::get_stripped_gid(upper);
 
         refcnt_requests_->apply(lower_raw, upper_raw
           , util::decrementer<boost::int64_t>(credit));
