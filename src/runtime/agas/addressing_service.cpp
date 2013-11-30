@@ -1811,10 +1811,10 @@ lcos::future<bool> addressing_service::register_name_async(
         if (0 == naming::detail::get_credit_from_gid(new_gid))
         {
             HPX_ASSERT(1 == naming::detail::get_credit_from_gid(mutable_gid));
-            naming::get_agas_client().incref(new_gid, 2 * HPX_INITIAL_GLOBALCREDIT);
+            naming::get_agas_client().incref(new_gid, 2 * HPX_GLOBALCREDIT_INITIAL);
 
-            naming::detail::add_credit_to_gid(new_gid, HPX_INITIAL_GLOBALCREDIT);
-            naming::detail::add_credit_to_gid(mutable_gid, HPX_INITIAL_GLOBALCREDIT);
+            naming::detail::add_credit_to_gid(new_gid, HPX_GLOBALCREDIT_INITIAL);
+            naming::detail::add_credit_to_gid(mutable_gid, HPX_GLOBALCREDIT_INITIAL);
         }
     }
     else {

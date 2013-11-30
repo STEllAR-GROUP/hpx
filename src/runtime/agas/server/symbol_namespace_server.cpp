@@ -369,11 +369,11 @@ response symbol_namespace::resolve(
             // the credit tentatively to the map entry to avoid that it is deleted
             // while the lock is relinquished. If the incref fails we try to recover
             // afterwards.
-            naming::detail::add_credit_to_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
+            naming::detail::add_credit_to_gid(it->second, HPX_GLOBALCREDIT_INITIAL);
 
             {
                 hpx::util::scoped_unlock<mutex_type::scoped_lock> ull(l);
-                naming::get_agas_client().incref(gid, 2 * HPX_INITIAL_GLOBALCREDIT, ec);
+                naming::get_agas_client().incref(gid, 2 * HPX_GLOBALCREDIT_INITIAL, ec);
             }
 
             if (ec)
@@ -395,7 +395,7 @@ response symbol_namespace::resolve(
                 }
 
                 // remove the tentativley added credit, if its still in place
-                if (naming::detail::get_credit_from_gid(it->second) < HPX_INITIAL_GLOBALCREDIT)
+                if (naming::detail::get_credit_from_gid(it->second) < HPX_GLOBALCREDIT_INITIAL)
                 {
                     LAGAS_(debug) << (boost::format(
                         "symbol_namespace::resolve, can't remove credit from map entry, "
@@ -408,7 +408,7 @@ response symbol_namespace::resolve(
                                   , invalid_status);
                 }
 
-                naming::detail::remove_credit_from_gid(it->second, HPX_INITIAL_GLOBALCREDIT);
+                naming::detail::remove_credit_from_gid(it->second, HPX_GLOBALCREDIT_INITIAL);
 
                 LAGAS_(debug) << (boost::format(
                     "symbol_namespace::resolve, could not accquire additional credits for "
@@ -422,7 +422,7 @@ response symbol_namespace::resolve(
             }
 
             // since all went well we add the credit to the gid to return as well
-            naming::detail::add_credit_to_gid(gid, HPX_INITIAL_GLOBALCREDIT);
+            naming::detail::add_credit_to_gid(gid, HPX_GLOBALCREDIT_INITIAL);
 
             LAGAS_(debug) << (boost::format(
                 "symbol_namespace::resolve, incremented entry credits: "
