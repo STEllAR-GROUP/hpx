@@ -1622,13 +1622,34 @@ lcos::future<bool> addressing_service::incref_async(
 
     typedef refcnt_requests_type::value_type mapping;
 
-    std::list<mapping> incref_list;
+    std::vector<mapping> incref_list;
 
     {
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
         naming::gid_type lower_raw = naming::detail::get_stripped_gid(lower);
         naming::gid_type upper_raw = naming::detail::get_stripped_gid(upper);
+
+        if (HPX_UNLIKELY(lower_raw > upper_raw))
+        {
+            HPX_THROW_EXCEPTION(bad_parameter
+              , "addressing_service::incref_async"
+              , boost::str(boost::format("upper id limit (%1%) smaller than lower id limit (%2%)")
+                    % upper_raw % lower_raw));
+            return lcos::future<bool>();
+        }
+
+        naming::gid_type count(upper_raw-lower_raw+1);
+        if (HPX_UNLIKELY(count.get_msb() != 0))
+        {
+            HPX_THROW_EXCEPTION(bad_parameter
+              , "addressing_service::incref_async"
+              , boost::str(boost::format("can't handle id ranges larger than 64 bit (%1%)")
+                    % count));
+            return lcos::future<bool>();
+        }
+
+        incref_list.reserve(count.get_lsb());
 
         refcnt_requests_->apply(lower_raw, upper_raw
           , util::incrementer<boost::int64_t>(credit));
