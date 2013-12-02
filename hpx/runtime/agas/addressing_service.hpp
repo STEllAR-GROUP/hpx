@@ -27,6 +27,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/agas/incref_requests.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
@@ -81,6 +82,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_requests_type;
+    typedef detail::incref_requests incref_requests_type;
 
     struct bootstrap_data_type;
     struct hosted_data_type;
@@ -96,6 +98,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     mutex_type refcnt_requests_mtx_;
     std::size_t refcnt_requests_count_;
     boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
+    boost::shared_ptr<incref_requests_type> incref_requests_;
 
     service_mode const service_type;
     runtime_mode const runtime_type;

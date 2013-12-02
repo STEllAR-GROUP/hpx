@@ -208,6 +208,7 @@ addressing_service::addressing_service(
   , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
   , refcnt_requests_count_(0)
   , refcnt_requests_(new refcnt_requests_type)
+  , incref_requests_(new incref_requests_type)
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , caching_(ini_.get_agas_caching_mode())
