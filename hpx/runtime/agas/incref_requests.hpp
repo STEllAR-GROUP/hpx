@@ -62,7 +62,12 @@ namespace hpx { namespace agas { namespace detail
         bool add_remote_request(boost::int64_t credit, naming::gid_type const& gid,
             naming::id_type const& remote_locality);
 
-        void acknowledge_request(boost::int64_t credit, naming::id_type const& id);
+        typedef HPX_STD_FUNCTION<
+            bool(boost::int64_t, naming::id_type const&, naming::id_type const&)
+        > acknowledge_request_callback;
+
+        bool acknowledge_request(boost::int64_t credit, naming::id_type const& id,
+             acknowledge_request_callback const& f);
 
     private:
         mutable mutex_type mtx_;

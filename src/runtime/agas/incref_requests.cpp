@@ -7,6 +7,8 @@
 #include <hpx/runtime/agas/incref_requests.hpp>
 #include <hpx/util/assert.hpp>
 
+#include <boost/foreach.hpp>
+
 namespace hpx { namespace agas { namespace detail
 {
     incref_requests::iterator incref_requests::find_entry(
@@ -40,6 +42,11 @@ namespace hpx { namespace agas { namespace detail
         if (it != store_.end())
         {
             it->second.credit_ += credit;
+            if (it->second.credit_ == 0)
+            {
+                // this credit request was already handled, remove the entry
+                store_.erase(it);
+            }
         }
         else
         {
@@ -75,6 +82,7 @@ namespace hpx { namespace agas { namespace detail
         if (it_remote != store_.end())
         {
             it_remote->second.credit_ += credit;
+            HPX_ASSERT(it_remote->second.credit_ != 0);
         }
         else
         {
@@ -85,9 +93,67 @@ namespace hpx { namespace agas { namespace detail
         return true;
     }
 
-    void incref_requests::acknowledge_request(boost::int64_t credit,
-        naming::id_type const& id)
+    bool incref_requests::acknowledge_request(boost::int64_t credit,
+        naming::id_type const& id, acknowledge_request_callback const& f)
     {
+        HPX_ASSERT(credit > 0);
+        naming::gid_type const& gid = id.get_gid();
+
+        std::vector<incref_request_data> matching_data;
+
+        {
+            mutex_type::scoped_lock l(mtx_);
+
+            std::pair<iterator, iterator> r = store_.equal_range(gid);
+            while (r.first != r.second && credit != 0)
+            {
+                incref_request_data& data = r.first->second;
+                if (data.credit_ > credit)
+                {
+                    // adjust remaining part of the credit
+                    data.credit_ -= credit;
+
+                    // construct proper acknowledgement data
+                    matching_data.push_back(data);
+                    matching_data.back().credit_ = credit;
+
+                    // we're done with handling acknowledged credit
+                    credit = 0;
+
+                    ++r.first;
+                }
+                else
+                {
+                    // construct proper acknowledgement data
+                    matching_data.push_back(data);
+
+                    // adjust credit
+                    credit -= data.credit_;
+
+                    // delete the entry as it has been handled completely
+                    iterator it = r.first++;
+                    store_.erase(it);
+                }
+            }
+            HPX_ASSERT(credit >= 0);
+
+            if (credit != 0)
+            {
+                // add negative credit entry, we expect for a request to come
+                // in shortly
+                store_.insert(incref_requests_type::value_type(
+                    gid, incref_request_data(-credit, id, naming::invalid_id)));
+            }
+        }
+
+        // now handle all acknowledged credits
+        BOOST_FOREACH(incref_request_data const& data, matching_data)
+        {
+            if (!f(data.credit_, data.keep_alive_, data.locality_))
+                return false;
+        }
+
+        return true;
     }
 }}}
 

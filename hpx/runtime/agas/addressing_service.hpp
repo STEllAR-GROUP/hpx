@@ -209,6 +209,22 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     void* get_bootstrap_component_ns_ptr() const;
     void* get_bootstrap_symbol_ns_ptr() const;
 
+    bool synchronize_with_async_incref(
+        hpx::future<bool>& fut
+      , naming::id_type const& id
+      , boost::int64_t credit
+        );
+    bool synchronize_with_async_increfs(
+        hpx::future<std::vector<hpx::future<bool> > >& futures
+      , naming::id_type const& id
+      , boost::int64_t credit
+        );
+    bool propagate_incref_acknowlegdement(
+        boost::int64_t credit
+      , naming::id_type const& id
+      , naming::id_type const& loc
+        );
+
 protected:
     void launch_bootstrap(
         parcelset::parcelport& pp
@@ -1087,29 +1103,18 @@ public:
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     lcos::future<bool> incref_async(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
+        naming::gid_type const& gid
       , boost::int64_t credits = 1
       , naming::id_type const& keep_alive = naming::invalid_id
         );
 
     bool incref(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
+        naming::gid_type const& gid
       , boost::int64_t credits = 1
       , error_code& ec = throws
         )
     {
-        return incref_async(lower, upper, credits).get(ec);
-    }
-
-    bool incref(
-        naming::gid_type const& id
-      , boost::int64_t credits = 1
-      , error_code& ec = throws
-        )
-    {
-        return incref(id, id, credits, ec);
+        return incref_async(gid, credits).get(ec);
     }
 
     /// \brief Decrement the global reference count for the given id

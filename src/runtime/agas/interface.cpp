@@ -393,14 +393,13 @@ void decref(
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<bool> incref_async(
-    naming::gid_type const& lower
-  , naming::gid_type const& upper
+    naming::gid_type const& gid
   , boost::int64_t credits
   , naming::id_type const& keep_alive
   )
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    return resolver.incref_async(lower, upper, credits, keep_alive);
+    return resolver.incref_async(gid, credits, keep_alive);
 }
 
 }}

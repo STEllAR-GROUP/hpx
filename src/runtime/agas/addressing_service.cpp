@@ -1592,23 +1592,60 @@ void addressing_service::route(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-static bool synchronize_with_async_incref(
-    hpx::future<std::vector<hpx::future<bool> > >& futures
-  , naming::id_type const& keep_alive
+bool addressing_service::propagate_incref_acknowlegdement(
+    boost::int64_t credit
+  , naming::id_type const& id
+  , naming::id_type const& loc
     )
 {
-    std::vector<hpx::future<bool> > results = futures.get();
-
-    for (boost::uint64_t i = 0; i < results.size(); ++i)
-        if (!results[i].get())
-            return false;
-
     return true;
 }
 
+bool addressing_service::synchronize_with_async_increfs(
+    hpx::future<std::vector<hpx::future<bool> > >& futures
+  , naming::id_type const& id
+  , boost::int64_t credit
+    )
+{
+    // check the result from all incref requests
+    bool result = true;
+    std::vector<hpx::future<bool> > results = futures.get();
+    for (boost::uint64_t i = 0; i < results.size(); ++i)
+    {
+        result = results[i].get() && result;
+    }
+
+    // update all outstanding incref requests for the given id
+    using util::placeholders::_1;
+    using util::placeholders::_2;
+    using util::placeholders::_3;
+
+    return incref_requests_->acknowledge_request(credit, id,
+        util::bind(&addressing_service::propagate_incref_acknowlegdement,
+            this, _1, _2, _3)) && result;
+}
+
+bool addressing_service::synchronize_with_async_incref(
+    hpx::future<bool>& fut
+  , naming::id_type const& id
+  , boost::int64_t credit
+    )
+{
+    // check the result from the given incref request
+    bool result = fut.get();
+
+    // update all outstanding incref requests for the given id
+    using util::placeholders::_1;
+    using util::placeholders::_2;
+    using util::placeholders::_3;
+
+    return incref_requests_->acknowledge_request(credit, id,
+        util::bind(&addressing_service::propagate_incref_acknowlegdement,
+            this, _1, _2, _3)) && result;
+}
+
 lcos::future<bool> addressing_service::incref_async(
-    naming::gid_type const& lower
-  , naming::gid_type const& upper
+    naming::gid_type const& gid
   , boost::int64_t credit
   , naming::id_type const& keep_alive
     )
@@ -1624,58 +1661,38 @@ lcos::future<bool> addressing_service::incref_async(
     typedef refcnt_requests_type::value_type mapping;
 
     std::vector<mapping> incref_list;
+    incref_list.reserve(1);
 
     {
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
-        naming::gid_type lower_raw = naming::detail::get_stripped_gid(lower);
-        naming::gid_type upper_raw = naming::detail::get_stripped_gid(upper);
-
-        if (HPX_UNLIKELY(lower_raw > upper_raw))
-        {
-            HPX_THROW_EXCEPTION(bad_parameter
-              , "addressing_service::incref_async"
-              , boost::str(boost::format("upper id limit (%1%) smaller than lower id limit (%2%)")
-                    % upper_raw % lower_raw));
-            return lcos::future<bool>();
-        }
-
-        naming::gid_type count(upper_raw-lower_raw+1);
-        if (HPX_UNLIKELY(count.get_msb() != 0))
-        {
-            HPX_THROW_EXCEPTION(bad_parameter
-              , "addressing_service::incref_async"
-              , boost::str(boost::format("can't handle id ranges larger than 64 bit (%1%)")
-                    % count));
-            return lcos::future<bool>();
-        }
-
-        incref_list.reserve(count.get_lsb());
-
-        refcnt_requests_->apply(lower_raw, upper_raw
-          , util::incrementer<boost::int64_t>(credit));
+        naming::gid_type raw = naming::detail::get_stripped_gid(gid);
+        refcnt_requests_->apply(raw, raw, util::incrementer<boost::int64_t>(credit));
 
         typedef refcnt_requests_type::key_type key_type;
         typedef refcnt_requests_type::data_type data_type;
         typedef refcnt_requests_type::iterator iterator;
 
         std::pair<iterator, iterator> matches
-            = refcnt_requests_->find(lower_raw, upper_raw);
+            = refcnt_requests_->find(raw, raw);
 
-        // Collect all entries which require to increment the refcnt, those
-        // need ot be handled immediately.
-        while (matches.first != matches.second)
+        // make sure all available data is still consistent
+        for (iterator it = matches.first; it != matches.second; ++it)
         {
-            data_type& match_data = matches.first->data_;
-
-            if (HPX_UNLIKELY(0 > match_data))
+            if (HPX_UNLIKELY(0 > it->data_))
             {
                 HPX_THROW_EXCEPTION(bad_parameter
                   , "addressing_service::incref_async"
                   , boost::str(boost::format("invalid credit count of %1%") % credit));
                 return lcos::future<bool>();
             }
+        }
 
+        // Collect all entries which require to increment the refcnt, those
+        // need ot be handled immediately.
+        while (matches.first != matches.second)
+        {
+            data_type& match_data = matches.first->data_;
             if (0 < match_data)
             {
                 iterator current = matches.first++;
@@ -1688,9 +1705,13 @@ lcos::future<bool> addressing_service::incref_async(
                 ++matches.first;
             }
         }
+
+        // store the incref request as well
+        incref_requests_->add_request(credit, keep_alive);
     }
 
     std::vector<lcos::future<bool> > futures;
+    futures.reserve(incref_list.size());
 
     // FIXME: Use bulk requests.
     BOOST_FOREACH(mapping const& e, incref_list)
@@ -1707,9 +1728,17 @@ lcos::future<bool> addressing_service::incref_async(
             stubs::primary_namespace::service_async<bool>(target, req));
     }
 
-    using HPX_STD_PLACEHOLDERS::_1;
+    using util::placeholders::_1;
+    if (futures.size() == 1)
+    {
+        return futures[0].then(
+            util::bind(&addressing_service::synchronize_with_async_incref,
+                this, _1, keep_alive, credit));
+    }
+
     return when_all(futures).then(
-        HPX_STD_BIND(synchronize_with_async_incref, _1, keep_alive));
+        util::bind(&addressing_service::synchronize_with_async_increfs,
+            this, _1, keep_alive, credit));
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////

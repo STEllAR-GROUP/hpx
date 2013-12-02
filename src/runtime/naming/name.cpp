@@ -263,7 +263,7 @@ namespace hpx { namespace naming
             // the split gid. In the worst case this will cause a
             // memory leak. I'm not sure if it is possible to reliably
             // handle this problem.
-            return agas::incref_async(id, id, credit, keep_alive);
+            return agas::incref_async(id, credit, keep_alive);
         }
 
         ///////////////////////////////////////////////////////////////////////
