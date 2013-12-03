@@ -222,7 +222,6 @@ namespace hpx { namespace threads { namespace detail
                             }
 
                             tfunc_time = util::hardware::timestamp() - overall_timestamp;
-                            ++executed_threads;
                         }
                         else {
                             // some other worker-thread got in between and started
@@ -288,7 +287,10 @@ namespace hpx { namespace threads { namespace detail
                 // references go out of scope.
                 // REVIEW: what has to be done with depleted HPX threads?
                 if (state_val == depleted || state_val == terminated)
+                {
+                    ++executed_threads;
                     scheduler.SchedulingPolicy::destroy_thread(thrd, busy_loop_count);
+                }
 
                 tfunc_time = util::hardware::timestamp() - overall_timestamp;
             }
