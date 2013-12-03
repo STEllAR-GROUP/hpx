@@ -234,7 +234,7 @@ namespace hpx
             typedef boost::intrusive_ptr<thread_task_base> future_base_type;
 
         protected:
-            typedef future_data<void>::result_type result_type;
+            typedef lcos::detail::future_data<void>::result_type result_type;
 
         public:
             thread_task_base(threads::thread_id_type const& id)
