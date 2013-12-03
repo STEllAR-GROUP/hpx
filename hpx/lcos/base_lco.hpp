@@ -15,12 +15,6 @@
 
 #include <hpx/plugins/parcel/coalescing_message_handler.hpp>
 
-#if defined(HPX_HAVE_CXX11)
-#include <type_traits>
-#else
-#include <boost/type_traits.hpp>
-#endif
-
 #include <boost/mpl/bool.hpp>
 
 namespace hpx { namespace lcos

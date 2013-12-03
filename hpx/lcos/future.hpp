@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2013 Agustin Berge
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -134,27 +135,27 @@ namespace hpx { namespace lcos
     class future
     {
     public:
-        typedef lcos::detail::future_data_base<Result> future_data_type;
+        typedef lcos::detail::future_data<Result> future_data_type;
 
     private:
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            boost::intrusive_ptr<detail::future_data_base<Result_> > const&);
+            boost::intrusive_ptr<detail::future_data<Result_> > const&);
 
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result_> >));
+            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data<Result_> >));
 
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            detail::future_data_base<Result_>* p);
+            detail::future_data<Result_>* p);
 
         template <typename Result_>
-        friend detail::future_data_base<Result_>*
+        friend detail::future_data<Result_>*
             detail::get_future_data(lcos::future<Result_>&);
 
         template <typename Result_>
-        friend detail::future_data_base<Result_> const*
+        friend detail::future_data<Result_> const*
             detail::get_future_data(lcos::future<Result_> const&);
 
     private:
@@ -202,42 +203,6 @@ namespace hpx { namespace lcos
             future_data_ = boost::move(f.future_data_);
         }
 
-        // extension: init from given value, set future to ready right away
-        explicit future(Result const& init)
-        {
-            typedef lcos::detail::future_data<Result> impl_type;
-            boost::intrusive_ptr<future_data_type> p(new impl_type());
-            static_cast<impl_type*>(p.get())->set_data(init);
-            future_data_ = boost::move(p);
-        }
-
-        explicit future(BOOST_RV_REF(Result) init)
-        {
-            typedef lcos::detail::future_data<Result> impl_type;
-            boost::intrusive_ptr<future_data_type> p(new impl_type());
-            static_cast<impl_type*>(p.get())->set_data(boost::move(init));
-            future_data_ = boost::move(p);
-        }
-
-        // extension: support timed future creation
-        future(boost::posix_time::ptime const& at, Result const& init)
-          : future_data_(new lcos::detail::timed_future_data<Result>(at, init))
-        {}
-
-        future(boost::posix_time::ptime const& at, BOOST_RV_REF(Result) init)
-          : future_data_(new lcos::detail::timed_future_data<Result>(
-                at, boost::move(init)))
-        {}
-
-        future(boost::posix_time::time_duration const& d, Result const& init)
-          : future_data_(new lcos::detail::timed_future_data<Result>(d, init))
-        {}
-
-        future(boost::posix_time::time_duration const& d, BOOST_RV_REF(Result) init)
-          : future_data_(new lcos::detail::timed_future_data<Result>(
-                d, boost::move(init)))
-        {}
-
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this... defined at promise.hpp
         explicit future(promise_type& promise);
@@ -267,25 +232,38 @@ namespace hpx { namespace lcos
         }
 
         // retrieving the value
-        Result get() const
+        Result const& get() const
         {
             if (!future_data_) {
                 HPX_THROW_EXCEPTION(no_state,
                     "future<Result>::get",
                     "this future has no valid shared state");
             }
-            return future_data_->get_data();
+
+            typedef typename future_data_type::data_type data_type;
+            data_type& data = future_data_->get_result();
+
+            // no error has been reported, return the result
+            return data.get_value();
         }
 
-        Result get(error_code& ec) const
+        Result const& get(error_code& ec) const
         {
+            static result_type default_;
+
             if (!future_data_) {
                 HPX_THROWS_IF(ec, no_state,
                     "future<Result>::get",
                     "this future has no valid shared state");
-                return Result();
+                return default_;
             }
-            return future_data_->get_data(ec);
+
+            typedef typename future_data_type::data_type data_type;
+            data_type& data = future_data_->get_result(ec);
+            if (ec) return default_;
+
+            // no error has been reported, return the result
+            return data.get_value();
         }
 
     private:
@@ -306,40 +284,66 @@ namespace hpx { namespace lcos
         friend struct invalidate;
 
     public:
-        Result move(error_code& ec = throws)
+        Result move()
         {
             if (!future_data_) {
                 HPX_THROW_EXCEPTION(no_state,
-                    "future<Result>::get",
+                    "future<Result>::move",
                     "this future has no valid shared state");
             }
 
             invalidate on_exit(*this);
-            return future_data_->move_data(ec);
+
+            typedef typename future_data_type::data_type data_type;
+            data_type& data = future_data_->get_result();
+
+            // no error has been reported, return the result
+            return data.move_value();
+        }
+
+        Result move(error_code& ec)
+        {
+            static result_type default_;
+
+            if (!future_data_) {
+                HPX_THROWS_IF(ec, no_state,
+                    "future<Result>::move",
+                    "this future has no valid shared state");
+                return default_;
+            }
+
+            invalidate on_exit(*this);
+
+            typedef typename future_data_type::data_type data_type;
+            data_type& data = future_data_->get_result(ec);
+            if (ec) return default_;
+
+            // no error has been reported, return the result
+            return data.move_value();
         }
 
         // state introspection
         bool is_ready() const
         {
-            return future_data_ && future_data_->is_ready();
+            return future_data_ != 0 && future_data_->is_ready();
         }
 
         bool has_value() const
         {
-            return future_data_ && future_data_->has_value();
+            return future_data_ != 0 && future_data_->has_value();
         }
 
         bool has_exception() const
         {
-            return future_data_ && future_data_->has_exception();
+            return future_data_ != 0 && future_data_->has_exception();
         }
 
-        BOOST_SCOPED_ENUM(future_status) get_state() const
+        BOOST_SCOPED_ENUM(future_status) get_status() const
         {
             if (!future_data_)
                 return future_status::uninitialized;
 
-            return future_data_->get_state();
+            return future_data_->get_status();
         }
 
         // cancellation support
@@ -407,15 +411,6 @@ namespace hpx { namespace lcos
         typename detail::unwrapped_future_result<Result>::type
         unwrap(error_code& ec = throws);
 
-    private:
-        template <typename InnerResult, typename UnwrapResult>
-        void on_inner_ready(future<InnerResult>& inner,
-            boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p);
-
-        template <typename UnwrapResult>
-        void on_outer_ready(
-            boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p);
-
     protected:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
@@ -426,8 +421,13 @@ namespace hpx { namespace lcos
     future<typename util::decay<Result>::type>
     make_ready_future(BOOST_FWD_REF(Result) init)
     {
-        return future<typename util::decay<Result>::type>(
-            boost::forward<Result>(init));
+        typedef typename util::decay<Result>::type result_type;
+        typedef lcos::detail::future_data<result_type> future_data_type;
+
+        boost::intrusive_ptr<future_data_type> p(new future_data_type());
+        p->set_data(boost::forward<Result>(init));
+
+        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
     }
 
     // extension: create a pre-initialized future object which holds the
@@ -437,8 +437,10 @@ namespace hpx { namespace lcos
     make_error_future(boost::exception_ptr const& e)
     {
         typedef lcos::detail::future_data<Result> future_data_type;
+
         boost::intrusive_ptr<future_data_type> p(new future_data_type());
         p->set_exception(e);
+
         return lcos::detail::make_future_from_data<Result>(boost::move(p));
     }
 
@@ -449,8 +451,11 @@ namespace hpx { namespace lcos
     make_ready_future_at(boost::posix_time::ptime const& at,
         BOOST_FWD_REF(Result) init)
     {
-        return future<typename util::decay<Result>::type>(
-            at, boost::forward<Result>(init));
+        typedef typename util::decay<Result>::type result_type;
+        typedef lcos::detail::timed_future_data<result_type> future_data_type;
+
+        return lcos::detail::make_future_from_data<result_type>(
+            new future_data_type(at, boost::forward<Result>(init)));
     }
 
     template <typename Clock, typename Duration, typename Result>
@@ -458,7 +463,7 @@ namespace hpx { namespace lcos
     make_ready_future_at(boost::chrono::time_point<Clock, Duration> const& at,
         BOOST_FWD_REF(Result) init)
     {
-        return future<typename util::decay<Result>::type>(
+        return make_ready_future_at(
             util::to_ptime(at), boost::forward<Result>(init));
     }
 
@@ -467,8 +472,11 @@ namespace hpx { namespace lcos
     make_ready_future_after(boost::posix_time::time_duration const& d,
         BOOST_FWD_REF(Result) init)
     {
-        return future<typename util::decay<Result>::type>(
-            d, boost::forward<Result>(init));
+        typedef typename util::decay<Result>::type result_type;
+        typedef lcos::detail::timed_future_data<result_type> future_data_type;
+
+        return lcos::detail::make_future_from_data<result_type>(
+            new future_data_type(d, boost::forward<Result>(init)));
     }
 
     template <typename Rep, typename Period, typename Result>
@@ -476,7 +484,7 @@ namespace hpx { namespace lcos
     make_ready_future_after(boost::chrono::duration<Rep, Period> const& d,
         BOOST_FWD_REF(Result) init)
     {
-        return future<typename util::decay<Result>::type>(
+        return make_ready_future_at(
             util::to_time_duration(d), boost::forward<Result>(init));
     }
 
@@ -485,31 +493,29 @@ namespace hpx { namespace lcos
     class future<void>
     {
     public:
-        typedef lcos::detail::future_data_base<void> future_data_type;
+        typedef lcos::detail::future_data<void> future_data_type;
+        typedef future_data_type::data_type data_type;
 
     private:
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            boost::intrusive_ptr<detail::future_data_base<Result_> > const&);
+            boost::intrusive_ptr<detail::future_data<Result_> > const&);
 
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result_> >));
+            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data<Result_> >));
 
         template <typename Result_>
         friend lcos::future<Result_> detail::make_future_from_data(
-            detail::future_data_base<Result_>*);
+            detail::future_data<Result_>*);
 
         template <typename Result_>
-        friend detail::future_data_base<Result_>*
+        friend detail::future_data<Result_>*
             detail::get_future_data(lcos::future<Result_>&);
 
         template <typename Result_>
-        friend detail::future_data_base<Result_> const*
+        friend detail::future_data<Result_> const*
             detail::get_future_data(lcos::future<Result_> const&);
-
-        // make_future uses the dummy argument constructor below
-        friend future<void> make_ready_future();
 
     private:
         BOOST_COPYABLE_AND_MOVABLE(future)
@@ -526,15 +532,6 @@ namespace hpx { namespace lcos
           : future_data_(p)
         {
             p.reset();
-        }
-
-        explicit future(int)
-        {
-            boost::intrusive_ptr<future_data_type> p(
-                new lcos::detail::future_data<void>());
-            static_cast<lcos::detail::future_data<void> *>(p.get())->
-                set_data(util::unused);
-            future_data_ = boost::move(p);
         }
 
     public:
@@ -564,17 +561,6 @@ namespace hpx { namespace lcos
             future f = other.unwrap();
             future_data_ = boost::move(f.future_data_);
         }
-
-        // extension: support timed future creation
-        explicit future(boost::posix_time::ptime const& at)
-          : future_data_(new lcos::detail::timed_future_data<void>(
-                at, util::unused))
-        {}
-
-        explicit future(boost::posix_time::time_duration const& d)
-          : future_data_(new lcos::detail::timed_future_data<void>(
-                d, util::unused))
-        {}
 
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this... defined at promise.hpp
@@ -608,49 +594,52 @@ namespace hpx { namespace lcos
         void get(error_code& ec = throws) const
         {
             if (!future_data_) {
-                HPX_THROW_EXCEPTION(no_state,
+                HPX_THROWS_IF(ec, no_state,
                     "future<void>::get",
                     "this future has no valid shared state");
+                return;
             }
-            future_data_->get_data(ec);
+
+            future_data_->get_result(ec);
         }
 
         void move(error_code& ec = throws)
         {
             if (!future_data_) {
-                HPX_THROW_EXCEPTION(no_state,
+                HPX_THROWS_IF(ec, no_state,
                     "future<void>::get",
                     "this future has no valid shared state");
+                return;
             }
 
-            future_data_->move_data(ec);
+            future_data_->get_result(ec);
 
             // This resets the intrusive pointer itself, not the future_data_
-            future_data_.reset(); 
+            future_data_.reset();
         }
 
         // state introspection
         bool is_ready() const
         {
-            return future_data_->is_ready();
+            return future_data_ != 0 && future_data_->is_ready();
         }
 
         bool has_value() const
         {
-            return future_data_->has_value();
+            return future_data_ != 0 && future_data_->has_value();
         }
 
         bool has_exception() const
         {
-            return future_data_->has_exception();
+            return future_data_ != 0 && future_data_->has_exception();
         }
 
-        BOOST_SCOPED_ENUM(future_status) get_state() const
+        BOOST_SCOPED_ENUM(future_status) get_status() const
         {
             if (!future_data_)
                 return future_status::uninitialized;
 
-            return future_data_->get_state();
+            return future_data_->get_status();
         }
 
         // cancellation support
@@ -722,7 +711,12 @@ namespace hpx { namespace lcos
     // extension: create a pre-initialized future object
     inline future<void> make_ready_future()
     {
-        return future<void>(1);   // dummy argument
+        typedef lcos::detail::future_data<void> future_data_type;
+
+        boost::intrusive_ptr<future_data_type> p(new future_data_type());
+        p->set_data(util::unused);
+
+        return lcos::detail::make_future_from_data<void>(boost::move(p));
     }
 
     // extension: create a pre-initialized future object which gets ready at
@@ -730,27 +724,33 @@ namespace hpx { namespace lcos
     inline future<void> make_ready_future_at(
         boost::posix_time::ptime const& at)
     {
-        return future<void>(at);
+        typedef lcos::detail::timed_future_data<void> future_data_type;
+
+        return lcos::detail::make_future_from_data<void>(
+            new future_data_type(at, util::unused));
     }
 
     template <typename Clock, typename Duration>
     inline future<void> make_ready_future_at(
         boost::chrono::time_point<Clock, Duration> const& at)
     {
-        return future<void>(util::to_ptime(at));
+        return make_ready_future_at(util::to_ptime(at));
     }
 
     inline future<void> make_ready_future_after(
         boost::posix_time::time_duration const& d)
     {
-        return future<void>(d);
+        typedef lcos::detail::timed_future_data<void> future_data_type;
+
+        return lcos::detail::make_future_from_data<void>(
+            new future_data_type(d, util::unused));
     }
 
     template <typename Rep, typename Period>
     inline future<void> make_ready_future_at(
         boost::chrono::duration<Rep, Period> const& d)
     {
-        return future<void>(util::to_time_duration(d));
+        return make_ready_future_after(util::to_time_duration(d));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -758,34 +758,34 @@ namespace hpx { namespace lcos
     {
         template <typename Result>
         inline lcos::future<Result> make_future_from_data(
-            boost::intrusive_ptr<detail::future_data_base<Result> > const& p)
+            boost::intrusive_ptr<detail::future_data<Result> > const& p)
         {
             return lcos::future<Result>(p);
         }
 
         template <typename Result>
         inline lcos::future<Result> make_future_from_data( //-V659
-            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result> >) p)
+            BOOST_RV_REF(boost::intrusive_ptr<detail::future_data<Result> >) p)
         {
             return lcos::future<Result>(boost::move(p));
         }
 
         template <typename Result>
         inline lcos::future<Result> make_future_from_data(
-            detail::future_data_base<Result>* p)
+            detail::future_data<Result>* p)
         {
             return lcos::future<Result>(p);
         }
 
         template <typename Result>
-        inline detail::future_data_base<Result>*
+        inline detail::future_data<Result>*
             get_future_data(lcos::future<Result>& f)
         {
             return f.future_data_.get();
         }
 
         template <typename Result>
-        inline detail::future_data_base<Result> const*
+        inline detail::future_data<Result> const*
             get_future_data(lcos::future<Result> const& f)
         {
             return f.future_data_.get();
