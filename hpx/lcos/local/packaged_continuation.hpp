@@ -64,28 +64,6 @@ namespace hpx { namespace lcos { namespace detail
           : started_(false), id_(threads::invalid_thread_id)
         {}
 
-        // retrieving the value
-        result_type get(error_code& ec = throws)
-        {
-            if (!started_) {
-                lcos::future<ContResult> f =
-                    lcos::detail::make_future_from_data<ContResult>(this);
-                run(f, ec);
-            }
-            return this->get_data(ec);
-        }
-
-        // moving out the value
-        result_type move(error_code& ec = throws)
-        {
-            if (!started_) {
-                lcos::future<ContResult> f =
-                    lcos::detail::make_future_from_data<ContResult>(this);
-                run(f, ec);
-            }
-            return this->move_data(ec);
-        }
-
         template <typename Result>
         void run_impl(lcos::future<Result>& f);
 
@@ -350,6 +328,42 @@ namespace hpx { namespace lcos { namespace local
                 typename lcos::detail::future_traits<Source>::type
             >::type predicate;
             transfer_result(src, dest, predicate());
+        }
+        
+        ///////////////////////////////////////////////////////////////////////
+        template <typename InnerResult, typename UnwrapResult>
+        void unwrap_on_inner_ready(lcos::future<InnerResult>& inner,
+            boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p)
+        {
+            try {
+                local::detail::transfer_result(inner, *p);
+            }
+            catch (...) {
+                p->set_exception(boost::current_exception());
+            }
+        }
+
+        template <typename Result, typename UnwrapResult>
+        void unwrap_on_outer_ready(
+            lcos::future<Result>& outer,
+            boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p)
+        {
+            typedef typename lcos::detail::future_traits<Result>::type inner_result_type;
+
+            void (*inner_ready)(lcos::future<inner_result_type>&,
+                boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> >) =
+                    &unwrap_on_inner_ready<inner_result_type, UnwrapResult>;
+
+            try {
+                // if we get here, this future is ready
+                using util::placeholders::_1;
+
+                Result inner = outer.get();
+                inner.then(util::bind(inner_ready, _1, boost::move(p)));
+            }
+            catch(...) {
+                p->set_exception(boost::current_exception());
+            }
         }
     }
 
@@ -628,47 +642,11 @@ namespace hpx { namespace lcos
 
         // Bind an on_completed handler to this future which will wait for
         // the inner future and will transfer its result to the new future.
-        void (future::*outer_ready)(boost::intrusive_ptr<future_data_type>) =
-                &future::on_outer_ready<result_type>;
+        void (*outer_ready)(future&, boost::intrusive_ptr<future_data_type>) =
+            &local::detail::unwrap_on_outer_ready<Result, result_type>;
         future_data_->set_on_completed(util::bind(outer_ready, *this, p));
 
         return lcos::detail::make_future_from_data<result_type>(boost::move(p));
-    }
-
-    template <typename Result>
-    template <typename InnerResult, typename UnwrapResult>
-    void future<Result>::on_inner_ready(future<InnerResult>& inner,
-        boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p)
-    {
-        try {
-            local::detail::transfer_result(inner, *p);
-        }
-        catch (...) {
-            p->set_exception(boost::current_exception());
-        }
-    }
-
-    template <typename Result>
-    template <typename UnwrapResult>
-    void future<Result>::on_outer_ready(
-        boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> > p)
-    {
-        typedef typename lcos::detail::future_traits<Result>::type inner_result_type;
-
-        void (future::*inner_ready)(future<inner_result_type>&,
-            boost::intrusive_ptr<lcos::detail::future_data<UnwrapResult> >) =
-                &future::on_inner_ready<inner_result_type, UnwrapResult>;
-
-        try {
-            // if we get here, this future is ready
-            using util::placeholders::_1;
-
-            Result inner = get();
-            inner.then(util::bind(inner_ready, *this, _1, boost::move(p)));
-        }
-        catch(...) {
-            p->set_exception(boost::current_exception());
-        }
     }
 }}
 

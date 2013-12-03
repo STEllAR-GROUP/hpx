@@ -14,14 +14,12 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/ini.hpp>
-
-#if defined(HPX_HAVE_CXX11)
-#include <type_traits>
-#else
-#include <boost/type_traits.hpp>
-#endif
+#include <hpx/util/unused.hpp>
+#include <hpx/util/void_guard.hpp>
 
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 namespace hpx { namespace lcos
 {
@@ -35,6 +33,10 @@ namespace hpx { namespace lcos
     template <typename Result, typename RemoteResult>
     class base_lco_with_value : public base_lco
     {
+        typedef typename boost::mpl::if_<
+            boost::is_same<void, Result>, util::unused_type, Result
+        >::type result_type;
+
     protected:
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
@@ -47,7 +49,7 @@ namespace hpx { namespace lcos
 
         virtual void set_value (BOOST_RV_REF(RemoteResult) result) = 0;
 
-        virtual Result get_value() = 0;
+        virtual result_type const& get_value(error_code& ec = throws) = 0;
 
     public:
         // components must contain a typedef for wrapping_type defining the
@@ -83,7 +85,7 @@ namespace hpx { namespace lcos
         /// is overloaded by the derived concrete LCO.
         Result get_value_nonvirt()
         {
-            return get_value();
+            return util::void_guard<Result>(), get_value();
         }
 
     public:
