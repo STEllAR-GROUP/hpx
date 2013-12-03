@@ -432,21 +432,21 @@ namespace hpx { namespace util
                  "locality (default: 1, using 'all' will spawn one thread for "
                  "each processing unit")
                 ("hpx:cores", value<std::string>()->default_value("all"),
-                 "the number of cores to utilize for this HPX locality"
-                 "locality (default: 'all', i.e. the number of cores is based on"
-                 "the number of total cores in the system")
+                 "the number of cores to utilize for this HPX "
+                 "locality (default: 'all', i.e. the number of cores is based on "
+                 "the number of total cores in the system)")
                 ("hpx:queuing", value<std::string>(),
                   "the queue scheduling policy to use, options are 'global', "
                   "'local', 'priority_local', 'abp', 'priority_abp', "
                   "'hierarchy', 'static' and 'periodic' (default: priority_local); "
-                  "all option values can be abbreviated.")
+                  "all option values can be abbreviated)")
                 ("hpx:hierarchy-arity", value<std::size_t>(),
                   "the arity of the of the thread queue tree, valid for "
                    "--hpx:queuing=hierarchy only (default: 2)")
                 ("hpx:high-priority-threads", value<std::size_t>(),
                   "the number of operating system threads maintaining a high "
                   "priority queue (default: number of OS threads), valid for "
-                  "--hpx:queuing=priority_local and --hpx:queuing=priority_abp only")
+                  "--hpx:queuing=priority_local and --hpx:queuing=priority_abp only)")
                 ("hpx:numa-sensitive",
                   "makes the priority_local scheduler NUMA sensitive, valid for "
                   "--hpx:queuing=local and priority_local only")
