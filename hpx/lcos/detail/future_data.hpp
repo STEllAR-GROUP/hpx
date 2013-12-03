@@ -164,7 +164,7 @@ namespace detail
     };
 
     typedef boost::intrusive::member_hook<
-        queue_entry, typename queue_entry::hook_type,
+        queue_entry, queue_entry::hook_type,
         &queue_entry::list_hook_
     > list_option_type;
 
