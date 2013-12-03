@@ -100,7 +100,8 @@ int hpx_main(
         high_resolution_timer t;
 
         for (boost::uint64_t i = 0; i < tasks; ++i)
-            register_work(HPX_STD_BIND(&invoke_worker_timed, delay_sec));
+            register_work(HPX_STD_BIND(&invoke_worker_timed, delay_sec),
+                "invoke_worker_timed");
 
         // Reschedule hpx_main until all other hpx-threads have finished. We
         // should be resumed after most of the null px-threads have been

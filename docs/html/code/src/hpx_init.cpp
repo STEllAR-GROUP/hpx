@@ -1332,7 +1332,7 @@ namespace hpx
         if (0 == rt.get()) {
             HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
                 "the runtime system is not active (did you already "
-                "call hpx::finalize?)");
+                "call hpx::stop?)");
             return -1;
         }
 
