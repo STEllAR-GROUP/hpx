@@ -12,7 +12,7 @@
 
 namespace hpx
 {
-    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is the main, non-blocking entry point for any HPX application.
     /// This function (or one of its overloads below) should be called from the
@@ -30,7 +30,7 @@ namespace hpx
         return start(f, desc_cmdline, argc, argv, cfg, startup, shutdown, mode);
     }
 
-    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will be
@@ -46,7 +46,7 @@ namespace hpx
             argc, argv, startup, shutdown, mode);
     }
 
-    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
@@ -63,7 +63,27 @@ namespace hpx
             argc, argv, cfg, startup, shutdown, mode);
     }
 
-    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
+    ///
+    /// This is a simplified main, non-blocking entry point, which can be used
+    /// to set up the runtime for an HPX application (the runtime system will
+    /// be set up in console mode or worker mode depending on the command line
+    /// settings). It will return immediatly after that. Use `hpx::wait` and
+    /// `hpx::stop` to synchronize with the runtime system's execution.
+    inline bool
+    start(int argc, char** argv, std::vector<std::string> const& cfg,
+        hpx::runtime_mode mode)
+    {
+        using boost::program_options::options_description;
+
+        options_description desc_commandline(
+            "Usage: " HPX_APPLICATION_STRING " [options]");
+
+        HPX_STD_FUNCTION<void()> const empty;
+        return start(desc_commandline, argc, argv, cfg, empty, empty, mode);
+    }
+
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
@@ -79,7 +99,7 @@ namespace hpx
             argc, argv, empty, empty, mode);
     }
 
-    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
@@ -95,7 +115,7 @@ namespace hpx
             empty, empty, mode);
     }
 
-    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
@@ -108,7 +128,7 @@ namespace hpx
             HPX_APPLICATION_STRING, argc, argv, mode);
     }
 
-    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
@@ -130,7 +150,7 @@ namespace hpx
             1, dummy_argv, cfg, empty, empty, mode);
     }
 
-    /// \brief Main, non-blocking entry point for launching the HPX runtime system.
+    /// \brief Main non-blocking entry point for launching the HPX runtime system.
     ///
     /// This is a simplified main, non-blocking entry point, which can be used
     /// to set up the runtime for an HPX application (the runtime system will
