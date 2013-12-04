@@ -50,7 +50,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
     };
 
     /// counter function declarations
-
+    
     HPX_COMPONENT_EXPORT boost::int64_t get_initialized_count(bool);
     HPX_COMPONENT_EXPORT boost::int64_t get_constructed_count(bool);
     HPX_COMPONENT_EXPORT boost::int64_t get_fired_count(bool);
@@ -306,7 +306,7 @@ namespace hpx { namespace traits
         typedef typename Action::result_type remote_result;
 
         // This is called by our action after it executed. The argument is what
-        // has been calculated by the action. The result has to be sent to all
+        // has been calculated by the action. The result has to be sent to all 
         // connected dataflow instances.
         void set_value(BOOST_RV_REF(remote_result) r)
         {
@@ -477,10 +477,11 @@ namespace hpx { namespace traits
             this->set_value_nonvirt(remote_result());
         }
 
-        result_type get_value()
+        result_type const& get_value(error_code& ec = throws)
         {
             HPX_ASSERT(false);
-            return result_type();
+            static result_type default_;
+            return default_;
         }
 
         naming::id_type get_gid() const
