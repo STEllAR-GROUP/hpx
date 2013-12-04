@@ -144,7 +144,7 @@ namespace hpx { namespace lcos
                 threads::thread_id_type id = threads::get_self_id();
                 for (std::size_t i = 0; i != size; ++i)
                 {
-                    lcos::detail::future_data<T>* current =
+                    lcos::detail::future_data_base<T>* current =
                         get_future_data(lazy_values_[i]);
 
                     current->set_on_completed(

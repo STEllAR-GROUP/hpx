@@ -130,7 +130,7 @@ namespace hpx { namespace lcos { namespace local
                         >::type
                         future_result_type;
                     boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
+                        lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
                     next_future_data->set_on_completed(
@@ -191,7 +191,7 @@ namespace hpx { namespace lcos { namespace local
                         >::type
                         future_result_type;
                     boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
+                        lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
                     next_future_data->set_on_completed(
@@ -246,7 +246,7 @@ namespace hpx { namespace lcos { namespace local
                 return
                     lcos::detail::make_future_from_data(
                         boost::intrusive_ptr<
-                            lcos::detail::future_data<result_type>
+                            lcos::detail::future_data_base<result_type>
                         >(this)
                     );
             }
@@ -471,7 +471,7 @@ namespace hpx { namespace lcos { namespace local
                         >::type
                         future_result_type;
                     boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
+                        lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
                     next_future_data->set_on_completed(
@@ -532,7 +532,7 @@ namespace hpx { namespace lcos { namespace local
                         >::type
                         future_result_type;
                     boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
+                        lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
                     next_future_data->set_on_completed(
@@ -587,7 +587,7 @@ namespace hpx { namespace lcos { namespace local
                 return
                     lcos::detail::make_future_from_data(
                         boost::intrusive_ptr<
-                            lcos::detail::future_data<result_type>
+                            lcos::detail::future_data_base<result_type>
                         >(this)
                     );
             }
@@ -812,7 +812,7 @@ namespace hpx { namespace lcos { namespace local
                         >::type
                         future_result_type;
                     boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
+                        lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
                     next_future_data->set_on_completed(
@@ -873,7 +873,7 @@ namespace hpx { namespace lcos { namespace local
                         >::type
                         future_result_type;
                     boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
+                        lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
                     next_future_data->set_on_completed(
@@ -928,7 +928,7 @@ namespace hpx { namespace lcos { namespace local
                 return
                     lcos::detail::make_future_from_data(
                         boost::intrusive_ptr<
-                            lcos::detail::future_data<result_type>
+                            lcos::detail::future_data_base<result_type>
                         >(this)
                     );
             }
@@ -1153,7 +1153,7 @@ namespace hpx { namespace lcos { namespace local
                         >::type
                         future_result_type;
                     boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
+                        lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
                     next_future_data->set_on_completed(
@@ -1214,7 +1214,7 @@ namespace hpx { namespace lcos { namespace local
                         >::type
                         future_result_type;
                     boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
+                        lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
                     next_future_data->set_on_completed(
@@ -1269,7 +1269,7 @@ namespace hpx { namespace lcos { namespace local
                 return
                     lcos::detail::make_future_from_data(
                         boost::intrusive_ptr<
-                            lcos::detail::future_data<result_type>
+                            lcos::detail::future_data_base<result_type>
                         >(this)
                     );
             }
@@ -1494,7 +1494,7 @@ namespace hpx { namespace lcos { namespace local
                         >::type
                         future_result_type;
                     boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
+                        lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(*next);
                     next_future_data->set_on_completed(
@@ -1555,7 +1555,7 @@ namespace hpx { namespace lcos { namespace local
                         >::type
                         future_result_type;
                     boost::intrusive_ptr<
-                        lcos::detail::future_data<future_result_type>
+                        lcos::detail::future_data_base<future_result_type>
                     > next_future_data
                         = hpx::lcos::detail::get_future_data(f_);
                     next_future_data->set_on_completed(
@@ -1610,7 +1610,7 @@ namespace hpx { namespace lcos { namespace local
                 return
                     lcos::detail::make_future_from_data(
                         boost::intrusive_ptr<
-                            lcos::detail::future_data<result_type>
+                            lcos::detail::future_data_base<result_type>
                         >(this)
                     );
             }

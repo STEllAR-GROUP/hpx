@@ -178,11 +178,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -477,11 +476,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -779,11 +777,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -1081,11 +1078,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -1383,11 +1379,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -1685,11 +1680,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -1987,11 +1981,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -2289,11 +2282,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -2591,11 +2583,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -2893,11 +2884,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -3195,11 +3185,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -3497,11 +3486,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -3799,11 +3787,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -4101,11 +4088,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -4403,11 +4389,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {
@@ -4705,11 +4690,10 @@
         {
             this->set_value_nonvirt(remote_result());
         }
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
         naming::id_type get_gid() const
         {

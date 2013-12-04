@@ -71,10 +71,10 @@ namespace hpx { namespace components
         {}
 
         explicit client_base(naming::id_type const& gid)
-          : gid_(lcos::make_ready_future(gid))
+          : gid_(future_type(gid))
         {}
         explicit client_base(BOOST_RV_REF(naming::id_type) gid)
-          : gid_(lcos::make_ready_future(boost::move(gid)))
+          : gid_(future_type(boost::move(gid)))
         {}
 
         explicit client_base(future_type const& gid)

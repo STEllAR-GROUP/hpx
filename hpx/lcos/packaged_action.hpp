@@ -66,6 +66,8 @@ namespace hpx { namespace lcos
     private:
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef promise<Result, typename action_type::remote_result_type> base_type;
+        typedef typename base_type::completed_callback_type
+            completed_callback_type;
 
         struct profiler_tag {};
 
@@ -89,6 +91,15 @@ namespace hpx { namespace lcos
         /// called.
         packaged_action()
           : apply_logger_("packaged_action")
+        {
+            LLCO_(info) << "packaged_action::packaged_action("
+                        << hpx::actions::detail::get_action_name<action_type>()
+                        << ") args(0)";
+        }
+
+        explicit packaged_action(completed_callback_type const& data_sink)
+          : base_type(data_sink),
+            apply_logger_("packaged_action")
         {
             LLCO_(info) << "packaged_action::packaged_action("
                         << hpx::actions::detail::get_action_name<action_type>()
@@ -192,6 +203,8 @@ namespace hpx { namespace lcos
     private:
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef promise<Result, typename action_type::remote_result_type> base_type;
+        typedef typename base_type::completed_callback_type
+            completed_callback_type;
 
         struct profiler_tag {};
 
