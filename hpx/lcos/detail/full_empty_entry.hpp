@@ -26,13 +26,6 @@
 namespace hpx { namespace lcos { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    enum full_empty_state
-    {
-        empty = false,
-        full = true
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     // data structure holding all counters for full_empty entries
     struct full_empty_counter_data
     {
