@@ -64,28 +64,6 @@ namespace hpx { namespace lcos { namespace detail
           : started_(false), id_(threads::invalid_thread_id)
         {}
 
-        // retrieving the value
-        result_type get(error_code& ec = throws)
-        {
-            if (!started_) {
-                lcos::future<ContResult> f =
-                    lcos::detail::make_future_from_data<ContResult>(this);
-                run(f, ec);
-            }
-            return this->get_data(ec);
-        }
-
-        // moving out the value
-        result_type move(error_code& ec = throws)
-        {
-            if (!started_) {
-                lcos::future<ContResult> f =
-                    lcos::detail::make_future_from_data<ContResult>(this);
-                run(f, ec);
-            }
-            return this->move_data(ec);
-        }
-
         template <typename Result>
         void run_impl(lcos::future<Result>& f);
 

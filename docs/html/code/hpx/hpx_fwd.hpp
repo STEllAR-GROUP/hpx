@@ -628,6 +628,16 @@ namespace hpx
             template <typename ValueType>
             struct object_semaphore;
         }
+
+        namespace detail
+        {
+            ///////////////////////////////////////////////////////////////////////////
+            enum full_empty_state
+            {
+                empty = false,
+                full = true
+            };
+        }
     }
 
     /// \namespace util
