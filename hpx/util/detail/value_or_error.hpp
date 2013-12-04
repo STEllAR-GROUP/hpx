@@ -12,14 +12,9 @@
 
 #include <boost/exception_ptr.hpp>
 
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/fold.hpp>
-#include <boost/mpl/transform.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/sizeof.hpp>
-#include <boost/mpl/placeholders.hpp>
-#include <boost/mpl/max_element.hpp>
-#include <boost/mpl/deref.hpp>
+#include <boost/mpl/max.hpp>
 
 #include <boost/math/common_factor_ct.hpp>
 #include <boost/aligned_storage.hpp>
@@ -27,25 +22,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace detail
 {
-    struct max_alignment
-    {
-        template <typename State, typename Item>
-        struct apply : boost::mpl::size_t<
-            boost::math::static_lcm<
-                State::value, boost::alignment_of<Item>::value
-            >::value>
-        {};
-    };
-
-    template <typename Sequence, typename F>
-    struct max_value
-    {
-        typedef typename boost::mpl::transform1<Sequence, F>::type transformed_;
-        typedef typename boost::mpl::max_element<transformed_>::type max_it;
-
-        typedef typename boost::mpl::deref<max_it>::type type;
-    };
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     class value_or_error
@@ -53,7 +29,6 @@ namespace hpx { namespace util { namespace detail
     protected:
         typedef T value_type;
         typedef boost::exception_ptr error_type;
-        typedef boost::mpl::vector2<value_type, error_type> types;
 
         enum state { has_none, has_value, has_error };
 
@@ -348,13 +323,19 @@ namespace hpx { namespace util { namespace detail
 
         // determine the required alignment, define aligned storage of proper
         // size
-        typedef typename boost::mpl::fold<
-            types, boost::mpl::size_t<1>, detail::max_alignment
-        >::type max_alignment;
-
-        typedef typename detail::max_value<
-            types, boost::mpl::sizeof_<boost::mpl::_1>
-        >::type max_size;
+        typedef
+            typename boost::math::static_lcm<
+                boost::alignment_of<value_type>::value
+              , boost::alignment_of<error_type>::value
+            >::type
+            max_alignment;
+        
+        typedef
+            typename boost::mpl::max<
+                boost::mpl::sizeof_<value_type>
+              , boost::mpl::sizeof_<error_type>
+            >::type
+            max_size;
 
         typedef boost::aligned_storage<
             max_size::value, max_alignment::value

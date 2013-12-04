@@ -12,8 +12,6 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
-#include <hpx/lcos/detail/full_empty_memory.hpp>
-#include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/scoped_unlock.hpp>
