@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/lcos/detail/full_empty_memory.hpp>
@@ -19,6 +20,7 @@
 #include <hpx/util/detail/value_or_error.hpp>
 
 #include <boost/intrusive_ptr.hpp>
+#include <boost/intrusive/slist.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -50,27 +52,27 @@ namespace local { template <typename T> struct channel; }
 
 namespace detail
 {
-    template <typename Result> struct future_data_base;
+    template <typename Result> struct future_data;
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Result>
     inline lcos::future<Result> make_future_from_data(
-        boost::intrusive_ptr<detail::future_data_base<Result> > const&);
+        boost::intrusive_ptr<detail::future_data<Result> > const&);
 
     template <typename Result>
     inline lcos::future<Result> make_future_from_data(
-        BOOST_RV_REF(boost::intrusive_ptr<detail::future_data_base<Result> >));
+        BOOST_RV_REF(boost::intrusive_ptr<detail::future_data<Result> >));
 
     template <typename Result>
     inline lcos::future<Result> make_future_from_data(
-        detail::future_data_base<Result>* p);
+        detail::future_data<Result>* p);
 
     template <typename Result>
-    inline detail::future_data_base<Result>*
+    inline detail::future_data<Result>*
         get_future_data(lcos::future<Result>&);
 
     template <typename Result>
-    inline detail::future_data_base<Result> const*
+    inline detail::future_data<Result> const*
         get_future_data(lcos::future<Result> const&);
 
     ///////////////////////////////////////////////////////////////////////
@@ -109,134 +111,6 @@ namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
-    struct future_data_base : future_data_refcnt_base
-    {
-        typedef typename boost::mpl::if_<
-            boost::is_same<void, Result>, util::unused_type, Result
-        >::type result_type;
-        typedef HPX_STD_FUNCTION<void(lcos::future<Result>&)>
-            completed_callback_type;
-        typedef lcos::local::spinlock mutex_type;
-
-        virtual void deleting_owner() {}
-
-        virtual result_type get_data(error_code& ec = throws) = 0;
-        virtual result_type move_data(error_code& ec = throws) = 0;
-        virtual bool is_ready() const = 0;
-        virtual bool is_ready_locked() const = 0;
-        virtual bool has_value() const = 0;
-        virtual bool has_exception() const = 0;
-        virtual BOOST_SCOPED_ENUM(future_status) get_state() const = 0;
-
-        // cancellation is disabled by default
-        virtual bool cancelable() const
-        {
-            return false;
-        }
-        virtual void cancel()
-        {
-            HPX_THROW_EXCEPTION(future_does_not_support_cancellation,
-                "future_data_base::cancel",
-                "this future does not support cancellation");
-        }
-
-        // continuation support
-        virtual completed_callback_type
-            set_on_completed(BOOST_RV_REF(completed_callback_type)) = 0;
-        virtual completed_callback_type
-            set_on_completed_locked(BOOST_RV_REF(completed_callback_type),
-            typename mutex_type::scoped_lock& l) = 0;
-        virtual completed_callback_type reset_on_completed_locked() = 0;
-
-        // wait support
-        struct wake_me_up
-        {
-            explicit wake_me_up(threads::thread_id_type const& thread_id)
-              : thread_id_(thread_id)
-            {}
-
-            void operator()(lcos::future<Result>& /*f*/) const
-            {
-                threads::set_thread_state(
-                    thread_id_, threads::pending, threads::wait_timeout);
-            }
-
-            threads::thread_id_type thread_id_;
-        };
-
-        struct reset_cb
-        {
-            template <typename F>
-            reset_cb(future_data_base& fb, BOOST_FWD_REF(F) f,
-                    typename mutex_type::scoped_lock& l)
-              : target_(fb),
-                l_(l),
-                oldcb_(fb.reset_on_completed_locked())
-            {
-                fb.set_on_completed_locked(boost::forward<F>(f), l);
-            }
-            ~reset_cb()
-            {
-                l_.lock();
-                target_.set_on_completed_locked(boost::move(oldcb_), l_);
-            }
-
-            future_data_base& target_;
-            typename mutex_type::scoped_lock& l_;
-            completed_callback_type oldcb_;
-        };
-
-        void wait()
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            if (!is_ready_locked()) {
-                boost::intrusive_ptr<future_data_base> this_(this);
-                wake_me_up callback(threads::get_self_id());
-                set_on_completed_locked(boost::ref(callback), l);  // leaves 'l' unlocked
-
-                this_thread::suspend(threads::suspended);
-            }
-        }
-
-        BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::posix_time::time_duration const& p)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            if (!is_ready_locked()) {
-                boost::intrusive_ptr<future_data_base> this_(this);
-                reset_cb r(*this, wake_me_up(threads::get_self_id()), l);  // leaves 'l' unlocked
-
-                // if the timer has hit, the waiting period timed out
-                return (this_thread::suspend(p) == threads::wait_signaled) ? //-V110
-                    future_status::timeout : future_status::ready;
-            }
-            return future_status::ready; //-V110
-        }
-
-        BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::posix_time::ptime const& at)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            if (!is_ready_locked()) {
-                boost::intrusive_ptr<future_data_base> this_(this);
-                reset_cb r(*this, wake_me_up(threads::get_self_id()), l);  // leaves 'l' unlocked
-
-                // if the timer has hit, the waiting period timed out
-                return (this_thread::suspend(at) == threads::wait_signaled) ? //-V110
-                    future_status::timeout : future_status::ready;
-            }
-            return future_status::ready; //-V110
-        }
-
-    protected:
-        mutable mutex_type mtx_;
-
-    protected:
-        future_data_base() {}
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename F1, typename F2>
     struct compose_cb_impl
     {
@@ -248,59 +122,104 @@ namespace detail
 
         typedef void result_type;
 
-        template <typename Future>
-        void operator()(Future & f) const
+        void operator()() const
         {
-            if (!f1_.empty()) f1_(f);
-            if (!f2_.empty()) f2_(f);
+            f1_();
+            f2_();
         }
 
         typename util::remove_reference<F1>::type f1_;
         typename util::remove_reference<F2>::type f2_;
     };
 
+    template <typename F1, typename F2>
+    static BOOST_FORCEINLINE HPX_STD_FUNCTION<void()>
+    compose_cb(BOOST_FWD_REF(F1) f1, BOOST_FWD_REF(F2) f2)
+    {
+        if (f1.empty())
+            return boost::forward<F2>(f2);
+        else if (f2.empty())
+            return boost::forward<F1>(f1);
+
+        // otherwise create a combined callback
+        return compose_cb_impl<F1, F2>(
+            boost::forward<F1>(f1), boost::forward<F2>(f2));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // define data structures needed for intrusive slist container used for
+    // the queues
+    struct queue_entry
+    {
+        typedef boost::intrusive::slist_member_hook<
+            boost::intrusive::link_mode<boost::intrusive::normal_link>
+        > hook_type;
+
+        queue_entry(threads::thread_id_type const& id)
+          : id_(id)
+        {}
+
+        threads::thread_id_type id_;
+        hook_type list_hook_;
+    };
+
+    typedef boost::intrusive::member_hook<
+        queue_entry, queue_entry::hook_type,
+        &queue_entry::list_hook_
+    > list_option_type;
+
+    typedef boost::intrusive::slist<
+        queue_entry, list_option_type,
+        boost::intrusive::cache_last<true>,
+        boost::intrusive::constant_time_size<false>
+    > queue_type;
+
+    struct reset_queue_entry
+    {
+        reset_queue_entry(queue_entry& e, queue_type& q)
+          : e_(e), q_(q), last_(q.last())
+        {}
+
+        ~reset_queue_entry()
+        {
+            if (e_.id_)
+                q_.erase(last_);     // remove entry from queue
+        }
+
+        queue_entry& e_;
+        queue_type& q_;
+        queue_type::const_iterator last_;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
-    struct future_data : future_data_base<Result>
+    struct future_data : future_data_refcnt_base
     {
-    public:
-        typedef future_data_base<Result> base_type;
-        typedef typename base_type::result_type result_type;
-        typedef typename base_type::mutex_type mutex_type;
-        typedef boost::exception_ptr error_type;
+        typedef typename boost::mpl::if_<
+            boost::is_same<void, Result>, util::unused_type, Result
+        >::type result_type;
         typedef util::detail::value_or_error<result_type> data_type;
-
-        typedef typename base_type::completed_callback_type
+        typedef HPX_STD_FUNCTION<void()>
             completed_callback_type;
-
-        template <typename T>
-        friend class lcos::future;
-
-        template <typename T>
-        friend struct local::channel;
-
-        friend future<Result>
-        lcos::make_error_future<Result>(boost::exception_ptr const& e);
-
-    protected:
-        future_data() {}
-
-        future_data(completed_callback_type const& data_sink)
-          : on_completed_(data_sink) {}
+        typedef lcos::local::spinlock mutex_type;
 
     public:
-        static result_type handle_error(data_type const& d, error_code &ec)
+        future_data()
+          : data_(), state_(empty)
+        {}
+
+        virtual void deleting_owner() {}
+
+        // cancellation is disabled by default
+        virtual bool cancelable() const
         {
-            // an error has been reported in the meantime, throw or set
-            // the error code
-            if (&ec == &throws) {
-                boost::rethrow_exception(d.get_error());
-                // never reached
-            }
-            else {
-                ec = make_error_code(d.get_error());
-            }
-            return result_type();
+            return false;
+        }
+        virtual void cancel()
+        {
+            HPX_THROW_EXCEPTION(future_does_not_support_cancellation,
+                "future_data::cancel",
+                "this future does not support cancellation");
         }
 
         /// Get the result of the requested action. This call blocks (yields
@@ -319,61 +238,77 @@ namespace detail
         ///               \a base_lco#set_exception), this function will throw an
         ///               exception encapsulating the reported error code and
         ///               error description if <code>&ec == &throws</code>.
-        result_type get_data(error_code& ec = throws)
+        virtual data_type& get_result(error_code& ec = throws)
         {
             // yields control if needed
-            data_type d;
-            {
-                typename mutex_type::scoped_lock l(this->mtx_);
-                data_.read(d, l, ec);      // copies the data out of the store
-                if (ec) return result_type();
-            }
+            wait(ec);
+            if (ec) return data_;
 
-            if (d.is_empty()) {
+            if (data_.is_empty()) {
                 // the value has already been moved out of this future
                 HPX_THROWS_IF(ec, no_state,
-                    "future_data::get_data",
+                    "future_data::get_result",
                     "this future has no valid shared state");
-                return result_type();
+                return data_;
             }
 
             // the thread has been re-activated by one of the actions
             // supported by this promise (see \a promise::set_event
             // and promise::set_exception).
-            if (d.stores_error())
-                return handle_error(d, ec);
-
-            // no error has been reported, return the result
-            return d.move_value();
+            if (data_.stores_error())
+            {
+                // an error has been reported in the meantime, throw or set
+                // the error code
+                if (&ec == &throws) {
+                    boost::rethrow_exception(data_.get_error());
+                    // never reached
+                }
+                else {
+                    ec = make_error_code(data_.get_error());
+                }
+            }
+            return data_;
         }
 
-    public:
-        result_type move_data(error_code& ec = throws)
+        /// Set the result of the requested action.
+        template <typename Target>
+        void set_result(BOOST_FWD_REF(Target) data, error_code& ec = throws)
         {
-            // yields control if needed
-            data_type d;
+            completed_callback_type on_completed;
             {
                 typename mutex_type::scoped_lock l(this->mtx_);
-                data_.move(d, l, ec); // moves the data from the store
-                if (ec) return result_type();
+
+                // check whether the data already has been set
+                if (is_ready_locked()) {
+                    HPX_THROWS_IF(ec, promise_already_satisfied,
+                        "future_data::set_result",
+                        "data has already been set for this future");
+                    return;
+                }
+
+                on_completed = boost::move(this->on_completed_);
+
+                // set the data
+                data_ = boost::forward<Target>(data);
+
+                // make sure the entry is full
+                state_ = full;
+
+                // handle all threads waiting for the block to become full
+                while (!wait_queue_.empty()) {
+                    threads::thread_id_type id = wait_queue_.front().id_;
+                    wait_queue_.front().id_ = threads::invalid_thread_id;
+                    wait_queue_.pop_front();
+
+                    threads::set_thread_state(id, threads::pending,
+                        threads::wait_timeout, threads::thread_priority_default, ec);
+                    if (ec) return;
+                }
             }
 
-            if (d.is_empty()) {
-                // the value has already been moved out of this future
-                HPX_THROWS_IF(ec, no_state,
-                    "future_data::move_data",
-                    "this future has no valid shared state");
-                return result_type();
-            }
-
-            // the thread has been re-activated by one of the actions
-            // supported by this promise (see \a promise::set_event
-            // and promise::set_exception).
-            if (d.stores_error())
-                return handle_error(d, ec);
-
-            // no error has been reported, return the result
-            return d.move_value();
+            // invoke the callback (continuation) function
+            if (!on_completed.empty())
+                on_completed();
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -381,10 +316,6 @@ namespace detail
         template <typename T>
         void set_data(BOOST_FWD_REF(T) result)
         {
-            // this future instance coincidentally keeps us alive
-            lcos::future<Result> f =
-                lcos::detail::make_future_from_data<Result>(this);
-
             // set the received result, reset error status
             try {
                typedef typename util::decay<T>::type naked_type;
@@ -393,61 +324,21 @@ namespace detail
                     result_type, naked_type
                 > get_remote_result_type;
 
-                completed_callback_type on_completed;
-                {
-                    typename mutex_type::scoped_lock l(this->mtx_);
-
-                    // check whether the data already has been set
-                    if (!data_.is_empty()) {
-                        HPX_THROW_EXCEPTION(promise_already_satisfied,
-                            "packaged_task::set_data<Result>",
-                            "data has already been set for this future");
-                    }
-
-                    on_completed = boost::move(on_completed_);
-
-                    // store the value
-                    data_.set(boost::move(get_remote_result_type::call(
-                          boost::forward<T>(result))));
-                }
-
-                // invoke the callback (continuation) function
-                if (!on_completed.empty())
-                    on_completed(f);
+                // store the value
+                set_result(boost::move(get_remote_result_type::call(
+                        boost::forward<T>(result))));
             }
             catch (hpx::exception const&) {
                 // store the error instead
-                set_exception(boost::current_exception());
+                set_result(boost::current_exception());
             }
         }
 
         // trigger the future with the given error condition
         void set_exception(boost::exception_ptr const& e)
         {
-            // this future instance coincidentally keeps us alive
-            lcos::future<Result> f =
-                lcos::detail::make_future_from_data<Result>(this);
-
-            completed_callback_type on_completed;
-            {
-                typename mutex_type::scoped_lock l(this->mtx_);
-
-                // check whether the data already has been set
-                if (!data_.is_empty()) {
-                    HPX_THROW_EXCEPTION(promise_already_satisfied,
-                        "packaged_task::set_data<Result>",
-                        "data has already been set for this future");
-                }
-
-                on_completed = boost::move(on_completed_);
-
-                // store the error code
-                data_.set(e);
-            }
-
-            // invoke the callback (continuation) function
-            if (!on_completed.empty())
-                on_completed(f);
+            // store the error code
+            set_result(e);
         }
 
         void set_error(error e, char const* f, char const* msg)
@@ -457,46 +348,8 @@ namespace detail
             }
             catch (hpx::exception const&) {
                 // store the error code
-                set_exception(boost::current_exception());
+                set_result(boost::current_exception());
             }
-        }
-
-        /// Return whether or not the data is available for this
-        /// \a promise.
-        bool is_ready() const
-        {
-            typename mutex_type::scoped_lock l(this->mtx_);
-            return is_ready_locked();
-        }
-
-        bool is_ready_locked() const
-        {
-            return !data_.is_empty();
-        }
-
-    private:
-        static bool has_data_helper(data_type const& d)
-        {
-            return d.stores_value();
-        }
-
-    public:
-        bool has_value() const
-        {
-            typename mutex_type::scoped_lock l(this->mtx_);
-            return !data_.is_empty() && data_.peek(&has_data_helper);
-        }
-
-        bool has_exception() const
-        {
-            typename mutex_type::scoped_lock l(this->mtx_);
-            return !data_.is_empty() && !data_.peek(&has_data_helper);
-        }
-
-        BOOST_SCOPED_ENUM(future_status) get_state() const
-        {
-            typename mutex_type::scoped_lock l(this->mtx_);
-            return !data_.is_empty() ? future_status::ready : future_status::deferred; //-V110
         }
 
         /// Reset the promise to allow to restart an asynchronous
@@ -504,62 +357,39 @@ namespace detail
         void reset(error_code& ec = throws)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
-            data_.set_empty(ec);
+            state_ = empty;
         }
+
+        // continuation support
 
         /// Set the callback which needs to be invoked when the future becomes
         /// ready. If the future is ready the function will be invoked
         /// immediately.
         completed_callback_type
-        set_on_completed(BOOST_RV_REF(completed_callback_type) data_sink)
+        set_on_completed(completed_callback_type data_sink)
         {
             typename mutex_type::scoped_lock l(this->mtx_);
-            return set_on_completed_locked(boost::move(data_sink), l);
-        }
 
-    private:
-        template <typename F1, typename F2>
-        static BOOST_FORCEINLINE completed_callback_type
-        compose_cb(BOOST_FWD_REF(F1) f1, BOOST_FWD_REF(F2) f2)
-        {
-            // otherwise create a combined callback
-            return completed_callback_type(boost::move(
-                    compose_cb_impl<F1, F2>(
-                        boost::forward<F1>(f1),
-                        boost::forward<F2>(f2))
-                ));
-        }
+            completed_callback_type retval = boost::move(this->on_completed_);
 
-    public:
-        // note: leaves the given lock in unlocked state when returning
-        completed_callback_type set_on_completed_locked(
-            BOOST_RV_REF(completed_callback_type) data_sink,
-            typename mutex_type::scoped_lock& l)
-        {
-            completed_callback_type retval = boost::move(on_completed_);
-
-            if (!data_sink.empty() && !data_.is_empty()) {
-                // this future instance coincidentally keeps us alive
-                lcos::future<Result> f =
-                    lcos::detail::make_future_from_data<Result>(this);
-
+            if (!data_sink.empty() && is_ready_locked()) {
                 // invoke the callback (continuation) function right away
                 l.unlock();
 
                 if (!retval.empty())
-                    retval(f);
-                data_sink(f);
+                    retval();
+                data_sink();
             }
             else if (!retval.empty()) {
                 // store a combined callback wrapping the old and the new one
-                on_completed_ = boost::move(
+                this->on_completed_ = boost::move(
                     compose_cb(boost::move(data_sink), retval));
 
                 l.unlock();
             }
             else {
                 // store the new callback
-                on_completed_ = boost::move(data_sink);
+                this->on_completed_ = boost::move(data_sink);
 
                 l.unlock();
             }
@@ -569,12 +399,143 @@ namespace detail
 
         completed_callback_type reset_on_completed_locked()
         {
-            return boost::move(on_completed_);
+            return boost::move(this->on_completed_);
+        }
+
+        virtual void wait(error_code& ec = throws)
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+
+            // block if this entry is empty
+            if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (0 == self || ec) return;
+
+                // enqueue the request and block this thread
+                queue_entry f(threads::get_self_id());
+                wait_queue_.push_back(f);
+
+                reset_queue_entry r(f, wait_queue_);
+                {
+                    // yield this thread
+                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    this_thread::suspend(threads::suspended,
+                        "future_data::wait", ec);
+                    if (ec) return;
+                }
+            }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+        }
+
+        virtual BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::posix_time::time_duration const& p, error_code& ec = throws)
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+
+            // block if this entry is empty
+            if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (0 == self || ec) return future_status::uninitialized;
+
+                // enqueue the request and block this thread
+                queue_entry f(threads::get_self_id());
+                wait_queue_.push_back(f);
+
+                reset_queue_entry r(f, wait_queue_);
+                {
+                    // yield this thread
+                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    threads::thread_state_ex_enum const reason =
+                        this_thread::suspend(p, "future_data::wait_for", ec);
+                    if (ec) return future_status::uninitialized;
+
+                    // if the timer has hit, the waiting period timed out
+                    return (reason == threads::wait_signaled) ? //-V110
+                        future_status::timeout : future_status::ready;
+                }
+            }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            return future_status::ready; //-V110
+        }
+
+        virtual BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::posix_time::ptime const& at, error_code& ec = throws)
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+
+            // block if this entry is empty
+            if (state_ == empty) {
+                threads::thread_self* self = threads::get_self_ptr_checked(ec);
+                if (0 == self || ec) return future_status::uninitialized;
+
+                // enqueue the request and block this thread
+                queue_entry f(threads::get_self_id());
+                wait_queue_.push_back(f);
+
+                reset_queue_entry r(f, wait_queue_);
+                {
+                    // yield this thread
+                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
+                    threads::thread_state_ex_enum const reason =
+                        this_thread::suspend(at, "future_data::wait_until", ec);
+                    if (ec) return future_status::uninitialized;
+
+                    // if the timer has hit, the waiting period timed out
+                    return (reason == threads::wait_signaled) ? //-V110
+                        future_status::timeout : future_status::ready;
+                }
+            }
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            return future_status::ready; //-V110
+        }
+
+        /// Return whether or not the data is available for this
+        /// \a future.
+        bool is_ready() const
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+            return is_ready_locked();
+        }
+
+        bool is_ready_locked() const
+        {
+            return state_ != empty;
+        }
+
+        bool has_value() const
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+            return state_ != empty && data_.stores_value();
+        }
+
+        bool has_exception() const
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+            return state_ != empty && data_.stores_error();
+        }
+
+        BOOST_SCOPED_ENUM(future_status) get_status() const
+        {
+            typename mutex_type::scoped_lock l(mtx_);
+            return state_ != empty ? future_status::ready : future_status::deferred; //-V110
         }
 
     protected:
-        detail::full_empty<data_type, lcos::local::no_mutex> data_;
+        mutable mutex_type mtx_;
+        data_type data_;                      // protected data
         completed_callback_type on_completed_;
+
+    private:
+        queue_type wait_queue_;               // threads waiting in read
+        full_empty_state state_;              // current full/empty state
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -585,13 +546,25 @@ namespace detail
         typedef future_data<Result> base_type;
         typedef typename base_type::result_type result_type;
         typedef typename base_type::mutex_type mutex_type;
-        typedef typename base_type::error_type error_type;
         typedef typename base_type::data_type data_type;
 
-        template <typename T>
-        friend class lcos::future;
+    public:
+        timed_future_data() {}
 
-    private:
+        template <typename Result_>
+        timed_future_data(boost::posix_time::ptime const& at,
+            BOOST_FWD_REF(Result_) init)
+        {
+            at_time(at, boost::forward<Result_>(init));
+        }
+
+        template <typename Result_>
+        timed_future_data(boost::posix_time::time_duration const& d,
+            BOOST_RV_REF(Result_) init)
+        {
+            at_time(d, boost::forward<Result_>(init));
+        }
+
         void set_data(result_type const& value)
         {
             this->base_type::set_data(value);
@@ -622,23 +595,6 @@ namespace detail
                 this->base_type::set_exception(hpx::detail::access_exception(ec));
             }
         }
-
-    protected:
-        timed_future_data() {}
-
-        template <typename Result_>
-        timed_future_data(boost::posix_time::ptime const& at,
-            BOOST_FWD_REF(Result_) init)
-        {
-            at_time(at, boost::forward<Result_>(init));
-        }
-
-        template <typename Result_>
-        timed_future_data(boost::posix_time::time_duration const& d,
-            BOOST_RV_REF(Result_) init)
-        {
-            at_time(d, boost::forward<Result_>(init));
-        }
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -651,6 +607,7 @@ namespace detail
 
     protected:
         typedef typename future_data<Result>::result_type result_type;
+        typedef typename future_data<Result>::data_type data_type;
 
         threads::thread_id_type get_id() const
         {
@@ -673,23 +630,36 @@ namespace detail
         {}
 
         // retrieving the value
-        result_type get_data(error_code& ec = throws)
+        virtual data_type& get_result(error_code& ec = throws)
         {
-            if (!was_started())
+            if (!started_test_and_set())
                 this->do_run();
-            return this->future_data<Result>::get_data(ec);
+            return this->future_data<Result>::get_result(ec);
         }
 
-        // moving out the value
-        result_type move_data(error_code& ec = throws)
+        // wait support
+        virtual void wait(error_code& ec = throws)
         {
-            if (!was_started())
+            if (!started_test_and_set())
                 this->do_run();
-            return this->future_data<Result>::move_data(ec);
+            else
+                this->future_data<Result>::wait(ec);
         }
+
+        virtual BOOST_SCOPED_ENUM(future_status)
+        wait_for(boost::posix_time::time_duration const& p, error_code& ec = throws)
+        {
+            return future_status::deferred; //-V110
+        }
+
+        virtual BOOST_SCOPED_ENUM(future_status)
+        wait_until(boost::posix_time::ptime const& at, error_code& ec = throws)
+        {
+            return future_status::deferred; //-V110
+        };
 
     private:
-        bool was_started()
+        bool started_test_and_set()
         {
             typename mutex_type::scoped_lock l(this->mtx_);
             if (started_)
@@ -704,7 +674,8 @@ namespace detail
             typename mutex_type::scoped_lock l(this->mtx_);
             if (started_) {
                 HPX_THROW_EXCEPTION(task_already_started,
-                    "task_base::check_started", "this task has already been started");
+                    "task_base::check_started",
+                    "this task has already been started");
                 return;
             }
             started_ = true;
