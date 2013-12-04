@@ -61,7 +61,7 @@ namespace hpx
 
                     using lcos::detail::get_future_data;
 
-                    lcos::detail::future_data<R>* future_data =
+                    lcos::detail::future_data_base<R>* future_data =
                         get_future_data(future);
 
                     future_data->set_on_completed(Callback(callback_));

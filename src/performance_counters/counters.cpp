@@ -923,7 +923,7 @@ namespace hpx { namespace performance_counters
         }
         if (ec) return result_type();
 
-        return lcos::make_ready_future(id);
+        return result_type(id);
     }
 
     lcos::future<naming::id_type> get_counter_async(

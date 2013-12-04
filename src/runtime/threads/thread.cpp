@@ -233,9 +233,6 @@ namespace hpx
             typedef lcos::detail::future_data<void>::mutex_type mutex_type;
             typedef boost::intrusive_ptr<thread_task_base> future_base_type;
 
-        protected:
-            typedef lcos::detail::future_data<void>::result_type result_type;
-
         public:
             thread_task_base(threads::thread_id_type const& id)
               : id_(thread::uninitialized)
@@ -246,6 +243,18 @@ namespace hpx
                 {
                     id_ = id;
                 }
+            }
+
+            // retrieving the value
+            void get(error_code& ec = throws)
+            {
+                this->get_data(ec);
+            }
+
+            // moving out the value
+            void move(error_code& ec = throws)
+            {
+                this->move_data(ec);
             }
 
             bool valid() const
@@ -297,7 +306,7 @@ namespace hpx
         }
 
         detail::thread_task_base* p = new detail::thread_task_base(id_);
-        boost::intrusive_ptr<lcos::detail::future_data<void> > base(p);
+        boost::intrusive_ptr<lcos::detail::future_data_base<void> > base(p);
         if (!p->valid()) {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::get_future",
                 "Could not create future as thread has been terminated.");

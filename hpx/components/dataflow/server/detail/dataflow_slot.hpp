@@ -86,7 +86,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
                 << hpx::actions::detail::get_action_name<SinkAction>()
                 << ">::connect() from "
                 << get_gid();
-            
+
             HPX_ASSERT(get_gid());
 
             if(dataflow_source.valid())
@@ -104,11 +104,10 @@ namespace hpx { namespace lcos { namespace server { namespace detail
             this->set_value_nonvirt(remote_result());
         }
 
-        result_type const& get_value(error_code& ec = throws)
+        result_type get_value()
         {
             HPX_ASSERT(false);
-            static result_type default_;
-            return default_;
+            return result_type();
         }
 
         naming::id_type get_gid() const

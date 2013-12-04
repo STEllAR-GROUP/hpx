@@ -21,11 +21,11 @@ struct channel_future_data : future_data<Result>
   public:
     typedef typename future_data<Result>::mutex_type mutex_type;
     typedef typename future_data<Result>::result_type result_type;
+    typedef typename future_data<Result>::data_type data_type;
 
   public:
     result_type move_data(error_code& ec = throws)
     {
-        typedef typename future_data<Result>::data_type data_type;
         // yields control if needed
         data_type d;
         {

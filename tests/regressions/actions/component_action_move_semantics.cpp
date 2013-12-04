@@ -166,14 +166,19 @@ void test_actions()
                 return_object<
                     action_move_semantics::return_test_non_movable_action, non_movable_object
                 >(id)
-            ), 1u, 3u); // ?call + value_or_error(w) + ?return
+            ), 3u, 6u); // ?call + value_or_error(w) + value_or_error(r) +
+                    // future_data::get_data + ?future::get + ?return
+            //! should be: ?call + value_or_error(w) + ?return
         } else {
             HPX_TEST_RANGE((
                 return_object<
                     action_move_semantics::return_test_non_movable_action, non_movable_object
                 >(id)
-            ), 4u, 6u); // transfer_action + bind + function + ?call +
-                    // value_or_error(w) + ?return
+            ), 6u, 9u); // transfer_action + bind + function + ?call +
+                    // value_or_error(w) + value_or_error(r) +
+                    // future_data::get_data + ?future::get + ?return
+            //! should be: transfer_action + bind + function + ?call +
+            //             value_or_error(w) + ?return
         }
     }
 }
@@ -271,14 +276,19 @@ void test_direct_actions()
                 return_object<
                     action_move_semantics::return_test_non_movable_direct_action, non_movable_object
                 >(id)
-            ), 1u, 3u); // ?call + value_or_error(w) + ?return
+            ), 3u, 6u); // ?call + value_or_error(w) + value_or_error(r) +
+                    // future_data::get_data + ?future::get +  ?return
+            //! should be: ?call + value_or_error(w) + ?return
         } else {
             HPX_TEST_RANGE((
                 return_object<
                     action_move_semantics::return_test_non_movable_direct_action, non_movable_object
                 >(id)
-            ), 4u, 6u); // transfer_action + bind + function + ?call +
-                    // value_or_error(w) + ?return
+            ), 6u, 9u); // transfer_action + bind + function + ?call +
+                    // value_or_error(w) + value_or_error(r) +
+                    // future_data::get_data + ?future::get + ?return
+            //! should be: transfer_action + bind + function + ?call +
+            //             value_or_error(w) + ?return
         }
     }
 }

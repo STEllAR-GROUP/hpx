@@ -97,7 +97,7 @@ namespace hpx { namespace lcos
             closure_();
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_value(ec);
+            return (*this->impl_)->get_data(ec);
         }
 
         void set_exception(boost::exception_ptr const& e)
@@ -286,7 +286,7 @@ namespace hpx { namespace lcos
         /// the result has been returned and the waiting thread has been
         /// re-scheduled by the thread manager the function \a deferred_packaged_task#get
         /// will return.
-        Result const& get(error_code& ec = throws) const
+        Result get(error_code& ec = throws) const
         {
             if (!closure_)
             {
@@ -298,7 +298,7 @@ namespace hpx { namespace lcos
             closure_();
 
             // wait for the result (yield control)
-            return (*this->impl_)->get_value(ec);
+            return (*this->impl_)->get_data(ec);
         }
 
         void set_exception(boost::exception_ptr const& e)
