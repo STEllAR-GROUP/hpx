@@ -746,6 +746,20 @@ struct merging_map : boost::noncopyable
         return;
     }
 
+    template <
+        typename F
+    >
+    void apply(
+        Key const& key_
+      , F f
+      , data_type const& default_ = data_type()
+        )
+    {
+        key_type const key(key_, key_);
+        apply(key, f, default_);
+        return;
+    }
+
     /// Call \p f on the data mapped to [\p lower, \p upper]. For any subsets
     /// of \p key that are not mapped, a copy of \p default_ is inserted and
     /// \p f is applied to it. \p f may be called 0 or more times. The order
@@ -908,6 +922,14 @@ struct merging_map : boost::noncopyable
         return map_.equal_range(key, polymorphic_less());
     }
 
+    iterator find(
+        Key const& key_
+        )
+    {
+        key_type const key(key_, key_);
+        return map_.lower_bound(key, polymorphic_less());
+    }
+
     std::pair<const_iterator, const_iterator> find(
         Key const& lower
       , Key const& upper
@@ -917,6 +939,15 @@ struct merging_map : boost::noncopyable
         return map_.equal_range(key, polymorphic_less());
     }
 
+    const_iterator find(
+        Key const& key_
+        ) const
+    {
+        key_type const key(key_, key_);
+        return map_.lower_bound(key, polymorphic_less());
+    }
+
+    //
     template <
         typename T
     >

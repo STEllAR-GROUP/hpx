@@ -6,6 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/agas/incref_requests.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/lcos/future.hpp>
 
 #include <boost/foreach.hpp>
 
@@ -44,8 +45,17 @@ namespace hpx { namespace agas { namespace detail
             it->second.credit_ += credit;
             if (it->second.credit_ == 0)
             {
-                // this credit request was already handled, remove the entry
+                // this credit request was already acknowledged,
+                // remove the entry
                 store_.erase(it);
+            }
+            else if (it->second.keep_alive_.get_management_type() ==
+                     naming::id_type::unmanaged)
+            {
+                // If the currently stored id is unmanaged then the entry
+                // was created by a remote acknowledgement. Update the
+                // id with a local one to be kept alife.
+                it->second.keep_alive_ = id;
             }
         }
         else
@@ -87,7 +97,8 @@ namespace hpx { namespace agas { namespace detail
         else
         {
             store_.insert(incref_requests_type::value_type(
-                gid, incref_request_data(credit, naming::invalid_id, remote_locality)));
+                gid, incref_request_data(
+                    credit, naming::invalid_id, remote_locality)));
         }
 
         return true;
@@ -147,13 +158,25 @@ namespace hpx { namespace agas { namespace detail
         }
 
         // now handle all acknowledged credits
+        std::vector<hpx::future<bool> > requests;
+        requests.reserve(matching_data.size());
+
         BOOST_FOREACH(incref_request_data const& data, matching_data)
         {
-            if (!f(data.credit_, data.keep_alive_, data.locality_))
-                return false;
+            if (data.locality_ != naming::invalid_id)
+            {
+                requests.push_back(
+                    f(data.credit_, data.keep_alive_, data.locality_));
+            }
         }
 
-        return true;
+        bool result = true;
+        BOOST_FOREACH(hpx::future<bool>& f, requests)
+        {
+            result = f.get() && result;
+        }
+
+        return result;
     }
 }}}
 

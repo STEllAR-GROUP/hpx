@@ -63,7 +63,7 @@ namespace hpx { namespace agas { namespace detail
             naming::id_type const& remote_locality);
 
         typedef HPX_STD_FUNCTION<
-            bool(boost::int64_t, naming::id_type const&, naming::id_type const&)
+            hpx::future<bool>(boost::int64_t, naming::id_type const&, naming::id_type const&)
         > acknowledge_request_callback;
 
         bool acknowledge_request(boost::int64_t credit, naming::id_type const& id,

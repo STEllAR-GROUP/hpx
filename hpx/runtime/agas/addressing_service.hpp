@@ -219,10 +219,14 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
       , naming::id_type const& id
       , boost::int64_t credit
         );
-    bool propagate_incref_acknowlegdement(
+    hpx::future<bool> propagate_remote_incref_acknowlegdement(
         boost::int64_t credit
       , naming::id_type const& id
       , naming::id_type const& loc
+        );
+    bool propagate_local_incref_acknowlegdement(
+        boost::int64_t credit
+      , naming::gid_type const& gid
         );
 
 protected:
