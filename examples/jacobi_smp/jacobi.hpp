@@ -31,8 +31,8 @@ namespace jacobi_smp {
     };
 
     void jacobi_kernel(
-        double * restrict dst
-      , const double * restrict src
+        double * dst
+      , const double * src
       , std::size_t n
     );
 
