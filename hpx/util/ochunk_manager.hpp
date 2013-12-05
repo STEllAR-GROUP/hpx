@@ -8,7 +8,9 @@
 
 #include <hpx/util/binary_filter.hpp>
 
+#include <cstddef> // for size_t
 #include <cstring> // for memcpy
+#include <vector>
 
 namespace hpx { namespace util { namespace detail
 {
