@@ -16,6 +16,7 @@
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/policies/message_handler.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/binary_filter.hpp>
 
 #include <boost/serialization/split_member.hpp>
@@ -24,7 +25,6 @@
 #include <boost/serialization/is_bitwise_serializable.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>

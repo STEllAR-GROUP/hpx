@@ -9,12 +9,13 @@
 #define HPX_0097965D_313C_40DB_ABD0_5EA9537DDF8F
 
 #include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/move.hpp>
+
 #include <functional>
 #include <iostream>
 #include <list>
 
-#include <hpx/util/move.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/integer.hpp>
 #include <boost/icl/interval_set.hpp>
 #include <boost/intrusive/set.hpp>

@@ -8,11 +8,12 @@
 #ifndef BOOST_CHRONO_IO_TIME_POINT_GET_HPP
 #define BOOST_CHRONO_IO_TIME_POINT_GET_HPP
 
+#include <hpx/util/assert.hpp>
+
 #include <boost/chrono/config.hpp>
 #include <boost/chrono/detail/scan_keyword.hpp>
 #include <boost/chrono/io/time_point_units.hpp>
 #include <boost/chrono/io/duration_get.hpp>
-#include <hpx/util/assert.hpp>
 #include <locale>
 #include <string>
 

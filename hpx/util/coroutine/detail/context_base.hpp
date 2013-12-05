@@ -37,11 +37,14 @@
  * we will play it safe and use an atomic count. The overhead shouldn't
  * be big.
  */
+#include <hpx/util/assert.hpp>
+#include <hpx/util/coroutine/detail/swap_context.hpp> //for swap hints
+#include <hpx/util/coroutine/exception.hpp>
+
 #include <cstddef>
 #include <algorithm> //for swap
 
 #include <boost/atomic.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/version.hpp>
 #include <boost/intrusive_ptr.hpp>
 
@@ -50,9 +53,6 @@
 #else
 #include <boost/exception/all.hpp>
 #endif
-
-#include <hpx/util/coroutine/detail/swap_context.hpp> //for swap hints
-#include <hpx/util/coroutine/exception.hpp>
 
 #define HPX_THREAD_MAINTAIN_OPERATIONS_COUNT  0
 

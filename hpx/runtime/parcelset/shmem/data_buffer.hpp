@@ -13,6 +13,7 @@
 #define HPX_PARCELSET_SHMEM_DATA_BUFFER_NOV_25_2012_0854PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/allocators/allocator.hpp>
@@ -23,7 +24,6 @@
 #endif
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <string>
 

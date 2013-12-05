@@ -20,8 +20,8 @@
 # pragma once
 #endif
 
-#include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/logging/detail/fwd.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>
 #include <vector>

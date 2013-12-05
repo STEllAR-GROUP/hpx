@@ -6,12 +6,13 @@
 #if !defined(HPX_HIGH_RESOLUTION_CLOCK_FEB_24_2012_1125AM)
 #define HPX_HIGH_RESOLUTION_CLOCK_FEB_24_2012_1125AM
 
+#include <hpx/util/assert.hpp>
+
 #if defined(__bgq__)
 #include <hwi/include/bqc/A2_inlines.h>
 #endif
 #include <boost/chrono/chrono.hpp>
 #include <boost/chrono/process_cpu_clocks.hpp>
-#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace util
 {

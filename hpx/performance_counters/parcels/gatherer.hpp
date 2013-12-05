@@ -8,13 +8,13 @@
 #if !defined(HPX_05A1C29B_DB73_463A_8C9D_B8EDC3B69F5E)
 #define HPX_05A1C29B_DB73_463A_8C9D_B8EDC3B69F5E
 
-#include <boost/config.hpp>
-#include <hpx/util/assert.hpp>
-#include <boost/cstdint.hpp>
-
 #include <hpx/performance_counters/parcels/data_point.hpp>
-#include <hpx/util/spinlock.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/util/spinlock.hpp>
+
+#include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 
 namespace hpx { namespace performance_counters { namespace parcels
 {

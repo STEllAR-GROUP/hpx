@@ -20,13 +20,16 @@
 // IN GENERAL, ARCHIVES CREATED WITH THIS CLASS WILL NOT BE READABLE
 // ON PLATFORM APART FROM THE ONE THEY ARE CREATE ON
 
+#include <hpx/util/assert.hpp>
+#include <hpx/util/binary_filter.hpp>
+#include <hpx/util/ochunk_manager.hpp>
+
 #include <iosfwd>
 #include <string>
 #include <cstring> // memcpy
 #include <cstddef> // size_t
 #include <vector>
 
-#include <hpx/util/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/integer.hpp>
@@ -38,9 +41,6 @@
 #include <boost/serialization/is_bitwise_serializable.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/serialization/array.hpp>
-
-#include <hpx/util/binary_filter.hpp>
-#include <hpx/util/ochunk_manager.hpp>
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 

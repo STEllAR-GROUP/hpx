@@ -32,6 +32,7 @@
 #include "worker.hpp"
 
 #include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <tbb/task.h>
@@ -40,7 +41,6 @@
 #include <stdexcept>
 #include <iostream>
 
-#include <hpx/util/assert.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 

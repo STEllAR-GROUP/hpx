@@ -35,13 +35,8 @@
 #pragma warning (disable: 4355) //this used in base member initializer
 #endif
 
-#include <cstddef>
-#include <hpx/util/assert.hpp>
-#include <boost/optional.hpp>
-#include <boost/config.hpp>
-#include <boost/move/move.hpp>
-
 #include <hpx/config.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/coroutine/detail/config.hpp>
 #include <hpx/util/coroutine/detail/argument_unpacker.hpp>
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
@@ -51,6 +46,11 @@
 #include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
+
+#include <cstddef>
+#include <boost/optional.hpp>
+#include <boost/config.hpp>
+#include <boost/move/move.hpp>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {

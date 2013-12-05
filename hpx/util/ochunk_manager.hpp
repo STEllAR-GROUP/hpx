@@ -8,6 +8,8 @@
 
 #include <hpx/util/binary_filter.hpp>
 
+#include <cstring> // for memcpy
+
 namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////

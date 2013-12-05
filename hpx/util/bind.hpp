@@ -14,6 +14,7 @@
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_placeholder.hpp>
 #include <hpx/util/add_rvalue_reference.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/invoke_fused.hpp>
@@ -23,7 +24,6 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/result_of_or.hpp>
 
-#include <hpx/util/assert.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>

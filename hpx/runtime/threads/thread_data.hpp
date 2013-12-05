@@ -9,15 +9,6 @@
 #define HPX_PX_THREAD_MAY_20_2008_0910AM
 
 #include <hpx/config.hpp>
-
-#include <boost/atomic.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/noncopyable.hpp>
-#include <hpx/util/assert.hpp>
-#include <boost/lockfree/detail/freelist.hpp>
-#include <boost/lockfree/detail/branch_hints.hpp>
-
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -27,11 +18,19 @@
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 #include <hpx/lcos/base_lco.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/backtrace.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/util/coroutine/stackless_coroutine.hpp>
-#include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/lockfree/fifo.hpp>
-#include <hpx/util/backtrace.hpp>
+#include <hpx/util/spinlock_pool.hpp>
+
+#include <boost/atomic.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/lockfree/detail/freelist.hpp>
+#include <boost/lockfree/detail/branch_hints.hpp>
 
 #include <stack>
 

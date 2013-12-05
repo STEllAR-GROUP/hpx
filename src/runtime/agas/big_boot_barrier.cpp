@@ -13,6 +13,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/plain_component_factory.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/reinitializable_static.hpp>
@@ -38,7 +39,6 @@
 
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>

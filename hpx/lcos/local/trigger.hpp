@@ -10,9 +10,9 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/lcos/local/conditional_trigger.hpp>
 #include <hpx/lcos/local/no_mutex.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/move/move.hpp>
-#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {

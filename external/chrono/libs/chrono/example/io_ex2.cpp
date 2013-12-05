@@ -12,9 +12,10 @@ Many thanks to Howard for making his code available under the Boost license.
 
 */
 
+#include <hpx/util/assert.hpp>
+
 #include <boost/chrono/chrono_io.hpp>
 #include <sstream>
-#include <hpx/util/assert.hpp>
 
 int main()
 {

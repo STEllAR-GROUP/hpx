@@ -32,20 +32,21 @@
 #include <windows.h>
 #include <winnt.h>
 
+#include <hpx/config/forceinline.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/coroutine/detail/config.hpp>
+#include <hpx/util/coroutine/exception.hpp>
+#include <hpx/util/coroutine/detail/swap_context.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
+
 #include <boost/config.hpp>
 #include <boost/version.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/atomic.hpp>
-#include <hpx/config/forceinline.hpp>
-#include <hpx/util/coroutine/detail/config.hpp>
-#include <hpx/util/coroutine/exception.hpp>
-#include <hpx/util/coroutine/detail/swap_context.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 
 #if HPX_HAVE_SWAP_CONTEXT_EMULATION != 0
 extern "C" void switch_to_fiber(void* lpFiber) throw();

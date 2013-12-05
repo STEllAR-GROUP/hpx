@@ -27,6 +27,7 @@ time2_demo contained this comment:
 */
 
 #include <hpx/util/assert.hpp>
+
 #include <boost/chrono/chrono.hpp>
 #include <boost/type_traits.hpp>
 

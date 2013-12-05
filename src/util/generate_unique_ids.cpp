@@ -8,12 +8,12 @@
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/logging.hpp>
 
-#include <hpx/util/assert.hpp>
 #include <boost/swap.hpp>
 #include <boost/format.hpp>
 

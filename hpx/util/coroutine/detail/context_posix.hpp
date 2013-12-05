@@ -43,10 +43,11 @@
 #endif
 #endif
 
-#include <boost/config.hpp>
 #include <hpx/util/assert.hpp>
-#include <boost/atomic.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+
+#include <boost/config.hpp>
+#include <boost/atomic.hpp>
 
 #if defined(__FreeBSD__) || (defined(_XOPEN_UNIX) && defined(_XOPEN_VERSION) && _XOPEN_VERSION >= 500)
 

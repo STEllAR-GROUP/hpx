@@ -11,7 +11,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/components/security/key_pair.hpp>
 #include <hpx/components/security/server/root_certificate_authority.hpp>
-
 #include <hpx/util/assert.hpp>
 
 namespace hpx { namespace util { namespace security

@@ -8,12 +8,13 @@
 #ifndef BOOST_CHRONO_IO_DURATION_UNITS_HPP
 #define BOOST_CHRONO_IO_DURATION_UNITS_HPP
 
+#include <hpx/util/assert.hpp>
+
 #include <boost/chrono/config.hpp>
 #include <boost/ratio/ratio_io.hpp>
 #include <boost/chrono/duration.hpp>
 #include <boost/chrono/io/duration_style.hpp>
 #include <boost/chrono/io/ios_base_state.hpp>
-#include <hpx/util/assert.hpp>
 #include <string>
 #include <ios>
 #include <locale>

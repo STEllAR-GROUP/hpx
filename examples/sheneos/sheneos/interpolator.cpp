@@ -12,9 +12,9 @@
 #include <hpx/include/async.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/foreach.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/move/move.hpp>
 

@@ -8,12 +8,13 @@
 #if !defined(HPX_F646702C_6556_48FA_BF9D_3E7959983122)
 #define HPX_F646702C_6556_48FA_BF9D_3E7959983122
 
+#include <hpx/util/assert.hpp>
+
 #include <cstddef>
 
 #include <iostream>
 
 #include <boost/io/ios_state.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/current_function.hpp>
 #include <boost/preprocessor/stringize.hpp>

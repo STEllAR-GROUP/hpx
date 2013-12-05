@@ -29,13 +29,13 @@
 #ifndef HPX_COROUTINE_DETAIL_SELF_HPP_20060809
 #define HPX_COROUTINE_DETAIL_SELF_HPP_20060809
 
-#include <boost/noncopyable.hpp>
 #include <hpx/util/assert.hpp>
-#include <boost/move/move.hpp>
-
 #include <hpx/util/coroutine/detail/fix_result.hpp>
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/util/function.hpp>
+
+#include <boost/noncopyable.hpp>
+#include <boost/move/move.hpp>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
