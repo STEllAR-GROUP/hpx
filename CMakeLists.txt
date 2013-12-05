@@ -1341,6 +1341,7 @@ else()
     hpx_use_flag_if_available(-wd1098)
     hpx_use_flag_if_available(-wd488)
     hpx_use_flag_if_available(-wd2203)
+    hpx_use_flag_if_available(-wd2536)
     if("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel" OR
        "${CMAKE_BUILD_TYPE}" STREQUAL "Release" OR
        "${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
