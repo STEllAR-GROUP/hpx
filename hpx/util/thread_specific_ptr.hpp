@@ -8,6 +8,8 @@
 #if !defined(HPX_BABB0428_2085_4DCF_851A_8819D186835E)
 #define HPX_BABB0428_2085_4DCF_851A_8819D186835E
 
+#include <hpx/util/assert.hpp>
+
 #include <boost/config.hpp>
 
 #include <hpx/config/export_definitions.hpp>
@@ -30,8 +32,6 @@
 #else
 #  error "Native thread local storage is not supported for this platform, please undefine HPX_HAVE_NATIVE_TLS"
 #endif
-
-#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace util
 {
@@ -77,7 +77,6 @@ namespace hpx { namespace util
 #else
 
 #include <pthread.h>
-#include <hpx/util/assert.hpp>
 #include <hpx/util/static.hpp>
 
 namespace hpx { namespace util

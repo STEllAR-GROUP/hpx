@@ -31,6 +31,7 @@
 
 #include "worker.hpp"
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
 #include <stdexcept>
@@ -38,7 +39,6 @@
 
 #include <qthread/qthread.h>
 
-#include <hpx/util/assert.hpp>
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
 #include <boost/cstdint.hpp>

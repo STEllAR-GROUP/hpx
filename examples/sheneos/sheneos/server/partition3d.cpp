@@ -10,10 +10,11 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
+#include <hpx/util/assert.hpp>
+
 #include <cmath>
 #include <memory>
 
-#include <hpx/util/assert.hpp>
 #include <boost/move/move.hpp>
 
 #include "partition3d.hpp"

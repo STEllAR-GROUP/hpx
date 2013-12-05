@@ -7,10 +7,10 @@
 #define HPX_LCOS_LOCAL_CONDITIONAL_TRIGGER_SEP_09_2012_1256PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
 
 #include <boost/move/move.hpp>
-#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {

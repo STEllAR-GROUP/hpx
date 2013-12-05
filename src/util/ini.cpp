@@ -20,11 +20,11 @@
 #include <fstream>
 
 #include <hpx/exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <hpx/util/assert.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>

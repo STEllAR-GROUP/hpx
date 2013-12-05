@@ -86,6 +86,7 @@ namespace hpx { namespace lcos
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/detail/count_num_args.hpp>
 
@@ -97,7 +98,6 @@ namespace hpx { namespace lcos
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_binary_params.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <hpx/util/assert.hpp>
 
 namespace hpx { namespace lcos
 {

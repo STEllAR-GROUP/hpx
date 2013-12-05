@@ -8,6 +8,8 @@
 #ifndef BOOST_CHRONO_IO_DURATION_GET_HPP
 #define BOOST_CHRONO_IO_DURATION_GET_HPP
 
+#include <hpx/util/assert.hpp>
+
 #include <boost/chrono/config.hpp>
 #include <string>
 #include <boost/type_traits/is_scalar.hpp>
@@ -17,8 +19,6 @@
 #include <boost/math/common_factor_rt.hpp>
 #include <boost/chrono/detail/scan_keyword.hpp>
 #include <boost/chrono/detail/no_warning/signed_unsigned_cmp.hpp>
-
-#include <hpx/util/assert.hpp>
 #include <locale>
 
 /**

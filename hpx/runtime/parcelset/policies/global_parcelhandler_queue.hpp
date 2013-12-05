@@ -14,7 +14,6 @@
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/parcelhandler_queue_base.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-
 #include <hpx/util/assert.hpp>
 
 namespace hpx { namespace parcelset { namespace policies

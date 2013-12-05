@@ -20,9 +20,9 @@
 #ifndef JT28092007_BOOST_TSS_IMPL_WIN32
 #define JT28092007_BOOST_TSS_IMPL_WIN32
 
+#include <hpx/util/assert.hpp>
 #include <vector>
 #include <memory>
-#include <hpx/util/assert.hpp>
 
 #   include <windef.h>
 

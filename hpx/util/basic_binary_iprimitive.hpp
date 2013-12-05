@@ -24,13 +24,17 @@
 // IN GENERAL, ARCHIVES CREATED WITH THIS CLASS WILL NOT BE READABLE
 // ON PLATFORM APART FROM THE ONE THEY ARE CREATED ON
 
+#include <hpx/util/assert.hpp>
+#include <hpx/util/binary_filter.hpp>
+#include <hpx/util/ichunk_manager.hpp>
+#include <hpx/util/unused.hpp>
+
 #include <iosfwd>
 #include <cstring>    // std::memcpy
 #include <cstddef>    // std::size_t
 #include <string>
 #include <vector>
 
-#include <hpx/util/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/throw_exception.hpp>
@@ -42,10 +46,6 @@
 #include <boost/archive/archive_exception.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/serialization/is_bitwise_serializable.hpp>
-
-#include <hpx/util/binary_filter.hpp>
-#include <hpx/util/ichunk_manager.hpp>
-#include <hpx/util/unused.hpp>
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 

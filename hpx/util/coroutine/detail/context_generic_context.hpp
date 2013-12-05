@@ -8,6 +8,13 @@
 #if !defined(HPX_COROUTINE_CONTEXT_GENERIC_SEP_01_2012_0519PM)
 #define HPX_COROUTINE_CONTEXT_GENERIC_SEP_01_2012_0519PM
 
+#include <hpx/config.hpp>
+#include <hpx/config/forceinline.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/coroutine/exception.hpp>
+#include <hpx/util/coroutine/detail/swap_context.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
+
 #include <boost/version.hpp>
 
 #if BOOST_VERSION < 105100
@@ -15,17 +22,10 @@
 #endif
 
 #include <boost/config.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/detail/atomic_count.hpp>
 
 #include <boost/context/all.hpp>
 #include <boost/noncopyable.hpp>
-
-#include <hpx/config.hpp>
-#include <hpx/config/forceinline.hpp>
-#include <hpx/util/coroutine/exception.hpp>
-#include <hpx/util/coroutine/detail/swap_context.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 
 #include <cstddef>
 #include <cstdlib>

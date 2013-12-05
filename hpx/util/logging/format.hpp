@@ -21,18 +21,17 @@
 # pragma once
 #endif
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/forward_constructor.hpp>
+#include <hpx/util/logging/detail/manipulator.hpp>
+#include <hpx/util/logging/format_fwd.hpp>
 #include <hpx/util/logging/format/op_equal.hpp>
 #include <hpx/util/logging/format/array.hpp>
 #include <vector>
 #include <set>
 #include <boost/shared_ptr.hpp>
-#include <hpx/util/assert.hpp>
-
 #include <boost/type_traits/is_base_of.hpp>
-#include <hpx/util/logging/detail/manipulator.hpp>
-#include <hpx/util/logging/format_fwd.hpp>
 
 namespace hpx { namespace util { namespace logging {
 

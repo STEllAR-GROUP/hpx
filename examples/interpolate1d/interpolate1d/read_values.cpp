@@ -5,10 +5,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/assert.hpp>
 
 #include "read_values.hpp"
-
-#include <hpx/util/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation helper functions related to hdf5

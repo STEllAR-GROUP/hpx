@@ -13,6 +13,7 @@
 #include <hpx/util/portable_binary_oarchive.hpp>
 
 #include <hpx/util/assert.hpp>
+
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 

@@ -10,10 +10,11 @@
 #if !defined(HPX_53514563_F7A4_4F1E_B52A_083D8033E014)
 #define HPX_53514563_F7A4_4F1E_B52A_083D8033E014
 
+#include <hpx/util/assert.hpp>
+
 #include <algorithm>                       // copy
 #include <iosfwd>                          // streamsize
 
-#include <hpx/util/assert.hpp>
 #include <boost/iostreams/categories.hpp>  // sink_tag
 
 ///////////////////////////////////////////////////////////////////////////////

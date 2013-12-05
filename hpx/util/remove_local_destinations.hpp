@@ -9,12 +9,12 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <vector>
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/move/move.hpp>
-#include <hpx/util/assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

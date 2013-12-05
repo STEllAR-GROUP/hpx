@@ -29,6 +29,7 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/future_wait.hpp>
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/parse_command_line.hpp>
@@ -41,7 +42,6 @@
 #include <set>
 
 #include <boost/foreach.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/path.hpp>

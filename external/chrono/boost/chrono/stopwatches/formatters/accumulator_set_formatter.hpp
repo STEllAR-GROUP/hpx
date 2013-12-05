@@ -7,6 +7,8 @@
 #ifndef BOOST_CHRONO_STOPWATCHES_FORMATTERS_ACCUMULATOR_SET_HPP
 #define BOOST_CHRONO_STOPWATCHES_FORMATTERS_ACCUMULATOR_SET_HPP
 
+#include <hpx/util/assert.hpp>
+
 #include <boost/chrono/stopwatches/formatters/base_formatter.hpp>
 #include <boost/chrono/chrono_io.hpp>
 #include <boost/current_function.hpp>
@@ -20,7 +22,6 @@
 #include <boost/format.hpp>
 #include <boost/format/group.hpp>
 #include <boost/cstdint.hpp>
-#include <hpx/util/assert.hpp>
 #include <string>
 #include <iostream>
 #include <cassert>

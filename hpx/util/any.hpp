@@ -24,6 +24,7 @@
 #include <hpx/util/remove_reference.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
 #include <hpx/runtime/actions/guid_initialization.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/binary_filter.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -35,7 +36,6 @@
 #include <boost/throw_exception.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/mpl/bool.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/detail/sp_typeinfo.hpp>
 #include <boost/functional/hash.hpp>
 

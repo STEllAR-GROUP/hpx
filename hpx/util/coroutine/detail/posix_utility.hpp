@@ -29,6 +29,9 @@
 
 #ifndef HPX_COROUTINE_DETAIL_POSIX_UTILITY_HPP_02012006
 #define HPX_COROUTINE_DETAIL_POSIX_UTILITY_HPP_02012006
+
+#include <hpx/util/assert.hpp>
+
 #include <boost/config.hpp>
 
 #if defined(_POSIX_VERSION)
@@ -44,7 +47,6 @@
 #include <new>
 #include <iostream>
 #include <boost/type_traits.hpp>
-#include <hpx/util/assert.hpp>
 
 #if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0
 #include <sys/mman.h>

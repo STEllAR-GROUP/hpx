@@ -10,12 +10,12 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/stringstream.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/cstdint.hpp>
-#include <hpx/util/assert.hpp>
 #include <boost/intrusive/slist.hpp>
 
 #if defined(BOOST_MSVC)

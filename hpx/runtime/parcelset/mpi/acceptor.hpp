@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/runtime/parcelset/mpi/header.hpp>
-
 #include <hpx/util/assert.hpp>
+
 #include <boost/noncopyable.hpp>
 
 #include <vector>

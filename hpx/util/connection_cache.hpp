@@ -15,17 +15,17 @@
 #if !defined(HPX_UTIL_CONNECTION_CACHE_MAY_20_0104PM)
 #define HPX_UTIL_CONNECTION_CACHE_MAY_20_0104PM
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
+
 #include <map>
 #include <list>
 #include <stdexcept>
 #include <string>
 
-#include <hpx/hpx_fwd.hpp>
-#include <hpx/exception.hpp>
-#include <hpx/util/logging.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
-
-#include <hpx/util/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>

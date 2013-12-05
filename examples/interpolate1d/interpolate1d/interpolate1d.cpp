@@ -6,9 +6,9 @@
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <boost/foreach.hpp>
-#include <hpx/util/assert.hpp>
 
 #include "read_values.hpp"
 #include "partition.hpp"

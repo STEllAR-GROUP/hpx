@@ -18,8 +18,9 @@
 
 // for now, extended type info is part of the serialization libraries
 // this could change in the future.
-#include <cstdarg>
 #include <hpx/util/assert.hpp>
+
+#include <cstdarg>
 #include <cstddef> // NULL
 #include <boost/config.hpp>
 #include <boost/noncopyable.hpp>
