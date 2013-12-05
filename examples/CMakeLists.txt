@@ -15,6 +15,7 @@ set(subdirs
     heartbeat
     interpolate1d
     jacobi
+    jacobi_smp
     nqueen
     performance_counters
     quickstart
