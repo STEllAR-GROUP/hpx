@@ -31,6 +31,7 @@
 #include <hpx/util/decay.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/detail/full_empty_memory.hpp>
 
 namespace hpx { namespace lcos { namespace server { namespace detail
 {
