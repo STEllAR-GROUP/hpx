@@ -27,6 +27,11 @@ namespace jacobi_smp {
         }
     }
 
+    void status(std::size_t i)
+    {
+        std::cout << "iteration " << i << "\n";
+    }
+
     void jacobi(
         std::size_t n
       , std::size_t iterations, std::size_t block_size
@@ -50,6 +55,7 @@ namespace jacobi_smp {
         hpx::util::high_resolution_timer t;
         for(std::size_t i = 0; i < iterations; ++i)
         {
+            (*deps_old)[0].then(hpx::util::bind(status, i));
             for(std::size_t y = 1, j = 0; y < n -1; y += block_size, ++j)
             {
                 std::size_t y_end = (std::min)(y + block_size, n - 1);
