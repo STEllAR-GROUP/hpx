@@ -6,13 +6,11 @@
 #if !defined(HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM)
 #define HPX_LCOS_SERVER_QUEUE_FEB_09_2011_1204PM
 
-#include <boost/version.hpp>
 #include <boost/intrusive/slist.hpp>
 
 #include <hpx/exception.hpp>
+#include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
-#include <hpx/util/scoped_unlock.hpp>
-#include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
@@ -44,58 +42,14 @@ namespace hpx { namespace lcos { namespace server
         typedef lcos::local::spinlock mutex_type;
         typedef components::managed_component_base<queue> base_type;
 
-        // define data structures needed for intrusive slist container used for
-        // the queues
-        struct queue_thread_entry
-        {
-            typedef boost::intrusive::slist_member_hook<
-                boost::intrusive::link_mode<boost::intrusive::normal_link>
-            > hook_type;
-
-            queue_thread_entry(threads::thread_id_type const& id)
-              : id_(id)
-            {}
-
-            threads::thread_id_type id_;
-            hook_type slist_hook_;
-        };
-
-        typedef boost::intrusive::member_hook<
-            queue_thread_entry, typename queue_thread_entry::hook_type,
-            &queue_thread_entry::slist_hook_
-        > slist_option_type;
-
-        typedef boost::intrusive::slist<
-            queue_thread_entry, slist_option_type,
-            boost::intrusive::cache_last<true>,
-            boost::intrusive::constant_time_size<false>
-        > thread_queue_type;
-
-        struct reset_queue_entry
-        {
-            reset_queue_entry(queue_thread_entry& e, thread_queue_type& q)
-              : e_(e), q_(q), last_(q.last())
-            {}
-
-            ~reset_queue_entry()
-            {
-                if (e_.id_)
-                    q_.erase(last_);     // remove entry from queue
-            }
-
-            queue_thread_entry& e_;
-            thread_queue_type& q_;
-            typename thread_queue_type::const_iterator last_;
-        };
-
         // queue holding the values to process
-        struct queue_value_entry
+        struct queue_entry
         {
             typedef boost::intrusive::slist_member_hook<
                 boost::intrusive::link_mode<boost::intrusive::normal_link>
             > hook_type;
 
-            queue_value_entry(ValueType const& val)
+            queue_entry(ValueType const& val)
               : val_(val)
             {}
 
@@ -104,15 +58,15 @@ namespace hpx { namespace lcos { namespace server
         };
 
         typedef boost::intrusive::member_hook<
-            queue_value_entry, typename queue_value_entry::hook_type,
-            &queue_value_entry::slist_hook_
-        > value_slist_option_type;
+            queue_entry, typename queue_entry::hook_type,
+            &queue_entry::slist_hook_
+        > slist_option_type;
 
         typedef boost::intrusive::slist<
-            queue_value_entry, value_slist_option_type,
+            queue_entry, slist_option_type,
             boost::intrusive::cache_last<true>,
             boost::intrusive::constant_time_size<false>
-        > value_queue_type;
+        > queue_type;
 
     public:
         // This is the component id. Every component needs to have an embedded
@@ -123,32 +77,7 @@ namespace hpx { namespace lcos { namespace server
 
         ~queue()
         {
-            if (!thread_queue_.empty()) {
-                LERR_(fatal) << "~queue: thread_queue is not empty, aborting threads";
-
-                mutex_type::scoped_lock l(mtx_);
-                while (!thread_queue_.empty()) {
-                    threads::thread_id_type id = thread_queue_.front().id_;
-                    thread_queue_.front().id_ = threads::invalid_thread_id;
-                    thread_queue_.pop_front();
-
-                    // we know that the id is actually the pointer to the thread
-                    LERR_(fatal) << "~queue: pending thread: "
-                            << get_thread_state_name(id->get_state())
-                            << "(" << id.get() << "): " << id->get_description();
-
-                    // forcefully abort thread, do not throw
-                    error_code ec(lightweight);
-                    threads::set_thread_state(id, threads::pending,
-                        threads::wait_abort, threads::thread_priority_default, ec);
-                    if (ec) {
-                        LERR_(fatal) << "~queue: could not abort thread"
-                            << get_thread_state_name(id->get_state())
-                            << "(" << id.get() << "): " << id->get_description();
-                    }
-                }
-            }
-            HPX_ASSERT(value_queue_.empty());
+            HPX_ASSERT(queue_.empty());
         }
 
         // disambiguate base classes
@@ -170,23 +99,17 @@ namespace hpx { namespace lcos { namespace server
         void set_value (BOOST_RV_REF(RemoteType) result)
         {
             // push back the new value onto the queue
-            HPX_STD_UNIQUE_PTR<queue_value_entry> node(
-                new queue_value_entry(
+            HPX_STD_UNIQUE_PTR<queue_entry> node(
+                new queue_entry(
                     traits::get_remote_result<ValueType, RemoteType>::call(result)));
 
             mutex_type::scoped_lock l(mtx_);
-            value_queue_.push_back(*node);
+            queue_.push_back(*node);
 
             node.release();
 
             // resume the first thread waiting to pick up that value
-            if (!thread_queue_.empty()) {
-                threads::thread_id_type id = thread_queue_.front().id_;
-                thread_queue_.front().id_ = threads::invalid_thread_id;
-                thread_queue_.pop_front();
-
-                threads::set_thread_state(id, threads::pending);
-            }
+            cond_.notify_one(l);
         }
 
         /// The \a function set_exception is called whenever a
@@ -197,14 +120,7 @@ namespace hpx { namespace lcos { namespace server
         void set_exception(boost::exception_ptr const& /*e*/)
         {
             mutex_type::scoped_lock l(mtx_);
-
-            while (!thread_queue_.empty()) {
-                threads::thread_id_type id = thread_queue_.front().id_;
-                thread_queue_.front().id_ = threads::invalid_thread_id;
-                thread_queue_.pop_front();
-
-                threads::set_thread_state(id, threads::pending, threads::wait_abort);
-            }
+            cond_.abort_all(l);
         }
 
         // Retrieve the next value from the queue (pop value from front of
@@ -214,32 +130,22 @@ namespace hpx { namespace lcos { namespace server
         ValueType get_value()
         {
             mutex_type::scoped_lock l(mtx_);
-            if (value_queue_.empty()) {
-                // suspend this thread until a new value is placed into the
-                // value queue
-                queue_thread_entry e(threads::get_self_id());
-                thread_queue_.push_back(e);
-
-                reset_queue_entry r(e, thread_queue_);
-                {
-                    util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-                    this_thread::suspend(threads::suspended,
-                        "queue::get_value");
-                }
+            if (queue_.empty()) {
+                cond_.wait(l, "queue::get_value");
             }
 
             // get the first value from the value queue and return it to the
             // caller
-            ValueType value = value_queue_.front().val_;
-            value_queue_.pop_front();
+            ValueType value = queue_.front().val_;
+            queue_.pop_front();
 
             return value;
         }
 
     private:
         mutex_type mtx_;
-        value_queue_type value_queue_;
-        thread_queue_type thread_queue_;
+        queue_type queue_;
+        local::detail::condition_variable cond_;
     };
 }}}
 

@@ -7,18 +7,17 @@
 #define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/traits/get_remote_result.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/util/unused.hpp>
-#include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/detail/value_or_error.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/intrusive/slist.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <boost/detail/atomic_count.hpp>
@@ -145,51 +144,6 @@ namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // define data structures needed for intrusive slist container used for
-    // the queues
-    struct queue_entry
-    {
-        typedef boost::intrusive::slist_member_hook<
-            boost::intrusive::link_mode<boost::intrusive::normal_link>
-        > hook_type;
-
-        queue_entry(threads::thread_id_type const& id)
-          : id_(id)
-        {}
-
-        threads::thread_id_type id_;
-        hook_type list_hook_;
-    };
-
-    typedef boost::intrusive::member_hook<
-        queue_entry, queue_entry::hook_type,
-        &queue_entry::list_hook_
-    > list_option_type;
-
-    typedef boost::intrusive::slist<
-        queue_entry, list_option_type,
-        boost::intrusive::cache_last<true>,
-        boost::intrusive::constant_time_size<false>
-    > queue_type;
-
-    struct reset_queue_entry
-    {
-        reset_queue_entry(queue_entry& e, queue_type& q)
-          : e_(e), q_(q), last_(q.last())
-        {}
-
-        ~reset_queue_entry()
-        {
-            if (e_.id_)
-                q_.erase(last_);     // remove entry from queue
-        }
-
-        queue_entry& e_;
-        queue_type& q_;
-        queue_type::const_iterator last_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     struct future_data : future_data_refcnt_base
     {
@@ -293,15 +247,7 @@ namespace detail
                 state_ = full;
 
                 // handle all threads waiting for the block to become full
-                while (!wait_queue_.empty()) {
-                    threads::thread_id_type id = wait_queue_.front().id_;
-                    wait_queue_.front().id_ = threads::invalid_thread_id;
-                    wait_queue_.pop_front();
-
-                    threads::set_thread_state(id, threads::pending,
-                        threads::wait_timeout, threads::thread_priority_default, ec);
-                    if (ec) return;
-                }
+                cond_.notify_all(l, ec);
             }
 
             // invoke the callback (continuation) function
@@ -406,21 +352,8 @@ namespace detail
 
             // block if this entry is empty
             if (state_ == empty) {
-                threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (0 == self || ec) return;
-
-                // enqueue the request and block this thread
-                queue_entry f(threads::get_self_id());
-                wait_queue_.push_back(f);
-
-                reset_queue_entry r(f, wait_queue_);
-                {
-                    // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
-                    this_thread::suspend(threads::suspended,
-                        "future_data::wait", ec);
-                    if (ec) return;
-                }
+                cond_.wait(l, "future_data::wait", ec);
+                if (ec) return;
             }
 
             if (&ec != &throws)
@@ -434,25 +367,12 @@ namespace detail
 
             // block if this entry is empty
             if (state_ == empty) {
-                threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (0 == self || ec) return future_status::uninitialized;
+                threads::thread_state_ex_enum const reason =
+                    cond_.wait_for(l, p, "future_data::wait_for", ec);
+                if (ec) return future_status::uninitialized;
 
-                // enqueue the request and block this thread
-                queue_entry f(threads::get_self_id());
-                wait_queue_.push_back(f);
-
-                reset_queue_entry r(f, wait_queue_);
-                {
-                    // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
-                    threads::thread_state_ex_enum const reason =
-                        this_thread::suspend(p, "future_data::wait_for", ec);
-                    if (ec) return future_status::uninitialized;
-
-                    // if the timer has hit, the waiting period timed out
-                    return (reason == threads::wait_signaled) ? //-V110
-                        future_status::timeout : future_status::ready;
-                }
+                return (reason == threads::wait_signaled) ?
+                    future_status::timeout : future_status::ready; //-V110
             }
 
             if (&ec != &throws)
@@ -468,27 +388,14 @@ namespace detail
 
             // block if this entry is empty
             if (state_ == empty) {
-                threads::thread_self* self = threads::get_self_ptr_checked(ec);
-                if (0 == self || ec) return future_status::uninitialized;
+                threads::thread_state_ex_enum const reason =
+                    cond_.wait_until(l, at, "future_data::wait_until", ec);
+                if (ec) return future_status::uninitialized;
 
-                // enqueue the request and block this thread
-                queue_entry f(threads::get_self_id());
-                wait_queue_.push_back(f);
-
-                reset_queue_entry r(f, wait_queue_);
-                {
-                    // yield this thread
-                    util::scoped_unlock<typename mutex_type::scoped_lock> ul(l);
-                    threads::thread_state_ex_enum const reason =
-                        this_thread::suspend(at, "future_data::wait_until", ec);
-                    if (ec) return future_status::uninitialized;
-
-                    // if the timer has hit, the waiting period timed out
-                    return (reason == threads::wait_signaled) ? //-V110
-                        future_status::timeout : future_status::ready;
-                }
+                return (reason == threads::wait_signaled) ?
+                    future_status::timeout : future_status::ready; //-V110
             }
-
+            
             if (&ec != &throws)
                 ec = make_success_code();
 
@@ -532,7 +439,7 @@ namespace detail
         completed_callback_type on_completed_;
 
     private:
-        queue_type wait_queue_;               // threads waiting in read
+        local::detail::condition_variable cond_;// threads waiting in read
         full_empty_state state_;              // current full/empty state
     };
 

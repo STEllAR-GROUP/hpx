@@ -534,12 +534,12 @@ void test_unique_future_for_string()
     HPX_TEST_EQ(res, "foo");
 }
 
-hpx::lcos::local::mutex callback_mutex;
+hpx::lcos::local::spinlock callback_mutex;
 unsigned callback_called = 0;
 
 void wait_callback(hpx::lcos::future<int>)
 {
-    boost::lock_guard<hpx::lcos::local::mutex> lk(callback_mutex);
+    boost::lock_guard<hpx::lcos::local::spinlock> lk(callback_mutex);
     ++callback_called;
 }
 
@@ -574,7 +574,7 @@ void test_wait_callback()
 
 void do_nothing_callback(hpx::lcos::local::promise<int>& /*pi*/)
 {
-    boost::lock_guard<hpx::lcos::local::mutex> lk(callback_mutex);
+    boost::lock_guard<hpx::lcos::local::spinlock> lk(callback_mutex);
     ++callback_called;
 }
 
