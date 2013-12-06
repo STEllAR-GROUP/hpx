@@ -11,6 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/stringstream.hpp>

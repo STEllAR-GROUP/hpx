@@ -11,6 +11,7 @@ set(tests
     async_local
     async_remote
     composable_guard
+    condition_variable
     barrier
     dataflow
     deferred_packaged_task
