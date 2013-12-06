@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/thread/lock_types.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/utility/declval.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
