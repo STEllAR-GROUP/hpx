@@ -78,7 +78,7 @@ namespace hpx { namespace threads { namespace policies
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
     typedef HPX_STD_TUPLE<thread_data_base*, boost::uint64_t> thread_description;
 #else
-    typedef thread_data_base* thread_description;
+    typedef thread_data_base thread_description;
 #endif
 
     typedef boost::lockfree::fifo<thread_description*> work_item_queue_type;
@@ -150,12 +150,6 @@ namespace hpx { namespace threads { namespace policies
         std::size_t add_new(boost::int64_t add_count, thread_queue* addfrom,
             std::size_t num_thread)
         {
-#if defined(HPX_DEBUG)
-            // make sure our mutex is locked at this point
-            typename mutex_type::scoped_try_lock l(mtx_);
-            HPX_ASSERT(!l);
-#endif
-
             if (HPX_UNLIKELY(0 == add_count))
                 return 0;
 
@@ -467,7 +461,6 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread, error_code& ec)
         {
             if (run_now) {
-                typename mutex_type::scoped_lock lk(mtx_);
 
                 threads::thread_id_type thrd;
 
@@ -480,33 +473,39 @@ namespace hpx { namespace threads { namespace policies
                         data, &memory_pool_, initial_state));
                 }
 
-                // add a new entry in the map for this thread
-                std::pair<thread_map_type::iterator, bool> p =
-                    thread_map_.insert(thread_map_type::value_type(thrd.get(), thrd));
+                // The mutex can not be locked while a new thread is getting
+                // created, as it might have that the current HPX thread gets
+                // suspended.
+                {
+                    typename mutex_type::scoped_lock lk(mtx_);
+                    // add a new entry in the map for this thread
+                    std::pair<thread_map_type::iterator, bool> p =
+                        thread_map_.insert(thread_map_type::value_type(thrd.get(), thrd));
 
-                if (HPX_UNLIKELY(!p.second)) {
-                    HPX_THROWS_IF(ec, hpx::out_of_memory,
-                        "threadmanager::register_thread",
-                        "Couldn't add new thread to the map of threads");
-                    return invalid_thread_id;
+                    if (HPX_UNLIKELY(!p.second)) {
+                        HPX_THROWS_IF(ec, hpx::out_of_memory,
+                            "threadmanager::register_thread",
+                            "Couldn't add new thread to the map of threads");
+                        return invalid_thread_id;
+                    }
+                    ++thread_map_count_;
+
+                    // push the new thread in the pending queue thread
+                    if (initial_state == pending)
+                        schedule_thread(thrd.get(), num_thread);
+
+                    // this thread has to be in the map now
+                    HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
+                    HPX_ASSERT(thrd->is_created_from(&memory_pool_));
+
+                    do_some_work();       // try to execute the new work item
+
+                    if (&ec != &throws)
+                        ec = make_success_code();
+
+                    // return the thread_id of the newly created thread
+                    return thrd;
                 }
-                ++thread_map_count_;
-
-                // push the new thread in the pending queue thread
-                if (initial_state == pending)
-                    schedule_thread(thrd.get(), num_thread);
-
-                // this thread has to be in the map now
-                HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
-                HPX_ASSERT(thrd->is_created_from(&memory_pool_));
-
-                do_some_work();       // try to execute the new work item
-
-                if (&ec != &throws)
-                    ec = make_success_code();
-
-                // return the thread_id of the newly created thread
-                return thrd;
             }
 
             // do not execute the work, but register a task description for
