@@ -20,6 +20,7 @@
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
@@ -27,7 +28,6 @@
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
 
-#include <hpx/util/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio/deadline_timer.hpp>

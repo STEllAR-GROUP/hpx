@@ -115,10 +115,10 @@ void test_id_comparison()
 
 ///////////////////////////////////////////////////////////////////////////////
 void interruption_point_thread(hpx::lcos::local::barrier* b, 
-    hpx::lcos::local::mutex* m, bool* failed)
+    hpx::lcos::local::spinlock* m, bool* failed)
 {
     try {
-        hpx::lcos::local::mutex::scoped_lock lk(*m);
+        hpx::lcos::local::spinlock::scoped_lock lk(*m);
         hpx::this_thread::interruption_point();
         *failed = true;
     }
@@ -131,10 +131,10 @@ void interruption_point_thread(hpx::lcos::local::barrier* b,
 
 void do_test_thread_interrupts_at_interruption_point()
 {
-    hpx::lcos::local::mutex m;
+    hpx::lcos::local::spinlock m;
     hpx::lcos::local::barrier b(2);
     bool failed = false;
-    hpx::lcos::local::mutex::scoped_lock lk(m);
+    hpx::lcos::local::spinlock::scoped_lock lk(m);
     hpx::thread thrd(
         HPX_STD_BIND(&interruption_point_thread, &b, &m, &failed));
     thrd.interrupt();
@@ -154,12 +154,12 @@ void test_thread_interrupts_at_interruption_point()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void disabled_interruption_point_thread(hpx::lcos::local::mutex* m, 
+void disabled_interruption_point_thread(hpx::lcos::local::spinlock* m, 
     hpx::lcos::local::barrier* b, bool* failed)
 {
     hpx::this_thread::disable_interruption dc;
     try {
-        hpx::lcos::local::mutex::scoped_lock lk(*m);
+        hpx::lcos::local::spinlock::scoped_lock lk(*m);
         hpx::this_thread::interruption_point();
         *failed = false;
     }
@@ -172,10 +172,10 @@ void disabled_interruption_point_thread(hpx::lcos::local::mutex* m,
 
 void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 {
-    hpx::lcos::local::mutex m;
+    hpx::lcos::local::spinlock m;
     hpx::lcos::local::barrier b(2);
     bool failed = true;
-    hpx::lcos::local::mutex::scoped_lock lk(m);
+    hpx::lcos::local::spinlock::scoped_lock lk(m);
     hpx::thread thrd(
         HPX_STD_BIND(&disabled_interruption_point_thread, &m, &b, &failed));
     thrd.interrupt();

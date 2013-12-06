@@ -14,12 +14,12 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/runtime/threads/thread.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
-#include <hpx/util/assert.hpp>
 #include <boost/atomic.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/fusion/include/for_each.hpp>

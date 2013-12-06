@@ -10,9 +10,9 @@
 #include <hpx/config.hpp>
 #include <hpx/runtime/parcelset/mpi/header.hpp>
 #include <hpx/runtime/parcelset/mpi/allocator.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
-#include <hpx/util/assert.hpp>
 #include <boost/move/move.hpp>
 #include <boost/noncopyable.hpp>
 

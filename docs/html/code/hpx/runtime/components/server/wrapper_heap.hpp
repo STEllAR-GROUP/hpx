@@ -17,14 +17,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local/mutex.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/util/logging.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/generate_unique_ids.hpp>
 #include <hpx/util/itt_notify.hpp>
+#include <hpx/util/logging.hpp>
+#include <hpx/util/scoped_unlock.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace detail

@@ -8,6 +8,7 @@
 #include <hpx/state.hpp>
 #include <hpx/runtime.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
@@ -17,7 +18,6 @@
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/util/reinitializable_static.hpp>
 
-#include <hpx/util/assert.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/serialization/vector.hpp>
 

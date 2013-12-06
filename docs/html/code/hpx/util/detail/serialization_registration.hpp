@@ -7,6 +7,7 @@
 #ifndef HPX_FUNCTION_DETAILSERIALIZATION_REGISTRATION_HPP
 #define HPX_FUNCTION_DETAILSERIALIZATION_REGISTRATION_HPP
 
+#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/serialization/base_object.hpp>
@@ -17,7 +18,6 @@
 #include <boost/serialization/extended_type_info_typeid.hpp>
 #include <boost/uuid/sha1.hpp>
 #include <boost/cstdint.hpp>
-#include <hpx/util/assert.hpp>
 
 #include <typeinfo>
 

@@ -10,9 +10,8 @@
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
-
 #include <hpx/util/assert.hpp>
+#include <hpx/util/coroutine/detail/coroutine_impl_impl.hpp>
 
 // #if HPX_DEBUG
 // #  define HPX_DEBUG_THREAD_POOL 1

@@ -8,11 +8,11 @@
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/util/assert.hpp>
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 
-#include <hpx/util/assert.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/vector.hpp>

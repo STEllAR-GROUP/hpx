@@ -10,12 +10,12 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/traits/component_type_database.hpp>
+#include <hpx/util/assert.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #if defined(HPX_HAVE_SECURITY)
 #include <hpx/components/security/capability.hpp>
 #endif
 
-#include <hpx/util/assert.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/cstdint.hpp>
 
