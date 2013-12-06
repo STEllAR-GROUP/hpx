@@ -148,7 +148,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // add new threads if there is some amount of work available
         std::size_t add_new(boost::int64_t add_count, thread_queue* addfrom,
-            std::size_t num_thread)
+            std::size_t num_thread, typename mutex_type::scoped_try_lock &lk)
         {
             if (HPX_UNLIKELY(0 == add_count))
                 return 0;
@@ -174,13 +174,17 @@ namespace hpx { namespace threads { namespace policies
                 thread_state_enum state = HPX_STD_GET(1, *task);
                 threads::thread_id_type thrd;
 
-                if (data.stacksize != 0) {
-                    thrd.reset(new (memory_pool_) threads::thread_data(
-                        data, memory_pool_, state));
-                }
-                else {
-                    thrd.reset(new threads::stackless_thread_data(
-                        data, &memory_pool_, state));
+                {
+                    hpx::util::scoped_unlock<typename mutex_type::scoped_try_lock>
+                        ull(lk);
+                    if (data.stacksize != 0) {
+                        thrd.reset(new (memory_pool_) threads::thread_data(
+                            data, memory_pool_, state));
+                    }
+                    else {
+                        thrd.reset(new threads::stackless_thread_data(
+                            data, &memory_pool_, state));
+                    }
                 }
 
                 delete task;
@@ -219,7 +223,7 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         bool add_new_if_possible(std::size_t& added, thread_queue* addfrom,
-            std::size_t num_thread)
+            std::size_t num_thread, typename mutex_type::scoped_try_lock &lk)
         {
             if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
                 return false;
@@ -243,14 +247,14 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            std::size_t addednew = add_new(add_count, addfrom, num_thread);
+            std::size_t addednew = add_new(add_count, addfrom, num_thread, lk);
             added += addednew;
             return addednew != 0;
         }
 
         ///////////////////////////////////////////////////////////////////////
         bool add_new_always(std::size_t& added, thread_queue* addfrom,
-            std::size_t num_thread)
+            std::size_t num_thread, typename mutex_type::scoped_try_lock &lk)
         {
             if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
                 return false;
@@ -280,7 +284,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            std::size_t addednew = add_new(add_count, addfrom, num_thread);
+            std::size_t addednew = add_new(add_count, addfrom, num_thread, lk);
             added += addednew;
             return addednew != 0;
         }
@@ -716,7 +720,7 @@ namespace hpx { namespace threads { namespace policies
 
                 // stop running after all HPX threads have been terminated
                 thread_queue* addfrom = addfrom_ ? addfrom_ : this;
-                bool added_new = add_new_always(added, addfrom, num_thread);
+                bool added_new = add_new_always(added, addfrom, num_thread, lk);
                 if (!added_new) {
                     // Before exiting each of the OS threads deletes the
                     // remaining terminated PX threads
