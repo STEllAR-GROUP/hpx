@@ -9,7 +9,7 @@
 #include <boost/intrusive/slist.hpp>
 
 #include <hpx/exception.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
