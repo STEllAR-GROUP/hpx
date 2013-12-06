@@ -32,7 +32,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
 #   if !defined(BOOST_NO_CXX11_DECLTYPE_N3276) && !defined(BOOST_NO_SFINAE_EXPR)
     template <typename Lock>
-    decltype(boost::declval(Lock).owns_lock())
+    decltype(boost::declval<Lock>().owns_lock())
     assert_owns_lock(Lock& l, long)
     {
         HPX_ASSERT(l.owns_lock());
