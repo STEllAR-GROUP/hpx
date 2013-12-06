@@ -21,7 +21,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/state.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/lcos/local/shared_mutex.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
