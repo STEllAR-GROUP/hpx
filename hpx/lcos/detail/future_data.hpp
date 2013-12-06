@@ -7,7 +7,7 @@
 #define HPX_LCOS_DETAIL_FUTURE_DATA_MAR_06_2012_1055AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/traits/get_remote_result.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>

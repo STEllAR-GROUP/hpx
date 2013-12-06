@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_BARRIER_JUN_23_2008_0530PM)
 #define HPX_LCOS_BARRIER_JUN_23_2008_0530PM
 
-#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
