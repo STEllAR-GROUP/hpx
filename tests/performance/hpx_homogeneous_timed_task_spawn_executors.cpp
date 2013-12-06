@@ -34,7 +34,6 @@ using hpx::threads::get_thread_count;
 using hpx::util::high_resolution_timer;
 
 using hpx::reset_active_counters;
-using hpx::evaluate_active_counters;
 using hpx::stop_active_counters;
 
 using hpx::cout;
@@ -140,8 +139,8 @@ int hpx_main(
     // Stop the clock
     double time_elapsed = t.elapsed();
 
-    // Evaluate Performance Counters
-    evaluate_active_counters();
+    // Stop Performance Counters
+    stop_active_counters();
 
     print_results(get_os_thread_count(), time_elapsed);
 
