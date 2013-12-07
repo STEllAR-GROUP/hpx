@@ -214,11 +214,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
       , naming::id_type const& id
       , boost::int64_t credit
         );
-    bool synchronize_with_async_increfs(
-        hpx::future<std::vector<hpx::future<bool> > >& futures
-      , naming::id_type const& id
-      , boost::int64_t credit
-        );
     hpx::future<bool> propagate_remote_incref_acknowlegdement(
         boost::int64_t credit
       , naming::id_type const& id
@@ -246,7 +241,7 @@ private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests(
         mutex_type::scoped_lock& l
-      , error_code& ec
+      , error_code& ec = throws
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
@@ -1121,6 +1116,12 @@ public:
         return incref_async(gid, credits).get(ec);
     }
 
+    bool add_remote_incref_request(
+        boost::int64_t credit
+      , naming::gid_type const& gid
+      , naming::id_type const& remote_locality
+        );
+
     /// \brief Decrement the global reference count for the given id
     ///
     /// \param id         [in] The global address (id) for which the
@@ -1144,36 +1145,16 @@ public:
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     void decref(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
-      , boost::int64_t credits = 1
-      , error_code& ec = throws
-        );
-
-    void decref(
         naming::gid_type const& id
       , boost::int64_t credits = 1
       , error_code& ec = throws
-        )
-    {
-        decref(id, id, credits, ec);
-    }
-
-    lcos::future<void> decref_async(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
-      , boost::int64_t credits = 1
-      , naming::id_type const& keep_alive = naming::invalid_id
         );
 
     lcos::future<void> decref_async(
         naming::gid_type const& id
       , boost::int64_t credits = 1
       , naming::id_type const& keep_alive = naming::invalid_id
-        )
-    {
-        return decref_async(id, id, credits, keep_alive);
-    }
+        );
 
 #if !defined(HPX_NO_DEPRECATED)
     /// \brief Register a global name with a global address (id)

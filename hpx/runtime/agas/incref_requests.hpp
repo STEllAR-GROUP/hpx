@@ -19,12 +19,14 @@ namespace hpx { namespace agas { namespace detail
     {
         incref_request_data(boost::uint64_t credit,
                 naming::id_type const& id, naming::id_type const& loc)
-            : credit_(credit), keep_alive_(id), locality_(loc)
+            : credit_(credit), keep_alive_(id), locality_(loc), debit_(0)
         {}
 
         boost::int64_t credit_;         // amount of credit not acknowledged yet
         naming::id_type keep_alive_;    // id for which credit is outstanding
         naming::id_type locality_;      // locality where this credit belongs
+        boost::int64_t debit_;          // amount of credits held back because of
+                                        // pending acknowledgements
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -51,7 +53,7 @@ namespace hpx { namespace agas { namespace detail
         // This function will be called as part of setting up an incref request.
         // It will also keep the given id alive until all of the credits are
         // acknowledged (see acknowledge_request below).
-        void add_request(boost::int64_t credit, naming::id_type const& id);
+        void add_incref_request(boost::int64_t credit, naming::id_type const& id);
 
         // Add a credit request for a remote id, this will subtract the credit from an
         // existing local request before adding the rmeote one. This function does
@@ -59,15 +61,21 @@ namespace hpx { namespace agas { namespace detail
         //
         // This function will be called during id-splitting to store a bread-crumb
         // pointing to the locality where the outstanding credit has to be tracked.
-        bool add_remote_request(boost::int64_t credit, naming::gid_type const& gid,
-            naming::id_type const& remote_locality);
+        bool add_remote_incref_request(boost::int64_t credit,
+            naming::gid_type const& gid, naming::id_type const& remote_locality);
 
+        // This function will be called whenever a acknoledgement message from AGAS
+        // is received. It will compensate the pending credits for the acknowledged
+        // amount of credits.
         typedef HPX_STD_FUNCTION<
             hpx::future<bool>(boost::int64_t, naming::id_type const&, naming::id_type const&)
         > acknowledge_request_callback;
 
         bool acknowledge_request(boost::int64_t credit, naming::id_type const& id,
              acknowledge_request_callback const& f);
+
+        //
+        bool add_decref_request(boost::int64_t credit, naming::gid_type const& id);
 
     private:
         mutable mutex_type mtx_;

@@ -381,14 +381,13 @@ naming::gid_type get_next_id(
 
 ///////////////////////////////////////////////////////////////////////////////
 void decref(
-    naming::gid_type const& lower
-  , naming::gid_type const& upper
+    naming::gid_type const& gid
   , boost::int64_t credits
   , error_code& ec
   )
 {
     naming::resolver_client& resolver = naming::get_agas_client();
-    resolver.decref(lower, upper, credits, ec);
+    resolver.decref(gid, credits, ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

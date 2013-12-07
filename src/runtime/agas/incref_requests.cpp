@@ -28,12 +28,12 @@ namespace hpx { namespace agas { namespace detail
         return store_.end();
     }
 
-    void incref_requests::add_request(boost::int64_t credit,
+    void incref_requests::add_incref_request(boost::int64_t credit,
         naming::id_type const& id)
     {
         HPX_ASSERT(credit > 0);
 
-        naming::gid_type const& gid = id.get_gid();
+        naming::gid_type gid = naming::detail::get_stripped_gid(id.get_gid());
 
         mutex_type::scoped_lock l(mtx_);
 
@@ -53,8 +53,8 @@ namespace hpx { namespace agas { namespace detail
                      naming::id_type::unmanaged)
             {
                 // If the currently stored id is unmanaged then the entry
-                // was created by a remote acknowledgement. Update the
-                // id with a local one to be kept alife.
+                // was created by a remote acknowledgment. Update the
+                // id with a local one to be kept alive.
                 it->second.keep_alive_ = id;
             }
         }
@@ -65,7 +65,7 @@ namespace hpx { namespace agas { namespace detail
         }
     }
 
-    bool incref_requests::add_remote_request(boost::int64_t credit,
+    bool incref_requests::add_remote_incref_request(boost::int64_t credit,
         naming::gid_type const& gid, naming::id_type const& remote_locality)
     {
         HPX_ASSERT(credit > 0);
@@ -108,7 +108,7 @@ namespace hpx { namespace agas { namespace detail
         naming::id_type const& id, acknowledge_request_callback const& f)
     {
         HPX_ASSERT(credit > 0);
-        naming::gid_type const& gid = id.get_gid();
+        naming::gid_type gid = naming::detail::get_stripped_gid(id.get_gid());
 
         std::vector<incref_request_data> matching_data;
 
@@ -124,9 +124,10 @@ namespace hpx { namespace agas { namespace detail
                     // adjust remaining part of the credit
                     data.credit_ -= credit;
 
-                    // construct proper acknowledgement data
+                    // construct proper acknowledgment data
                     matching_data.push_back(data);
                     matching_data.back().credit_ = credit;
+                    matching_data.back().debit_ = 0;
 
                     // we're done with handling acknowledged credit
                     credit = 0;
@@ -135,7 +136,7 @@ namespace hpx { namespace agas { namespace detail
                 }
                 else
                 {
-                    // construct proper acknowledgement data
+                    // construct proper acknowledgment data
                     matching_data.push_back(data);
 
                     // adjust credit
@@ -163,10 +164,20 @@ namespace hpx { namespace agas { namespace detail
 
         BOOST_FOREACH(incref_request_data const& data, matching_data)
         {
+            if (data.debit_ != 0)
+            {
+                HPX_ASSERT(data.locality_ == naming::invalid_id);
+                HPX_ASSERT(data.debit_ > 0);
+                requests.push_back(
+                    f(-data.debit_, data.keep_alive_, data.locality_)
+                );
+            }
+
             if (data.locality_ != naming::invalid_id)
             {
                 requests.push_back(
-                    f(data.credit_, data.keep_alive_, data.locality_));
+                    f(data.credit_, data.keep_alive_, data.locality_)
+                );
             }
         }
 
@@ -177,6 +188,20 @@ namespace hpx { namespace agas { namespace detail
         }
 
         return result;
+    }
+
+    bool incref_requests::add_decref_request(boost::int64_t credit,
+        naming::gid_type const& gid)
+    {
+        mutex_type::scoped_lock l(mtx_);
+
+        // There is nothing for us to do if no local entry exists.
+        iterator it_local = find_entry(gid, naming::invalid_id);
+        if (it_local == store_.end())
+            return false;   // perform 'normal' (non-delayed) decref handling
+
+        (*it_local).second.debit_ += credit;
+        return true;
     }
 }}}
 

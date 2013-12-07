@@ -250,20 +250,10 @@ HPX_API_EXPORT naming::gid_type get_next_id(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT void decref(
-    naming::gid_type const& lower
-  , naming::gid_type const& upper
-  , boost::int64_t credits
-  , error_code& ec = throws
-  );
-
-inline void decref(
     naming::gid_type const& id
   , boost::int64_t credits
   , error_code& ec = throws
-  )
-{
-    decref(id, id, credits, ec);
-}
+  );
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT hpx::future<bool> incref_async(
