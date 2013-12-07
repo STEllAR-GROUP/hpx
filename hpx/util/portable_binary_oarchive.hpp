@@ -8,16 +8,6 @@
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/type_traits/is_integral.hpp>
 
-#if !defined(HPX_USE_PORTABLE_ARCHIVES) || HPX_USE_PORTABLE_ARCHIVES == 0
-#include <boost/archive/binary_oarchive.hpp>
-
-namespace hpx { namespace util
-{
-    typedef boost::archive::binary_oarchive portable_binary_oarchive;
-}}
-
-#else
-
 // MS compatible compilers support #pragma once
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -32,7 +22,7 @@ namespace hpx { namespace util
 // portable_binary_oarchive.hpp
 
 // (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
-// Copyright (c) 2007-2012 Hartmut Kaiser
+// Copyright (c) 2007-2013 Hartmut Kaiser
 //
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -597,7 +587,6 @@ namespace boost { namespace archive { namespace detail
 #pragma warning( pop )
 #endif
 
-#endif // HPX_USE_PORTABLE_ARCHIVES == 0
 #endif // PORTABLE_BINARY_OARCHIVE_HPP
 
 
