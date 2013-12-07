@@ -70,6 +70,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
             // generate the name for this data_buffer
             std::string data_buffer_name(pv[0].get_parcel_id().to_string());
+            boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
 
             // clear and preallocate out_buffer_ (or fetch from cache)
             out_buffer_ = get_data_buffer((arg_size * 12) / 10 + 1024,
@@ -80,8 +81,8 @@ namespace hpx { namespace parcelset { namespace shmem
 
             {
                 // Serialize the data
-                util::portable_binary_oarchive archive(
-                    out_buffer_.get_buffer(), 0, archive_flags_);
+                util::portable_binary_oarchive archive(out_buffer_.get_buffer(),
+                    dest_locality_id, 0, archive_flags_);
 
                 std::size_t count = pv.size();
                 archive << count;

@@ -101,6 +101,9 @@ class HPX_SERIALIZATION_EXPORT portable_binary_oarchive :
     typedef boost::archive::detail::common_oarchive<
         portable_binary_oarchive
     > archive_base_t;
+
+    boost::uint32_t dest_locality_id_;
+
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
 public:
 #else
@@ -231,18 +234,22 @@ protected:
 
 public:
     template <typename Container>
-    portable_binary_oarchive(Container& buffer, binary_filter* filter = 0, unsigned flags = 0)
+    portable_binary_oarchive(Container& buffer, boost::uint32_t dest_locality_id,
+            binary_filter* filter = 0, unsigned flags = 0)
       : primitive_base_t(buffer, flags),
-        archive_base_t(flags)
+        archive_base_t(flags),
+        dest_locality_id_(dest_locality_id)
     {
         init(filter, flags);
     }
 
     template <typename Container>
     portable_binary_oarchive(Container& buffer, std::vector<serialization_chunk>* chunks,
+            boost::uint32_t dest_locality_id,
             binary_filter* filter = 0, unsigned flags = 0)
       : primitive_base_t(buffer, chunks, flags),
-        archive_base_t(flags)
+        archive_base_t(flags),
+        dest_locality_id_(dest_locality_id)
     {
         init(filter, flags);
     }
@@ -291,6 +298,12 @@ public:
     void save_array(boost::serialization::array<signed char> const& a, unsigned int)
     {
         this->primitive_base_t::save_array(a);
+    }
+
+    // return destination locality id
+    boost::uint32_t get_dest_locality_id() const
+    {
+        return dest_locality_id_;
     }
 };
 

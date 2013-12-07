@@ -390,6 +390,16 @@ void decref(
     resolver.decref(gid, credits, ec);
 }
 
+bool add_remote_incref_request(
+    boost::int64_t credit
+  , naming::gid_type const& gid
+  , naming::id_type const& remote_locality
+    )
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.add_remote_incref_request(credit, gid, remote_locality);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<bool> incref_async(
     naming::gid_type const& gid

@@ -503,7 +503,7 @@ namespace hpx { namespace naming
         private:
             // credit management (called during serialization), this function
             // has to be 'const' as save() above has to be 'const'.
-            naming::gid_type preprocess_gid() const;
+            naming::gid_type preprocess_gid(naming::id_type const& dest_id) const;
 
             void postprocess_gid();
 

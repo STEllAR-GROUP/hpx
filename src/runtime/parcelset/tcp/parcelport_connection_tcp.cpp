@@ -185,6 +185,7 @@ namespace hpx { namespace parcelset { namespace tcp
 
         // collect argument sizes from parcels
         std::size_t arg_size = 0;
+        boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
 
         // guard against serialization errors
         try {
@@ -199,6 +200,7 @@ namespace hpx { namespace parcelset { namespace tcp
             }
 
             out_buffer_.reserve(arg_size*2);
+            boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
 
             // mark start of serialization
             util::high_resolution_timer timer;
@@ -214,8 +216,8 @@ namespace hpx { namespace parcelset { namespace tcp
                     archive_flags |= util::enable_compression;
                 }
 
-                util::portable_binary_oarchive archive(
-                    out_buffer_, &out_chunks_, filter.get(), archive_flags);
+                util::portable_binary_oarchive archive(out_buffer_,
+                    &out_chunks_, dest_locality_id, filter.get(), archive_flags);
 
 #if defined(HPX_HAVE_SECURITY)
                 std::set<boost::uint32_t> localities;

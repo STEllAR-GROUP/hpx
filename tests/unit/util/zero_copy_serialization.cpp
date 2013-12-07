@@ -80,13 +80,15 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     std::size_t arg_size = hpx::traits::get_type_size(outp);
     std::vector<char> out_buffer;
     std::vector<hpx::util::serialization_chunk> out_chunks;
+    boost::uint32_t dest_locality_id = outp.get_destination_locality_id();
 
     out_buffer.resize(arg_size + HPX_PARCEL_SERIALIZATION_OVERHEAD);
 
     {
         // create an output archive and serialize the parcel
         hpx::util::portable_binary_oarchive archive(
-            out_buffer, zero_copy ? &out_chunks : 0, 0, out_archive_flags);
+            out_buffer, dest_locality_id, zero_copy ? &out_chunks : 0, 0,
+            out_archive_flags);
         archive << outp;
 
         arg_size = archive.bytes_written();

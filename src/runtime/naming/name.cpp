@@ -268,7 +268,8 @@ namespace hpx { namespace naming
 
         ///////////////////////////////////////////////////////////////////////
         // prepare the given id, note: this function modifies the passed id
-        naming::gid_type id_type_impl::preprocess_gid() const
+        naming::gid_type id_type_impl::preprocess_gid(
+            naming::id_type const& dest_id) const
         {
             gid_type::mutex_type::scoped_lock l(this);
 
@@ -282,14 +283,20 @@ namespace hpx { namespace naming
                 naming::gid_type newid = detail::split_credits_for_gid(
                     const_cast<id_type_impl&>(*this));
 
+                boost::int16_t dest_credit = detail::get_credit_from_gid(newid);
+
                 // none of the ids should be left without credits
                 HPX_ASSERT(detail::get_credit_from_gid(*this) != 0);
-                HPX_ASSERT(detail::get_credit_from_gid(newid) != 0);
+                HPX_ASSERT(dest_credit != 0);
+
+                // Inform our incref tracking that part of a credit is going to
+                // be sent over the wire.
+                agas::add_remote_incref_request(dest_credit, newid, dest_id);
 
                 // We now add new credits to the id which is left behind only.
                 // The credit for the newid will be handled upon arrival
                 // on the destination node.
-                if (1 == detail::get_credit_from_gid(newid))
+                if (1 == dest_credit)
                 {
                     HPX_ASSERT(detail::get_credit_from_gid(*this) >= 1);
 
@@ -335,13 +342,16 @@ namespace hpx { namespace naming
         template <typename Archive>
         void id_type_impl::save(Archive& ar) const
         {
+            naming::id_type dest_id =
+                naming::get_id_from_locality_id(ar.get_dest_locality_id());
+
             if(ar.flags() & util::disable_array_optimization) {
-                naming::gid_type split_id(preprocess_gid());
+                naming::gid_type split_id(preprocess_gid(dest_id));
                 ar << split_id << type_;
             }
             else {
                 gid_serialization_data data;
-                data.gid_ = preprocess_gid();
+                data.gid_ = preprocess_gid(dest_id);
                 data.type_ = type_;
 
                 ar.save(data);

@@ -42,20 +42,25 @@ namespace hpx { namespace agas { namespace detail
         iterator it = find_entry(gid, naming::invalid_id);
         if (it != store_.end())
         {
-            it->second.credit_ += credit;
-            if (it->second.credit_ == 0)
+            incref_request_data& data = it->second;
+            data.credit_ += credit;
+            if (data.credit_ == 0)
             {
-                // this credit request was already acknowledged,
-                // remove the entry
+                // An entry with a negative credit should not have been used to
+                // store a pending decref request.
+                HPX_ASSERT(data.debit_ == 0);
+
+                // This credit request was already acknowledged earlier,
+                // remove the entry.
                 store_.erase(it);
             }
-            else if (it->second.keep_alive_.get_management_type() ==
+            else if (data.keep_alive_.get_management_type() ==
                      naming::id_type::unmanaged)
             {
                 // If the currently stored id is unmanaged then the entry
                 // was created by a remote acknowledgment. Update the
                 // id with a local one to be kept alive.
-                it->second.keep_alive_ = id;
+                data.keep_alive_ = id;
             }
         }
         else
@@ -65,6 +70,8 @@ namespace hpx { namespace agas { namespace detail
         }
     }
 
+    // This function will be called during id-splitting to store a bread-crumb
+    // pointing to the locality where the outstanding credit has to be tracked.
     bool incref_requests::add_remote_incref_request(boost::int64_t credit,
         naming::gid_type const& gid, naming::id_type const& remote_locality)
     {
@@ -79,10 +86,15 @@ namespace hpx { namespace agas { namespace detail
 
         // Subtract the given credit from any existing local entry, remove
         // the entry if the remaining outstanding credit becomes zero.
-        HPX_ASSERT(it_local->second.credit_ >= credit);
-        it_local->second.credit_ -= credit;
-        if (it_local->second.credit_ == 0)
+        incref_request_data& data_local = it_local->second;
+        HPX_ASSERT(data_local.credit_ >= credit);
+        data_local.credit_ -= credit;
+        if (data_local.credit_ == 0)
         {
+            // An entry with a negative credit should not have been used to
+            // store a pending decref request.
+            HPX_ASSERT(data_local.debit_ == 0);
+
             store_.erase(it_local);
             return false;
         }
@@ -121,21 +133,32 @@ namespace hpx { namespace agas { namespace detail
                 incref_request_data& data = r.first->second;
                 if (data.credit_ > credit)
                 {
+                    // This entry is requesting more credits than have been
+                    // acknowledged.
+
                     // adjust remaining part of the credit
                     data.credit_ -= credit;
 
                     // construct proper acknowledgment data
                     matching_data.push_back(data);
+
+                    // not all pending credits were acknowledged
                     matching_data.back().credit_ = credit;
+
+                    // any pending decref requests will be handled once all
+                    // incref requests are acknowledged
                     matching_data.back().debit_ = 0;
 
-                    // we're done with handling acknowledged credit
+                    // we're done with handling the acknowledged credit
                     credit = 0;
 
                     ++r.first;
                 }
-                else
+                else if (data.credit_ > 0)
                 {
+                    // This entry is requesting less or an equal amount of
+                    // credits compared to the acknowledged amount of credits.
+
                     // construct proper acknowledgment data
                     matching_data.push_back(data);
 
@@ -146,13 +169,26 @@ namespace hpx { namespace agas { namespace detail
                     iterator it = r.first++;
                     store_.erase(it);
                 }
+                else
+                {
+                    // This entry already stores a certain amount of
+                    // pre-acknowledged credits.
+
+                    // entries with zero credits should never happen
+                    HPX_ASSERT(data.credit_ < 0);
+
+                    data.credit_ -= credit;
+
+                    // we're done with handling the acknowledged credit
+                    credit = 0;
+                }
             }
             HPX_ASSERT(credit >= 0);
 
             if (credit != 0)
             {
-                // add negative credit entry, we expect for a request to come
-                // in shortly
+                // Add negative credit entry, we expect for a request to come
+                // in shortly.
                 store_.insert(incref_requests_type::value_type(
                     gid, incref_request_data(-credit, id, naming::invalid_id)));
             }
@@ -168,12 +204,14 @@ namespace hpx { namespace agas { namespace detail
             {
                 HPX_ASSERT(data.locality_ == naming::invalid_id);
                 HPX_ASSERT(data.debit_ > 0);
+
                 requests.push_back(
-                    f(-data.debit_, data.keep_alive_, data.locality_)
+                    f(-data.debit_, data.keep_alive_, naming::invalid_id)
                 );
             }
 
-            if (data.locality_ != naming::invalid_id)
+            // local incref requests have already been handled above
+            if (data.credit_ != 0 && data.locality_ != naming::invalid_id)
             {
                 requests.push_back(
                     f(data.credit_, data.keep_alive_, data.locality_)
@@ -200,7 +238,14 @@ namespace hpx { namespace agas { namespace detail
         if (it_local == store_.end())
             return false;   // perform 'normal' (non-delayed) decref handling
 
-        (*it_local).second.debit_ += credit;
+        // The only way for a credit to become negative is when an
+        // acknowledgment comes in and no incref matching entry is found.
+        //
+        // We don't need to hold back any decref request for such an id.
+        if (it_local->second.credit_ < 0)
+            return false;   // this entry holds some pre-acknowledged credits only
+
+        it_local->second.debit_ += credit;
         return true;
     }
 }}}

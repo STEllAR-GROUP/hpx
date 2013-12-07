@@ -1640,7 +1640,7 @@ hpx::future<bool> addressing_service::propagate_remote_incref_acknowlegdement(
         return async(act, loc, credit, id.get_gid());
     }
 
-    // there shouldn't occur any remote pending decref requests
+    // remote pending decref requests should not occur
     HPX_ASSERT(loc == naming::invalid_id);
     try {
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
