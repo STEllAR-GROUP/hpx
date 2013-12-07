@@ -8,7 +8,7 @@
 #define HPX_LCOS_EVENT_SEP_29_2012_1918AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/local/condition_variable.hpp>
+#include <hpx/lcos/local/detail/condition_variable.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/assert.hpp>
 
