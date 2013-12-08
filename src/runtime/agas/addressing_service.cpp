@@ -1609,10 +1609,18 @@ HPX_PLAIN_ACTION(hpx::agas::propagate_incref_acknowlegdement,
 namespace hpx { namespace agas
 {
 
+void addressing_service::add_incref_request(
+    boost::int64_t credit
+  , naming::id_type const& keep_alive
+    )
+{
+    return incref_requests_->add_incref_request(credit, keep_alive);
+}
+
 bool addressing_service::add_remote_incref_request(
     boost::int64_t credit
   , naming::gid_type const& gid
-  , naming::id_type const& remote_locality
+  , boost::int32_t remote_locality
     )
 {
     return incref_requests_->add_remote_incref_request(credit, gid, remote_locality);
@@ -1626,7 +1634,7 @@ bool addressing_service::add_remote_incref_request(
 hpx::future<bool> addressing_service::propagate_remote_incref_acknowlegdement(
     boost::int64_t credit
   , naming::gid_type const& gid
-  , naming::id_type const& loc
+  , boost::int32_t loc
     )
 {
     HPX_ASSERT(credit != 0);
@@ -1634,14 +1642,14 @@ hpx::future<bool> addressing_service::propagate_remote_incref_acknowlegdement(
     {
         // local acknowledgment request have already been handled by the
         // incref_requests functionality
-        HPX_ASSERT(loc != naming::invalid_id);
+        HPX_ASSERT(loc != naming::invalid_locality_id);
 
         propagate_incref_acknowlegdement_action act;
-        return async(act, loc, credit, gid);
+        return async(act, naming::get_id_from_locality_id(loc), credit, gid);
     }
 
-    // remote pending decref requests should not occur
-    HPX_ASSERT(loc == naming::invalid_id);
+    // pending decref requests should not be remote
+    HPX_ASSERT(loc == naming::invalid_locality_id);
     try {
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 

@@ -13,7 +13,7 @@
 namespace hpx { namespace agas { namespace detail
 {
     incref_requests::iterator incref_requests::find_entry(
-        naming::gid_type const& gid, naming::id_type const& loc)
+        naming::gid_type const& gid, boost::int32_t loc)
     {
         std::pair<iterator, iterator> r = store_.equal_range(gid);
 
@@ -39,7 +39,7 @@ namespace hpx { namespace agas { namespace detail
 
         // Either add the given credit to the local entry or create
         // a new entry.
-        iterator it = find_entry(gid, naming::invalid_id);
+        iterator it = find_entry(gid);
         if (it != store_.end())
         {
             incref_request_data& data = it->second;
@@ -66,21 +66,21 @@ namespace hpx { namespace agas { namespace detail
         else
         {
             store_.insert(incref_requests_type::value_type(
-                gid, incref_request_data(credit, id, naming::invalid_id)));
+                gid, incref_request_data(credit, id)));
         }
     }
 
     // This function will be called during id-splitting to store a bread-crumb
     // pointing to the locality where the outstanding credit has to be tracked.
     bool incref_requests::add_remote_incref_request(boost::int64_t credit,
-        naming::gid_type const& gid, naming::id_type const& remote_locality)
+        naming::gid_type const& gid, boost::int32_t remote_locality)
     {
         HPX_ASSERT(credit > 0);
 
         mutex_type::scoped_lock l(mtx_);
 
         // There is nothing for us to do if no local entry exists.
-        iterator it_local = find_entry(gid, naming::invalid_id);
+        iterator it_local = find_entry(gid);
         if (it_local == store_.end())
             return false;
 
@@ -100,6 +100,8 @@ namespace hpx { namespace agas { namespace detail
         {
             // This entry represents incref requests with less outstanding
             // credits than what has to be sent over the wire.
+            //
+            // FIXME: is that allowed at all?
             data_local.credit_ = 0;
         }
 
@@ -122,8 +124,7 @@ namespace hpx { namespace agas { namespace detail
         else
         {
             store_.insert(incref_requests_type::value_type(
-                gid, incref_request_data(
-                    credit, naming::invalid_id, remote_locality)));
+                gid, incref_request_data(credit, remote_locality)));
         }
 
         return true;
@@ -203,7 +204,7 @@ namespace hpx { namespace agas { namespace detail
                 // Add negative credit entry, we expect for a request to come
                 // in shortly.
                 store_.insert(incref_requests_type::value_type(
-                    gid, incref_request_data(-credit, id, naming::invalid_id)));
+                    gid, incref_request_data(-credit, id)));
             }
         }
 
@@ -219,16 +220,16 @@ namespace hpx { namespace agas { namespace detail
 
             if (data.debit_ != 0)
             {
-                HPX_ASSERT(data.locality_ == naming::invalid_id);
+                HPX_ASSERT(data.locality_ == naming::invalid_locality_id);
                 HPX_ASSERT(data.debit_ > 0);
 
                 requests.push_back(
-                    f(-data.debit_, raw, naming::invalid_id)
+                    f(-data.debit_, raw, naming::invalid_locality_id)
                 );
             }
 
             // local incref requests have already been handled above
-            if (data.credit_ != 0 && data.locality_ != naming::invalid_id)
+            if (data.credit_ != 0 && data.locality_ != naming::invalid_locality_id)
             {
                 requests.push_back(
                     f(data.credit_, raw, data.locality_)
@@ -251,7 +252,7 @@ namespace hpx { namespace agas { namespace detail
         mutex_type::scoped_lock l(mtx_);
 
         // There is nothing for us to do if no local entry exists.
-        iterator it_local = find_entry(gid, naming::invalid_id);
+        iterator it_local = find_entry(gid);
         if (it_local == store_.end())
             return false;   // perform 'normal' (non-delayed) decref handling
 

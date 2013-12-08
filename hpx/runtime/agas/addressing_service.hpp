@@ -217,7 +217,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     hpx::future<bool> propagate_remote_incref_acknowlegdement(
         boost::int64_t credit
       , naming::gid_type const& gid
-      , naming::id_type const& loc
+      , boost::int32_t locality
         );
     bool propagate_local_incref_acknowlegdement(
         boost::int64_t credit
@@ -1116,10 +1116,14 @@ public:
         return incref_async(gid, credits).get(ec);
     }
 
+    void add_incref_request(
+        boost::int64_t credit
+      , naming::id_type const& keep_alive
+        );
     bool add_remote_incref_request(
         boost::int64_t credit
       , naming::gid_type const& gid
-      , naming::id_type const& remote_locality
+      , boost::int32_t remote_locality
         );
 
     /// \brief Decrement the global reference count for the given id

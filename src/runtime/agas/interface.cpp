@@ -390,10 +390,19 @@ void decref(
     resolver.decref(gid, credits, ec);
 }
 
+void add_incref_request(
+    boost::int64_t credit
+  , naming::id_type const& keep_alive
+    )
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    resolver.add_incref_request(credit, keep_alive);
+}
+
 bool add_remote_incref_request(
     boost::int64_t credit
   , naming::gid_type const& gid
-  , naming::id_type const& remote_locality
+  , boost::int32_t remote_locality
     )
 {
     naming::resolver_client& resolver = naming::get_agas_client();

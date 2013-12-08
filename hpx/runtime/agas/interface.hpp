@@ -255,10 +255,14 @@ HPX_API_EXPORT void decref(
   , error_code& ec = throws
   );
 
+HPX_API_EXPORT void add_incref_request(
+    boost::int64_t credit
+  , naming::id_type const& keep_alive
+    );
 HPX_API_EXPORT bool add_remote_incref_request(
     boost::int64_t credit
   , naming::gid_type const& gid
-  , naming::id_type const& remote_locality
+  , boost::int32_t remote_locality
     );
 
 ///////////////////////////////////////////////////////////////////////////////
