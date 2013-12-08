@@ -503,7 +503,7 @@ namespace hpx { namespace naming
         private:
             // credit management (called during serialization), this function
             // has to be 'const' as save() above has to be 'const'.
-            naming::gid_type preprocess_gid(boost::int32_t dest_locality_id,
+            naming::gid_type preprocess_gid(boost::uint32_t dest_locality_id,
                 bool& requires_incref_handling) const;
 
             void postprocess_gid(bool requires_incref_handling);

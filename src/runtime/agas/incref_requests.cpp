@@ -13,7 +13,7 @@
 namespace hpx { namespace agas { namespace detail
 {
     incref_requests::iterator incref_requests::find_entry(
-        naming::gid_type const& gid, boost::int32_t loc)
+        naming::gid_type const& gid, boost::uint32_t loc)
     {
         std::pair<iterator, iterator> r = store_.equal_range(gid);
 
@@ -73,7 +73,7 @@ namespace hpx { namespace agas { namespace detail
     // This function will be called during id-splitting to store a bread-crumb
     // pointing to the locality where the outstanding credit has to be tracked.
     bool incref_requests::add_remote_incref_request(boost::int64_t credit,
-        naming::gid_type const& gid, boost::int32_t remote_locality)
+        naming::gid_type const& gid, boost::uint32_t remote_locality)
     {
         HPX_ASSERT(credit > 0);
 

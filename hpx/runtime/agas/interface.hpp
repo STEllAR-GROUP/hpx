@@ -262,7 +262,7 @@ HPX_API_EXPORT void add_incref_request(
 HPX_API_EXPORT bool add_remote_incref_request(
     boost::int64_t credit
   , naming::gid_type const& gid
-  , boost::int32_t remote_locality
+  , boost::uint32_t remote_locality
     );
 
 ///////////////////////////////////////////////////////////////////////////////

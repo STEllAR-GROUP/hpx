@@ -1620,7 +1620,7 @@ void addressing_service::add_incref_request(
 bool addressing_service::add_remote_incref_request(
     boost::int64_t credit
   , naming::gid_type const& gid
-  , boost::int32_t remote_locality
+  , boost::uint32_t remote_locality
     )
 {
     return incref_requests_->add_remote_incref_request(credit, gid, remote_locality);
@@ -1634,7 +1634,7 @@ bool addressing_service::add_remote_incref_request(
 hpx::future<bool> addressing_service::propagate_remote_incref_acknowlegdement(
     boost::int64_t credit
   , naming::gid_type const& gid
-  , boost::int32_t loc
+  , boost::uint32_t loc
     )
 {
     HPX_ASSERT(credit != 0);

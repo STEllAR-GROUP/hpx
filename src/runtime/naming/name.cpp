@@ -269,7 +269,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         // prepare the given id, note: this function modifies the passed id
         naming::gid_type id_type_impl::preprocess_gid(
-            boost::int32_t dest_locality_id, bool& requires_incref_handling) const
+            boost::uint32_t dest_locality_id, bool& requires_incref_handling) const
         {
             gid_type::mutex_type::scoped_lock l(this);
 
@@ -367,8 +367,8 @@ namespace hpx { namespace naming
                 // pending during the (possibly remote) AGAS operation.
                 l.unlock();
 
-                // Inform our incref tracking that part of a credit is going to
-                // be sent over the wire.
+                // Inform our incref tracking that part of a credit which was
+                // not acknowledged was received over the wire.
                 id_type id(this);
 
                 if (requires_incref_handling)
@@ -388,8 +388,8 @@ namespace hpx { namespace naming
                 // pending during the (possibly remote) AGAS operation.
                 l.unlock();
 
-                // Inform our incref tracking that part of a credit is going to
-                // be sent over the wire.
+                // Inform our incref tracking that part of a credit which was
+                // not acknowledged was received over the wire.
                 agas::add_incref_request(credits, id_type(this));
             }
         }
@@ -405,7 +405,7 @@ namespace hpx { namespace naming
         template <typename Archive>
         void id_type_impl::save(Archive& ar) const
         {
-            boost::int32_t dest_locality_id = ar.get_dest_locality_id();
+            boost::uint32_t dest_locality_id = ar.get_dest_locality_id();
             bool requires_incref_handling = false;
 
             if(ar.flags() & util::disable_array_optimization) {
