@@ -26,7 +26,7 @@ namespace hpx { namespace agas { namespace detail
         naming::id_type keep_alive_;    // id for which credit is outstanding
         naming::id_type locality_;      // locality where this credit belongs
         boost::int64_t debit_;          // amount of credits held back because of
-                                        // pending acknowledgements
+                                        // pending acknowledgments
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ namespace hpx { namespace agas { namespace detail
         incref_requests() {}
 
         // Add a credit request for a local id. This will add the credit to any
-        // existing local reuest.
+        // existing local request.
         //
         // This function will be called as part of setting up an incref request.
         // It will also keep the given id alive until all of the credits are
@@ -56,7 +56,7 @@ namespace hpx { namespace agas { namespace detail
         void add_incref_request(boost::int64_t credit, naming::id_type const& id);
 
         // Add a credit request for a remote id, this will subtract the credit from an
-        // existing local request before adding the rmeote one. This function does
+        // existing local request before adding the remote one. This function does
         // nothing if there is no local request for the given gid.
         //
         // This function will be called during id-splitting to store a bread-crumb
@@ -64,11 +64,11 @@ namespace hpx { namespace agas { namespace detail
         bool add_remote_incref_request(boost::int64_t credit,
             naming::gid_type const& gid, naming::id_type const& remote_locality);
 
-        // This function will be called whenever a acknoledgement message from AGAS
+        // This function will be called whenever a acknowledgment message from AGAS
         // is received. It will compensate the pending credits for the acknowledged
         // amount of credits.
         typedef HPX_STD_FUNCTION<
-            hpx::future<bool>(boost::int64_t, naming::id_type const&, naming::id_type const&)
+            hpx::future<bool>(boost::int64_t, naming::gid_type const&, naming::id_type const&)
         > acknowledge_request_callback;
 
         bool acknowledge_request(boost::int64_t credit, naming::id_type const& id,

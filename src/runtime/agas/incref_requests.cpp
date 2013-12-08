@@ -87,12 +87,25 @@ namespace hpx { namespace agas { namespace detail
         // Subtract the given credit from any existing local entry, remove
         // the entry if the remaining outstanding credit becomes zero.
         incref_request_data& data_local = it_local->second;
-        HPX_ASSERT(data_local.credit_ >= credit);
-        data_local.credit_ -= credit;
+        if (data_local.credit_ < 0)
+            return false;
+
+        if (data_local.credit_ >= credit)
+        {
+            // This entry represents incref requests with more outstanding
+            // credits than what has to be sent over the wire.
+            data_local.credit_ -= credit;
+        }
+        else
+        {
+            // This entry represents incref requests with less outstanding
+            // credits than what has to be sent over the wire.
+            data_local.credit_ = 0;
+        }
+
         if (data_local.credit_ == 0)
         {
-            // An entry with a negative credit should not have been used to
-            // store a pending decref request.
+            // Review: what should we do if this happens?
             HPX_ASSERT(data_local.debit_ == 0);
 
             store_.erase(it_local);
@@ -200,13 +213,17 @@ namespace hpx { namespace agas { namespace detail
 
         BOOST_FOREACH(incref_request_data const& data, matching_data)
         {
+            naming::gid_type raw = gid;
+            if (data.keep_alive_)
+                raw = naming::detail::get_stripped_gid(data.keep_alive_.get_gid());
+
             if (data.debit_ != 0)
             {
                 HPX_ASSERT(data.locality_ == naming::invalid_id);
                 HPX_ASSERT(data.debit_ > 0);
 
                 requests.push_back(
-                    f(-data.debit_, data.keep_alive_, naming::invalid_id)
+                    f(-data.debit_, raw, naming::invalid_id)
                 );
             }
 
@@ -214,7 +231,7 @@ namespace hpx { namespace agas { namespace detail
             if (data.credit_ != 0 && data.locality_ != naming::invalid_id)
             {
                 requests.push_back(
-                    f(data.credit_, data.keep_alive_, data.locality_)
+                    f(data.credit_, raw, data.locality_)
                 );
             }
         }

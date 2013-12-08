@@ -1625,7 +1625,7 @@ bool addressing_service::add_remote_incref_request(
 //
 hpx::future<bool> addressing_service::propagate_remote_incref_acknowlegdement(
     boost::int64_t credit
-  , naming::id_type const& id
+  , naming::gid_type const& gid
   , naming::id_type const& loc
     )
 {
@@ -1637,7 +1637,7 @@ hpx::future<bool> addressing_service::propagate_remote_incref_acknowlegdement(
         HPX_ASSERT(loc != naming::invalid_id);
 
         propagate_incref_acknowlegdement_action act;
-        return async(act, loc, credit, id.get_gid());
+        return async(act, loc, credit, gid);
     }
 
     // remote pending decref requests should not occur
@@ -1645,8 +1645,7 @@ hpx::future<bool> addressing_service::propagate_remote_incref_acknowlegdement(
     try {
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
-        naming::gid_type raw = naming::detail::get_stripped_gid(id.get_gid());
-        refcnt_requests_->apply(raw,
+        refcnt_requests_->apply(gid,
             util::decrementer<boost::int64_t>(-credit));
         send_refcnt_requests(l);
     }
