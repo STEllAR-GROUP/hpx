@@ -132,7 +132,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -473,7 +473,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -534,7 +534,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -814,7 +814,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -875,7 +875,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -1155,7 +1155,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -1216,7 +1216,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -1496,7 +1496,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -1557,7 +1557,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -1837,7 +1837,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -1898,7 +1898,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -2178,7 +2178,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -2239,7 +2239,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -2519,7 +2519,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -2580,7 +2580,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -2860,7 +2860,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -2921,7 +2921,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -3201,7 +3201,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -3262,7 +3262,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -3542,7 +3542,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -3603,7 +3603,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -3883,7 +3883,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -3944,7 +3944,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -4224,7 +4224,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -4285,7 +4285,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -4565,7 +4565,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -4626,7 +4626,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(
@@ -4906,7 +4906,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(*next);
+                        = lcos::detail::future_access::get_shared_state(*next);
                     next_future_data->set_on_completed(
                         boost::move(
                             boost::bind(
@@ -4967,7 +4967,7 @@ namespace hpx { namespace lcos { namespace local
                     boost::intrusive_ptr<
                         lcos::detail::future_data<future_result_type>
                     > next_future_data
-                        = hpx::lcos::detail::get_future_data(f_);
+                        = lcos::detail::future_access::get_shared_state(f_);
                     next_future_data->set_on_completed(
                         boost::move(
                             hpx::util::bind(

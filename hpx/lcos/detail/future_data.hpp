@@ -32,11 +32,6 @@ namespace hpx { namespace lcos
         ready, timeout, deferred, uninitialized
     };
     BOOST_SCOPED_ENUM_END
-
-    // forward declaration
-    template <typename Result>
-    future<Result>
-    make_error_future(boost::exception_ptr const& e);
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
