@@ -1128,8 +1128,10 @@ namespace hpx { namespace util
 
     struct hash_any
     {
-        template <typename IArchive, typename OArchive, typename Char>
-        size_t operator()(const basic_any<IArchive, OArchive, Char> &elem) const
+        template <typename Char>
+        size_t operator()(const basic_any<
+                portable_binary_iarchive, portable_binary_oarchive, Char
+            > &elem) const
         {
             detail::hash_binary_filter hasher;
 
