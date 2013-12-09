@@ -613,6 +613,12 @@ namespace hpx
 
         template <typename Result>
         class future;
+        
+        template <typename R>
+        class unique_future;
+        
+        template <typename R>
+        class shared_future;
 
         template <typename ValueType>
         struct object_semaphore;
@@ -697,6 +703,8 @@ namespace hpx
     // Pulling important types into the main namespace
     using naming::id_type;
     using lcos::future;
+    using lcos::unique_future;
+    using lcos::shared_future;
     using lcos::promise;
 
     /// \endcond
