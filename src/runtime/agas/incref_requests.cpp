@@ -84,42 +84,32 @@ namespace hpx { namespace agas { namespace detail
         if (it_local == store_.end())
             return false;
 
-        // Subtract the given credit from any existing local entry, remove
-        // the entry if the remaining outstanding credit becomes zero.
+        // Subtract the given credit from any existing local entry.
         incref_request_data& data_local = it_local->second;
         if (data_local.credit_ < 0)
+        {
+            // this entry holds some pre-acknowledged credits only
             return false;
-
-        if (data_local.credit_ >= credit)
-        {
-            // This entry represents incref requests with more outstanding
-            // credits than what has to be sent over the wire.
-            data_local.credit_ -= credit;
-        }
-        else
-        {
-            // This entry represents incref requests with less outstanding
-            // credits than what has to be sent over the wire.
-            //
-            // FIXME: is that allowed at all?
-            data_local.credit_ = 0;
         }
 
+        // This (local) entry has to represent incref requests with more
+        // outstanding credits than what has to be sent over the wire.
+        HPX_ASSERT(data_local.credit_ >= credit);
+        data_local.credit_ -= credit;
         if (data_local.credit_ == 0)
         {
             // Review: what should we do if this happens?
             HPX_ASSERT(data_local.debit_ == 0);
-
             store_.erase(it_local);
-            return false;
         }
 
-        // Add the given credit to any existing entry or create new one.
+        // Add the given credit to any existing (remote) entry or create a new
+        // (remote) one.
         iterator it_remote = find_entry(gid, remote_locality);
         if (it_remote != store_.end())
         {
+            HPX_ASSERT(it_remote->second.credit_ > 0);
             it_remote->second.credit_ += credit;
-            HPX_ASSERT(it_remote->second.credit_ != 0);
         }
         else
         {
@@ -130,10 +120,10 @@ namespace hpx { namespace agas { namespace detail
         return true;
     }
 
-    bool incref_requests::acknowledge_request(boost::int64_t credit,
+    bool incref_requests::acknowledge_request(boost::int64_t credits,
         naming::id_type const& id, acknowledge_request_callback const& f)
     {
-        HPX_ASSERT(credit > 0);
+        HPX_ASSERT(credits > 0);
         naming::gid_type gid = naming::detail::get_stripped_gid(id.get_gid());
 
         std::vector<incref_request_data> matching_data;
@@ -142,29 +132,29 @@ namespace hpx { namespace agas { namespace detail
             mutex_type::scoped_lock l(mtx_);
 
             std::pair<iterator, iterator> r = store_.equal_range(gid);
-            while (r.first != r.second && credit != 0)
+            while (r.first != r.second && credits != 0)
             {
                 incref_request_data& data = r.first->second;
-                if (data.credit_ > credit)
+                if (data.credit_ > credits)
                 {
                     // This entry is requesting more credits than have been
                     // acknowledged.
 
                     // adjust remaining part of the credit
-                    data.credit_ -= credit;
+                    data.credit_ -= credits;
 
                     // construct proper acknowledgment data
                     matching_data.push_back(data);
 
                     // not all pending credits were acknowledged
-                    matching_data.back().credit_ = credit;
+                    matching_data.back().credit_ = credits;
 
                     // any pending decref requests will be handled once all
                     // incref requests are acknowledged
                     matching_data.back().debit_ = 0;
 
                     // we're done with handling the acknowledged credit
-                    credit = 0;
+                    credits = 0;
 
                     ++r.first;
                 }
@@ -176,8 +166,8 @@ namespace hpx { namespace agas { namespace detail
                     // construct proper acknowledgment data
                     matching_data.push_back(data);
 
-                    // adjust credit
-                    credit -= data.credit_;
+                    // adjust acknowledged credits
+                    credits -= data.credit_;
 
                     // delete the entry as it has been handled completely
                     iterator it = r.first++;
@@ -191,26 +181,26 @@ namespace hpx { namespace agas { namespace detail
                     // entries with zero credits should never happen
                     HPX_ASSERT(data.credit_ < 0);
 
-                    data.credit_ -= credit;
+                    data.credit_ -= credits;
 
-                    // we're done with handling the acknowledged credit
-                    credit = 0;
+                    // we're done with handling the acknowledged credits
+                    credits = 0;
                 }
             }
-            HPX_ASSERT(credit >= 0);
+            HPX_ASSERT(credits >= 0);
 
-            if (credit != 0)
+            if (credits != 0)
             {
-                // Add negative credit entry, we expect for a request to come
-                // in shortly.
+                // Add negative credit entry, we expect for a matching request
+                // to come in shortly.
                 store_.insert(incref_requests_type::value_type(
-                    gid, incref_request_data(-credit, id)));
+                    gid, incref_request_data(-credits, id)));
             }
         }
 
-        // now handle all acknowledged credits
+        // now handle all acknowledged credits and all delayed debits
         std::vector<hpx::future<bool> > requests;
-        requests.reserve(matching_data.size());
+        requests.reserve(2*matching_data.size());
 
         BOOST_FOREACH(incref_request_data const& data, matching_data)
         {
@@ -257,11 +247,15 @@ namespace hpx { namespace agas { namespace detail
             return false;   // perform 'normal' (non-delayed) decref handling
 
         // The only way for a credit to become negative is when an
-        // acknowledgment comes in and no incref matching entry is found.
+        // acknowledgment comes in and no matching incref entry is found
+        // (assuming the incref request is about to come in).
         //
         // We don't need to hold back any decref request for such an id.
         if (it_local->second.credit_ < 0)
-            return false;   // this entry holds some pre-acknowledged credits only
+        {
+            // this entry holds some pre-acknowledged credits only
+            return false;
+        }
 
         it_local->second.debit_ += credit;
         return true;
