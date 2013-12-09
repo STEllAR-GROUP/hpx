@@ -1134,7 +1134,8 @@ namespace hpx { namespace util
             {
                 std::vector<char> data;
                 portable_binary_oarchive ar (
-                        data, &hasher, boost::archive::no_header);
+                        data, naming::invalid_locality_id,
+                        &hasher, boost::archive::no_header);
                 ar << elem;
             }  // let archive go out of scope
 
