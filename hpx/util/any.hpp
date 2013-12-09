@@ -1128,14 +1128,13 @@ namespace hpx { namespace util
 
     struct hash_any
     {
-        size_t operator()(const any &elem ) const
+        size_t operator()(const any &elem) const
         {
             detail::hash_binary_filter hasher;
             {
                 std::vector<char> data;
                 portable_binary_oarchive ar (
-                        data, naming::invalid_locality_id,
-                        &hasher, boost::archive::no_header);
+                        data, &hasher, boost::archive::no_header);
                 ar << elem;
             }  // let archive go out of scope
 
