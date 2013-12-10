@@ -18,8 +18,6 @@
 #include <hpx/util/detail/value_or_error.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/type_traits/is_same.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -50,27 +48,6 @@ namespace local { template <typename T> struct channel; }
 namespace detail
 {
     template <typename Result> struct future_data;
-
-    ///////////////////////////////////////////////////////////////////////
-    template <typename Result>
-    inline lcos::future<Result> make_future_from_data(
-        boost::intrusive_ptr<detail::future_data<Result> > const&);
-
-    template <typename Result>
-    inline lcos::future<Result> make_future_from_data(
-        BOOST_RV_REF(boost::intrusive_ptr<detail::future_data<Result> >));
-
-    template <typename Result>
-    inline lcos::future<Result> make_future_from_data(
-        detail::future_data<Result>* p);
-
-    template <typename Result>
-    inline detail::future_data<Result>*
-        get_future_data(lcos::future<Result>&);
-
-    template <typename Result>
-    inline detail::future_data<Result> const*
-        get_future_data(lcos::future<Result> const&);
 
     ///////////////////////////////////////////////////////////////////////
     struct future_data_refcnt_base;
@@ -106,6 +83,25 @@ namespace detail
         if (0 == --p->count_)
             delete p;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Result>
+    struct future_data_result
+    {
+        typedef Result type;
+    };
+
+    template <typename Result>
+    struct future_data_result<Result&>
+    {
+        typedef Result* type;
+    };
+
+    template <>
+    struct future_data_result<void>
+    {
+        typedef util::unused_type type;
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F1, typename F2>
@@ -147,12 +143,9 @@ namespace detail
     template <typename Result>
     struct future_data : future_data_refcnt_base
     {
-        typedef typename boost::mpl::if_<
-            boost::is_same<void, Result>, util::unused_type, Result
-        >::type result_type;
+        typedef typename future_data_result<Result>::type result_type;
         typedef util::detail::value_or_error<result_type> data_type;
-        typedef HPX_STD_FUNCTION<void()>
-            completed_callback_type;
+        typedef HPX_STD_FUNCTION<void()> completed_callback_type;
         typedef lcos::local::spinlock mutex_type;
 
     public:
@@ -395,7 +388,7 @@ namespace detail
                 return (reason == threads::wait_signaled) ?
                     future_status::timeout : future_status::ready; //-V110
             }
-            
+
             if (&ec != &throws)
                 ec = make_success_code();
 
