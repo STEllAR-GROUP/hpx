@@ -12,6 +12,9 @@
 namespace hpx { namespace lcos
 {
     template <typename Result> class future;
+    
+    template <typename R> class unique_future;
+    template <typename R> class shared_future;
 }}
 
 namespace hpx { namespace traits
@@ -23,6 +26,16 @@ namespace hpx { namespace traits
 
     template <typename Result>
     struct is_future<lcos::future<Result> >
+      : boost::mpl::true_
+    {};
+
+    template <typename R>
+    struct is_future<lcos::unique_future<R> >
+      : boost::mpl::true_
+    {};
+
+    template <typename R>
+    struct is_future<lcos::shared_future<R> >
       : boost::mpl::true_
     {};
 }}
