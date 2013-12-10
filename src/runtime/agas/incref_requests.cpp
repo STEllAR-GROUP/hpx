@@ -28,10 +28,10 @@ namespace hpx { namespace agas { namespace detail
         return store_.end();
     }
 
-    void incref_requests::add_incref_request(boost::int64_t credit,
+    void incref_requests::add_incref_request(boost::int64_t credits,
         naming::id_type const& id)
     {
-        HPX_ASSERT(credit > 0);
+        HPX_ASSERT(credits > 0);
 
         naming::gid_type gid = naming::detail::get_stripped_gid(id.get_gid());
 
@@ -43,7 +43,7 @@ namespace hpx { namespace agas { namespace detail
         if (it != store_.end())
         {
             incref_request_data& data = it->second;
-            data.credit_ += credit;
+            data.credit_ += credits;
             if (data.credit_ == 0)
             {
                 // An entry with a negative credit should not have been used to
@@ -66,16 +66,16 @@ namespace hpx { namespace agas { namespace detail
         else
         {
             store_.insert(incref_requests_type::value_type(
-                gid, incref_request_data(credit, id)));
+                gid, incref_request_data(credits, id)));
         }
     }
 
     // This function will be called during id-splitting to store a bread-crumb
     // pointing to the locality where the outstanding credit has to be tracked.
-    bool incref_requests::add_remote_incref_request(boost::int64_t credit,
+    bool incref_requests::add_remote_incref_request(boost::int64_t credits,
         naming::gid_type const& gid, boost::uint32_t remote_locality)
     {
-        HPX_ASSERT(credit > 0);
+        HPX_ASSERT(credits > 0);
 
         mutex_type::scoped_lock l(mtx_);
 
@@ -94,8 +94,8 @@ namespace hpx { namespace agas { namespace detail
 
         // This (local) entry has to represent incref requests with more
         // outstanding credits than what has to be sent over the wire.
-        HPX_ASSERT(data_local.credit_ >= credit);
-        data_local.credit_ -= credit;
+        HPX_ASSERT(data_local.credit_ >= credits);
+        data_local.credit_ -= credits;
         if (data_local.credit_ == 0)
         {
             // Review: what should we do if this happens?
@@ -109,12 +109,12 @@ namespace hpx { namespace agas { namespace detail
         if (it_remote != store_.end())
         {
             HPX_ASSERT(it_remote->second.credit_ > 0);
-            it_remote->second.credit_ += credit;
+            it_remote->second.credit_ += credits;
         }
         else
         {
             store_.insert(incref_requests_type::value_type(
-                gid, incref_request_data(credit, remote_locality)));
+                gid, incref_request_data(credits, remote_locality)));
         }
 
         return true;
@@ -236,7 +236,7 @@ namespace hpx { namespace agas { namespace detail
         return result;
     }
 
-    bool incref_requests::add_decref_request(boost::int64_t credit,
+    bool incref_requests::add_decref_request(boost::int64_t credits,
         naming::gid_type const& gid)
     {
         mutex_type::scoped_lock l(mtx_);
@@ -257,7 +257,7 @@ namespace hpx { namespace agas { namespace detail
             return false;
         }
 
-        it_local->second.debit_ += credit;
+        it_local->second.debit_ += credits;
         return true;
     }
 }}}
