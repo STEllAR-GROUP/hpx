@@ -87,7 +87,7 @@ void test_parcel_serialization(hpx::parcelset::parcel outp,
     {
         // create an output archive and serialize the parcel
         hpx::util::portable_binary_oarchive archive(
-            out_buffer, dest_locality_id, zero_copy ? &out_chunks : 0, 0,
+            out_buffer, zero_copy ? &out_chunks : 0, dest_locality_id, 0,
             out_archive_flags);
         archive << outp;
 
