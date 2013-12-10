@@ -293,17 +293,10 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines whether to use the portable binary archives for parcel
-/// serialization
-#if !defined(HPX_USE_PORTABLE_ARCHIVES)
-#  define HPX_USE_PORTABLE_ARCHIVES 1
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 /// This defines the initial global reference count associated with any created
 /// object.
-#if !defined(HPX_INITIAL_GLOBALCREDIT)
-#  define HPX_INITIAL_GLOBALCREDIT 255
+#if !defined(HPX_GLOBALCREDIT_INITIAL)
+#  define HPX_GLOBALCREDIT_INITIAL 255
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

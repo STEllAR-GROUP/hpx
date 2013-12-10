@@ -92,6 +92,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
             virtual void set_destination_addrs(std::vector<naming::address> const& addrs) = 0;
 #endif
+            virtual boost::uint32_t get_destination_locality_id() const = 0;
             virtual naming::locality const& get_destination_locality() const = 0;
 
             virtual naming::gid_type get_parcel_id() const = 0;
@@ -298,6 +299,11 @@ namespace hpx { namespace parcelset
                 HPX_ASSERT(false);
             }
 #endif
+            boost::uint32_t get_destination_locality_id() const
+            {
+                return naming::get_locality_id_from_id(dest_);
+            }
+
             ///
             naming::locality const& get_destination_locality() const
             {
@@ -470,6 +476,11 @@ namespace hpx { namespace parcelset
                 addrs_ = addrs;
             }
 #endif
+            boost::uint32_t get_destination_locality_id() const
+            {
+                return naming::get_locality_id_from_id(dests_[0]);
+            }
+
             ///
             naming::locality const& get_destination_locality() const
             {
@@ -626,6 +637,12 @@ namespace hpx { namespace parcelset
             }
         }
 #endif
+
+        boost::uint32_t get_destination_locality_id() const
+        {
+            return data_->get_destination_locality_id();
+        }
+
         naming::locality const& get_destination_locality() const
         {
             return data_->get_destination_locality();

@@ -719,8 +719,8 @@ response primary_namespace::allocate(
     next_id_ = upper;
 
     // Set the initial credit count.
-    naming::detail::set_credit_for_gid(lower, HPX_INITIAL_GLOBALCREDIT);
-    naming::detail::set_credit_for_gid(upper, HPX_INITIAL_GLOBALCREDIT);
+    naming::detail::set_credit_for_gid(lower, HPX_GLOBALCREDIT_INITIAL);
+    naming::detail::set_credit_for_gid(upper, HPX_GLOBALCREDIT_INITIAL);
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::allocate, count(%1%), "
@@ -812,7 +812,7 @@ void primary_namespace::increment(
     // it's global reference count is the initial global reference count.
     refcnts_.apply(lower, upper
                  , util::incrementer<boost::int64_t>(credits)
-                 , boost::int64_t(HPX_INITIAL_GLOBALCREDIT));
+                 , boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
     LAGAS_(info) << (boost::format(
         "primary_namespace::increment, lower(%1%), upper(%2%), credits(%3%)")
@@ -865,7 +865,7 @@ void primary_namespace::decrement_sweep(
         // reference count.
         refcnts_.apply(lower, upper
                      , util::decrementer<boost::int64_t>(credits)
-                     , boost::int64_t(HPX_INITIAL_GLOBALCREDIT));
+                     , boost::int64_t(HPX_GLOBALCREDIT_INITIAL));
 
         ///////////////////////////////////////////////////////////////////////
         // Search for dead objects.

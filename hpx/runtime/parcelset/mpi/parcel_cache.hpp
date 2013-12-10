@@ -128,6 +128,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
         {
             // collect argument sizes from parcels
             std::size_t arg_size = 0;
+            boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
 
             buffer->rank_ = pv[0].get_destination_locality().get_rank();
             if (buffer->rank_ == -1)
@@ -170,7 +171,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 }
 
                 util::portable_binary_oarchive archive(
-                    *buffer->buffer_, filter.get(), archive_flags);
+                    *buffer->buffer_, dest_locality_id, filter.get(), archive_flags);
 
                 std::size_t count = pv.size();
                 archive << count; //-V128

@@ -27,6 +27,7 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/gva.hpp>
+#include <hpx/runtime/agas/incref_requests.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
@@ -81,6 +82,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_requests_type;
+    typedef detail::incref_requests incref_requests_type;
 
     struct bootstrap_data_type;
     struct hosted_data_type;
@@ -96,6 +98,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     mutex_type refcnt_requests_mtx_;
     std::size_t refcnt_requests_count_;
     boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
+    boost::shared_ptr<incref_requests_type> incref_requests_;
 
     service_mode const service_type;
     runtime_mode const runtime_type;
@@ -206,6 +209,21 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     void* get_bootstrap_component_ns_ptr() const;
     void* get_bootstrap_symbol_ns_ptr() const;
 
+    bool synchronize_with_async_incref(
+        hpx::future<bool>& fut
+      , naming::id_type const& id
+      , boost::int64_t credit
+        );
+    hpx::future<bool> propagate_remote_incref_acknowlegdement(
+        boost::int64_t credit
+      , naming::gid_type const& gid
+      , boost::uint32_t locality
+        );
+    bool propagate_local_incref_acknowlegdement(
+        boost::int64_t credit
+      , naming::gid_type const& gid
+        );
+
 protected:
     void launch_bootstrap(
         parcelset::parcelport& pp
@@ -223,7 +241,7 @@ private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
     void send_refcnt_requests(
         mutex_type::scoped_lock& l
-      , error_code& ec
+      , error_code& ec = throws
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
@@ -1084,36 +1102,29 @@ public:
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     lcos::future<bool> incref_async(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
+        naming::gid_type const& gid
       , boost::int64_t credits = 1
       , naming::id_type const& keep_alive = naming::invalid_id
         );
 
-    void incref_apply(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
+    bool incref(
+        naming::gid_type const& gid
       , boost::int64_t credits = 1
+      , error_code& ec = throws
+        )
+    {
+        return incref_async(gid, credits).get(ec);
+    }
+
+    void add_incref_request(
+        boost::int64_t credit
+      , naming::id_type const& keep_alive
         );
-
-    bool incref(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
-      , boost::int64_t credits = 1
-      , error_code& ec = throws
-        )
-    {
-        return incref_async(lower, upper, credits).get(ec);
-    }
-
-    bool incref(
-        naming::gid_type const& id
-      , boost::int64_t credits = 1
-      , error_code& ec = throws
-        )
-    {
-        return incref(id, id, credits, ec);
-    }
+    bool add_remote_incref_request(
+        boost::int64_t credit
+      , naming::gid_type const& gid
+      , boost::uint32_t remote_locality
+        );
 
     /// \brief Decrement the global reference count for the given id
     ///
@@ -1138,36 +1149,16 @@ public:
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     void decref(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
-      , boost::int64_t credits = 1
-      , error_code& ec = throws
-        );
-
-    void decref(
         naming::gid_type const& id
       , boost::int64_t credits = 1
       , error_code& ec = throws
-        )
-    {
-        decref(id, id, credits, ec);
-    }
-
-    lcos::future<void> decref_async(
-        naming::gid_type const& lower
-      , naming::gid_type const& upper
-      , boost::int64_t credits = 1
-      , naming::id_type const& keep_alive = naming::invalid_id
         );
 
     lcos::future<void> decref_async(
         naming::gid_type const& id
       , boost::int64_t credits = 1
       , naming::id_type const& keep_alive = naming::invalid_id
-        )
-    {
-        return decref_async(id, id, credits, keep_alive);
-    }
+        );
 
 #if !defined(HPX_NO_DEPRECATED)
     /// \brief Register a global name with a global address (id)

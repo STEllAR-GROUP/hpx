@@ -8,16 +8,6 @@
 #include <boost/type_traits/is_unsigned.hpp>
 #include <boost/type_traits/is_integral.hpp>
 
-#if !defined(HPX_USE_PORTABLE_ARCHIVES) || HPX_USE_PORTABLE_ARCHIVES == 0
-#include <boost/archive/binary_oarchive.hpp>
-
-namespace hpx { namespace util
-{
-    typedef boost::archive::binary_oarchive portable_binary_oarchive;
-}}
-
-#else
-
 // MS compatible compilers support #pragma once
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 # pragma once
@@ -32,7 +22,7 @@ namespace hpx { namespace util
 // portable_binary_oarchive.hpp
 
 // (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
-// Copyright (c) 2007-2012 Hartmut Kaiser
+// Copyright (c) 2007-2013 Hartmut Kaiser
 //
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -111,6 +101,9 @@ class HPX_SERIALIZATION_EXPORT portable_binary_oarchive :
     typedef boost::archive::detail::common_oarchive<
         portable_binary_oarchive
     > archive_base_t;
+
+    boost::uint32_t dest_locality_id_;
+
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
 public:
 #else
@@ -241,18 +234,34 @@ protected:
 
 public:
     template <typename Container>
-    portable_binary_oarchive(Container& buffer, binary_filter* filter = 0, unsigned flags = 0)
+    portable_binary_oarchive(Container& buffer, binary_filter* filter = 0,
+            unsigned flags = 0)
       : primitive_base_t(buffer, flags),
-        archive_base_t(flags)
+        archive_base_t(flags),
+        dest_locality_id_(~0U)
     {
         init(filter, flags);
     }
 
     template <typename Container>
-    portable_binary_oarchive(Container& buffer, std::vector<serialization_chunk>* chunks,
+    portable_binary_oarchive(Container& buffer,
+            boost::uint32_t dest_locality_id,
+            binary_filter* filter = 0, unsigned flags = 0)
+      : primitive_base_t(buffer, flags),
+        archive_base_t(flags),
+        dest_locality_id_(dest_locality_id)
+    {
+        init(filter, flags);
+    }
+
+    template <typename Container>
+    portable_binary_oarchive(Container& buffer,
+            std::vector<serialization_chunk>* chunks,
+            boost::uint32_t dest_locality_id,
             binary_filter* filter = 0, unsigned flags = 0)
       : primitive_base_t(buffer, chunks, flags),
-        archive_base_t(flags)
+        archive_base_t(flags),
+        dest_locality_id_(dest_locality_id)
     {
         init(filter, flags);
     }
@@ -301,6 +310,12 @@ public:
     void save_array(boost::serialization::array<signed char> const& a, unsigned int)
     {
         this->primitive_base_t::save_array(a);
+    }
+
+    // return destination locality id
+    boost::uint32_t get_dest_locality_id() const
+    {
+        return dest_locality_id_;
     }
 };
 
@@ -597,7 +612,6 @@ namespace boost { namespace archive { namespace detail
 #pragma warning( pop )
 #endif
 
-#endif // HPX_USE_PORTABLE_ARCHIVES == 0
 #endif // PORTABLE_BINARY_OARCHIVE_HPP
 
 
