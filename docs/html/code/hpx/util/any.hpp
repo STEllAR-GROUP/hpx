@@ -692,8 +692,8 @@ namespace hpx { namespace util
 
         // these functions have been added in the assumption that the embedded
         // type has a corresponding operator defined, which is completely safe
-        // because hpx::uti::any is used only in contexts where these operators
-        // do exist
+        // because hpx::util::any is used only in contexts where these operators
+        // exist
         template <typename IArchive_, typename OArchive_, typename Char_>
         friend std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
@@ -998,7 +998,7 @@ namespace hpx { namespace util
         // these functions have been added in the assumption that the embedded
         // type has a corresponding operator defined, which is completely safe
         // because hpx::util::any is used only in contexts where these operators
-        // do exist
+        // exist
         template <typename IArchive_, typename OArchive_, typename Char_>
         friend std::basic_istream<Char_>&
         operator>> (std::basic_istream<Char_>& i,
@@ -1128,9 +1128,13 @@ namespace hpx { namespace util
 
     struct hash_any
     {
-        size_t operator()(const any &elem ) const
+        template <typename Char>
+        size_t operator()(const basic_any<
+                portable_binary_iarchive, portable_binary_oarchive, Char
+            > &elem) const
         {
             detail::hash_binary_filter hasher;
+
             {
                 std::vector<char> data;
                 portable_binary_oarchive ar (

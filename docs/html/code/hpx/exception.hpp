@@ -1433,6 +1433,16 @@ namespace hpx
         }
     }
 
+    inline boost::exception_ptr get_exception_ptr(hpx::exception const& e)
+    {
+        try {
+            throw e;
+        }
+        catch (...) {
+            return boost::current_exception();
+        }
+    }
+
     inline error_code::error_code(int err, hpx::exception const& e)
     {
         this->boost::system::error_code::assign(err, get_hpx_category());
@@ -1440,7 +1450,7 @@ namespace hpx
             throw e;
         }
         catch (...) {
-            exception_ = boost::current_exception();
+            exception_ = get_exception_ptr(e);
         }
     }
 

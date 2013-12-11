@@ -81,6 +81,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
         // collect argument sizes from parcels
         std::size_t arg_size = 0;
+        boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
 
         // guard against serialization errors
         try {
@@ -110,7 +111,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 }
 
                 util::portable_binary_oarchive archive(
-                    out_buffer_, filter.get(), archive_flags);
+                    out_buffer_, dest_locality_id, filter.get(), archive_flags);
 
                 std::size_t count = pv.size();
                 archive << count;
