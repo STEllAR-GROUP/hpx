@@ -1631,7 +1631,7 @@ bool addressing_service::add_remote_incref_request(
 // a) remote incref requests which need ot be acknowledged (loc != invalid_id)
 // b) local decref request which needs to be executed (loc == invalid_id)
 //
-hpx::future<bool> addressing_service::propagate_remote_incref_acknowlegdement(
+hpx::future<bool> addressing_service::propagate_acknowlegdements(
     boost::int64_t credit
   , naming::gid_type const& gid
   , boost::uint32_t loc
@@ -1676,7 +1676,7 @@ bool addressing_service::propagate_local_incref_acknowlegdement(
 
     naming::id_type id(gid, naming::id_type::unmanaged);
     return incref_requests_->acknowledge_request(credit, id,
-        util::bind(&addressing_service::propagate_remote_incref_acknowlegdement,
+        util::bind(&addressing_service::propagate_acknowlegdements,
             this, _1, _2, _3));
 }
 
@@ -1695,7 +1695,7 @@ bool addressing_service::synchronize_with_async_incref(
     using util::placeholders::_3;
 
     return incref_requests_->acknowledge_request(credit, id,
-        util::bind(&addressing_service::propagate_remote_incref_acknowlegdement,
+        util::bind(&addressing_service::propagate_acknowlegdements,
             this, _1, _2, _3)) && result;
 }
 
@@ -1741,10 +1741,9 @@ lcos::future<bool> addressing_service::incref_async(
         typedef refcnt_requests_type::data_type data_type;
         typedef refcnt_requests_type::iterator iterator;
 
-        iterator matches = refcnt_requests_->find(raw);
-
         // Collect all entries which require to increment the refcnt, those
-        // need ot be handled immediately.
+        // need to be handled immediately.
+        iterator matches = refcnt_requests_->find(raw);
         if (matches != refcnt_requests_->end())
         {
             data_type& match_data = matches->data_;
@@ -1764,7 +1763,7 @@ lcos::future<bool> addressing_service::incref_async(
             }
             else if (match_data == 0)
             {
-                // If the incref offset any pending decref, just remove the
+                // If the incref offsets any pending decref, just remove the
                 // pending decref request.
                 refcnt_requests_->erase(matches);
             }
@@ -1776,29 +1775,23 @@ lcos::future<bool> addressing_service::incref_async(
         return hpx::make_ready_future<bool>(true);
     }
 
-    std::vector<lcos::future<bool> > futures;
-    futures.reserve(incref_list.size());
+    HPX_ASSERT(incref_list.size() == 1);
 
-    // FIXME: Use bulk requests.
-    BOOST_FOREACH(mapping const& e, incref_list)
-    {
-        naming::gid_type const e_lower = boost::icl::lower(e.key());
+    mapping const& e = incref_list[0];
+    naming::gid_type const e_lower = boost::icl::lower(e.key());
 
-        request req(primary_ns_change_credit_non_blocking,
-            e_lower, boost::icl::upper(e.key()), e.data());
+    request req(primary_ns_change_credit_non_blocking,
+        e_lower, boost::icl::upper(e.key()), e.data());
 
-        naming::id_type target(
-            stubs::primary_namespace::get_service_instance(e_lower)
-          , naming::id_type::unmanaged);
+    naming::id_type target(
+        stubs::primary_namespace::get_service_instance(e_lower)
+      , naming::id_type::unmanaged);
 
-        futures.push_back(
-            stubs::primary_namespace::service_async<bool>(target, req));
-    }
-
-    HPX_ASSERT(futures.size() == 1);
+    lcos::future<bool> f =
+        stubs::primary_namespace::service_async<bool>(target, req);
 
     using util::placeholders::_1;
-    return futures[0].then(
+    return f.then(
         util::bind(&addressing_service::synchronize_with_async_incref,
             this, _1, keep_alive, credit));
 } // }}}
@@ -1834,9 +1827,9 @@ void addressing_service::decref(
     }
 
     try {
-        mutex_type::scoped_lock l(refcnt_requests_mtx_);
-
         naming::gid_type raw = naming::detail::get_stripped_gid(gid);
+
+        mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
         // Match the decref request with entries in the incref table
         if (!incref_requests_->add_decref_request(credit, raw))
@@ -1890,10 +1883,11 @@ lcos::future<void> addressing_service::decref_async(
     }
 
     try {
+        naming::gid_type raw = naming::detail::get_stripped_gid(gid);
+
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
         // Match the decref request with entries in the incref table
-        naming::gid_type raw = naming::detail::get_stripped_gid(gid);
         if (!incref_requests_->add_decref_request(credit, raw))
         {
             // file 'real' decref request only if there is no pending incref
