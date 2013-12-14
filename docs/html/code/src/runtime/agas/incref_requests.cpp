@@ -92,18 +92,30 @@ namespace hpx { namespace agas { namespace detail
             return false;
         }
 
-        // This (local) entry has to represent incref requests with more
-        // outstanding credits than what has to be sent over the wire.
-        HPX_ASSERT(data_local.credit_ >= credits);
-        data_local.credit_ -= credits;
-        if (data_local.credit_ == 0)
+        // Remove the maximally possible amount of credits from the local
+        // entry. If there are more credits moved off the locality than there
+        // are credits to be acknowledged (which can happen because of the
+        // initial credit every id gets assigned when being created), we can
+        // still assume that there all credits which are still waiting to be
+        // acknowledged have been moved off this locality, i.e. no local
+        // credits require any acknowledgment anymore.
+        if (data_local.credit_ >= credits)
         {
-            // Review: what should we do if this happens?
-            HPX_ASSERT(data_local.debit_ == 0);
+            data_local.credit_ -= credits;
+        }
+        else
+        {
+            data_local.credit_ = 0;
+        }
+
+        // Remove the current entry when it does not hold any pending requests
+        // anymore.
+        if (data_local.credit_ == 0 && data_local.debit_ == 0)
+        {
             store_.erase(it_local);
         }
 
-        // Add the given credit to any existing (remote) entry or create a new
+        // Add the given credit to an existing (remote) entry or create a new
         // (remote) one.
         iterator it_remote = find_entry(gid, remote_locality);
         if (it_remote != store_.end())
@@ -127,6 +139,7 @@ namespace hpx { namespace agas { namespace detail
         naming::gid_type gid = naming::detail::get_stripped_gid(id.get_gid());
 
         std::vector<incref_request_data> matching_data;
+        std::vector<incref_request_data> decref_data;
 
         {
             mutex_type::scoped_lock l(mtx_);
@@ -172,6 +185,24 @@ namespace hpx { namespace agas { namespace detail
                     // delete the entry as it has been handled completely
                     iterator it = r.first++;
                     store_.erase(it);
+
+                    if (matching_data.back().debit_ != 0)
+                    {
+                        // This entry also stores some pending decref request.
+                        // We're allowed to release those decref requests only
+                        // if there is no other entry referring this id besides
+                        // the current one anymore.
+                        std::pair<iterator, iterator> r = store_.equal_range(gid);
+                        if (r.first != r.second)
+                        {
+                            // Reinsert the data as local pure decref requests
+                            decref_data.push_back(matching_data.back());
+                            decref_data.back().credit_ = 0;
+
+                            // Don't release the decref request right now.
+                            matching_data.back().debit_ = 0;
+                        }
+                    }
                 }
                 else
                 {
@@ -195,6 +226,15 @@ namespace hpx { namespace agas { namespace detail
                 // to come in shortly.
                 store_.insert(incref_requests_type::value_type(
                     gid, incref_request_data(-credits, id)));
+            }
+
+            // Re-insert deleted decref requests which need to stay.
+            BOOST_FOREACH(incref_request_data const& data, decref_data)
+            {
+                HPX_ASSERT(data.credit_ == 0);
+                HPX_ASSERT(data.debit_ != 0);
+
+                store_.insert(incref_requests_type::value_type(gid, data));
             }
         }
 
@@ -241,10 +281,30 @@ namespace hpx { namespace agas { namespace detail
     {
         mutex_type::scoped_lock l(mtx_);
 
-        // There is nothing for us to do if no local entry exists.
+        // We have to hold back any decref requests as long as there exists
+        // some (local or remote) entry referencing the given id.
         iterator it_local = find_entry(gid);
         if (it_local == store_.end())
-            return false;   // perform 'normal' (non-delayed) decref handling
+        {
+            // no local entry exists, look for a remote one
+            std::pair<iterator, iterator> r = store_.equal_range(gid);
+
+            // perform 'normal' (non-delayed) decref handling if any entry
+            // exists
+            if (r.first != r.second)
+            {
+                // create a new (local) entry keeping track of the decref
+                // request which was held back
+                id_type id(gid, id_type::unmanaged);
+                store_.insert(incref_requests_type::value_type(
+                    gid, incref_request_data(credits, id)));
+
+                return true; // hold back the decref
+            }
+
+            // no entry exists which references the given id, release the decref
+            return false;
+        }
 
         // The only way for a credit to become negative is when an
         // acknowledgment comes in and no matching incref entry is found
