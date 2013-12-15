@@ -5,8 +5,8 @@
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BASIC_BINARY_IPRIMITIVE_IMPL_HPP
-#define BASIC_BINARY_IPRIMITIVE_IMPL_HPP
+#ifndef BASIC_BINARY_OPRIMITIVE_IMPL_HPP
+#define BASIC_BINARY_OPRIMITIVE_IMPL_HPP
 
 // MS compatible compilers support #pragma once
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
@@ -24,9 +24,9 @@ namespace hpx { namespace util
         if (flags & boost::archive::no_header)
             return;
 
-        // Record native sizes of fundamental types. This is to permit 
-        // detection of attempts to pass native binary archives accross 
-        // incompatible machines. This is not foolproof but its better 
+        // Record native sizes of fundamental types. This is to permit
+        // detection of attempts to pass native binary archives across
+        // incompatible machines. This is not foolproof but its better
         // than nothing.
         This()->save(static_cast<unsigned char>(sizeof(int)));
         This()->save(static_cast<unsigned char>(sizeof(long)));
