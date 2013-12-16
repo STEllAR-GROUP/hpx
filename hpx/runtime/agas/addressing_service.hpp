@@ -1154,12 +1154,6 @@ public:
       , error_code& ec = throws
         );
 
-    lcos::future<void> decref_async(
-        naming::gid_type const& id
-      , boost::int64_t credits = 1
-      , naming::id_type const& keep_alive = naming::invalid_id
-        );
-
 #if !defined(HPX_NO_DEPRECATED)
     /// \brief Register a global name with a global address (id)
     ///
