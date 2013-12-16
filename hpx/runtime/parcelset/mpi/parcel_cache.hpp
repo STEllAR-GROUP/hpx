@@ -160,59 +160,71 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
 
             // guard against serialization errors
             try {
-                // Serialize the data
-                HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
-                    pv[0].get_serialization_filter());
-
-                int archive_flags = archive_flags_;
-                if (filter.get() != 0) {
-                    filter->set_max_length(buffer->buffer_->capacity());
-                    archive_flags |= util::enable_compression;
+                try {
+                    // Serialize the data
+                    HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
+                        pv[0].get_serialization_filter());
+    
+                    int archive_flags = archive_flags_;
+                    if (filter.get() != 0) {
+                        filter->set_max_length(buffer->buffer_->capacity());
+                        archive_flags |= util::enable_compression;
+                    }
+    
+                    util::portable_binary_oarchive archive(
+                        *buffer->buffer_, filter.get(), archive_flags);
+    
+                    std::size_t count = pv.size();
+                    archive << count; //-V128
+    
+                    BOOST_FOREACH(parcel const& p, pv)
+                    {
+                        archive << p;
+                    }
+    
+                    arg_size = archive.bytes_written();
+    
+                    // store the time required for serialization
+                    datapoint.serialization_time_ =
+                        timer.elapsed_nanoseconds() - serialization_start;
                 }
-
-                util::portable_binary_oarchive archive(
-                    *buffer->buffer_, dest_locality_id, filter.get(), archive_flags);
-
-                std::size_t count = pv.size();
-                archive << count; //-V128
-
-                BOOST_FOREACH(parcel const& p, pv)
-                {
-                    archive << p;
+                catch (hpx::exception const& e) {
+                    LPT_(fatal)
+                        << "mpi::detail::parcel_cache::encode_parcels: "
+                           "caught hpx::exception: "
+                        << e.what();
+                    hpx::report_error(boost::current_exception());
+                    return 0;
                 }
-
-                arg_size = archive.bytes_written();
-
-                // store the time required for serialization
-                datapoint.serialization_time_ =
-                    timer.elapsed_nanoseconds() - serialization_start;
+                catch (boost::system::system_error const& e) {
+                    LPT_(fatal)
+                        << "mpi::detail::parcel_cache::encode_parcels: "
+                           "caught boost::system::error: "
+                        << e.what();
+                    hpx::report_error(boost::current_exception());
+                    return 0;
+                }
+                catch (boost::exception const&) {
+                    LPT_(fatal)
+                        << "mpi::detail::parcel_cache::encode_parcels: "
+                           "caught boost::exception";
+                    hpx::report_error(boost::current_exception());
+                    return 0;
+                }
+                catch (std::exception const& e) {
+                    // We have to repackage all exceptions thrown by the
+                    // serialization library as otherwise we will loose the
+                    // e.what() description of the problem, due to slicing.
+                    boost::throw_exception(boost::enable_error_info(
+                        hpx::exception(serialization_error, e.what())));
+                    return 0;
+                }
             }
-            catch (boost::archive::archive_exception const& e) {
-                // We have to repackage all exceptions thrown by the
-                // serialization library as otherwise we will loose the
-                // e.what() description of the problem.
-                HPX_THROW_EXCEPTION(serialization_error,
-                    "mpi::detail::parcel_cache::set_parcel",
-                    boost::str(boost::format(
-                        "parcelport: parcel serialization failed, caught "
-                        "boost::archive::archive_exception: %s") % e.what()));
-                return 0;
-            }
-            catch (boost::system::system_error const& e) {
-                HPX_THROW_EXCEPTION(serialization_error,
-                    "mpi::detail::parcel_cache::set_parcel",
-                    boost::str(boost::format(
-                        "parcelport: parcel serialization failed, caught "
-                        "boost::system::system_error: %d (%s)") %
-                            e.code().value() % e.code().message()));
-                return 0;
-            }
-            catch (std::exception const& e) {
-                HPX_THROW_EXCEPTION(serialization_error,
-                    "mpi::detail::parcel_cache::set_parcel",
-                    boost::str(boost::format(
-                        "parcelport: parcel serialization failed, caught "
-                        "std::exception: %s") % e.what()));
+            catch (...) {
+                LPT_(fatal)
+                    << "mpi::detail::parcel_cache::encode_parcels: "
+                       "caught unknown exception";
+                hpx::report_error(boost::current_exception());
                 return 0;
             }
 
@@ -220,7 +232,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
             if (buffer->buffer_->size() > max_outbound_size_)
             {
                 HPX_THROW_EXCEPTION(serialization_error,
-                    "mpi::detail::parcel_cache::set_parcel",
+                    "mpi::detail::parcel_cache::encode_parcels",
                     boost::str(boost::format(
                         "parcelport: parcel serialization created message larger "
                         "than allowed (created: %ld, allowed: %ld), consider"
@@ -292,6 +304,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                 );
                 ++num_requests;
             }
+            // This should be RAII'd
             if(early_exit)
             {
                 BOOST_FOREACH(parcel_holders::value_type & ph, phs)

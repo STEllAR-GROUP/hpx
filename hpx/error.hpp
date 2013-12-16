@@ -25,8 +25,7 @@ namespace hpx
     enum error
     {
         success = 0,                                ///< The operation was successful
-        no_success = 1,                             ///< The operation was successful,
-                                                    ///< but additional conditions apply
+        no_success = 1,                             ///< The operation did failed, but not in an unexpected manner
         not_implemented = 2,                        ///< The operation is not implemented
         out_of_memory = 3,                          ///< The operation caused a out of memory condition
         bad_action_code = 4,                        ///<

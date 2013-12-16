@@ -572,20 +572,23 @@ namespace hpx { namespace parcelset { namespace shmem
                 pp.add_received_data(receive_data);
             }
             catch (hpx::exception const& e) {
-                LPT_(error)
-                    << "decode_message: caught hpx::exception: "
+                LPT_(fatal)
+                    << "shmem::parcelport::decode_message: "
+                       "caught hpx::exception: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
             }
             catch (boost::system::system_error const& e) {
-                LPT_(error)
-                    << "decode_message: caught boost::system::error: "
+                LPT_(fatal)
+                    << "shmem::parcelport::decode_message: "
+                       "caught boost::system::error: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
             }
             catch (boost::exception const&) {
-                LPT_(error)
-                    << "decode_message: caught boost::exception.";
+                LPT_(fatal)
+                    << "shmem::parcelport::decode_message: "
+                       "caught boost::exception";
                 hpx::report_error(boost::current_exception());
             }
             catch (std::exception const& e) {
@@ -597,8 +600,9 @@ namespace hpx { namespace parcelset { namespace shmem
             }
         }
         catch (...) {
-            LPT_(error)
-                << "decode_message: caught unknown exception.";
+            LPT_(fatal)
+                << "shmem::parcelport::decode_message: "
+                   "caught unknown exception";
             hpx::report_error(boost::current_exception());
         }
     }

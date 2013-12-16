@@ -600,21 +600,27 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 pp.add_received_data(receive_data);
             }
             catch (hpx::exception const& e) {
-                LPT_(error)
-                    << "decode_message: caught hpx::exception: "
+                LPT_(fatal)
+                    << "ibverbs::parcelport::decode_message: "
+                       "caught hpx::exception: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
+                return;
             }
             catch (boost::system::system_error const& e) {
-                LPT_(error)
-                    << "decode_message: caught boost::system::error: "
+                LPT_(fatal)
+                    << "ibverbs::parcelport::decode_message: "
+                       "caught boost::system::error: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
+                return;
             }
             catch (boost::exception const&) {
-                LPT_(error)
-                    << "decode_message: caught boost::exception.";
+                LPT_(fatal)
+                    << "ibverbs::parcelport::decode_message: "
+                       "caught boost::exception";
                 hpx::report_error(boost::current_exception());
+                return;
             }
             catch (std::exception const& e) {
                 // We have to repackage all exceptions thrown by the
@@ -625,9 +631,11 @@ namespace hpx { namespace parcelset { namespace ibverbs
             }
         }
         catch (...) {
-            LPT_(error)
-                << "decode_message: caught unknown exception.";
+            LPT_(fatal)
+                << "ibverbs::parcelport::decode_message: "
+                   "caught unknown exception";
             hpx::report_error(boost::current_exception());
+            return;
         }
     }
 }}}
