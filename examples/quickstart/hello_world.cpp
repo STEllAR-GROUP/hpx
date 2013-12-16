@@ -44,11 +44,7 @@ std::size_t hello_world_worker(std::size_t desired)
     if (current == desired)
     {
         // The HPX-thread has been run on the desired OS-thread.
-#ifdef HPX_NATIVE_MIC
-        char const* msg = "hello world from OS-thread %1% on locality %2% on the Xeon Phi";
-#else
         char const* msg = "hello world from OS-thread %1% on locality %2%";
-#endif
 
         hpx::cout << (boost::format(msg) % desired % hpx::get_locality_id())
                   << hpx::endl;
@@ -128,7 +124,6 @@ void hello_world_foreman()
 // Define the boilerplate code necessary for the function 'hello_world_foreman'
 // to be invoked as an HPX action.
 HPX_PLAIN_ACTION(hello_world_foreman, hello_world_foreman_action);
-HPX_ACTION_USES_SNAPPY_COMPRESSION(hello_world_foreman_action);
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
