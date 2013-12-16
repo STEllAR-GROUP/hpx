@@ -45,11 +45,11 @@
 // credit. Credits are issued in chunks which allows to create a global copy
 // of an id_type instance (like passing it to another locality) without needing
 // to talk to AGAS to request a global reference count increment. The referenced
-// entity is free'd when the global reference count falls to zero.
+// entity is freed when the global reference count falls to zero.
 //
 // Any newly created object assumes an initial credit. This credit is not
 // accounted for by AGAS as long as no global increment or decrement requests
-// are received. It is important to understand that there is no way to distingish
+// are received. It is important to understand that there is no way to distinguish
 // whether an object has already been deleted (and therefore no entry exists in
 // the table storing the global reference count for this object) or whether the
 // object is still alive but no increment/decrement requests have been received
@@ -94,19 +94,55 @@
 //
 // Replenishing the credit for an id_type instance is performed by:
 //
-//   a) asynchronously sending an increment request to AGAS
-//   b) adding the requested credit to the local instance
-//   c) asynchronously keeping the local instance alive until the request
+//   1) asynchronously sending an increment request to AGAS
+//   2) adding the requested credit to the local instance
+//   3) asynchronously keeping the local instance alive until the request
 //      is acknowledged by AGAS
-//   d) making sure that none of the requested credits is given back to
+//   4) making sure that none of the requested credits is given back to
 //      AGAS before the request was acknowledged (only at that point it is
 //      guaranteed that the decrement request is received after the increment
 //      request)
 //
-// It is the last item (d) which is the most difficult to implement. This is
+// It is the last item (4) which is the most difficult to implement. This is
 // because part of the requested credit may already have been split again and
-// sent to any of the other localities before the acknowledgement from AGAS
+// sent to any of the other localities before the acknowledgment from AGAS
 // arrives.
+//
+// The current implementation of (4) keeps lists of (see incref_requests.hpp
+// and incref_requests.cpp):
+//
+//   a) incref requests which have been (asynchronously) sent to AGAS for all
+//      id_type instances (which are locally alive) but which have not been
+//      acknowledged yet.
+//   b) incref forwarding requests for the credits of all id_type instances
+//      which have been moved to a different locality (have been split) while
+//      there existed pending incref requests (from (a)) at the time the
+//      id_type instance was sent.
+//   c) decref requests for the credits of all (local) id_type instances which
+//      went out of scope while there existed pending incref requests (from
+//      (a) or (b)) at the time the id_type instance was deleted.
+//
+// The list (a) is controlling whether items are being held in the list (b).
+// The lists (a) and (b) are controlling whether items are being stored in the
+// list (c).
+//
+// Any incref request which results from credits running low after a credit
+// split operation is stored in list (a). Repeated incref requests for the same
+// id_type are accumulated in a single entry in list (a). The incref
+// acknowledgments which coming back from AGAS adjust the amount of credits
+// stored in list (a). If any of the entries in list (a) go to zero credits
+// they are deleted.
+//
+// Any operation splitting credits (id-splitting) causes an incref forwarding
+// request to be stored in list (b), if - at the point of the id-splitting -
+// there exists a (local) incref request entry in list (a).
+//
+// Any decref operation (any last id_type instance on a locality going out of
+// scope) causes a new entry in list (c) to be created if there exists at
+// least one entry for this id_type in list (a) and/or list (b). If a decref
+// entry has to be created (or an existing decref is augmented), the
+// corresponding decref operation in AGAS is not performed. It is held back
+// until all entries for an id_type in list (a) and list (b) are deleted.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
