@@ -180,7 +180,7 @@ namespace hpx { namespace naming
                 // guard for wait_abort and other shutdown issues
                 try {
                     // decrement global reference count for the given gid,
-                    boost::int32_t credits = detail::get_credit_from_gid(*p);
+                    boost::int64_t credits = detail::get_credit_from_gid(*p);
                     HPX_ASSERT(0 != credits);
 
                     if (get_runtime_ptr())
@@ -232,24 +232,9 @@ namespace hpx { namespace naming
         {
             // a credit of zero means the component is not (globally) reference
             // counted
-            boost::int32_t credits = detail::get_credit_from_gid(*p);
-            if (0 != credits)
-            {
-                // We take over the ownership of the gid_type object here
-                // as the shared_ptr is assuming it has been properly deleted
-                // already. The actual deletion happens in the decrement_refcnt
-                // once it is executed.
-                //error_code ec;
-                //applier::register_work(boost::bind(decrement_refcnt, p),
-                //    "decrement global gid reference count",
-                //    threads::thread_state(threads::pending),
-                //    threads::thread_priority_normal, std::size_t(-1), ec);
-                //if (ec)
-                //{
-                    // if we are not able to spawn a new thread, we need to execute
-                    // the deleter directly
-                    decrement_refcnt(p);
-                //}
+            if (detail::has_credits(*p)) {
+                // execute the deleter directly
+                decrement_refcnt(p);
             }
             else {
                 delete p;   // delete local gid representation if needed
@@ -278,30 +263,6 @@ namespace hpx { namespace naming
             return 0;
         }
 
-//         ///////////////////////////////////////////////////////////////////////
-//         template <typename Lock>
-//         hpx::future<bool> retrieve_new_credits(naming::gid_type& id,
-//             boost::uint16_t credit, naming::id_type const& keep_alive,
-//             Lock& l)
-//         {
-//             // We add the new credits to the gids first to avoid
-//             // duplicate splitting during concurrent serialization
-//             // operations.
-//             if (credit) detail::add_credit_to_gid(id, credit);
-//
-//             // We unlock the lock as all operations on the local credit
-//             // have been performed and we don't want the lock to be
-//             // pending during the (possibly remote) AGAS operation.
-//             l.unlock();
-//
-//             // If something goes wrong during the reference count
-//             // increment below we will have already added credits to
-//             // the split gid. In the worst case this will cause a
-//             // memory leak. I'm not sure if it is possible to reliably
-//             // handle this problem.
-//             return agas::incref_async(id, credit, keep_alive);
-//         }
-
         ///////////////////////////////////////////////////////////////////////
         // prepare the given id, note: this function modifies the passed id
         naming::gid_type id_type_impl::preprocess_gid(
@@ -311,72 +272,71 @@ namespace hpx { namespace naming
 
             // If the initial credit is zero the gid is 'unmanaged' and no
             // additional action needs to be performed.
-            boost::int16_t oldcredits = detail::get_credit_from_gid(*this);
-            if (0 != oldcredits)
+            if (!has_credits(*this))
             {
-                // Request new credits from AGAS if needed (i.e. the remainder
-                // of the credit splitting is equal to one).
-                naming::gid_type newid = detail::split_credits_for_gid(
-                    const_cast<id_type_impl&>(*this));
-
-                boost::int16_t dest_credit = detail::get_credit_from_gid(newid);
-
-                // none of the ids should be left without credits
-                HPX_ASSERT(detail::get_credit_from_gid(*this) != 0);
-                HPX_ASSERT(dest_credit != 0);
-
-                // We now add new credits to the id which is left behind only.
-                // The credit for the newid will be handled upon arrival
-                // on the destination node.
-                if (1 == dest_credit)
-                {
-                    HPX_ASSERT(detail::get_credit_from_gid(*this) >= 1);
-
-                    // note: the future returned by agas::incref_async()
-                    //       keeps this instance alive as it is passed along
-                    //       as the keep_alive parameter
-                    naming::gid_type& gid = const_cast<id_type_impl&>(*this);
-
-                    // We add the new credits to the gids first to avoid
-                    // duplicate splitting during concurrent serialization
-                    // operations.
-                    detail::add_credit_to_gid(gid, HPX_GLOBALCREDIT_INITIAL);
-
-                    // We unlock the lock as all operations on the local credit
-                    // have been performed and we don't want the lock to be
-                    // pending during the (possibly remote) AGAS operation.
-                    l.unlock();
-
-                    // Inform our incref tracking that part of a credit is going to
-                    // be sent over the wire.
-                    requires_incref_handling = agas::add_remote_incref_request(
-                        dest_credit, newid, dest_locality_id);
-
-                    // If something goes wrong during the reference count
-                    // increment below we will have already added credits to
-                    // the split gid. In the worst case this will cause a
-                    // memory leak. I'm not sure if it is possible to reliably
-                    // handle this problem.
-                    agas::incref_async(gid, HPX_GLOBALCREDIT_INITIAL,
-                        id_type(const_cast<id_type_impl*>(this)));
-                }
-                else
-                {
-                    // We unlock the lock as all operations on the local credit
-                    // have been performed and we don't want the lock to be
-                    // pending during the (possibly remote) AGAS operation.
-                    l.unlock();
-
-                    // Inform our incref tracking that part of a credit is going to
-                    // be sent over the wire.
-                    requires_incref_handling = agas::add_remote_incref_request(
-                        dest_credit, newid, dest_locality_id);
-                }
-                return newid;
+                HPX_ASSERT(unmanaged == type_);
+                return *this;
             }
 
-            HPX_ASSERT(unmanaged == type_);
-            return *this;
+            // Request new credits from AGAS if needed (i.e. the remainder
+            // of the credit splitting is equal to one).
+            naming::gid_type newid = detail::split_credits_for_gid(
+                const_cast<id_type_impl&>(*this));
+
+            boost::int64_t dest_credit = detail::get_credit_from_gid(newid);
+
+            // none of the ids should be left without credits
+            HPX_ASSERT(detail::has_credits(*this));
+            HPX_ASSERT(dest_credit != 0);
+
+            // We now add new credits to the id which is left behind only.
+            // The credit for the newid will be handled upon arrival
+            // on the destination node.
+            if (1 == dest_credit)
+            {
+                HPX_ASSERT(detail::get_credit_from_gid(*this) >= 1);
+
+                // note: the future returned by agas::incref_async()
+                //       keeps this instance alive as it is passed along
+                //       as the keep_alive parameter
+                naming::gid_type& gid = const_cast<id_type_impl&>(*this);
+
+                // We add the new credits to the gid's first to avoid
+                // duplicate splitting during concurrent serialization
+                // operations.
+                boost::uint64_t added_credit = detail::fill_credit_for_gid(gid);
+
+                // We unlock the lock as all operations on the local credit
+                // have been performed and we don't want the lock to be
+                // pending during the (possibly remote) AGAS operation.
+                l.unlock();
+
+                // Inform our incref tracking that part of a credit is going to
+                // be sent over the wire.
+                requires_incref_handling = agas::add_remote_incref_request(
+                    dest_credit, newid, dest_locality_id);
+
+                // If something goes wrong during the reference count
+                // increment below we will have already added credits to
+                // the split gid. In the worst case this will cause a
+                // memory leak. I'm not sure if it is possible to reliably
+                // handle this problem.
+                agas::incref_async(gid, added_credit,
+                    id_type(const_cast<id_type_impl*>(this)));
+            }
+            else
+            {
+                // We unlock the lock as all operations on the local credit
+                // have been performed and we don't want the lock to be
+                // pending during the (possibly remote) AGAS operation.
+                l.unlock();
+
+                // Inform our incref tracking that part of a credit is going to
+                // be sent over the wire.
+                requires_incref_handling = agas::add_remote_incref_request(
+                    dest_credit, newid, dest_locality_id);
+            }
+            return newid;
         }
 
         // prepare the given id, note: this function modifies the passed id
@@ -384,10 +344,13 @@ namespace hpx { namespace naming
         {
             gid_type::mutex_type::scoped_lock l(this);
 
+            if (!detail::has_credits(*this))
+                return;
+
             // If the initial credit after de-serialization is 1 we need to
             // add more global credits.
-            boost::int16_t credits = detail::get_credit_from_gid(*this);
-            if (1 == credits)
+            boost::int16_t credits = detail::get_log2credit_from_gid(*this);
+            if (0 == credits)
             {
                 // note: the future returned by agas::incref_async()
                 //       keeps this instance alive as it is passed along
@@ -396,7 +359,7 @@ namespace hpx { namespace naming
                 // We add the new credits to the gid first to avoid
                 // duplicate splitting during concurrent serialization
                 // operations.
-                detail::add_credit_to_gid(*this, HPX_GLOBALCREDIT_INITIAL);
+                boost::uint64_t added_credit = detail::fill_credit_for_gid(*this);
 
                 // We unlock the lock as all operations on the local credit
                 // have been performed and we don't want the lock to be
@@ -408,14 +371,14 @@ namespace hpx { namespace naming
                 id_type id(this);
 
                 if (requires_incref_handling)
-                    agas::add_incref_request(credits, id);
+                    agas::add_incref_request(naming::detail::power2(credits), id);
 
                 // If something goes wrong during the reference count
                 // increment below we will have already added credits to
                 // the split gid. In the worst case this will cause a
                 // memory leak. I'm not sure if it is possible to reliably
                 // handle this problem.
-                agas::incref_async(*this, HPX_GLOBALCREDIT_INITIAL, id);
+                agas::incref_async(*this, added_credit, id);
             }
             else if (requires_incref_handling)
             {

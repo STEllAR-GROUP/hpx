@@ -296,7 +296,7 @@
 /// This defines the initial global reference count associated with any created
 /// object.
 #if !defined(HPX_GLOBALCREDIT_INITIAL)
-#  define HPX_GLOBALCREDIT_INITIAL 255
+#  define HPX_GLOBALCREDIT_INITIAL 0x80000000ll     // 2 ^ 31, i.e. 2 ^ 0b11111
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

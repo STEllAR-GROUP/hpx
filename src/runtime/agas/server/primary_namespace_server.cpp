@@ -700,7 +700,7 @@ response primary_namespace::allocate(
     // Check for overflow.
     if (upper.get_msb() != lower.get_msb())
     {
-        // Check for address space exhaustion (we currently use 80 bis of
+        // Check for address space exhaustion (we currently use 80 bits of
         // the gid for the actual id)
         if (HPX_UNLIKELY((lower.get_msb() & ~0xFF) == 0xFF))
         {
@@ -856,7 +856,7 @@ void primary_namespace::decrement_sweep(
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        // Apply the decrement across the entire keyspace (e.g. [lower, upper]).
+        // Apply the decrement across the entire key space (e.g. [lower, upper]).
 
         // The third parameter we pass here is the default data to use in case
         // the key is not mapped. We don't insert GIDs into the refcnt table

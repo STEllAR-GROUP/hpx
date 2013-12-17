@@ -57,8 +57,11 @@ namespace hpx { namespace naming
 
         static boost::uint64_t const credit_base_mask = 0x1ful;
         static boost::uint16_t const credit_shift = 24;
+
         static boost::uint64_t const credit_mask = credit_base_mask << credit_shift;
         static boost::uint64_t const was_split_mask = 0x80000000ul; //-V112
+        static boost::uint64_t const has_credits_mask = 0x40000000ul; //-V112
+
         static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
 
         explicit gid_type (boost::uint64_t lsb_id = 0)
@@ -161,46 +164,42 @@ namespace hpx { namespace naming
 
         friend bool operator< (gid_type const& lhs, gid_type const& rhs)
         {
-            if (detail::strip_credit_from_gid(lhs.id_msb_)
-               < detail::strip_credit_from_gid(rhs.id_msb_))
+            if (detail::strip_credit_from_gid(lhs.id_msb_) <
+                detail::strip_credit_from_gid(rhs.id_msb_))
+            {
                 return true;
-            if (detail::strip_credit_from_gid(lhs.id_msb_)
-               > detail::strip_credit_from_gid(rhs.id_msb_))
+            }
+            if (detail::strip_credit_from_gid(lhs.id_msb_) >
+                detail::strip_credit_from_gid(rhs.id_msb_))
+            {
                 return false;
+            }
             return lhs.id_lsb_ < rhs.id_lsb_;
         }
 
         friend bool operator<= (gid_type const& lhs, gid_type const& rhs)
         {
-            if (detail::strip_credit_from_gid(lhs.id_msb_)
-               < detail::strip_credit_from_gid(rhs.id_msb_))
+            if (detail::strip_credit_from_gid(lhs.id_msb_) <
+                detail::strip_credit_from_gid(rhs.id_msb_))
+            {
                 return true;
-            if (detail::strip_credit_from_gid(lhs.id_msb_)
-               > detail::strip_credit_from_gid(rhs.id_msb_))
+            }
+            if (detail::strip_credit_from_gid(lhs.id_msb_) >
+                detail::strip_credit_from_gid(rhs.id_msb_))
+            {
                 return false;
+            }
             return lhs.id_lsb_ <= rhs.id_lsb_;
         }
 
         friend bool operator> (gid_type const& lhs, gid_type const& rhs)
         {
-            if (detail::strip_credit_from_gid(lhs.id_msb_)
-               > detail::strip_credit_from_gid(rhs.id_msb_))
-                return true;
-            if (detail::strip_credit_from_gid(lhs.id_msb_)
-               < detail::strip_credit_from_gid(rhs.id_msb_))
-                return false;
-            return lhs.id_lsb_ > rhs.id_lsb_;
+            return !(lhs <= rhs);
         }
 
         friend bool operator>= (gid_type const& lhs, gid_type const& rhs)
         {
-            if (detail::strip_credit_from_gid(lhs.id_msb_)
-               > detail::strip_credit_from_gid(rhs.id_msb_))
-                return true;
-            if (detail::strip_credit_from_gid(lhs.id_msb_)
-               < detail::strip_credit_from_gid(rhs.id_msb_))
-                return false;
-            return lhs.id_lsb_ >= rhs.id_lsb_;
+            return !(lhs < rhs);
         }
 
         boost::uint64_t get_msb() const
@@ -344,16 +343,6 @@ namespace hpx { namespace naming
     namespace detail
     {
         // We store the log2(credit) in the gid_type
-        inline boost::int64_t get_credit_from_gid(gid_type const& id) HPX_PURE;
-
-        inline boost::int64_t get_credit_from_gid(gid_type const& id)
-        {
-            boost::int16_t log2credits =
-                boost::int16_t((id.get_msb() >> gid_type::credit_shift) &
-                    gid_type::credit_base_mask);
-            return 1ull << log2credits;
-        }
-
         inline boost::int16_t log2(boost::int64_t val)
         {
             boost::int16_t ret = -1;
@@ -365,29 +354,100 @@ namespace hpx { namespace naming
             return ret;
         }
 
-        inline void set_credit_for_gid(gid_type& id, boost::int64_t credit)
+        inline boost::uint64_t power2(boost::uint16_t log2credits)
         {
-            HPX_ASSERT(0 == (credit & ~gid_type::credit_base_mask));
+            return 1ull << log2credits;
+        }
 
-            boost::int16_t log2credits = detail::log2(credit);
+        ///////////////////////////////////////////////////////////////////////
+        inline bool has_credits(gid_type const& id)
+        {
+            return (id.get_msb() & gid_type::has_credits_mask) ? true : false;
+        }
 
+        inline bool gid_was_split(gid_type const& id)
+        {
+            return (id.get_msb() & gid_type::was_split_mask) != 0;
+        }
+
+        inline void set_credit_split_mask_for_gid(gid_type& id)
+        {
+            id.set_msb(id.get_msb() | gid_type::was_split_mask);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        inline boost::int64_t get_credit_from_gid(gid_type const& id) HPX_PURE;
+
+        inline boost::int16_t get_log2credit_from_gid(gid_type const& id)
+        {
+            HPX_ASSERT(has_credits(id));
+            return boost::int16_t((id.get_msb() >> gid_type::credit_shift) &
+                    gid_type::credit_base_mask);
+        }
+
+        inline boost::int64_t get_credit_from_gid(gid_type const& id)
+        {
+            return has_credits(id) ? detail::power2(get_log2credit_from_gid(id)) : 0;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb)
+        {
+            return msb & ~(
+                gid_type::credit_mask |
+                gid_type::was_split_mask |
+                gid_type::has_credits_mask);
+        }
+
+        inline gid_type& strip_credit_from_gid(gid_type& id)
+        {
+            id.set_msb(strip_credit_from_gid(id.get_msb()));
+            return id;
+        }
+
+        inline gid_type get_stripped_gid(gid_type const& id) HPX_PURE;
+
+        inline gid_type get_stripped_gid(gid_type const& id)
+        {
+            boost::uint64_t const msb = strip_credit_from_gid(id.get_msb());
+            boost::uint64_t const lsb = id.get_lsb();
+            return gid_type(msb, lsb);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        inline void set_log2credit_for_gid(gid_type& id, boost::int16_t log2credits)
+        {
             // credit should be a clean log2
             HPX_ASSERT(log2credits >= 0);
-            HPX_ASSERT((1ull << log2credits) == credit);
-
             HPX_ASSERT(0 == (log2credits & ~gid_type::credit_base_mask));
 
             id.set_msb((id.get_msb() & ~gid_type::credit_mask) |
-                ((boost::int32_t(log2credits) << gid_type::credit_shift) &
-                    gid_type::credit_mask));
+                ((boost::int32_t(log2credits) << gid_type::credit_shift) & gid_type::credit_mask) |
+                gid_type::has_credits_mask);
         }
 
+        inline void set_credit_for_gid(gid_type& id, boost::int64_t credits)
+        {
+            if (credits != 0)
+            {
+                boost::int16_t log2credits = detail::log2(credits);
+                HPX_ASSERT(detail::power2(log2credits) == credits);
+
+                set_log2credit_for_gid(id, log2credits);
+            }
+            else
+            {
+                strip_credit_from_gid(id);
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         // has side effects, can't be pure
-        inline boost::int64_t add_credit_to_gid(gid_type& id, boost::int64_t credit)
+        inline boost::int64_t add_credit_to_gid(gid_type& id, boost::int64_t credits)
         {
             boost::int64_t c = get_credit_from_gid(id);
 
-            c += credit;
+            c += credits;
             set_credit_for_gid(id, c);
 
             return c;
@@ -404,60 +464,35 @@ namespace hpx { namespace naming
             return c;
         }
 
-        inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb)
+        inline boost::int64_t fill_credit_for_gid(gid_type& id,
+            boost::int64_t credits = HPX_GLOBALCREDIT_INITIAL)
         {
-            return msb & ~(gid_type::credit_mask | gid_type::was_split_mask);
+            boost::int64_t c = get_credit_from_gid(id);
+            HPX_ASSERT(c <= credits);
+
+            boost::int64_t added = credits - c;
+            set_credit_for_gid(id, credits);
+
+            return added;
         }
 
-        inline gid_type& strip_credit_from_gid(gid_type& id)
+        ///////////////////////////////////////////////////////////////////////
+        // splits the current credit of the given id and assigns half of it to
+        // the returned copy
+        inline gid_type split_credits_for_gid(gid_type& id)
         {
-            id.set_msb(strip_credit_from_gid(id.get_msb()));
-            return id;
-        }
+            boost::uint16_t log2credits = get_log2credit_from_gid(id);
+            HPX_ASSERT(log2credits > 0);
 
-        inline gid_type strip_credit_from_gid(gid_type const& id) HPX_PURE;
+            gid_type newid = id;
 
-        inline gid_type get_stripped_gid(gid_type const& id)
-        {
-            boost::uint64_t const msb = strip_credit_from_gid(id.get_msb());
-            boost::uint64_t const lsb = id.get_lsb();
-            return gid_type(msb, lsb);
-        }
+            set_log2credit_for_gid(id, log2credits-1);
+            set_credit_split_mask_for_gid(id);
 
-        inline void set_credit_split_mask_for_gid(gid_type& id)
-        {
-            id.set_msb(id.get_msb() | gid_type::was_split_mask);
-        }
+            set_log2credit_for_gid(newid, log2credits-1);
+            set_credit_split_mask_for_gid(newid);
 
-        // splits the current credit of the given id and assigns half of it to the
-        // returned copy
-        inline gid_type split_credits_for_gid(gid_type& id, int fraction = 2)
-        {
-            boost::uint64_t msb = id.get_msb();
-            boost::int64_t credits = get_credit_from_gid(id);
-
-            HPX_ASSERT(fraction > 0);
-            boost::int64_t newcredits = static_cast<boost::int64_t>(credits / fraction);
-
-            msb &= ~gid_type::credit_mask;
-            id.set_msb(
-                msb |
-                ((boost::int64_t(credits - newcredits) << gid_type::credit_shift) &
-                    gid_type::credit_mask) |
-                gid_type::was_split_mask
-            );
-
-            return gid_type(
-                    msb |
-                        ((boost::int64_t(newcredits) << gid_type::credit_shift) &
-                            gid_type::credit_mask) |
-                        gid_type::was_split_mask,
-                    id.get_lsb());
-        }
-
-        inline bool gid_was_split(gid_type const& id)
-        {
-            return (id.get_msb() & gid_type::was_split_mask) != 0;
+            return newid;
         }
     }
 

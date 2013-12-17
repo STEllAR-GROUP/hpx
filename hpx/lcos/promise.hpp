@@ -162,7 +162,7 @@ namespace hpx { namespace lcos { namespace detail
                 const_cast<naming::gid_type&>(this->gid_));
 
             // we request the id of a future only once
-            HPX_ASSERT(0 != naming::detail::get_credit_from_gid(gid));
+            HPX_ASSERT(naming::detail::has_credits(gid));
 
             return naming::id_type(gid, naming::id_type::managed);
         }
@@ -257,8 +257,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         friend void intrusive_ptr_release(promise* p)
         {
-            bool get_gid_was_called =
-                (0 == naming::detail::get_credit_from_gid(p->gid_));
+            bool get_gid_was_called = !naming::detail::has_credits(p->gid_);
             long counter = --p->count_;
 
             // if this promise was never asked for its id we need to take
@@ -352,8 +351,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         friend void intrusive_ptr_release(promise* p)
         {
-            bool get_gid_was_called =
-                (0 == naming::detail::get_credit_from_gid(p->gid_));
+            bool get_gid_was_called = !naming::detail::has_credits(p->gid_);
             long counter = --p->count_;
 
             // if this promise was never asked for its id we need to take
