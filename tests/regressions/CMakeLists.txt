@@ -21,6 +21,7 @@ foreach(subdir ${subdirs})
 endforeach()
 
 set(tests
+    id_type_ref_counting
     multiple_init
    )
 
