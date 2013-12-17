@@ -100,13 +100,19 @@ int hpx_main()
         // creating test_server1 instance
         hpx::id_type server1 = hpx::async(test_server2::create_test_server1_action(), server2).get();
         server2 = hpx::id_type();
+        hpx::agas::garbage_collect();
+        hpx::agas::garbage_collect();
+        hpx::agas::garbage_collect();
+
         HPX_TEST(test_server1::alive);
         HPX_TEST(test_server2::alive);
+
         test_server1::test_action()(server1);
         server1 = hpx::id_type();
         hpx::agas::garbage_collect();
         hpx::agas::garbage_collect();
         hpx::agas::garbage_collect();
+
         HPX_TEST(!test_server1::alive);
         HPX_TEST(!test_server2::alive);
     }
