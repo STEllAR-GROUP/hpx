@@ -193,38 +193,38 @@ namespace hpx { namespace parcelset { namespace tcp
                 // clear and preallocate out_buffer_
                 out_buffer_.clear();
                 out_chunks_.clear();
-    
+
                 BOOST_FOREACH(parcel const & p, pv)
                 {
                     arg_size += traits::get_type_size(p);
                     priority = (std::max)(p.get_thread_priority(), priority);
                 }
-    
+
                 out_buffer_.reserve(arg_size*2);
-    
+
                 // mark start of serialization
                 util::high_resolution_timer timer;
-    
+
                 {
                     // Serialize the data
                     HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
                         pv[0].get_serialization_filter());
-    
+
                     int archive_flags = archive_flags_;
                     if (filter.get() != 0) {
                         filter->set_max_length(out_buffer_.capacity());
                         archive_flags |= util::enable_compression;
                     }
-    
+
                     util::portable_binary_oarchive archive(out_buffer_, &out_chunks_,
                         dest_locality_id, filter.get(), archive_flags);
-    
+
 #if defined(HPX_HAVE_SECURITY)
                     std::set<boost::uint32_t> localities;
 #endif
                     std::size_t count = pv.size();
                     archive << count; //-V128
-    
+
                     BOOST_FOREACH(parcel const& p, pv)
                     {
 #if defined(HPX_HAVE_SECURITY)
@@ -232,10 +232,10 @@ namespace hpx { namespace parcelset { namespace tcp
 #endif
                         archive << p;
                     }
-    
+
                     arg_size = archive.bytes_written();
                 }
-    
+
 #if defined(HPX_HAVE_SECURITY)
                 // calculate and sign the hash, but only after everything has
                 // been initialized
