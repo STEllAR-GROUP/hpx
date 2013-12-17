@@ -31,7 +31,7 @@ struct test
     {
         for(std::size_t i = 0; i != iterations; ++i)
         {
-            const std::size_t num_pongs = 10;
+            const std::size_t num_pongs = 50;
             std::vector<hpx::future<void> > futures;
             futures.reserve(num_pongs);
             for(std::size_t j = 0; j != num_pongs; ++j)
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
     desc.add_options()
         ( "iterations",
-          boost::program_options::value<boost::uint64_t>()->default_value(1000),
+          boost::program_options::value<boost::uint64_t>()->default_value(100),
           "number of times to repeat the test")
         ;
 

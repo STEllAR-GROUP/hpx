@@ -216,7 +216,7 @@ struct get_remote_result<naming::id_type, agas::response>
     {
         naming::gid_type raw_gid = rep.get_gid();
 
-        if (naming::detail::get_credit_from_gid(raw_gid) != 0)
+        if (naming::detail::has_credits(raw_gid))
             return naming::id_type(raw_gid, naming::id_type::managed);
 
         return naming::id_type(raw_gid, naming::id_type::unmanaged);

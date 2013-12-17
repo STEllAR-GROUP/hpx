@@ -52,14 +52,14 @@ using hpx::find_here;
 void split(
     id_type const& from
   , id_type const& target
-  , boost::int16_t old_credit
+  , boost::int64_t old_credit
     );
 
 HPX_PLAIN_ACTION(split);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions.
-inline boost::int32_t get_credit(id_type const& id)
+inline boost::int64_t get_credit(id_type const& id)
 {
     return get_credit_from_gid(id.get_gid());
 }
@@ -68,7 +68,7 @@ inline boost::int32_t get_credit(id_type const& id)
 void split(
     id_type const& from
   , id_type const& target
-  , boost::int16_t old_credit
+  , boost::int64_t old_credit
     )
 {
     cout << "[" << find_here() << "/" << target << "]: "
@@ -83,8 +83,10 @@ void split(
     id_type const here = find_here();
 
     if (get_locality_id_from_id(from) == get_locality_id_from_id(here))
+    {
         throw std::logic_error("infinite recursion detected, split was "
                                "invoked locally");
+    }
 
     // Recursively call split on the sender locality.
     async<split_action>(from, here, target, get_credit(target)).get();

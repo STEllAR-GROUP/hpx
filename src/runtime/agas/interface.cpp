@@ -58,11 +58,10 @@ bool unregister_name_sync(
 
     if (agas_.unregister_name(name, raw_gid, ec) && !ec)
     {
-        if (naming::detail::get_credit_from_gid(raw_gid) != 0)
-            gid = naming::id_type(raw_gid, naming::id_type::managed);
-        else
-            gid = naming::id_type(raw_gid, naming::id_type::unmanaged);
-
+        gid = naming::id_type(raw_gid,
+            naming::detail::has_credits(raw_gid) ?
+                naming::id_type::managed :
+                naming::id_type::unmanaged);
         return true;
     }
 
@@ -114,11 +113,10 @@ bool resolve_name_sync(
 
     if (agas_.resolve_name(name, raw_gid, ec) && !ec)
     {
-        if (naming::detail::get_credit_from_gid(raw_gid) != 0)
-            gid = naming::id_type(raw_gid, naming::id_type::managed);
-        else
-            gid = naming::id_type(raw_gid, naming::id_type::unmanaged);
-
+        gid = naming::id_type(raw_gid,
+            naming::detail::has_credits(raw_gid) ?
+                naming::id_type::managed :
+                naming::id_type::unmanaged);
         return true;
     }
 
