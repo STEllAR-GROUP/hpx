@@ -354,8 +354,9 @@ namespace hpx { namespace naming
             return ret;
         }
 
-        inline boost::uint64_t power2(boost::uint16_t log2credits)
+        inline boost::int64_t power2(boost::int16_t log2credits)
         {
+            HPX_ASSERT(log2credits >= 0);
             return 1ull << log2credits;
         }
 
