@@ -425,7 +425,7 @@ system and application performance.
          the counter returns the accumulated number of retired __hpx__-threads
          for all worker threads (cores) on that locality. If the instance name
          is `worker-thread#*` the counter will return the overall number of
-         retired __hpx__-threads for the specified worker thread.]
+         retired __hpx__-threads for all worker threads separately.]
     ]
     [   [`/threads/count/cumulative_phases`]
         [`locality#*/total` or[br]
@@ -445,12 +445,13 @@ system and application performance.
           for the application using the option [hpx_cmdline `--hpx:threads`].
         ]
         [None]
-        [Returns the overall number of executed (retired) __hpx__-threads on the
-         given locality since application start. If the instance name is `total`
-         the counter returns the accumulated number of retired __hpx__-threads
-         for all worker threads (cores) on that locality. If the instance name
-         is `worker-thread#*` the counter will return the overall number of
-         retired __hpx__-threads for the specified worker thread.]
+        [Returns the overall number of executed __hpx__-thread phases
+         (invocations) on the given locality since application start. If the
+         instance name is `total` the counter returns the accumulated number
+         of executed __hpx__-thread phases (invocations) for all worker threads
+         (cores) on that locality. If the instance name is `worker-thread#*`
+         the counter will return the overall number of executed __hpx__-thread
+         phases for all worker threads separately.]
     ]
     [   [`/threads/count/instantaneous/<thread-state>`
 
@@ -482,8 +483,8 @@ system and application performance.
          name is `total` the counter returns the current number of __hpx__-threads
          of the given state for all worker threads (cores) on that locality. If
          the instance name is `worker-thread#*` the counter will return the
-         current number of __hpx__-threads in the given state for the specified
-         worker thread.]
+         current number of __hpx__-threads in the given state for all
+         worker threads separately.]
     ]
     [   [`/threads/wait-time/<thread-state>`
 
@@ -518,8 +519,8 @@ system and application performance.
          name is `total` the counter returns the wait time of __hpx__-threads
          of the given state for all worker threads (cores) on that locality. If
          the instance name is `worker-thread#*` the counter will return the
-         wait time of __hpx__-threads in the given state for the specified
-         worker thread.
+         wait time of __hpx__-threads in the given state for all
+         worker threads separately.
 
          These counters are available only if the compile time constant
          `HPX_THREAD_MAINTAIN_QUEUE_WAITTIME` was defined while compiling the
@@ -556,7 +557,7 @@ system and application performance.
           `locality#*` is defining the locality for which the current length
           of all thread queues in the scheduler for all (or one) worker threads
           should be queried for. The locality id (given by `*`) is a (zero
-          based) number identifying the locality
+          based) number identifying the locality.
 
           `worker-thread#*` is defining the worker thread for which the
           current length of all thread queues in the scheduler should be
