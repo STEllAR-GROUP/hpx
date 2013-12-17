@@ -164,7 +164,8 @@ namespace hpx { namespace threads { namespace detail
     template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
         boost::atomic<hpx::state>& global_state, boost::int64_t& executed_threads,
-        boost::uint64_t& tfunc_time, boost::uint64_t& exec_time,
+        boost::int64_t& executed_thread_phases, boost::uint64_t& tfunc_time,
+        boost::uint64_t& exec_time,
         util::function_nonser<void()> const& cb = util::function_nonser<void()>())
     {
         util::itt::stack_context ctx;        // helper for itt support
@@ -221,6 +222,7 @@ namespace hpx { namespace threads { namespace detail
                                 exec_time += util::hardware::timestamp() - timestamp;
                             }
 
+                            ++executed_thread_phases;
                             tfunc_time = util::hardware::timestamp() - overall_timestamp;
                         }
                         else {
@@ -261,8 +263,9 @@ namespace hpx { namespace threads { namespace detail
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
-                        // REVIEW: Passing a specific target thread may screw
-                        // with the round robin queuing.
+                        //
+                        // REVIEW: Passing a specific target thread may set off
+                        // the round robin queuing.
                         scheduler.SchedulingPolicy::schedule_thread_last(thrd, num_thread);
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
@@ -277,8 +280,9 @@ namespace hpx { namespace threads { namespace detail
                     // this might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
                     // yet
-                    // REVIEW: Passing a specific target thread may screw
-                    // with the round robin queuing.
+                    //
+                    // REVIEW: Passing a specific target thread may set off
+                    // the round robin queuing.
                     scheduler.SchedulingPolicy::schedule_thread(thrd, num_thread);
                 }
 

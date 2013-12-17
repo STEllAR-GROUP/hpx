@@ -459,8 +459,10 @@ namespace hpx { namespace threads
             scheduler_.on_error(num_thread, e);
         }
 
-        boost::int64_t get_executed_threads(std::size_t num = std::size_t(-1),
-            bool reset = false);
+        boost::int64_t get_executed_threads(
+            std::size_t num = std::size_t(-1), bool reset = false);
+        boost::int64_t get_executed_thread_phases(
+            std::size_t num = std::size_t(-1), bool reset = false);
 
     protected:
         ///
@@ -529,8 +531,9 @@ namespace hpx { namespace threads
         std::size_t num_threads_;
         boost::ptr_vector<boost::thread> threads_;
 
-        // count number of executed HPX-threads (invocations)
+        // count number of executed HPX-threads and thread phases (invocations)
         std::vector<boost::int64_t> executed_threads_;
+        std::vector<boost::int64_t> executed_thread_phases_;
         boost::atomic<long> thread_count_;
 
         boost::atomic<hpx::state> state_;   ///< thread manager state
