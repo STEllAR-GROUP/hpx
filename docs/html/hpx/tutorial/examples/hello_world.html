@@ -121,7 +121,7 @@ hello world from OS-thread 0 on locality 0
 <p>
           In the <a class="link" href="fibonacci.html" title="Fibonacci">Fibonacci Example</a>,
           we used <code class="computeroutput"><a class="link" href="../../find_here.html" title="Function find_here">hpx::find_here</a></code><code class="computeroutput"><span class="special">()</span></code> to specified the target' of our actions.
-          Here, we instead use <code class="computeroutput"><a class="link" href="../../find_all_local_idp15868480.html" title="Function find_all_localities">hpx::find_all_localities</a></code><code class="computeroutput"><span class="special">()</span></code>, which returns an <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;&gt;</span></code> containing the identifiers of all
+          Here, we instead use <code class="computeroutput"><a class="link" href="../../find_all_local_idp16652288.html" title="Function find_all_localities">hpx::find_all_localities</a></code><code class="computeroutput"><span class="special">()</span></code>, which returns an <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;&gt;</span></code> containing the identifiers of all
           the machines in the system, including the one that we are on.
         </p>
 <p>
@@ -132,7 +132,6 @@ hello world from OS-thread 0 on locality 0
 <pre class="programlisting"><span class="comment">// Define the boilerplate code necessary for the function 'hello_world_foreman'</span>
 <span class="comment">// to be invoked as an HPX action.</span>
 <span class="identifier">HPX_PLAIN_ACTION</span><span class="special">(</span><span class="identifier">hello_world_foreman</span><span class="special">,</span> <span class="identifier">hello_world_foreman_action</span><span class="special">);</span>
-<span class="identifier">HPX_ACTION_USES_SNAPPY_COMPRESSION</span><span class="special">(</span><span class="identifier">hello_world_foreman_action</span><span class="special">);</span>
 </pre>
 <p>
           Another way of thinking about this wrapping technique is as follows: functions
@@ -235,11 +234,7 @@ hello world from OS-thread 0 on locality 0
     <span class="keyword">if</span> <span class="special">(</span><span class="identifier">current</span> <span class="special">==</span> <span class="identifier">desired</span><span class="special">)</span>
     <span class="special">{</span>
         <span class="comment">// The HPX-thread has been run on the desired OS-thread.</span>
-<span class="preprocessor">#ifdef</span> <span class="identifier">HPX_NATIVE_MIC</span>
-        <span class="keyword">char</span> <span class="keyword">const</span><span class="special">*</span> <span class="identifier">msg</span> <span class="special">=</span> <span class="string">"hello world from OS-thread %1% on locality %2% on the Xeon Phi"</span><span class="special">;</span>
-<span class="preprocessor">#else</span>
         <span class="keyword">char</span> <span class="keyword">const</span><span class="special">*</span> <span class="identifier">msg</span> <span class="special">=</span> <span class="string">"hello world from OS-thread %1% on locality %2%"</span><span class="special">;</span>
-<span class="preprocessor">#endif</span>
 
         <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="special">(</span><span class="identifier">boost</span><span class="special">::</span><span class="identifier">format</span><span class="special">(</span><span class="identifier">msg</span><span class="special">)</span> <span class="special">%</span> <span class="identifier">desired</span> <span class="special">%</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">get_locality_id</span><span class="special">())</span>
                   <span class="special">&lt;&lt;</span> <span class="identifier">hpx</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span>

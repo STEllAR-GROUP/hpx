@@ -189,101 +189,98 @@ namespace hpx { namespace parcelset { namespace tcp
 
         // guard against serialization errors
         try {
-            // clear and preallocate out_buffer_
-            out_buffer_.clear();
-            out_chunks_.clear();
-
-            BOOST_FOREACH(parcel const & p, pv)
-            {
-                arg_size += traits::get_type_size(p);
-                priority = (std::max)(p.get_thread_priority(), priority);
-            }
-
-            out_buffer_.reserve(arg_size*2);
-            boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
-
-            // mark start of serialization
-            util::high_resolution_timer timer;
-
-            {
-                // Serialize the data
-                HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
-                    pv[0].get_serialization_filter());
-
-                int archive_flags = archive_flags_;
-                if (filter.get() != 0) {
-                    filter->set_max_length(out_buffer_.capacity());
-                    archive_flags |= util::enable_compression;
-                }
-
-                util::portable_binary_oarchive archive(out_buffer_,
-                    &out_chunks_, dest_locality_id, filter.get(), archive_flags);
-
-#if defined(HPX_HAVE_SECURITY)
-                std::set<boost::uint32_t> localities;
-#endif
-                std::size_t count = pv.size();
-                archive << count; //-V128
-
-                BOOST_FOREACH(parcel const& p, pv)
+            try {
+                // clear and preallocate out_buffer_
+                out_buffer_.clear();
+                out_chunks_.clear();
+    
+                BOOST_FOREACH(parcel const & p, pv)
                 {
-#if defined(HPX_HAVE_SECURITY)
-                    serialize_certificate(archive, localities, p);
-#endif
-                    archive << p;
+                    arg_size += traits::get_type_size(p);
+                    priority = (std::max)(p.get_thread_priority(), priority);
                 }
-
-                arg_size = archive.bytes_written();
-            }
-
+    
+                out_buffer_.reserve(arg_size*2);
+    
+                // mark start of serialization
+                util::high_resolution_timer timer;
+    
+                {
+                    // Serialize the data
+                    HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
+                        pv[0].get_serialization_filter());
+    
+                    int archive_flags = archive_flags_;
+                    if (filter.get() != 0) {
+                        filter->set_max_length(out_buffer_.capacity());
+                        archive_flags |= util::enable_compression;
+                    }
+    
+                    util::portable_binary_oarchive archive(out_buffer_, &out_chunks_,
+                        dest_locality_id, filter.get(), archive_flags);
+    
 #if defined(HPX_HAVE_SECURITY)
-            // calculate and sign the hash, but only after everything has
-            // been initialized
-            if (!first_message_)
-                create_message_suffix(pv[0].get_parcel_id());
+                    std::set<boost::uint32_t> localities;
 #endif
-            // store the time required for serialization
-            send_data_.serialization_time_ = timer.elapsed_nanoseconds();
+                    std::size_t count = pv.size();
+                    archive << count; //-V128
+    
+                    BOOST_FOREACH(parcel const& p, pv)
+                    {
+#if defined(HPX_HAVE_SECURITY)
+                        serialize_certificate(archive, localities, p);
+#endif
+                        archive << p;
+                    }
+    
+                    arg_size = archive.bytes_written();
+                }
+    
+#if defined(HPX_HAVE_SECURITY)
+                // calculate and sign the hash, but only after everything has
+                // been initialized
+                if (!first_message_)
+                    create_message_suffix(pv[0].get_parcel_id());
+#endif
+                // store the time required for serialization
+                send_data_.serialization_time_ = timer.elapsed_nanoseconds();
+            }
+            catch (hpx::exception const& e) {
+                LPT_(fatal)
+                    << "tcp::parcelport_connection::set_parcel: "
+                       "caught hpx::exception: "
+                    << e.what();
+                hpx::report_error(boost::current_exception());
+                return;
+            }
+            catch (boost::system::system_error const& e) {
+                LPT_(fatal)
+                    << "tcp::parcelport_connection::set_parcel: "
+                       "caught boost::system::error: "
+                    << e.what();
+                hpx::report_error(boost::current_exception());
+                return;
+            }
+            catch (boost::exception const&) {
+                LPT_(fatal)
+                    << "tcp::parcelport_connection::set_parcel: "
+                       "caught boost::exception";
+                hpx::report_error(boost::current_exception());
+                return;
+            }
+            catch (std::exception const& e) {
+                // We have to repackage all exceptions thrown by the
+                // serialization library as otherwise we will loose the
+                // e.what() description of the problem, due to slicing.
+                boost::throw_exception(boost::enable_error_info(
+                    hpx::exception(serialization_error, e.what())));
+            }
         }
-        catch (boost::archive::archive_exception const& e) {
-            // We have to repackage all exceptions thrown by the
-            // serialization library as otherwise we will loose the
-            // e.what() description of the problem.
-            HPX_THROW_EXCEPTION(serialization_error,
-                "tcp::parcelport_connection::set_parcel",
-                boost::str(boost::format(
-                    "parcelport: parcel serialization failed, caught "
-                    "boost::archive::archive_exception: %s") % e.what()));
-            return;
-        }
-        catch (boost::system::system_error const& e) {
-            HPX_THROW_EXCEPTION(serialization_error,
-                "tcp::parcelport_connection::set_parcel",
-                boost::str(boost::format(
-                    "parcelport: parcel serialization failed, caught "
-                    "boost::system::system_error: %d (%s)") %
-                        e.code().value() % e.code().message()));
-            return;
-        }
-        catch (std::exception const& e) {
-            HPX_THROW_EXCEPTION(serialization_error,
-                "tcp::parcelport_connection::set_parcel",
-                boost::str(boost::format(
-                    "parcelport: parcel serialization failed, caught "
-                    "std::exception: %s") % e.what()));
-            return;
-        }
-
-        // make sure outgoing message is not larger than allowed
-        if (out_buffer_.size() > max_outbound_size_)
-        {
-            HPX_THROW_EXCEPTION(serialization_error,
-                "tcp::parcelport_connection::set_parcel",
-                boost::str(boost::format(
-                    "parcelport: parcel serialization created message larger "
-                    "than allowed (created: %ld, allowed: %ld), consider"
-                    "configuring larger hpx.parcel.max_message_size") %
-                        out_buffer_.size() % max_outbound_size_));
+        catch (...) {
+            LPT_(fatal)
+                << "tcp::parcelport_connection::set_parcel: "
+                   "caught unknown exception";
+            hpx::report_error(boost::current_exception());
             return;
         }
 

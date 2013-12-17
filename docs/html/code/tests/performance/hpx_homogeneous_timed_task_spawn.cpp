@@ -9,7 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
-#include <hpx/include/iostreams.hpp>
+#include <hpx/lcos/local/barrier.hpp>
+//#include <hpx/include/iostreams.hpp>
 
 #include <stdexcept>
 
@@ -36,17 +37,17 @@ using hpx::util::high_resolution_timer;
 using hpx::reset_active_counters;
 using hpx::stop_active_counters;
 
-using hpx::cout;
-using hpx::flush;
+//using hpx::cout;
+//using hpx::flush;
+
+using std::cout;
+using std::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables.
 boost::uint64_t tasks = 500000;
 boost::uint64_t delay = 0;
 bool header = true;
-
-// delay in seconds
-double delay_sec = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
@@ -78,6 +79,14 @@ int invoke_worker_timed(double delay_sec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void wait_for_tasks(hpx::lcos::local::barrier& bar)
+{
+    BOOST_ASSERT(get_thread_count(hpx::threads::thread_priority_normal) == 1);
+
+    bar.wait();
+}
+
+///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
     )
@@ -85,35 +94,34 @@ int hpx_main(
     if (vm.count("no-header"))
         header = false;
 
-    // delay in seconds
-    delay_sec = delay * 1.0E-6;
-
     {
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
 
-        // Reset performance counters (if specified on command line)
+        // Reset performance counters.
         reset_active_counters();
 
         // Start the clock.
         high_resolution_timer t;
 
         for (boost::uint64_t i = 0; i < tasks; ++i)
-            register_work(HPX_STD_BIND(&invoke_worker_timed, delay_sec),
-                "invoke_worker_timed");
+            register_work(boost::bind(&invoke_worker_timed
+                                    , double(delay) * 1e-6)
+              , "invoke_worker_timed");
 
-        // Reschedule hpx_main until all other hpx-threads have finished. We
-        // should be resumed after most of the null px-threads have been
-        // executed. If we haven't, we just reschedule ourselves again.
-        do {
-            suspend();
-        } while (get_thread_count(hpx::threads::thread_priority_normal) > 1);
+        // Schedule a low-priority thread; when it is executed, it checks to
+        // make sure all the tasks (which are normal priority) have been 
+        // executed, and then it
+        hpx::lcos::local::barrier bar(2);
+
+        register_work(boost::bind(&wait_for_tasks, boost::ref(bar)),
+            "wait_for_tasks", hpx::threads::pending,
+            hpx::threads::thread_priority_low);
+
+        bar.wait();
 
         // Stop the clock
         double time_elapsed = t.elapsed();
-
-        // Stop Performance Counters
-           stop_active_counters();
 
         print_results(get_os_thread_count(), time_elapsed);
     }

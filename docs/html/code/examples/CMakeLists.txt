@@ -31,6 +31,7 @@ set(subdirs
 if(HPX_HAVE_CXX11_LAMBDAS)
   set(subdirs ${subdirs}
       tuplespace
+      diskperf
       )
 endif()
 

@@ -96,9 +96,7 @@ namespace hpx { namespace agas { namespace detail
         // entry. If there are more credits moved off the locality than there
         // are credits to be acknowledged (which can happen because of the
         // initial credit every id gets assigned when being created), we can
-        // still assume that there all credits which are still waiting to be
-        // acknowledged have been moved off this locality, i.e. no local
-        // credits require any acknowledgment anymore.
+        // still assume that no local credits require acknowledgment anymore.
         if (data_local.credit_ >= credits)
         {
             data_local.credit_ -= credits;

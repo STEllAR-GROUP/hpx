@@ -420,5 +420,15 @@ hpx::future<bool> incref_async(
     return resolver.incref_async(gid, credits, keep_alive);
 }
 
+bool incref(
+    naming::gid_type const& gid
+  , boost::int64_t credits
+  , error_code& ec
+  )
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.incref(gid, credits, ec);
+}
+
 }}
 
