@@ -40,7 +40,7 @@ COMPILER=
 
 ###############################################################################
 # Argument parsing
-while getopts “hnt:d:v:c:x:” OPTION; do case $OPTION in
+while getopts "hnt:d:v:c:x:" OPTION; do case $OPTION in
     h)
         usage
         exit 0
