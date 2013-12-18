@@ -1899,9 +1899,8 @@ lcos::future<bool> addressing_service::register_name_async(
             boost::uint64_t added_new_credit =
                 naming::detail::fill_credit_for_gid(new_gid);
 
-            naming::resolver_client& client = naming::get_agas_client();
-            client.incref_async(mutable_gid, added_credit);
-            client.incref_async(new_gid, added_new_credit);
+            incref_async(mutable_gid, added_credit);
+            incref_async(new_gid, added_new_credit);
         }
     }
     else
