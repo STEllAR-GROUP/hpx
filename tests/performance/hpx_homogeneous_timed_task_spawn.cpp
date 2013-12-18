@@ -62,6 +62,11 @@ void print_results(
 {
     if (header)
     {
+        cout << "# HPX " << hpx::build_string() << " "
+                         << hpx::build_type() << "\n"
+             << "# Boost " << hpx::boost_version() << "\n"
+             << "#\n";
+
         // Note that if we change the number of fields above, we have to
         // change the constant that we add when printing out the field # for
         // performance counters below (e.g. the last_index part).
