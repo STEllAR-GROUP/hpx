@@ -1047,6 +1047,14 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
+            // /threads{locality#%d/total}/count/cumulative_phases
+            // /threads{locality#%d/worker-thread%d}/count/cumulative_phases
+            { "count/cumulative_phases",
+              HPX_STD_BIND(&ti::get_executed_thread_phases, this, -1, _1),
+              HPX_STD_BIND(&ti::get_executed_thread_phases, this,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
             // /threads{locality#%d/total}/count/instantaneous/all
             // /threads{locality#%d/worker-thread%d}/count/instantaneous/all
             { "count/instantaneous/all",
@@ -1289,8 +1297,8 @@ namespace hpx { namespace threads
 
         // run main scheduling loop until terminated
         detail::scheduling_loop(num_thread, scheduler_, state_,
-            executed_threads_[num_thread], tfunc_times[num_thread],
-            exec_times[num_thread]);
+            executed_threads_[num_thread], executed_thread_phases_[num_thread],
+            tfunc_times[num_thread], exec_times[num_thread]);
 
 #if HPX_DEBUG != 0
         // the OS thread is allowed to exit only if no more HPX threads exist
@@ -1321,6 +1329,7 @@ namespace hpx { namespace threads
         timer_pool_.run(false);
 
         executed_threads_.resize(num_threads);
+        executed_thread_phases_.resize(num_threads);
         tfunc_times.resize(num_threads);
         exec_times.resize(num_threads);
 
@@ -1442,6 +1451,27 @@ namespace hpx { namespace threads
             executed_threads_.end(), 0LL);
         if (reset)
             std::fill(executed_threads_.begin(), executed_threads_.end(), 0LL);
+        return result;
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_executed_thread_phases(std::size_t num, bool reset)
+    {
+        boost::int64_t result = 0;
+        if (num != std::size_t(-1)) {
+            result = executed_thread_phases_[num];
+            if (reset)
+                executed_thread_phases_[num] = 0;
+            return result;
+        }
+
+        result = std::accumulate(executed_thread_phases_.begin(),
+            executed_thread_phases_.end(), 0LL);
+        if (reset) {
+            std::fill(executed_thread_phases_.begin(),
+                executed_thread_phases_.end(), 0LL);
+        }
         return result;
     }
 

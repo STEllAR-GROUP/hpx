@@ -262,8 +262,9 @@ response symbol_namespace::bind(
 
     if (it != end)
     {
-        boost::int16_t const credits = naming::detail::get_credit_from_gid(gid);
+        boost::int64_t const credits = naming::detail::get_credit_from_gid(gid);
         naming::gid_type raw_gid = it->second;
+
         naming::detail::strip_credit_from_gid(raw_gid);
         naming::detail::strip_credit_from_gid(gid);
 
@@ -277,6 +278,7 @@ response symbol_namespace::bind(
                 % naming::detail::get_credit_from_gid(it->second)
                 % (naming::detail::get_credit_from_gid(it->second) + credits));
 
+            // REVIEW: do we need to add the credit of the argument to the table?
             naming::detail::add_credit_to_gid(it->second, credits);
 
             if (&ec != &throws)
@@ -285,10 +287,13 @@ response symbol_namespace::bind(
             return response(symbol_ns_bind);
         }
 
-        naming::detail::add_credit_to_gid(gid, credits);
-        LAGAS_(info) << (boost::format(
-            "symbol_namespace::bind, key(%1%), gid(%2%), response(no_success)")
-            % key % gid);
+        if (LAGAS_ENABLED(info))
+        {
+            naming::detail::add_credit_to_gid(gid, credits);
+            LAGAS_(info) << (boost::format(
+                "symbol_namespace::bind, key(%1%), gid(%2%), response(no_success)")
+                % key % gid);
+        }
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -351,7 +356,8 @@ response symbol_namespace::resolve(
     naming::gid_type gid;
 
     // Is this entry reference counted?
-    if (naming::detail::get_credit_from_gid(it->second) != 0)
+    naming::gid_type::mutex_type::scoped_lock gid_l(&(it->second));
+    if (naming::detail::has_credits(it->second))
     {
         gid = naming::detail::split_credits_for_gid(it->second);
 
@@ -361,68 +367,21 @@ response symbol_namespace::resolve(
             % key % it->second % gid);
 
         // Credit exhaustion - we need to get more.
-        if (0 == naming::detail::get_credit_from_gid(gid))
+        if (1 == naming::detail::get_credit_from_gid(gid))
         {
             HPX_ASSERT(1 == naming::detail::get_credit_from_gid(it->second));
 
-            // Since we have to give up the lock for the actual incref, we add
-            // the credit tentatively to the map entry to avoid that it is deleted
-            // while the lock is relinquished. If the incref fails we try to recover
-            // afterwards.
-            naming::detail::add_credit_to_gid(it->second, HPX_GLOBALCREDIT_INITIAL);
+            boost::uint64_t added_credit =
+                naming::detail::fill_credit_for_gid(it->second);
 
-            {
-                hpx::util::scoped_unlock<mutex_type::scoped_lock> ull(l);
-                naming::get_agas_client().incref(gid, 2 * HPX_GLOBALCREDIT_INITIAL, ec);
-            }
+            gid_l.unlock();
 
-            if (ec)
-            {
-                // the incref call failed, remove the tentatively added credit from
-                // the map entry
-                it = gids_.find(key);       // relocate the entry
-                if (it == end)
-                {
-                    LAGAS_(debug) << (boost::format(
-                        "symbol_namespace::resolve, can't re-locate map entry, "
-                        "giving up: key(%1%), gid(%2%)")
-                        % key % gid);
+            boost::uint64_t added_new_credit =
+                naming::detail::fill_credit_for_gid(gid);
 
-                    // the map  entry is gone, giving up
-                    return response(symbol_ns_resolve
-                                  , naming::invalid_gid
-                                  , invalid_status);
-                }
-
-                // remove the tentativley added credit, if its still in place
-                if (naming::detail::get_credit_from_gid(it->second) < HPX_GLOBALCREDIT_INITIAL)
-                {
-                    LAGAS_(debug) << (boost::format(
-                        "symbol_namespace::resolve, can't remove credit from map entry, "
-                        "giving up: key(%1%), entry(%2%), gid(%3%)")
-                        % key % it->second % gid);
-
-                    // giving up as the credit has already been (partially) used
-                    return response(symbol_ns_resolve
-                                  , naming::invalid_gid
-                                  , invalid_status);
-                }
-
-                naming::detail::remove_credit_from_gid(it->second, HPX_GLOBALCREDIT_INITIAL);
-
-                LAGAS_(debug) << (boost::format(
-                    "symbol_namespace::resolve, could not accquire additional credits for "
-                    "credit splitting: key(%1%), entry(%2%), gid(%3%)")
-                    % key % it->second % gid);
-
-                // return error to caller
-                return response(symbol_ns_resolve
-                              , naming::invalid_gid
-                              , invalid_status);
-            }
-
-            // since all went well we add the credit to the gid to return as well
-            naming::detail::add_credit_to_gid(gid, HPX_GLOBALCREDIT_INITIAL);
+            naming::resolver_client& client = naming::get_agas_client();
+            client.incref_async(it->second, added_credit);
+            client.incref_async(gid, added_new_credit);
 
             LAGAS_(debug) << (boost::format(
                 "symbol_namespace::resolve, incremented entry credits: "
@@ -430,9 +389,10 @@ response symbol_namespace::resolve(
                 % key % it->second % gid);
         }
     }
-
     else
+    {
         gid = it->second;
+    }
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::resolve, key(%1%), gid(%2%)")

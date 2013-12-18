@@ -1864,7 +1864,7 @@ bool addressing_service::register_name(
 } // }}}
 
 static void correct_credit_on_failure(future<bool> f, naming::id_type id,
-    boost::int16_t mutable_gid_credit, boost::int16_t new_gid_credit)
+    boost::int64_t mutable_gid_credit, boost::int64_t new_gid_credit)
 {
     // Return the credit to the GID if the operation failed
     if (f.has_exception() && mutable_gid_credit != 0)
@@ -1880,22 +1880,31 @@ lcos::future<bool> addressing_service::register_name_async(
     naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
     naming::gid_type new_gid;
 
-    // FIXME: combine incref with register_name, if needed
-    if (naming::detail::get_credit_from_gid(mutable_gid) != 0)
+    naming::gid_type::mutex_type::scoped_lock l(&mutable_gid);
+
+    if (naming::detail::has_credits(mutable_gid))
     {
         new_gid = naming::detail::split_credits_for_gid(mutable_gid);
 
         // Credit exhaustion - we need to get more.
-        if (0 == naming::detail::get_credit_from_gid(new_gid))
+        if (1 == naming::detail::get_credit_from_gid(mutable_gid))
         {
-            HPX_ASSERT(1 == naming::detail::get_credit_from_gid(mutable_gid));
-            naming::get_agas_client().incref(new_gid, 2 * HPX_GLOBALCREDIT_INITIAL);
+            HPX_ASSERT(1 == naming::detail::get_credit_from_gid(new_gid));
 
-            naming::detail::add_credit_to_gid(new_gid, HPX_GLOBALCREDIT_INITIAL);
-            naming::detail::add_credit_to_gid(mutable_gid, HPX_GLOBALCREDIT_INITIAL);
+            boost::uint64_t added_credit =
+                naming::detail::fill_credit_for_gid(mutable_gid);
+
+            l.unlock();
+
+            boost::uint64_t added_new_credit =
+                naming::detail::fill_credit_for_gid(new_gid);
+
+            incref_async(mutable_gid, added_credit);
+            incref_async(new_gid, added_new_credit);
         }
     }
-    else {
+    else
+    {
         new_gid = mutable_gid;
     }
 

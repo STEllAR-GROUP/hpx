@@ -60,6 +60,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
         // collect argument sizes from parcels
         std::size_t arg_size = 0;
+        boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
 
         // guard against serialization errors
         try {
@@ -68,33 +69,33 @@ namespace hpx { namespace parcelset { namespace shmem
                 {
                     arg_size += traits::get_type_size(p);
                 }
-    
+
                 // generate the name for this data_buffer
                 std::string data_buffer_name(pv[0].get_parcel_id().to_string());
-    
+
                 // clear and preallocate out_buffer_ (or fetch from cache)
                 out_buffer_ = get_data_buffer((arg_size * 12) / 10 + 1024,
                     data_buffer_name);
-    
+
                 // mark start of serialization
                 util::high_resolution_timer timer;
-    
+
                 {
                     // Serialize the data
                     util::portable_binary_oarchive archive(
-                        out_buffer_.get_buffer(), 0, archive_flags_);
-    
+                        out_buffer_.get_buffer(), dest_locality_id, 0, archive_flags_);
+
                     std::size_t count = pv.size();
                     archive << count;
-    
+
                     BOOST_FOREACH(parcel const & p, pv)
                     {
                         archive << p;
                     }
-    
+
                     arg_size = archive.bytes_written();
                 }
-    
+
                 // store the time required for serialization
                 send_data_.serialization_time_ = timer.elapsed_nanoseconds();
             }

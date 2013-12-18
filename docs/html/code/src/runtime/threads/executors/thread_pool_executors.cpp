@@ -304,11 +304,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             on_run_exit on_exit(current_concurrency_, shutdown_sem_);
 
-            boost::int64_t executed_threads = 0;
+            boost::int64_t executed_threads = 0, executed_thread_phases = 0;
             boost::uint64_t overall_times = 0, thread_times = 0;
             threads::detail::scheduling_loop(virt_core, scheduler_,
-                states_[virt_core], executed_threads, overall_times,
-                thread_times, &suspend_back_into_calling_context);
+                states_[virt_core], executed_threads, executed_thread_phases,
+                overall_times, thread_times, &suspend_back_into_calling_context);
 
 #if HPX_DEBUG != 0
             // the scheduling_loop is allowed to exit only if no more HPX

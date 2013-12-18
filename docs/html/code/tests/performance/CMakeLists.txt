@@ -116,10 +116,10 @@ if(NOT MSVC)
   set(boost_library_dependencies ${boost_library_dependencies} ${BOOST_THREAD_LIBRARY})
 endif()
 
-set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES test_worker_lib)
-#set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
+set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
 set(hpx_homogeneous_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
-set(hpx_homogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_timed_lib)
+set(hpx_homogeneous_timed_task_spawn_FLAGS DEPENDENCIES test_worker_timed_lib)
+#set(hpx_homogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_timed_lib)
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component test_worker_timed_lib)
 
 set(hpx_heterogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)

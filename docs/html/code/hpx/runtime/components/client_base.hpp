@@ -161,12 +161,12 @@ namespace hpx { namespace components
         }
 
         ///////////////////////////////////////////////////////////////////////
-        naming::id_type get_gid() const
+        naming::id_type const & get_gid() const
         {
             return gid_.get();
         }
 
-        naming::gid_type get_raw_gid() const
+        naming::gid_type const & get_raw_gid() const
         {
             return gid_.get().get_gid();
         }

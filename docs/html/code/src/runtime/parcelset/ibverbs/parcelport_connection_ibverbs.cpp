@@ -88,43 +88,43 @@ namespace hpx { namespace parcelset { namespace ibverbs
             try {
                 // clear and preallocate out_buffer_
                 out_buffer_.clear();
-    
+
                 BOOST_FOREACH(parcel const & p, pv)
                 {
                     arg_size += traits::get_type_size(p);
                     priority = (std::max)(p.get_thread_priority(), priority);
                 }
-    
+
                 out_buffer_.reserve(arg_size*2);
-    
+
                 // mark start of serialization
                 util::high_resolution_timer timer;
-    
+
                 {
                     // Serialize the data
                     HPX_STD_UNIQUE_PTR<util::binary_filter> filter(
                         pv[0].get_serialization_filter());
-    
+
                     int archive_flags = archive_flags_;
                     if (filter.get() != 0) {
                         filter->set_max_length(out_buffer_.capacity());
                         archive_flags |= util::enable_compression;
                     }
-    
+
                     util::portable_binary_oarchive archive(
                         out_buffer_, filter.get(), archive_flags);
-    
+
                     std::size_t count = pv.size();
                     archive << count;
-    
+
                     BOOST_FOREACH(parcel const & p, pv)
                     {
                         archive << p;
                     }
-    
+
                     arg_size = archive.bytes_written();
                 }
-    
+
                 // store the time required for serialization
                 send_data_.serialization_time_ = timer.elapsed_nanoseconds();
             }
