@@ -10,6 +10,9 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/local/barrier.hpp>
+#include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/agas/addressing_service.hpp>
+#include <hpx/util/activate_counters.hpp>
 //#include <hpx/include/iostreams.hpp>
 
 #include <stdexcept>
@@ -53,20 +56,55 @@ bool header = true;
 void print_results(
     boost::uint64_t cores
   , double walltime
+  , std::vector<std::string> const& counters
+  , boost::shared_ptr<hpx::util::activate_counters> ac 
     )
 {
     if (header)
-        cout << "OS-threads,Tasks,Delay (micro-seconds),"
-                "Total Walltime (seconds),Walltime per Task (seconds)\n"
-             << flush;
+    {
+        // Note that if we change the number of fields above, we have to
+        // change the constant that we add when printing out the field # for
+        // performance counters below (e.g. the last_index part).
+        cout << "# 0: OS-threads - Independent Variable\n"
+                "# 1: Tasks - Independent Variable\n"
+                "# 2: Delay [micro-seconds] - Independent Variable\n"
+                "# 3: Total Walltime [seconds]\n"
+                ;
 
-    std::string const cores_str = boost::str(boost::format("%lu,") % cores);
-    std::string const tasks_str = boost::str(boost::format("%lu,") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu,") % delay);
+        boost::uint64_t const last_index = 3;
 
-    cout << ( boost::format("%-21s %-21s %-21s %10.12s, %10.12s\n")
-            % cores_str % tasks_str % delay_str
-            % walltime % (walltime / tasks)) << flush;
+        for (boost::uint64_t i = 0; i < counters.size(); ++i)
+        {
+            cout << "# " << (i + 1 + last_index) << ": " << ac->name(i);
+
+            if (!ac->unit_of_measure(i).empty())
+                cout << " [" << ac->unit_of_measure(i) << "]";
+
+            cout << "\n";            
+        }
+    }
+
+    std::string const cores_str = boost::str(boost::format("%lu") % cores);
+    std::string const tasks_str = boost::str(boost::format("%lu") % tasks);
+    std::string const delay_str = boost::str(boost::format("%lu") % delay);
+
+    cout << ( boost::format("%lu %lu %lu %.14g")
+            % cores
+            % tasks 
+            % delay 
+            % walltime);
+
+    if (ac)
+    {   
+        hpx::util::activate_counters::counter_values_type values
+            = ac->evaluate_counters();
+
+        for (boost::uint64_t i = 0; i < counters.size(); ++i)
+            cout << ( boost::format(" %.14g")
+                    % values[i].get().get_value<double>());
+    }
+
+    cout << "\n";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,15 +129,21 @@ int hpx_main(
     variables_map& vm
     )
 {
-    if (vm.count("no-header"))
-        header = false;
-
     {
+        if (vm.count("no-header"))
+            header = false;
+
+        std::vector<std::string> counters;
+        if (vm.count("counter"))
+            counters = vm["counter"].as<std::vector<std::string> >();
+
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
 
-        // Reset performance counters.
-        reset_active_counters();
+        boost::shared_ptr<hpx::util::activate_counters> ac;
+
+        if (!counters.empty())
+            ac.reset(new hpx::util::activate_counters(counters));
 
         // Start the clock.
         high_resolution_timer t;
@@ -123,7 +167,7 @@ int hpx_main(
         // Stop the clock
         double time_elapsed = t.elapsed();
 
-        print_results(get_os_thread_count(), time_elapsed);
+        print_results(get_os_thread_count(), time_elapsed, counters, ac);
     }
 
     return finalize();
@@ -146,6 +190,10 @@ int main(
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
         , "time in micro-seconds for the delay loop")
+
+        ( "counter"
+        , value<std::vector<std::string> >()->composing()
+        , "activate and report the specified performance counter")
 
         ( "no-header"
         , "do not print out the csv header row")
