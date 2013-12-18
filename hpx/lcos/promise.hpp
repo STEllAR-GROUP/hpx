@@ -154,12 +154,12 @@ namespace hpx { namespace lcos { namespace detail
         // retrieve the gid of this promise
         naming::id_type get_gid() const
         {
-            naming::gid_type::mutex_type::scoped_lock l(&this->gid_);
+            naming::gid_type::mutex_type::scoped_lock l(&gid_);
 
             // take all credits to avoid a self reference
             naming::gid_type gid = gid_;
             naming::detail::strip_credit_from_gid(
-                const_cast<naming::gid_type&>(this->gid_));
+                const_cast<naming::gid_type&>(gid_));
 
             // we request the id of a future only once
             HPX_ASSERT(naming::detail::has_credits(gid));
@@ -257,12 +257,11 @@ namespace hpx { namespace lcos { namespace detail
     private:
         friend void intrusive_ptr_release(promise* p)
         {
-            bool get_gid_was_called = !naming::detail::has_credits(p->gid_);
             long counter = --p->count_;
 
             // if this promise was never asked for its id we need to take
             // special precautions for it to go out of scope
-            if (1 == counter && !get_gid_was_called)
+            if (1 == counter && naming::detail::has_credits(p->gid_))
             {
                 p->get_gid();          // this will trigger normal destruction
             }
