@@ -1707,7 +1707,14 @@ lcos::future<bool> addressing_service::incref_async(
 { // {{{ incref implementation
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
-        return async(util::bind(&addressing_service::incref_async, this,
+        // reschedule this call as an HPX thread
+        lcos::future<bool> (addressing_service::*incref_async_ptr)(
+            naming::gid_type const&
+          , boost::int64_t
+          , naming::id_type const&
+        ) = &addressing_service::incref_async;
+
+        return async(util::bind(incref_async_ptr, this,
             gid, credit, keep_alive_));
     }
 
