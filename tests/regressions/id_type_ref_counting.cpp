@@ -13,7 +13,7 @@
 void func(hpx::id_type id);
 
 struct test_server1
-  : hpx::components::simple_component_base<test_server1>
+  : hpx::components::managed_component_base<test_server1>
 {
     test_server1()
     {
@@ -43,11 +43,11 @@ struct test_server1
 
 bool test_server1::alive = false;
 
-typedef hpx::components::simple_component<test_server1> server1_type;
+typedef hpx::components::managed_component<test_server1> server1_type;
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server1_type, test_server1);
 
 struct test_server2
-  : hpx::components::simple_component_base<test_server2>
+  : hpx::components::managed_component_base<test_server2>
 {
     test_server2()
     {
@@ -71,7 +71,7 @@ struct test_server2
 
 bool test_server2::alive = false;
 
-typedef hpx::components::simple_component<test_server2> server2_type;
+typedef hpx::components::managed_component<test_server2> server2_type;
 HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server2_type, test_server2);
 
 void test_server1::test()
@@ -82,6 +82,11 @@ void test_server1::test()
 
 void func(hpx::id_type id)
 {
+    hpx::agas::garbage_collect();
+    hpx::agas::garbage_collect();
+    hpx::agas::garbage_collect();
+
+    HPX_TEST(!test_server1::alive);
     HPX_TEST(test_server2::alive);
     HPX_TEST(id);
 }
@@ -113,12 +118,9 @@ int hpx_main()
         hpx::agas::garbage_collect();
         hpx::agas::garbage_collect();
 
-        HPX_TEST(!test_server1::alive);
+        hpx::this_thread::yield();
         HPX_TEST(!test_server2::alive);
     }
-
-    HPX_TEST(!test_server1::alive);
-    HPX_TEST(!test_server2::alive);
     
     return hpx::finalize();
 }
