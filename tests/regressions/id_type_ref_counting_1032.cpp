@@ -1,9 +1,9 @@
-//  Copyright (c) 2012 Thomas Heller
+//  Copyright (c) 2013 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Demonstrating #565
+// Demonstrating #1032: id_type local reference counting is wrong 
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -98,7 +98,8 @@ int hpx_main()
         HPX_TEST(test_server2::alive);
 
         // creating test_server1 instance
-        hpx::id_type server1 = hpx::async(test_server2::create_test_server1_action(), server2).get();
+        hpx::id_type server1 = hpx::async(
+            test_server2::create_test_server1_action(), server2).get();
         server2 = hpx::id_type();
         hpx::agas::garbage_collect();
         hpx::agas::garbage_collect();
@@ -117,9 +118,6 @@ int hpx_main()
         HPX_TEST(!test_server2::alive);
     }
 
-    HPX_TEST(!test_server1::alive);
-    HPX_TEST(!test_server2::alive);
-    
     return hpx::finalize();
 }
 

@@ -56,10 +56,6 @@ namespace hpx { namespace components
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        ///
-        /// \param self [in] The PX \a thread used to execute this function.
-        /// \param appl [in] The applier to be used for finalization of the
-        ///             component instance.
         void finalize() {}
 
         // This exposes the component type.
@@ -99,12 +95,31 @@ namespace hpx { namespace components
                         hpx::util::osstream_get_string(strm));
                 }
             }
-            return gid_;
+
+            if (!naming::detail::has_credits(gid_)) 
+                return gid_;
+
+            // on first invocation take all credits to avoid a self reference
+            naming::gid_type gid = gid_;
+            naming::detail::strip_credit_from_gid(const_cast<naming::gid_type&>(gid_));
+
+            // We have to assume this credit was split as otherwise the gid
+            // returned at this point will control the lifetime of the
+            // component.
+            naming::detail::set_credit_split_mask_for_gid(gid);
+
+            return gid;
         }
 
         naming::id_type get_gid() const
         {
-            return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
+            // all credits should have been taken already
+            naming::gid_type gid = get_base_gid();
+            HPX_ASSERT(!naming::detail::has_credits(gid));
+
+            // any (subsequent) invocation causes the credits to be replenished
+            naming::detail::replenish_credits(gid);
+            return naming::id_type(gid, naming::id_type::managed);
         }
 
         /// \brief  The function \a get_factory_properties is used to
