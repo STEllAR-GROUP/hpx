@@ -25,6 +25,8 @@ set(tests
     multiple_init
    )
 
+set(id_type_ref_counting_1032_PARAMETERS THREADS_PER_LOCALITY 1)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
@@ -50,3 +52,7 @@ foreach(test ${tests})
   add_hpx_pseudo_dependencies(tests.regressions.${test}
                               ${test}_test_exe)
 endforeach()
+  
+add_hpx_test(
+  "tests.regressions" id_type_ref_counting_1032_4
+  EXECUTABLE id_type_ref_counting_1032 THREADS_PER_LOCALITY 4)
