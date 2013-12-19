@@ -393,6 +393,58 @@ namespace hpx { namespace naming
             }
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        boost::int64_t split_gid(gid_type& gid, gid_type& new_gid)
+        {
+            boost::int64_t new_credit = 0;
+            naming::gid_type::mutex_type::scoped_lock l(&gid);
+
+            if (naming::detail::has_credits(gid))
+            {
+                new_gid = naming::detail::split_credits_for_gid(gid);
+
+                // Credit exhaustion - we need to get more.
+                if (1 == naming::detail::get_credit_from_gid(gid))
+                {
+                    HPX_ASSERT(1 == naming::detail::get_credit_from_gid(new_gid));
+
+                    boost::int64_t added_credit =
+                        naming::detail::fill_credit_for_gid(gid);
+
+                    l.unlock();
+
+                    boost::int64_t added_new_credit =
+                        naming::detail::fill_credit_for_gid(new_gid);
+                    new_credit = naming::detail::get_credit_from_gid(new_gid);
+
+                    agas::incref_async(gid, added_credit);
+                    agas::incref_async(new_gid, added_new_credit);
+                }
+            }
+            else
+            {
+                new_gid = gid;
+            }
+
+            return new_credit;
+        }
+
+        hpx::future<bool> replenish_credits(gid_type& id)
+        {
+            boost::int64_t added_credit = 0;
+
+            {
+                gid_type::mutex_type::scoped_lock l(&id);
+
+                HPX_ASSERT(0 == get_credit_from_gid(id));
+                added_credit = naming::detail::fill_credit_for_gid(id);
+                naming::detail::set_credit_split_mask_for_gid(id);
+            }
+
+            return agas::incref_async(id, added_credit);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         struct gid_serialization_data
         {
             gid_type gid_;

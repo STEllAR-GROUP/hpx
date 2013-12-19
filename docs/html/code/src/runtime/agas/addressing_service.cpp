@@ -1702,13 +1702,20 @@ bool addressing_service::synchronize_with_async_incref(
 lcos::future<bool> addressing_service::incref_async(
     naming::gid_type const& gid
   , boost::int64_t credit
-  , naming::id_type const& keep_alive
+  , naming::id_type const& keep_alive_
     )
 { // {{{ incref implementation
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
-        return async(util::bind(&addressing_service::incref_async, this,
-            gid, credit, keep_alive));
+        // reschedule this call as an HPX thread
+        lcos::future<bool> (addressing_service::*incref_async_ptr)(
+            naming::gid_type const&
+          , boost::int64_t
+          , naming::id_type const&
+        ) = &addressing_service::incref_async;
+
+        return async(util::bind(incref_async_ptr, this,
+            gid, credit, keep_alive_));
     }
 
     if (HPX_UNLIKELY(0 >= credit))
@@ -1718,6 +1725,12 @@ lcos::future<bool> addressing_service::incref_async(
           , boost::str(boost::format("invalid credit count of %1%") % credit));
         return lcos::future<bool>();
     }
+
+    naming::id_type keep_alive;
+    if (keep_alive_)
+        keep_alive = keep_alive_;
+    else
+        keep_alive = naming::id_type(gid, id_type::unmanaged);
 
     typedef refcnt_requests_type::value_type mapping;
 
@@ -1863,12 +1876,16 @@ bool addressing_service::register_name(
     }
 } // }}}
 
-static void correct_credit_on_failure(future<bool> f, naming::id_type id,
+static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
     boost::int64_t mutable_gid_credit, boost::int64_t new_gid_credit)
 {
     // Return the credit to the GID if the operation failed
     if (f.has_exception() && mutable_gid_credit != 0)
+    {
         naming::detail::add_credit_to_gid(id.get_gid(), new_gid_credit);
+        return false;
+    }
+    return true;
 }
 
 lcos::future<bool> addressing_service::register_name_async(
@@ -1880,45 +1897,22 @@ lcos::future<bool> addressing_service::register_name_async(
     naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
     naming::gid_type new_gid;
 
-    naming::gid_type::mutex_type::scoped_lock l(&mutable_gid);
-
-    if (naming::detail::has_credits(mutable_gid))
-    {
-        new_gid = naming::detail::split_credits_for_gid(mutable_gid);
-
-        // Credit exhaustion - we need to get more.
-        if (1 == naming::detail::get_credit_from_gid(mutable_gid))
-        {
-            HPX_ASSERT(1 == naming::detail::get_credit_from_gid(new_gid));
-
-            boost::uint64_t added_credit =
-                naming::detail::fill_credit_for_gid(mutable_gid);
-
-            l.unlock();
-
-            boost::uint64_t added_new_credit =
-                naming::detail::fill_credit_for_gid(new_gid);
-
-            incref_async(mutable_gid, added_credit);
-            incref_async(new_gid, added_new_credit);
-        }
-    }
-    else
-    {
-        new_gid = mutable_gid;
-    }
+    boost::int64_t new_credit = naming::detail::split_gid(mutable_gid, new_gid);
 
     request req(symbol_ns_bind, name, new_gid);
 
     future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
 
-    using HPX_STD_PLACEHOLDERS::_1;
-    f.then(
-        HPX_STD_BIND(correct_credit_on_failure, _1, id,
-            naming::detail::get_credit_from_gid(mutable_gid),
-            naming::detail::get_credit_from_gid(new_gid))
-    );
+    if (new_credit != 0)
+    {
+        using HPX_STD_PLACEHOLDERS::_1;
+        return f.then(
+            HPX_STD_BIND(correct_credit_on_failure, _1, id,
+                HPX_GLOBALCREDIT_INITIAL, new_credit)
+        );
+    }
+
     return f;
 } // }}}
 
