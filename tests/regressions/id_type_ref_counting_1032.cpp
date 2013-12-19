@@ -10,48 +10,59 @@
 #include <hpx/include/components.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
+template <typename T>
+struct simple_base
+{
+    typedef hpx::components::simple_component_base<T> type;
+};
+
+template <typename T>
+struct managed_base
+{
+    typedef hpx::components::simple_component_base<T> type;
+};
+
+template <template <typename> class ComponentBase>
 void func(hpx::id_type id);
 
+template <template <typename> class ComponentBase>
 struct test_server1
-  : hpx::components::simple_component_base<test_server1>
+  : ComponentBase<test_server1<ComponentBase> >::type
 {
     test_server1()
     {
-        BOOST_ASSERT(!alive);
+        HPX_ASSERT(!alive);
         alive=true;
     }
     test_server1(hpx::id_type o)
       : other(o)
     {
-        BOOST_ASSERT(!alive);
+        HPX_ASSERT(!alive);
         alive=true;
     }
 
     ~test_server1()
     {
-        hpx::apply(hpx::util::bind(func, other));
+        void (*f)(hpx::id_type) = func<ComponentBase>;
+        hpx::apply(hpx::util::bind(f, other));
         alive = false;
     }
 
     void test();
     
-    HPX_DEFINE_COMPONENT_ACTION(test_server1, test);
+    HPX_DEFINE_COMPONENT_ACTION_TPL(test_server1, test, test_action);
 
     hpx::id_type other;
     static bool alive;
 };
 
-bool test_server1::alive = false;
-
-typedef hpx::components::simple_component<test_server1> server1_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server1_type, test_server1);
-
+template <template <typename> class ComponentBase>
 struct test_server2
-  : hpx::components::simple_component_base<test_server2>
+  : ComponentBase<test_server2<ComponentBase> >::type
 {
     test_server2()
     {
-        BOOST_ASSERT(!alive);
+        HPX_ASSERT(!alive);
         alive=true;
     }
     ~test_server2()
@@ -61,61 +72,118 @@ struct test_server2
 
     hpx::id_type create_test_server1()
     {
-        return hpx::new_<test_server1>(hpx::find_here(), this->get_gid()).get();
+        return hpx::new_<test_server1<ComponentBase> >(hpx::find_here(), this->get_gid()).get();
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server2, create_test_server1);
+    HPX_DEFINE_COMPONENT_ACTION_TPL(test_server2, create_test_server1, create_test_server1_action);
 
     static bool alive;
 };
 
-bool test_server2::alive = false;
+template <template <typename> class ComponentBase>
+bool test_server1<ComponentBase>::alive = false;
 
-typedef hpx::components::simple_component<test_server2> server2_type;
-HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(server2_type, test_server2);
+template <template <typename> class ComponentBase>
+bool test_server2<ComponentBase>::alive = false;
 
-void test_server1::test()
+typedef test_server1<simple_base> test_simple_server1;
+typedef test_server2<simple_base> test_simple_server2;
+
+typedef test_server1<managed_base> test_managed_server1;
+typedef test_server2<managed_base> test_managed_server2;
+
+typedef hpx::components::simple_component<test_simple_server1> simple_server1_type;
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(simple_server1_type, test_simple_server1);
+
+typedef hpx::components::simple_component<test_simple_server2> simple_server2_type;
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(simple_server2_type, test_simple_server2);
+
+typedef hpx::components::simple_component<test_managed_server1> managed_server1_type;
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(managed_server1_type, test_managed_server1);
+
+typedef hpx::components::simple_component<test_managed_server2> managed_server2_type;
+HPX_REGISTER_MINIMAL_COMPONENT_FACTORY(managed_server2_type, test_managed_server2);
+
+template <template <typename> class ComponentBase>
+void test_server1<ComponentBase>::test()
 {
-    HPX_TEST(test_server2::alive);
+    HPX_TEST(test_server2<ComponentBase>::alive);
     HPX_TEST(other);
 }
 
+template <template <typename> class ComponentBase>
 void func(hpx::id_type id)
 {
-    HPX_TEST(test_server2::alive);
+    hpx::agas::garbage_collect();
+    hpx::agas::garbage_collect();
+    hpx::agas::garbage_collect();
+
+    HPX_TEST(!test_server1<ComponentBase>::alive);
+    HPX_TEST(test_server2<ComponentBase>::alive);
     HPX_TEST(id);
+}
+
+void ensure_garbage_collect()
+{
+    hpx::agas::garbage_collect();
+    hpx::this_thread::yield();
+    hpx::agas::garbage_collect();
+    hpx::this_thread::yield();
+    hpx::agas::garbage_collect();
+    hpx::this_thread::yield();
 }
 
 int hpx_main()
 {
     {
-        HPX_TEST(!test_server1::alive);
-        HPX_TEST(!test_server2::alive);
+        HPX_TEST(!test_simple_server1::alive);
+        HPX_TEST(!test_simple_server2::alive);
 
         // creating test_server2 instance
-        hpx::id_type server2 = hpx::new_<test_server2>(hpx::find_here()).get();
-        HPX_TEST(!test_server1::alive);
-        HPX_TEST(test_server2::alive);
+        hpx::id_type server2 = hpx::new_<test_simple_server2>(hpx::find_here()).get();
+        HPX_TEST(!test_simple_server1::alive);
+        HPX_TEST(test_simple_server2::alive);
 
         // creating test_server1 instance
         hpx::id_type server1 = hpx::async(
-            test_server2::create_test_server1_action(), server2).get();
+            test_simple_server2::create_test_server1_action(), server2).get();
         server2 = hpx::id_type();
-        hpx::agas::garbage_collect();
-        hpx::agas::garbage_collect();
-        hpx::agas::garbage_collect();
+        ensure_garbage_collect();
 
-        HPX_TEST(test_server1::alive);
-        HPX_TEST(test_server2::alive);
+        HPX_TEST(test_simple_server1::alive);
+        HPX_TEST(test_simple_server2::alive);
 
-        test_server1::test_action()(server1);
+        test_simple_server1::test_action()(server1);
         server1 = hpx::id_type();
-        hpx::agas::garbage_collect();
-        hpx::agas::garbage_collect();
-        hpx::agas::garbage_collect();
+        ensure_garbage_collect();
 
-        HPX_TEST(!test_server1::alive);
-        HPX_TEST(!test_server2::alive);
+        HPX_TEST(!test_simple_server1::alive);
+        HPX_TEST(!test_simple_server2::alive);
+    }
+    {
+        HPX_TEST(!test_managed_server1::alive);
+        HPX_TEST(!test_managed_server2::alive);
+
+        // creating test_server2 instance
+        hpx::id_type server2 = hpx::new_<test_managed_server2>(hpx::find_here()).get();
+        HPX_TEST(!test_managed_server1::alive);
+        HPX_TEST(test_managed_server2::alive);
+
+        // creating test_server1 instance
+        hpx::id_type server1 = hpx::async(
+            test_managed_server2::create_test_server1_action(), server2).get();
+        server2 = hpx::id_type();
+        ensure_garbage_collect();
+
+        HPX_TEST(test_managed_server1::alive);
+        HPX_TEST(test_managed_server2::alive);
+
+        test_managed_server1::test_action()(server1);
+        server1 = hpx::id_type();
+        ensure_garbage_collect();
+
+        HPX_TEST(!test_managed_server1::alive);
+        HPX_TEST(!test_managed_server2::alive);
     }
 
     return hpx::finalize();
@@ -125,8 +193,11 @@ int main(int argc, char **argv)
 {
     hpx::init(argc, argv);
 
-    HPX_TEST(!test_server1::alive);
-    HPX_TEST(!test_server2::alive);
+    HPX_TEST(!test_simple_server1::alive);
+    HPX_TEST(!test_simple_server2::alive);
+
+    HPX_TEST(!test_managed_server1::alive);
+    HPX_TEST(!test_managed_server2::alive);
 
     return hpx::util::report_errors();
 }
