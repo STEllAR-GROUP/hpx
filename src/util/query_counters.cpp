@@ -145,8 +145,12 @@ namespace hpx { namespace util
 
     void query_counters::terminate()
     {
-        mutex_type::scoped_lock l(mtx_);
-        ids_.clear();      // give up control over all performance counters
+        std::vector<naming::id_type> ids;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            // give up control over all performance counters
+            std::swap(ids, ids_);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

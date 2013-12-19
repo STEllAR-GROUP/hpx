@@ -60,6 +60,7 @@ namespace hpx { namespace util
                 evaluate(threads::wait_signaled);
             }
             else {
+                l.unlock();
                 schedule_thread();
             }
 
@@ -87,6 +88,7 @@ namespace hpx { namespace util
             evaluate(threads::wait_signaled);
         }
         else {
+            l.unlock();
             schedule_thread();
         }
         return true;
@@ -165,6 +167,7 @@ namespace hpx { namespace util
             // some other thread might already have started the timer
             if (0 == id_ && result) {
                 HPX_ASSERT(!is_started_);
+                l.unlock();
                 schedule_thread();        // wait and repeat
             }
         }
@@ -191,6 +194,7 @@ namespace hpx { namespace util
             threads::thread_stacksize_default, ec);
 
         if (ec) {
+            mutex_type::scoped_lock l(mtx_);
             is_terminated_ = true;
             is_started_ = false;
             return;
@@ -203,8 +207,11 @@ namespace hpx { namespace util
             threads::thread_priority_critical, ec);
 
         if (ec) {
-            is_terminated_ = true;
-            is_started_ = false;
+            {
+                mutex_type::scoped_lock l(mtx_);
+                is_terminated_ = true;
+                is_started_ = false;
+            }
 
             // abort the newly created thread
             threads::set_thread_state(id, threads::pending, threads::wait_abort,
@@ -213,8 +220,11 @@ namespace hpx { namespace util
             return;
         }
 
-        id_ = id;
-        is_started_ = true;
+        {
+            mutex_type::scoped_lock l(mtx_);
+            id_ = id;
+            is_started_ = true;
+        }
     }
 }}
 
