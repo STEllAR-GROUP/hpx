@@ -7,7 +7,7 @@
 
 #include <pthread.h>
 
-#include <hpx/util/lightweight_test.hpp>
+#include <boost/detail/lightweight_test.hpp>
 
 // Based on the example in pthread_setaffinity(3).
 
@@ -25,14 +25,16 @@ int main()
     for (int j = 0; j < 8; ++j)
         CPU_SET(j, &cpuset);
 
-    HPX_TEST_EQ(pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpuset), 0);
+    BOOST_TEST_EQ(pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpuset), 0);
 
     // Check the actual affinity mask assigned to the thread.
-    HPX_TEST_EQ(pthread_getaffinity_np(thread, sizeof(cpu_set_t), &cpuset), 0);
+    BOOST_TEST_EQ(pthread_getaffinity_np(thread, sizeof(cpu_set_t), &cpuset), 0);
 
     std::cout << "set returned by pthread_getaffinity_np() contained:\n";
     for (int j = 0; j < CPU_SETSIZE; ++j)
         if (CPU_ISSET(j, &cpuset))
             std::cout << "CPU" << j << "\n";
+
+    return boost::report_errors();
 }
 

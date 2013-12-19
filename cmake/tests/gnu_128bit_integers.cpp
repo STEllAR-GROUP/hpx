@@ -5,12 +5,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/util/lightweight_test.hpp>
+#include <boost/detail/lightweight_test.hpp>
 
 int main()
 {
-    HPX_TEST_EQ(sizeof(__uint128_t), 16);
-    HPX_TEST_EQ(sizeof(__int128_t), 16);
-    return hpx::util::report_errors();
+    BOOST_TEST_EQ(sizeof(__uint128_t), 16U);
+    BOOST_TEST_EQ(sizeof(__int128_t), 16U);
+    return boost::report_errors();
 }
 
