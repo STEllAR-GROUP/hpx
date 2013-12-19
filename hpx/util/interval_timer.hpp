@@ -24,6 +24,9 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT interval_timer
     {
+    private:
+        typedef lcos::local::spinlock mutex_type;
+
     public:
         interval_timer();
         interval_timer(HPX_STD_FUNCTION<bool()> const& f,
@@ -61,7 +64,7 @@ namespace hpx { namespace util
 
     protected:
         // schedule a high priority task after a given time interval
-        void schedule_thread();
+        void schedule_thread(mutex_type::scoped_lock & l);
 
         threads::thread_state_enum
             evaluate(threads::thread_state_ex_enum statex);
@@ -70,8 +73,6 @@ namespace hpx { namespace util
         bool stop_locked();
 
     private:
-        typedef lcos::local::spinlock mutex_type;
-
         mutable mutex_type mtx_;
         HPX_STD_FUNCTION<bool()> f_;  ///< function to call
         HPX_STD_FUNCTION<void()> on_term_;  ///< function to call on termination

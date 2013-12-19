@@ -60,8 +60,7 @@ namespace hpx { namespace util
                 evaluate(threads::wait_signaled);
             }
             else {
-                l.unlock();
-                schedule_thread();
+                schedule_thread(l);
             }
 
             return true;
@@ -88,8 +87,7 @@ namespace hpx { namespace util
             evaluate(threads::wait_signaled);
         }
         else {
-            l.unlock();
-            schedule_thread();
+            schedule_thread(l);
         }
         return true;
     }
@@ -167,8 +165,7 @@ namespace hpx { namespace util
             // some other thread might already have started the timer
             if (0 == id_ && result) {
                 HPX_ASSERT(!is_started_);
-                l.unlock();
-                schedule_thread();        // wait and repeat
+                schedule_thread(l);        // wait and repeat
             }
         }
         catch (hpx::exception const& e){
@@ -180,21 +177,28 @@ namespace hpx { namespace util
     }
 
     // schedule a high priority task after a given time interval
-    void interval_timer::schedule_thread()
+    void interval_timer::schedule_thread(mutex_type::scoped_lock & l)
     {
         using namespace hpx::threads;
 
         error_code ec;
 
         // create a new suspended thread
-        threads::thread_id_type id = hpx::applier::register_thread_plain(
-            boost::bind(&interval_timer::evaluate, this, _1),
-            description_.c_str(), threads::suspended, true,
-            threads::thread_priority_critical, std::size_t(-1),
-            threads::thread_stacksize_default, ec);
+        threads::thread_id_type id;
+        {
+            // FIXME: registering threads might lead to thread suspension since
+            // the allocators use hpx::lcos::local::spinlock. Unlocking the
+            // lock here would be the right thing but leads to crashes and hangs
+            // at shutdown.
+            //util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+            id = hpx::applier::register_thread_plain(
+                boost::bind(&interval_timer::evaluate, this, _1),
+                description_.c_str(), threads::suspended, true,
+                threads::thread_priority_critical, std::size_t(-1),
+                threads::thread_stacksize_default, ec);
+        }
 
         if (ec) {
-            mutex_type::scoped_lock l(mtx_);
             is_terminated_ = true;
             is_started_ = false;
             return;
@@ -207,11 +211,8 @@ namespace hpx { namespace util
             threads::thread_priority_critical, ec);
 
         if (ec) {
-            {
-                mutex_type::scoped_lock l(mtx_);
-                is_terminated_ = true;
-                is_started_ = false;
-            }
+            is_terminated_ = true;
+            is_started_ = false;
 
             // abort the newly created thread
             threads::set_thread_state(id, threads::pending, threads::wait_abort,
@@ -220,11 +221,8 @@ namespace hpx { namespace util
             return;
         }
 
-        {
-            mutex_type::scoped_lock l(mtx_);
-            id_ = id;
-            is_started_ = true;
-        }
+        id_ = id;
+        is_started_ = true;
     }
 }}
 
