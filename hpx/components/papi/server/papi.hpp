@@ -72,7 +72,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     struct thread_counters
     {
     public:
-        typedef hpx::util::spinlock mutex_type;
+        typedef hpx::lcos::local::spinlock mutex_type;
 
     private:
         typedef std::vector<papi_counter *> ctable_type;
@@ -121,7 +121,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     ///////////////////////////////////////////////////////////////////////////
     class papi_counter_base: boost::noncopyable
     {
-        typedef hpx::util::spinlock mutex_type;
+        typedef hpx::lcos::local::spinlock mutex_type;
         typedef std::map<boost::uint32_t, thread_counters *> ttable_type;
 
         //// shared state
