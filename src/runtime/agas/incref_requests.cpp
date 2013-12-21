@@ -58,7 +58,7 @@ namespace hpx { namespace agas { namespace detail
         naming::gid_type gid = naming::detail::get_stripped_gid(id.get_gid());
 
         LDEB_ << (boost::format(
-            "incref_requests::add_incref_request: gid(%1%): credit(%2%)") %
+            "incref_requests::add_incref_request: gid(%1%): credit(%2$#016x)") %
                 gid % credits);
 
         mutex_type::scoped_lock l(mtx_);
@@ -105,7 +105,7 @@ namespace hpx { namespace agas { namespace detail
 
         LDEB_ << (boost::format(
             "incref_requests::add_remote_incref_request: gid(%1%): "
-            "credit(%2%), remote_locality(%3%)") %
+            "credit(%2$#016x), remote_locality(%3%)") %
                 gid % credits % remote_locality);
 
         mutex_type::scoped_lock l(mtx_);
@@ -211,7 +211,7 @@ namespace hpx { namespace agas { namespace detail
 
         LDEB_ << (boost::format(
             "incref_requests::acknowledge_request: gid(%1%): "
-            "credit(%2%)") % gid % credits);
+            "credit(%2$#016x)") % gid % credits);
 
         std::vector<incref_request_data> matching_data;
         std::vector<incref_request_data> decref_data;
@@ -367,7 +367,7 @@ namespace hpx { namespace agas { namespace detail
     {
         LDEB_ << (boost::format(
             "incref_requests::add_decref_request: gid(%1%): "
-            "credit(%2%)") % gid % credits);
+            "credit(%2$#016x)") % gid % credits);
 
         mutex_type::scoped_lock l(mtx_);
 
@@ -393,7 +393,7 @@ namespace hpx { namespace agas { namespace detail
 
                 LDEB_ << (boost::format(
                     "> incref_requests::add_decref_request: gid(%1%): "
-                    "holding back credit(%2%) because of pending remote "
+                    "holding back credit(%2$#016x) because of pending remote "
                     "incref request(%3%)") % gid % credits % r.first->second);
 
                 return true; // hold back the decref
@@ -403,7 +403,7 @@ namespace hpx { namespace agas { namespace detail
 
             LDEB_ << (boost::format(
                 "> incref_requests::add_decref_request: gid(%1%): "
-                "passing through credit(%2%)") % gid % credits);
+                "passing through credit(%2$#016x)") % gid % credits);
 
             // no entry exists which references the given id, release the decref
             return false;
@@ -421,7 +421,7 @@ namespace hpx { namespace agas { namespace detail
 
             LDEB_ << (boost::format(
                 "> incref_requests::add_decref_request: gid(%1%): "
-                "passing through credit(%2%) because of pre-acknowledged "
+                "passing through credit(%2$#016x) because of pre-acknowledged "
                 "credits(%3%)") % gid % credits % it_local->second);
 
             return false;
@@ -433,7 +433,7 @@ namespace hpx { namespace agas { namespace detail
 
         LDEB_ << (boost::format(
             "> incref_requests::add_decref_request: gid(%1%): "
-            "holding back credit(%2%) because of pending local incref "
+            "holding back credit(%2$#016x) because of pending local incref "
             "request(%3%)") % gid % credits % it_local->second);
 
         return true;
