@@ -84,6 +84,22 @@ namespace hpx { namespace util
     /**/
 
     ///////////////////////////////////////////////////////////////////////////
+    // special debug logging channel
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(debuglog_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(debuglog_logger, logger_type)
+
+    #define LDEB_                                                             \
+        HPX_LOG_USE_LOG_IF_LEVEL(hpx::util::debuglog_logger(),                \
+            hpx::util::debuglog_level(), error)                               \
+        << hpx::util::levelname(::hpx::util::logging::level::error) << " "    \
+    /**/
+
+    #define LDEB_ENABLED                                                      \
+        hpx::util::debuglog_level()->is_enabled(                              \
+            ::hpx::util::logging::level::error)                               \
+    /**/
+
+    ///////////////////////////////////////////////////////////////////////////
     // errors are logged in a special manner (always to cerr and additionally,
     // if enabled to 'normal' logging destination as well)
     HPX_EXPORT HPX_DECLARE_LOG_FILTER(hpx_error_level, filter_type)
@@ -123,6 +139,11 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT HPX_DECLARE_LOG_FILTER(app_console_level, filter_type)
     HPX_EXPORT HPX_DECLARE_LOG(app_console_logger, logger_type)
+
+    ///////////////////////////////////////////////////////////////////////////
+    // special debug logging channel
+    HPX_EXPORT HPX_DECLARE_LOG_FILTER(debuglog_console_level, filter_type)
+    HPX_EXPORT HPX_DECLARE_LOG(debuglog_console_logger, logger_type)
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -154,6 +175,13 @@ namespace hpx { namespace util
             static_cast<hpx::util::logging::level::type>(lvl)))               \
 /**/
 
+#define LDEB_CONSOLE_                                                         \
+    HPX_LOG_USE_LOG(hpx::util::debuglog_console_logger(),                     \
+        read_msg().gather().out(),                                            \
+        hpx::util::debuglog_console_level()->is_enabled(                      \
+            hpx::util::logging::level::error))                                \
+/**/
+
 #else
 // logging is disabled all together
 
@@ -174,17 +202,21 @@ namespace hpx { namespace util { namespace detail
     #define LTIM_(lvl)            if(true) {} else hpx::util::detail::dummy_log
     #define LHPX_(lvl, cat)       if(true) {} else hpx::util::detail::dummy_log
     #define LAPP_(lvl)            if(true) {} else hpx::util::detail::dummy_log
+    #define LDEB_                 if(true) {} else hpx::util::detail::dummy_log
+
     #define LFATAL_               if(true) {} else hpx::util::detail::dummy_log
 
     #define LAGAS_CONSOLE_(lvl)   if(true) {} else hpx::util::detail::dummy_log
     #define LTIM_CONSOLE_(lvl)    if(true) {} else hpx::util::detail::dummy_log
     #define LHPX_CONSOLE_(lvl)    if(true) {} else hpx::util::detail::dummy_log
     #define LAPP_CONSOLE_(lvl)    if(true) {} else hpx::util::detail::dummy_log
+    #define LDEB_CONSOLE_         if(true) {} else hpx::util::detail::dummy_log
 
     #define LAGAS_ENABLED(lvl)    (false)
     #define LTIM_ENABLED(lvl)     (false)
     #define LHPX_ENABLED(lvl)     (false)
     #define LAPP_ENABLED(lvl)     (false)
+    #define LDEB_ENABLED          (false)
 }}}
 
 #endif

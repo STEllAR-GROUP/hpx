@@ -85,6 +85,10 @@ namespace hpx { namespace components { namespace server
                 LAPP_CONSOLE_(level) << s;
                 break;
 
+            case destination_debuglog:
+                LDEB_CONSOLE_ << s;
+                break;
+
             default:
                 break;
             }

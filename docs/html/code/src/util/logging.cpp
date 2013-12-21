@@ -123,9 +123,10 @@ namespace hpx { namespace util
         case hpx::util::logging::level::always:
             return "  <always>";
         }
-        // FIXME: This one will screw up the formatting.
-        //return "<" + boost::lexical_cast<std::string>(level) + ">";
-        return     " <unknown>";
+
+        std::string unknown = boost::lexical_cast<std::string>(level);
+        return std::string((std::max)(7-unknown.size(), std::size_t(0)), ' ') +
+            "<" + unknown + ">";
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -411,8 +412,10 @@ namespace hpx { namespace util
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            logdest = logini->get_entry("destination", empty);
-            logformat = detail::unescape(logini->get_entry("format", empty));
+            if (!loglevel.empty()) {
+                logdest = logini->get_entry("destination", empty);
+                logformat = detail::unescape(logini->get_entry("format", empty));
+            }
         }
 
         unsigned lvl = hpx::util::logging::level::disable_all;
@@ -461,8 +464,10 @@ namespace hpx { namespace util
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            logdest = logini->get_entry("destination", empty);
-            logformat = detail::unescape(logini->get_entry("format", empty));
+            if (!loglevel.empty()) {
+                logdest = logini->get_entry("destination", empty);
+                logformat = detail::unescape(logini->get_entry("format", empty));
+            }
         }
 
         unsigned lvl = hpx::util::logging::level::disable_all;
@@ -514,8 +519,10 @@ namespace hpx { namespace util
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            logdest = logini->get_entry("destination", empty);
-            logformat = detail::unescape(logini->get_entry("format", empty));
+            if (!loglevel.empty()) {
+                logdest = logini->get_entry("destination", empty);
+                logformat = detail::unescape(logini->get_entry("format", empty));
+            }
         }
 
         unsigned lvl = hpx::util::logging::level::disable_all;
@@ -597,8 +604,10 @@ namespace hpx { namespace util
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            logdest = logini->get_entry("destination", empty);
-            logformat = detail::unescape(logini->get_entry("format", empty));
+            if (!loglevel.empty()) {
+                logdest = logini->get_entry("destination", empty);
+                logformat = detail::unescape(logini->get_entry("format", empty));
+            }
         }
 
         unsigned lvl = hpx::util::logging::level::disable_all;
@@ -629,6 +638,59 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(debuglog_level, filter_type,
+        hpx::util::logging::level::disable_all)
+    HPX_DEFINE_LOG(debuglog_logger, logger_type)
+
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(debuglog_error_level, filter_type,
+        hpx::util::logging::level::fatal)
+    HPX_DEFINE_LOG(debuglog_error_logger, logger_type)
+
+    // initialize logging for application
+    void init_debuglog_logs(util::section const& ini, bool isconsole)
+    {
+        std::string loglevel, logdest, logformat;
+
+        if (ini.has_section("hpx.logging.debuglog")) {
+            util::section const* logini = ini.get_section("hpx.logging.debuglog");
+            HPX_ASSERT(NULL != logini);
+
+            std::string empty;
+            loglevel = logini->get_entry("level", empty);
+            if (!loglevel.empty()) {
+                logdest = logini->get_entry("destination", empty);
+                logformat = detail::unescape(logini->get_entry("format", empty));
+            }
+        }
+
+        unsigned lvl = hpx::util::logging::level::disable_all;
+        if (!loglevel.empty())
+            lvl = detail::get_log_level(loglevel);
+
+        if (hpx::util::logging::level::disable_all != lvl) {
+            logger_writer_type& writer = debuglog_logger()->writer();
+
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = isconsole ? "android_log" : "console";
+            writer.add_destination("android_log", android_log("hpx.debuglog"));
+#else
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = isconsole ? "cerr" : "console";
+#endif
+            if (logformat.empty())
+                logformat = "|\\n";
+
+            writer.add_destination("console", console(lvl, destination_debuglog)); //-V106
+            writer.write(logformat, logdest);
+            detail::define_formatters(writer);
+
+            debuglog_logger()->mark_as_initialized();
+            debuglog_level()->set_enabled(lvl);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     HPX_DEFINE_LOG_FILTER_WITH_ARGS(agas_console_level, filter_type,
         hpx::util::logging::level::disable_all)
     HPX_DEFINE_LOG(agas_console_logger, logger_type)
@@ -644,8 +706,10 @@ namespace hpx { namespace util
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            logdest = logini->get_entry("destination", empty);
-            logformat = detail::unescape(logini->get_entry("format", empty));
+            if (!loglevel.empty()) {
+                logdest = logini->get_entry("destination", empty);
+                logformat = detail::unescape(logini->get_entry("format", empty));
+            }
         }
 
         unsigned lvl = hpx::util::logging::level::disable_all;
@@ -690,8 +754,10 @@ namespace hpx { namespace util
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            logdest = logini->get_entry("destination", empty);
-            logformat = detail::unescape(logini->get_entry("format", empty));
+            if (!loglevel.empty()) {
+                logdest = logini->get_entry("destination", empty);
+                logformat = detail::unescape(logini->get_entry("format", empty));
+            }
         }
 
         unsigned lvl = hpx::util::logging::level::disable_all;
@@ -736,8 +802,10 @@ namespace hpx { namespace util
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            logdest = logini->get_entry("destination", empty);
-            logformat = detail::unescape(logini->get_entry("format", empty));
+            if (!loglevel.empty()) {
+                logdest = logini->get_entry("destination", empty);
+                logformat = detail::unescape(logini->get_entry("format", empty));
+            }
         }
 
         unsigned lvl = hpx::util::logging::level::disable_all;
@@ -782,8 +850,10 @@ namespace hpx { namespace util
 
             std::string empty;
             loglevel = logini->get_entry("level", empty);
-            logdest = logini->get_entry("destination", empty);
-            logformat = detail::unescape(logini->get_entry("format", empty));
+            if (!loglevel.empty()) {
+                logdest = logini->get_entry("destination", empty);
+                logformat = detail::unescape(logini->get_entry("format", empty));
+            }
         }
 
         unsigned lvl = hpx::util::logging::level::disable_all;
@@ -809,6 +879,54 @@ namespace hpx { namespace util
 
             app_console_logger()->mark_as_initialized();
             app_console_level()->set_enabled(lvl);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_DEFINE_LOG_FILTER_WITH_ARGS(debuglog_console_level, filter_type,
+        hpx::util::logging::level::disable_all)
+    HPX_DEFINE_LOG(debuglog_console_logger, logger_type)
+
+    // initialize logging for applications
+    void init_debuglog_console_log(util::section const& ini)
+    {
+        std::string loglevel, logdest, logformat;
+
+        if (ini.has_section("hpx.logging.console.debuglog")) {
+            util::section const* logini = ini.get_section("hpx.logging.console.debuglog");
+            HPX_ASSERT(NULL != logini);
+
+            std::string empty;
+            loglevel = logini->get_entry("level", empty);
+            if (!loglevel.empty()) {
+                logdest = logini->get_entry("destination", empty);
+                logformat = detail::unescape(logini->get_entry("format", empty));
+            }
+        }
+
+        unsigned lvl = hpx::util::logging::level::disable_all;
+        if (!loglevel.empty())
+            lvl = detail::get_log_level(loglevel, true);
+
+        if (hpx::util::logging::level::disable_all != lvl)
+        {
+            logger_writer_type& writer = debuglog_console_logger()->writer();
+
+#if defined(ANDROID) || defined(__ANDROID__)
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = "android_log";
+            writer.add_destination("android_log", android_log("hpx.debuglog"));
+#else
+            if (logdest.empty())      // ensure minimal defaults
+                logdest = "cerr";
+#endif
+            if (logformat.empty())
+                logformat = "|\\n";
+
+            writer.write(logformat, logdest);
+
+            debuglog_console_logger()->mark_as_initialized();
+            debuglog_console_level()->set_enabled(lvl);
         }
     }
 }}
@@ -909,7 +1027,25 @@ namespace hpx { namespace util { namespace detail
 #else
                 "destination = ${HPX_CONSOLE_APP_LOGDESTINATION:file(hpx.application.$[system.pid].log)}",
 #endif
-                "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}"
+                "format = ${HPX_CONSOLE_APP_LOGFORMAT:|}",
+
+                // logging of debug channel
+                "[hpx.logging.debuglog]",
+                "level = ${HPX_DEB_LOGLEVEL:-1}",
+                "destination = ${HPX_DEB_LOGDESTINATION:console}",
+                "format = ${HPX_DEB_LOGFORMAT:"
+                    "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
+                    "P%parentloc%/%hpxparent%.%hpxparentphase% %time%(" HPX_TIMEFORMAT
+                    ") [%idx%] [DEB] |\\n}",
+
+                "[hpx.logging.console.debuglog]",
+                "level = ${HPX_DEB_LOGLEVEL:$[hpx.logging.debuglog.level]}",
+#if defined(ANDROID) || defined(__ANDROID__)
+                "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:android_log}",
+#else
+                "destination = ${HPX_CONSOLE_DEB_LOGDESTINATION:file(hpx.debuglog.$[system.pid].log)}",
+#endif
+                "format = ${HPX_CONSOLE_DEB_LOGFORMAT:|}"
             ;
         }
         catch (std::exception const&) {
@@ -932,16 +1068,19 @@ namespace hpx { namespace util { namespace detail
     init_logging::init_logging(runtime_configuration& ini, bool isconsole,
         naming::resolver_client& agas_client)
     {
+        // initialize normal logs
         init_agas_log(ini, isconsole);
         init_timing_log(ini, isconsole);
         init_hpx_logs(ini, isconsole);
         init_app_logs(ini, isconsole);
+        init_debuglog_logs(ini, isconsole);
 
         // initialize console logs
         init_agas_console_log(ini);
         init_timing_console_log(ini);
         init_hpx_console_log(ini);
         init_app_console_log(ini);
+        init_debuglog_console_log(ini);
     }
 }}}
 
@@ -967,6 +1106,7 @@ namespace hpx { namespace util { namespace detail
         if (ini.get_entry("hpx.logging.level", "0") != "0" ||
             ini.get_entry("hpx.logging.timing.level", "0") != "0" ||
             ini.get_entry("hpx.logging.agas.level", "0") != "0" ||
+            ini.get_entry("hpx.logging.debuglog.level", "0") != "0" ||
             ini.get_entry("hpx.logging.application.level", "0") != "0")
         {
             std::cerr << "hpx::init_logging: warning: logging is requested even "
