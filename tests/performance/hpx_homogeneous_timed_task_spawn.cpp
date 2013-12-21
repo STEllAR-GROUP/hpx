@@ -70,17 +70,17 @@ void print_results(
         // Note that if we change the number of fields above, we have to
         // change the constant that we add when printing out the field # for
         // performance counters below (e.g. the last_index part).
-        cout << "# 0: OS-threads - Independent Variable\n"
-                "# 1: Tasks - Independent Variable\n"
-                "# 2: Delay [micro-seconds] - Independent Variable\n"
-                "# 3: Total Walltime [seconds]\n"
+        cout << "## 0: OS-threads - Independent Variable\n"
+                "## 1: Tasks - Independent Variable\n"
+                "## 2: Delay [micro-seconds] - Independent Variable\n"
+                "## 3: Total Walltime [seconds]\n"
                 ;
 
         boost::uint64_t const last_index = 3;
 
         for (boost::uint64_t i = 0; i < counters.size(); ++i)
         {
-            cout << "# " << (i + 1 + last_index) << ": " << ac->name(i);
+            cout << "## " << (i + 1 + last_index) << ": " << ac->name(i);
 
             if (!ac->unit_of_measure(i).empty())
                 cout << " [" << ac->unit_of_measure(i) << "]";
