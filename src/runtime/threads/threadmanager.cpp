@@ -1215,6 +1215,12 @@ namespace hpx { namespace threads
               &performance_counters::locality_thread_counter_discoverer,
               ""
             },
+            { "/threads/count/cumulative_phases", performance_counters::counter_raw,
+              "returns the overall number of HPX-thread phases executed for "
+              "the referenced locality", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
+            },
             { "/threads/count/instantaneous/all", performance_counters::counter_raw,
               "returns the overall current number of HPX-threads instantiated at the "
               "referenced locality", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
