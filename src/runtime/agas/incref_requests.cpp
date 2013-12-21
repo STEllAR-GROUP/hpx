@@ -9,9 +9,31 @@
 #include <hpx/lcos/future.hpp>
 
 #include <boost/foreach.hpp>
+#include <boost/format.hpp>
+#include <boost/io/ios_state.hpp>
+
+#include <iosfwd>
 
 namespace hpx { namespace agas { namespace detail
 {
+    ///////////////////////////////////////////////////////////////////////////
+    std::ostream& operator<<(std::ostream& os, incref_request_data const& data)
+    {
+        boost::io::ios_flags_saver ifs(os);
+        naming::gid_type gid;
+        if (data.keep_alive_ != naming::invalid_id)
+            gid = naming::detail::get_stripped_gid(data.keep_alive_.get_gid());
+
+        os << "{"
+                << "credit: " << data.credit_
+                << ", id: " << gid
+                << ", locality: " << data.locality_
+                << ", debit: " << data.debit_
+           << "}";
+        return os;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     incref_requests::iterator incref_requests::find_entry(
         naming::gid_type const& gid, boost::uint32_t loc)
     {
@@ -34,6 +56,10 @@ namespace hpx { namespace agas { namespace detail
         HPX_ASSERT(credits > 0);
 
         naming::gid_type gid = naming::detail::get_stripped_gid(id.get_gid());
+
+        LDEB_ << (boost::format(
+            "incref_requests::add_incref_request: gid(%1%): credit(%2%)") %
+                gid % credits);
 
         mutex_type::scoped_lock l(mtx_);
 
@@ -77,18 +103,38 @@ namespace hpx { namespace agas { namespace detail
     {
         HPX_ASSERT(credits > 0);
 
+        LDEB_ << (boost::format(
+            "incref_requests::add_remote_incref_request: gid(%1%): "
+            "credit(%2%), remote_locality(%3%)") %
+                gid % credits % remote_locality);
+
         mutex_type::scoped_lock l(mtx_);
 
         // There is nothing for us to do if no local entry exists.
         iterator it_local = find_entry(gid);
         if (it_local == store_.end())
+        {
+            l.unlock();
+
+            LDEB_ << (boost::format(
+                "> incref_requests::add_remote_incref_request: gid(%1%): "
+                "passing through as no local entry exists") % gid);
+
             return false;
+        }
 
         // Subtract the given credit from any existing local entry.
         incref_request_data& data_local = it_local->second;
         if (data_local.credit_ < 0)
         {
             // this entry holds some pre-acknowledged credits only
+            l.unlock();
+
+            LDEB_ << (boost::format(
+                "> incref_requests::add_remote_incref_request: gid(%1%): "
+                "passing through because of pre-acknowledged credits(%2%)") % 
+                    gid % data_local);
+
             return false;
         }
 
@@ -108,13 +154,16 @@ namespace hpx { namespace agas { namespace detail
 
         // Remove the current entry when it does not hold any pending requests
         // anymore.
+        bool erased_local_entry = false;
         if (data_local.credit_ == 0 && data_local.debit_ == 0)
         {
             store_.erase(it_local);
+            erased_local_entry = true;
         }
 
         // Add the given credit to an existing (remote) entry or create a new
         // (remote) one.
+        bool created_remote_entry = false;
         iterator it_remote = find_entry(gid, remote_locality);
         if (it_remote != store_.end())
         {
@@ -123,10 +172,34 @@ namespace hpx { namespace agas { namespace detail
         }
         else
         {
-            store_.insert(incref_requests_type::value_type(
+            it_remote = store_.insert(incref_requests_type::value_type(
                 gid, incref_request_data(credits, remote_locality)));
+            created_remote_entry = true;
         }
 
+        if (LDEB_ENABLED)
+        {
+            l.unlock();
+
+            if (erased_local_entry)
+            {
+                LDEB_ << (boost::format(
+                    "> incref_requests::add_remote_incref_request: gid(%1%): "
+                    "erased local entry") % gid);
+            }
+            if (created_remote_entry)
+            {
+                LDEB_ << (boost::format(
+                    "> incref_requests::add_remote_incref_request: gid(%1%): "
+                    "created remote entry(%2%)") % gid % it_remote->second);
+            }
+            else
+            {
+                LDEB_ << (boost::format(
+                    "> incref_requests::add_remote_incref_request: gid(%1%): "
+                    "updated remote entry(%2%)") % gid % it_remote->second);
+            }
+        }
         return true;
     }
 
@@ -135,6 +208,10 @@ namespace hpx { namespace agas { namespace detail
     {
         HPX_ASSERT(credits > 0);
         naming::gid_type gid = naming::detail::get_stripped_gid(id.get_gid());
+
+        LDEB_ << (boost::format(
+            "incref_requests::acknowledge_request: gid(%1%): "
+            "credit(%2%)") % gid % credits);
 
         std::vector<incref_request_data> matching_data;
         std::vector<incref_request_data> decref_data;
@@ -236,6 +313,17 @@ namespace hpx { namespace agas { namespace detail
             }
         }
 
+        // log all pending operations
+        if (LDEB_ENABLED)
+        {
+            BOOST_FOREACH(incref_request_data const& data, matching_data)
+            {
+                LDEB_ << (boost::format(
+                    "> incref_requests::acknowledge_request: gid(%1%): "
+                    "pending action(%2%)") % gid % data);
+            }
+        }
+
         // now handle all acknowledged credits and all delayed debits
         std::vector<hpx::future<bool> > requests;
         requests.reserve(2*matching_data.size());
@@ -277,6 +365,10 @@ namespace hpx { namespace agas { namespace detail
     bool incref_requests::add_decref_request(boost::int64_t credits,
         naming::gid_type const& gid)
     {
+        LDEB_ << (boost::format(
+            "incref_requests::add_decref_request: gid(%1%): "
+            "credit(%2%)") % gid % credits);
+
         mutex_type::scoped_lock l(mtx_);
 
         // We have to hold back any decref requests as long as there exists
@@ -297,8 +389,21 @@ namespace hpx { namespace agas { namespace detail
                 store_.insert(incref_requests_type::value_type(
                     gid, incref_request_data(credits, id)));
 
+                l.unlock();
+
+                LDEB_ << (boost::format(
+                    "> incref_requests::add_decref_request: gid(%1%): "
+                    "holding back credit(%2%) because of pending remote "
+                    "incref request(%3%)") % gid % credits % r.first->second);
+
                 return true; // hold back the decref
             }
+
+            l.unlock();
+
+            LDEB_ << (boost::format(
+                "> incref_requests::add_decref_request: gid(%1%): "
+                "passing through credit(%2%)") % gid % credits);
 
             // no entry exists which references the given id, release the decref
             return false;
@@ -312,10 +417,25 @@ namespace hpx { namespace agas { namespace detail
         if (it_local->second.credit_ < 0)
         {
             // this entry holds some pre-acknowledged credits only
+            l.unlock();
+
+            LDEB_ << (boost::format(
+                "> incref_requests::add_decref_request: gid(%1%): "
+                "passing through credit(%2%) because of pre-acknowledged "
+                "credits(%3%)") % gid % credits % it_local->second);
+
             return false;
         }
 
         it_local->second.debit_ += credits;
+
+        l.unlock();
+
+        LDEB_ << (boost::format(
+            "> incref_requests::add_decref_request: gid(%1%): "
+            "holding back credit(%2%) because of pending local incref "
+            "request(%3%)") % gid % credits % it_local->second);
+
         return true;
     }
 }}}

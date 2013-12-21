@@ -52,6 +52,10 @@ namespace hpx { namespace components
             case destination_app:
                 LAPP_CONSOLE_(at_c<1>(msg)) << fail_msg << at_c<2>(msg);
                 break;
+
+            case destination_debuglog:
+                LDEB_CONSOLE_ << fail_msg << at_c<2>(msg);
+                break;
             }
         }
     }
