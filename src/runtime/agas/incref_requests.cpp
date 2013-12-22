@@ -31,14 +31,15 @@ namespace hpx { namespace agas { namespace detail
             gid = naming::detail::get_stripped_gid(data.keep_alive_.get_gid());
 
         os << "{"
-                << "credit: " << data.credit_
+                << "credit: 0x" 
+                << std::hex << std::setw(16) << std::setfill('0') << data.credit_
                 << ", id: " << gid
                 << ", locality: ";
 
         if (data.locality_ != naming::invalid_locality_id)
             os << data.locality_;
         else
-            os << "invalid_locality_id";
+            os << "invalid";
 
         os << ", debit: " << data.debit_ << "}";
         return os;
@@ -90,6 +91,12 @@ namespace hpx { namespace agas { namespace detail
                 // This credit request was already acknowledged earlier,
                 // remove the entry.
                 store_.erase(it);
+
+                l.unlock();
+
+                LINCREF_ << (boost::format(
+                    "> incref_requests::add_incref_request: gid(%1%): "
+                    "deleted existing entry") % gid);
             }
             else if (data.keep_alive_.get_management_type() ==
                      naming::id_type::unmanaged)
@@ -98,12 +105,31 @@ namespace hpx { namespace agas { namespace detail
                 // was created by a remote acknowledgment. Update the
                 // id with a local one to be kept alive.
                 data.keep_alive_ = id;
+
+                l.unlock();
+
+                LINCREF_ << (boost::format(
+                    "> incref_requests::add_incref_request: gid(%1%): "
+                    "updated keep_alive id(%2%)") % gid % data);
+            }
+            else
+            {
+                l.unlock();
+
+                LINCREF_ << (boost::format(
+                    "> incref_requests::add_incref_request: gid(%1%): "
+                    "updated existing entry(%2%)") % gid % data);
             }
         }
         else
         {
-            store_.insert(incref_requests_type::value_type(
+            it = store_.insert(incref_requests_type::value_type(
                 gid, incref_request_data(credits, id)));
+
+            l.unlock();
+            LINCREF_ << (boost::format(
+                "> incref_requests::add_incref_request: gid(%1%): "
+                "created new entry(%2%)") % gid % it->second);
         }
     }
 
@@ -145,7 +171,7 @@ namespace hpx { namespace agas { namespace detail
 
             LINCREF_ << (boost::format(
                 "> incref_requests::add_remote_incref_request: gid(%1%): "
-                "passing through because of pre-acknowledged credits(%2%)") % 
+                "passing through because of pre-acknowledged credits(%2%)") %
                     raw % data_local);
 
             return false;
@@ -229,6 +255,8 @@ namespace hpx { namespace agas { namespace detail
         std::vector<incref_request_data> matching_data;
         std::vector<incref_request_data> decref_data;
 
+        boost::int64_t debits = credits;
+
         {
             mutex_type::scoped_lock l(mtx_);
 
@@ -250,9 +278,24 @@ namespace hpx { namespace agas { namespace detail
                     // not all pending credits were acknowledged
                     matching_data.back().credit_ = credits;
 
-                    // any pending decref requests will be handled once all
-                    // incref requests are acknowledged
-                    matching_data.back().debit_ = 0;
+                    // For local entries, handle as many decref requests as we
+                    // have received.
+                    if (debits != 0 && data.locality_ == naming::invalid_locality_id)
+                    {
+                        if (matching_data.back().debit_ > debits)
+                        {
+                            // release available amount of decrefs
+                            data.debit_ -= debits;
+                            matching_data.back().debit_ = debits;
+                            debits = 0;
+                        }
+                        else if (matching_data.back().debit_ != 0)
+                        {
+                            // all pending decref requests can be released
+                            data.debit_ = 0;
+                            debits -= matching_data.back().debit_;
+                        }
+                    }
 
                     // we're done with handling the acknowledged credit
                     credits = 0;
@@ -276,10 +319,14 @@ namespace hpx { namespace agas { namespace detail
 
                     if (matching_data.back().debit_ != 0)
                     {
-                        // This entry also stores some pending decref request.
+                        // This entry also stores some pending decref requests.
                         // We're allowed to release those decref requests only
-                        // if there is no other entry referring this id besides
-                        // the current one anymore.
+                        // if there is no other entry referring to this id
+                        // besides the current one anymore.
+                        //
+                        // If there isn't any other entry we're allowed to
+                        // release only as many decrefs as we have received
+                        // incref acknowledgments.
                         std::pair<iterator, iterator> rr = store_.equal_range(gid);
                         if (rr.first != rr.second)
                         {
@@ -289,6 +336,28 @@ namespace hpx { namespace agas { namespace detail
 
                             // Don't release the decref request right now.
                             matching_data.back().debit_ = 0;
+                        }
+                        else if (matching_data.back().debit_ > debits)
+                        {
+                            // Reinsert the data as local pure decref requests
+                            // for the remaining amount.
+                            decref_data.push_back(matching_data.back());
+                            decref_data.back().credit_ = 0;
+                            decref_data.back().debit_ =
+                                matching_data.back().debit_ - debits;
+
+                            // Release the given amount of decrefs now.
+                            matching_data.back().debit_ = debits;
+
+                            // Adjust remaining amount of decref requests.
+                            debits = 0;
+                        }
+                        else
+                        {
+                            // Adjust remaining amount of decref requests as
+                            // we're releasing all of the decrefs of the
+                            // current entry.
+                            debits -= matching_data.back().debit_;
                         }
                     }
                 }
