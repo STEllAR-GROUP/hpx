@@ -143,11 +143,13 @@ namespace hpx { namespace components
                 queue_mutex_type::scoped_lock l(queue_mtx_);
                 queue_.push_back(msg);
             }
-
-            // and log it locally
-            messages_type msgs;
-            msgs.push_back(msg);
-            fallback_console_logging_locked(msgs);
+            else
+            {
+                // log it locally on the console
+                messages_type msgs;
+                msgs.push_back(msg);
+                fallback_console_logging_locked(msgs);
+            }
         }
     }
 
