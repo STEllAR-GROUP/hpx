@@ -667,7 +667,8 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel);
 
-        if (hpx::util::logging::level::disable_all != lvl) {
+        if (hpx::util::logging::level::disable_all != lvl)
+        {
             logger_writer_type& writer = debuglog_logger()->writer();
 
 #if defined(ANDROID) || defined(__ANDROID__)
@@ -812,9 +813,6 @@ namespace hpx { namespace util
         if (!loglevel.empty())
             lvl = detail::get_log_level(loglevel, true);
 
-        if (logformat.empty())
-            logformat = "|";
-
         if (hpx::util::logging::level::disable_all != lvl) {
             logger_writer_type& writer = hpx_console_logger()->writer();
 
@@ -826,6 +824,8 @@ namespace hpx { namespace util
             if (logdest.empty())      // ensure minimal defaults
                 logdest = "cerr";
 #endif
+            if (logformat.empty())
+                logformat = "|\\n";
 
             writer.write(logformat, logdest);
 
