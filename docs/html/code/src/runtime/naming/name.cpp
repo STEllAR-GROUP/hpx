@@ -389,7 +389,7 @@ namespace hpx { namespace naming
 
                 // Inform our incref tracking that part of a credit which was
                 // not acknowledged was received over the wire.
-                agas::add_incref_request(credits, id_type(this));
+                agas::add_incref_request(naming::detail::power2(credits), id_type(this));
             }
         }
 
