@@ -279,18 +279,6 @@ namespace boost { namespace serialization
 namespace hpx { namespace naming
 {
     ///////////////////////////////////////////////////////////////////////////
-    inline std::ostream& operator<< (std::ostream& os, gid_type const& id)
-    {
-        boost::io::ios_flags_saver ifs(os);
-        os << std::hex
-           << "{" << std::right << std::setfill('0') << std::setw(16)
-                  << id.id_msb_ << ", "
-                  << std::right << std::setfill('0') << std::setw(16)
-                  << id.id_lsb_ << "}";
-        return os;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from locality_id
     inline gid_type get_gid_from_locality_id(boost::uint32_t locality_id) HPX_SUPER_PURE;
 
@@ -504,6 +492,25 @@ namespace hpx { namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
     gid_type const invalid_gid = gid_type();
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline std::ostream& operator<< (std::ostream& os, gid_type const& id)
+    {
+        boost::io::ios_flags_saver ifs(os);
+        if (id != naming::invalid_gid)
+        {
+            os << std::hex
+               << "{" << std::right << std::setfill('0') << std::setw(16)
+                      << id.id_msb_ << ", "
+                      << std::right << std::setfill('0') << std::setw(16)
+                      << id.id_lsb_ << "}";
+        }
+        else
+        {
+            os << "{invalid}";
+        }
+        return os;
+    }
 
     namespace detail
     {

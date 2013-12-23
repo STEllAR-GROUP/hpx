@@ -411,10 +411,18 @@ bool add_remote_incref_request(
 hpx::future<bool> incref_async(
     naming::gid_type const& gid
   , boost::int64_t credits
-  , naming::id_type const& keep_alive
+  , naming::id_type const& keep_alive_
   )
 {
     naming::resolver_client& resolver = naming::get_agas_client();
+
+    naming::id_type keep_alive;
+    if (keep_alive_)
+        keep_alive = keep_alive_;
+    else
+        keep_alive = naming::id_type(gid, id_type::unmanaged);
+
+    add_incref_request(credits, keep_alive);
     return resolver.incref_async(gid, credits, keep_alive);
 }
 
