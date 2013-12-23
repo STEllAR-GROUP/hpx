@@ -416,13 +416,10 @@ hpx::future<bool> incref_async(
 {
     naming::resolver_client& resolver = naming::get_agas_client();
 
-    naming::id_type keep_alive;
     if (keep_alive_)
-        keep_alive = keep_alive_;
-    else
-        keep_alive = naming::id_type(gid, id_type::unmanaged);
+        return resolver.incref_async(gid, credits, keep_alive_);
 
-    add_incref_request(credits, keep_alive);
+    naming::id_type keep_alive = naming::id_type(gid, id_type::unmanaged);
     return resolver.incref_async(gid, credits, keep_alive);
 }
 

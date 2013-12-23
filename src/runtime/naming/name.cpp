@@ -306,22 +306,24 @@ namespace hpx { namespace naming
                 // operations.
                 boost::uint64_t added_credit = detail::fill_credit_for_gid(gid);
 
-                // We unlock the lock as all operations on the local credit
-                // have been performed and we don't want the lock to be
-                // pending during the (possibly remote) AGAS operation.
-                l.unlock();
-
                 // Inform our incref tracking that part of a credit is going to
                 // be sent over the wire.
                 requires_incref_handling = agas::add_remote_incref_request(
                     dest_credit, newid, dest_locality_id);
+
+                id_type id(const_cast<id_type_impl*>(this));
+                agas::add_incref_request(added_credit, id);
+
+                // We unlock the lock as all operations on the local credit
+                // have been performed and we don't want the lock to be
+                // pending during the (possibly remote) AGAS operation.
+                l.unlock();
 
                 // If something goes wrong during the reference count
                 // increment below we will have already added credits to
                 // the split gid. In the worst case this will cause a
                 // memory leak. I'm not sure if it is possible to reliably
                 // handle this problem.
-                id_type id(const_cast<id_type_impl*>(this));
                 agas::incref_async(gid, added_credit, id);
             }
             else
@@ -352,26 +354,24 @@ namespace hpx { namespace naming
             boost::int16_t credits = detail::get_log2credit_from_gid(*this);
             if (0 == credits)
             {
-                // note: the future returned by agas::incref_async()
-                //       keeps this instance alive as it is passed along
-                //       as the keep_alive parameter
+                // Inform our incref tracking that part of a credit which was
+                // not acknowledged was received over the wire.
+                id_type id(this);
+
+                if (requires_incref_handling)
+                    agas::add_incref_request(1, id);
 
                 // We add the new credits to the gid first to avoid
                 // duplicate splitting during concurrent serialization
                 // operations.
                 boost::uint64_t added_credit = detail::fill_credit_for_gid(*this);
 
+                agas::add_incref_request(added_credit, id);
+
                 // We unlock the lock as all operations on the local credit
                 // have been performed and we don't want the lock to be
                 // pending during the (possibly remote) AGAS operation.
                 l.unlock();
-
-                // Inform our incref tracking that part of a credit which was
-                // not acknowledged was received over the wire.
-                id_type id(this);
-
-                if (requires_incref_handling)
-                    agas::add_incref_request(naming::detail::power2(credits), id);
 
                 // If something goes wrong during the reference count
                 // increment below we will have already added credits to
@@ -382,11 +382,6 @@ namespace hpx { namespace naming
             }
             else if (requires_incref_handling)
             {
-                // We unlock the lock as all operations on the local credit
-                // have been performed and we don't want the lock to be
-                // pending during the (possibly remote) AGAS operation.
-                l.unlock();
-
                 // Inform our incref tracking that part of a credit which was
                 // not acknowledged was received over the wire.
                 agas::add_incref_request(naming::detail::power2(credits), id_type(this));
@@ -411,11 +406,17 @@ namespace hpx { namespace naming
                     boost::int64_t added_credit =
                         naming::detail::fill_credit_for_gid(gid);
 
-                    l.unlock();
-
                     boost::int64_t added_new_credit =
                         naming::detail::fill_credit_for_gid(new_gid);
                     new_credit = naming::detail::get_credit_from_gid(new_gid);
+
+                    // inform incref handler before unlocking
+                    agas::add_incref_request(added_credit,
+                        naming::id_type(gid, id_type::unmanaged));
+                    agas::add_incref_request(added_new_credit,
+                        naming::id_type(new_gid, id_type::unmanaged));
+
+                    l.unlock();
 
                     agas::incref_async(gid, added_credit);
                     agas::incref_async(new_gid, added_new_credit);
@@ -439,6 +440,9 @@ namespace hpx { namespace naming
                 HPX_ASSERT(0 == get_credit_from_gid(id));
                 added_credit = naming::detail::fill_credit_for_gid(id);
                 naming::detail::set_credit_split_mask_for_gid(id);
+
+                agas::add_incref_request(added_credit,
+                    naming::id_type(id, id_type::unmanaged));
             }
 
             return agas::incref_async(id, added_credit);
