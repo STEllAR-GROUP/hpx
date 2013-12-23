@@ -39,7 +39,7 @@ namespace hpx
 
         template <typename Component>
         boost::shared_ptr<Component>
-        get_ptr_postproc(future<naming::address>& f, naming::id_type const& id)
+        get_ptr_postproc(future<naming::address> f, naming::id_type const& id)
         {
             naming::address addr = f.get();
 

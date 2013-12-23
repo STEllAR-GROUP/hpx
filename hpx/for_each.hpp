@@ -27,7 +27,7 @@ namespace hpx {
             {}
 
             template <typename Future>
-            result_type operator()(Future const & f)
+            result_type operator()(Future f)
             {
                 boost::copy(f.get(), out_);
             }

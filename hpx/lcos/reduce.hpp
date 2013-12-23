@@ -152,7 +152,7 @@ namespace hpx { namespace lcos
               : reduce_op_(reduce_op)
             {}
 
-            Result operator()(hpx::future<std::vector<hpx::future<Result> > >& r) const
+            Result operator()(hpx::future<std::vector<hpx::future<Result> > > r) const
             {
                 std::vector<hpx::future<Result> > fres = boost::move(r.move());
 

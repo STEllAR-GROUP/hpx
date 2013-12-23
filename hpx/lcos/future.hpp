@@ -174,14 +174,14 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef struct continuation_not_callable
         {
-            void error(Future& future, F& f)
+            void error(Future future, F& f)
             {
                 f(future);
             }
 
             ~continuation_not_callable()
             {
-                error(boost::declval<Future&>(), boost::declval<F&>());
+                error(boost::declval<Future>(), boost::declval<F&>());
             }
         } type;
     };
@@ -190,11 +190,11 @@ namespace hpx { namespace lcos { namespace detail
     struct future_then_result<
         Future, F
       , typename util::always_void<
-            typename boost::result_of<F(Future&)>::type
+            typename boost::result_of<F(Future)>::type
         >::type
     >
     {
-        typedef typename boost::result_of<F(Future&)>::type result;
+        typedef typename boost::result_of<F(Future)>::type result;
 
         typedef lcos::unique_future<
             typename boost::mpl::eval_if<
@@ -208,11 +208,11 @@ namespace hpx { namespace lcos { namespace detail
     struct future_then_result<
         future<Result>, F
       , typename util::always_void<
-            typename boost::result_of<F(future<Result>&)>::type
+            typename boost::result_of<F(future<Result>)>::type
         >::type
     >
     {
-        typedef typename boost::result_of<F(future<Result>&)>::type result;
+        typedef typename boost::result_of<F(future<Result>)>::type result;
 
         typedef
             typename boost::mpl::if_<
@@ -487,7 +487,7 @@ namespace hpx { namespace lcos { namespace detail
                 return result_type();
             }
 
-            typedef typename boost::result_of<F(Derived&)>::type result;
+            typedef typename boost::result_of<F(Derived)>::type result;
             typedef
                 typename shared_state_ptr_for<result>::type
                 shared_state_ptr;
@@ -514,7 +514,7 @@ namespace hpx { namespace lcos { namespace detail
                 return result_type();
             }
 
-            typedef typename boost::result_of<F(Derived&)>::type result;
+            typedef typename boost::result_of<F(Derived)>::type result;
             typedef
                 typename shared_state_ptr_for<result>::type
                 shared_state_ptr;

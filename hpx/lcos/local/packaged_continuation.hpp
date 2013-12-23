@@ -27,7 +27,7 @@ namespace hpx { namespace lcos { namespace detail
         boost::mpl::false_)
     {
         try {
-            dest.set_data(func(future));
+            dest.set_data(func(boost::move(future)));
         }
         catch (...) {
             dest.set_exception(boost::current_exception());
@@ -351,7 +351,7 @@ namespace hpx { namespace lcos
     inline typename detail::future_then_result<future<Result>, F>::type
     future<Result>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future&)>::type result_type;
+        typedef typename boost::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
 
         if (!future_data_) {
@@ -371,7 +371,7 @@ namespace hpx { namespace lcos
     inline typename detail::future_then_result<future<Result>, F>::type
     future<Result>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future&)>::type result_type;
+        typedef typename boost::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
 
         if (!future_data_) {
@@ -398,7 +398,7 @@ namespace hpx { namespace lcos
     inline typename detail::future_then_result<future<void>, F>::type
     future<void>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future&)>::type result_type;
+        typedef typename boost::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
 
         if (!future_data_) {
@@ -417,7 +417,7 @@ namespace hpx { namespace lcos
     inline typename detail::future_then_result<future<void>, F>::type
     future<void>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future&)>::type result_type;
+        typedef typename boost::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
 
         if (!future_data_) {

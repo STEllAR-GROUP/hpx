@@ -240,7 +240,7 @@ namespace hpx { namespace lcos
               : fold_op_(fold_op), init_(init)
             {}
 
-            Result operator()(hpx::future<std::vector<hpx::future<Result> > >& r) const
+            Result operator()(hpx::future<std::vector<hpx::future<Result> > > r) const
             {
                 std::vector<hpx::future<Result> > fres = boost::move(r.move());
                 HPX_ASSERT(!fres.empty());

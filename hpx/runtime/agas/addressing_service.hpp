@@ -210,7 +210,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     void* get_bootstrap_symbol_ns_ptr() const;
 
     bool synchronize_with_async_incref(
-        hpx::future<bool>& fut
+        hpx::future<bool> fut
       , naming::id_type const& id
       , boost::int64_t credit
         );
@@ -233,7 +233,7 @@ protected:
     void launch_hosted();
 
     naming::address resolve_full_postproc(
-        future<response>& f
+        future<response> f
       , naming::gid_type const& id
         );
 
