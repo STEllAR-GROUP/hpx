@@ -1702,7 +1702,7 @@ bool addressing_service::synchronize_with_async_incref(
 lcos::future<bool> addressing_service::incref_async(
     naming::gid_type const& gid
   , boost::int64_t credit
-  , naming::id_type const& keep_alive_
+  , naming::id_type const& keep_alive
     )
 { // {{{ incref implementation
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
@@ -1715,7 +1715,7 @@ lcos::future<bool> addressing_service::incref_async(
         ) = &addressing_service::incref_async;
 
         return async(util::bind(incref_async_ptr, this,
-            gid, credit, keep_alive_));
+            gid, credit, keep_alive));
     }
 
     if (HPX_UNLIKELY(0 >= credit))
@@ -1726,11 +1726,7 @@ lcos::future<bool> addressing_service::incref_async(
         return lcos::future<bool>();
     }
 
-    naming::id_type keep_alive;
-    if (keep_alive_)
-        keep_alive = keep_alive_;
-    else
-        keep_alive = naming::id_type(gid, id_type::unmanaged);
+    HPX_ASSERT(keep_alive != naming::invalid_id);
 
     typedef refcnt_requests_type::value_type mapping;
 
@@ -1762,10 +1758,6 @@ lcos::future<bool> addressing_service::incref_async(
                 // Store the remaining incref to be handled below.
                 incref_list.push_back(mapping(matches->key_, match_data));
                 refcnt_requests_->erase(matches);
-
-                // store the incref request as well, but only if there
-                // is actually an incref request going out.
-                incref_requests_->add_incref_request(credit, keep_alive);
             }
             else if (match_data == 0)
             {
@@ -1778,7 +1770,12 @@ lcos::future<bool> addressing_service::incref_async(
 
     if (incref_list.empty())
     {
-        return hpx::make_ready_future<bool>(true);
+        lcos::future<bool> f = hpx::make_ready_future<bool>(true);
+
+        using util::placeholders::_1;
+        return f.then(
+            util::bind(&addressing_service::synchronize_with_async_incref,
+                this, _1, keep_alive, credit));
     }
 
     HPX_ASSERT(incref_list.size() == 1);

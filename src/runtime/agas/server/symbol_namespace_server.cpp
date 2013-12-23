@@ -379,9 +379,8 @@ response symbol_namespace::resolve(
             boost::uint64_t added_new_credit =
                 naming::detail::fill_credit_for_gid(gid);
 
-            naming::resolver_client& client = naming::get_agas_client();
-            client.incref_async(it->second, added_credit);
-            client.incref_async(gid, added_new_credit);
+            agas::incref_async(it->second, added_credit);
+            agas::incref_async(gid, added_new_credit);
 
             LAGAS_(debug) << (boost::format(
                 "symbol_namespace::resolve, incremented entry credits: "

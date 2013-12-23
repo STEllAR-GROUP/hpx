@@ -321,8 +321,8 @@ namespace hpx { namespace naming
                 // the split gid. In the worst case this will cause a
                 // memory leak. I'm not sure if it is possible to reliably
                 // handle this problem.
-                agas::incref_async(gid, added_credit,
-                    id_type(const_cast<id_type_impl*>(this)));
+                id_type id(const_cast<id_type_impl*>(this));
+                agas::incref_async(gid, added_credit, id);
             }
             else
             {
