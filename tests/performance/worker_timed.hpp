@@ -13,8 +13,6 @@
 #include <hpx/util/high_resolution_timer.hpp>
 #include <boost/cstdint.hpp>
 
-using hpx::util::high_resolution_timer;
-
 HPX_SYMBOL_EXPORT void worker_timed(double delay_sec, volatile int * i);
 
 #endif
