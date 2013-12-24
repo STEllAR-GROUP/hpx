@@ -1,12 +1,18 @@
-//  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
+//  Copyright (c) 2011-2013 Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// This test demonstrates the issue described in #1036: Scheduler hangs when
+// user code attempts to "block" OS-threads 
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/runtime/threads/topology.hpp>
+
+#include <boost/assign/std/vector.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 void blocker(
@@ -24,16 +30,15 @@ void blocker(
 volatile int i = 0;
 boost::uint64_t delay = 100;
 
-int hpx_main(
-    boost::program_options::variables_map& vm
-    )
+int hpx_main()
 {
     {
         ///////////////////////////////////////////////////////////////////////
         // Block all other OS threads.
         boost::atomic<bool> started(false);
 
-        for (boost::uint64_t i = 0; i < (hpx::get_os_thread_count() - 1); ++i)
+        boost::uint64_t num_threads = hpx::get_os_thread_count() - 1;
+        for (boost::uint64_t j = 0; j != num_threads; ++j)
         {
             boost::atomic<bool> entered(false);
 
@@ -82,8 +87,14 @@ int main(
         , "time in micro-seconds for the delay loop")
         ;
 
+    // We force this test to use all available threads by default.
+    using namespace boost::assign;
+    std::vector<std::string> cfg;
+    cfg += "hpx.os_threads=" +
+        boost::lexical_cast<std::string>(hpx::threads::hardware_concurrency());
+
     // Initialize and run HPX.
-    return hpx::init(cmdline, argc, argv);
+    return hpx::init(cmdline, argc, argv, cfg);
 }
 
 
