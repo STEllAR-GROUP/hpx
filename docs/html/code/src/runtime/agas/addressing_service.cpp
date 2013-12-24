@@ -1350,7 +1350,7 @@ hpx::future<naming::address> addressing_service::resolve_async(
 }
 
 naming::address addressing_service::resolve_full_postproc(
-    future<response>& f, naming::gid_type const& id
+    future<response> f, naming::gid_type const& id
     )
 {
     naming::address addr;
@@ -1681,7 +1681,7 @@ bool addressing_service::propagate_local_incref_acknowlegdement(
 }
 
 bool addressing_service::synchronize_with_async_incref(
-    hpx::future<bool>& fut
+    hpx::future<bool> fut
   , naming::id_type const& id
   , boost::int64_t credit
     )

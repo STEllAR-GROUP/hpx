@@ -27,7 +27,7 @@ namespace hpx { namespace components
         // This will be called when f is ready().
         template <typename Component>
         naming::id_type copy_same_locality(naming::id_type const& to_copy,
-            future<naming::id_type>& f)
+            future<naming::id_type> f)
         {
             typedef typename server::copy_component_action<Component>
                 action_type;
@@ -43,7 +43,7 @@ namespace hpx { namespace components
         template <typename Component>
         naming::id_type copy_any_locality(naming::id_type const& to_copy,
             naming::id_type const& target_locality,
-            future<naming::id_type>& f)
+            future<naming::id_type> f)
         {
             typedef typename server::copy_component_action<Component>
                 action_type;

@@ -373,11 +373,15 @@ response symbol_namespace::resolve(
 
             boost::uint64_t added_credit =
                 naming::detail::fill_credit_for_gid(it->second);
-
-            gid_l.unlock();
+            agas::add_incref_request(added_credit,
+                naming::id_type(it->second, id_type::unmanaged));
 
             boost::uint64_t added_new_credit =
                 naming::detail::fill_credit_for_gid(gid);
+            agas::add_incref_request(added_new_credit,
+                naming::id_type(gid, id_type::unmanaged));
+
+            gid_l.unlock();
 
             agas::incref_async(it->second, added_credit);
             agas::incref_async(gid, added_new_credit);

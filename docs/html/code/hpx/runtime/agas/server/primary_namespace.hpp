@@ -60,23 +60,24 @@ char const* const primary_namespace_service_name = "primary/";
 ///     prefix     - Highest 32 bits (bit 96 to bit 127) of the MSB. Each
 ///                  locality is assigned a prefix. This creates a 96-bit
 ///                  address space for each locality.
-///     RC         - Bit 80 to bit 95 of the MSB. This is the number of
-///                  reference counting credits on the GID. Bit 95 is not part
-///                  of this value; instead, it is a flag that is set if a GID's
-///                  credit count is ever split (e.g. if the GID is ever passed
-///                  to another locality).
-///     identifier - Bit 64 to bit 80 of the MSB, and the entire LSB. The
+///     RC         - Bit 88 to bit 92 of the MSB. This is the log2 of the number
+///                  of reference counting credits on the GID. Bit 93 is unused.
+///                  Bit 94 is a flag which is set if the credit value is valid.
+///                  Bit 95 is a flag that is set if a GID's credit count is
+///                  ever split (e.g. if the GID is ever passed to another
+///                  locality).
+///     identifier - Bit 64 to bit 87 of the MSB, and the entire LSB. The
 ///                  content of these bits depends on the component type of
 ///                  the underlying object. For all user-defined components,
-///                  these bits contain a unique 80-bit number which is
+///                  these bits contain a unique 88-bit number which is
 ///                  assigned sequentially for each locality. For
 ///                  \a hpx#components#component_runtime_support and
-///                  \a hpx#components#component_memory, the high 16 bits are
+///                  \a hpx#components#component_memory, the high 24 bits are
 ///                  zeroed and the low 64 bits hold the LVA of the component.
 ///
 /// The following address ranges are reserved. Some are either explicitly or
 /// implicitly protected by AGAS. The letter x represents a single-byte
-/// wildcard.
+/// wild card.
 ///
 ///     00000000xxxxxxxxxxxxxxxxxxxxxxxx
 ///         Historically unused address space reserved for future use.
@@ -99,7 +100,7 @@ char const* const primary_namespace_service_name = "primary/";
 ///     00000001000000010000000000000005
 ///         Address of the root-CA component
 ///     xxxxxxxx000000010000000000000006
-///         Address of the locality based sub-CA, xxxxxxxx is replaced with the 
+///         Address of the locality based sub-CA, xxxxxxxx is replaced with the
 ///         correct locality id
 ///
 struct HPX_EXPORT primary_namespace
@@ -215,8 +216,8 @@ struct HPX_EXPORT primary_namespace
 
 #if defined(HPX_AGAS_DUMP_REFCNT_ENTRIES)
     /// Dump the credit counts of all matching ranges. Expects that \p l
-    /// is locked. 
-    void dump_refcnt_matches( 
+    /// is locked.
+    void dump_refcnt_matches(
         refcnt_match match
       , naming::gid_type const& lower
       , naming::gid_type const& upper

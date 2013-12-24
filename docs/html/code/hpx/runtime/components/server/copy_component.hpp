@@ -22,7 +22,7 @@ namespace hpx { namespace components { namespace server
     {
         template <typename Component>
         naming::id_type copy_component_postproc(
-            future<boost::shared_ptr<Component> >& f,
+            future<boost::shared_ptr<Component> > f,
             naming::id_type const& target_locality)
         {
             boost::shared_ptr<Component> ptr = f.get();
