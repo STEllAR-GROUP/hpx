@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from math import sqrt
 from sys import exit
@@ -7,17 +8,17 @@ from optparse import OptionParser
 
 from numpy import std, mean
 
-# 0: OS-threads - Independent Variable
+# 0: Delay [micro-seconds] - Independent Variable
 # 1: Tasks - Independent Variable
-# 2: Delay [micro-seconds] - Independent Variable
+# 2: OS-threads - Independent Variable
 # 3: Total Walltime [seconds]
 # 4+: Counters
 
-OS_THREADS = 0
+DELAY = 0
 TASKS = 1
-DELAY = 2
+OS_THREADS = 2
 
-LAST_IVAR = DELAY
+LAST_IVAR = OS_THREADS
 
 # Returns the index of the independent variable that we use to differentiate
 # datasets (dataset == line on the graph).
@@ -26,7 +27,7 @@ def dataset_key(row):
 
 # Returns a list of all the independent variables. 
 def ivars(row):
-    return tuple(int(row[x]) for x in (DELAY, TASKS, OS_THREADS))
+    return tuple(int(row[x]) for x in range(0, LAST_IVAR + 1))
 
 # Returns a list of all the dependent variables. 
 def dvars(row):
@@ -48,11 +49,13 @@ try:
     while True:
         line = f.next()
 
-        # Look for legend 
+        # Look for the legend 
         if line[0] == '#':
             if line[1] == '#':
                 row = line.split(':')
                 legend.append(row[1].strip())
+            else:
+                print line,
             continue   
 
         # Look for blank lines
@@ -96,7 +99,17 @@ for i in range(0, (len(legend) - (LAST_IVAR + 1)) * 2, 2):
     print '## %i: %s - Average of %i Samples' % (i0, legend[i1], sample_size)
     print '## %i: %s - Standard Deviation' % (i0 + 1, legend[i1])
 
+is_first = True
+
 for (key, dataset) in sorted(master.iteritems()):
+    if not is_first: 
+        print
+        print
+    else:
+        is_first = False
+
+    print "\"%i μs\"" % key
+        
     # iv is a list, dvs is a list of lists.
     for (iv, dvs) in sorted(dataset.iteritems()):
         for e in iv:
@@ -110,7 +123,4 @@ for (key, dataset) in sorted(master.iteritems()):
             print mean(values), std(values),
 
         print
- 
-    print
-    print
 

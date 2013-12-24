@@ -19,6 +19,8 @@
 
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/thread/condition.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "worker_timed.hpp"
 
@@ -31,6 +33,7 @@ using hpx::finalize;
 using hpx::get_os_thread_count;
 
 using hpx::applier::register_work;
+using hpx::applier::register_thread_nullary;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
@@ -62,17 +65,16 @@ void print_results(
 {
     if (header)
     {
-        cout << "# HPX " << hpx::build_string() << " "
-                         << hpx::build_type() << "\n"
-             << "# Boost " << hpx::boost_version() << "\n"
+        cout << "# VERSION: " << HPX_GIT_COMMIT << " " << __DATE__ << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to
         // change the constant that we add when printing out the field # for
         // performance counters below (e.g. the last_index part).
-        cout << "## 0: OS-threads - Independent Variable\n"
+        cout <<
+                "## 0: Delay [micro-seconds] - Independent Variable\n"
                 "## 1: Tasks - Independent Variable\n"
-                "## 2: Delay [micro-seconds] - Independent Variable\n"
+                "## 2: OS-threads - Independent Variable\n"
                 "## 3: Total Walltime [seconds]\n"
                 ;
 
@@ -94,9 +96,9 @@ void print_results(
     std::string const delay_str = boost::str(boost::format("%lu") % delay);
 
     cout << ( boost::format("%lu %lu %lu %.14g")
-            % cores
-            % tasks 
             % delay 
+            % tasks 
+            % cores
             % walltime);
 
     if (ac)
@@ -113,7 +115,6 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// avoid having one single volatile variable to become a contention point
 int invoke_worker_timed(double delay_sec)
 {
     volatile int i = 0;
@@ -122,11 +123,36 @@ int invoke_worker_timed(double delay_sec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void wait_for_tasks(hpx::lcos::local::barrier& bar)
+void blocker(
+    boost::condition& entered_cond
+  , boost::mutex& entered_mut
+  , bool entered 
+    )
 {
-    BOOST_ASSERT(get_thread_count(hpx::threads::thread_priority_normal) == 1);
+    cout << "entered on " << hpx::get_worker_thread_num() << "\n" << flush;
 
-    bar.wait();
+    {
+        boost::mutex::scoped_lock lock(mut);
+        ready = true;
+        cond.notify_all();
+    }
+
+    //block.wait();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void wait_for_tasks(hpx::lcos::local::barrier& finished)
+{
+    if (get_thread_count(hpx::threads::thread_priority_normal) != 1)
+//        HPX_THROW_EXCEPTION(hpx::assertion_failure, "wait_for_tasks",
+//            "tasks are not finished");
+    {
+        register_work(boost::bind(&wait_for_tasks, boost::ref(finished)),
+            "wait_for_tasks", hpx::threads::pending,
+            hpx::threads::thread_priority_low);
+    }
+    else
+        finished.wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -146,9 +172,41 @@ int hpx_main(
             throw std::invalid_argument("count of 0 tasks specified\n");
 
         boost::shared_ptr<hpx::util::activate_counters> ac;
-
         if (!counters.empty())
             ac.reset(new hpx::util::activate_counters(counters));
+
+        ///////////////////////////////////////////////////////////////////////
+        // Block all other OS threads.
+
+        for (boost::uint64_t i = 0; i < (get_os_thread_count() - 1); ++i)
+        {
+            cout << "spawning " << i << " on " << hpx::get_worker_thread_num() << "\n" << flush;
+            boost::condition entered_cond;
+            boost::mutex entered_mut;
+            bool entered = false;
+
+            register_thread_nullary(
+                boost::bind(&blocker
+                          , boost::ref(entered_cond)
+                          , boost::ref(entered_mut)
+                          , boost::ref(entered)
+                           ),
+                "blocker", hpx::threads::pending, true,
+                hpx::threads::thread_priority_normal,
+                i + 1);
+
+            {
+                boost::mutex::scoped_lock lock(entered_mut);
+                if (!entered)
+                    entered_cond.wait(lock);
+            }
+
+            cout << "spawned " << i << " on " << hpx::get_worker_thread_num() << "\n" << flush;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        if (ac)
+            ac->reset_counters();
 
         // Start the clock.
         high_resolution_timer t;
@@ -158,16 +216,18 @@ int hpx_main(
                                     , double(delay) * 1e-6)
               , "invoke_worker_timed");
 
+//        block.wait();
+
         // Schedule a low-priority thread; when it is executed, it checks to
         // make sure all the tasks (which are normal priority) have been 
         // executed, and then it
-        hpx::lcos::local::barrier bar(2);
+        hpx::lcos::local::barrier finished(2);
 
-        register_work(boost::bind(&wait_for_tasks, boost::ref(bar)),
+        register_work(boost::bind(&wait_for_tasks, boost::ref(finished)),
             "wait_for_tasks", hpx::threads::pending,
             hpx::threads::thread_priority_low);
 
-        bar.wait();
+        finished.wait();
 
         // Stop the clock
         double time_elapsed = t.elapsed();
