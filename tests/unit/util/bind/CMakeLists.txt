@@ -25,7 +25,7 @@ set(tests
     bind_stateful_test
 #    bind_stdcall_mf_test
 #    bind_stdcall_test
-    bind_test__avoid_collision_with_function_bind_test
+    bind_test
     protect_test
    )
 
