@@ -1,0 +1,23 @@
+<!-- Copyright (c) 2013 Agustin Berge                                       -->
+<!-- Copyright (c) 2013 Hartmut Kaiser                                      -->
+
+<!-- Use, modification and distribution are subject to the Boost Software   -->
+<!-- License, Version 1.0. (See accompanying file LICENSE_1_0.txt           -->
+<!-- or copy at http://www.boost.org/LICENSE_1_0.txt)                       -->
+
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <Type Name="hpx::naming::gid_type">
+    <DisplayString>{{{id_msb_,x} {id_lsb_,x}}}</DisplayString>
+    <Expand>
+      <Item Name="[credits]">1ull &lt;&lt; ((id_msb_ &gt;&gt; 24) &amp; 0x1full), x</Item>
+      <Item Name="[log2credits]">(id_msb_ &gt;&gt; 24) &amp; 0x1full, d</Item>
+      <Item Name="[was_split]">(id_msb_ &amp; 0x80000000ull) ? true : false</Item>
+      <Item Name="[has_credit]">(id_msb_ &amp; 0x40000000ull) ? true : false</Item>
+      <Item Name="[locality]">((id_msb_ &gt;&gt; 32) &amp; 0xffffffffull) - 1, d</Item>
+      <Item Name="msb">id_msb_, x</Item>
+      <Item Name="lsb">id_lsb_, x</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>
