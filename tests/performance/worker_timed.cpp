@@ -9,13 +9,16 @@
 
 HPX_SYMBOL_EXPORT void worker_timed(double delay_sec, volatile int * i)
 {
-    //start timer
-    high_resolution_timer td;
+    // Start the timer.
+    hpx::util::high_resolution_timer td;
 
-    while(true) {
-        if(td.elapsed() > delay_sec)
+    while (true)
+    {
+        // Check if we've reached the specified delay.
+        if (td.elapsed() > delay_sec)
             break;
         else
+            // If we haven't reached the specified time, do some busy work. 
             ++*i;
     }
 }
