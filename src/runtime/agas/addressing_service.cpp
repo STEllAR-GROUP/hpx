@@ -1628,7 +1628,7 @@ bool addressing_service::add_remote_incref_request(
 
 // This function is invoked in 2 cases
 //
-// a) remote incref requests which need ot be acknowledged (loc != invalid_id)
+// a) remote incref requests which need to be acknowledged (loc != invalid_id)
 // b) local decref request which needs to be executed (loc == invalid_id)
 //
 hpx::future<bool> addressing_service::propagate_acknowlegdements(

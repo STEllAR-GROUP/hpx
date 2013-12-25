@@ -266,7 +266,7 @@ namespace hpx { namespace agas { namespace detail
             mutex_type::scoped_lock l(mtx_);
 
             std::pair<iterator, iterator> r = store_.equal_range(gid);
-            while (r.first != r.second && credits != 0)
+            while (r.first != r.second && (credits != 0 || debits != 0))
             {
                 incref_request_data& data = r.first->second;
                 if (data.credit_ > credits)
