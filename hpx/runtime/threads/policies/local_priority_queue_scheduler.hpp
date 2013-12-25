@@ -763,8 +763,11 @@ namespace hpx { namespace threads { namespace policies
                     mask_cref_type numa_domain = numa_domain_masks_[num_thread];
                     for (std::size_t i = 0; i < queues_size; ++i)
                     {
-                        if (i == num_thread || !test(numa_domain, i))
-                            continue;         // don't steal from ourselves
+                        if (i == num_thread ||
+                            !test(numa_domain_mask, topology_.get_pu_number(i)))
+                        {
+                            continue;
+                        }
 
                         if (i < high_priority_queues_.size())
                         {
@@ -795,11 +798,15 @@ namespace hpx { namespace threads { namespace policies
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
                 // if nothing found, ask everybody else
                 if (test(steals_outside_numa_domain_, num_thread)) {
-                    mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
+                    mask_cref_type numa_domain =
+                        outside_numa_domain_masks_[num_thread];
                     for (std::size_t i = 0; i < queues_size; ++i)
                     {
-                        if (i == num_thread || !test(numa_domain, i))
-                            continue;         // don't steal from ourselves
+                        if (i == num_thread ||
+                            !test(numa_domain_mask, topology_.get_pu_number(i)))
+                        {
+                            continue;
+                        }
 
                         if (i < high_priority_queues_.size())
                         {
@@ -866,10 +873,11 @@ namespace hpx { namespace threads { namespace policies
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
-            if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error))) {
+            if (HPX_UNLIKELY(minimal_deadlock_detection && LHPX_ENABLED(error)))
+            {
                 bool suspended_only = true;
 
-                for (std::size_t i = 0; suspended_only && i < queues_.size(); ++i) {
+                for (std::size_t i = 0; suspended_only && i != queues_.size(); ++i) {
                     suspended_only = queues_[i]->dump_suspended_threads(
                         i, idle_loop_count, running);
                 }
@@ -924,7 +932,7 @@ namespace hpx { namespace threads { namespace policies
 
             queues_[num_thread]->on_start_thread(num_thread);
 
-            // precalculate certain constants for the given thread number
+            // pre-calculate certain constants for the given thread number
             std::size_t num_pu = get_pu_num(num_thread);
             mask_cref_type machine_mask = topology_.get_machine_affinity_mask();
             mask_cref_type core_mask =
@@ -986,6 +994,7 @@ namespace hpx { namespace threads { namespace policies
         detail::affinity_data affinity_data_;
         bool numa_sensitive_;
         topology const& topology_;
+
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
         mask_type steals_in_numa_domain_;
         mask_type steals_outside_numa_domain_;
