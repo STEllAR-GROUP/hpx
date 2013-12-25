@@ -16,7 +16,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 1
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 1
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -89,7 +89,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 2
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 2
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -162,7 +162,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 3
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 3
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -235,7 +235,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 4
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 4
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -308,7 +308,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 5
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 5
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -381,7 +381,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 6
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 6
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -454,7 +454,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 7
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 7
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 6 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -527,7 +527,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 8
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 8
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 6 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 7 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -600,7 +600,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 9
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 9
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 6 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 7 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 8 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -673,7 +673,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 10
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 10
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 6 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 7 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 8 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 9 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -746,7 +746,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 11
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 11
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 6 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 7 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 8 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 9 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 10 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -819,7 +819,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 12
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 12
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 6 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 7 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 8 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 9 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 10 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 11 , typename util::decay<Tuple>::type >::type , Tuple >::type)
@@ -892,7 +892,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 13
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 13
             >::type
         > : invoke_result_of<
                 F(typename detail::qualify_as< typename util::tuple_element< 0 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 1 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 2 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 3 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 4 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 5 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 6 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 7 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 8 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 9 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 10 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 11 , typename util::decay<Tuple>::type >::type , Tuple >::type , typename detail::qualify_as< typename util::tuple_element< 12 , typename util::decay<Tuple>::type >::type , Tuple >::type)

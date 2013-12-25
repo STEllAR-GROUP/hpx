@@ -34,7 +34,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == 0
+                util::tuple_size<typename util::decay<Tuple>::type>::value == 0
             >::type
         > : invoke_result_of<F()>
         {};
@@ -134,7 +134,7 @@ namespace hpx { namespace util
         struct invoke_fused_result_of_impl<
             FD, F(Tuple)
           , typename boost::enable_if_c<
-                util::tuple_size<Tuple>::value == N
+                util::tuple_size<typename util::decay<Tuple>::type>::value == N
             >::type
         > : invoke_result_of<
                 F(BOOST_PP_ENUM(N, HPX_UTIL_INVOKE_FUSED_TUPLE_ELEM, _))

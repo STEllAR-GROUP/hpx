@@ -156,7 +156,7 @@ void future_function_pointers()
 
     future<void> f1
         = dataflow(
-            &future_void_f1, async(bind(&future_void_f1, make_ready_future()))
+            &future_void_f1, async(bind(&future_void_f1, future<void>(make_ready_future())))
         );
 
     hpx::wait(f1);
@@ -166,8 +166,8 @@ void future_function_pointers()
 
     future<void> f2 = dataflow(
         &future_void_f2
-      , async(bind(&future_void_f1, make_ready_future()))
-      , async(bind(&future_void_f1, make_ready_future()))
+      , async(bind(&future_void_f1, future<void>(make_ready_future())))
+      , async(bind(&future_void_f1, future<void>(make_ready_future())))
     );
 
     hpx::wait(f2);
