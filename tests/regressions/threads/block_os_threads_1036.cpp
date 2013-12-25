@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 
@@ -16,13 +17,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 void blocker(
-    boost::atomic<bool>& entered
-  , boost::atomic<bool>& started
+    boost::atomic<boost::uint64_t>* entered
+  , boost::atomic<boost::uint64_t>* started
+  , boost::scoped_array<boost::atomic<boost::uint64_t> >* blocked_threads
     )
 {
-    entered = true;
+    (*blocked_threads)[hpx::get_worker_thread_num()].fetch_add(1);
 
-    while (!started)
+    entered->fetch_add(1);
+
+    while (started->load() != 1)
         continue;
 }
 
@@ -35,21 +39,28 @@ int hpx_main()
     {
         ///////////////////////////////////////////////////////////////////////
         // Block all other OS threads.
-        boost::atomic<bool> started(false);
+        boost::atomic<boost::uint64_t> entered(0);
+        boost::atomic<boost::uint64_t> started(0);
 
-        boost::uint64_t num_threads = hpx::get_os_thread_count() - 1;
-        for (boost::uint64_t j = 0; j != num_threads; ++j)
+        boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+
+        boost::scoped_array<boost::atomic<boost::uint64_t> >
+            blocked_threads(
+                new boost::atomic<boost::uint64_t>[os_thread_count]);
+
+        for (boost::uint64_t i = 0; i < os_thread_count; ++i)
+            blocked_threads[i].store(0);
+
+        for (boost::uint64_t i = 0; i < (os_thread_count - 1); ++i)
         {
-            boost::atomic<bool> entered(false);
-
             hpx::threads::register_work(
-                boost::bind(&blocker, boost::ref(entered), boost::ref(started)),
+                boost::bind(&blocker, &entered, &started, &blocked_threads),
                 "blocker", hpx::threads::pending, 
                 hpx::threads::thread_priority_normal);
-
-            while (!entered)
-                continue;
         }
+
+        while (entered.load() != (os_thread_count - 1))
+            continue;
 
         {
             double delay_sec = delay * 1e-6; 
@@ -64,7 +75,10 @@ int hpx_main()
             }
         }
 
-        started = true;
+        started.fetch_add(1);
+    
+        for (boost::uint64_t i = 0; i < os_thread_count; ++i)
+            HPX_TEST(blocked_threads[i].load() <= 1); 
     }
 
     return hpx::finalize();
