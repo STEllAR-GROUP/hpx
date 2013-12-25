@@ -24,6 +24,10 @@ namespace hpx { namespace agas { namespace detail
                 boost::uint32_t loc = naming::invalid_locality_id)
             : credit_(credit), keep_alive_(id), locality_(loc), debit_(0)
         {}
+        incref_request_data(naming::id_type const& id, boost::uint64_t debit,
+                boost::uint32_t loc = naming::invalid_locality_id)
+            : credit_(0), keep_alive_(id), locality_(loc), debit_(debit)
+        {}
 
         boost::int64_t credit_;         // amount of credit not acknowledged yet
         naming::id_type keep_alive_;    // id for which credit is outstanding
