@@ -71,6 +71,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             >::type
             execute_function_type;
 
+    private:
+        // workaround gcc regression wrongly instantiating a copy-constructor
+        dataflow_frame(dataflow_frame const&);
+
+    public:
         template <typename FFunc, typename FFutures>
         dataflow_frame(
             Policy policy
