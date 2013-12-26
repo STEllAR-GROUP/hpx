@@ -29,22 +29,34 @@ namespace hpx { namespace threads
         std::size_t get_socket_number(
             std::size_t num_thread
           , error_code& ec = throws
-            ) const;
+            ) const
+        {
+            return socket_numbers_[num_thread % num_of_pus_];
+        }
 
         std::size_t get_numa_node_number(
             std::size_t num_thread
           , error_code& ec = throws
-            ) const;
+            ) const
+        {
+            return numa_node_numbers_[num_thread % num_of_pus_];
+        }
 
         std::size_t get_core_number(
             std::size_t num_thread
           , error_code& ec = throws
-            ) const;
+            ) const
+        {
+            return core_numbers_[num_thread % num_of_pus_];
+        }
 
         std::size_t get_pu_number(
             std::size_t num_thread
           , error_code& ec = throws
-            ) const;
+            ) const
+        {
+            return pu_numbers_[num_thread % num_of_pus_];
+        }
 
         std::size_t get_pu_number(
             std::size_t num_core
@@ -107,7 +119,10 @@ namespace hpx { namespace threads
             std::size_t num_core, mask_cref_type default_mask
             ) const;
         mask_type init_thread_affinity_mask(std::size_t num_thread) const;
-        mask_type init_thread_affinity_mask(std::size_t num_core, std::size_t num_pu) const;
+        mask_type init_thread_affinity_mask(
+            std::size_t num_core
+          , std::size_t num_pu
+            ) const;
 
         ///////////////////////////////////////////////////////////////////////
         std::size_t get_number_of_sockets() const;
