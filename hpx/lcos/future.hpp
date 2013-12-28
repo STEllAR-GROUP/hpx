@@ -680,6 +680,14 @@ namespace hpx { namespace lcos { namespace detail
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
+    // [N3722, 4.1] asks for this...
+    namespace local
+    {
+        template <typename Result>
+        class promise;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename R>
     class unique_future : public detail::future_base<unique_future<R>, R>
     {
@@ -760,7 +768,7 @@ namespace hpx { namespace lcos
         {}
 
         // [N3722, 4.1] asks for this...
-        typedef lcos::promise<R> promise_type;
+        typedef lcos::local::promise<R> promise_type;
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // defined at promise.hpp
         explicit unique_future(promise_type& promise);
@@ -946,7 +954,7 @@ namespace hpx { namespace lcos
         {}
 
         // [N3722, 4.1] asks for this...
-        typedef lcos::promise<R> promise_type;
+        typedef lcos::local::promise<R> promise_type;
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // defined at promise.hpp
         explicit shared_future(promise_type& promise);
@@ -1076,7 +1084,6 @@ namespace hpx { namespace lcos
         {}
 
     public:
-        typedef lcos::promise<Result> promise_type;
         typedef Result result_type;
 
         future()
@@ -1116,6 +1123,7 @@ namespace hpx { namespace lcos
             future_data_ = boost::move(f.future_data_);
         }
 
+        typedef lcos::local::promise<Result> promise_type;
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this... defined at promise.hpp
         explicit future(promise_type& promise);
@@ -1427,7 +1435,6 @@ namespace hpx { namespace lcos
         {}
 
     public:
-        typedef lcos::promise<void> promise_type;
         typedef void result_type;
 
         future()
@@ -1467,6 +1474,7 @@ namespace hpx { namespace lcos
             future_data_ = boost::move(f.future_data_);
         }
 
+        typedef lcos::local::promise<void> promise_type;
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this... defined at promise.hpp
         explicit future(promise_type& promise);
