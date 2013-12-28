@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace detail
     void invoke_continuation(Func& func, Future& future, Destination& dest)
     {
         typedef typename boost::is_void<
-            typename boost::result_of<Func(Future&)>::type
+            typename boost::result_of<Func(Future)>::type
         >::type predicate;
 
         invoke_continuation(func, future, dest, predicate());

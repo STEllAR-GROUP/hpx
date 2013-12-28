@@ -520,17 +520,18 @@ namespace hpx { namespace lcos
         virtual ~promise()
         {}
 
-        lcos::future<Result> get_future(error_code& ec = throws)
+        lcos::unique_future<Result> get_future(error_code& ec = throws)
         {
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<Result>::get_future",
                     "future already has been retrieved from this packaged_action");
-                return lcos::future<Result>();
+                return lcos::unique_future<Result>();
             }
 
+            using lcos::detail::future_access;
             future_obtained_ = true;
-            return lcos::detail::make_future_from_data<Result>(impl_->get());
+            return future_access::create<unique_future<Result> >(impl_->get());
         }
 
         ///
@@ -553,6 +554,16 @@ namespace hpx { namespace lcos
 
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this...
+        explicit operator lcos::unique_future<Result>()
+        {
+            return get_future();
+        }
+        
+        explicit operator lcos::shared_future<Result>()
+        {
+            return get_future();
+        }
+        
         explicit operator lcos::future<Result>()
         {
             return get_future();
@@ -567,9 +578,21 @@ namespace hpx { namespace lcos
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
     // [N3722, 4.1] asks for this...
     template <typename Result>
-    inline future<Result>::future(promise<Result>& promise)
+    inline unique_future<Result>::unique_future(promise<Result>& promise)
     {
         promise.get_future().swap(*this);
+    }
+    
+    template <typename Result>
+    inline shared_future<Result>::shared_future(promise<Result>& promise)
+    {
+        shared_future<Result>(promise.get_future()).swap(*this);
+    }
+    
+    template <typename Result>
+    inline future<Result>::future(promise<Result>& promise)
+    {
+        future<Result>(promise.get_future()).swap(*this);
     }
 #endif
 
@@ -639,17 +662,18 @@ namespace hpx { namespace lcos
         ~promise()
         {}
 
-        lcos::future<void> get_future(error_code& ec = throws)
+        lcos::unique_future<void> get_future(error_code& ec = throws)
         {
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<void>::get_future",
                     "future already has been retrieved from this packaged_action");
-                return lcos::future<void>();
+                return lcos::unique_future<void>();
             }
-
+            
+            using lcos::detail::future_access;
             future_obtained_ = true;
-            return lcos::detail::make_future_from_data<void>(impl_->get());
+            return future_access::create<unique_future<void> >(impl_->get());
         }
 
         void set_value()
@@ -664,6 +688,16 @@ namespace hpx { namespace lcos
 
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this...
+        explicit operator lcos::unique_future<void>()
+        {
+            return get_future();
+        }
+        
+        explicit operator lcos::shared_future<void>()
+        {
+            return get_future();
+        }
+        
         explicit operator lcos::future<void>()
         {
             return get_future();
@@ -677,9 +711,21 @@ namespace hpx { namespace lcos
 
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
     // [N3722, 4.1] asks for this...
-    inline future<void>::future(promise<void>& promise)
+    template <>
+    inline unique_future<void>::unique_future(promise<void>& promise)
     {
         promise.get_future().swap(*this);
+    }
+    
+    template <>
+    inline shared_future<void>::shared_future(promise<void>& promise)
+    {
+        shared_future<void>(promise.get_future()).swap(*this);
+    }
+
+    inline future<void>::future(promise<void>& promise)
+    {
+        future<void>(promise.get_future()).swap(*this);
     }
 #endif
 }}

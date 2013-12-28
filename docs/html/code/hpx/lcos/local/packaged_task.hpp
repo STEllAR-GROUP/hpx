@@ -194,7 +194,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // Result retrieval
-        lcos::future<Result> get_future(error_code& ec = throws)
+        lcos::unique_future<Result> get_future(error_code& ec = throws)
         {
             typename mutex_type::scoped_lock l(mtx_);
 
@@ -207,11 +207,12 @@ namespace hpx { namespace lcos { namespace local
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<Result>::get_future",
                     "future already has been retrieved from this promise");
-                return lcos::future<Result>();
+                return lcos::unique_future<Result>();
             }
-
+            
+            using lcos::detail::future_access;
             future_obtained_ = true;
-            return lcos::detail::make_future_from_data<Result>(task_);
+            return future_access::create<unique_future<Result> >(task_);
         }
 
         template <typename T>
@@ -339,7 +340,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // Result retrieval
-        lcos::future<void> get_future(error_code& ec = throws)
+        lcos::unique_future<void> get_future(error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
 
@@ -352,11 +353,12 @@ namespace hpx { namespace lcos { namespace local
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<void>::get_future",
                     "future already has been retrieved from this promise");
-                return lcos::future<void>();
+                return lcos::unique_future<void>();
             }
-
+            
+            using lcos::detail::future_access;
             future_obtained_ = true;
-            return lcos::detail::make_future_from_data<void>(task_);
+            return future_access::create<unique_future<void> >(task_);
         }
 
         void set_value()
@@ -524,23 +526,24 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // Result retrieval
-        lcos::future<Result> get_future(error_code& ec = throws)
+        lcos::unique_future<Result> get_future(error_code& ec = throws)
         {
             if (!task_) {
                 HPX_THROWS_IF(ec, task_moved,
                     "packaged_task<Result()>::get_future",
                     "packaged_task invalid (has it been moved?)");
-                return lcos::future<Result>();
+                return lcos::unique_future<Result>();
             }
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "packaged_task<Result()>::get_future",
                     "future already has been retrieved from this promise");
-                return lcos::future<Result>();
+                return lcos::unique_future<Result>();
             }
-
+            
+            using lcos::detail::future_access;
             future_obtained_ = true;
-            return lcos::detail::make_future_from_data<Result>(task_);
+            return future_access::create<unique_future<Result> >(task_);
         }
 
         bool valid() const BOOST_NOEXCEPT
@@ -657,23 +660,24 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // Result retrieval
-        lcos::future<Result> get_future(error_code& ec = throws)
+        lcos::unique_future<Result> get_future(error_code& ec = throws)
         {
             if (!task_) {
                 HPX_THROWS_IF(ec, task_moved,
                     "futures_factory<Result()>::get_future",
                     "futures_factory invalid (has it been moved?)");
-                return lcos::future<Result>();
+                return lcos::unique_future<Result>();
             }
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "futures_factory<Result()>::get_future",
                     "future already has been retrieved from this promise");
-                return lcos::future<Result>();
+                return lcos::unique_future<Result>();
             }
-
+            
+            using lcos::detail::future_access;
             future_obtained_ = true;
-            return lcos::detail::make_future_from_data<Result>(task_);
+            return future_access::create<unique_future<Result> >(task_);
         }
 
         bool valid() const BOOST_NOEXCEPT

@@ -116,7 +116,7 @@ namespace hpx { namespace lcos { namespace detail
         static Future
         create(SharedState* shared_state)
         {
-            return Future(boost::intrusive_ptr<SharedState>(shared_state, false));
+            return Future(boost::intrusive_ptr<SharedState>(shared_state));
         }
 
         template <typename R>
@@ -327,9 +327,15 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future, typename F, typename ContResult>
     class continuation;
 
-    template <typename Future, typename ContResult, typename F>
-    inline boost::intrusive_ptr<detail::continuation<Future, F, ContResult> >
-    make_continuation(BOOST_FWD_REF(F) f);
+    template <typename ContResult, typename Future, typename F>
+    inline typename shared_state_ptr<ContResult>::type
+    make_continuation(Future& future, BOOST_SCOPED_ENUM(launch) policy,
+        BOOST_FWD_REF(F) f);
+
+    template <typename ContResult, typename Future, typename F>
+    inline typename shared_state_ptr<ContResult>::type
+    make_continuation(Future& future, threads::executor& sched,
+        BOOST_FWD_REF(F) f);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
@@ -346,7 +352,7 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     template <typename Future>
-    inline typename shared_state_ptr<
+    typename shared_state_ptr<
         typename unwrap_result<Future>::type>::type
     unwrap(Future& future, error_code& ec);
 
@@ -383,6 +389,11 @@ namespace hpx { namespace lcos { namespace detail
           : shared_state_(boost::move(other.shared_state_))
         {
             other.shared_state_ = 0;
+        }
+
+        void swap(future_base& other)
+        {
+            shared_state_.swap(other.shared_state_);
         }
 
         future_base& operator=(BOOST_COPY_ASSIGN_REF(future_base) other)
@@ -496,7 +507,7 @@ namespace hpx { namespace lcos { namespace detail
 
             typedef typename boost::result_of<F(Derived)>::type result;
             typedef
-                typename shared_state_ptr_for<result>::type
+                typename shared_state_ptr_for<result_type>::type
                 shared_state_ptr;
 
             shared_state_ptr p =
@@ -523,7 +534,7 @@ namespace hpx { namespace lcos { namespace detail
 
             typedef typename boost::result_of<F(Derived)>::type result;
             typedef
-                typename shared_state_ptr_for<result>::type
+                typename shared_state_ptr_for<result_type>::type
                 shared_state_ptr;
 
             shared_state_ptr p =
@@ -747,6 +758,13 @@ namespace hpx { namespace lcos
         //   - destroys *this.
         ~unique_future()
         {}
+        
+        // [N3722, 4.1] asks for this...
+        typedef lcos::promise<R> promise_type;
+#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+        // defined at promise.hpp
+        explicit unique_future(promise_type& promise);
+#endif
 
         // Effects:
         //   - releases any shared state (30.6.4).
@@ -926,6 +944,13 @@ namespace hpx { namespace lcos
         //   - destroys *this.
         ~shared_future()
         {}
+        
+        // [N3722, 4.1] asks for this...
+        typedef lcos::promise<R> promise_type;
+#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+        // defined at promise.hpp
+        explicit shared_future(promise_type& promise);
+#endif
 
         // Effects:
         //   - releases any shared state (30.6.4).
@@ -1080,6 +1105,12 @@ namespace hpx { namespace lcos
 
         // accept wrapped future
         future(BOOST_RV_REF(future<future>) other)
+        {
+            future f = other.unwrap();
+            future_data_ = boost::move(f.future_data_);
+        }
+
+        future(BOOST_RV_REF(unique_future<future>) other)
         {
             future f = other.unwrap();
             future_data_ = boost::move(f.future_data_);
@@ -1308,7 +1339,7 @@ namespace hpx { namespace lcos
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
         p->set_data(boost::forward<Result>(init));
-        
+
         using lcos::detail::future_access;
         return future_access::create<unique_future<result_type> >(
             boost::move(p));
@@ -1325,7 +1356,7 @@ namespace hpx { namespace lcos
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
         p->set_exception(e);
-        
+
         using lcos::detail::future_access;
         return future_access::create<unique_future<result_type> >(
             boost::move(p));
@@ -1340,7 +1371,7 @@ namespace hpx { namespace lcos
     {
         typedef typename util::decay<Result>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
-        
+
         using lcos::detail::future_access;
         return future_access::create<unique_future<result_type> >(
             new shared_state(at, boost::forward<Result>(init)));
@@ -1362,7 +1393,7 @@ namespace hpx { namespace lcos
     {
         typedef typename util::decay<Result>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
-        
+
         using lcos::detail::future_access;
         return future_access::create<unique_future<result_type> >(
             new shared_state(d, boost::forward<Result>(init)));
@@ -1425,6 +1456,12 @@ namespace hpx { namespace lcos
 
         // extension: accept wrapped future
         future(BOOST_RV_REF(future<future>) other)
+        {
+            future f = other.unwrap();
+            future_data_ = boost::move(f.future_data_);
+        }
+
+        future(BOOST_RV_REF(unique_future<future>) other)
         {
             future f = other.unwrap();
             future_data_ = boost::move(f.future_data_);
@@ -1581,7 +1618,7 @@ namespace hpx { namespace lcos
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
         p->set_data(util::unused);
-        
+
         using lcos::detail::future_access;
         return future_access::create<unique_future<void> >(boost::move(p));
     }
@@ -1592,7 +1629,7 @@ namespace hpx { namespace lcos
         boost::posix_time::ptime const& at)
     {
         typedef lcos::detail::timed_future_data<void> shared_state;
-        
+
         using lcos::detail::future_access;
         return future_access::create<unique_future<void> >(
             new shared_state(at, util::unused));
@@ -1609,7 +1646,7 @@ namespace hpx { namespace lcos
         boost::posix_time::time_duration const& d)
     {
         typedef lcos::detail::timed_future_data<void> shared_state;
-        
+
         using lcos::detail::future_access;
         return future_access::create<unique_future<void> >(
             new shared_state(d, util::unused));
