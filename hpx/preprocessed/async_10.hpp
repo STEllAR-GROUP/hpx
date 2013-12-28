@@ -19,7 +19,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F()>::type result_type;
         if (policy == launch::sync)
@@ -39,7 +39,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f)
+    async(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F()>::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
@@ -53,7 +53,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
-    async (BOOST_FWD_REF(F) f)
+    async(BOOST_FWD_REF(F) f)
     {
         return async(launch::all, boost::forward<F>(f));
     }
@@ -62,7 +62,7 @@ namespace hpx
     
     
     template <typename Action, typename BoundArgs>
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -85,7 +85,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0)>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0)
     {
         typedef typename boost::result_of<
@@ -111,7 +111,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0)>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0)
     {
         typedef typename boost::result_of<F(A0)>::type
@@ -129,7 +129,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0)>
     >::type
-    async (BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0)
+    async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0)
     {
         return async(launch::all, boost::forward<F>(f),
             boost::forward<A0>( a0 ));
@@ -139,7 +139,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -165,7 +165,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1)>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef typename boost::result_of<
@@ -191,7 +191,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1)>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef typename boost::result_of<F(A0 , A1)>::type
@@ -209,7 +209,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1)>
     >::type
-    async (BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         return async(launch::all, boost::forward<F>(f),
             boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
@@ -219,7 +219,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -245,7 +245,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2)>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef typename boost::result_of<
@@ -271,7 +271,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2)>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef typename boost::result_of<F(A0 , A1 , A2)>::type
@@ -289,7 +289,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2)>
     >::type
-    async (BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         return async(launch::all, boost::forward<F>(f),
             boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
@@ -299,7 +299,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -325,7 +325,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3)>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef typename boost::result_of<
@@ -351,7 +351,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3)>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3)>::type
@@ -369,7 +369,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3)>
     >::type
-    async (BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         return async(launch::all, boost::forward<F>(f),
             boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
@@ -379,7 +379,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -405,7 +405,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef typename boost::result_of<
@@ -431,7 +431,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4)>::type
@@ -449,7 +449,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
     >::type
-    async (BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         return async(launch::all, boost::forward<F>(f),
             boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
@@ -459,7 +459,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -485,7 +485,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5)>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef typename boost::result_of<
@@ -511,7 +511,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5)>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5)>::type
@@ -529,7 +529,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5)>
     >::type
-    async (BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
+    async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         return async(launch::all, boost::forward<F>(f),
             boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ));
@@ -539,7 +539,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -565,7 +565,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef typename boost::result_of<
@@ -591,7 +591,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::type
@@ -609,7 +609,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
     >::type
-    async (BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
+    async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         return async(launch::all, boost::forward<F>(f),
             boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ));
@@ -619,7 +619,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -645,7 +645,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef typename boost::result_of<
@@ -671,7 +671,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::type
@@ -689,7 +689,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
     >::type
-    async (BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
+    async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         return async(launch::all, boost::forward<F>(f),
             boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ));
@@ -699,7 +699,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -725,7 +725,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
     {
         typedef typename boost::result_of<
@@ -751,7 +751,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
     {
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::type
@@ -769,7 +769,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
     >::type
-    async (BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
+    async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
     {
         return async(launch::all, boost::forward<F>(f),
             boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ));
@@ -779,7 +779,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -805,7 +805,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
     {
         typedef typename boost::result_of<
@@ -831,7 +831,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
     {
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::type
@@ -849,7 +849,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
     >::type
-    async (BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
+    async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
     {
         return async(launch::all, boost::forward<F>(f),
             boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ));
@@ -859,7 +859,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type

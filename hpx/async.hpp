@@ -33,20 +33,20 @@ namespace hpx { namespace detail
     template <typename F, typename Result = typename boost::result_of<F>::type>
     struct create_future
     {
-        typedef lcos::future<Result> type;
+        typedef lcos::unique_future<Result> type;
     };
 #elif _MSC_VER >= 1700
     // VS2012 has a decent implementation of std::result_of<>
     template <typename F, typename ResultOf = std::result_of<F> >
     struct create_future
     {
-        typedef lcos::future<typename ResultOf::type> type;
+        typedef lcos::unique_future<typename ResultOf::type> type;
     };
 #else
     template <typename F, typename ResultOf = boost::result_of<F> >
     struct create_future
     {
-        typedef lcos::future<typename ResultOf::type> type;
+        typedef lcos::unique_future<typename ResultOf::type> type;
     };
 #endif
 
@@ -86,7 +86,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F()>::type result_type;
         if (policy == launch::sync)
@@ -108,7 +108,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f)
+    async(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
         typedef typename boost::result_of<F()>::type result_type;
 
@@ -124,7 +124,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F()>
     >::type
-    async (BOOST_FWD_REF(F) f)
+    async(BOOST_FWD_REF(F) f)
     {
         return async(launch::all, boost::forward<F>(f));
     }
@@ -133,7 +133,7 @@ namespace hpx
     // Launch the given bound action asynchronously and return a future
     // allowing to synchronize with the returned result.
     template <typename Action, typename BoundArgs>
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -179,7 +179,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
-    async (BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
         typedef typename boost::result_of<
@@ -206,7 +206,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
-    async (threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, BOOST_FWD_REF(F) f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
         typedef typename boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type
@@ -225,7 +225,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
-    async (BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))
+    async(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))
     {
         return async(launch::all, boost::forward<F>(f),
             HPX_ENUM_FORWARD_ARGS(N, A, a));
@@ -236,7 +236,7 @@ namespace hpx
         typename Action, typename BoundArgs
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
-    lcos::future<
+    lcos::unique_future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type

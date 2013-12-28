@@ -23,7 +23,7 @@
     
     template <typename U0>
     BOOST_FORCEINLINE
-    hpx::lcos::future<result_type>
+    hpx::lcos::unique_future<result_type>
     async(BOOST_FWD_REF(U0) u0) const
     {
         return
@@ -57,7 +57,7 @@
     
     template <typename U0 , typename U1>
     BOOST_FORCEINLINE
-    hpx::lcos::future<result_type>
+    hpx::lcos::unique_future<result_type>
     async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1) const
     {
         return
@@ -91,7 +91,7 @@
     
     template <typename U0 , typename U1 , typename U2>
     BOOST_FORCEINLINE
-    hpx::lcos::future<result_type>
+    hpx::lcos::unique_future<result_type>
     async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2) const
     {
         return
@@ -125,7 +125,7 @@
     
     template <typename U0 , typename U1 , typename U2 , typename U3>
     BOOST_FORCEINLINE
-    hpx::lcos::future<result_type>
+    hpx::lcos::unique_future<result_type>
     async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3) const
     {
         return
@@ -159,7 +159,7 @@
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4>
     BOOST_FORCEINLINE
-    hpx::lcos::future<result_type>
+    hpx::lcos::unique_future<result_type>
     async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4) const
     {
         return
@@ -193,7 +193,7 @@
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5>
     BOOST_FORCEINLINE
-    hpx::lcos::future<result_type>
+    hpx::lcos::unique_future<result_type>
     async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5) const
     {
         return
@@ -227,7 +227,7 @@
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6>
     BOOST_FORCEINLINE
-    hpx::lcos::future<result_type>
+    hpx::lcos::unique_future<result_type>
     async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6) const
     {
         return
@@ -261,7 +261,7 @@
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7>
     BOOST_FORCEINLINE
-    hpx::lcos::future<result_type>
+    hpx::lcos::unique_future<result_type>
     async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7) const
     {
         return

@@ -136,7 +136,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Async wait, single future, non-void return.
         {
-            wait(async<null_result_action>(here_), cb);
+            wait(future<bool>(async<null_result_action>(here_)), cb);
 
             HPX_TEST_EQ(1U, cb.count());
             HPX_TEST_EQ(1U, result_counter.load());
@@ -194,7 +194,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Sync wait, single future, non-void return.
         {
-            HPX_TEST_EQ(true, wait(async<null_result_action>(here_)));
+            HPX_TEST_EQ(true, wait(future<bool>(async<null_result_action>(here_))));
             HPX_TEST_EQ(1U, result_counter.load());
 
             result_counter.store(0);
@@ -216,9 +216,9 @@ int hpx_main(
         // Sync wait, multiple futures, non-void return.
         {
             HPX_STD_TUPLE<bool, bool, bool> r 
-                = wait(async<null_result_action>(here_)
-                     , async<null_result_action>(here_)
-                     , async<null_result_action>(here_));
+                = wait(future<bool>(async<null_result_action>(here_))
+                     , future<bool>(async<null_result_action>(here_))
+                     , future<bool>(async<null_result_action>(here_)));
 
             HPX_TEST_EQ(true, HPX_STD_GET(0, r));
             HPX_TEST_EQ(true, HPX_STD_GET(1, r));

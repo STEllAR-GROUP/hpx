@@ -19,7 +19,7 @@
             error_code& ec)
         {
             return hpx::async<action>(policy, id,
-                boost::forward<Arg0>( arg0 )).move(ec);
+                boost::forward<Arg0>( arg0 )).get(ec);
         }
         template <typename Arg0>
         BOOST_FORCEINLINE static LocalResult call(
@@ -42,7 +42,7 @@
     operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
         BOOST_FWD_REF(Arg0) arg0, error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_1<local_result_type>::call(
                 is_future_pred(), policy, id,
                 boost::forward<Arg0>( arg0 ), ec);
@@ -58,7 +58,7 @@
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0,
         error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_1<local_result_type>::call(
                 is_future_pred(), launch::sync, id,
                 boost::forward<Arg0>( arg0 ), ec);
@@ -74,7 +74,7 @@
             error_code& ec)
         {
             return hpx::async<action>(policy, id,
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )).move(ec);
+                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )).get(ec);
         }
         template <typename Arg0 , typename Arg1>
         BOOST_FORCEINLINE static LocalResult call(
@@ -97,7 +97,7 @@
     operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1, error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_2<local_result_type>::call(
                 is_future_pred(), policy, id,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ), ec);
@@ -113,7 +113,7 @@
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1,
         error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_2<local_result_type>::call(
                 is_future_pred(), launch::sync, id,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ), ec);
@@ -129,7 +129,7 @@
             error_code& ec)
         {
             return hpx::async<action>(policy, id,
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )).move(ec);
+                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )).get(ec);
         }
         template <typename Arg0 , typename Arg1 , typename Arg2>
         BOOST_FORCEINLINE static LocalResult call(
@@ -152,7 +152,7 @@
     operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2, error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_3<local_result_type>::call(
                 is_future_pred(), policy, id,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ), ec);
@@ -168,7 +168,7 @@
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2,
         error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_3<local_result_type>::call(
                 is_future_pred(), launch::sync, id,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ), ec);
@@ -184,7 +184,7 @@
             error_code& ec)
         {
             return hpx::async<action>(policy, id,
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )).move(ec);
+                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )).get(ec);
         }
         template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
         BOOST_FORCEINLINE static LocalResult call(
@@ -207,7 +207,7 @@
     operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3, error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_4<local_result_type>::call(
                 is_future_pred(), policy, id,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ), ec);
@@ -223,7 +223,7 @@
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3,
         error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_4<local_result_type>::call(
                 is_future_pred(), launch::sync, id,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ), ec);
@@ -239,7 +239,7 @@
             error_code& ec)
         {
             return hpx::async<action>(policy, id,
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )).move(ec);
+                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )).get(ec);
         }
         template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
         BOOST_FORCEINLINE static LocalResult call(
@@ -262,7 +262,7 @@
     operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
         BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4, error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_5<local_result_type>::call(
                 is_future_pred(), policy, id,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ), ec);
@@ -278,7 +278,7 @@
     operator()(IdType const& id, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4,
         error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_5<local_result_type>::call(
                 is_future_pred(), launch::sync, id,
                 boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ), ec);

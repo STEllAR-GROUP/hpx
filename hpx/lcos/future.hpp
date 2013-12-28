@@ -758,7 +758,7 @@ namespace hpx { namespace lcos
         //   - destroys *this.
         ~unique_future()
         {}
-        
+
         // [N3722, 4.1] asks for this...
         typedef lcos::promise<R> promise_type;
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
@@ -944,7 +944,7 @@ namespace hpx { namespace lcos
         //   - destroys *this.
         ~shared_future()
         {}
-        
+
         // [N3722, 4.1] asks for this...
         typedef lcos::promise<R> promise_type;
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS

@@ -148,14 +148,13 @@ void test_actions()
                 return_object<
                     action_move_semantics::return_test_movable_action, movable_object
                 >(id)
-            ), 1u); // call
-            //! should be: -
+            ), 0u);
         } else {
             HPX_TEST_EQ((
                 return_object<
                     action_move_semantics::return_test_movable_action, movable_object
                 >(id)
-            ), 2u); // transfer_action + bind
+            ), 1u); // transfer_action
             //! should_be: -
         }
         
@@ -253,15 +252,13 @@ void test_direct_actions()
                 return_object<
                     action_move_semantics::return_test_movable_direct_action, movable_object
                 >(id)
-            ), 1u); // value_or_error(r)
-            //! should be: -
+            ), 0u);
         } else {
             HPX_TEST_EQ((
                 return_object<
                     action_move_semantics::return_test_movable_direct_action, movable_object
                 >(id)
-            ), 2u); // transfer_action + value_or_error(r)
-            //! should be: -
+            ), 1u); // transfer_action
         }
         
         // test non_movable_object()
