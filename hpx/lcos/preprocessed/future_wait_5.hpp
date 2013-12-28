@@ -10,84 +10,132 @@
 
 namespace hpx { namespace lcos
 {
-    template <typename T0 , typename T1 , typename T2>
-    inline HPX_STD_TUPLE<T0 , T1 , T2>
-    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2)
+    template <typename F0 , typename F1 , typename F2>
+    inline typename boost::enable_if_c<
+        !(true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value)
+      , HPX_STD_TUPLE<typename detail::future_traits<F0>::type , typename detail::future_traits<F1>::type , typename detail::future_traits<F2>::type>
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get());
     }
-    inline void
-    wait (lcos::future<void> const& f0 , lcos::future<void> const& f1 , lcos::future<void> const& f2)
+    
+    template <typename F0 , typename F1 , typename F2>
+    inline typename boost::enable_if_c<
+        (true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value)
+      , void
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2)
     {
         f0.get(); f1.get(); f2.get();
     }
 }}
 namespace hpx { namespace lcos
 {
-    template <typename T0 , typename T1 , typename T2 , typename T3>
-    inline HPX_STD_TUPLE<T0 , T1 , T2 , T3>
-    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3)
+    template <typename F0 , typename F1 , typename F2 , typename F3>
+    inline typename boost::enable_if_c<
+        !(true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value && boost::is_void< typename detail::future_traits<F3>::type>::value)
+      , HPX_STD_TUPLE<typename detail::future_traits<F0>::type , typename detail::future_traits<F1>::type , typename detail::future_traits<F2>::type , typename detail::future_traits<F3>::type>
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get());
     }
-    inline void
-    wait (lcos::future<void> const& f0 , lcos::future<void> const& f1 , lcos::future<void> const& f2 , lcos::future<void> const& f3)
+    
+    template <typename F0 , typename F1 , typename F2 , typename F3>
+    inline typename boost::enable_if_c<
+        (true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value && boost::is_void< typename detail::future_traits<F3>::type>::value)
+      , void
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3)
     {
         f0.get(); f1.get(); f2.get(); f3.get();
     }
 }}
 namespace hpx { namespace lcos
 {
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
-    inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4>
-    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4)
+    template <typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
+    inline typename boost::enable_if_c<
+        !(true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value && boost::is_void< typename detail::future_traits<F3>::type>::value && boost::is_void< typename detail::future_traits<F4>::type>::value)
+      , HPX_STD_TUPLE<typename detail::future_traits<F0>::type , typename detail::future_traits<F1>::type , typename detail::future_traits<F2>::type , typename detail::future_traits<F3>::type , typename detail::future_traits<F4>::type>
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get());
     }
-    inline void
-    wait (lcos::future<void> const& f0 , lcos::future<void> const& f1 , lcos::future<void> const& f2 , lcos::future<void> const& f3 , lcos::future<void> const& f4)
+    
+    template <typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
+    inline typename boost::enable_if_c<
+        (true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value && boost::is_void< typename detail::future_traits<F3>::type>::value && boost::is_void< typename detail::future_traits<F4>::type>::value)
+      , void
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4)
     {
         f0.get(); f1.get(); f2.get(); f3.get(); f4.get();
     }
 }}
 namespace hpx { namespace lcos
 {
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
-    inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5>
-    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5)
+    template <typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
+    inline typename boost::enable_if_c<
+        !(true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value && boost::is_void< typename detail::future_traits<F3>::type>::value && boost::is_void< typename detail::future_traits<F4>::type>::value && boost::is_void< typename detail::future_traits<F5>::type>::value)
+      , HPX_STD_TUPLE<typename detail::future_traits<F0>::type , typename detail::future_traits<F1>::type , typename detail::future_traits<F2>::type , typename detail::future_traits<F3>::type , typename detail::future_traits<F4>::type , typename detail::future_traits<F5>::type>
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get());
     }
-    inline void
-    wait (lcos::future<void> const& f0 , lcos::future<void> const& f1 , lcos::future<void> const& f2 , lcos::future<void> const& f3 , lcos::future<void> const& f4 , lcos::future<void> const& f5)
+    
+    template <typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
+    inline typename boost::enable_if_c<
+        (true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value && boost::is_void< typename detail::future_traits<F3>::type>::value && boost::is_void< typename detail::future_traits<F4>::type>::value && boost::is_void< typename detail::future_traits<F5>::type>::value)
+      , void
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5)
     {
         f0.get(); f1.get(); f2.get(); f3.get(); f4.get(); f5.get();
     }
 }}
 namespace hpx { namespace lcos
 {
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
-    inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6>
-    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6)
+    template <typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
+    inline typename boost::enable_if_c<
+        !(true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value && boost::is_void< typename detail::future_traits<F3>::type>::value && boost::is_void< typename detail::future_traits<F4>::type>::value && boost::is_void< typename detail::future_traits<F5>::type>::value && boost::is_void< typename detail::future_traits<F6>::type>::value)
+      , HPX_STD_TUPLE<typename detail::future_traits<F0>::type , typename detail::future_traits<F1>::type , typename detail::future_traits<F2>::type , typename detail::future_traits<F3>::type , typename detail::future_traits<F4>::type , typename detail::future_traits<F5>::type , typename detail::future_traits<F6>::type>
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get());
     }
-    inline void
-    wait (lcos::future<void> const& f0 , lcos::future<void> const& f1 , lcos::future<void> const& f2 , lcos::future<void> const& f3 , lcos::future<void> const& f4 , lcos::future<void> const& f5 , lcos::future<void> const& f6)
+    
+    template <typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
+    inline typename boost::enable_if_c<
+        (true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value && boost::is_void< typename detail::future_traits<F3>::type>::value && boost::is_void< typename detail::future_traits<F4>::type>::value && boost::is_void< typename detail::future_traits<F5>::type>::value && boost::is_void< typename detail::future_traits<F6>::type>::value)
+      , void
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6)
     {
         f0.get(); f1.get(); f2.get(); f3.get(); f4.get(); f5.get(); f6.get();
     }
 }}
 namespace hpx { namespace lcos
 {
-    template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
-    inline HPX_STD_TUPLE<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7>
-    wait (lcos::future<T0> const& f0 , lcos::future<T1> const& f1 , lcos::future<T2> const& f2 , lcos::future<T3> const& f3 , lcos::future<T4> const& f4 , lcos::future<T5> const& f5 , lcos::future<T6> const& f6 , lcos::future<T7> const& f7)
+    template <typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
+    inline typename boost::enable_if_c<
+        !(true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value && boost::is_void< typename detail::future_traits<F3>::type>::value && boost::is_void< typename detail::future_traits<F4>::type>::value && boost::is_void< typename detail::future_traits<F5>::type>::value && boost::is_void< typename detail::future_traits<F6>::type>::value && boost::is_void< typename detail::future_traits<F7>::type>::value)
+      , HPX_STD_TUPLE<typename detail::future_traits<F0>::type , typename detail::future_traits<F1>::type , typename detail::future_traits<F2>::type , typename detail::future_traits<F3>::type , typename detail::future_traits<F4>::type , typename detail::future_traits<F5>::type , typename detail::future_traits<F6>::type , typename detail::future_traits<F7>::type>
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7)
     {
         return HPX_STD_MAKE_TUPLE(f0.get() , f1.get() , f2.get() , f3.get() , f4.get() , f5.get() , f6.get() , f7.get());
     }
-    inline void
-    wait (lcos::future<void> const& f0 , lcos::future<void> const& f1 , lcos::future<void> const& f2 , lcos::future<void> const& f3 , lcos::future<void> const& f4 , lcos::future<void> const& f5 , lcos::future<void> const& f6 , lcos::future<void> const& f7)
+    
+    template <typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
+    inline typename boost::enable_if_c<
+        (true && boost::is_void< typename detail::future_traits<F0>::type>::value && boost::is_void< typename detail::future_traits<F1>::type>::value && boost::is_void< typename detail::future_traits<F2>::type>::value && boost::is_void< typename detail::future_traits<F3>::type>::value && boost::is_void< typename detail::future_traits<F4>::type>::value && boost::is_void< typename detail::future_traits<F5>::type>::value && boost::is_void< typename detail::future_traits<F6>::type>::value && boost::is_void< typename detail::future_traits<F7>::type>::value)
+      , void
+    >::type
+    wait(BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7)
     {
         f0.get(); f1.get(); f2.get(); f3.get(); f4.get(); f5.get(); f6.get(); f7.get();
     }
