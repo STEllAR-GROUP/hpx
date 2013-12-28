@@ -480,7 +480,8 @@ namespace hpx { namespace actions
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva)
         {
-            return Action::construct_thread_function(lva, arguments_);
+            return Action::construct_thread_function(lva,
+                boost::move(arguments_));
         }
 
         /// The \a get_thread_function constructs a proper thread function for
@@ -502,7 +503,8 @@ namespace hpx { namespace actions
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
-            return Action::construct_thread_function(cont, lva, arguments_);
+            return Action::construct_thread_function(cont, lva,
+                boost::move(arguments_));
         }
 
 #if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
