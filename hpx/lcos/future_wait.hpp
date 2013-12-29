@@ -213,35 +213,7 @@ namespace hpx { namespace lcos
     // invoked as soon as a value becomes available, it will not wait for all
     // results to be there.
     template <typename Future, typename F>
-    inline typename boost::enable_if_c<
-        !boost::is_void<typename detail::future_traits<Future>::type>::value
-      , std::size_t
-    >::type
-    wait(std::vector<Future> const& lazy_values, BOOST_FWD_REF(F) f,
-        boost::int32_t suspend_for = 10)
-    {
-        typedef std::vector<Future> return_type;
-
-        if (lazy_values.empty())
-            return 0;
-
-        boost::atomic<std::size_t> success_counter(0);
-        lcos::local::futures_factory<return_type()> p =
-            lcos::local::futures_factory<return_type()>(
-                detail::when_all<Future, F>(
-                    lazy_values, boost::forward<F>(f), &success_counter));
-
-        p.apply();
-        p.get_future().get();
-
-        return success_counter.load();
-    }
-
-    template <typename Future, typename F>
-    inline typename boost::enable_if_c<
-        boost::is_void<typename detail::future_traits<Future>::type>::value
-      , std::size_t
-    >::type
+    inline std::size_t
     wait(std::vector<Future> const& lazy_values, BOOST_FWD_REF(F) f,
         boost::int32_t suspend_for = 10)
     {
