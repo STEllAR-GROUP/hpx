@@ -13,6 +13,8 @@
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 
+using hpx::lcos::future;
+
 ///////////////////////////////////////////////////////////////////////////////
 bool null_thread_executed = false;
 

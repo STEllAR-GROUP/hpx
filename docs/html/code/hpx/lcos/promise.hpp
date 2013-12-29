@@ -552,49 +552,10 @@ namespace hpx { namespace lcos
             (*impl_)->set_local_data(boost::forward<Result>(result));
         }
 
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        // [N3722, 4.1] asks for this...
-        explicit operator lcos::unique_future<Result>()
-        {
-            return get_future();
-        }
-        
-        explicit operator lcos::shared_future<Result>()
-        {
-            return get_future();
-        }
-        
-        explicit operator lcos::future<Result>()
-        {
-            return get_future();
-        }
-#endif
-
     protected:
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
-
-#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-    // [N3722, 4.1] asks for this...
-    template <typename Result>
-    inline unique_future<Result>::unique_future(promise<Result>& promise)
-    {
-        promise.get_future().swap(*this);
-    }
-    
-    template <typename Result>
-    inline shared_future<Result>::shared_future(promise<Result>& promise)
-    {
-        shared_future<Result>(promise.get_future()).swap(*this);
-    }
-    
-    template <typename Result>
-    inline future<Result>::future(promise<Result>& promise)
-    {
-        future<Result>(promise.get_future()).swap(*this);
-    }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
@@ -670,7 +631,7 @@ namespace hpx { namespace lcos
                     "future already has been retrieved from this packaged_action");
                 return lcos::unique_future<void>();
             }
-            
+
             using lcos::detail::future_access;
             future_obtained_ = true;
             return future_access::create<unique_future<void> >(impl_->get());
@@ -686,48 +647,10 @@ namespace hpx { namespace lcos
             (*impl_)->set_exception(e);
         }
 
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        // [N3722, 4.1] asks for this...
-        explicit operator lcos::unique_future<void>()
-        {
-            return get_future();
-        }
-        
-        explicit operator lcos::shared_future<void>()
-        {
-            return get_future();
-        }
-        
-        explicit operator lcos::future<void>()
-        {
-            return get_future();
-        }
-#endif
-
     protected:
         boost::intrusive_ptr<wrapping_type> impl_;
         bool future_obtained_;
     };
-
-#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-    // [N3722, 4.1] asks for this...
-    template <>
-    inline unique_future<void>::unique_future(promise<void>& promise)
-    {
-        promise.get_future().swap(*this);
-    }
-    
-    template <>
-    inline shared_future<void>::shared_future(promise<void>& promise)
-    {
-        shared_future<void>(promise.get_future()).swap(*this);
-    }
-
-    inline future<void>::future(promise<void>& promise)
-    {
-        future<void>(promise.get_future()).swap(*this);
-    }
-#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

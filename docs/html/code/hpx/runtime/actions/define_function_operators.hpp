@@ -21,7 +21,7 @@
             boost::mpl::false_, BOOST_SCOPED_ENUM(launch) policy,
             IdType const& id, error_code& ec)
         {
-            return hpx::async<action>(policy, id).move(ec);
+            return hpx::async<action>(policy, id).get(ec);
         }
 
         template <typename IdType>
@@ -44,7 +44,7 @@
     operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
         error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_0<local_result_type>::call(is_future_pred(),
                 policy, id, ec);
     }
@@ -59,7 +59,7 @@
     >::type
     operator()(IdType const& id, error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             sync_invoke_0<local_result_type>::call(is_future_pred(),
                 launch::sync, id, ec);
     }
@@ -105,7 +105,7 @@
             error_code& ec)
         {
             return hpx::async<action>(policy, id,
-                HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).move(ec);
+                HPX_ENUM_FORWARD_ARGS(N, Arg, arg)).get(ec);
         }
 
         template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
@@ -130,7 +130,7 @@
     operator()(BOOST_SCOPED_ENUM(launch) policy, IdType const& id,
         HPX_ENUM_FWD_ARGS(N, Arg, arg), error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             BOOST_PP_CAT(sync_invoke_, N)<local_result_type>::call(
                 is_future_pred(), policy, id,
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg), ec);
@@ -147,7 +147,7 @@
     operator()(IdType const& id, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         error_code& ec = throws) const
     {
-        return util::void_guard<local_result_type>(), 
+        return util::void_guard<local_result_type>(),
             BOOST_PP_CAT(sync_invoke_, N)<local_result_type>::call(
                 is_future_pred(), launch::sync, id,
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg), ec);

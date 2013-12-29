@@ -7,8 +7,8 @@
 #define HPX_LCOS_LOCAL_PROMISE_MAR_01_2012_0121PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
+#include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/move.hpp>
 
@@ -209,7 +209,7 @@ namespace hpx { namespace lcos { namespace local
                     "future already has been retrieved from this promise");
                 return lcos::unique_future<Result>();
             }
-            
+
             using lcos::detail::future_access;
             future_obtained_ = true;
             return future_access::create<unique_future<Result> >(task_);
@@ -263,11 +263,58 @@ namespace hpx { namespace lcos { namespace local
             return task_->is_ready_locked();
         }
 
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+        // [N3722, 4.1] asks for this...
+        explicit operator lcos::unique_future<Result>()
+        {
+            return get_future();
+        }
+
+        explicit operator lcos::shared_future<Result>()
+        {
+            return get_future();
+        }
+
+        explicit operator lcos::future<Result>()
+        {
+            return get_future();
+        }
+#endif
+
     protected:
         boost::intrusive_ptr<task_impl_type> task_;
         bool future_obtained_;
         mutable mutex_type mtx_;
     };
+
+#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+}}}
+
+namespace hpx { namespace lcos
+{
+    // [N3722, 4.1] asks for this...
+    template <typename Result>
+    inline unique_future<Result>::unique_future(local::promise<Result>& promise)
+    {
+        promise.get_future().swap(*this);
+    }
+
+    template <typename Result>
+    inline shared_future<Result>::shared_future(local::promise<Result>& promise)
+    {
+        shared_future<Result>(promise.get_future()).swap(*this);
+    }
+
+    template <typename Result>
+    inline future<Result>::future(local::promise<Result>& promise)
+    {
+        future<Result>(promise.get_future()).swap(*this);
+    }
+}}
+
+namespace hpx { namespace lcos { namespace local
+{
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
@@ -355,7 +402,7 @@ namespace hpx { namespace lcos { namespace local
                     "future already has been retrieved from this promise");
                 return lcos::unique_future<void>();
             }
-            
+
             using lcos::detail::future_access;
             future_obtained_ = true;
             return future_access::create<unique_future<void> >(task_);
@@ -408,11 +455,57 @@ namespace hpx { namespace lcos { namespace local
             return task_->is_ready_locked();
         }
 
+#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+        // [N3722, 4.1] asks for this...
+        explicit operator lcos::unique_future<void>()
+        {
+            return get_future();
+        }
+
+        explicit operator lcos::shared_future<void>()
+        {
+            return get_future();
+        }
+
+        explicit operator lcos::future<void>()
+        {
+            return get_future();
+        }
+#endif
+
     private:
         boost::intrusive_ptr<task_impl_type> task_;
         bool future_obtained_;
         mutable mutex_type mtx_;
     };
+
+#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
+}}}
+
+namespace hpx { namespace lcos
+{
+    // [N3722, 4.1] asks for this...
+    template <>
+    inline unique_future<void>::unique_future(local::promise<void>& promise)
+    {
+        promise.get_future().swap(*this);
+    }
+
+    template <>
+    inline shared_future<void>::shared_future(local::promise<void>& promise)
+    {
+        shared_future<void>(promise.get_future()).swap(*this);
+    }
+
+    inline future<void>::future(local::promise<void>& promise)
+    {
+        future<void>(promise.get_future()).swap(*this);
+    }
+}}
+
+namespace hpx { namespace lcos { namespace local
+{
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Func>
@@ -540,7 +633,7 @@ namespace hpx { namespace lcos { namespace local
                     "future already has been retrieved from this promise");
                 return lcos::unique_future<Result>();
             }
-            
+
             using lcos::detail::future_access;
             future_obtained_ = true;
             return future_access::create<unique_future<Result> >(task_);
@@ -674,7 +767,7 @@ namespace hpx { namespace lcos { namespace local
                     "future already has been retrieved from this promise");
                 return lcos::unique_future<Result>();
             }
-            
+
             using lcos::detail::future_access;
             future_obtained_ = true;
             return future_access::create<unique_future<Result> >(task_);

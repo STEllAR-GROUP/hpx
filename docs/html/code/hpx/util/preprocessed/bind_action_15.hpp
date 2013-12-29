@@ -44,7 +44,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -147,7 +147,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -250,7 +250,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -353,7 +353,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -456,7 +456,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -559,7 +559,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -662,7 +662,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -765,7 +765,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -868,7 +868,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -971,7 +971,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -1074,7 +1074,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -1177,7 +1177,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -1280,7 +1280,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -1383,7 +1383,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -1486,7 +1486,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -1589,7 +1589,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -1692,7 +1692,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type
@@ -1795,7 +1795,7 @@ namespace hpx { namespace util
         >
         {
             typedef
-                lcos::future<
+                lcos::unique_future<
                     typename traits::promise_local_result<
                         typename hpx::actions::extract_action<Action>::result_type
                     >::type

@@ -36,18 +36,20 @@ namespace hpx
         template <typename Action, typename Result>
         struct sync_local_invoke_0
         {
-            BOOST_FORCEINLINE static lcos::future<Result> call(
-                boost::mpl::false_, naming::id_type const& gid,
-                naming::address const& addr)
+            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+                naming::id_type const& gid, naming::address const& addr)
             {
                 lcos::packaged_action<Action, Result> p;
                 p.apply(launch::sync, gid);
                 return p.get_future();
             }
+        };
 
-            BOOST_FORCEINLINE static lcos::future<Result> call(
-                boost::mpl::true_, naming::id_type const& gid,
-                naming::address const& addr)
+        template <typename Action, typename R>
+        struct sync_local_invoke_0<Action, lcos::unique_future<R> >
+        {
+            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+                naming::id_type const& gid, naming::address const& addr)
             {
                 HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
@@ -61,11 +63,11 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    lcos::future<
+    lcos::unique_future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid)
+    async(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -75,12 +77,8 @@ namespace hpx
         naming::address addr;
         if (policy == launch::sync && agas::is_local_address(gid, addr))
         {
-            typedef typename traits::is_future<
-                typename action_type::result_type
-            >::type is_future_pred;
-
             return detail::sync_local_invoke_0<action_type, result_type>::
-                call(is_future_pred(), gid, addr);
+                call(gid, addr);
         }
 
         lcos::packaged_action<action_type, result_type> p;
@@ -96,11 +94,11 @@ namespace hpx
     }
 
     template <typename Action>
-    lcos::future<
+    lcos::unique_future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async (naming::id_type const& gid)
+    async(naming::id_type const& gid)
     {
         return async<Action>(launch::all, gid);
     }
@@ -108,11 +106,11 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result,
         typename Arguments, typename Derived>
-    lcos::future<
+    lcos::unique_future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
-    async (BOOST_SCOPED_ENUM(launch) policy,
+    async(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > /*act*/, naming::id_type const& gid)
@@ -122,11 +120,11 @@ namespace hpx
 
     template <typename Component, typename Result,
         typename Arguments, typename Derived>
-    lcos::future<
+    lcos::unique_future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
-    async (
+    async(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > const & /*act*/, naming::id_type const& gid)
@@ -173,17 +171,21 @@ namespace hpx
         struct BOOST_PP_CAT(sync_local_invoke_, N)
         {
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-            BOOST_FORCEINLINE static lcos::future<Result> call(
-                boost::mpl::false_, naming::id_type const& gid,
-                naming::address const&, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+                naming::id_type const& gid, naming::address const&,
+                HPX_ENUM_FWD_ARGS(N, Arg, arg))
             {
                 lcos::packaged_action<Action, Result> p;
                 p.apply(launch::sync, gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
                 return p.get_future();
             }
+        };
 
+        template <typename Action, typename R>
+        struct BOOST_PP_CAT(sync_local_invoke_, N)<Action, lcos::unique_future<R> >
+        {
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-            BOOST_FORCEINLINE static lcos::future<Result> call(
+            BOOST_FORCEINLINE static lcos::unique_future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, HPX_ENUM_FWD_ARGS(N, Arg, arg))
             {
@@ -199,11 +201,11 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<
+    lcos::unique_future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async (BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+    async(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -214,12 +216,8 @@ namespace hpx
         naming::address addr;
         if (policy == launch::sync && agas::is_local_address(gid, addr))
         {
-            typedef typename traits::is_future<
-                typename action_type::result_type
-            >::type is_future_pred;
-
             return detail::BOOST_PP_CAT(sync_local_invoke_, N)<action_type, result_type>::
-                call(is_future_pred(), gid, addr, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+                call(gid, addr, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
         lcos::packaged_action<action_type, result_type> p;
@@ -235,11 +233,11 @@ namespace hpx
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<
+    lcos::unique_future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async (naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    async(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return async<Action>(launch::all, gid,
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
@@ -248,11 +246,11 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result,
         typename Arguments, typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<
+    lcos::unique_future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
-    async (BOOST_SCOPED_ENUM(launch) policy,
+    async(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > const & /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
@@ -263,11 +261,11 @@ namespace hpx
 
     template <typename Component, typename Result,
         typename Arguments, typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::future<
+    lcos::unique_future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
-    async (
+    async(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > /*act*/ const &, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))

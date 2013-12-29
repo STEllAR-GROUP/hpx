@@ -18,13 +18,16 @@
 #include <boost/atomic.hpp>
 #include <boost/foreach.hpp>
 #include <boost/dynamic_bitset.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/move/move.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#include <boost/preprocessor/cat.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/type_traits/is_void.hpp>
+#include <boost/utility/enable_if.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
@@ -34,7 +37,7 @@ namespace hpx { namespace lcos
         //////////////////////////////////////////////////////////////////////
         // This version has a callback to be invoked for each future when it
         // gets ready.
-        template <typename T, typename F>
+        template <typename Future, typename F>
         struct when_all
         {
         private:
@@ -86,12 +89,13 @@ namespace hpx { namespace lcos
 
             void on_future_ready(std::size_t i, threads::thread_id_type const& id)
             {
-                on_future_ready_(i, id, boost::is_same<void, T>());
+                on_future_ready_(i, id,
+                    boost::is_void<typename future_traits<Future>::type>());
             }
 
         public:
-            typedef std::vector<lcos::future<T> > argument_type;
-            typedef std::vector<lcos::future<T> > result_type;
+            typedef std::vector<Future> argument_type;
+            typedef std::vector<Future> result_type;
 
             template <typename F_>
             when_all(argument_type const& lazy_values, BOOST_FWD_REF(F_) f,
@@ -135,7 +139,7 @@ namespace hpx { namespace lcos
 
             result_type operator()()
             {
-                using lcos::detail::get_future_data;
+                using lcos::detail::future_access;
 
                 ready_count_.store(0);
 
@@ -144,8 +148,11 @@ namespace hpx { namespace lcos
                 threads::thread_id_type id = threads::get_self_id();
                 for (std::size_t i = 0; i != size; ++i)
                 {
-                    lcos::detail::future_data<T>* current =
-                        get_future_data(lazy_values_[i]);
+                    typedef
+                        typename lcos::detail::shared_state_ptr_for<Future>::type
+                        shared_state_ptr;
+                    shared_state_ptr current =
+                        future_access::get_shared_state(lazy_values_[i]);
 
                     current->set_on_completed(
                         util::bind(&when_all::on_future_ready, this, i, id));
@@ -166,7 +173,7 @@ namespace hpx { namespace lcos
                 return lazy_values_;
             }
 
-            std::vector<lcos::future<T> > lazy_values_;
+            std::vector<Future> lazy_values_;
             boost::atomic<std::size_t> ready_count_;
             typename util::remove_reference<F>::type f_;
             boost::atomic<std::size_t>* success_counter_;
@@ -178,17 +185,23 @@ namespace hpx { namespace lcos
 
     /// The one argument version is special in the sense that it returns the
     /// expected value directly (without wrapping it into a tuple).
-    template <typename T1, typename F>
-    inline std::size_t
-    wait (lcos::future<T1> const& f1, F const& f)
+    template <typename Future, typename F>
+    inline typename boost::enable_if_c<
+        !boost::is_void<typename detail::future_traits<Future>::type>::value
+      , std::size_t
+    >::type
+    wait(BOOST_FWD_REF(Future) f1, F const& f)
     {
         f(0, f1.get());
         return 1;
     }
 
-    template <typename F>
-    inline std::size_t
-    wait (lcos::future<void> const& f1, F const& f)
+    template <typename Future, typename F>
+    inline typename boost::enable_if_c<
+        boost::is_void<typename detail::future_traits<Future>::type>::value
+      , std::size_t
+    >::type
+    wait(BOOST_FWD_REF(Future) f1, F const& f)
     {
         f1.get();
         f(0);
@@ -199,12 +212,12 @@ namespace hpx { namespace lcos
     // This overload of wait() will make sure that the passed function will be
     // invoked as soon as a value becomes available, it will not wait for all
     // results to be there.
-    template <typename T1, typename F>
+    template <typename Future, typename F>
     inline std::size_t
-    wait (std::vector<lcos::future<T1> > const& lazy_values, BOOST_FWD_REF(F) f,
+    wait(std::vector<Future> const& lazy_values, BOOST_FWD_REF(F) f,
         boost::int32_t suspend_for = 10)
     {
-        typedef std::vector<lcos::future<T1> > return_type;
+        typedef std::vector<Future> return_type;
 
         if (lazy_values.empty())
             return 0;
@@ -212,29 +225,7 @@ namespace hpx { namespace lcos
         boost::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::when_all<T1, F>(
-                    lazy_values, boost::forward<F>(f), &success_counter));
-
-        p.apply();
-        p.get_future().get();
-
-        return success_counter.load();
-    }
-
-    template <typename F>
-    inline std::size_t
-    wait (std::vector<lcos::future<void> > const& lazy_values, BOOST_FWD_REF(F) f,
-        boost::int32_t suspend_for = 10)
-    {
-        typedef std::vector<lcos::future<void> > return_type;
-
-        if (lazy_values.empty())
-            return 0;
-
-        boost::atomic<std::size_t> success_counter(0);
-        lcos::local::futures_factory<return_type()> p =
-            lcos::local::futures_factory<return_type()>(
-                detail::when_all<void, F>(
+                detail::when_all<Future, F>(
                     lazy_values, boost::forward<F>(f), &success_counter));
 
         p.apply();
@@ -248,28 +239,33 @@ namespace hpx { namespace lcos
 
     /// The one argument version is special in the sense that it returns the
     /// expected value directly (without wrapping it into a tuple).
-    template <typename T1>
-    inline T1
-    wait (lcos::future<T1> const& f1)
+    template <typename F1>
+    inline typename detail::future_traits<F1>::type
+    wait(BOOST_FWD_REF(F1) f1)
     {
         return f1.get();
     }
 
-    inline void
-    wait (lcos::future<void> const& f1)
-    {
-        f1.get();
-    }
-
-    template <typename T1, typename T2>
-    inline HPX_STD_TUPLE<T1, T2>
-    wait (lcos::future<T1> const& f1, lcos::future<T2> const& f2)
+    template <typename F1, typename F2>
+    inline typename boost::enable_if_c<
+        !boost::is_void<typename detail::future_traits<F1>::type>::value &&
+        !boost::is_void<typename detail::future_traits<F2>::type>::value
+      , HPX_STD_TUPLE<
+            typename detail::future_traits<F1>::type
+          , typename detail::future_traits<F2>::type>
+    >::type 
+    wait(BOOST_FWD_REF(F1) f1, BOOST_FWD_REF(F2) f2)
     {
         return HPX_STD_MAKE_TUPLE(f1.get(), f2.get());
     }
-
-    inline void
-    wait (lcos::future<void> const& f1, lcos::future<void> const& f2)
+    
+    template <typename F1, typename F2>
+    inline typename boost::enable_if_c<
+        boost::is_void<typename detail::future_traits<F1>::type>::value &&
+        boost::is_void<typename detail::future_traits<F2>::type>::value
+      , void
+    >::type
+    wait(BOOST_FWD_REF(F1) f1, BOOST_FWD_REF(F2) f2)
     {
         f1.get();
         f2.get();
@@ -300,31 +296,22 @@ namespace hpx { namespace lcos
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
+    template <typename Future>
     inline void
-    wait (std::vector<lcos::future<T> > const& v, std::vector<T>& r)
+    wait(std::vector<Future> const& v, 
+        std::vector<typename detail::future_traits<Future>::type>& r)
     {
         r.reserve(v.size());
 
-        typedef lcos::future<T> value_type;
-        BOOST_FOREACH(value_type const& f, v)
+        BOOST_FOREACH(Future const& f, v)
             r.push_back(f.get());
     }
 
-    template <typename T>
+    template <typename Future>
     inline void
-    wait (std::vector<lcos::future<T> > const& v)
+    wait(std::vector<Future> const& v)
     {
-        typedef lcos::future<T> value_type;
-        BOOST_FOREACH(value_type const& f, v)
-            f.get();
-    }
-
-    inline void
-    wait (std::vector<lcos::future<void> > const& v)
-    {
-        typedef lcos::future<void> value_type;
-        BOOST_FOREACH(value_type const& f, v)
+        BOOST_FOREACH(Future const& f, v)
             f.get();
     }
 }}
@@ -343,11 +330,12 @@ namespace hpx
 
 #define N BOOST_PP_ITERATION()
 
-#define HPX_FUTURE_WAIT_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)             \
-        lcos::future<BOOST_PP_CAT(T, n)> const& BOOST_PP_CAT(f, n)            \
+#define HPX_FUTURE_RESULT_TYPE(z, n, data)    BOOST_PP_COMMA_IF(n)            \
+        typename detail::future_traits<BOOST_PP_CAT(F, n)>::type              \
     /**/
-#define HPX_FUTURE_WAIT_VOID_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)        \
-        lcos::future<void> const& BOOST_PP_CAT(f, n)                          \
+#define HPX_FUTURE_RESULT_TYPE_IS_VOID(z, n, data)                            \
+         && boost::is_void<                                                   \
+            typename detail::future_traits<BOOST_PP_CAT(F, n)>::type>::value  \
     /**/
 #define HPX_FUTURE_TUPLE_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)            \
         BOOST_PP_CAT(f, n).get()                                              \
@@ -356,22 +344,29 @@ namespace hpx
 
 namespace hpx { namespace lcos
 {
-    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    inline HPX_STD_TUPLE<BOOST_PP_ENUM_PARAMS(N, T)>
-    wait (BOOST_PP_REPEAT(N, HPX_FUTURE_WAIT_ARGUMENT, _))
+    template <BOOST_PP_ENUM_PARAMS(N, typename F)>
+    inline typename boost::enable_if_c<
+        !(true BOOST_PP_REPEAT(N, HPX_FUTURE_RESULT_TYPE_IS_VOID, _))
+      , HPX_STD_TUPLE<BOOST_PP_REPEAT(N, HPX_FUTURE_RESULT_TYPE, _)>
+    >::type
+    wait(HPX_ENUM_FWD_ARGS(N, F, f))
     {
         return HPX_STD_MAKE_TUPLE(BOOST_PP_REPEAT(N, HPX_FUTURE_TUPLE_ARGUMENT, _));
     }
-
-    inline void
-    wait (BOOST_PP_REPEAT(N, HPX_FUTURE_WAIT_VOID_ARGUMENT, _))
+    
+    template <BOOST_PP_ENUM_PARAMS(N, typename F)>
+    inline typename boost::enable_if_c<
+        (true BOOST_PP_REPEAT(N, HPX_FUTURE_RESULT_TYPE_IS_VOID, _))
+      , void
+    >::type
+    wait(HPX_ENUM_FWD_ARGS(N, F, f))
     {
         BOOST_PP_REPEAT(N, HPX_FUTURE_VOID_STATEMENT, _)
     }
 }}
 
-#undef HPX_FUTURE_WAIT_ARGUMENT
-#undef HPX_FUTURE_WAIT_VOID_ARGUMENT
+#undef HPX_FUTURE_RESULT_TYPE
+#undef HPX_FUTURE_RESULT_TYPE_IS_VOID
 #undef HPX_FUTURE_TUPLE_ARGUMENT
 #undef HPX_FUTURE_VOID_STATEMENT
 #undef N

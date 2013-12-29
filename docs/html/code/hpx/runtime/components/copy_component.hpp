@@ -34,7 +34,7 @@ namespace hpx { namespace components
 
             naming::id_type component_locality(f.move());
             return async<action_type>(component_locality, to_copy,
-                component_locality).move();
+                component_locality).get();
         }
 
         // This creates the new copy of the component on the same locality 
@@ -47,7 +47,7 @@ namespace hpx { namespace components
         {
             typedef typename server::copy_component_action<Component>
                 action_type;
-            return async<action_type>(f.move(), to_copy, target_locality).move();
+            return async<action_type>(f.move(), to_copy, target_locality).get();
         }
     }
     /// \endcond

@@ -102,15 +102,13 @@ void test_actions()
                 pass_object<
                     action_move_semantics::test_movable_action, movable_object
                 >(id)
-            ), 2u); // transfer_action + bind
-            //! should be: transfer_action
+            ), 1u); // transfer_action
 
             HPX_TEST_EQ((
                 move_object<
                     action_move_semantics::test_movable_action, movable_object
                 >(id)
-            ), 1u); // transfer_action
-            //! should be: -
+            ), 0u);
         }
 
         // test std::size_t(non_movable_object const& obj)
@@ -148,15 +146,13 @@ void test_actions()
                 return_object<
                     action_move_semantics::return_test_movable_action, movable_object
                 >(id)
-            ), 1u); // call
-            //! should be: -
+            ), 0u);
         } else {
             HPX_TEST_EQ((
                 return_object<
                     action_move_semantics::return_test_movable_action, movable_object
                 >(id)
-            ), 2u); // transfer_action + bind
-            //! should_be: -
+            ), 0u);
         }
         
         // test non_movable_object()
@@ -207,15 +203,13 @@ void test_direct_actions()
                 pass_object<
                     action_move_semantics::test_movable_direct_action, movable_object
                 >(id)
-            ), 2u); // transfer_action + bind
-            //! should be: transfer_action
+            ), 1u); // transfer_action
 
             HPX_TEST_EQ((
                 move_object<
                     action_move_semantics::test_movable_direct_action, movable_object
                 >(id)
-            ), 1u); // transfer_action
-            //! should be: -
+            ), 0u);
         }
         
         // test std::size_t(non_movable_object const& obj)
@@ -253,15 +247,13 @@ void test_direct_actions()
                 return_object<
                     action_move_semantics::return_test_movable_direct_action, movable_object
                 >(id)
-            ), 1u); // value_or_error(r)
-            //! should be: -
+            ), 0u);
         } else {
             HPX_TEST_EQ((
                 return_object<
                     action_move_semantics::return_test_movable_direct_action, movable_object
                 >(id)
-            ), 2u); // transfer_action + value_or_error(r)
-            //! should be: -
+            ), 0u);
         }
         
         // test non_movable_object()
