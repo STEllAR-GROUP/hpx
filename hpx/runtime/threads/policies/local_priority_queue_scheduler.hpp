@@ -253,63 +253,68 @@ namespace hpx { namespace threads { namespace policies
         bool get_next_thread(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
         {
-            // master thread only: first try to get a priority thread
-            std::size_t high_priority_queue_size = high_priority_queues_.size();
-            std::size_t queue_size = queues_.size();
-            if (num_thread < high_priority_queue_size)
+            std::size_t queues_size = queues_.size();
+
+            for (boost::uint64_t i = 0; i < high_priority_queues_.size(); ++i)
             {
-                bool result = high_priority_queues_[num_thread]->
-                    get_next_thread(thrd, queue_size + num_thread);
+                bool result = high_priority_queues_[i]->
+                    get_next_thread(thrd, num_thread);
                 if (result)
+                {
+                    if (i != num_thread)
+                        high_priority_queues_[i]->increment_num_stolen_threads();
                     return true;
+                }
             }
 
-            // try to get the next thread from our own queue
-            HPX_ASSERT(num_thread < queue_size);
+            HPX_ASSERT(num_thread < queues_size);
             if (queues_[num_thread]->get_next_thread(thrd, num_thread))
                 return true;
 
-            // try to execute low priority work if no other work is available
-            if (queue_size-1 == num_thread)
+            if (numa_sensitive_)
             {
-                bool result = low_priority_queue_.get_next_thread(
-                    thrd, queue_size + high_priority_queue_size);
-                if (result)
-                    return true;
+                mask_cref_type this_numa_domain = numa_domain_masks_[num_thread];
+                mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
+    
+                // steal thread from other queue
+                for (std::size_t i = 0; i < queues_size; ++i) {
+                    if (i == num_thread)
+                        continue;         // don't steal from ourselves
+                    if (!test(this_numa_domain, i) && !test(numa_domain, i))
+                        continue;
+    
+                    if (queues_[i]->get_next_thread(thrd, num_thread))
+                    {
+                        queues_[i]->increment_num_stolen_threads();
+                        return true;
+                    }
+                }
+                return false;
             }
 
-            // steal thread from other queue, first try high priority queues,
-            // then normal ones
-
-            mask_cref_type this_numa_domain = numa_domain_masks_[num_thread];
-            mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
-            for (std::size_t i = 0; i < high_priority_queue_size; ++i)
+            else // not NUMA-sensitive
             {
-                if (i == num_thread)
-                    continue;         // don't steal from ourselves
-                if (!test(this_numa_domain, i) && !test(numa_domain, i))
-                    continue;
-
-                if (high_priority_queues_[i]->get_next_thread(thrd, queue_size + i))
+                for (std::size_t i = 1; i < queues_size; ++i)
                 {
-                    high_priority_queues_[i]->increment_num_stolen_threads();
-                    return true;
+                    // FIXME: Do a better job here.
+                    std::size_t const idx = (i + num_thread) % queues_size;
+    
+                    if (queues_[idx]->get_next_thread(thrd, num_thread))
+                    {
+                        queues_[idx]->increment_num_stolen_threads();
+                        return true;
+                    }
                 }
             }
 
-            // steal thread from other queue
-            for (std::size_t i = 0; i < queue_size; ++i) {
-                if (i == num_thread)
-                    continue;         // don't steal from ourselves
-                if (!test(this_numa_domain, i) && !test(numa_domain, i))
-                    continue;
-
-                if (queues_[i]->get_next_thread(thrd, num_thread))
-                {
-                    queues_[i]->increment_num_stolen_threads();
-                    return true;
-                }
+            bool result = low_priority_queue_.get_next_thread(
+                    thrd, num_thread);
+            if (result)
+            {
+                low_priority_queue_.increment_num_stolen_threads();
+                return true;
             }
+
             return false;
         }
 
@@ -602,11 +607,13 @@ namespace hpx { namespace threads { namespace policies
             std::size_t added = 0;
             bool result = true;
 
-            if (num_thread < high_priority_queues_.size()) {
-                // Convert high priority tasks to threads before attempting to
-                // steal from other OS thread.
-                result = high_priority_queues_[num_thread]->
-                    wait_or_add_new(queues_size + num_thread, running,
+            for (boost::uint64_t i = 0; i < high_priority_queues_.size(); ++i)
+            {
+                // FIXME: Do a better job here.
+                boost::uint64_t const idx = (i + num_thread)
+                                          % high_priority_queues_.size();
+                result = high_priority_queues_[idx]->
+                    wait_or_add_new(num_thread, running,
                         idle_loop_count, added);
                 if (0 != added) return result;
             }
@@ -615,47 +622,60 @@ namespace hpx { namespace threads { namespace policies
                 num_thread, running, idle_loop_count, added) && result;
             if (0 != added) return result;
 
-            if (queues_size-1 == num_thread) {
-                // Convert low priority tasks to threads before attempting to
-                // steal from other OS thread.
-                result = low_priority_queue_.wait_or_add_new(
-                    num_thread, running, idle_loop_count, added) && result;
-                if (0 != added) return result;
-            }
-
-            // steal work items: first try to steal from other cores in
-            // the same NUMA node
-#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
-            if (test(steals_in_numa_domain_, num_thread))
-#endif
+            if (numa_sensitive_)
             {
-                mask_cref_type numa_domain = numa_domain_masks_[num_thread];
-                for (std::size_t i = 0; i < queues_size; ++i)
+                // steal work items: first try to steal from other cores in
+                // the same NUMA node
+#if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
+                if (test(steals_in_numa_domain_, num_thread))
+#endif
                 {
-                    if (i == num_thread || !test(numa_domain, i))
-                        continue;         // don't steal from ourselves
-
-                    result = queues_[num_thread]->wait_or_add_new(i,
-                        running, idle_loop_count, added, queues_[i]) && result;
-                    if (0 != added)
+                    mask_cref_type numa_domain = numa_domain_masks_[num_thread];
+                    for (std::size_t i = 0; i < queues_size; ++i)
                     {
-                        queues_[num_thread]->increment_num_stolen_threads(added);
-                        return result;
+                        if (i == num_thread || !test(numa_domain, i))
+                            continue;         // don't steal from ourselves
+    
+                        result = queues_[num_thread]->wait_or_add_new(num_thread,
+                            running, idle_loop_count, added, queues_[i]) && result;
+                        if (0 != added)
+                        {
+                            queues_[num_thread]->increment_num_stolen_threads(added);
+                            return result;
+                        }
                     }
                 }
-            }
 
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
-            // if nothing found, ask everybody else
-            if (test(steals_outside_numa_domain_, num_thread)) {
-                mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
-                for (std::size_t i = 0; i < queues_size; ++i)
-                {
-                    if (i == num_thread || !test(numa_domain, i))
-                        continue;         // don't steal from ourselves
+                // if nothing found, ask everybody else
+                if (test(steals_outside_numa_domain_, num_thread)) {
+                    mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
+                    for (std::size_t i = 0; i < queues_size; ++i)
+                    {
+                        if (i == num_thread || !test(numa_domain, i))
+                            continue;         // don't steal from ourselves
+    
+                        result = queues_[num_thread]->wait_or_add_new(num_thread,
+                            running, idle_loop_count, added, queues_[i]) && result;
+                        if (0 != added)
+                        {
+                            queues_[num_thread]->increment_num_stolen_threads(added);
+                            return result;
+                        }
+                    }
+                }
+#endif
+            }
 
-                    result = queues_[num_thread]->wait_or_add_new(i, running,
-                        idle_loop_count, added, queues_[i]) && result;
+            else // not NUMA-sensitive
+            {
+                for (std::size_t i = 1; i < queues_size; ++i)
+                {
+                    // FIXME: Do a better job here.
+                    std::size_t const idx = (i + num_thread) % queues_size;
+    
+                    result = queues_[num_thread]->wait_or_add_new(num_thread,
+                        running, idle_loop_count, added, queues_[idx]) && result;
                     if (0 != added)
                     {
                         queues_[num_thread]->increment_num_stolen_threads(added);
@@ -663,7 +683,6 @@ namespace hpx { namespace threads { namespace policies
                     }
                 }
             }
-#endif
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
@@ -689,6 +708,11 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 #endif
+
+            result = low_priority_queue_.wait_or_add_new(
+                num_thread, running, idle_loop_count, added) && result;
+            if (0 != added) return result;
+
             return result;
         }
 
