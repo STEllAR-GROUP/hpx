@@ -123,6 +123,7 @@ int invoke_worker_timed(double delay_sec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+/*
 void blocker(
     boost::condition& entered_cond
   , boost::mutex& entered_mut
@@ -139,6 +140,7 @@ void blocker(
 
     //block.wait();
 }
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_tasks(hpx::lcos::local::barrier& finished)
@@ -177,7 +179,7 @@ int hpx_main(
 
         ///////////////////////////////////////////////////////////////////////
         // Block all other OS threads.
-
+/*
         for (boost::uint64_t i = 0; i < (get_os_thread_count() - 1); ++i)
         {
             cout << "spawning " << i << " on " << hpx::get_worker_thread_num() << "\n" << flush;
@@ -203,6 +205,7 @@ int hpx_main(
 
             cout << "spawned " << i << " on " << hpx::get_worker_thread_num() << "\n" << flush;
         }
+*/
 
         ///////////////////////////////////////////////////////////////////////
         if (ac)
