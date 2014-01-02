@@ -19,8 +19,10 @@
 #include <boost/fusion/include/invoke.hpp>
 #include <boost/fusion/include/as_vector.hpp>
 #include <boost/fusion/include/fold.hpp>
+#include <boost/ref.hpp>
 
-namespace hpx { namespace util {
+namespace hpx { namespace util
+{
     namespace detail
     {
         template <typename Future, typename IsFutureRange =
@@ -34,10 +36,8 @@ namespace hpx { namespace util {
                 boost::mpl::bool_<
                     boost::is_void<
                         typename hpx::lcos::detail::future_traits<
-                            typename boost::remove_const<
-                                typename util::remove_reference<
-                                    Future
-                                >::type
+                            typename hpx::util::decay<
+                                Future
                             >::type::value_type
                         >::type
                     >::type::value
@@ -99,15 +99,14 @@ namespace hpx { namespace util {
         template <typename Future>
         struct unwrapped_param_type_impl<Future, boost::mpl::false_, boost::mpl::false_>
           : hpx::lcos::detail::future_traits<Future>
-        {
-        };
+        {};
 
         template <typename Future>
         struct unwrapped_param_type
         {
             typedef
                 typename unwrapped_param_type_impl<
-                    Future
+                    typename boost::unwrap_reference<Future>::type
                 >::type
                 type;
         };
@@ -139,12 +138,18 @@ namespace hpx { namespace util {
             typename result<unwrapped_param_value(Tuple, Future)>::type
             operator()(Tuple t, Future & f) const
             {
+                typedef
+                    typename boost::unwrap_reference<
+                        typename util::decay<Future>::type
+                    >::type
+                    future_type;
+
                 return
                     invoke(
                         boost::move(t)
-                      , f
-                      , typename traits::is_future_range<Future>::type()
-                      , typename is_void_future<Future>::type()
+                      , boost::unwrap_ref(f)
+                      , typename traits::is_future_range<future_type>::type()
+                      , typename is_void_future<future_type>::type()
                     );
             }
 
@@ -282,10 +287,10 @@ namespace hpx { namespace util {
     }
 
     template <typename F>
-    detail::unwrapped_impl<typename util::remove_reference<F>::type >
+    detail::unwrapped_impl<typename util::decay<F>::type >
     unwrapped(BOOST_FWD_REF(F) f)
     {
-        detail::unwrapped_impl<typename util::remove_reference<F>::type >
+        detail::unwrapped_impl<typename util::decay<F>::type >
             res = {boost::forward<F>(f)};
 
         return boost::move(res);

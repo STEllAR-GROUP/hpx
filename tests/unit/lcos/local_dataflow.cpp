@@ -18,7 +18,8 @@ using hpx::lcos::local::dataflow;
 using hpx::util::bind;
 
 using hpx::async;
-using hpx::future;
+using hpx::unique_future;
+using hpx::shared_future;
 
 using hpx::make_ready_future;
 
@@ -65,15 +66,15 @@ void function_pointers()
     int_f1_count.store(0);
     int_f2_count.store(0);
 
-    future<void> f1 = dataflow(unwrapped(&void_f1), async(bind(&int_f)));
-    future<int>
+    unique_future<void> f1 = dataflow(unwrapped(&void_f1), async(bind(&int_f)));
+    unique_future<int>
         f2 = dataflow(
             unwrapped(&int_f1)
           , dataflow(
                 unwrapped(&int_f1)
               , make_ready_future(42))
         );
-    future<int>
+    unique_future<int>
         f3 = dataflow(
             unwrapped(&int_f2)
           , dataflow(
@@ -87,14 +88,14 @@ void function_pointers()
         );
 
     int_f_vector_count.store(0);
-    std::vector<future<int> > vf;
+    std::vector<unique_future<int> > vf;
     for(std::size_t i = 0; i < 10; ++i)
     {
         vf.push_back(dataflow(unwrapped(&int_f1), make_ready_future(42)));
     }
-    future<int> f4 = dataflow(unwrapped(&int_f_vector), vf);
+    unique_future<int> f4 = dataflow(unwrapped(&int_f_vector), boost::move(vf));
 
-    future<int>
+    unique_future<int>
         f5 = dataflow(
             unwrapped(&int_f1)
           , dataflow(
@@ -122,14 +123,15 @@ void function_pointers()
 boost::atomic<boost::uint32_t> future_void_f1_count;
 boost::atomic<boost::uint32_t> future_void_f2_count;
 
-void future_void_f1(future<void> f1) { HPX_TEST(f1.is_ready()); ++future_void_f1_count;}
-void future_void_f2(future<void> f1, future<void> f2) { HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready()); ++future_void_f2_count;}
+void future_void_f1(unique_future<void> f1) { HPX_TEST(f1.is_ready()); ++future_void_f1_count;}
+void future_void_sf1(shared_future<void> f1) { HPX_TEST(f1.is_ready()); ++future_void_f1_count;}
+void future_void_f2(unique_future<void> f1, unique_future<void> f2) { HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready()); ++future_void_f2_count;}
 
 boost::atomic<boost::uint32_t> future_int_f1_count;
 boost::atomic<boost::uint32_t> future_int_f2_count;
 
-int future_int_f1(future<void> f1) { HPX_TEST(f1.is_ready()); ++future_int_f1_count; return 1;}
-int future_int_f2(future<int> f1, future<int> f2)
+int future_int_f1(unique_future<void> f1) { HPX_TEST(f1.is_ready()); ++future_int_f1_count; return 1;}
+int future_int_f2(unique_future<int> f1, unique_future<int> f2)
 {
     HPX_TEST(f1.is_ready()); HPX_TEST(f2.is_ready());
     ++future_int_f2_count;
@@ -138,10 +140,10 @@ int future_int_f2(future<int> f1, future<int> f2)
 
 boost::atomic<boost::uint32_t> future_int_f_vector_count;
 
-int future_int_f_vector(std::vector<future<int> > const & vf)
+int future_int_f_vector(std::vector<unique_future<int> >& vf)
 {
     int sum = 0;
-    BOOST_FOREACH(future<int> f, vf)
+    BOOST_FOREACH(unique_future<int>& f, vf)
     {
         HPX_TEST(f.is_ready());
         sum += f.get();
@@ -154,9 +156,9 @@ void future_function_pointers()
     future_void_f1_count.store(0);
     future_void_f2_count.store(0);
 
-    future<void> f1
+    unique_future<void> f1
         = dataflow(
-            &future_void_f1, async(bind(&future_void_f1, future<void>(make_ready_future())))
+            &future_void_f1, async(bind(&future_void_sf1, shared_future<void>(make_ready_future())))
         );
 
     hpx::wait(f1);
@@ -164,10 +166,10 @@ void future_function_pointers()
     HPX_TEST_EQ(future_void_f1_count, 2u);
     future_void_f1_count.store(0);
 
-    future<void> f2 = dataflow(
+    unique_future<void> f2 = dataflow(
         &future_void_f2
-      , async(bind(&future_void_f1, future<void>(make_ready_future())))
-      , async(bind(&future_void_f1, future<void>(make_ready_future())))
+      , async(bind(&future_void_sf1, shared_future<void>(make_ready_future())))
+      , async(bind(&future_void_sf1, shared_future<void>(make_ready_future())))
     );
 
     hpx::wait(f2);
@@ -176,7 +178,7 @@ void future_function_pointers()
     future_void_f1_count.store(0);
     future_void_f2_count.store(0);
 
-    future<int> f3 = dataflow(
+    unique_future<int> f3 = dataflow(
         &future_int_f1
       , make_ready_future()
     );
@@ -185,7 +187,7 @@ void future_function_pointers()
     HPX_TEST_EQ(future_int_f1_count, 1u);
     future_int_f1_count.store(0);
 
-    future<int> f4 = dataflow(
+    unique_future<int> f4 = dataflow(
         &future_int_f2
       , dataflow(&future_int_f1, make_ready_future())
       , dataflow(&future_int_f1, make_ready_future())
@@ -198,12 +200,12 @@ void future_function_pointers()
     future_int_f2_count.store(0);
 
     future_int_f_vector_count.store(0);
-    std::vector<future<int> > vf;
+    std::vector<unique_future<int> > vf;
     for(std::size_t i = 0; i < 10; ++i)
     {
         vf.push_back(dataflow(&future_int_f1, make_ready_future()));
     }
-    future<int> f5 = dataflow(&future_int_f_vector, vf);
+    unique_future<int> f5 = dataflow(&future_int_f_vector, boost::ref(vf));
 
     HPX_TEST_EQ(f5.get(), 10);
 }

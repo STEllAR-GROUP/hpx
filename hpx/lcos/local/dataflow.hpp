@@ -24,10 +24,12 @@
 #include <boost/fusion/include/deref.hpp>
 #include <boost/fusion/include/end.hpp>
 #include <boost/fusion/include/next.hpp>
+#include <boost/fusion/include/for_each.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <boost/ref.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/utility/enable_if.hpp>
 
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
@@ -41,6 +43,26 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     struct is_future_or_future_range
       : boost::mpl::or_<traits::is_future<T>, traits::is_future_range<T> >
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct reset_dataflow_future
+    {
+        typedef void result_type;
+
+        template <typename Future>
+        BOOST_FORCEINLINE
+        void operator()(Future& future) const
+        {
+            future = Future();
+        }
+        
+        template <typename Future>
+        BOOST_FORCEINLINE
+        void operator()(boost::reference_wrapper<Future>& future) const
+        {
+            future.get() = Future();
+        }
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Policy, typename Func, typename Futures>
@@ -72,7 +94,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             execute_function_type;
 
     private:
-        // workaround gcc regression wrongly instantiating a copy-constructor
+        // workaround gcc regression wrongly instantiating constructors
+        dataflow_frame();
         dataflow_frame(dataflow_frame const&);
 
     public:
@@ -96,7 +119,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                         func_, boost::move(futures_));
 
                 // reset futures
-                futures_ = Futures();
+                boost::fusion::for_each(futures_, reset_dataflow_future());
 
                 this->set_data(res);
             }
@@ -113,7 +136,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     func_, boost::move(futures_));
 
                 // reset futures
-                futures_ = Futures();
+                boost::fusion::for_each(futures_, reset_dataflow_future());
 
                 this->set_data(util::unused_type());
             } catch(...) {
@@ -203,15 +226,15 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             typedef
                 typename boost::fusion::result_of::next<Iter>::type
                 next_type;
-
+            
             await_range(
-                boost::move(boost::begin(boost::fusion::deref(iter)))
-              , boost::move(boost::end(boost::fusion::deref(iter)))
+                boost::begin(boost::unwrap_ref(boost::fusion::deref(iter)))
+              , boost::end(boost::unwrap_ref(boost::fusion::deref(iter)))
             );
 
             await(
                 policy_
-              , boost::move(boost::fusion::next(iter))
+              , boost::fusion::next(iter)
               , boost::mpl::bool_<
                     boost::is_same<next_type, end_type>::value
                 >()
@@ -227,8 +250,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 next_type;
 
             typedef
-                typename util::decay<
-                    typename boost::fusion::result_of::deref<Iter>::type
+                typename boost::unwrap_reference<
+                    typename util::decay<
+                        typename boost::fusion::result_of::deref<Iter>::type
+                    >::type
                 >::type
                 future_type;
             future_type &  f_ =
@@ -267,7 +292,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             await(
                 policy_
-              , boost::move(boost::fusion::next(iter))
+              , boost::fusion::next(iter)
               , boost::mpl::bool_<
                     boost::is_same<next_type, end_type>::value
                 >()
@@ -279,7 +304,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         void await(Policy&, Iter iter, boost::mpl::false_)
         {
             typedef
-                typename boost::fusion::result_of::deref<Iter>::type
+                typename boost::unwrap_reference<
+                    typename util::decay<
+                        typename boost::fusion::result_of::deref<Iter>::type
+                    >::type
+                >::type
                 future_type;
 
             typedef typename traits::is_future_range<
@@ -297,7 +326,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
             await(
                 policy_
-              , boost::move(boost::fusion::begin(futures_))
+              , boost::fusion::begin(futures_)
               , boost::mpl::bool_<
                     boost::is_same<begin_type, end_type>::value
                 >()
