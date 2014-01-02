@@ -591,7 +591,7 @@ namespace hpx { namespace naming
         return get_id_from_locality_id(locality_id);
     }
 
-    inline lcos::future<naming::id_type> get_colocation_id(naming::id_type const& id)
+    inline lcos::unique_future<naming::id_type> get_colocation_id(naming::id_type const& id)
     {
         return lcos::make_ready_future(naming::get_colocation_id_sync(id, throws));
     }
@@ -604,7 +604,7 @@ namespace hpx
         return naming::get_colocation_id(id).get(ec);
     }
 
-    lcos::future<naming::id_type> get_colocation_id(naming::id_type const& id)
+    lcos::unique_future<naming::id_type> get_colocation_id(naming::id_type const& id)
     {
         return naming::get_colocation_id(id);
     }

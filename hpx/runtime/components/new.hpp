@@ -42,12 +42,12 @@ namespace hpx { namespace components
     ///          which can be used to retrieve the global address of the
     ///          newly created component.
     template <typename Component, typename ArgN, ...>
-    hpx::future<hpx::id_type>
+    hpx::unique_future<hpx::id_type>
     new_(hpx::id_type const& locality, Arg0 argN, ...);
 #else
     template <typename Component>
     inline typename boost::enable_if<
-        traits::is_component<Component>, lcos::future<naming::id_type>
+        traits::is_component<Component>, lcos::unique_future<naming::id_type>
     >::type
     new_(id_type const& locality)
     {
@@ -92,7 +92,7 @@ namespace hpx
 
     template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline typename boost::enable_if<
-        traits::is_component<Component>, lcos::future<naming::id_type>
+        traits::is_component<Component>, lcos::unique_future<naming::id_type>
     >::type
     new_(id_type const& locality, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {

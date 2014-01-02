@@ -1227,7 +1227,7 @@ namespace hpx
     ///        referenced by the given id is currently located on
     ///
     /// \see    \a hpx::get_colocation_id_sync()
-    HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id(
+    HPX_API_EXPORT lcos::unique_future<naming::id_type> get_colocation_id(
         naming::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////

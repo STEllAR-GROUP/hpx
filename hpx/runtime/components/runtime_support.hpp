@@ -51,7 +51,7 @@ namespace hpx { namespace components
 
         /// Asynchronously create a new component using the runtime_support
         template <typename Component>
-        lcos::future<naming::id_type> create_component_async()
+        lcos::unique_future<naming::id_type> create_component_async()
         {
             return this->base_type::template create_component_async<Component>
                 (gid_);
@@ -59,7 +59,7 @@ namespace hpx { namespace components
 
 #define HPX_RUNTIME_SUPPORT_CLIENT_CREATE(Z, N, D)                           \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>   \
-        lcos::future<naming::id_type>                                        \
+        lcos::unique_future<naming::id_type>                                 \
         create_component_async(BOOST_PP_ENUM_BINARY_PARAMS(N, A, a))         \
         {                                                                    \
             return this->base_type::template create_component_async<Component>\
@@ -92,7 +92,7 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously create a new component using the runtime_support
-        lcos::future<std::vector<naming::id_type> >
+        lcos::unique_future<std::vector<naming::id_type> >
         bulk_create_components_async(components::component_type type,
             std::size_t count = 1)
         {
