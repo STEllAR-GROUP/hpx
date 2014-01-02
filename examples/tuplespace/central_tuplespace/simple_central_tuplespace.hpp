@@ -60,7 +60,7 @@ namespace examples
             }
 
             // request gid;
-            *this = hpx::components::new_<examples::server::simple_central_tuplespace>(locality);
+            *this = simple_central_tuplespace(hpx::components::new_<examples::server::simple_central_tuplespace>(locality));
             bool rc = hpx::agas::register_name(symbol_name, this->get_gid()).get();
 
             if(rc)
