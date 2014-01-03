@@ -198,7 +198,7 @@ void test_dataflow_object()
         } else {
             HPX_TEST_EQ((
                 (f <= movable_functor<movable_object>()).get()
-            ), 1u);
+            ), 0u);
         }
 
         // test movable_functor<non_movable_object>()
