@@ -40,7 +40,7 @@ namespace jacobi_smp {
         for(std::size_t i = 0; i < dst->size(); i += block_size)
         {
             block_ranges.push_back(
-                range(i, std::min(dst->size(), i + block_size)));
+                range(i, std::min<std::size_t>(dst->size(), i + block_size)));
         }
 
         // pre-computing dependencies
