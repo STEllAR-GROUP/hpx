@@ -139,10 +139,12 @@ struct channel
         data_->reset();
    }
 
-    hpx::future<T> get_future()
+    hpx::unique_future<T> get_future()
     {
         HPX_ASSERT(data_);
-        return lcos::detail::make_future_from_data<T>(data_);
+        
+        using lcos::detail::future_access;
+        return future_access::create<hpx::unique_future<T> >(data_);
     }
 
     T get(hpx::error_code& ec = hpx::throws) const
@@ -176,11 +178,13 @@ struct channel
     }
 
     template <typename F>
-    hpx::future<typename boost::result_of<F(hpx::future<T>)>::type>
+    hpx::unique_future<typename boost::result_of<F(hpx::unique_future<T>)>::type>
     then(BOOST_FWD_REF(F) f)
     {
         HPX_ASSERT(data_);
-        return lcos::detail::make_future_from_data<T>(data_).then
+        
+        using lcos::detail::future_access;
+        return future_access::create<hpx::unique_future<T> >(data_).then
             (boost::forward<F>(f));
     }
 
@@ -260,10 +264,12 @@ struct channel<void>
         data_->reset();
    }
 
-    hpx::future<void> get_future()
+    hpx::unique_future<void> get_future()
     {
         HPX_ASSERT(data_);
-        return lcos::detail::make_future_from_data<void>(data_);
+        
+        using lcos::detail::future_access;
+        return future_access::create<hpx::unique_future<void> >(data_);
     }
 
     void get(hpx::error_code& ec = hpx::throws) const
@@ -287,11 +293,13 @@ struct channel<void>
     }
 
     template <typename F>
-    hpx::future<typename boost::result_of<F(hpx::future<void>)>::type>
+    hpx::unique_future<typename boost::result_of<F(hpx::unique_future<void>)>::type>
     then(BOOST_FWD_REF(F) f)
     {
         HPX_ASSERT(data_);
-        return lcos::detail::make_future_from_data<void>(data_).then
+        
+        using lcos::detail::future_access;
+        return future_access::create<hpx::unique_future<void> >(data_).then
             (boost::forward<completed_callback_type>(f));
     }
 

@@ -70,7 +70,7 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         /// \brief get a future allowing to wait for the trigger to fire
-        future<void> get_future(std::size_t* generation = 0,
+        unique_future<void> get_future(std::size_t* generation = 0,
             error_code& ec = hpx::throws)
         {
             typename mutex_type::scoped_lock l(mtx_);
@@ -84,7 +84,7 @@ namespace hpx { namespace lcos { namespace local
                     *generation = generation_;
                 return promise_.get_future(ec);
             }
-            return hpx::future<void>();
+            return hpx::unique_future<void>();
         }
 
         /// \brief Trigger this object.
@@ -133,7 +133,7 @@ namespace hpx { namespace lcos { namespace local
                 this_.conditions_.erase(it_);
             }
 
-            future<void> get_future(HPX_STD_FUNCTION<bool()> const& func,
+            unique_future<void> get_future(HPX_STD_FUNCTION<bool()> const& func,
                 error_code& ec = hpx::throws)
             {
                 return (*it_)->get_future(func, ec);
@@ -175,7 +175,7 @@ namespace hpx { namespace lcos { namespace local
                 conditional_trigger c;
                 manage_condition cond(*this, c);
 
-                future<void> f = cond.get_future(util::bind(
+                unique_future<void> f = cond.get_future(util::bind(
                         &base_trigger::test_condition, this, generation));
 
                 {
