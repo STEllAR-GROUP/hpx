@@ -15,7 +15,7 @@ namespace hpx { namespace agas { namespace stubs
 {
 
 template <typename Result>
-lcos::future<Result> component_namespace::service_async(
+lcos::unique_future<Result> component_namespace::service_async(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
@@ -28,13 +28,13 @@ lcos::future<Result> component_namespace::service_async(
     return p.get_future();
 }
 
-template lcos::future<response> component_namespace::service_async<response>(
+template lcos::unique_future<response> component_namespace::service_async<response>(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
     );
 
-template lcos::future<boost::uint32_t> component_namespace::service_async<boost::uint32_t>(
+template lcos::unique_future<boost::uint32_t> component_namespace::service_async<boost::uint32_t>(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
@@ -50,7 +50,7 @@ void component_namespace::service_non_blocking(
     hpx::apply_p<action_type>(gid, priority, req);
 }
 
-lcos::future<std::vector<response> > component_namespace::bulk_service_async(
+lcos::unique_future<std::vector<response> > component_namespace::bulk_service_async(
     naming::id_type const& gid
   , std::vector<request> const& reqs
   , threads::thread_priority priority

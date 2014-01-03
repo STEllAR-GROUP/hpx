@@ -717,7 +717,7 @@ bool addressing_service::get_localities(
     }
 } // }}}
 
-lcos::future<std::vector<naming::locality> >
+lcos::unique_future<std::vector<naming::locality> >
     addressing_service::get_resolved_localities_async()
 { // {{{ get_resolved_localities_async implementation
     naming::id_type const target = bootstrap_locality_namespace_id();
@@ -768,7 +768,7 @@ boost::uint32_t addressing_service::get_num_localities(
     return boost::uint32_t(-1);
 } // }}}
 
-lcos::future<boost::uint32_t> addressing_service::get_num_localities_async(
+lcos::unique_future<boost::uint32_t> addressing_service::get_num_localities_async(
     components::component_type type
     )
 { // {{{ get_num_localities implementation
@@ -809,7 +809,7 @@ boost::uint32_t addressing_service::get_num_overall_threads(
     return boost::uint32_t(0);
 } // }}}
 
-lcos::future<boost::uint32_t> addressing_service::get_num_overall_threads_async()
+lcos::unique_future<boost::uint32_t> addressing_service::get_num_overall_threads_async()
 { // {{{
     naming::id_type const target = bootstrap_locality_namespace_id();
     request req(locality_ns_num_threads);
@@ -840,7 +840,7 @@ std::vector<boost::uint32_t> addressing_service::get_num_threads(
     return std::vector<boost::uint32_t>();
 } // }}}
 
-lcos::future<std::vector<boost::uint32_t> > addressing_service::get_num_threads_async()
+lcos::unique_future<std::vector<boost::uint32_t> > addressing_service::get_num_threads_async()
 { // {{{
     naming::id_type const target = bootstrap_locality_namespace_id();
     request req(locality_ns_num_threads);
@@ -1326,7 +1326,7 @@ bool addressing_service::resolve_cached(
     return false;
 } // }}}
 
-hpx::future<naming::address> addressing_service::resolve_async(
+hpx::unique_future<naming::address> addressing_service::resolve_async(
     naming::gid_type const& gid
     )
 {
@@ -1350,7 +1350,7 @@ hpx::future<naming::address> addressing_service::resolve_async(
 }
 
 naming::address addressing_service::resolve_full_postproc(
-    future<response> f, naming::gid_type const& id
+    unique_future<response> f, naming::gid_type const& id
     )
 {
     naming::address addr;
@@ -1385,7 +1385,7 @@ naming::address addressing_service::resolve_full_postproc(
     return addr;
 }
 
-hpx::future<naming::address> addressing_service::resolve_full_async(
+hpx::unique_future<naming::address> addressing_service::resolve_full_async(
     naming::gid_type const& gid
     )
 {
@@ -1401,7 +1401,7 @@ hpx::future<naming::address> addressing_service::resolve_full_async(
       , naming::id_type::unmanaged);
 
     using util::placeholders::_1;
-    future<response> f = stubs::primary_namespace::service_async<response>(target, req);
+    unique_future<response> f = stubs::primary_namespace::service_async<response>(target, req);
     return f.then(util::bind(&addressing_service::resolve_full_postproc, this, _1, gid));
 }
 
@@ -1631,7 +1631,7 @@ bool addressing_service::add_remote_incref_request(
 // a) remote incref requests which need to be acknowledged (loc != invalid_id)
 // b) local decref request which needs to be executed (loc == invalid_id)
 //
-hpx::future<bool> addressing_service::propagate_acknowlegdements(
+hpx::unique_future<bool> addressing_service::propagate_acknowlegdements(
     boost::int64_t credit
   , naming::gid_type const& gid
   , boost::uint32_t loc
@@ -1699,7 +1699,7 @@ bool addressing_service::synchronize_with_async_incref(
             this, _1, _2, _3)) && result;
 }
 
-lcos::future<bool> addressing_service::incref_async(
+lcos::unique_future<bool> addressing_service::incref_async(
     naming::gid_type const& gid
   , boost::int64_t credit
   , naming::id_type const& keep_alive
@@ -1708,7 +1708,7 @@ lcos::future<bool> addressing_service::incref_async(
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
-        lcos::future<bool> (addressing_service::*incref_async_ptr)(
+        lcos::unique_future<bool> (addressing_service::*incref_async_ptr)(
             naming::gid_type const&
           , boost::int64_t
           , naming::id_type const&
@@ -1723,7 +1723,7 @@ lcos::future<bool> addressing_service::incref_async(
         HPX_THROW_EXCEPTION(bad_parameter
           , "addressing_service::incref_async"
           , boost::str(boost::format("invalid credit count of %1%") % credit));
-        return lcos::future<bool>();
+        return lcos::unique_future<bool>();
     }
 
     HPX_ASSERT(keep_alive != naming::invalid_id);
@@ -1770,7 +1770,7 @@ lcos::future<bool> addressing_service::incref_async(
 
     if (incref_list.empty())
     {
-        lcos::future<bool> f = hpx::make_ready_future<bool>(true);
+        lcos::unique_future<bool> f = hpx::make_ready_future<bool>(true);
 
         using util::placeholders::_1;
         return f.then(
@@ -1790,7 +1790,7 @@ lcos::future<bool> addressing_service::incref_async(
         stubs::primary_namespace::get_service_instance(e_lower)
       , naming::id_type::unmanaged);
 
-    lcos::future<bool> f =
+    lcos::unique_future<bool> f =
         stubs::primary_namespace::service_async<bool>(target, req);
 
     using util::placeholders::_1;
@@ -1885,7 +1885,7 @@ static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
     return true;
 }
 
-lcos::future<bool> addressing_service::register_name_async(
+lcos::unique_future<bool> addressing_service::register_name_async(
     std::string const& name
   , naming::id_type const& id
     )
@@ -1898,7 +1898,7 @@ lcos::future<bool> addressing_service::register_name_async(
 
     request req(symbol_ns_bind, name, new_gid);
 
-    future<bool> f = stubs::symbol_namespace::service_async<bool>(
+    unique_future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
 
     if (new_credit != 0)
@@ -1943,7 +1943,7 @@ bool addressing_service::unregister_name(
     }
 } // }}}
 
-lcos::future<naming::id_type> addressing_service::unregister_name_async(
+lcos::unique_future<naming::id_type> addressing_service::unregister_name_async(
     std::string const& name
     )
 { // {{{
@@ -1984,7 +1984,7 @@ bool addressing_service::resolve_name(
     }
 } // }}}
 
-lcos::future<naming::id_type> addressing_service::resolve_name_async(
+lcos::unique_future<naming::id_type> addressing_service::resolve_name_async(
     std::string const& name
     )
 { // {{{
