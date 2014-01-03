@@ -499,7 +499,8 @@ namespace hpx { namespace lcos { namespace detail
                 // if we get here, this future is ready
                 Outer outer = future_access::create<Outer>(outer_state);
 
-                inner_shared_state_ptr const& inner_state =
+                // take by value, as the future will go away immediately
+                inner_shared_state_ptr inner_state =
                     future_access::get_shared_state(outer.get());
                 inner_state->set_on_completed(
                     util::bind(inner_ready, boost::move(this_), inner_state));
