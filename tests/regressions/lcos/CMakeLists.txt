@@ -6,6 +6,7 @@
 
 set(tests
     after_588
+    async_unwrap_1037
     dataflow_launch_775
     async_callback_non_deduced_context
     future_790
