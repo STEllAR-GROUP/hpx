@@ -1,4 +1,4 @@
-//  Copyright 2013 (c) Agustin Berge
+//  Copyright 2013 (c) Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,6 +24,6 @@ hpx::future<int> f(int i)
 
 int main()
 {
-    f(0).get();
+    HPX_TEST_EQ(f(0).get(), 1);
     return hpx::util::report_errors();
 }
