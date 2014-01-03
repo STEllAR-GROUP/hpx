@@ -39,7 +39,7 @@ namespace hpx { namespace lcos { namespace detail
         boost::mpl::true_)
     {
         try {
-            func(future);
+            func(boost::move(future));
             dest.set_data(util::unused);
         }
         catch (...) {
