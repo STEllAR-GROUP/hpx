@@ -19,7 +19,7 @@ hpx::future<int> f(int i)
         return hpx::async(hpx::util::bind(f, i+1));
     }
 
-    return hpx::make_ready_future<int>(i);
+    return hpx::make_ready_future(i);
 }
 
 int main()
