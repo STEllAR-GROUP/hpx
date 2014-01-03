@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace stubs
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
         template <typename Component>
-        static lcos::future<naming::id_type>
+        static lcos::unique_future<naming::id_type>
         create_component_async(naming::id_type const& gid)
         {
             if (!naming::is_locality(gid))
@@ -82,7 +82,7 @@ namespace hpx { namespace components { namespace stubs
 /**/
 #define HPX_RUNTIME_SUPPORT_STUB_CREATE(Z, N, D)                              \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>  \
-        static lcos::future<naming::id_type>                                  \
+        static lcos::unique_future<naming::id_type>                           \
         create_component_async(naming::id_type const& gid,                    \
             HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
         {                                                                     \
@@ -126,7 +126,7 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // copy construct a component 
         template <typename Component>
-        static lcos::future<naming::id_type>
+        static lcos::unique_future<naming::id_type>
         copy_create_component_async(naming::id_type const& gid,
             boost::shared_ptr<Component> const& p, bool local_op)
         {
@@ -154,7 +154,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<std::vector<naming::id_type> >
+        static lcos::unique_future<std::vector<naming::id_type> >
         bulk_create_components_async(
             naming::id_type const& gid, components::component_type type,
             std::size_t count = 1);

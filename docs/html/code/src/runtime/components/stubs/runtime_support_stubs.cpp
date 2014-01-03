@@ -45,7 +45,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////
-    lcos::future<std::vector<naming::id_type> >
+    lcos::unique_future<std::vector<naming::id_type> >
     runtime_support::bulk_create_components_async(
         naming::id_type const& gid, components::component_type type,
         std::size_t count)

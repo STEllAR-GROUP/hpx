@@ -27,12 +27,12 @@ namespace hpx { namespace components
         // This will be called when f is ready().
         template <typename Component>
         naming::id_type copy_same_locality(naming::id_type const& to_copy,
-            future<naming::id_type> f)
+            unique_future<naming::id_type> f)
         {
             typedef typename server::copy_component_action<Component>
                 action_type;
 
-            naming::id_type component_locality(f.move());
+            naming::id_type component_locality(f.get());
             return async<action_type>(component_locality, to_copy,
                 component_locality).get();
         }
@@ -43,11 +43,11 @@ namespace hpx { namespace components
         template <typename Component>
         naming::id_type copy_any_locality(naming::id_type const& to_copy,
             naming::id_type const& target_locality,
-            future<naming::id_type> f)
+            unique_future<naming::id_type> f)
         {
             typedef typename server::copy_component_action<Component>
                 action_type;
-            return async<action_type>(f.move(), to_copy, target_locality).get();
+            return async<action_type>(f.get(), to_copy, target_locality).get();
         }
     }
     /// \endcond
@@ -76,7 +76,7 @@ namespace hpx { namespace components
     ///
     template <typename Component>
 #if defined(DOXYGEN)
-    future<naming::id_type>
+    unique_future<naming::id_type>
 #else
     inline typename boost::enable_if<
         traits::is_component<Component>, future<naming::id_type>
@@ -85,7 +85,7 @@ namespace hpx { namespace components
     copy(naming::id_type const& to_copy,
         naming::id_type const& target_locality = naming::invalid_id)
     {
-        future<naming::id_type> f = get_colocation_id(to_copy);
+        unique_future<naming::id_type> f = get_colocation_id(to_copy);
 
         // if the new component should be created on the same locality as 
         // the source component, we simply invoke the copy operation there.
