@@ -287,13 +287,13 @@ namespace hpx
         };
     }
 
-    lcos::future<void> thread::get_future(error_code& ec)
+    lcos::unique_future<void> thread::get_future(error_code& ec)
     {
         if (id_ == threads::invalid_thread_id || id_ == thread::uninitialized)
         {
             HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
                 "NULL thread id encountered");
-            return lcos::future<void>();
+            return lcos::unique_future<void>();
         }
 
         detail::thread_task_base* p = new detail::thread_task_base(id_);
@@ -301,10 +301,11 @@ namespace hpx
         if (!p->valid()) {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::get_future",
                 "Could not create future as thread has been terminated.");
-            return lcos::future<void>();
+            return lcos::unique_future<void>();
         }
 
-        return lcos::detail::make_future_from_data<void>(boost::move(base));
+        using lcos::detail::future_access;
+        return future_access::create<lcos::unique_future<void> >(boost::move(base));
     }
 
     ///////////////////////////////////////////////////////////////////////////
