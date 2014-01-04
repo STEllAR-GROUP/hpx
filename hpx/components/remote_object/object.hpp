@@ -96,7 +96,7 @@ namespace hpx { namespace components
         explicit object(naming::id_type const & gid) : gid_(gid) {}
         naming::id_type gid_;
         template <typename F>
-        lcos::future<
+        lcos::unique_future<
             typename boost::result_of<typename hpx::util::remove_reference<F>::type(T &)>::type
         >
         operator<=(BOOST_FWD_REF(F) f) const
@@ -109,7 +109,7 @@ namespace hpx { namespace components
         }
 
         template <typename F>
-        lcos::future<
+        lcos::unique_future<
             typename boost::result_of<typename hpx::util::remove_reference<F>::type(T &)>::type
         >
         apply(BOOST_FWD_REF(F) f) const

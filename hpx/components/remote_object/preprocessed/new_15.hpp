@@ -12,7 +12,7 @@
     
     template <typename T, typename A0>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0)
     {
@@ -36,7 +36,7 @@
     }
     template <typename T, typename A0 , typename A1>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
@@ -60,7 +60,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
@@ -84,7 +84,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
@@ -108,7 +108,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
@@ -132,7 +132,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
@@ -156,7 +156,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
@@ -180,7 +180,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
@@ -204,7 +204,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
     {
@@ -228,7 +228,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
     {
@@ -252,7 +252,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10)
     {
@@ -276,7 +276,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11)
     {
@@ -300,7 +300,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12)
     {
@@ -324,7 +324,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13)
     {
@@ -348,7 +348,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14)
     {
@@ -372,7 +372,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15)
     {
@@ -396,7 +396,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16)
     {
@@ -420,7 +420,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17)
     {
