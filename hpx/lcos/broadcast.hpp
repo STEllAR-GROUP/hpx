@@ -76,7 +76,8 @@ namespace hpx { namespace lcos {
         {};
 
         ///////////////////////////////////////////////////////////////////////
-        inline void return_void(hpx::future<std::vector<hpx::future<void> > >)
+        inline void return_void(
+            hpx::unique_future<std::vector<hpx::unique_future<void> > >)
         {
             // todo: verify validity of all futures in the vector
         }
@@ -85,23 +86,24 @@ namespace hpx { namespace lcos {
             typename Result
         >
         std::vector<Result>
-        wrap_into_vector(hpx::future<Result> r)
+        wrap_into_vector(hpx::unique_future<Result> r)
         {
-            return std::vector<Result>(1, r.move());
+            return std::vector<Result>(1, r.get());
         }
 
         template <
             typename Result
         >
         std::vector<Result>
-        return_result_type(hpx::future<std::vector<hpx::future<std::vector<Result> > > > r)
+        return_result_type(
+            hpx::unique_future<std::vector<hpx::unique_future<std::vector<Result> > > > r)
         {
             std::vector<Result> res;
-            std::vector<hpx::future<std::vector<Result> > > fres = boost::move(r.move());
+            std::vector<hpx::unique_future<std::vector<Result> > > fres = boost::move(r.get());
 
-            BOOST_FOREACH(hpx::future<std::vector<Result> >& f, fres)
+            BOOST_FOREACH(hpx::unique_future<std::vector<Result> >& f, fres)
             {
-                std::vector<Result> t = boost::move(f.move());
+                std::vector<Result> t = boost::move(f.get());
                 res.reserve(res.capacity() + t.size());
                 boost::move(t.begin(), t.end(), std::back_inserter(res));
             }
@@ -341,7 +343,7 @@ namespace hpx { namespace lcos {
             typename Action
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
         >
-        //hpx::future<void>
+        //hpx::unique_future<void>
         void
         BOOST_PP_CAT(broadcast_impl, N)(
             Action const & act
@@ -353,7 +355,7 @@ namespace hpx { namespace lcos {
         {
             if(ids.empty()) return;// hpx::lcos::make_ready_future();
 
-            std::vector<hpx::future<void> > broadcast_futures;
+            std::vector<hpx::unique_future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
 
             broadcast_invoke(
@@ -417,7 +419,7 @@ namespace hpx { namespace lcos {
             typename Action
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
         >
-        //hpx::future<typename broadcast_result<Action>::type>
+        //hpx::unique_future<typename broadcast_result<Action>::type>
         typename broadcast_result<Action>::type
         BOOST_PP_CAT(broadcast_impl, N)(
             Action const & act
@@ -437,7 +439,7 @@ namespace hpx { namespace lcos {
             //if(ids.empty()) return hpx::lcos::make_ready_future(result_type());
             if(ids.empty()) return result_type();
 
-            std::vector<hpx::future<result_type> > broadcast_futures;
+            std::vector<hpx::unique_future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
 
             broadcast_invoke(
@@ -506,7 +508,7 @@ namespace hpx { namespace lcos {
         >
         struct BOOST_PP_CAT(broadcast_invoker, N)
         {
-            //static hpx::future<typename broadcast_result<Action>::type>
+            //static hpx::unique_future<typename broadcast_result<Action>::type>
             static typename broadcast_result<Action>::type
             call(
                 Action const & act
@@ -557,7 +559,7 @@ namespace hpx { namespace lcos {
         typename Action
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast(
@@ -591,7 +593,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
@@ -611,7 +613,7 @@ namespace hpx { namespace lcos {
         typename Action
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast_with_index(
@@ -631,7 +633,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
