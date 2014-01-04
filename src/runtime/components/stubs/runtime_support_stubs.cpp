@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace stubs
     /// to call \a future#get on the result of this function
     /// to obtain the global id of the newly created object.
     template <typename T, typename Config>
-    lcos::future<naming::id_type>
+    lcos::unique_future<naming::id_type>
     runtime_support::create_memory_block_async(
         naming::id_type const& id, std::size_t count,
         hpx::actions::manage_object_action<T, Config> const& act)
