@@ -12,9 +12,9 @@
 #include <hpx/lcos/async.hpp>
 #include <hpx/lcos/async_continue.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/protect.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/traits/is_callable.hpp>
 
 #include <boost/utility/enable_if.hpp>
@@ -188,11 +188,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 HPX_ENUM_FORWARD_ARGS(N, A, a)), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 HPX_ENUM_FORWARD_ARGS(N, A, a)));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -212,7 +212,7 @@ namespace hpx
         typedef typename boost::result_of<F(BOOST_PP_ENUM_PARAMS(N, A))>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 HPX_ENUM_FORWARD_ARGS(N, A, a)));
         p.apply();
         return p.get_future();
