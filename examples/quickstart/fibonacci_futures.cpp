@@ -29,8 +29,8 @@ BOOST_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t add(
-    hpx::future<boost::uint64_t> const& f1,
-    hpx::future<boost::uint64_t> const& f2)
+    hpx::unique_future<boost::uint64_t> f1,
+    hpx::unique_future<boost::uint64_t> f2)
 {
     return f1.get() + f2.get();
 }
@@ -40,20 +40,20 @@ struct when_all_wrapper
 {
     typedef boost::uint64_t result_type;
     typedef HPX_STD_TUPLE<
-            hpx::lcos::future<uint64_t>
-          , hpx::lcos::future<uint64_t> > data_type;
+            hpx::unique_future<uint64_t>
+          , hpx::unique_future<uint64_t> > data_type;
 
     boost::uint64_t operator()(
-        hpx::lcos::future<data_type> data
+        hpx::unique_future<data_type> data
     ) const
     {
-        data_type v = data.move();
+        data_type v = data.get();
         return HPX_STD_GET(0, v).get() + HPX_STD_GET(1, v).get();
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n);
+hpx::unique_future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n);
 
 struct fibonacci_future_one_continuation
 {
@@ -63,9 +63,9 @@ struct fibonacci_future_one_continuation
       : n_(n)
     {}
 
-    result_type operator()(hpx::future<boost::uint64_t> res) const
+    result_type operator()(hpx::unique_future<boost::uint64_t> res) const
     {
-        return add(fibonacci_future_one(n_ - 2), res);
+        return add(fibonacci_future_one(n_ - 2), boost::move(res));
     }
 
     boost::uint64_t n_;
@@ -76,7 +76,7 @@ boost::uint64_t fib(boost::uint64_t n)
     return fibonacci_future_one(n).get();
 }
 
-hpx::future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n)
+hpx::unique_future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -104,7 +104,8 @@ boost::uint64_t fibonacci(boost::uint64_t n)
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
-    hpx::future<boost::uint64_t> f = hpx::async(policy(n), &fibonacci, n-1);
+    hpx::unique_future<boost::uint64_t> f =
+        hpx::async(policy(n), &fibonacci, n-1);
     boost::uint64_t r = fibonacci(n-2);
 
     // attach a continuation to this future which is called asynchronously on
@@ -113,7 +114,7 @@ boost::uint64_t fibonacci(boost::uint64_t n)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
+hpx::unique_future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -123,14 +124,14 @@ hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
-    hpx::future<hpx::future<boost::uint64_t> > f =
+    hpx::unique_future<hpx::unique_future<boost::uint64_t> > f =
         hpx::async(&fibonacci_future, n-1);
-    hpx::future<boost::uint64_t> r = fibonacci_future(n-2);
+    hpx::unique_future<boost::uint64_t> r = fibonacci_future(n-2);
 
-    return hpx::async(&add, f.get(), r);
+    return hpx::async(&add, f.get(), boost::move(r));
 }
 
-hpx::future<boost::uint64_t> fibonacci_future_when_all(boost::uint64_t n)
+hpx::unique_future<boost::uint64_t> fibonacci_future_when_all(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -140,14 +141,14 @@ hpx::future<boost::uint64_t> fibonacci_future_when_all(boost::uint64_t n)
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
-    hpx::future<hpx::future<boost::uint64_t> > f =
+    hpx::unique_future<hpx::unique_future<boost::uint64_t> > f =
         hpx::async(&fibonacci_future, n-1);
-    hpx::future<boost::uint64_t> r = fibonacci_future(n-2);
+    hpx::unique_future<boost::uint64_t> r = fibonacci_future(n-2);
 
     return hpx::when_all(f.get(), r).then(when_all_wrapper());
 }
 
-hpx::future<boost::uint64_t> fibonacci_future_unwrapped_when_all(boost::uint64_t n)
+hpx::unique_future<boost::uint64_t> fibonacci_future_unwrapped_when_all(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -157,15 +158,15 @@ hpx::future<boost::uint64_t> fibonacci_future_unwrapped_when_all(boost::uint64_t
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
-    hpx::future<boost::uint64_t> f =
+    hpx::unique_future<boost::uint64_t> f =
         hpx::async(&fibonacci_future, n-1).unwrap();
-    hpx::future<boost::uint64_t> r = fibonacci_future(n-2);
+    hpx::unique_future<boost::uint64_t> r = fibonacci_future(n-2);
 
     return hpx::when_all(f, r).then(when_all_wrapper());
 }
 
 /////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
+hpx::unique_future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -173,20 +174,18 @@ hpx::future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
     if (n < threshold)
         return hpx::make_ready_future(fibonacci_serial(n));
 
-    using hpx::future;
-
     // asynchronously launch the calculation of both of the sub-terms
-    future<boost::uint64_t> f1 = fibonacci_future_all(n - 1);
-    future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
+    hpx::unique_future<boost::uint64_t> f1 = fibonacci_future_all(n - 1);
+    hpx::unique_future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
 
     // create a future representing the successful calculation of both sub-terms
     // attach a continuation to this future which is called asynchronously on
     // its completion and which calculates the the final result
-    return hpx::async(&add, f1, f2);
+    return hpx::async(&add, boost::move(f1), boost::move(f2));
 }
 
 /////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::uint64_t> fibonacci_future_all_when_all(boost::uint64_t n)
+hpx::unique_future<boost::uint64_t> fibonacci_future_all_when_all(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -194,11 +193,9 @@ hpx::future<boost::uint64_t> fibonacci_future_all_when_all(boost::uint64_t n)
     if (n < threshold)
         return hpx::make_ready_future(fibonacci_serial(n));
 
-    using hpx::future;
-
     // asynchronously launch the calculation of both of the sub-terms
-    future<boost::uint64_t> f1 = fibonacci_future_all(n - 1);
-    future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
+    hpx::unique_future<boost::uint64_t> f1 = fibonacci_future_all(n - 1);
+    hpx::unique_future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
 
     // create a future representing the successful calculation of both sub-terms
     // attach a continuation to this future which is called asynchronously on
@@ -223,7 +220,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     threshold = vm["threshold"].as<unsigned int>();
     if (threshold < 2 || threshold > n) {
         std::cerr << "fibonacci_futures: wrong command line argument value for "
-            "option 'threshold', should be in between 2 and n-value" 
+            "option 'threshold', should be in between 2 and n-value"
             ", value specified: " << threshold << std::endl;
         return hpx::finalize(); // Handles HPX shutdown
     }
@@ -237,9 +234,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (std::size_t i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i)
         {
-            // Create a Future for the whole calculation, execute it locally, 
+            // Create a Future for the whole calculation, execute it locally,
             // and wait for it.
             r = fibonacci_serial(n);
         }
@@ -258,9 +255,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (std::size_t i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i)
         {
-            // Create a Future for the whole calculation, execute it locally, 
+            // Create a Future for the whole calculation, execute it locally,
             // and wait for it.
             r = fibonacci_future_one(n).get();
         }
@@ -279,7 +276,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (std::size_t i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i)
         {
             // Create a Future for the whole calculation, execute it locally, and
             // wait for it.
@@ -299,7 +296,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (std::size_t i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i)
         {
             // Create a Future for the whole calculation, execute it locally, and
             // wait for it.
@@ -319,7 +316,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (std::size_t i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i)
         {
             // Create a Future for the whole calculation, execute it locally, and
             // wait for it.
@@ -339,7 +336,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (std::size_t i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i)
         {
             // Create a Future for the whole calculation, execute it locally, and
             // wait for it.
@@ -359,7 +356,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (std::size_t i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i)
         {
             // Create a future for the whole calculation, execute it locally, and
             // wait for it.
@@ -379,7 +376,7 @@ int hpx_main(boost::program_options::variables_map& vm)
         // Keep track of the time required to execute.
         boost::uint64_t start = hpx::util::high_resolution_clock::now();
 
-        for (std::size_t i = 0; i != max_runs; ++i) 
+        for (std::size_t i = 0; i != max_runs; ++i)
         {
             // Create a Future for the whole calculation, execute it locally, and
             // wait for it.
@@ -408,7 +405,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    boost::program_options::options_description 
+    boost::program_options::options_description
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     using boost::program_options::value;
