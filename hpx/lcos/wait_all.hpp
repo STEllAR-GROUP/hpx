@@ -12,6 +12,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/wait_n.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -20,6 +21,8 @@
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/iterate.hpp>
 
+#include <algorithm>
+#include <iterator>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,13 +47,12 @@ namespace hpx
     ///             inputs are fixed in number and are of heterogeneous types.
     ///             The inputs can be any arbitrary number of future objects.
 
-    template <typename R>
-    lcos::future<std::vector<lcos::future<R> > >
-    when_all(BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<R> >))) lazy_values,
+    template <typename Future>
+    lcos::unique_future<std::vector<Future> >
+    when_all(std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<R> > result_type;
+        typedef std::vector<Future> result_type;
 
         if (lazy_values.empty())
             return lcos::make_ready_future(result_type());
@@ -58,32 +60,32 @@ namespace hpx
         return when_n(lazy_values.size(), lazy_values, ec);
     }
 
-    template <typename R>
-    lcos::future<std::vector<lcos::future<R> > > //-V659
-    when_all(std::vector<lcos::future<R> > const& lazy_values,
+    template <typename Future>
+    lcos::unique_future<std::vector<Future> > //-V659
+    when_all(BOOST_RV_REF(std::vector<Future>) lazy_values,
         error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<R> > result_type;
-
-        result_type lazy_values_(lazy_values);
-        return when_all(boost::move(lazy_values_), ec);
+        return when_all(lazy_values, ec);
     }
 
     template <typename Iterator>
-    lcos::future<std::vector<lcos::future<
-        typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
-    > > >
+    lcos::unique_future<std::vector<
+        typename lcos::detail::future_iterator_traits<Iterator>::type
+    > >
     when_all(Iterator begin, Iterator end, error_code& ec = throws)
     {
-        typedef typename lcos::detail::future_iterator_traits<
-            Iterator>::traits_type::type value_type;
-        typedef std::vector<lcos::future<value_type> > result_type;
+        typedef
+            typename lcos::detail::future_iterator_traits<Iterator>::type
+            future_type;
+        typedef std::vector<future_type> result_type;
 
-        result_type lazy_values_(begin, end);
-        return when_all(boost::move(lazy_values_), ec);
+        result_type lazy_values_;
+        std::transform(begin, end, std::back_inserter(lazy_values_),
+            detail::when_acquire_future<future_type>());
+        return when_all(lazy_values_, ec);
     }
 
-    inline lcos::future<HPX_STD_TUPLE<> > //-V524
+    inline lcos::unique_future<HPX_STD_TUPLE<> > //-V524
     when_all(error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<> result_type;
@@ -110,15 +112,14 @@ namespace hpx
     ///             inputs are fixed in number and are of heterogeneous types.
     ///             The inputs can be any arbitrary number of future objects.
 
-    template <typename R>
-    std::vector<lcos::future<R> >
-    wait_all(BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<R> >))) lazy_values,
+    template <typename Future>
+    std::vector<Future>
+    wait_all(std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<R> > result_type;
+        typedef std::vector<Future> result_type;
 
-        lcos::future<result_type> f = when_all(lazy_values, ec);
+        lcos::unique_future<result_type> f = when_all(lazy_values, ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all",
                 "lcos::when_all didn't return a valid future");
@@ -128,29 +129,32 @@ namespace hpx
         return f.get(ec);
     }
 
-    template <typename R>
-    std::vector<lcos::future<R> >
-    wait_all(std::vector<lcos::future<R> > const& lazy_values,
+    template <typename Future>
+    std::vector<Future>
+    wait_all(BOOST_RV_REF(std::vector<Future>) lazy_values,
         error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<R> > result_type;
-
-        result_type lazy_values_(lazy_values);
-        return wait_all(boost::move(lazy_values_), ec);
+        return wait_all(lazy_values, ec);
     }
 
     template <typename Iterator>
     std::vector<
-        typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
+        typename lcos::detail::future_iterator_traits<Iterator>::type
     >
     wait_all(Iterator begin, Iterator end, error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<
-            typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
-        > > result_type;
+        typedef std::vector<
+            typename lcos::detail::future_iterator_traits<Iterator>::type
+        > result_type;
 
-        result_type lazy_values_(begin, end);
-        return wait_all(boost::move(lazy_values_), ec);
+        lcos::unique_future<result_type> f = when_all(begin, end, ec);
+        if (!f.valid()) {
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all",
+                "lcos::when_all didn't return a valid future");
+            return result_type();
+        }
+
+        return f.get(ec);
     }
 
     inline HPX_STD_TUPLE<>
@@ -158,7 +162,7 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<> result_type;
 
-        lcos::future<result_type> f = when_all(ec);
+        lcos::unique_future<result_type> f = when_all(ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all",
                 "lcos::when_all didn't return a valid future");
@@ -195,36 +199,28 @@ namespace hpx
 
 #define N BOOST_PP_ITERATION()
 
-#define HPX_WAIT_ALL_FUTURE_TYPE(z, n, _)                                     \
-        lcos::future<BOOST_PP_CAT(R, n)>                                      \
-    /**/
-#define HPX_WAIT_ALL_FUTURE_ARG(z, n, _)                                      \
-        lcos::future<BOOST_PP_CAT(R, n)> BOOST_PP_CAT(f, n)                   \
-    /**/
-#define HPX_WAIT_ALL_FUTURE_VAR(z, n, _) BOOST_PP_CAT(f, n)                   \
+#define HPX_WHEN_N_DECAY_FUTURE(Z, N, D)                                      \
+    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
     /**/
 
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <BOOST_PP_ENUM_PARAMS(N, typename R)>
-    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_TYPE, _)> >
-    when_all(BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_ARG, _),
-        error_code& ec = throws)
+    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+    lcos::unique_future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> >
+    when_all(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
-        return when_n(N, BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_VAR, _), ec);
+        return when_n(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
     }
 
-    template <BOOST_PP_ENUM_PARAMS(N, typename R)>
-    HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_TYPE, _)>
-    wait_all(BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_ARG, _),
-        error_code& ec = throws)
+    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+    HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)>
+    wait_all(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_TYPE, _)>
-            result_type;
+        typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> result_type;
 
-        lcos::future<result_type> f = when_all(
-            BOOST_PP_ENUM(N, HPX_WAIT_ALL_FUTURE_VAR, _), ec);
+        lcos::unique_future<result_type> f =
+            when_all(HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_all",
                 "lcos::when_all didn't return a valid future");
@@ -235,9 +231,7 @@ namespace hpx
     }
 }
 
-#undef HPX_WAIT_ALL_FUTURE_VAR
-#undef HPX_WAIT_ALL_FUTURE_ARG
-#undef HPX_WAIT_ALL_FUTURE_TYPE
+#undef HPX_WHEN_N_DECAY_FUTURE
 #undef N
 
 #endif

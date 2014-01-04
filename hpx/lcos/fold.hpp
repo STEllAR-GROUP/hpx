@@ -514,7 +514,7 @@ namespace hpx { namespace lcos
 
             return hpx::when_all(fold_futures).
                 then(perform_folding<result_type, FoldOp>(fold_op, init)).
-                move();
+                get();
         }
 
         ///////////////////////////////////////////////////////////////////////

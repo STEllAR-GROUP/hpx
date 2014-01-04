@@ -4,8 +4,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/include/lcos.hpp>
 #include <hpx/async.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/util/move.hpp>
 
 #include <boost/range.hpp>
@@ -97,8 +97,7 @@ namespace hpx {
         futures_iterator_type futures_begin = futures.begin();
         futures_iterator_type futures_mid = futures.begin() + futures.size()/2;
 
-        //! change this for wait_all once updated to std::futures
-        hpx::lcos::wait(
+        hpx::wait_all(
             left_future.then(move_futures_type(futures_begin))
           , right_future.then(move_futures_type(futures_mid))
         );

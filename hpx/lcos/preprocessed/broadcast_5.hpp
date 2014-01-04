@@ -232,7 +232,7 @@ namespace hpx { namespace lcos {
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>).move();
+                then(&return_result_type<action_result>).get();
         }
         
         template <
@@ -594,7 +594,7 @@ namespace hpx { namespace lcos {
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>).move();
+                then(&return_result_type<action_result>).get();
         }
         
         template <
@@ -956,7 +956,7 @@ namespace hpx { namespace lcos {
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>).move();
+                then(&return_result_type<action_result>).get();
         }
         
         template <
@@ -1318,7 +1318,7 @@ namespace hpx { namespace lcos {
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>).move();
+                then(&return_result_type<action_result>).get();
         }
         
         template <
@@ -1680,7 +1680,7 @@ namespace hpx { namespace lcos {
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>).move();
+                then(&return_result_type<action_result>).get();
         }
         
         template <
@@ -2042,7 +2042,7 @@ namespace hpx { namespace lcos {
                 }
             }
             return hpx::when_all(broadcast_futures).
-                then(&return_result_type<action_result>).move();
+                then(&return_result_type<action_result>).get();
         }
         
         template <
