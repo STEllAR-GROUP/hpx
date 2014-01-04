@@ -1260,7 +1260,7 @@ namespace hpx
     ///           and may be different for different parcelports.
     ///
     /// \see      \a std::string get_locality_name()
-    HPX_API_EXPORT future<std::string> get_locality_name(
+    HPX_API_EXPORT unique_future<std::string> get_locality_name(
         naming::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////
