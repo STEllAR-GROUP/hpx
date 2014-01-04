@@ -36,7 +36,7 @@ bool register_name_sync(
     return agas_.register_name(name, id);
 }
 
-lcos::future<bool> register_name(
+lcos::unique_future<bool> register_name(
     std::string const& name
   , naming::id_type const& id
     )
@@ -77,7 +77,7 @@ naming::id_type unregister_name_sync(
     return agas_.unregister_name(name);
 }
 
-lcos::future<naming::id_type> unregister_name(
+lcos::unique_future<naming::id_type> unregister_name(
     std::string const& name
     )
 {
@@ -123,7 +123,7 @@ bool resolve_name_sync(
     return false;
 }
 
-lcos::future<naming::id_type> resolve_name(
+lcos::unique_future<naming::id_type> resolve_name(
     std::string const& name
     )
 {
@@ -141,7 +141,7 @@ naming::id_type resolve_name_sync(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// lcos::future<std::vector<naming::id_type> > get_localities(
+// lcos::unique_future<std::vector<naming::id_type> > get_localities(
 //     components::component_type type
 //     )
 // {
@@ -158,7 +158,7 @@ naming::id_type resolve_name_sync(
 //     return agas_.get_localities(type, ec);
 // }
 
-lcos::future<boost::uint32_t> get_num_localities(
+lcos::unique_future<boost::uint32_t> get_num_localities(
     components::component_type type
     )
 {
@@ -175,7 +175,7 @@ boost::uint32_t get_num_localities_sync(
     return agas_.get_num_localities(type, ec);
 }
 
-lcos::future<std::vector<boost::uint32_t> > get_num_threads()
+lcos::unique_future<std::vector<boost::uint32_t> > get_num_threads()
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_threads_async();
@@ -189,7 +189,7 @@ std::vector<boost::uint32_t> get_num_threads_sync(
     return agas_.get_num_threads(ec);
 }
 
-lcos::future<boost::uint32_t> get_num_overall_threads()
+lcos::unique_future<boost::uint32_t> get_num_overall_threads()
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_overall_threads_async();
@@ -269,7 +269,7 @@ bool is_local_lva_encoded_address(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<naming::address> resolve(
+hpx::unique_future<naming::address> resolve(
     naming::id_type const& id
     )
 {
@@ -408,7 +408,7 @@ bool add_remote_incref_request(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<bool> incref_async(
+hpx::unique_future<bool> incref_async(
     naming::gid_type const& gid
   , boost::int64_t credits
   , naming::id_type const& keep_alive_

@@ -298,6 +298,25 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     inline void
+    wait(std::vector<Future>& v, 
+        std::vector<typename detail::future_traits<Future>::type>& r)
+    {
+        r.reserve(v.size());
+
+        BOOST_FOREACH(Future& f, v)
+            r.push_back(f.get());
+    }
+
+    template <typename Future>
+    inline void
+    wait(BOOST_RV_REF(std::vector<Future>) v, 
+        std::vector<typename detail::future_traits<Future>::type>& r)
+    {
+        return wait(v);
+    }
+
+    template <typename Future>
+    inline void
     wait(std::vector<Future> const& v, 
         std::vector<typename detail::future_traits<Future>::type>& r)
     {
@@ -305,6 +324,21 @@ namespace hpx { namespace lcos
 
         BOOST_FOREACH(Future const& f, v)
             r.push_back(f.get());
+    }
+
+    template <typename Future>
+    inline void
+    wait(std::vector<Future>& v)
+    {
+        BOOST_FOREACH(Future& f, v)
+            f.get();
+    }
+    
+    template <typename Future>
+    inline void
+    wait(BOOST_RV_REF(std::vector<Future>) v)
+    {
+        return wait(v);
     }
 
     template <typename Future>

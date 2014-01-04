@@ -16,6 +16,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/range/algorithm/copy.hpp>
 
 boost::uint64_t delay = 0;
 

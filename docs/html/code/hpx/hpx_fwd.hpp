@@ -986,7 +986,7 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities();
+    HPX_API_EXPORT lcos::unique_future<boost::uint32_t> get_num_localities();
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
@@ -1028,7 +1028,7 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities(
+    HPX_API_EXPORT lcos::unique_future<boost::uint32_t> get_num_localities(
         components::component_type t);
 
     ///////////////////////////////////////////////////////////////////////////

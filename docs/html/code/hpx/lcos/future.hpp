@@ -253,9 +253,11 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Iter>
     struct future_iterator_traits
     {
-        typedef future_traits<
+        typedef
             typename boost::detail::iterator_traits<Iter>::value_type
-        > traits_type;
+            type;
+
+        typedef future_traits<type> traits_type;
     };
 
     template <typename T>

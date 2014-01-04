@@ -16,6 +16,7 @@
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/bind.hpp>
+#include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
@@ -32,6 +33,7 @@
 #include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
+#include <iterator>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,6 +41,34 @@ namespace hpx
 {
     namespace detail
     {
+        template <typename Future>
+        struct when_acquire_future
+        {
+            typedef Future result_type;
+
+            template <typename R>
+            BOOST_FORCEINLINE hpx::unique_future<R>
+            operator()(hpx::unique_future<R>& future) const
+            {
+                return boost::move(future);
+            }
+
+            template <typename R>
+            BOOST_FORCEINLINE hpx::shared_future<R>
+            operator()(hpx::shared_future<R>& future) const
+            {
+                return future;
+            }
+
+            template <typename Result>
+            BOOST_FORCEINLINE hpx::future<Result>
+            operator()(hpx::future<Result>& future) const
+            {
+                return future;
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Sequence>
         struct when_n;
 
@@ -51,20 +81,23 @@ namespace hpx
                 callback_(callback)
             {}
 
-            template <typename R>
-            void operator()(lcos::future<R>& future) const
+            template <typename Future>
+            void operator()(Future& future) const
             {
                 std::size_t counter = when_.count_.load(boost::memory_order_acquire);
                 if (counter < when_.needed_count_ && !future.is_ready()) {
                     // handle future only if not enough futures are ready yet
                     // also, do not touch any futures which are already ready
 
-                    using lcos::detail::get_future_data;
+                    typedef
+                        typename lcos::detail::shared_state_ptr_for<Future>::type
+                        shared_state_ptr;
 
-                    lcos::detail::future_data<R>* future_data =
-                        get_future_data(future);
+                    using lcos::detail::future_access;
+                    shared_state_ptr const& shared_state =
+                        future_access::get_shared_state(future);
 
-                    future_data->set_on_completed(Callback(callback_));
+                    shared_state->set_on_completed(Callback(callback_));
                 }
                 else {
                     ++when_.count_;
@@ -72,14 +105,14 @@ namespace hpx
             }
 
             template <typename Sequence_>
-            void operator()(Sequence_& sequence, typename boost::enable_if<
+            void apply(Sequence_& sequence, typename boost::enable_if<
                 boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
             {
                 boost::fusion::for_each(sequence, *this);
             }
 
             template <typename Sequence_>
-            void operator()(Sequence_& sequence, typename boost::disable_if<
+            void apply(Sequence_& sequence, typename boost::disable_if<
                 boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
             {
                 std::for_each(sequence.begin(), sequence.end(), *this);
@@ -95,7 +128,7 @@ namespace hpx
         {
             set_on_completed_callback_impl<Sequence, Callback>
                 set_on_completed_callback_helper(when, callback);
-            set_on_completed_callback_helper(when.lazy_values_);
+            set_on_completed_callback_helper.apply(when.lazy_values_);
         }
 
         template <typename Sequence>
@@ -112,15 +145,14 @@ namespace hpx
                 }
             }
 
+        private:
+            // workaround gcc regression wrongly instantiating constructors
+            when_n();
+            when_n(when_n const&);
+
         public:
             typedef Sequence argument_type;
             typedef Sequence result_type;
-
-            when_n(argument_type const& lazy_values, std::size_t n)
-              : lazy_values_(lazy_values)
-              , count_(0)
-              , needed_count_(n)
-            {}
 
             when_n(BOOST_RV_REF(argument_type) lazy_values, std::size_t n)
               : lazy_values_(boost::move(lazy_values))
@@ -176,13 +208,16 @@ namespace hpx
     ///             inputs are fixed in number and are of heterogeneous types.
     ///             The inputs can be any arbitrary number of future objects.
 
-    template <typename R>
-    lcos::future<std::vector<lcos::future<R> > >
-    when_n(std::size_t n, BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<R> >))) lazy_values,
+    template <typename Future>
+    lcos::unique_future<std::vector<Future> >
+    when_n(std::size_t n,
+        std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<R> > result_type;
+        BOOST_STATIC_ASSERT_MSG(
+            traits::is_future<Future>::value, "invalid use of when_n");
+
+        typedef std::vector<Future> result_type;
 
         if (n == 0)
         {
@@ -197,9 +232,14 @@ namespace hpx
             return lcos::make_ready_future(result_type());
         }
 
+        result_type lazy_values_;
+        std::transform(lazy_values.begin(), lazy_values.end(),
+            std::back_inserter(lazy_values_),
+            detail::when_acquire_future<Future>());
+
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                boost::move(lazy_values_), n);
 
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
@@ -208,33 +248,34 @@ namespace hpx
         return p.get_future();
     }
 
-    template <typename R>
-    lcos::future<std::vector<lcos::future<R> > > //-V659
-    when_n(std::size_t n, std::vector<lcos::future<R> > const& lazy_values,
+    template <typename Future>
+    lcos::unique_future<std::vector<Future> > //-V659
+    when_n(std::size_t n,
+        BOOST_RV_REF(std::vector<Future>) lazy_values,
         error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<R> > result_type;
-
-        result_type lazy_values_(lazy_values);
-        return when_n(n, boost::move(lazy_values_), ec);
+        return when_n(n, lazy_values, ec);
     }
 
     template <typename Iterator>
-    lcos::future<std::vector<lcos::future<
-        typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
-    > > >
+    lcos::unique_future<std::vector<
+        typename lcos::detail::future_iterator_traits<Iterator>::type
+    > >
     when_n(std::size_t n, Iterator begin, Iterator end,
         error_code& ec = throws)
     {
-        typedef typename lcos::detail::future_iterator_traits<
-            Iterator>::traits_type::type value_type;
-        typedef std::vector<lcos::future<value_type> > result_type;
+        typedef
+            typename lcos::detail::future_iterator_traits<Iterator>::type
+            future_type;
+        typedef std::vector<future_type> result_type;
 
-        result_type lazy_values_(begin, end);
-        return when_n(n, boost::move(lazy_values_), ec);
+        result_type lazy_values_;
+        std::transform(begin, end, std::back_inserter(lazy_values_),
+            detail::when_acquire_future<future_type>());
+        return when_n(n, lazy_values_, ec);
     }
 
-    inline lcos::future<HPX_STD_TUPLE<> >
+    inline lcos::unique_future<HPX_STD_TUPLE<> >
     when_n(std::size_t n, error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<> result_type;
@@ -274,15 +315,15 @@ namespace hpx
     ///             inputs are fixed in number and are of heterogeneous types.
     ///             The inputs can be any arbitrary number of future objects.
 
-    template <typename R>
-    std::vector<lcos::future<R> >
-    wait_n(std::size_t n, BOOST_RV_REF(HPX_UTIL_STRIP((
-        std::vector<lcos::future<R> >))) lazy_values,
+    template <typename Future>
+    std::vector<Future>
+    wait_n(std::size_t n,
+        std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<R> > result_type;
+        typedef std::vector<Future> result_type;
 
-        lcos::future<result_type> f = when_n(n, lazy_values, ec);
+        lcos::unique_future<result_type> f = when_n(n, lazy_values, ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
@@ -292,29 +333,34 @@ namespace hpx
         return f.get(ec);
     }
 
-    template <typename R>
-    std::vector<lcos::future<R> >
-    wait_n(std::size_t n, std::vector<lcos::future<R> > const& lazy_values,
+    template <typename Future>
+    std::vector<Future>
+    wait_n(std::size_t n,
+        BOOST_RV_REF(std::vector<Future>) lazy_values,
         error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<R> > result_type;
-
-        result_type lazy_values_(lazy_values);
-        return wait_n(n, boost::move(lazy_values_), ec);
+        return wait_n(n, lazy_values, ec);
     }
 
     template <typename Iterator>
-    std::vector<lcos::future<
-        typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
-    > >
-    wait_n(std::size_t n, Iterator begin, Iterator end, error_code& ec = throws)
+    std::vector<
+        typename lcos::detail::future_iterator_traits<Iterator>::type
+    >
+    wait_n(std::size_t n, Iterator begin, Iterator end,
+        error_code& ec = throws)
     {
-        typedef std::vector<lcos::future<
-            typename lcos::detail::future_iterator_traits<Iterator>::traits_type::type
-        > > result_type;
+        typedef std::vector<
+            typename lcos::detail::future_iterator_traits<Iterator>::type
+        > result_type;
 
-        result_type lazy_values_(begin, end);
-        return wait_n(n, boost::move(lazy_values_), ec);
+        lcos::unique_future<result_type> f = when_n(n, begin, end, ec);
+        if (!f.valid()) {
+            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
+                "lcos::when_n didn't return a valid future");
+            return result_type();
+        }
+
+        return f.get(ec);
     }
 
     inline HPX_STD_TUPLE<>
@@ -322,7 +368,7 @@ namespace hpx
     {
         typedef HPX_STD_TUPLE<> result_type;
 
-        lcos::future<result_type> f = when_n(n, ec);
+        lcos::unique_future<result_type> f = when_n(n, ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
@@ -359,27 +405,24 @@ namespace hpx
 
 #define N BOOST_PP_ITERATION()
 
-#define HPX_WHEN_N_FUTURE_TYPE(z, n, _)                                       \
-        lcos::future<BOOST_PP_CAT(R, n)>                                      \
+#define HPX_WHEN_N_DECAY_FUTURE(Z, N, D)                                      \
+    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
     /**/
-#define HPX_WHEN_N_FUTURE_ARG(z, n, _)                                        \
-        lcos::future<BOOST_PP_CAT(R, n)> BOOST_PP_CAT(f, n)                   \
-    /**/
-#define HPX_WHEN_N_FUTURE_VAR(z, n, _) BOOST_PP_CAT(f, n)                     \
+#define HPX_WHEN_N_ACQUIRE_FUTURE(Z, N, D)                                    \
+    detail::when_acquire_future<BOOST_PP_CAT(T, N)>()(BOOST_PP_CAT(f, N))     \
     /**/
 
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <BOOST_PP_ENUM_PARAMS(N, typename R)>
-    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_TYPE, _)> >
-    when_n(std::size_t n, BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_ARG, _),
+    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+    lcos::unique_future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> >
+    when_n(std::size_t n, HPX_ENUM_FWD_ARGS(N, T, f),
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_TYPE, _)>
-            result_type;
+        typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> result_type;
 
-        result_type lazy_values(BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_VAR, _));
+        result_type lazy_values(BOOST_PP_ENUM(N, HPX_WHEN_N_ACQUIRE_FUTURE, _));
 
         if (n == 0)
         {
@@ -405,16 +448,15 @@ namespace hpx
         return p.get_future();
     }
 
-    template <BOOST_PP_ENUM_PARAMS(N, typename R)>
-    HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_TYPE, _)>
-    wait_n(std::size_t n, BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_ARG, _),
+    template <BOOST_PP_ENUM_PARAMS(N, typename T)>
+    HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)>
+    wait_n(std::size_t n, HPX_ENUM_FWD_ARGS(N, T, f),
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_TYPE, _)>
-            result_type;
+        typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> result_type;
 
-        lcos::future<result_type> f = when_n(n,
-            BOOST_PP_ENUM(N, HPX_WHEN_N_FUTURE_VAR, _), ec);
+        lcos::unique_future<result_type> f = when_n(n,
+            HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
         if (!f.valid()) {
             HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
                 "lcos::when_n didn't return a valid future");
@@ -425,9 +467,8 @@ namespace hpx
     }
 }
 
-#undef HPX_WHEN_N_FUTURE_VAR
-#undef HPX_WHEN_N_FUTURE_ARG
-#undef HPX_WHEN_N_FUTURE_TYPE
+#undef HPX_WHEN_N_DECAY_FUTURE
+#undef HPX_WHEN_N_ACQUIRE_FUTURE
 #undef N
 
 #endif

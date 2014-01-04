@@ -152,9 +152,10 @@ namespace hpx { namespace lcos
               : reduce_op_(reduce_op)
             {}
 
-            Result operator()(hpx::future<std::vector<hpx::future<Result> > > r) const
+            Result operator()(
+                hpx::unique_future<std::vector<hpx::future<Result> > > r) const
             {
-                std::vector<hpx::future<Result> > fres = boost::move(r.move());
+                std::vector<hpx::future<Result> > fres = boost::move(r.get());
 
                 HPX_ASSERT(!fres.empty());
 
@@ -440,7 +441,7 @@ namespace hpx { namespace lcos
 
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
 
         ///////////////////////////////////////////////////////////////////////

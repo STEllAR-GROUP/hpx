@@ -22,7 +22,7 @@ struct HPX_EXPORT primary_namespace
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
-    static lcos::future<Result> service_async(
+    static lcos::unique_future<Result> service_async(
         naming::id_type const& gid
       , request const& req
       , threads::thread_priority priority = threads::thread_priority_default
@@ -55,7 +55,7 @@ struct HPX_EXPORT primary_namespace
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::future<std::vector<response> > bulk_service_async(
+    static lcos::unique_future<std::vector<response> > bulk_service_async(
         naming::id_type const& gid
       , std::vector<request> const& reqs
       , threads::thread_priority priority = threads::thread_priority_default

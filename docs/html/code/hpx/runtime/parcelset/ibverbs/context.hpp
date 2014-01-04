@@ -1203,7 +1203,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
             boost::uint64_t header[2] =
                 {
                     data.size()
-                  , std::min(
+                  , std::min<boost::uint64_t>(
                         connection_.buffer_size_ - 2 * sizeof(boost::uint64_t)
                       , data.size()
                     )
@@ -1254,7 +1254,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
                 {
                     HPX_IBVERBS_NEXT_WC(ec, MSG_DATA, 3, 0, true);
                     boost::uint64_t chunk_size
-                        = std::min(
+                        = std::min<boost::uint64_t>(
                             connection_.buffer_size_ - sizeof(boost::uint64_t)
                           , header[0] - bytes_sent
                         );

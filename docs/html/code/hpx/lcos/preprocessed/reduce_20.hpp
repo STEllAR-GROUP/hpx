@@ -122,7 +122,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -392,7 +392,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -662,7 +662,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -932,7 +932,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -1202,7 +1202,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -1472,7 +1472,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -1742,7 +1742,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -2012,7 +2012,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -2282,7 +2282,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -2552,7 +2552,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -2822,7 +2822,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -3092,7 +3092,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -3362,7 +3362,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -3632,7 +3632,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -3902,7 +3902,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -4172,7 +4172,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -4442,7 +4442,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -4712,7 +4712,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -4982,7 +4982,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -5252,7 +5252,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
@@ -5522,7 +5522,7 @@ namespace hpx { namespace lcos
             );
             return hpx::when_all(reduce_futures).
                 then(perform_reduction<result_type, ReduceOp>(reduce_op)).
-                move();
+                get();
         }
         
         template <
