@@ -142,11 +142,11 @@ int hpx_main(variables_map & vm)
         called_f2 = false;
         called_f3 = false;
         called_f4 = false;
-        hpx::lcos::future<void> f0 = hpx::lcos::dataflow<f0action>(here).get_future();
-        hpx::lcos::future<void> f1 = hpx::lcos::dataflow<f1action>(here).get_future();
-        hpx::lcos::future<void> f2 = hpx::lcos::dataflow<f2action>(here).get_future();
-        hpx::lcos::future<void> f3 = hpx::lcos::dataflow<f3action>(here).get_future();
-        hpx::lcos::future<void> f4 = hpx::lcos::dataflow<f4action>(here).get_future();
+        hpx::lcos::unique_future<void> f0 = hpx::lcos::dataflow<f0action>(here).get_future();
+        hpx::lcos::unique_future<void> f1 = hpx::lcos::dataflow<f1action>(here).get_future();
+        hpx::lcos::unique_future<void> f2 = hpx::lcos::dataflow<f2action>(here).get_future();
+        hpx::lcos::unique_future<void> f3 = hpx::lcos::dataflow<f3action>(here).get_future();
+        hpx::lcos::unique_future<void> f4 = hpx::lcos::dataflow<f4action>(here).get_future();
         f0.get();
         f1.get();
         f2.get();

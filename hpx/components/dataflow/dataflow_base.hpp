@@ -24,8 +24,8 @@ namespace hpx { namespace lcos
         dataflow_base()
         {}
 
-        dataflow_base(future<naming::id_type> const & promise)
-            : impl(new detail::dataflow_base_impl(promise))
+        explicit dataflow_base(lcos::unique_future<naming::id_type> promise)
+            : impl(new detail::dataflow_base_impl(boost::move(promise)))
         {}
 
         void connect(naming::id_type const & id) const
@@ -33,7 +33,7 @@ namespace hpx { namespace lcos
             impl->connect(id);
         }
 
-        future<Result> get_future() const
+        unique_future<Result> get_future() const
         {
             promise<Result, remote_result_type> p;
             impl->connect(p.get_gid());

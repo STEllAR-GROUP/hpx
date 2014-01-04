@@ -56,7 +56,7 @@ namespace hpx { namespace lcos
         }
 
         // MSVC chokes on having the lambda in the member initializer list below
-        static inline lcos::future<naming::id_type>
+        static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target)
         {
             typedef
@@ -130,7 +130,7 @@ namespace hpx { namespace lcos
 #define N BOOST_PP_ITERATION()
 
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>
-        static inline lcos::future<naming::id_type>
+        static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
           , HPX_ENUM_FWD_ARGS(N, A, a)
           , boost::mpl::false_
@@ -156,7 +156,7 @@ namespace hpx { namespace lcos
         }
 
         template <BOOST_PP_ENUM_PARAMS(N, typename A)>
-        static inline lcos::future<naming::id_type>
+        static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
           , HPX_ENUM_FWD_ARGS(N, A, a)
           , boost::mpl::true_
