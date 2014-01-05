@@ -179,15 +179,6 @@ std::size_t return_object(id_type id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Action, typename Object>
-std::size_t return_move_object(id_type id)
-{
-    Object obj(dataflow<Action>(id).get_future().move());
-    return obj.get_count();
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map&)
 {
     std::vector<id_type> localities = hpx::find_all_localities();
@@ -312,31 +303,6 @@ int hpx_main(variables_map&)
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
         ), is_local ? 8u : 10u);
-
-        HPX_TEST_LTE((
-            return_move_object<
-                return_movable_object_action, movable_object
-            >(id)
-        ), is_local ? 4u : 4u);
-
-        HPX_TEST_LTE((
-            return_move_object<
-                return_movable_object_direct_action, movable_object
-            >(id)
-        ), is_local ? 4u : 4u);
-
-        HPX_TEST_RANGE((
-            return_move_object<
-                return_non_movable_object_action, non_movable_object
-            >(id)
-        ),
-        is_local ? 6u : 9u, is_local ? 10u : 12u);
-
-        HPX_TEST_RANGE((
-            return_move_object<
-                return_non_movable_object_direct_action, non_movable_object
-            >(id)
-        ), is_local ? 6u : 9u, is_local ? 10u : 12u);
     }
 
     finalize();

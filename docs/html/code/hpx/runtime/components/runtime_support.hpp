@@ -40,7 +40,7 @@ namespace hpx { namespace components
         ///         This function is used by the \a distributing_factory to
         ///         determine a correct allocation strategy
         int get_factory_properties(components::component_type type);
-        lcos::future<int> get_factory_properties_async(components::component_type);
+        lcos::unique_future<int> get_factory_properties_async(components::component_type);
 
         /// Create a new component type using the runtime_support
         template <typename Component>

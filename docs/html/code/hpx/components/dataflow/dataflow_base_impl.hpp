@@ -22,8 +22,8 @@ namespace hpx { namespace lcos { namespace detail
         virtual ~dataflow_base_impl()
         {}
 
-        dataflow_base_impl(lcos::future<naming::id_type> const & promise)
-            : gid_promise(promise)
+        explicit dataflow_base_impl(lcos::unique_future<naming::id_type> promise)
+            : gid_promise(boost::move(promise))
             , count_(0)
         {}
 
@@ -44,7 +44,7 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     protected:
-        lcos::future<naming::id_type> gid_promise;
+        lcos::shared_future<naming::id_type> gid_promise;
 
     private:
         friend class boost::serialization::access;

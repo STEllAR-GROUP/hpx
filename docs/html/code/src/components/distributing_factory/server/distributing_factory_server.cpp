@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace server
         {}
 
         naming::gid_type locality_;
-        lcos::future<std::vector<naming::gid_type > > gids_;
+        lcos::shared_future<std::vector<naming::gid_type > > gids_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ namespace hpx { namespace components { namespace server
         BOOST_FOREACH(lazy_result& lr, v)
         {
             results.push_back(remote_result_type::value_type(lr.locality_, type));
-            results.back().gids_ = boost::move(lr.gids_.move());
+            results.back().gids_ = boost::move(lr.gids_.get());
         }
 
         return results;
@@ -166,7 +166,7 @@ namespace hpx { namespace components { namespace server
         BOOST_FOREACH(lazy_result& lr, v)
         {
             results.push_back(remote_result_type::value_type(lr.locality_, type));
-            results.back().gids_ = boost::move(lr.gids_.move());
+            results.back().gids_ = boost::move(lr.gids_.get());
         }
 
         return results;

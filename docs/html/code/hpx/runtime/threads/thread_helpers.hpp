@@ -798,7 +798,7 @@ namespace hpx { namespace applier
     ///
     /// \note       For synchronous operation use the function
     ///             \a threads#create_sync.
-    HPX_API_EXPORT lcos::future<naming::id_type>
+    HPX_API_EXPORT lcos::unique_future<naming::id_type>
         create(naming::id_type const& targetgid,
             components::component_type type, std::size_t count = 1);
 

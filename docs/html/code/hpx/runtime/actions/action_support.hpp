@@ -142,6 +142,18 @@ namespace hpx { namespace actions
         };
 
         template <typename Result>
+        struct remote_action_result<lcos::shared_future<Result> >
+        {
+            typedef Result type;
+        };
+
+        template <>
+        struct remote_action_result<lcos::shared_future<void> >
+        {
+            typedef hpx::util::unused_type type;
+        };
+
+        template <typename Result>
         struct remote_action_result<lcos::future<Result> >
         {
             typedef Result type;

@@ -37,14 +37,14 @@ struct when_all_wrapper
 {
     typedef boost::uint64_t result_type;
     typedef HPX_STD_TUPLE<
-            hpx::lcos::future<uint64_t>
-          , hpx::lcos::future<uint64_t> > data_type;
+            hpx::lcos::unique_future<uint64_t>
+          , hpx::lcos::unique_future<uint64_t> > data_type;
 
     boost::uint64_t operator()(
-        hpx::lcos::future<data_type> data
+        hpx::lcos::unique_future<data_type> data
     ) const
     {
-        data_type v = data.move();
+        data_type v = data.get();
         return HPX_STD_GET(0, v).get() + HPX_STD_GET(1, v).get();
     }
 };
@@ -70,10 +70,10 @@ hpx::id_type const& get_next_locality(boost::uint64_t next)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n);
+hpx::unique_future<boost::uint64_t> fibonacci_future(boost::uint64_t n);
 HPX_PLAIN_ACTION(fibonacci_future);
 
-hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
+hpx::unique_future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -94,8 +94,8 @@ hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
         loc2 = get_next_locality(next);
     }
 
-    hpx::future<boost::uint64_t> f = hpx::async(fib, loc1, n-1);
-    hpx::future<boost::uint64_t> r = fib(loc2, n-2);
+    hpx::unique_future<boost::uint64_t> f = hpx::async(fib, loc1, n-1);
+    hpx::unique_future<boost::uint64_t> r = fib(loc2, n-2);
 
     return hpx::when_all(f, r).then(when_all_wrapper());
 }
@@ -218,7 +218,7 @@ void init_globals()
         HPX_THROW_EXCEPTION(hpx::commandline_option_error,
             "fibonacci_futures_distributed",
             "wrong command line argument value for option 'threshold', "
-            "should be in between 2 and n-value, value specified: " + 
+            "should be in between 2 and n-value, value specified: " +
                 boost::lexical_cast<std::string>(threshold));
         return;
     }
@@ -228,7 +228,7 @@ void init_globals()
         HPX_THROW_EXCEPTION(hpx::commandline_option_error,
             "fibonacci_futures_distributed",
             "wrong command line argument value for option 'distribute-at', "
-            "should be in between 2 and n-value, value specified: " + 
+            "should be in between 2 and n-value, value specified: " +
                 boost::lexical_cast<std::string>(distribute_at));
         return;
     }

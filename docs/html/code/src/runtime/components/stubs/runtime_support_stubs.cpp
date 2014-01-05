@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace stubs
     ///         be created in blocks (i.e. more than one instance at once).
     ///         This function is used by the \a distributing_factory to
     ///         determine a correct allocation strategy
-    lcos::future<int> runtime_support::get_factory_properties_async(
+    lcos::unique_future<int> runtime_support::get_factory_properties_async(
         naming::id_type const& targetgid, components::component_type type)
     {
         // Create a future, execute the required action,
@@ -81,7 +81,7 @@ namespace hpx { namespace components { namespace stubs
     /// to call \a future#get on the result of this function
     /// to obtain the global id of the newly created object.
     template <typename T, typename Config>
-    lcos::future<naming::id_type>
+    lcos::unique_future<naming::id_type>
     runtime_support::create_memory_block_async(
         naming::id_type const& id, std::size_t count,
         hpx::actions::manage_object_action<T, Config> const& act)

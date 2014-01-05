@@ -39,12 +39,12 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     // Invoking the Fibonacci algorithm twice is inefficient.
     // However, we intentionally demonstrate it this way to create some
     // heavy workload.
-    using hpx::lcos::future;
-    using hpx::async;
 
     fibonacci_action fib;
-    future<boost::uint64_t> n1 = async(fib, locality_id, n - 1);
-    future<boost::uint64_t> n2 = async(fib, locality_id, n - 2);
+    hpx::unique_future<boost::uint64_t> n1 =
+        hpx::async(fib, locality_id, n - 1);
+    hpx::unique_future<boost::uint64_t> n2 =
+        hpx::async(fib, locality_id, n - 2);
 
     return n1.get() + n2.get();   // wait for the Futures to return their values
 }

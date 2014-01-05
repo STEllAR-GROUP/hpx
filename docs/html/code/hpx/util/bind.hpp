@@ -24,6 +24,8 @@
 #include <hpx/util/tuple.hpp>
 #include <hpx/util/detail/result_of_or.hpp>
 
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/identity.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
@@ -242,55 +244,72 @@ namespace hpx { namespace util
             BOOST_COPYABLE_AND_MOVABLE(bound);
 
         public:
+#           if !defined(HPX_DISABLE_ASSERTS)
             // default constructor is needed for serialization
             one_shot_wrapper()
-#           if !defined(HPX_DISABLE_ASSERTS)
               : _called(false)
-#           endif
             {}
 
             explicit one_shot_wrapper(F const& f)
               : _f(f)
-#           if !defined(HPX_DISABLE_ASSERTS)
               , _called(false)
-#           endif
             {}
             explicit one_shot_wrapper(BOOST_RV_REF(F) f)
               : _f(boost::move(f))
-#           if !defined(HPX_DISABLE_ASSERTS)
               , _called(false)
-#           endif
             {}
 
             one_shot_wrapper(one_shot_wrapper const& other)
               : _f(other._f)
-#           if !defined(HPX_DISABLE_ASSERTS)
               , _called(other._called)
-#           endif
             {}
             one_shot_wrapper(BOOST_RV_REF(one_shot_wrapper) other)
               : _f(boost::move(other._f))
-#           if !defined(HPX_DISABLE_ASSERTS)
               , _called(other._called)
-#           endif
             {
-#           if !defined(HPX_DISABLE_ASSERTS)
                 other._called = true;
-#           endif
             }
 
             void check_call()
             {
-#           if !defined(HPX_DISABLE_ASSERTS)
                 HPX_ASSERT(!_called);
 
                 _called = true;
-#           endif
             }
+#           else
+            // default constructor is needed for serialization
+            one_shot_wrapper()
+            {}
+
+            explicit one_shot_wrapper(F const& f)
+              : _f(f)
+            {}
+            explicit one_shot_wrapper(BOOST_RV_REF(F) f)
+              : _f(boost::move(f))
+            {}
+
+            one_shot_wrapper(one_shot_wrapper const& other)
+              : _f(other._f)
+            {}
+            one_shot_wrapper(BOOST_RV_REF(one_shot_wrapper) other)
+              : _f(boost::move(other._f))
+            {}
+
+            void check_call()
+            {}
+#           endif
 
             template <typename T>
-            struct result
-              : util::detail::result_of_or<T, cannot_be_called>
+            struct result;
+
+            template <typename This>
+            struct result<This()>
+              : util::detail::result_of_or<F(), cannot_be_called>
+            {};
+
+            template <typename This>
+            struct result<This const()>
+              : boost::mpl::identity<cannot_be_called>
             {};
 
             BOOST_FORCEINLINE
@@ -302,6 +321,19 @@ namespace hpx { namespace util
             }
 
 #           define HPX_UTIL_BIND_ONE_SHOT_WRAPPER_FUNCTION_OP(Z, N, D)        \
+            template <typename This, BOOST_PP_ENUM_PARAMS(N, typename T)>     \
+            struct result<This(BOOST_PP_ENUM_PARAMS(N, T))>                   \
+              : util::detail::result_of_or<                                   \
+                    F(BOOST_PP_ENUM_PARAMS(N, T))                             \
+                  , cannot_be_called                                          \
+                >                                                             \
+            {};                                                               \
+                                                                              \
+            template <typename This, BOOST_PP_ENUM_PARAMS(N, typename T)>     \
+            struct result<This const(BOOST_PP_ENUM_PARAMS(N, T))>             \
+              : boost::mpl::identity<cannot_be_called>                        \
+            {};                                                               \
+                                                                              \
             template <BOOST_PP_ENUM_PARAMS(N, typename T)>                    \
             BOOST_FORCEINLINE                                                 \
             typename result<one_shot_wrapper(BOOST_PP_ENUM_PARAMS(N, T))>::type\
@@ -569,6 +601,17 @@ namespace hpx { namespace util
             {
                 return util::invoke(f, BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _));
             }
+        };
+
+        template <typename F, typename BoundArgs, typename UnboundArgs>
+        struct bind_invoke_impl<
+            one_shot_wrapper<F> const, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == N
+            >::type
+        >
+        {
+            typedef cannot_be_called type;
         };
 #       undef HPX_UTIL_BIND_EVAL_TYPE
 #       undef HPX_UTIL_BIND_EVAL

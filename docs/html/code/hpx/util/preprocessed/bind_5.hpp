@@ -36,6 +36,16 @@ namespace hpx { namespace util
                 return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
             }
         };
+        template <typename F, typename BoundArgs, typename UnboundArgs>
+        struct bind_invoke_impl<
+            one_shot_wrapper<F> const, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 1
+            >::type
+        >
+        {
+            typedef cannot_be_called type;
+        };
     }
     template <typename F, typename T0>
     typename boost::disable_if_c<
@@ -86,6 +96,16 @@ namespace hpx { namespace util
             {
                 return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
             }
+        };
+        template <typename F, typename BoundArgs, typename UnboundArgs>
+        struct bind_invoke_impl<
+            one_shot_wrapper<F> const, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 2
+            >::type
+        >
+        {
+            typedef cannot_be_called type;
         };
     }
     template <typename F, typename T0 , typename T1>
@@ -138,6 +158,16 @@ namespace hpx { namespace util
                 return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
             }
         };
+        template <typename F, typename BoundArgs, typename UnboundArgs>
+        struct bind_invoke_impl<
+            one_shot_wrapper<F> const, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 3
+            >::type
+        >
+        {
+            typedef cannot_be_called type;
+        };
     }
     template <typename F, typename T0 , typename T1 , typename T2>
     typename boost::disable_if_c<
@@ -188,6 +218,16 @@ namespace hpx { namespace util
             {
                 return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
             }
+        };
+        template <typename F, typename BoundArgs, typename UnboundArgs>
+        struct bind_invoke_impl<
+            one_shot_wrapper<F> const, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 4
+            >::type
+        >
+        {
+            typedef cannot_be_called type;
         };
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3>
@@ -240,6 +280,16 @@ namespace hpx { namespace util
                 return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
             }
         };
+        template <typename F, typename BoundArgs, typename UnboundArgs>
+        struct bind_invoke_impl<
+            one_shot_wrapper<F> const, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 5
+            >::type
+        >
+        {
+            typedef cannot_be_called type;
+        };
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     typename boost::disable_if_c<
@@ -290,6 +340,16 @@ namespace hpx { namespace util
             {
                 return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
             }
+        };
+        template <typename F, typename BoundArgs, typename UnboundArgs>
+        struct bind_invoke_impl<
+            one_shot_wrapper<F> const, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 6
+            >::type
+        >
+        {
+            typedef cannot_be_called type;
         };
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
@@ -342,6 +402,16 @@ namespace hpx { namespace util
                 return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
             }
         };
+        template <typename F, typename BoundArgs, typename UnboundArgs>
+        struct bind_invoke_impl<
+            one_shot_wrapper<F> const, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 7
+            >::type
+        >
+        {
+            typedef cannot_be_called type;
+        };
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     typename boost::disable_if_c<
@@ -392,6 +462,16 @@ namespace hpx { namespace util
             {
                 return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
             }
+        };
+        template <typename F, typename BoundArgs, typename UnboundArgs>
+        struct bind_invoke_impl<
+            one_shot_wrapper<F> const, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 8
+            >::type
+        >
+        {
+            typedef cannot_be_called type;
         };
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>

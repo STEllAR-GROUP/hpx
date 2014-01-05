@@ -32,7 +32,7 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
         template <typename T, typename Config>
-        static lcos::future<naming::id_type>
+        static lcos::unique_future<naming::id_type>
         create_async(naming::id_type const& targetgid, std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act)
         {
@@ -59,7 +59,7 @@ namespace hpx { namespace components { namespace stubs
         /// or a copy of the remote data.
 
         HPX_EXPORT static 
-        lcos::future<components::memory_block_data> get_async(
+        lcos::unique_future<components::memory_block_data> get_async(
             naming::id_type const& targetgid);
 
         static components::memory_block_data get(
@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
         HPX_EXPORT static 
-        lcos::future<components::memory_block_data> get_async(
+        lcos::unique_future<components::memory_block_data> get_async(
             naming::id_type const& targetgid,
             components::memory_block_data const& cfg);
 
@@ -86,7 +86,7 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT static 
-        lcos::future<components::memory_block_data> checkout_async(
+        lcos::unique_future<components::memory_block_data> checkout_async(
             naming::id_type const& targetgid);
 
         static components::memory_block_data checkout(
@@ -98,7 +98,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT static lcos::future<naming::id_type>
+        HPX_EXPORT static lcos::unique_future<naming::id_type>
         clone_async(naming::id_type const& targetgid);
 
         static naming::id_type clone(naming::id_type const& targetgid)
@@ -110,7 +110,7 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
-        static lcos::future<void>
+        static lcos::unique_future<void>
         checkin_async(naming::id_type const& targetgid,
             components::access_memory_block<T> const& data)
         {

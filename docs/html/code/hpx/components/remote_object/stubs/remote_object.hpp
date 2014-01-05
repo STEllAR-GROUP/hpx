@@ -22,7 +22,7 @@ namespace hpx { namespace components { namespace stubs
     {
     public:
         template <typename F>
-        static lcos::future<typename F::result_type>
+        static lcos::unique_future<typename F::result_type>
         apply_async(naming::id_type const & target_id, F f)
         {
             typedef typename
@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
         template <typename F>
-        static lcos::future<void>
+        static lcos::unique_future<void>
         set_dtor_async(naming::id_type const & target_id, F const & f)
         {
             typedef server::remote_object::set_dtor_action action_type;

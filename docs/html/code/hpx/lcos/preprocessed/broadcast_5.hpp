@@ -105,7 +105,7 @@ namespace hpx { namespace lcos {
         )
         {
             if(ids.empty()) return;
-            std::vector<hpx::future<void> > broadcast_futures;
+            std::vector<hpx::unique_future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -180,7 +180,7 @@ namespace hpx { namespace lcos {
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
+            std::vector<hpx::unique_future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -285,7 +285,7 @@ namespace hpx { namespace lcos {
         typename Action
        
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast(
@@ -316,7 +316,7 @@ namespace hpx { namespace lcos {
       , typename Derived
        
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
@@ -335,7 +335,7 @@ namespace hpx { namespace lcos {
         typename Action
        
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast_with_index(
@@ -354,7 +354,7 @@ namespace hpx { namespace lcos {
       , typename Derived
        
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
@@ -467,7 +467,7 @@ namespace hpx { namespace lcos {
         )
         {
             if(ids.empty()) return;
-            std::vector<hpx::future<void> > broadcast_futures;
+            std::vector<hpx::unique_future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -542,7 +542,7 @@ namespace hpx { namespace lcos {
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
+            std::vector<hpx::unique_future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -647,7 +647,7 @@ namespace hpx { namespace lcos {
         typename Action
       , typename A0
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast(
@@ -678,7 +678,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       , typename A0
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
@@ -697,7 +697,7 @@ namespace hpx { namespace lcos {
         typename Action
       , typename A0
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast_with_index(
@@ -716,7 +716,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       , typename A0
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
@@ -829,7 +829,7 @@ namespace hpx { namespace lcos {
         )
         {
             if(ids.empty()) return;
-            std::vector<hpx::future<void> > broadcast_futures;
+            std::vector<hpx::unique_future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -904,7 +904,7 @@ namespace hpx { namespace lcos {
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
+            std::vector<hpx::unique_future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -1009,7 +1009,7 @@ namespace hpx { namespace lcos {
         typename Action
       , typename A0 , typename A1
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast(
@@ -1040,7 +1040,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       , typename A0 , typename A1
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
@@ -1059,7 +1059,7 @@ namespace hpx { namespace lcos {
         typename Action
       , typename A0 , typename A1
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast_with_index(
@@ -1078,7 +1078,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       , typename A0 , typename A1
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
@@ -1191,7 +1191,7 @@ namespace hpx { namespace lcos {
         )
         {
             if(ids.empty()) return;
-            std::vector<hpx::future<void> > broadcast_futures;
+            std::vector<hpx::unique_future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -1266,7 +1266,7 @@ namespace hpx { namespace lcos {
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
+            std::vector<hpx::unique_future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -1371,7 +1371,7 @@ namespace hpx { namespace lcos {
         typename Action
       , typename A0 , typename A1 , typename A2
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast(
@@ -1402,7 +1402,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       , typename A0 , typename A1 , typename A2
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
@@ -1421,7 +1421,7 @@ namespace hpx { namespace lcos {
         typename Action
       , typename A0 , typename A1 , typename A2
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast_with_index(
@@ -1440,7 +1440,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       , typename A0 , typename A1 , typename A2
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
@@ -1553,7 +1553,7 @@ namespace hpx { namespace lcos {
         )
         {
             if(ids.empty()) return;
-            std::vector<hpx::future<void> > broadcast_futures;
+            std::vector<hpx::unique_future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -1628,7 +1628,7 @@ namespace hpx { namespace lcos {
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
+            std::vector<hpx::unique_future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -1733,7 +1733,7 @@ namespace hpx { namespace lcos {
         typename Action
       , typename A0 , typename A1 , typename A2 , typename A3
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast(
@@ -1764,7 +1764,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
@@ -1783,7 +1783,7 @@ namespace hpx { namespace lcos {
         typename Action
       , typename A0 , typename A1 , typename A2 , typename A3
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast_with_index(
@@ -1802,7 +1802,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(
@@ -1915,7 +1915,7 @@ namespace hpx { namespace lcos {
         )
         {
             if(ids.empty()) return;
-            std::vector<hpx::future<void> > broadcast_futures;
+            std::vector<hpx::unique_future<void> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -1990,7 +1990,7 @@ namespace hpx { namespace lcos {
                 result_type;
             
             if(ids.empty()) return result_type();
-            std::vector<hpx::future<result_type> > broadcast_futures;
+            std::vector<hpx::unique_future<result_type> > broadcast_futures;
             broadcast_futures.reserve(3);
             broadcast_invoke(
                 act
@@ -2095,7 +2095,7 @@ namespace hpx { namespace lcos {
         typename Action
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast(
@@ -2126,7 +2126,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast(
@@ -2145,7 +2145,7 @@ namespace hpx { namespace lcos {
         typename Action
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Action>::type
     >
     broadcast_with_index(
@@ -2164,7 +2164,7 @@ namespace hpx { namespace lcos {
       , typename Derived
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    hpx::future<
+    hpx::unique_future<
         typename detail::broadcast_result<Derived>::type
     >
     broadcast_with_index(

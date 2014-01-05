@@ -94,11 +94,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -117,7 +117,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 )));
         p.apply();
         return p.get_future();
@@ -174,11 +174,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -197,7 +197,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )));
         p.apply();
         return p.get_future();
@@ -254,11 +254,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -277,7 +277,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )));
         p.apply();
         return p.get_future();
@@ -334,11 +334,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -357,7 +357,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )));
         p.apply();
         return p.get_future();
@@ -414,11 +414,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -437,7 +437,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )));
         p.apply();
         return p.get_future();
@@ -494,11 +494,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -517,7 +517,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )));
         p.apply();
         return p.get_future();
@@ -574,11 +574,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -597,7 +597,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )));
         p.apply();
         return p.get_future();
@@ -654,11 +654,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -677,7 +677,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 )));
         p.apply();
         return p.get_future();
@@ -734,11 +734,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -757,7 +757,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 )));
         p.apply();
         return p.get_future();
@@ -814,11 +814,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -837,7 +837,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 )));
         p.apply();
         return p.get_future();
@@ -894,11 +894,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -917,7 +917,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 )));
         p.apply();
         return p.get_future();
@@ -974,11 +974,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -997,7 +997,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 )));
         p.apply();
         return p.get_future();
@@ -1054,11 +1054,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -1077,7 +1077,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 )));
         p.apply();
         return p.get_future();
@@ -1134,11 +1134,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -1157,7 +1157,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 )));
         p.apply();
         return p.get_future();
@@ -1214,11 +1214,11 @@ namespace hpx
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(util::bind(
-                util::protect(boost::forward<F>(f)),
+                util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 )), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 )));
         if (detail::has_async_policy(policy))
             p.apply();
@@ -1237,7 +1237,7 @@ namespace hpx
         typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14)>::type
             result_type;
         lcos::local::futures_factory<result_type()> p(sched,
-            util::bind(util::protect(boost::forward<F>(f)),
+            util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 )));
         p.apply();
         return p.get_future();

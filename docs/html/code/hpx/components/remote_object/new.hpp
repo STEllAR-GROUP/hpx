@@ -42,7 +42,7 @@ namespace hpx { namespace components
     // asynchronously creates an instance of type T on locality target_id
     template <typename T>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id)
     {
@@ -98,7 +98,7 @@ namespace hpx { namespace components
 
     template <typename T, BOOST_PP_ENUM_PARAMS(N, typename A)>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::future<object<T> >
+        traits::is_component<T>, lcos::unique_future<object<T> >
     >::type
     new_(naming::id_type const & target_id, HPX_ENUM_FWD_ARGS(N, A, a))
     {
