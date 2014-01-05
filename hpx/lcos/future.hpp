@@ -1752,7 +1752,7 @@ namespace hpx { namespace actions
                 << "typed_continuation<lcos::unique_future<R> >::trigger("
                 << this->get_gid() << ")";
             
-            typedef typename boost::is_void<R>::type predicate;
+            typedef boost::mpl::bool_<boost::is_void<R>::value> predicate;
 
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {
