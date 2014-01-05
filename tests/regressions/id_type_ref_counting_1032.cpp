@@ -3,7 +3,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-// Demonstrating #1032: id_type local reference counting is wrong 
+// Demonstrating #1032: id_type local reference counting is wrong
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -49,8 +49,14 @@ struct test_server1
     }
 
     void test();
-    
+
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+        typedef hpx::actions::action0<
+            test_server1, &test_server1::test
+        > test_action;
+#else
     HPX_DEFINE_COMPONENT_ACTION_TPL(test_server1, test, test_action);
+#endif
 
     hpx::id_type other;
     static bool alive;
@@ -72,10 +78,18 @@ struct test_server2
 
     hpx::id_type create_test_server1()
     {
-        return hpx::new_<test_server1<ComponentBase> >(hpx::find_here(), this->get_gid()).get();
+        return hpx::new_<test_server1<ComponentBase> >(
+            hpx::find_here(), this->get_gid()).get();
     }
 
-    HPX_DEFINE_COMPONENT_ACTION_TPL(test_server2, create_test_server1, create_test_server1_action);
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
+        typedef hpx::actions::action0<
+            test_server2, &test_server2::create_test_server1
+        > create_test_server1_action;
+#else
+    HPX_DEFINE_COMPONENT_ACTION_TPL(test_server2, create_test_server1,
+        create_test_server1_action);
+#endif
 
     static bool alive;
 };
