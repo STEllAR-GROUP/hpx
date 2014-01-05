@@ -83,8 +83,8 @@ struct test_server2
     }
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
-        typedef hpx::actions::action0<
-            test_server2, &test_server2::create_test_server1
+        typedef hpx::actions::result_action0<
+            test_server2, hpx::id_type, &test_server2::create_test_server1
         > create_test_server1_action;
 #else
     HPX_DEFINE_COMPONENT_ACTION_TPL(test_server2, create_test_server1,
