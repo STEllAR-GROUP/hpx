@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2014 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -105,13 +105,6 @@ add_hpx_library_sources(hpx_init
   GLOB GLOBS "${hpx_SOURCE_DIR}/src/main.cpp" APPEND)
 
 set(hpx_external_SOURCES "" CACHE INTERNAL "Sources for libhpx_external." FORCE)
-
-# Boost Chrono sources (as long as this library is not in Boost)
-if(HPX_INTERNAL_CHRONO)
-  add_hpx_library_sources(hpx_external
-    GLOB GLOBS "${hpx_SOURCE_DIR}/external/chrono/libs/chrono/src/*.cpp"
-    APPEND)
-endif()
 
 if(MSVC)
   if(HPX_HAVE_SWAP_CONTEXT_EMULATION)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,9 +17,9 @@
 #include <boost/config.hpp>
 #include <boost/version.hpp>
 
-#if BOOST_VERSION < 104200
+#if BOOST_VERSION < 104900
 // Please update your Boost installation (see www.boost.org for details).
-#error HPX cannot be compiled with a Boost version earlier than V1.42.
+#error HPX cannot be compiled with a Boost version earlier than V1.49.
 #endif
 
 #if defined(BOOST_WINDOWS)

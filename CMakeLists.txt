@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2014 Hartmut Kaiser
 # Copyright (c) 2011-2013 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
@@ -96,12 +96,6 @@ endif()
 # Boost configuration
 ################################################################################
 
-# Boost.Chrono is in newer versions of Boost
-hpx_option(HPX_INTERNAL_CHRONO BOOL "Use HPX's internal version of Boost.Chrono (default: OFF)" OFF ADVANCED)
-
-# Boost.Move is in newer versions of Boost
-hpx_option(HPX_INTERNAL_MOVE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" OFF ADVANCED)
-
 # This cmake module will snag the Boost version we'll be using (which we need
 # to know to specify the Boost libraries that we want to look for)
 find_package(HPX_BoostVersion)
@@ -110,8 +104,8 @@ if(NOT BOOST_VERSION_FOUND)
   hpx_error("boost" "Failed to locate Boost.")
 endif()
 
-if(NOT MSVC AND ${BOOST_MINOR_VERSION} LESS 47)
-  hpx_warn("boost" "Applications will segfault at shutdown with this version of Boost, please use 1.47.0 or higher.")
+if(${BOOST_MINOR_VERSION} LESS 49)
+  hpx_error("boost" "HPX requires Boost V1.49.0 or higher (current version is: V${BOOST_MAJOR_VERSION}.${BOOST_MINOR_VERSION}.${BOOST_PATCH_VERSION}).")
 endif()
 
 ###############################################################################
@@ -123,18 +117,6 @@ set(BOOST_LIBRARIES date_time
                     serialization
                     system
                     thread)
-
-# Decide whether to use internal version of Boost.Chrono
-if(${BOOST_MINOR_VERSION} LESS 47)
-  hpx_warn("boost" "Using internal version of Boost.Chrono, setting HPX_INTERNAL_CHRONO=ON.")
-  set(HPX_INTERNAL_CHRONO ON CACHE BOOL "Use HPX's internal version of Boost.Chrono (default: OFF)" FORCE)
-endif()
-
-# Decide whether to use internal version of Boost.Move
-if(${BOOST_MINOR_VERSION} LESS 48)
-  hpx_warn("boost" "Using internal version of Boost.Move, setting HPX_INTERNAL_MOVE=ON.")
-  set(HPX_INTERNAL_MOVE ON CACHE BOOL "Use HPX's internal version of Boost.Move (default: OFF)" FORCE)
-endif()
 
 # Decide whether to use Boost.Context for coroutine implementation
 if(${BOOST_MINOR_VERSION} GREATER 50)
@@ -159,22 +141,12 @@ endif()
 ################################################################################
 hpx_include_directories(${hpx_SOURCE_DIR})
 hpx_include_directories(${CMAKE_BINARY_DIR})
-if(HPX_INTERNAL_MOVE)
-  hpx_add_config_define(HPX_INTERNAL_MOVE)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/move)
-endif()
 if(${BOOST_MINOR_VERSION} LESS 53)
   hpx_include_directories(${hpx_SOURCE_DIR}/external/atomic)
 else()
   set(BOOST_LIBRARIES ${BOOST_LIBRARIES} atomic)
 endif()
-if(HPX_INTERNAL_CHRONO)
-  hpx_add_config_define(HPX_INTERNAL_CHRONO)
-  hpx_add_config_define(BOOST_CHRONO_NO_LIB)
-  hpx_include_directories(${hpx_SOURCE_DIR}/external/chrono)
-else()
-  set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
-endif()
+set(BOOST_LIBRARIES ${BOOST_LIBRARIES} chrono)
 if(HPX_USE_GENERIC_COROUTINE_CONTEXT)
   if(${BOOST_MINOR_VERSION} GREATER 50)
     hpx_add_config_define(HPX_HAVE_GENERIC_CONTEXT_COROUTINES)
@@ -1195,11 +1167,11 @@ else()
     hpx_check_for_cxx11_decltype(HPX_HAVE_CXX11_DECLTYPE
       DEFINITIONS HPX_HAVE_CXX11_DECLTYPE BOOST_RESULT_OF_USE_DECLTYPE)
 
-	hpx_check_for_cxx11_alias_templates(HPX_HAVE_CXX11_ALIAS_TEMPLATES
-	  DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
+    hpx_check_for_cxx11_alias_templates(HPX_HAVE_CXX11_ALIAS_TEMPLATES
+      DEFINITIONS HPX_HAVE_CXX11_ALIAS_TEMPLATES)
 
-	hpx_check_for_cxx11_defaulted_deleted_functions(HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS
-	  DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS)
+    hpx_check_for_cxx11_defaulted_deleted_functions(HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS
+      DEFINITIONS HPX_HAVE_CXX11_DEFAULTED_DELETED_FUNCTIONS)
 
     hpx_check_for_cxx11_std_unique_ptr(HPX_HAVE_CXX11_STD_UNIQUE_PTR
       DEFINITIONS HPX_HAVE_CXX11_STD_UNIQUE_PTR
@@ -1728,25 +1700,6 @@ if(NOT HPX_NO_INSTALL)
     # Install Boost.Lockfree library for older Boost versions only
     install(
       DIRECTORY external/lockfree/boost
-      DESTINATION include/hpx/external
-      COMPONENT core
-      FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".git" EXCLUDE)
-  endif()
-
-  if(HPX_INTERNAL_MOVE)
-    # Install Boost.Move if requested
-    install(
-      DIRECTORY external/move/boost
-      DESTINATION include
-      COMPONENT core
-      FILES_MATCHING PATTERN "*.hpp"
-      PATTERN ".git" EXCLUDE)
-  endif()
-
-  if(HPX_INTERNAL_CHRONO)
-    install( # Install Boost.Chrono headers if we're using our internal version
-      DIRECTORY external/chrono/boost
       DESTINATION include/hpx/external
       COMPONENT core
       FILES_MATCHING PATTERN "*.hpp"
