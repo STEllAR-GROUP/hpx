@@ -793,8 +793,7 @@ namespace hpx { namespace lcos
         // Postcondition: valid() == false.
         shared_future<R> share()
         {
-            invalidate on_exit(*this);
-            return shared_future<R>(boost::move(this->shared_state_));
+            return shared_future<R>(boost::move(*this));
         }
 
         // Effects: wait()s until the shared state is ready, then retrieves
