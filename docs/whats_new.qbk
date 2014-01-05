@@ -16,6 +16,11 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1038] - Bump minimal required Boost to 1.49.0 
+* [issue 1037] - Implicit unwrapping of futures in async broken
+* [issue 1030] - Implement condition_variable
+* [issue 1029] - Deadlock in thread scheduling subsystem
+* [issue 1028] - HPX-thread cumulative count performance counters report incorrect value 
 * [issue 1027] - Expose hpx::thread_interrupted error code as a separate
                  exception type
 * [issue 1026] - Exceptions thrown in asynchronous calls can be lost if the
