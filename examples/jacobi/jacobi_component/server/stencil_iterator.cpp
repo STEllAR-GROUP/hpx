@@ -28,32 +28,30 @@ namespace jacobi
             HPX_ASSERT(this->get_gid() != top.id);
             HPX_ASSERT(this->get_gid() != bottom.id);
 
-            std::vector<hpx::lcos::future<void> > fs;
+            std::vector<hpx::lcos::unique_future<void> > fs;
             for(std::size_t x = 1; x < nx-1; x += line_block)
             {
                 std::size_t x_end = (std::min)(nx-1, x + line_block);
                 fs.push_back(
                     hpx::async(
-                        HPX_STD_BIND(
-                            &stencil_iterator::update
-                          , this
-                          , rows[dst].get(x, x_end)
-                          , rows[src].get(x-1, x_end+1)
-                          , top.get(x, x_end)
-                          , bottom.get(x, x_end)
-                        )
+                        &stencil_iterator::update
+                      , this
+                      , rows[dst].get(x, x_end)
+                      , rows[src].get(x-1, x_end+1)
+                      , top.get(x, x_end)
+                      , bottom.get(x, x_end)
                     )
                 );
             }
-            hpx::lcos::wait(fs);
+            hpx::wait_all(fs);
             std::swap(src, dst);
         }
 
         void stencil_iterator::update(
-            hpx::lcos::future<row_range> dst
-          , hpx::lcos::future<row_range> src
-          , hpx::lcos::future<row_range> top
-          , hpx::lcos::future<row_range> bottom
+            hpx::lcos::unique_future<row_range> dst
+          , hpx::lcos::unique_future<row_range> src
+          , hpx::lcos::unique_future<row_range> top
+          , hpx::lcos::unique_future<row_range> bottom
         )
         {
             row_range d = dst.get();

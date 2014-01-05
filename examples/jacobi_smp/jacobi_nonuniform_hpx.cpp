@@ -70,7 +70,7 @@ namespace jacobi_smp {
             }
         }
 
-        typedef std::vector<hpx::future<void> > future_vector;
+        typedef std::vector<hpx::shared_future<void> > future_vector;
         boost::shared_ptr<future_vector> deps_dst(new future_vector(dependencies.size(), hpx::make_ready_future()));
         boost::shared_ptr<future_vector> deps_src(new future_vector(dependencies.size(), hpx::make_ready_future()));
 
@@ -80,7 +80,7 @@ namespace jacobi_smp {
             for(std::size_t block = 0; block < block_ranges.size(); ++block)
             {
                 std::vector<std::size_t> const & deps(dependencies[block]);
-                std::vector<hpx::future<void> > trigger;
+                std::vector<hpx::shared_future<void> > trigger;
                 trigger.reserve(deps.size());
                 BOOST_FOREACH(std::size_t dep, deps)
                 {

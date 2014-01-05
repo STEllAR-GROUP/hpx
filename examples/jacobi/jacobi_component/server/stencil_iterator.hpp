@@ -87,10 +87,10 @@ namespace jacobi
             jacobi::row get(std::size_t idx);
 
             void update(
-                hpx::lcos::future<row_range> dst
-              , hpx::lcos::future<row_range> src
-              , hpx::lcos::future<row_range> top
-              , hpx::lcos::future<row_range> bottom
+                hpx::lcos::unique_future<row_range> dst
+              , hpx::lcos::unique_future<row_range> src
+              , hpx::lcos::unique_future<row_range> top
+              , hpx::lcos::unique_future<row_range> bottom
             );
 
             HPX_DEFINE_COMPONENT_ACTION(stencil_iterator, init, init_action);
@@ -104,9 +104,9 @@ namespace jacobi
             std::size_t line_block;
             std::size_t src;
             std::size_t dst;
-            hpx::lcos::future<jacobi::row> top_future[2];
+            hpx::lcos::shared_future<jacobi::row> top_future[2];
             jacobi::row rows[2];
-            hpx::lcos::future<jacobi::row> bottom_future[2];
+            hpx::lcos::shared_future<jacobi::row> bottom_future[2];
 
         };
     }

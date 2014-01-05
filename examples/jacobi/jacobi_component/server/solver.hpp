@@ -70,7 +70,7 @@ namespace jacobi
                 hpx::components::distributing_factory::result_type si_allocated =
                     factory.create_components(type, ny);
 
-                std::vector<hpx::lcos::future<void> > init_futures;
+                std::vector<hpx::lcos::shared_future<void> > init_futures;
                 init_futures.reserve(ny);
                 std::size_t y = 0;
                 BOOST_FOREACH(hpx::naming::id_type id, hpx::util::locality_results(si_allocated))
@@ -83,7 +83,7 @@ namespace jacobi
                 }
                 HPX_ASSERT(y == ny);
 
-                std::vector<hpx::lcos::future<void> > boundary_futures;
+                std::vector<hpx::lcos::shared_future<void> > boundary_futures;
                 hpx::lcos::wait(
                     init_futures
                   , [&](std::size_t y)
@@ -128,7 +128,7 @@ namespace jacobi
 
                 for(std::size_t iter = 0; iter < max_iterations; ++iter)
                 {
-                    std::vector<hpx::lcos::future<void> > run_futures;
+                    std::vector<hpx::lcos::shared_future<void> > run_futures;
                     run_futures.reserve(ny-2);
                     for(std::size_t y = 1; y < ny-1; ++y)
                     {
