@@ -8,7 +8,7 @@
 #include <hpx/components/remote_object/object.hpp>
 #include <hpx/components/distributing_factory/distributing_factory.hpp>
 #include <hpx/components/remote_object/distributed_new.hpp>
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/lcos/wait_all.hpp>
 #include <hpx/include/iostreams.hpp>
 
 #include "grid.hpp"
@@ -32,7 +32,7 @@ namespace jacobi
             factory.create_components(type, ny);
 
         rows.reserve(ny);
-        std::vector<hpx::lcos::future<void> > init_futures;
+        std::vector<hpx::lcos::unique_future<void> > init_futures;
         init_futures.reserve(ny);
         BOOST_FOREACH(hpx::naming::id_type id, hpx::util::locality_results(rows_allocated))
         {
@@ -41,6 +41,6 @@ namespace jacobi
             rows.push_back(r);
         }
 
-        hpx::lcos::wait(init_futures);
+        hpx::wait_all(init_futures);
     }
 }

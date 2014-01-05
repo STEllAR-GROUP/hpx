@@ -35,7 +35,7 @@ namespace hpx { namespace components { namespace stubs
         ///         be created in blocks (i.e. more than one instance at once).
         ///         This function is used by the \a distributing_factory to
         ///         determine a correct allocation strategy
-        static lcos::future<int> get_factory_properties_async(
+        static lcos::unique_future<int> get_factory_properties_async(
             naming::id_type const& targetgid, components::component_type type);
 
         static int get_factory_properties(naming::id_type const& targetgid,

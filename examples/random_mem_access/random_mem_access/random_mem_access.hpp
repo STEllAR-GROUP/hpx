@@ -51,7 +51,7 @@ namespace hpx { namespace components
             this->base_type::add(get_gid());
         }
 
-        hpx::lcos::future<void> add_async ()
+        hpx::lcos::unique_future<void> add_async ()
         {
             return(this->base_type::add_async(get_gid()));
         }
@@ -62,7 +62,7 @@ namespace hpx { namespace components
             this->base_type::print(get_gid());
         }
         /// Asynchronously query the current value of the random_mem_access
-        hpx::lcos::future<void> print_async ()
+        hpx::lcos::unique_future<void> print_async ()
         {
             return(this->base_type::print_async(get_gid()));
         }
@@ -74,7 +74,7 @@ namespace hpx { namespace components
         }
 
         /// Asynchronously query the current value of the random_mem_access
-        lcos::future<int> query_async()
+        lcos::unique_future<int> query_async()
         {
             return this->base_type::query_async(get_gid());
         }
