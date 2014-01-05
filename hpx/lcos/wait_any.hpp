@@ -81,16 +81,23 @@ namespace hpx
                 threads::thread_id_type id = threads::get_self_id();
                 for (std::size_t i = 0; i != size; ++i)
                 {
-                    typedef
-                        typename lcos::detail::shared_state_ptr_for<Future>::type
-                        shared_state_ptr;
+                    if (lazy_values_[i].is_ready())
+                    {
+                        index_.store(i);
+                        break;
+                    } else {
+                        typedef
+                            typename lcos::detail::shared_state_ptr_for<Future>::type
+                            shared_state_ptr;
 
-                    using lcos::detail::future_access;
-                    shared_state_ptr const& shared_state =
-                        future_access::get_shared_state(lazy_values_[i]);
+                        using lcos::detail::future_access;
+                        shared_state_ptr const& shared_state =
+                            future_access::get_shared_state(lazy_values_[i]);
 
-                    shared_state->set_on_completed(util::bind(
-                        &when_any_swapped::on_future_ready, this->shared_from_this(), i, id));
+                        shared_state->set_on_completed(util::bind(
+                            &when_any_swapped::on_future_ready, 
+                            this->shared_from_this(), i, id));
+                    }
                 }
 
                 // If one of the futures is already set, our callback above has
