@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace server
         {}
 
         naming::gid_type locality_;
-        lcos::unique_future<std::vector<naming::gid_type > > gids_;
+        lcos::shared_future<std::vector<naming::gid_type > > gids_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
