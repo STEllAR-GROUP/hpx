@@ -15,6 +15,7 @@
 #include <hpx/lcos/local/packaged_continuation.hpp>
 #include <hpx/runtime/threads/thread.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/always_void.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -69,13 +70,29 @@ namespace hpx
         };
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Future>
+        struct when_get_shared_state
+        {
+            typedef
+                typename lcos::detail::shared_state_ptr_for<Future>::type const&
+                result_type;
+
+            BOOST_FORCEINLINE result_type
+            operator()(Future const& f) const
+            {
+                using lcos::detail::future_access;
+                return future_access::get_shared_state(f);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename Sequence>
         struct when_n;
 
         template <typename Sequence, typename Callback>
-        struct set_on_completed_callback_impl
+        struct set_when_on_completed_callback_impl
         {
-            explicit set_on_completed_callback_impl(
+            explicit set_when_on_completed_callback_impl(
                     when_n<Sequence>& when, Callback const& callback)
               : when_(when),
                 callback_(callback)
@@ -126,7 +143,7 @@ namespace hpx
         void set_on_completed_callback(when_n<Sequence>& when,
             Callback const& callback)
         {
-            set_on_completed_callback_impl<Sequence, Callback>
+            set_when_on_completed_callback_impl<Sequence, Callback>
                 set_on_completed_callback_helper(when, callback);
             set_on_completed_callback_helper.apply(when.lazy_values_);
         }
@@ -187,6 +204,116 @@ namespace hpx
             boost::atomic<std::size_t> count_;
             std::size_t needed_count_;
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Sequence>
+        struct wait_n;
+
+        template <typename Sequence, typename Callback>
+        struct set_wait_on_completed_callback_impl
+        {
+            explicit set_wait_on_completed_callback_impl(
+                    wait_n<Sequence>& wait, Callback const& callback)
+              : wait_(wait),
+                callback_(callback)
+            {}
+
+            template <typename SharedState>
+            void operator()(SharedState& shared_state) const
+            {
+                std::size_t counter = wait_.count_.load(boost::memory_order_acquire);
+                if (counter < wait_.needed_count_ && !shared_state->is_ready()) {
+                    // handle future only if not enough futures are ready yet
+                    // also, do not touch any futures which are already ready
+
+                    shared_state->set_on_completed(Callback(callback_));
+                }
+                else {
+                    ++wait_.count_;
+                }
+            }
+
+            template <typename Sequence_>
+            void apply(Sequence_& sequence, typename boost::enable_if<
+                boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
+            {
+                boost::fusion::for_each(sequence, *this);
+            }
+
+            template <typename Sequence_>
+            void apply(Sequence_& sequence, typename boost::disable_if<
+                boost::fusion::traits::is_sequence<Sequence_> >::type* = 0) const
+            {
+                std::for_each(sequence.begin(), sequence.end(), *this);
+            }
+
+            wait_n<Sequence>& wait_;
+            Callback const& callback_;
+        };
+
+        template <typename Sequence, typename Callback>
+        void set_on_completed_callback(wait_n<Sequence>& wait,
+            Callback const& callback)
+        {
+            set_wait_on_completed_callback_impl<Sequence, Callback>
+                set_on_completed_callback_helper(wait, callback);
+            set_on_completed_callback_helper.apply(wait.lazy_values_);
+        }
+
+        template <typename Sequence>
+        struct wait_n : boost::enable_shared_from_this<wait_n<Sequence> >
+        {
+        private:
+            void on_future_ready(threads::thread_id_type const& id)
+            {
+                if (count_.fetch_add(1) + 1 == needed_count_)
+                {
+                    // reactivate waiting thread only if it's not us
+                    if (id != threads::get_self_id())
+                        threads::set_thread_state(id, threads::pending);
+                }
+            }
+
+        private:
+            // workaround gcc regression wrongly instantiating constructors
+            wait_n();
+            wait_n(wait_n const&);
+
+        public:
+            typedef Sequence argument_type;
+            typedef void result_type;
+
+            wait_n(BOOST_RV_REF(argument_type) lazy_values, std::size_t n)
+              : lazy_values_(boost::move(lazy_values))
+              , count_(0)
+              , needed_count_(n)
+            {}
+
+            result_type operator()()
+            {
+                // set callback functions to executed wait future is ready
+                set_on_completed_callback(*this,
+                    util::bind(
+                        &wait_n::on_future_ready, this->shared_from_this(),
+                        threads::get_self_id()));
+
+                // if all of the requested futures are already set, our
+                // callback above has already been called often enough, otherwise
+                // we suspend ourselves
+                if (count_.load(boost::memory_order_acquire) < needed_count_)
+                {
+                    // wait for any of the futures to return to become ready
+                    this_thread::suspend(threads::suspended);
+                }
+
+                // at least N futures should be ready
+                HPX_ASSERT(count_.load(boost::memory_order_acquire) >= needed_count_);
+            }
+
+            argument_type lazy_values_;
+            boost::atomic<std::size_t> count_;
+            std::size_t needed_count_;
+        };
     }
 
     /// The function \a when_n is a operator allowing to join on the result
@@ -233,6 +360,7 @@ namespace hpx
         }
 
         result_type lazy_values_;
+        lazy_values_.reserve(lazy_values.size());
         std::transform(lazy_values.begin(), lazy_values.end(),
             std::back_inserter(lazy_values_),
             detail::when_acquire_future<Future>());
@@ -316,66 +444,101 @@ namespace hpx
     ///             The inputs can be any arbitrary number of future objects.
 
     template <typename Future>
-    std::vector<Future>
+    void wait_n(std::size_t n,
+        std::vector<Future> const& lazy_values,
+        error_code& ec = throws)
+    {
+        BOOST_STATIC_ASSERT_MSG(
+            traits::is_future<Future>::value, "invalid use of wait_n");
+
+        typedef
+            typename lcos::detail::shared_state_ptr_for<Future>::type
+            shared_state_ptr;
+        typedef std::vector<shared_state_ptr> result_type;
+
+        if (n == 0)
+        {
+            return;
+        }
+
+        if (n > lazy_values.size())
+        {
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::wait_n",
+                "number of results to wait for is out of bounds");
+            return;
+        }
+
+        result_type lazy_values_;
+        std::transform(lazy_values.begin(), lazy_values.end(),
+            std::back_inserter(lazy_values_),
+            detail::when_get_shared_state<Future>());
+
+        boost::shared_ptr<detail::wait_n<result_type> > f =
+            boost::make_shared<detail::wait_n<result_type> >(
+                boost::move(lazy_values_), n);
+
+        return (*f.get())();
+    }
+
+    template <typename Future>
+    void
     wait_n(std::size_t n,
         std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
-        typedef std::vector<Future> result_type;
-
-        lcos::unique_future<result_type> f = when_n(n, lazy_values, ec);
-        if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
-                "lcos::when_n didn't return a valid future");
-            return result_type();
-        }
-
-        return f.get(ec);
+        return wait_n(n, const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
     template <typename Future>
-    std::vector<Future>
+    void
     wait_n(std::size_t n,
         BOOST_RV_REF(std::vector<Future>) lazy_values,
         error_code& ec = throws)
     {
-        return wait_n(n, lazy_values, ec);
+        return wait_n(n, const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
     template <typename Iterator>
-    std::vector<
+    typename util::always_void<
         typename lcos::detail::future_iterator_traits<Iterator>::type
-    >
+    >::type
     wait_n(std::size_t n, Iterator begin, Iterator end,
         error_code& ec = throws)
     {
-        typedef std::vector<
+        typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
-        > result_type;
+            future_type;
+        typedef
+            typename lcos::detail::shared_state_ptr_for<future_type>::type
+            shared_state_ptr;
+        typedef std::vector<shared_state_ptr> result_type;
 
-        lcos::unique_future<result_type> f = when_n(n, begin, end, ec);
-        if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
-                "lcos::when_n didn't return a valid future");
-            return result_type();
-        }
+        result_type lazy_values_;
+        std::transform(begin, end, std::back_inserter(lazy_values_),
+            detail::when_get_shared_state<future_type>());
 
-        return f.get(ec);
+        boost::shared_ptr<detail::wait_n<result_type> > f =
+            boost::make_shared<detail::wait_n<result_type> >(
+                boost::move(lazy_values_), n);
+
+        return (*f.get())();
     }
 
-    inline HPX_STD_TUPLE<>
-    wait_n(std::size_t n, error_code& ec = throws)
+    inline void wait_n(std::size_t n, error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<> result_type;
-
-        lcos::unique_future<result_type> f = when_n(n, ec);
-        if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
-                "lcos::when_n didn't return a valid future");
-            return result_type();
+        if (n == 0)
+        {
+            return;
         }
 
-        return f.get(ec);
+        //if (n > 0)
+        //{
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::wait_n",
+                "number of results to wait for is out of bounds");
+            return;
+        //}
     }
 }
 
@@ -411,6 +574,12 @@ namespace hpx
 #define HPX_WHEN_N_ACQUIRE_FUTURE(Z, N, D)                                    \
     detail::when_acquire_future<BOOST_PP_CAT(T, N)>()(BOOST_PP_CAT(f, N))     \
     /**/
+#define HPX_WAIT_N_SHARED_STATE_FOR_FUTURE(Z, N, D)                           \
+    typename lcos::detail::shared_state_ptr_for<BOOST_PP_CAT(T, N)>::type     \
+    /**/
+#define HPX_WAIT_N_GET_SHARED_STATE(Z, N, D)                                  \
+    lcos::detail::future_access::get_shared_state(BOOST_PP_CAT(f, N))         \
+    /**/
 
 namespace hpx
 {
@@ -420,7 +589,9 @@ namespace hpx
     when_n(std::size_t n, HPX_ENUM_FWD_ARGS(N, T, f),
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> result_type;
+        typedef HPX_STD_TUPLE<
+            BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)>
+            result_type;
 
         result_type lazy_values(BOOST_PP_ENUM(N, HPX_WHEN_N_ACQUIRE_FUTURE, _));
 
@@ -449,26 +620,42 @@ namespace hpx
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)>
+    void
     wait_n(std::size_t n, HPX_ENUM_FWD_ARGS(N, T, f),
         error_code& ec = throws)
     {
-        typedef HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> result_type;
+        typedef HPX_STD_TUPLE<
+            BOOST_PP_ENUM(N, HPX_WAIT_N_SHARED_STATE_FOR_FUTURE, _)>
+            result_type;
 
-        lcos::unique_future<result_type> f = when_n(n,
-            HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
-        if (!f.valid()) {
-            HPX_THROWS_IF(ec, uninitialized_value, "lcos::wait_n",
-                "lcos::when_n didn't return a valid future");
-            return result_type();
+        result_type lazy_values_(
+            BOOST_PP_ENUM(N, HPX_WAIT_N_GET_SHARED_STATE, _));
+
+        if (n == 0)
+        {
+            return;
         }
 
-        return f.get(ec);
+        if (n > N)
+        {
+            HPX_THROWS_IF(ec, hpx::bad_parameter,
+                "hpx::lcos::wait_n",
+                "number of results to wait for is out of bounds");
+            return;
+        }
+
+        boost::shared_ptr<detail::wait_n<result_type> > f =
+            boost::make_shared<detail::wait_n<result_type> >(
+                boost::move(lazy_values_), n);
+
+        return (*f.get())();
     }
 }
 
 #undef HPX_WHEN_N_DECAY_FUTURE
 #undef HPX_WHEN_N_ACQUIRE_FUTURE
+#undef HPX_WAIT_N_SHARED_STATE_FOR_FUTURE
+#undef HPX_WAIT_N_GET_SHARED_STATE
 #undef N
 
 #endif

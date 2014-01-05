@@ -2627,7 +2627,7 @@ void addressing_service::send_refcnt_requests_sync(
     std::vector<hpx::unique_future<response> > lazy_results =
         send_refcnt_requests_async(l);
 
-    lazy_results = wait_all(lazy_results);
+    wait_all(lazy_results);
 
     BOOST_FOREACH(hpx::unique_future<response> & f, lazy_results)
     {

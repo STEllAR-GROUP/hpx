@@ -78,6 +78,21 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future>
     struct shared_state_ptr_for
     {};
+    
+    template <typename Future>
+    struct shared_state_ptr_for<Future const>
+      : shared_state_ptr_for<Future>
+    {};
+    
+    template <typename Future>
+    struct shared_state_ptr_for<Future&>
+      : shared_state_ptr_for<Future>
+    {};
+    
+    template <typename Future>
+    struct shared_state_ptr_for<BOOST_RV_REF(Future)>
+      : shared_state_ptr_for<Future>
+    {};
 
     template <typename R>
     struct shared_state_ptr_for<unique_future<R> >
