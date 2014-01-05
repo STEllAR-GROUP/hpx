@@ -98,7 +98,7 @@ namespace hpx { namespace util
 
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
-        std::vector<future<bool> > started;
+        std::vector<unique_future<bool> > started;
 
         started.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -121,7 +121,7 @@ namespace hpx { namespace util
 
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
-        std::vector<future<bool> > stopped;
+        std::vector<unique_future<bool> > stopped;
 
         stopped.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -145,7 +145,7 @@ namespace hpx { namespace util
 
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
-        std::vector<future<void> > reset;
+        std::vector<unique_future<void> > reset;
 
         reset.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -155,7 +155,7 @@ namespace hpx { namespace util
         wait_all(reset, ec);
     }
 
-    std::vector<future<performance_counters::counter_value> >
+    std::vector<unique_future<performance_counters::counter_value> >
     activate_counters::evaluate_counters(bool reset, error_code& ec)
     {
         if (ids_.empty())
@@ -163,11 +163,11 @@ namespace hpx { namespace util
             // start has not been called yet
             HPX_THROWS_IF(ec, invalid_status, "activate_counters::evaluate_counters",
                 "The counters to be evaluated have not been initialized yet");
-            std::vector<future<performance_counters::counter_value> > tmp;
+            std::vector<unique_future<performance_counters::counter_value> > tmp;
             return tmp;
         }
 
-        std::vector<future<performance_counters::counter_value> > values;
+        std::vector<unique_future<performance_counters::counter_value> > values;
 
         values.reserve(ids_.size());
         using hpx::performance_counters::stubs::performance_counter;

@@ -842,7 +842,7 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type register_with_agas(lcos::future<naming::id_type> f,
+    naming::id_type register_with_agas(lcos::unique_future<naming::id_type> f,
         std::string const& fullname)
     {
         // register the canonical name with AGAS
@@ -852,10 +852,10 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future<naming::id_type> get_counter_async(
+    lcos::unique_future<naming::id_type> get_counter_async(
         counter_info const& info, error_code& ec)
     {
-        typedef lcos::future<naming::id_type> result_type;
+        typedef lcos::unique_future<naming::id_type> result_type;
 
         // complement counter info data
         counter_info complemented_info = info;
@@ -896,7 +896,7 @@ namespace hpx { namespace performance_counters
                 // use the runtime_support component of the target locality to
                 // create the new performance counter
                 using namespace components::stubs;
-                lcos::future<naming::id_type> f;
+                lcos::unique_future<naming::id_type> f;
                 if (p.parentinstanceindex_ >= 0) {
                     f = runtime_support::create_performance_counter_async(
                         naming::get_id_from_locality_id(
@@ -918,7 +918,7 @@ namespace hpx { namespace performance_counters
                 ec = make_error_code(e.get_error(), e.what());
                 LPCS_(warning) << (boost::format("failed to create counter %s (%s)")
                     % remove_counter_prefix(complemented_info.fullname_) % e.what());
-                return lcos::future<naming::id_type>();
+                return lcos::unique_future<naming::id_type>();
             }
         }
         if (ec) return result_type();
@@ -926,7 +926,7 @@ namespace hpx { namespace performance_counters
         return lcos::make_ready_future(id);
     }
 
-    lcos::future<naming::id_type> get_counter_async(
+    lcos::unique_future<naming::id_type> get_counter_async(
         std::string const& name, error_code& ec)
     {
         ensure_counter_prefix(name);      // pre-pend prefix, if necessary
