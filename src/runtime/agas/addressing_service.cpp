@@ -1681,7 +1681,7 @@ bool addressing_service::propagate_local_incref_acknowlegdement(
 }
 
 bool addressing_service::synchronize_with_async_incref(
-    hpx::future<bool> fut
+    hpx::unique_future<bool> fut
   , naming::id_type const& id
   , boost::int64_t credit
     )
@@ -2575,7 +2575,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
     }
 }
 
-std::vector<hpx::future<response> >
+std::vector<hpx::unique_future<response> >
 addressing_service::send_refcnt_requests_async(
     addressing_service::mutex_type::scoped_lock& l
     )
@@ -2598,7 +2598,7 @@ addressing_service::send_refcnt_requests_async(
             "addressing_service::send_refcnt_requests_sync");
 #endif
 
-    std::vector<hpx::future<response> > lazy_results;
+    std::vector<hpx::unique_future<response> > lazy_results;
     BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
     {
         naming::gid_type lower(boost::icl::lower(e.key()));
@@ -2624,12 +2624,12 @@ void addressing_service::send_refcnt_requests_sync(
   , error_code& ec
     )
 {
-    std::vector<hpx::future<response> > lazy_results =
+    std::vector<hpx::unique_future<response> > lazy_results =
         send_refcnt_requests_async(l);
 
-    wait_all(lazy_results);
+    lazy_results = wait_all(lazy_results);
 
-    BOOST_FOREACH(hpx::future<response> const& f, lazy_results)
+    BOOST_FOREACH(hpx::unique_future<response> & f, lazy_results)
     {
         response const& rep = f.get();
         if (success != rep.get_status())

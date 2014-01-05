@@ -436,7 +436,7 @@ namespace hpx { namespace naming
             return new_credit;
         }
 
-        hpx::future<bool> replenish_credits(gid_type& id)
+        hpx::unique_future<bool> replenish_credits(gid_type& id)
         {
             boost::int64_t added_credit = 0;
 

@@ -109,14 +109,14 @@ namespace hpx { namespace components
 
         /// Asynchronously create a new memory block using the runtime_support
         template <typename T, typename Config>
-        lcos::future<naming::id_type>
+        lcos::unique_future<naming::id_type>
         create_memory_block_async(std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act)
         {
             return this->base_type::create_memory_block_async(gid_, count, act);
         }
 
-        lcos::future<bool> load_components_async()
+        lcos::unique_future<bool> load_components_async()
         {
             return this->base_type::load_components_async(gid_);
         }
@@ -126,7 +126,7 @@ namespace hpx { namespace components
             return this->base_type::load_components(gid_);
         }
 
-        lcos::future<void> call_startup_functions_async(bool pre_startup)
+        lcos::unique_future<void> call_startup_functions_async(bool pre_startup)
         {
             return this->base_type::call_startup_functions_async(gid_, pre_startup);
         }
@@ -136,7 +136,7 @@ namespace hpx { namespace components
             this->base_type::call_startup_functions(gid_, pre_startup);
         }
 
-        lcos::future<void> call_shutdown_functions_async(bool pre_shutdown)
+        lcos::unique_future<void> call_shutdown_functions_async(bool pre_shutdown)
         {
             return this->base_type::call_shutdown_functions_async(gid_, pre_shutdown);
         }
@@ -147,7 +147,7 @@ namespace hpx { namespace components
         }
 
         /// \brief Shutdown the given runtime system
-        lcos::future<void> shutdown_async(double timeout = -1)
+        lcos::unique_future<void> shutdown_async(double timeout = -1)
         {
             return this->base_type::shutdown_async(gid_, timeout);
         }
@@ -164,7 +164,7 @@ namespace hpx { namespace components
         }
 
         /// \brief Terminate the given runtime system
-        lcos::future<void> terminate_async()
+        lcos::unique_future<void> terminate_async()
         {
             return this->base_type::terminate_async(gid_);
         }

@@ -75,7 +75,7 @@ namespace hpx { namespace agas { namespace detail
         // is received. It will compensate the pending credits for the acknowledged
         // amount of credits.
         typedef HPX_STD_FUNCTION<
-            hpx::future<bool>(boost::int64_t, naming::gid_type const&, boost::uint32_t)
+            hpx::unique_future<bool>(boost::int64_t, naming::gid_type const&, boost::uint32_t)
         > acknowledge_request_callback;
 
         bool acknowledge_request(boost::int64_t credit, naming::id_type const& id,

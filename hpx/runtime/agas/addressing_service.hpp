@@ -210,7 +210,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     void* get_bootstrap_symbol_ns_ptr() const;
 
     bool synchronize_with_async_incref(
-        hpx::future<bool> fut
+        hpx::unique_future<bool> fut
       , naming::id_type const& id
       , boost::int64_t credit
         );
@@ -251,7 +251,7 @@ private:
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
-    std::vector<hpx::future<response> > send_refcnt_requests_async(
+    std::vector<hpx::unique_future<response> > send_refcnt_requests_async(
         mutex_type::scoped_lock& l
         );
 
