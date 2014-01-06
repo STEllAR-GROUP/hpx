@@ -24,7 +24,7 @@ int p1()
     return 1;
 }
 
-int p2(hpx::lcos::future<int> f)
+int p2(hpx::lcos::unique_future<int> f)
 {
     HPX_TEST(f.valid());
     int i = f.get();
@@ -32,7 +32,7 @@ int p2(hpx::lcos::future<int> f)
     return 2 * i;
 }
 
-void p3(hpx::lcos::future<int> f)
+void p3(hpx::lcos::unique_future<int> f)
 {
     HPX_TEST(f.valid());
     int i = f.get();
@@ -41,17 +41,17 @@ void p3(hpx::lcos::future<int> f)
     return;
 }
 
-hpx::lcos::future<int> p4(hpx::lcos::future<int> f)
+hpx::lcos::unique_future<int> p4(hpx::lcos::unique_future<int> f)
 {
-    return hpx::async(p2, f);
+    return hpx::async(p2, boost::move(f));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_return_int()
 {
-    hpx::lcos::future<int> f1 = hpx::async(hpx::launch::async, &p1);
+    hpx::lcos::unique_future<int> f1 = hpx::async(hpx::launch::async, &p1);
     HPX_TEST(f1.valid());
-    hpx::lcos::future<int> f2 = f1.then(&p2);
+    hpx::lcos::unique_future<int> f2 = f1.then(&p2);
     HPX_TEST(f2.valid());
     try {
         HPX_TEST(f2.get()==2);
@@ -67,9 +67,9 @@ void test_return_int()
 ///////////////////////////////////////////////////////////////////////////////
 void test_return_void()
 {
-    hpx::lcos::future<int> f1 = hpx::async(hpx::launch::async, &p1);
+    hpx::lcos::unique_future<int> f1 = hpx::async(hpx::launch::async, &p1);
     HPX_TEST(f1.valid());
-    hpx::lcos::future<void> f2 = f1.then(&p3);
+    hpx::lcos::unique_future<void> f2 = f1.then(&p3);
     HPX_TEST(f2.valid());
     try {
         f2.wait();
@@ -85,9 +85,9 @@ void test_return_void()
 ///////////////////////////////////////////////////////////////////////////////
 void test_implicit_unwrapping()
 {
-    hpx::lcos::future<int> f1 = hpx::async(hpx::launch::async, &p1);
+    hpx::lcos::unique_future<int> f1 = hpx::async(hpx::launch::async, &p1);
     HPX_TEST(f1.valid());
-    hpx::lcos::future<int> f2 = f1.then(&p4);
+    hpx::lcos::unique_future<int> f2 = f1.then(&p4);
     HPX_TEST(f2.valid());
     try {
         HPX_TEST(f2.get()==2);
@@ -103,31 +103,31 @@ void test_implicit_unwrapping()
 ///////////////////////////////////////////////////////////////////////////////
 void test_simple_then()
 {
-    hpx::lcos::future<int> f2 = hpx::async(p1).then(&p2);
+    hpx::lcos::unique_future<int> f2 = hpx::async(p1).then(&p2);
     HPX_TEST(f2.get()==2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_complex_then()
 {
-    hpx::lcos::future<int> f1 = hpx::async(p1);
-    hpx::lcos::future<int> f21 = f1.then(&p2);
-    hpx::lcos::future<int> f2= f21.then(&p2);
+    hpx::lcos::unique_future<int> f1 = hpx::async(p1);
+    hpx::lcos::unique_future<int> f21 = f1.then(&p2);
+    hpx::lcos::unique_future<int> f2= f21.then(&p2);
     HPX_TEST(f2.get()==4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_complex_then_chain_one()
 {
-    hpx::lcos::future<int> f1 = hpx::async(p1);
-    hpx::lcos::future<int> f2= f1.then(&p2).then(&p2);
+    hpx::lcos::unique_future<int> f1 = hpx::async(p1);
+    hpx::lcos::unique_future<int> f2= f1.then(&p2).then(&p2);
     HPX_TEST(f2.get()==4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_complex_then_chain_two()
 {
-    hpx::lcos::future<int> f2 = hpx::async(p1).then(&p2).then(&p2);
+    hpx::lcos::unique_future<int> f2 = hpx::async(p1).then(&p2).then(&p2);
     HPX_TEST(f2.get()==4);
 }
 

@@ -34,7 +34,7 @@ using hpx::naming::id_type;
 
 using hpx::actions::plain_result_action1;
 
-using hpx::lcos::future;
+using hpx::lcos::unique_future;
 using hpx::async;
 using hpx::lcos::wait;
 
@@ -203,7 +203,7 @@ int hpx_main(
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
-        std::vector<future<double> > futures;
+        std::vector<unique_future<double> > futures;
 
         futures.reserve(count);
 

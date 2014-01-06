@@ -9,7 +9,6 @@
 #include <hpx/include/lcos.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-#include <boost/bind.hpp>
 #include <boost/ref.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,7 +33,7 @@ char const* const error_msg = "throwing test exception: HPX(not_implemented)";
 int future_callback(
     bool& data_cb_called
   , bool& error_cb_called
-  , hpx::lcos::future<int> f
+  , hpx::lcos::shared_future<int> f
     )
 {
     if (f.has_value()) {
@@ -65,17 +64,14 @@ int future_callback(
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(boost::program_options::variables_map&)
 {
-    using hpx::lcos::future;
-    using hpx::async;
-
     {
-        future<int> p = async<test_action>(hpx::find_here());
+        hpx::lcos::unique_future<int> p = hpx::async<test_action>(hpx::find_here());
         HPX_TEST_EQ(p.get(), 42);
     }
 
     {
         test_action do_test;
-        future<int> p = async(do_test, hpx::find_here());
+        hpx::lcos::unique_future<int> p = hpx::async(do_test, hpx::find_here());
         HPX_TEST_EQ(p.get(), 42);
     }
 
@@ -83,9 +79,10 @@ int hpx_main(boost::program_options::variables_map&)
         bool data_cb_called = false;
         bool error_cb_called = false;
 
-        future<int> f = async<test_action>(hpx::find_here());
-        future<int> p = f.then(boost::bind(future_callback, 
-            boost::ref(data_cb_called), boost::ref(error_cb_called), _1));
+        hpx::lcos::shared_future<int> f = hpx::async<test_action>(hpx::find_here());
+        hpx::lcos::unique_future<int> p = f.then(hpx::util::bind(future_callback,
+            boost::ref(data_cb_called), boost::ref(error_cb_called),
+            hpx::util::placeholders::_1));
 
         HPX_TEST_EQ(p.get(), 42);
         HPX_TEST(data_cb_called);
@@ -97,14 +94,14 @@ int hpx_main(boost::program_options::variables_map&)
         bool error_cb_called = false;
         test_action do_test;
 
-        future<int> f = async(do_test, hpx::find_here());
+        hpx::lcos::shared_future<int> f = hpx::async(do_test, hpx::find_here());
 
         // The HPX_STD_FUNCTION is a workaround for a GCC bug, see the
         // async_callback_non_deduced_context regression test.
-        future<int> p = f.then(
-            HPX_STD_FUNCTION<int(hpx::lcos::future<int>)>(
-                boost::bind(future_callback, boost::ref(data_cb_called),
-                    boost::ref(error_cb_called), _1)));
+        hpx::lcos::unique_future<int> p = f.then(
+            HPX_STD_FUNCTION<int(hpx::lcos::shared_future<int>)>(
+                hpx::util::bind(future_callback, boost::ref(data_cb_called),
+                    boost::ref(error_cb_called), hpx::util::placeholders::_1)));
 
         HPX_TEST_EQ(p.get(), 42);
         HPX_TEST(data_cb_called);
@@ -112,7 +109,7 @@ int hpx_main(boost::program_options::variables_map&)
     }
 
     {
-        future<int> p = async<test_error_action>(hpx::find_here());
+        hpx::lcos::unique_future<int> p = hpx::async<test_error_action>(hpx::find_here());
 
         std::string what_msg;
 
@@ -130,7 +127,7 @@ int hpx_main(boost::program_options::variables_map&)
 
     {
         test_error_action do_error;
-        future<int> p = async(do_error, hpx::find_here());
+        hpx::lcos::unique_future<int> p = hpx::async(do_error, hpx::find_here());
 
         std::string what_msg;
 
@@ -150,9 +147,10 @@ int hpx_main(boost::program_options::variables_map&)
         bool data_cb_called = false;
         bool error_cb_called = false;
 
-        future<int> f = async<test_error_action>(hpx::find_here());
-        future<int> p = f.then(boost::bind(future_callback, 
-            boost::ref(data_cb_called), boost::ref(error_cb_called), _1));
+        hpx::lcos::shared_future<int> f = hpx::async<test_error_action>(hpx::find_here());
+        hpx::lcos::unique_future<int> p = f.then(hpx::util::bind(future_callback,
+            boost::ref(data_cb_called), boost::ref(error_cb_called),
+            hpx::util::placeholders::_1));
 
         std::string what_msg;
 
@@ -176,14 +174,14 @@ int hpx_main(boost::program_options::variables_map&)
         bool error_cb_called = false;
         test_error_action do_test_error;
 
-        future<int> f = async(do_test_error, hpx::find_here());
+        hpx::lcos::shared_future<int> f = hpx::async(do_test_error, hpx::find_here());
 
         // The HPX_STD_FUNCTION is a workaround for a GCC bug, see the
         // async_callback_non_deduced_context regression test.
-        future<int> p = f.then(
-            HPX_STD_FUNCTION<int(hpx::lcos::future<int>)>(
-                boost::bind(future_callback, boost::ref(data_cb_called),
-                    boost::ref(error_cb_called), _1)));
+        hpx::lcos::unique_future<int> p = f.then(
+            HPX_STD_FUNCTION<int(hpx::lcos::shared_future<int>)>(
+                hpx::util::bind(future_callback, boost::ref(data_cb_called),
+                    boost::ref(error_cb_called), hpx::util::placeholders::_1)));
 
         std::string what_msg;
 

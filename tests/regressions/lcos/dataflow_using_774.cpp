@@ -16,7 +16,7 @@
 // the following line causes compile errors
 using hpx::lcos::local::dataflow;
 
-typedef hpx::lcos::future< double > future_type;
+typedef hpx::lcos::shared_future< double > future_type;
 
 template< typename Value >
 struct mul

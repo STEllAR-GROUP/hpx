@@ -17,7 +17,7 @@
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 
-using hpx::lcos::future;
+using hpx::lcos::shared_future;
 using hpx::lcos::make_ready_future;
 using hpx::util::unwrapped;
 
@@ -29,7 +29,7 @@ double func(double x1 , double x2 , double x3 , double x4 , double x5 , double x
 
 int main()
 {
-    future< double > f = make_ready_future( 1.0 );
+    shared_future< double > f = make_ready_future( 1.0 );
     f = hpx::lcos::local::dataflow(
             hpx::launch::sync,
             unwrapped( &func ), 

@@ -66,7 +66,7 @@ struct vector_t_client:
   {
     return hpx::get_ptr<vector_t_server>(get_gid()).get()->data;
   }
-  hpx::future<boost::shared_ptr<vector_t>> get_data() const
+  hpx::unique_future<boost::shared_ptr<vector_t>> get_data() const
   {
     return hpx::async(vector_t_server::get_data_action(), get_gid());
   }
@@ -80,23 +80,23 @@ struct vector_t_client:
     return vector_t_server::set_elt_action()(get_gid(), i, x);
   }
 
-  hpx::future<void> axpy(double alpha, const vector_t_client& x) const
+  hpx::unique_future<void> axpy(double alpha, const vector_t_client& x) const
   {
     return hpx::async(vector_t_server::axpy_action(), get_gid(),
                       alpha, x.get_gid());
   }
-  hpx::future<void> copy(const vector_t_client& x) const
+  hpx::unique_future<void> copy(const vector_t_client& x) const
   {
     return hpx::async(vector_t_server::copy_action(), get_gid(), x.get_gid());
   }
-  hpx::future<void> gemv(bool trans, double alpha, const matrix_t_client& a,
+  hpx::unique_future<void> gemv(bool trans, double alpha, const matrix_t_client& a,
                          const vector_t_client& x,
                          double beta) const;
-  hpx::future<double> nrm2_process() const
+  hpx::unique_future<double> nrm2_process() const
   {
     return hpx::async(vector_t_server::nrm2_process_action(), get_gid());
   }
-  hpx::future<void> scal(double alpha) const
+  hpx::unique_future<void> scal(double alpha) const
   {
     return hpx::async(vector_t_server::scal_action(), get_gid(), alpha);
   }
@@ -157,7 +157,7 @@ struct matrix_t_client:
   {
     return hpx::get_ptr<matrix_t_server>(get_gid()).get()->data;
   }
-  hpx::future<boost::shared_ptr<matrix_t>> get_data() const
+  hpx::unique_future<boost::shared_ptr<matrix_t>> get_data() const
   {
     return hpx::async(matrix_t_server::get_data_action(), get_gid());
   }
@@ -171,18 +171,18 @@ struct matrix_t_client:
     return matrix_t_server::set_elt_action()(get_gid(), i, j, x);
   }
   
-  hpx::future<void> axpy(bool trans, double alpha, const matrix_t_client& a)
+  hpx::unique_future<void> axpy(bool trans, double alpha, const matrix_t_client& a)
     const
   {
     return hpx::async(matrix_t_server::axpy_action(), get_gid(),
                       trans, alpha, a.get_gid());
   }
-  hpx::future<void> copy(bool transa, const matrix_t_client& a) const
+  hpx::unique_future<void> copy(bool transa, const matrix_t_client& a) const
   {
     return hpx::async(matrix_t_server::copy_action(), get_gid(),
                       transa, a.get_gid());
   }
-  hpx::future<void> gemm(bool transa, bool transb, double alpha,
+  hpx::unique_future<void> gemm(bool transa, bool transb, double alpha,
                          const matrix_t_client& a,
                          const matrix_t_client& b,
                          double beta) const
@@ -190,17 +190,17 @@ struct matrix_t_client:
     return hpx::async(matrix_t_server::gemm_action(), get_gid(),
                       transa, transb, alpha, a.get_gid(), b.get_gid(), beta);
   }
-  // hpx::future<vector_t_client> gemv_process(bool trans, double alpha,
+  // hpx::unique_future<vector_t_client> gemv_process(bool trans, double alpha,
   //                                           const vector_t_client& x) const
   // {
   //   return hpx::async(matrix_t_server::gemv_process_action(), get_gid(),
   //                     trans, alpha, x.get_gid());
   // }
-  hpx::future<double> nrm2_process() const
+  hpx::unique_future<double> nrm2_process() const
   {
     return hpx::async(matrix_t_server::nrm2_process_action(), get_gid());
   }
-  hpx::future<void> scal(double alpha) const
+  hpx::unique_future<void> scal(double alpha) const
   {
     return hpx::async(matrix_t_server::scal_action(), get_gid(), alpha);
   }

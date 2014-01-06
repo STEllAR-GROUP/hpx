@@ -523,14 +523,12 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             typedef typename boost::result_of<F(Derived)>::type result;
-            typedef
-                typename shared_state_ptr_for<result_type>::type
-                shared_state_ptr;
+            typedef typename shared_state_ptr<result>::type shared_state_ptr;
 
             shared_state_ptr p =
                 detail::make_continuation<result>(*static_cast<Derived*>(this),
                     policy, boost::forward<F>(f));
-            return future_access::create<result_type>(boost::move(p));
+            return future_access::create<unique_future<result> >(boost::move(p));
         }
 
         template <typename F>
@@ -550,14 +548,12 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             typedef typename boost::result_of<F(Derived)>::type result;
-            typedef
-                typename shared_state_ptr_for<result_type>::type
-                shared_state_ptr;
+            typedef typename shared_state_ptr<result>::type shared_state_ptr;
 
             shared_state_ptr p =
                 detail::make_continuation<result>(*static_cast<Derived*>(this),
                     sched, boost::forward<F>(f));
-            return future_access::create<result_type>(boost::move(p));
+            return future_access::create<unique_future<result> >(boost::move(p));
         }
 
         // Notes:

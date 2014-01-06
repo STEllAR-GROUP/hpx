@@ -24,6 +24,7 @@ set(tests
     local_mutex
     packaged_action
     promise
+    shared_future
    )
 
 # include some of the tests for non-gcc 4.4 only
