@@ -188,17 +188,17 @@ namespace hpx { namespace components { namespace stubs
             return create_memory_block_async(id, count, act).get();
         }
 
-        static lcos::future<bool>
+        static lcos::unique_future<bool>
         load_components_async(naming::id_type const& gid);
         static bool load_components(naming::id_type const& gid);
 
-        static lcos::future<void>
+        static lcos::unique_future<void>
         call_startup_functions_async(naming::id_type const& gid,
             bool pre_startup);
         static void call_startup_functions(naming::id_type const& gid,
             bool pre_startup);
 
-        static lcos::future<void>
+        static lcos::unique_future<void>
         call_shutdown_functions_async(naming::id_type const& gid,
             bool pre_shutdown);
 
@@ -211,7 +211,7 @@ namespace hpx { namespace components { namespace stubs
             naming::gid_type const& gid, naming::gid_type const& count);
 
         /// \brief Shutdown the given runtime system
-        static lcos::future<void>
+        static lcos::unique_future<void>
         shutdown_async(naming::id_type const& targetgid,
             double timeout = -1);
         static void shutdown(naming::id_type const& targetgid,
@@ -226,7 +226,7 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
         /// \brief Terminate the given runtime system
-        static lcos::future<void>
+        static lcos::unique_future<void>
         terminate_async(naming::id_type const& targetgid);
 
         static void terminate(naming::id_type const& targetgid);
@@ -247,14 +247,14 @@ namespace hpx { namespace components { namespace stubs
         static void
         garbage_collect_non_blocking(naming::id_type const& targetgid);
 
-        static lcos::future<void>
+        static lcos::unique_future<void>
         garbage_collect_async(naming::id_type const& targetgid);
 
         static void
         garbage_collect(naming::id_type const& targetgid);
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<naming::id_type>
+        static lcos::unique_future<naming::id_type>
         create_performance_counter_async(naming::id_type targetgid,
             performance_counters::counter_info const& info);
         static naming::id_type
@@ -264,13 +264,13 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
-        static lcos::future<util::section> get_config_async(
+        static lcos::unique_future<util::section> get_config_async(
             naming::id_type const& targetgid);
         static void get_config(naming::id_type const& targetgid, util::section& ini);
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve instance count for given component type
-        static lcos::future<boost::int32_t > get_instance_count_async(
+        static lcos::unique_future<boost::int32_t > get_instance_count_async(
             naming::id_type const& targetgid, components::component_type type);
         static boost::int32_t  get_instance_count(naming::id_type const& targetgid,
             components::component_type type);

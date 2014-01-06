@@ -10,7 +10,7 @@
 
 namespace jacobi
 {
-    hpx::lcos::future<void> stencil_iterator::init(
+    hpx::lcos::unique_future<void> stencil_iterator::init(
         jacobi::row const & r
       , std::size_t y
       , std::size_t nx
@@ -22,7 +22,7 @@ namespace jacobi
         return hpx::async<server::stencil_iterator::init_action>(id, r, y, nx, ny, l);
     }
 
-    hpx::lcos::future<void> stencil_iterator::setup_boundary(
+    hpx::lcos::unique_future<void> stencil_iterator::setup_boundary(
         stencil_iterator const & top
       , stencil_iterator const & bottom
     )
@@ -38,14 +38,14 @@ namespace jacobi
             );
     }
 
-    hpx::lcos::future<void> stencil_iterator::step()
+    hpx::lcos::unique_future<void> stencil_iterator::step()
     {
         HPX_ASSERT(id);
         return
             hpx::async<server::stencil_iterator::step_action>(id);
     }
 
-    hpx::lcos::future<jacobi::row> stencil_iterator::get(std::size_t idx) const
+    hpx::lcos::unique_future<jacobi::row> stencil_iterator::get(std::size_t idx) const
     {
         HPX_ASSERT(id);
         return hpx::async<server::stencil_iterator::get_action>(id, idx);

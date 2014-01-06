@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -653,12 +653,6 @@
 #  else
 #    define BOOST_NOINLINE
 #  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Make sure Chrono is handled properly
-#if defined(HPX_INTERNAL_CHRONO) && BOOST_VERSION < 104700 && !defined(BOOST_CHRONO_NO_LIB)
-#  define BOOST_CHRONO_NO_LIB
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

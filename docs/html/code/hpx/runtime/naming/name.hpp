@@ -468,7 +468,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT boost::int64_t split_gid(gid_type& id, gid_type& new_gid);
 
-        HPX_EXPORT hpx::future<bool> replenish_credits(gid_type& id);
+        HPX_EXPORT hpx::unique_future<bool> replenish_credits(gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////
         // splits the current credit of the given id and assigns half of it to

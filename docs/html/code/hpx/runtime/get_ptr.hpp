@@ -39,7 +39,7 @@ namespace hpx
 
         template <typename Component>
         boost::shared_ptr<Component>
-        get_ptr_postproc(future<naming::address> f, naming::id_type const& id)
+        get_ptr_postproc(hpx::unique_future<naming::address> f, naming::id_type const& id)
         {
             naming::address addr = f.get();
 
@@ -85,11 +85,11 @@ namespace hpx
     ///            error.
     ///
     template <typename Component>
-    hpx::future<boost::shared_ptr<Component> >
+    hpx::unique_future<boost::shared_ptr<Component> >
     get_ptr(naming::id_type const& id)
     {
         using util::placeholders::_1;
-        future<naming::address> f = agas::resolve(id);
+        hpx::unique_future<naming::address> f = agas::resolve(id);
         return f.then(util::bind(&detail::get_ptr_postproc<Component>, _1, id));
     }
     
@@ -124,7 +124,7 @@ namespace hpx
     boost::shared_ptr<Component>
     get_ptr_sync(naming::id_type const& id, error_code& ec = throws)
     {
-        hpx::future<boost::shared_ptr<Component> > ptr =
+        hpx::unique_future<boost::shared_ptr<Component> > ptr =
             get_ptr<Component>(id);
         return ptr.get(ec);
     }

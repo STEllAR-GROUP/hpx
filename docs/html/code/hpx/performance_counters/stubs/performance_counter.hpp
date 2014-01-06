@@ -16,9 +16,9 @@ namespace hpx { namespace performance_counters { namespace stubs
     struct HPX_EXPORT performance_counter
     {
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<counter_info> get_info_async(
+        static lcos::unique_future<counter_info> get_info_async(
             naming::id_type const& targetid);
-        static lcos::future<counter_value> get_value_async(
+        static lcos::unique_future<counter_value> get_value_async(
             naming::id_type const& targetid, bool reset = false);
 
         static counter_info get_info(naming::id_type const& targetid,
@@ -27,9 +27,9 @@ namespace hpx { namespace performance_counters { namespace stubs
             bool reset = false, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<bool> start_async(naming::id_type const& targetid);
-        static lcos::future<bool> stop_async(naming::id_type const& targetid);
-        static lcos::future<void> reset_async(naming::id_type const& targetid);
+        static lcos::unique_future<bool> start_async(naming::id_type const& targetid);
+        static lcos::unique_future<bool> stop_async(naming::id_type const& targetid);
+        static lcos::unique_future<void> reset_async(naming::id_type const& targetid);
 
         static bool start(naming::id_type const& targetid,
             error_code& ec = throws);

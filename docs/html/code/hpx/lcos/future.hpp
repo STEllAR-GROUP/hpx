@@ -78,6 +78,21 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future>
     struct shared_state_ptr_for
     {};
+    
+    template <typename Future>
+    struct shared_state_ptr_for<Future const>
+      : shared_state_ptr_for<Future>
+    {};
+    
+    template <typename Future>
+    struct shared_state_ptr_for<Future&>
+      : shared_state_ptr_for<Future>
+    {};
+    
+    template <typename Future>
+    struct shared_state_ptr_for<BOOST_RV_REF(Future)>
+      : shared_state_ptr_for<Future>
+    {};
 
     template <typename R>
     struct shared_state_ptr_for<unique_future<R> >
@@ -793,8 +808,7 @@ namespace hpx { namespace lcos
         // Postcondition: valid() == false.
         shared_future<R> share()
         {
-            invalidate on_exit(*this);
-            return shared_future<R>(boost::move(this->shared_state_));
+            return shared_future<R>(boost::move(*this));
         }
 
         // Effects: wait()s until the shared state is ready, then retrieves

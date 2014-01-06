@@ -103,7 +103,7 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(id, count, act);
     }
 
-    lcos::future<bool>
+    lcos::unique_future<bool>
     runtime_support::load_components_async(naming::id_type const& gid)
     {
         typedef server::runtime_support::load_components_action action_type;
@@ -115,7 +115,7 @@ namespace hpx { namespace components { namespace stubs
         return load_components_async(gid).get();
     }
 
-    lcos::future<void>
+    lcos::unique_future<void>
     runtime_support::call_startup_functions_async(naming::id_type const& gid,
         bool pre_startup)
     {
@@ -129,7 +129,7 @@ namespace hpx { namespace components { namespace stubs
         call_startup_functions_async(gid, pre_startup).get();
     }
 
-    lcos::future<void>
+    lcos::unique_future<void>
     runtime_support::call_shutdown_functions_async(naming::id_type const& gid,
         bool pre_shutdown)
     {
@@ -176,7 +176,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     /// \brief Shutdown the given runtime system
-    lcos::future<void>
+    lcos::unique_future<void>
     runtime_support::shutdown_async(naming::id_type const& targetgid,
         double timeout)
     {
@@ -217,7 +217,7 @@ namespace hpx { namespace components { namespace stubs
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve configuration information
     /// \brief Terminate the given runtime system
-    lcos::future<void>
+    lcos::unique_future<void>
     runtime_support::terminate_async(naming::id_type const& targetgid)
     {
         // Create a future directly and execute the required action.
@@ -272,7 +272,7 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<action_type>(targetgid);
     }
 
-    lcos::future<void> runtime_support::garbage_collect_async(
+    lcos::unique_future<void> runtime_support::garbage_collect_async(
         naming::id_type const& targetgid)
     {
         typedef server::runtime_support::garbage_collect_action
@@ -288,7 +288,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////
-    lcos::future<naming::id_type>
+    lcos::unique_future<naming::id_type>
     runtime_support::create_performance_counter_async(naming::id_type targetgid,
         performance_counters::counter_info const& info)
     {
@@ -316,7 +316,7 @@ namespace hpx { namespace components { namespace stubs
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve configuration information
-    lcos::future<util::section> runtime_support::get_config_async(
+    lcos::unique_future<util::section> runtime_support::get_config_async(
         naming::id_type const& targetgid)
     {
         // Create a future, execute the required action,
@@ -336,7 +336,7 @@ namespace hpx { namespace components { namespace stubs
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve instance count for given component type
-    lcos::future<boost::int32_t> runtime_support::get_instance_count_async(
+    lcos::unique_future<boost::int32_t> runtime_support::get_instance_count_async(
         naming::id_type const& targetgid, components::component_type type)
     {
         // Create a future, execute the required action,
