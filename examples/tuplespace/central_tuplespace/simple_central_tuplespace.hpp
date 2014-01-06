@@ -38,7 +38,7 @@ namespace examples
 
         /// Create a client side representation for the existing
         /// \a server::simple_central_tuplespace instance with the given GID.
-        simple_central_tuplespace(hpx::future<hpx::naming::id_type> const& gid)
+        simple_central_tuplespace(hpx::shared_future<hpx::naming::id_type> const& gid)
           : base_type(gid)
         {}
 

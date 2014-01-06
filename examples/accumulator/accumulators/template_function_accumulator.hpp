@@ -90,7 +90,7 @@ namespace examples
         ///          the future should be called. If the value is available,
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
-        hpx::lcos::future<double> query_async()
+        hpx::lcos::unique_future<double> query_async()
         {
             HPX_ASSERT(this->get_gid());
             return this->base_type::query_async(this->get_gid());

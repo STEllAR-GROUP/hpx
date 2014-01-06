@@ -79,7 +79,7 @@ namespace hpx { namespace components
     unique_future<naming::id_type>
 #else
     inline typename boost::enable_if<
-        traits::is_component<Component>, future<naming::id_type>
+        traits::is_component<Component>, unique_future<naming::id_type>
     >::type 
 #endif
     copy(naming::id_type const& to_copy,

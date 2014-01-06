@@ -31,7 +31,7 @@ struct object_semaphore
     object_semaphore(naming::id_type gid) : base_type(gid) {}
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future<void> signal_async(
+    lcos::unique_future<void> signal_async(
         ValueType const& val
       , boost::uint64_t count = 1)
     {
@@ -55,7 +55,7 @@ struct object_semaphore
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    lcos::future<ValueType> get_async()
+    lcos::unique_future<ValueType> get_async()
     {
         HPX_ASSERT(this->get_gid());
         return this->base_type::get_async(this->get_gid());

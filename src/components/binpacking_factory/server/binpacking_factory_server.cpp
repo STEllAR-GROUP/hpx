@@ -28,7 +28,7 @@ namespace hpx { namespace components { namespace server
         {}
 
         naming::gid_type locality_;
-        lcos::future<std::vector<naming::gid_type> > gids_;
+        lcos::shared_future<std::vector<naming::gid_type> > gids_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ namespace hpx { namespace components { namespace server
             count = localities.size();
 
         // retrieve the current number of instances of the given component
-        std::vector<lcos::future<boost::int32_t> > lazy_counts;
+        std::vector<lcos::unique_future<boost::int32_t> > lazy_counts;
         BOOST_FOREACH(naming::id_type const& id, localities)
         {
             lazy_counts.push_back(
@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace server
 
         std::vector<long> counts;
         counts.reserve(lazy_counts.size());
-        BOOST_FOREACH(lcos::future<boost::int32_t> const& f, lazy_counts)
+        BOOST_FOREACH(lcos::unique_future<boost::int32_t> & f, lazy_counts)
         {
             counts.push_back(f.get());
             maxcount = (std::max)(maxcount, counts.back());
@@ -138,7 +138,7 @@ namespace hpx { namespace components { namespace server
         BOOST_FOREACH(lazy_result& lr, v)
         {
             results.push_back(remote_result_type::value_type(lr.locality_, type));
-            results.back().gids_ = boost::move(lr.gids_.move());
+            results.back().gids_ = boost::move(lr.gids_.get());
         }
 
         return results;
@@ -175,7 +175,7 @@ namespace hpx { namespace components { namespace server
         performance_counters::get_counter_type_path_elements(countername, p);
 
         // FIXME: make loop asynchronous
-        typedef lcos::future<naming::id_type> future_type;
+        typedef lcos::unique_future<naming::id_type> future_type;
 
         std::vector<future_type> lazy_counts;
         BOOST_FOREACH(naming::id_type const& id, localities)
@@ -193,7 +193,7 @@ namespace hpx { namespace components { namespace server
         // FIXME: make loop asynchronous
         std::vector<long> counts;
         counts.reserve(lazy_counts.size());
-        BOOST_FOREACH(future_type const& f, lazy_counts)
+        BOOST_FOREACH(future_type & f, lazy_counts)
         {
             performance_counters::counter_value value =
                 performance_counters::stubs::performance_counter::get_value(f.get());
@@ -263,7 +263,7 @@ namespace hpx { namespace components { namespace server
         BOOST_FOREACH(lazy_result& lr, v)
         {
             results.push_back(remote_result_type::value_type(lr.locality_, type));
-            results.back().gids_ = boost::move(lr.gids_.move());
+            results.back().gids_ = boost::move(lr.gids_.get());
         }
 
         return results;

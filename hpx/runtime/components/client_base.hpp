@@ -60,7 +60,7 @@ namespace hpx { namespace components
 
     protected:
         typedef typename detail::make_stub<Stub>::type stub_type;
-        typedef future<naming::id_type> future_type;
+        typedef shared_future<naming::id_type> future_type;
 
     public:
         typedef typename detail::make_stub<Stub>::server_component_type
@@ -173,7 +173,7 @@ namespace hpx { namespace components
 
         future_type detach()
         {
-            future<naming::id_type> g;
+            shared_future<naming::id_type> g;
             std::swap(gid_, g);
             return g;
         }
