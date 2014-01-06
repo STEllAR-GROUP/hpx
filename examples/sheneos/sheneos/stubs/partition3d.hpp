@@ -19,7 +19,7 @@ namespace sheneos { namespace stubs
       : hpx::components::stub_base<sheneos::server::partition3d>
     {
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::future<void>
+        static hpx::lcos::unique_future<void>
         init_async(hpx::naming::id_type const& gid, std::string const& datafilename,
             dimension const& dimx, dimension const& dimy, dimension const& dimz)
         {
@@ -38,7 +38,7 @@ namespace sheneos { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::future<std::vector<double> >
+        static hpx::lcos::unique_future<std::vector<double> >
         interpolate_async(hpx::naming::id_type const& gid,
             double ye, double temp, double rho, boost::uint32_t eosvalues)
         {
@@ -55,7 +55,7 @@ namespace sheneos { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::future<double>
+        static hpx::lcos::unique_future<double>
         interpolate_one_async(hpx::naming::id_type const& gid,
             double ye, double temp, double rho, boost::uint32_t eosvalues)
         {
@@ -72,7 +72,7 @@ namespace sheneos { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::future<std::vector<double> >
+        static hpx::lcos::unique_future<std::vector<double> >
         interpolate_one_bulk_async(hpx::naming::id_type const& gid,
             std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalue)
         {
@@ -91,7 +91,7 @@ namespace sheneos { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::future<std::vector<std::vector<double> > >
+        static hpx::lcos::unique_future<std::vector<std::vector<double> > >
         interpolate_bulk_async(hpx::naming::id_type const& gid,
             std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalues)
         {

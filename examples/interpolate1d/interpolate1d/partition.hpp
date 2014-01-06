@@ -42,7 +42,7 @@ namespace interpolate1d
         {}
 
         // initialize this partition
-        hpx::lcos::future<void>
+        hpx::lcos::unique_future<void>
         init_async(std::string datafilename, dimension const& dim,
             std::size_t num_nodes)
         {
@@ -58,7 +58,7 @@ namespace interpolate1d
 
         // ask this partition to interpolate, note that value must be in the
         // range valid for this partition
-        hpx::lcos::future<double>
+        hpx::lcos::unique_future<double>
         interpolate_async(double value)
         {
             return stubs::partition::interpolate_async(this->get_gid(), value);

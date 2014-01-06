@@ -30,7 +30,7 @@ boost::uint64_t factorial(boost::uint64_t n)
     if (0 >= n)
         return 1;
 
-    hpx::lcos::future<boost::uint64_t> n1 =
+    hpx::lcos::unique_future<boost::uint64_t> n1 =
         hpx::async<factorial_action>(hpx::find_here(), n - 1);
     return n * n1.get();
 }

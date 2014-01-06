@@ -44,7 +44,7 @@ namespace sheneos
         {}
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::lcos::future<void>
+        hpx::lcos::unique_future<void>
         init_async(std::string const& datafile,
             std::string const& symbolic_name, std::size_t num_instances)
         {
@@ -60,7 +60,7 @@ namespace sheneos
         }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::lcos::future<config_data> get_async() const
+        hpx::lcos::unique_future<config_data> get_async() const
         {
             return stubs::configuration::get_async(this->get_gid());
         }
