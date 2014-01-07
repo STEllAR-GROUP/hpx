@@ -92,11 +92,7 @@ namespace detail
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
 
-                // The arguments are moved here. This function is called from a
-                // bound functor. In order to do true perfect forwarding in an
-                // asynchronous operation. These bound variables must be moved
-                // out of the bound object.
-                func(HPX_ENUM_MOVE_ARGS(N, arg));
+                func(HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
                 cont->trigger();
             }
             catch (...) {
@@ -118,8 +114,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                BOOST_PP_CAT(continuation_thread_function_void_, N)<Action>(),
+            return util::bind(util::one_shot(
+                BOOST_PP_CAT(continuation_thread_function_void_, N)<Action>()),
                 cont, boost::forward<Func>(func)
               BOOST_PP_COMMA_IF(N)
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
@@ -143,12 +139,8 @@ namespace detail
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
 
-                // The arguments are moved here. This function is called from a
-                // bound functor. In order to do true perfect forwarding in an
-                // asynchronous operation. These bound variables must be moved
-                // out of the bound object.
                 cont->trigger(boost::forward<typename Action::result_type>(
-                    func(HPX_ENUM_MOVE_ARGS(N, arg))
+                    func(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
                 ));
             }
             catch (...) {
@@ -167,8 +159,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                BOOST_PP_CAT(continuation_thread_function_, N)<Action>(),
+            return util::bind(util::one_shot(
+                BOOST_PP_CAT(continuation_thread_function_, N)<Action>()),
                 cont, boost::forward<Func>(func)
               BOOST_PP_COMMA_IF(N)
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));

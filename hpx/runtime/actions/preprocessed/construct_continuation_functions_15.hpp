@@ -25,10 +25,6 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 (obj->*func)();
                 cont->trigger();
             }
@@ -51,10 +47,6 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 (obj->*func)();
                 cont->trigger();
             }
@@ -73,8 +65,8 @@
         void (Object::* func)(), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_0(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_0()),
             cont, func, obj
           
                 );
@@ -87,8 +79,8 @@
         void (Object::* const func)() const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_0(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_0()),
             cont, func, obj
           
                 );
@@ -109,10 +101,6 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
                     (obj->*func)()
                 ));
@@ -136,10 +124,6 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
                     (obj->*func)()
                 ));
@@ -159,8 +143,8 @@
         Result (Object::* func)(), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_0(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_0()),
             cont, func, obj
           
                 );
@@ -173,8 +157,8 @@
         Result (Object::* const func)() const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_0(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_0()),
             cont, func, obj
           
                 );
@@ -196,11 +180,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0));
+                (obj->*func)(boost::forward<Arg0>( arg0 ));
                 cont->trigger();
             }
             catch (...) {
@@ -222,11 +202,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0));
+                (obj->*func)(boost::forward<Arg0>( arg0 ));
                 cont->trigger();
             }
             catch (...) {
@@ -244,8 +220,8 @@
         void (Object::* func)(FArg0), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_1(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_1()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)));
@@ -258,8 +234,8 @@
         void (Object::* const func)(FArg0) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_1(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_1()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)));
@@ -280,12 +256,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ))
                 ));
             }
             catch (...) {
@@ -307,12 +279,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ))
                 ));
             }
             catch (...) {
@@ -330,8 +298,8 @@
         Result (Object::* func)(FArg0), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_1(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_1()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)));
@@ -344,8 +312,8 @@
         Result (Object::* const func)(FArg0) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_1(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_1()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)));
@@ -367,11 +335,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
                 cont->trigger();
             }
             catch (...) {
@@ -393,11 +357,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
                 cont->trigger();
             }
             catch (...) {
@@ -415,8 +375,8 @@
         void (Object::* func)(FArg0 , FArg1), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_2(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_2()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)));
@@ -429,8 +389,8 @@
         void (Object::* const func)(FArg0 , FArg1) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_2(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_2()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)));
@@ -451,12 +411,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))
                 ));
             }
             catch (...) {
@@ -478,12 +434,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))
                 ));
             }
             catch (...) {
@@ -501,8 +453,8 @@
         Result (Object::* func)(FArg0 , FArg1), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_2(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_2()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)));
@@ -515,8 +467,8 @@
         Result (Object::* const func)(FArg0 , FArg1) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_2(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_2()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)));
@@ -538,11 +490,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
                 cont->trigger();
             }
             catch (...) {
@@ -564,11 +512,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
                 cont->trigger();
             }
             catch (...) {
@@ -586,8 +530,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_3(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_3()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)));
@@ -600,8 +544,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_3(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_3()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)));
@@ -622,12 +566,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))
                 ));
             }
             catch (...) {
@@ -649,12 +589,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))
                 ));
             }
             catch (...) {
@@ -672,8 +608,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_3(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_3()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)));
@@ -686,8 +622,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_3(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_3()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)));
@@ -709,11 +645,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
                 cont->trigger();
             }
             catch (...) {
@@ -735,11 +667,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
                 cont->trigger();
             }
             catch (...) {
@@ -757,8 +685,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_4(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_4()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)));
@@ -771,8 +699,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_4(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_4()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)));
@@ -793,12 +721,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))
                 ));
             }
             catch (...) {
@@ -820,12 +744,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))
                 ));
             }
             catch (...) {
@@ -843,8 +763,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_4(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_4()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)));
@@ -857,8 +777,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_4(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_4()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)));
@@ -880,11 +800,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
                 cont->trigger();
             }
             catch (...) {
@@ -906,11 +822,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
                 cont->trigger();
             }
             catch (...) {
@@ -928,8 +840,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_5(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_5()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)));
@@ -942,8 +854,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_5(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_5()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)));
@@ -964,12 +876,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))
                 ));
             }
             catch (...) {
@@ -991,12 +899,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))
                 ));
             }
             catch (...) {
@@ -1014,8 +918,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_5(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_5()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)));
@@ -1028,8 +932,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_5(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_5()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)));
@@ -1051,11 +955,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1077,11 +977,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1099,8 +995,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_6(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_6()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)));
@@ -1113,8 +1009,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_6(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_6()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)));
@@ -1135,12 +1031,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ))
                 ));
             }
             catch (...) {
@@ -1162,12 +1054,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ))
                 ));
             }
             catch (...) {
@@ -1185,8 +1073,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_6(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_6()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)));
@@ -1199,8 +1087,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_6(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_6()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)));
@@ -1222,11 +1110,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1248,11 +1132,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1270,8 +1150,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_7(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_7()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)));
@@ -1284,8 +1164,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_7(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_7()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)));
@@ -1306,12 +1186,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ))
                 ));
             }
             catch (...) {
@@ -1333,12 +1209,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ))
                 ));
             }
             catch (...) {
@@ -1356,8 +1228,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_7(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_7()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)));
@@ -1370,8 +1242,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_7(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_7()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)));
@@ -1393,11 +1265,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1419,11 +1287,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1441,8 +1305,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_8(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_8()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)));
@@ -1455,8 +1319,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_8(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_8()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)));
@@ -1477,12 +1341,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ))
                 ));
             }
             catch (...) {
@@ -1504,12 +1364,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ))
                 ));
             }
             catch (...) {
@@ -1527,8 +1383,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_8(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_8()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)));
@@ -1541,8 +1397,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_8(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_8()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)));
@@ -1564,11 +1420,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1590,11 +1442,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1612,8 +1460,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_9(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_9()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)));
@@ -1626,8 +1474,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_9(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_9()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)));
@@ -1648,12 +1496,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ))
                 ));
             }
             catch (...) {
@@ -1675,12 +1519,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ))
                 ));
             }
             catch (...) {
@@ -1698,8 +1538,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_9(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_9()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)));
@@ -1712,8 +1552,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_9(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_9()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)));
@@ -1735,11 +1575,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1761,11 +1597,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1783,8 +1615,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_10(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_10()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)));
@@ -1797,8 +1629,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_10(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_10()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)));
@@ -1819,12 +1651,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ))
                 ));
             }
             catch (...) {
@@ -1846,12 +1674,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ))
                 ));
             }
             catch (...) {
@@ -1869,8 +1693,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_10(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_10()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)));
@@ -1883,8 +1707,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_10(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_10()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)));
@@ -1906,11 +1730,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1932,11 +1752,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1954,8 +1770,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_11(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_11()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)));
@@ -1968,8 +1784,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_11(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_11()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)));
@@ -1990,12 +1806,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ))
                 ));
             }
             catch (...) {
@@ -2017,12 +1829,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ))
                 ));
             }
             catch (...) {
@@ -2040,8 +1848,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_11(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_11()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)));
@@ -2054,8 +1862,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_11(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_11()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)));
@@ -2077,11 +1885,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2103,11 +1907,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2125,8 +1925,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_12(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_12()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)));
@@ -2139,8 +1939,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_12(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_12()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)));
@@ -2161,12 +1961,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ))
                 ));
             }
             catch (...) {
@@ -2188,12 +1984,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ))
                 ));
             }
             catch (...) {
@@ -2211,8 +2003,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_12(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_12()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)));
@@ -2225,8 +2017,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_12(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_12()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)));
@@ -2248,11 +2040,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2274,11 +2062,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2296,8 +2080,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_13(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_13()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)));
@@ -2310,8 +2094,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_13(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_13()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)));
@@ -2332,12 +2116,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ))
                 ));
             }
             catch (...) {
@@ -2359,12 +2139,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ))
                 ));
             }
             catch (...) {
@@ -2382,8 +2158,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_13(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_13()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)));
@@ -2396,8 +2172,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_13(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_13()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)));
@@ -2419,11 +2195,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12) , boost::move(arg13));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2445,11 +2217,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12) , boost::move(arg13));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2467,8 +2235,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_14(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_14()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)));
@@ -2481,8 +2249,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_14(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_14()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)));
@@ -2503,12 +2271,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12) , boost::move(arg13))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ))
                 ));
             }
             catch (...) {
@@ -2530,12 +2294,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12) , boost::move(arg13))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ))
                 ));
             }
             catch (...) {
@@ -2553,8 +2313,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_14(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_14()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)));
@@ -2567,8 +2327,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_14(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_14()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)));
@@ -2590,11 +2350,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12) , boost::move(arg13) , boost::move(arg14));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2616,11 +2372,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12) , boost::move(arg13) , boost::move(arg14));
+                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2638,8 +2390,8 @@
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14), Object* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_15(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_15()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)));
@@ -2652,8 +2404,8 @@
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_void_15(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_void_15()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)));
@@ -2674,12 +2426,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12) , boost::move(arg13) , boost::move(arg14))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ))
                 ));
             }
             catch (...) {
@@ -2701,12 +2449,8 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4) , boost::move(arg5) , boost::move(arg6) , boost::move(arg7) , boost::move(arg8) , boost::move(arg9) , boost::move(arg10) , boost::move(arg11) , boost::move(arg12) , boost::move(arg13) , boost::move(arg14))
+                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ))
                 ));
             }
             catch (...) {
@@ -2724,8 +2468,8 @@
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14), Component* obj,
         BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_15(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_15()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)));
@@ -2738,8 +2482,8 @@
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14) const,
         Component* obj, BOOST_FWD_REF(Arguments_) args)
     {
-        return HPX_STD_BIND(
-            continuation_thread_object_function_15(),
+        return util::bind(util::one_shot(
+            continuation_thread_object_function_15()),
             cont, func, obj
           ,
                 util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)));

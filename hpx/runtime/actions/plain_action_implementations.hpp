@@ -104,13 +104,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ").";
 
-                    // The arguments are moved here. This function is called from a
-                    // bound functor. In order to do true perfect forwarding in an
-                    // asynchronous operation. These bound variables must be moved
-                    // out of the bound object.
-
                     // call the function, ignoring the return value
-                    F(HPX_ENUM_MOVE_ARGS(N, arg));
+                    F(HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
                 }
                 catch (hpx::thread_interrupted const&) {
                     /* swallow this exception */
@@ -152,7 +147,7 @@ namespace hpx { namespace actions
             BOOST_FWD_REF(Arguments) args)
         {
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(),
+                util::bind(util::one_shot(typename Derived::thread_function()),
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)), lva);
         }
 
@@ -302,13 +297,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ").";
 
-                    // The arguments are moved here. This function is called from a
-                    // bound functor. In order to do true perfect forwarding in an
-                    // asynchronous operation. These bound variables must be moved
-                    // out of the bound object.
-
                     // call the function, ignoring the return value
-                    F(HPX_ENUM_MOVE_ARGS(N, arg));
+                    F(HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
                 }
                 catch (hpx::thread_interrupted const&) {
                     /* swallow this exception */
@@ -350,7 +340,7 @@ namespace hpx { namespace actions
             BOOST_FWD_REF(Arguments) args)
         {
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(),
+                util::bind(util::one_shot(typename Derived::thread_function()),
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)), lva);
         }
 
