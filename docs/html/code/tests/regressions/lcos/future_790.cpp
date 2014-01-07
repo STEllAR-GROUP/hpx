@@ -12,7 +12,7 @@
 
 int main()
 {
-    hpx::lcos::future<int> future = hpx::lcos::make_ready_future(0);
+    hpx::lcos::unique_future<int> future = hpx::lcos::make_ready_future(0);
     boost::chrono::nanoseconds tn(static_cast<long long>(1000000000LL));
     future.wait_for(tn);
 

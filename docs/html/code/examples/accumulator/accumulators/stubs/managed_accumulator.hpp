@@ -80,7 +80,7 @@ namespace examples { namespace stubs
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
         //[managed_accumulator_stubs_query_async
-        static hpx::lcos::future<argument_type>
+        static hpx::lcos::unique_future<argument_type>
         query_async(hpx::naming::id_type const& gid)
         {
             typedef server::managed_accumulator::query_action action_type;

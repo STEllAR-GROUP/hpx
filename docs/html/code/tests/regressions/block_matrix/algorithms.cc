@@ -42,7 +42,7 @@ void axpy(double alpha, const vector_t& x, vector_t& y)
 void axpy(double alpha, const block_vector_t& x, block_vector_t& y)
 {
   assert(x.str == y.str);
-  std::vector<hpx::future<void>> fs;
+  std::vector<hpx::unique_future<void>> fs;
   for (std::ptrdiff_t ib=0; ib<y.str->B; ++ib) {
     fs.push_back(y.block(ib).axpy(alpha, x.block(ib)));
   }
@@ -64,7 +64,7 @@ void copy(const vector_t& x, vector_t& y)
 void copy(const block_vector_t& x, block_vector_t& y)
 {
   assert(x.str == y.str);
-  std::vector<hpx::future<void>> fs;
+  std::vector<hpx::unique_future<void>> fs;
   for (std::ptrdiff_t ib=0; ib<y.str->B; ++ib) {
     fs.push_back(y.block(ib).copy(x.block(ib)));
   }
@@ -107,12 +107,12 @@ double nrm2(const vector_t& x)
 
 double nrm2(const block_vector_t& x)
 {
-  std::vector<hpx::future<double>> fs;
+  std::vector<hpx::unique_future<double>> fs;
   for (std::ptrdiff_t ib=0; ib<x.str->B; ++ib) {
     fs.push_back(x.block(ib).nrm2_process());
   }
   double val = nrm2_init();
-  for (auto f: fs) {
+  for (auto& f: fs) {
     val = nrm2_accumulate(val, f.get());
   }
   return nrm2_finalize(val);
@@ -139,7 +139,7 @@ void scal(double alpha, vector_t& x)
 void scal(double alpha, block_vector_t& x)
 {
   if (alpha == 1.0) return;
-  std::vector<hpx::future<void>> fs;
+  std::vector<hpx::unique_future<void>> fs;
   for (std::ptrdiff_t ib=0; ib<x.str->B; ++ib) {
     fs.push_back(x.block(ib).scal(alpha));
   }
@@ -194,7 +194,7 @@ void axpy(bool trans, double alpha, const block_matrix_t& a,
           block_matrix_t& b)
 {
   if (alpha == 0.0) return;
-  std::vector<hpx::future<void>> fs;
+  std::vector<hpx::unique_future<void>> fs;
   if (!trans) {
     assert(b.istr == a.istr);
     assert(b.jstr == a.jstr);
@@ -242,7 +242,7 @@ void copy(bool transa, const matrix_t& a, matrix_t& b)
 
 void copy(bool transa, const block_matrix_t& a, block_matrix_t& b)
 {
-  std::vector<hpx::future<void>> fs;
+  std::vector<hpx::unique_future<void>> fs;
   if (!transa) {
     assert(b.istr == a.istr);
     assert(b.jstr == a.jstr);
@@ -307,7 +307,7 @@ void gemv(bool trans, double alpha,
     copy(x, xtmp);
     scal(alpha, xtmp);
     for (std::ptrdiff_t jb=0; jb<x.str->B; ++jb) {
-      std::vector<hpx::future<void>> fs;
+      std::vector<hpx::unique_future<void>> fs;
       for (std::ptrdiff_t ib=0; ib<y.str->B; ++ib) {
         fs.push_back(y.block(ib).gemv(trans, 1.0, a.block(ib,jb),
                                       xtmp.block(jb), 1.0));
@@ -355,14 +355,14 @@ double nrm2(const matrix_t& a)
 
 double nrm2(const block_matrix_t& a)
 {
-  std::vector<hpx::future<double>> fs;
+  std::vector<hpx::unique_future<double>> fs;
   for (std::ptrdiff_t jb=0; jb<a.jstr->B; ++jb) {
     for (std::ptrdiff_t ib=0; ib<a.istr->B; ++ib) {
       fs.push_back(a.block(ib,jb).nrm2_process());
     }
   }
   double val = nrm2_init();
-  for (auto f: fs) {
+  for (auto& f: fs) {
     val = nrm2_accumulate(val, f.get());
   }
   return nrm2_finalize(val);
@@ -393,7 +393,7 @@ void scal(double alpha, matrix_t& a)
 void scal(double alpha, block_matrix_t& a)
 {
   if (alpha == 1.0) return;
-  std::vector<hpx::future<void>> fs;
+  std::vector<hpx::unique_future<void>> fs;
   for (std::ptrdiff_t jb=0; jb<a.jstr->B; ++jb) {
     for (std::ptrdiff_t ib=0; ib<a.istr->B; ++ib) {
       fs.push_back(a.block(ib,jb).scal(alpha));
@@ -538,7 +538,7 @@ void gemm(bool transa, bool transb,
       scal(alpha, btmp);
       for (std::ptrdiff_t jb=0; jb<c.jstr->B; ++jb) {
         for (std::ptrdiff_t kb=0; kb<b.istr->B; ++kb) {
-          std::vector<hpx::future<void>> fs;
+          std::vector<hpx::unique_future<void>> fs;
           for (std::ptrdiff_t ib=0; ib<c.istr->B; ++ib) {
             fs.push_back(c.block(ib,jb).gemm(transa, transb,
                                              1.0,

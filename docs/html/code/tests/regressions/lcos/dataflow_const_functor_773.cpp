@@ -11,7 +11,7 @@
 #include <hpx/lcos/local/dataflow.hpp>
 #include <hpx/util/unwrapped.hpp>
 
-typedef hpx::lcos::future< double > future_type;
+typedef hpx::lcos::shared_future< double > future_type;
 
 template< typename Value >
 struct mul 

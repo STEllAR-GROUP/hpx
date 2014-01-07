@@ -22,7 +22,7 @@ void wake_up_after_2_seconds()
 
     // Schedule a wakeup after 2 seconds.
     using boost::posix_time::seconds;
-    hpx::future<void> f = hpx::make_ready_future_after(seconds(2));
+    hpx::unique_future<void> f = hpx::make_ready_future_after(seconds(2));
 
     // ... do other things while waiting for the future to get ready
 
@@ -42,7 +42,7 @@ int return_int_at_time()
     // Schedule a wakeup 2 seconds from now.
     using namespace boost::posix_time;
     int arg = 42;
-    hpx::future<int> f = hpx::make_ready_future_at(
+    hpx::unique_future<int> f = hpx::make_ready_future_at(
         microsec_clock::universal_time() + seconds(2), 42);
 
     // ... do other things while waiting for the future to get ready

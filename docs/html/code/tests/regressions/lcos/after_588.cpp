@@ -32,7 +32,7 @@ struct test
         for(std::size_t i = 0; i != iterations; ++i)
         {
             const std::size_t num_pongs = 50;
-            std::vector<hpx::future<void> > futures;
+            std::vector<hpx::unique_future<void> > futures;
             futures.reserve(num_pongs);
             for(std::size_t j = 0; j != num_pongs; ++j)
             {
@@ -64,8 +64,8 @@ int hpx_main(boost::program_options::variables_map & vm)
         hpx::id_type id0 = hpx::components::new_<test>(localities[0]).get();
         hpx::id_type id1 = hpx::components::new_<test>(there).get();
 
-        hpx::future<void> f0 = hpx::async(test::ping_action(), id0, id1, vm["iterations"].as<std::size_t>());
-        hpx::future<void> f1 = hpx::async(test::ping_action(), id1, id0, vm["iterations"].as<std::size_t>());
+        hpx::unique_future<void> f0 = hpx::async(test::ping_action(), id0, id1, vm["iterations"].as<std::size_t>());
+        hpx::unique_future<void> f1 = hpx::async(test::ping_action(), id1, id0, vm["iterations"].as<std::size_t>());
         hpx::wait_all(f0, f1);
     }
     hpx::finalize();

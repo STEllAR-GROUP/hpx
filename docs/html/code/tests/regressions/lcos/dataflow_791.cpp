@@ -20,7 +20,7 @@
 #include <cstdlib>
 
 using std::vector;
-using hpx::lcos::future;
+using hpx::lcos::shared_future;
 using hpx::lcos::wait;
 using hpx::async;
 using hpx::lcos::local::dataflow;
@@ -115,8 +115,8 @@ void LU( int numBlocks)
     hpx::naming::id_type here = hpx::find_here();
     vector<vector<block>> blockList;
     getBlockList(blockList, numBlocks);
-    vector<vector<vector<future<block>>>> dfArray(numBlocks);
-    future<block> *diag_block, *first_col;
+    vector<vector<vector<shared_future<block>>>> dfArray(numBlocks);
+    shared_future<block> *diag_block, *first_col;
 
     for(int i = 0; i < numBlocks; i++){
         dfArray[i].resize(numBlocks);
@@ -270,7 +270,7 @@ void Print_Matrix(vector<double> &v)
 
 void InitMatrix3()
 {
-    vector<future<void>> futures;
+    vector<shared_future<void>> futures;
     futures.reserve(size);
     for(int i = 0; i < size; i++)
         for(int j = 0; j < size; j++){

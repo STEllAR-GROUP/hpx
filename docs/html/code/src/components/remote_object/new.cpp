@@ -27,9 +27,9 @@ namespace hpx { namespace components { namespace remote_object
         naming::id_type object_id
             = stubs::remote_object::create(target_id);
 
-        lcos::future<void> apply_promise
+        lcos::unique_future<void> apply_promise
             = stubs::remote_object::apply_async(object_id, ctor);
-        lcos::future<void> dtor_promise
+        lcos::unique_future<void> dtor_promise
             = stubs::remote_object::set_dtor_async(object_id, dtor);
 
         apply_promise.get();

@@ -145,7 +145,7 @@ int hpx_main(boost::program_options::variables_map& vm)
     bool continuation = vm.count("continuation") != 0;
     bool zerocopy = vm.count("zerocopy") != 0;
 
-    std::vector<hpx::future<double> > timings;
+    std::vector<hpx::unique_future<double> > timings;
     for (std::size_t i = 0; i != concurrency; ++i)
     {
         timings.push_back(hpx::async(hpx::util::bind(

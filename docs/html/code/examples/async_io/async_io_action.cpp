@@ -29,7 +29,7 @@ namespace detail
     }
 
     // This function will be executed by an HPX thread
-    hpx::lcos::future<int> async_io_worker(std::string const& string_to_write)
+    hpx::lcos::unique_future<int> async_io_worker(std::string const& string_to_write)
     {
         boost::shared_ptr<hpx::lcos::local::promise<int> > p =
             boost::make_shared<hpx::lcos::local::promise<int> >();
@@ -48,7 +48,7 @@ namespace detail
 // invoked. This allows to remotely execute the async_io.
 int async_io(std::string const& string_to_write)
 {
-    hpx::lcos::future<int> f = detail::async_io_worker(string_to_write);
+    hpx::lcos::unique_future<int> f = detail::async_io_worker(string_to_write);
     return f.get();    // simply wait for the IO to finish
 }
 

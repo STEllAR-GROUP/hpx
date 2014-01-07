@@ -11,7 +11,7 @@
 
 #include <boost/chrono.hpp>
 
-void wait_for(hpx::lcos::future<int> f)
+void wait_for(hpx::lcos::shared_future<int> f)
 {
     try {
         f.wait_for(boost::chrono::nanoseconds(1));
@@ -25,7 +25,7 @@ void wait_for(hpx::lcos::future<int> f)
     HPX_TEST(false);
 }
 
-void wait_until(hpx::lcos::future<int> f)
+void wait_until(hpx::lcos::shared_future<int> f)
 {
     try {
         f.wait_until(boost::chrono::system_clock::now() + boost::chrono::nanoseconds(1));
@@ -42,7 +42,7 @@ void wait_until(hpx::lcos::future<int> f)
 void test_wait_for()
 {
     hpx::lcos::promise<int> promise;
-    hpx::lcos::future<int> future = promise.get_future();
+    hpx::lcos::shared_future<int> future = promise.get_future();
 
     hpx::thread thread(&wait_for, future);
 
@@ -66,7 +66,7 @@ void test_wait_for()
 void test_wait_until()
 {
     hpx::lcos::promise<int> promise;
-    hpx::lcos::future<int> future = promise.get_future();
+    hpx::lcos::shared_future<int> future = promise.get_future();
 
     hpx::thread thread(&wait_until, future);
 

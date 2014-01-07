@@ -133,7 +133,7 @@ int hpx_main()
         print_tuple(tuple2);
         hpx::cout<< hpx::endl;
 
-        std::vector<hpx::lcos::future<void> > futures;
+        std::vector<hpx::lcos::unique_future<void> > futures;
 
         BOOST_FOREACH(hpx::naming::id_type const& node, localities)
         {

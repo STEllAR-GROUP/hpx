@@ -20,7 +20,7 @@
 
 using hpx::util::unwrapped;
 
-typedef hpx::lcos::future< double > future_type;
+typedef hpx::lcos::shared_future< double > future_type;
 
 struct mul
 {

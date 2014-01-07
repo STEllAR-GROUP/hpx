@@ -30,7 +30,7 @@ using hpx::finalize;
 using hpx::find_here;
 using hpx::naming::id_type;
 
-using hpx::future;
+using hpx::unique_future;
 using hpx::async;
 using hpx::lcos::wait;
 
@@ -59,7 +59,7 @@ void measure_action_futures(boost::uint64_t count, bool csv)
 {
     const id_type here = find_here();
 
-    std::vector<future<double> > futures;
+    std::vector<unique_future<double> > futures;
     futures.reserve(count);
 
     // start the clock
@@ -87,7 +87,7 @@ void measure_action_futures(boost::uint64_t count, bool csv)
 
 void measure_function_futures(boost::uint64_t count, bool csv)
 {
-    std::vector<future<double> > futures;
+    std::vector<unique_future<double> > futures;
 
     futures.reserve(count);
 

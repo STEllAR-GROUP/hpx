@@ -12,7 +12,7 @@
 #include <hpx/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
 
-hpx::future<int> f(int i)
+hpx::unique_future<int> f(int i)
 {
     if(i == 0)
     {

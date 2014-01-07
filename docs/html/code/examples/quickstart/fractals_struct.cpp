@@ -65,7 +65,7 @@ int hpx_main()
     {
         int max_iteration = 255;
 
-        std::vector<hpx::future<std::size_t> > iteration;
+        std::vector<hpx::unique_future<std::size_t> > iteration;
         iteration.reserve(sizeX * sizeY);
 
         fractals_action act;

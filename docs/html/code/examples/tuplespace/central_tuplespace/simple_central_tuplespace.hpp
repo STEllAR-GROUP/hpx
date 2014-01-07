@@ -38,7 +38,7 @@ namespace examples
 
         /// Create a client side representation for the existing
         /// \a server::simple_central_tuplespace instance with the given GID.
-        simple_central_tuplespace(hpx::future<hpx::naming::id_type> const& gid)
+        simple_central_tuplespace(hpx::shared_future<hpx::naming::id_type> const& gid)
           : base_type(gid)
         {}
 
@@ -95,7 +95,7 @@ namespace examples
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         //[simple_central_tuplespace_client_write_async
-        hpx::lcos::future<int> write_async(const tuple_type& tuple)
+        hpx::lcos::unique_future<int> write_async(const tuple_type& tuple)
         {
             HPX_ASSERT(this->get_gid());
             return this->base_type::write_async(this->get_gid(), tuple);
@@ -117,7 +117,7 @@ namespace examples
         /// \note This function has fire-and-forget semantics. It will not wait
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
-        hpx::lcos::future<tuple_type> read_async(const tuple_type& tp, long const timeout)
+        hpx::lcos::unique_future<tuple_type> read_async(const tuple_type& tp, long const timeout)
         {
             HPX_ASSERT(this->get_gid());
             return this->base_type::read_async(this->get_gid(), tp, timeout);
@@ -143,7 +143,7 @@ namespace examples
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
         //[simple_central_tuplespace_client_take_async
-        hpx::lcos::future<tuple_type> take_async(const tuple_type& tp, long const timeout)
+        hpx::lcos::unique_future<tuple_type> take_async(const tuple_type& tp, long const timeout)
         {
             HPX_ASSERT(this->get_gid());
             return this->base_type::take_async(this->get_gid(), tp, timeout);

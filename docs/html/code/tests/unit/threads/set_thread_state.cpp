@@ -26,7 +26,7 @@ using hpx::actions::plain_action4;
 
 using hpx::applier::register_thread_nullary;
 
-using hpx::lcos::future;
+using hpx::lcos::unique_future;
 using hpx::async;
 
 using hpx::threads::thread_id_type;
@@ -49,7 +49,7 @@ namespace detail
 {
     template <typename T1>
     boost::uint64_t wait(
-        std::vector<future<T1> > const& lazy_values
+        std::vector<unique_future<T1> > const& lazy_values
       , boost::int32_t suspend_for = 10
         )
     {
@@ -121,7 +121,7 @@ void tree_boot(
     HPX_ASSERT(grain_size);
     HPX_ASSERT(count);
 
-    std::vector<future<void> > promises;
+    std::vector<unique_future<void> > promises;
 
     boost::uint64_t const actors = (count > grain_size) ? grain_size : count;
 

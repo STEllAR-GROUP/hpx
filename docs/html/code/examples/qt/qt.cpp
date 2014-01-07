@@ -36,7 +36,7 @@ HPX_PLAIN_ACTION(runner, runner_action)
 
 void run(widget * w, std::size_t num_threads)
 {
-    std::vector<hpx::lcos::future<double> > futures(num_threads);
+    std::vector<hpx::lcos::unique_future<double> > futures(num_threads);
 
     for(std::size_t i = 0; i < num_threads; ++i)
     {

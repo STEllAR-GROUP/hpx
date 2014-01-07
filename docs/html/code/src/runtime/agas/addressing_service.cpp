@@ -1873,7 +1873,7 @@ bool addressing_service::register_name(
     }
 } // }}}
 
-static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
+static bool correct_credit_on_failure(unique_future<bool> f, naming::id_type id,
     boost::int64_t mutable_gid_credit, boost::int64_t new_gid_credit)
 {
     // Return the credit to the GID if the operation failed

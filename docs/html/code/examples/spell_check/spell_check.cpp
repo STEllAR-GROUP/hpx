@@ -175,11 +175,11 @@ int hpx_main()
         }
         t.restart();
         {
-            using hpx::lcos::future;
+            using hpx::lcos::unique_future;
             using hpx::async;
             using hpx::wait_all;
             vector<search_action> sAct;//[sizeX * sizeY];
-            vector<future<string>> wordRun;
+            vector<unique_future<string>> wordRun;
             wordRun.reserve(strs.size());
             for (string::size_type i = 0; i < strs.size(); ++i)
             {

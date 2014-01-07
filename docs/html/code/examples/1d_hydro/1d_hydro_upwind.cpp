@@ -24,7 +24,7 @@
 using hpx::naming::id_type;
 using hpx::naming::invalid_id;
 
-using hpx::lcos::future;
+using hpx::lcos::unique_future;
 using hpx::lcos::wait;
 using hpx::async;
 
@@ -166,7 +166,7 @@ struct time_element{
   double elapsed_time;
   bool computed;
   double physics_time;
-  std::vector<hpx::lcos::future<cell> > fluid_future;//future for each cell 
+  std::vector<hpx::lcos::shared_future<cell> > fluid_future;//future for each cell 
   std::vector<cell> fluid;
 };
 // declaring time_array
@@ -186,7 +186,6 @@ public:
     One_Dimension_Grid(boost::uint64_t num_cells,boost::uint64_t num_time_steps):number_t_steps(num_time_steps),number_of_cells(num_cells)
     {}
     // ~One_Dimension_Grid();
-    std::vector<future<cell> > GetTimeStepVector(boost::uint64_t time_step_row);//takes the timesteps position in the vector
     void remove_bottom_time_step();//takes the timesteps position in the vector
     void addNewTimeStep();
 
@@ -226,7 +225,7 @@ double get_pressure(cell input);
 // Wrapping in plain_action
 HPX_PLAIN_ACTION(compute);
 
-typedef hpx::lcos::future<cell> compute_future;
+typedef hpx::lcos::unique_future<cell> compute_future;
 
 // this will return the timestep size.  The timestep index will refer to the
 // timestep where it will be USED rather than the timestep where it was
@@ -372,11 +371,11 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
   compute_future nright = async<compute_action>(here,timestep-1,location+1);
 
   // OR is this the correct way to do it?
-  //future<cell> left;
+  //unique_future<cell> left;
   //left = async<compute_action>(here,timestep-1,location-1);
-  //future<cell> middle;
+  //unique_future<cell> middle;
   //middle = async<compute_action>(here,timestep-1,location);
-  //future<cell> right;
+  //unique_future<cell> right;
   //right = async<compute_action>(here,timestep-1,location+1);
 
   cell now;

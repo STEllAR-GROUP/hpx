@@ -63,7 +63,7 @@ int hpx_main(variables_map& vm)
         functor g;
         hpx::util::function<int()> f(g);
 
-        std::vector<hpx::future<void> > futures;
+        std::vector<hpx::unique_future<void> > futures;
 
         for (std::size_t i = 0; i != 16; ++i)
         {

@@ -49,7 +49,7 @@ struct test_client
     explicit test_client(hpx::id_type const& id)
       : client_base_type(id)
     {}
-    explicit test_client(hpx::future<hpx::id_type> const& fgid)
+    explicit test_client(hpx::shared_future<hpx::id_type> const& fgid)
       : client_base_type(fgid)
     {}
 

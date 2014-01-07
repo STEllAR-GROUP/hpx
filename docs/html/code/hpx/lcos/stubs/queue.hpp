@@ -22,7 +22,7 @@ namespace hpx { namespace lcos { namespace stubs
             lcos::server::queue<ValueType, RemoteType> >
     {
         ///////////////////////////////////////////////////////////////////////
-        static lcos::future<ValueType>
+        static lcos::unique_future<ValueType>
         get_value_async(naming::id_type const& gid)
         {
             typedef typename
@@ -31,7 +31,7 @@ namespace hpx { namespace lcos { namespace stubs
             return hpx::async<action_type>(gid);
         }
 
-        static lcos::future<void>
+        static lcos::unique_future<void>
         set_value_async(naming::id_type const& gid, BOOST_RV_REF(RemoteType) val)
         {
             typedef typename
@@ -40,7 +40,7 @@ namespace hpx { namespace lcos { namespace stubs
             return hpx::async<action_type>(gid, boost::move(val));
         }
 
-        static lcos::future<void>
+        static lcos::unique_future<void>
         abort_pending_async(naming::id_type const& gid,
             boost::exception_ptr const& e)
         {

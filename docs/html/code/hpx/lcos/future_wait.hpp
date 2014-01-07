@@ -34,6 +34,33 @@ namespace hpx { namespace lcos
 {
     namespace detail
     {
+        template <typename Future>
+        struct wait_acquire_future
+        {
+            typedef Future result_type;
+
+            template <typename R>
+            BOOST_FORCEINLINE hpx::unique_future<R>
+            operator()(hpx::unique_future<R>& future) const
+            {
+                return boost::move(future);
+            }
+
+            template <typename R>
+            BOOST_FORCEINLINE hpx::shared_future<R>
+            operator()(hpx::shared_future<R>& future) const
+            {
+                return future;
+            }
+
+            template <typename Result>
+            BOOST_FORCEINLINE hpx::future<Result>
+            operator()(hpx::future<Result>& future) const
+            {
+                return future;
+            }
+        };
+
         //////////////////////////////////////////////////////////////////////
         // This version has a callback to be invoked for each future when it
         // gets ready.
@@ -170,7 +197,7 @@ namespace hpx { namespace lcos
                 // all futures should be ready
                 HPX_ASSERT(ready_count_ == size);
 
-                return lazy_values_;
+                return boost::move(lazy_values_);
             }
 
             std::vector<Future> lazy_values_;
@@ -214,6 +241,42 @@ namespace hpx { namespace lcos
     // results to be there.
     template <typename Future, typename F>
     inline std::size_t
+    wait(std::vector<Future>& lazy_values, BOOST_FWD_REF(F) f,
+        boost::int32_t suspend_for = 10)
+    {
+        typedef std::vector<Future> return_type;
+
+        if (lazy_values.empty())
+            return 0;
+        
+        return_type lazy_values_;
+        lazy_values_.reserve(lazy_values.size());
+        std::transform(lazy_values.begin(), lazy_values.end(),
+            std::back_inserter(lazy_values_),
+            detail::wait_acquire_future<Future>());
+
+        boost::atomic<std::size_t> success_counter(0);
+        lcos::local::futures_factory<return_type()> p =
+            lcos::local::futures_factory<return_type()>(
+                detail::when_each<Future, F>(boost::move(lazy_values_), 
+                    boost::forward<F>(f), &success_counter));
+
+        p.apply();
+        p.get_future().get();
+
+        return success_counter.load();
+    }
+
+    template <typename Future, typename F>
+    inline std::size_t
+    wait(BOOST_RV_REF(std::vector<Future>) lazy_values, BOOST_FWD_REF(F) f,
+        boost::int32_t suspend_for = 10)
+    {
+        return wait(lazy_values, boost::forward<F>(f), suspend_for);
+    }
+
+    template <typename Future, typename F>
+    inline std::size_t
     wait(std::vector<Future> const& lazy_values, BOOST_FWD_REF(F) f,
         boost::int32_t suspend_for = 10)
     {
@@ -221,12 +284,18 @@ namespace hpx { namespace lcos
 
         if (lazy_values.empty())
             return 0;
+        
+        return_type lazy_values_;
+        lazy_values_.reserve(lazy_values.size());
+        std::transform(lazy_values.begin(), lazy_values.end(),
+            std::back_inserter(lazy_values_),
+            detail::wait_acquire_future<Future>());
 
         boost::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::when_each<Future, F>(
-                    lazy_values, boost::forward<F>(f), &success_counter));
+                detail::when_each<Future, F>(boost::move(lazy_values_), 
+                    boost::forward<F>(f), &success_counter));
 
         p.apply();
         p.get_future().get();

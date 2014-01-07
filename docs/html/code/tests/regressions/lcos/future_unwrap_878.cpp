@@ -13,8 +13,8 @@
 
 int main()
 {
-    hpx::promise<hpx::future<int> > promise;
-    hpx::future<hpx::future<int> > future = promise.get_future();
+    hpx::promise<hpx::shared_future<int> > promise;
+    hpx::unique_future<hpx::shared_future<int> > future = promise.get_future();
     try
     {
         throw hpx::bad_parameter;
@@ -24,7 +24,7 @@ int main()
     }
     HPX_TEST(future.has_exception());
 
-    hpx::future<int> inner = future.unwrap();
+    hpx::unique_future<int> inner = future.unwrap();
     HPX_TEST(inner.has_exception());
 
     return hpx::util::report_errors();

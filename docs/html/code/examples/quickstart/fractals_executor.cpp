@@ -50,13 +50,13 @@ int hpx_main()
     {
         using namespace std;
 
-        using hpx::future;
+        using hpx::unique_future;
         using hpx::async;
         using hpx::wait_all;
 
         int const max_iteration = 255;
 
-        vector<future<int>> iteration;
+        vector<unique_future<int>> iteration;
         iteration.reserve(sizeX*sizeY);
 
         hpx::cout << "Initial setup completed in " 
