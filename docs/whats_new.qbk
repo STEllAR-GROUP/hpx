@@ -16,22 +16,38 @@
 
 Here is a list of the important tickets we closed for this release.
 
-* [issue 1038] - Bump minimal required Boost to 1.49.0 
+* [issue 1043] - async et.al. compute the wrong result type
+* [issue 1041] - Remove redundant costly Kleene stars from regex searches
+* [issue 1040] - CMake script regex match patterns has unnecessary kleenes
+* [issue 1038] - Bump minimal required Boost to 1.49.0
 * [issue 1037] - Implicit unwrapping of futures in async broken
+* [issue 1036] - Scheduler hangs when user code attempts to "block" OS-threads
+* [issue 1035] - Idle-rate counter always reports 100% idle rate
+* [issue 1033] - Application options read in from an options file generate an
+                 error message
 * [issue 1030] - Implement condition_variable
 * [issue 1029] - Deadlock in thread scheduling subsystem
-* [issue 1028] - HPX-thread cumulative count performance counters report incorrect value 
+* [issue 1028] - HPX-thread cumulative count performance counters report
+                 incorrect value
 * [issue 1027] - Expose hpx::thread_interrupted error code as a separate
                  exception type
 * [issue 1026] - Exceptions thrown in asynchronous calls can be lost if the
                  value of the future is never queried
+* [issue 1025] - future::wait_for/wait_until do not remove callback
 * [issue 1024] - Remove dependence to boost assert and create hpx assert
+* [issue 1023] - Segfaults with tcmalloc
 * [issue 1022] - prerequisites link in readme is broken
 * [issue 1020] - HPX Deadlock on external synchronization
 * [issue 1019] - Convert using `BOOST_ASSERT` to `HPX_ASSERT`
 * [issue 1018] - compiling bug with gcc 4.8.1
+* [issue 1017] - Possible crash in io_pool executor
+* [issue 1016] - Crash at startup
+* [issue 1014] - Implement Increment/Decrement Merging
+* [issue 1013] - Add more logging channels to enable greater control over
+                 logging granularity
 * [issue 1012] - `--hpx:debug-hpx-log` and `--hpx:debug-agas-log` lead to
                  non-thread safe writes
+* [issue 1010] - Mergable decrement requests are not being merged
 * [issue 1009] - `--hpx:list-symbolic-names` crashes
 * [issue 1006] - Segfault/hang in set_data
 * [issue 1003] - Performance counter naming issue
