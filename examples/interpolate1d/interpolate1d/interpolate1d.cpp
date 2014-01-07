@@ -47,7 +47,7 @@ namespace interpolate1d
 
         // initialize the partitions and store the mappings
         partitions_.reserve(num_instances);
-        fill_partitions(datafilename, result);
+        fill_partitions(datafilename, boost::move(result));
     }
 
     void interpolate1d::fill_partitions(std::string const& datafilename,
