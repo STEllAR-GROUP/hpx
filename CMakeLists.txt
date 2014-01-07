@@ -1419,6 +1419,10 @@ else()
   hpx_cpuid("rdtscp" HPX_RDTSCP
     DEFINITIONS HPX_HAVE_RDTSCP)
 
+  if(NOT HPX_RDTSC AND NOT HPX_RDTSCP)
+    hpx_warn("hardware_timer" "Neither rdtsc nor rdtscp is available; some performance counters may report incorrect results")
+  endif()
+
   hpx_option(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION BOOL
       "Disable automatic registration with Boost.Serialization (Default: Off)" Off ADVANCED)
 
