@@ -250,7 +250,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
 
         template <typename Parcelport>
         std::list<boost::shared_ptr<sender> > get_senders(
-            HPX_STD_FUNCTION<bool(int&)> const& tag_generator, MPI_Comm communicator,
+            MPI_Comm communicator,
             Parcelport& pp, std::size_t & num_requests, std::size_t max_requests)
         {
             std::list<boost::shared_ptr<sender> > res;
@@ -273,7 +273,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     break;
                 }
                 int tag;
-                if(!tag_generator(tag))
+                if(!pp.get_next_tag(tag))
                 {
                     // If no new tag could be generated, we need to put the
                     // remaining parcels back in the cache

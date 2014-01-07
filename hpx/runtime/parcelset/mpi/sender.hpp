@@ -96,8 +96,10 @@ namespace hpx { namespace parcelset { namespace mpi
             case sending_header:
                 {
                     int completed = 0;
-                    MPI_Test(&header_request_, &completed, MPI_STATUS_IGNORE);
-                    if(completed)
+                    MPI_Status status;
+                    int ret = MPI_Test(&header_request_, &completed, &status);
+                    HPX_ASSERT(ret == MPI_SUCCESS);
+                    if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
                     {
                         state_ = sent_header;
                         return done(pp);
@@ -114,8 +116,10 @@ namespace hpx { namespace parcelset { namespace mpi
             case sending_data:
                 {
                     int completed = 0;
-                    MPI_Test(&data_request_, &completed, MPI_STATUS_IGNORE);
-                    if(completed)
+                    MPI_Status status;
+                    int ret = MPI_Test(&data_request_, &completed, &status);
+                    HPX_ASSERT(ret == MPI_SUCCESS);
+                    if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
                     {
                         state_ = sent_data;
                         return done(pp);

@@ -35,8 +35,9 @@ namespace hpx { namespace parcelset { namespace mpi {
         {
             MPI_Status status;
             int completed = 0;
-            MPI_Test(&request_, &completed, &status);
-            if(completed)
+            int err = MPI_Test(&request_, &completed, &status);
+            HPX_ASSERT(err == MPI_SUCCESS);
+            if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
             {
                 HPX_ASSERT(header_.rank() == -1);
                 header h = header_;
