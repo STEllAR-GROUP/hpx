@@ -145,6 +145,7 @@ namespace hpx { namespace parcelset { namespace mpi
         std::size_t next_tag_;
         std::deque<int> free_tags_;
 
+    public:
         bool get_next_tag(int& tag)
         {
             tag = 0;
@@ -161,6 +162,7 @@ namespace hpx { namespace parcelset { namespace mpi
             tag = static_cast<int>(next_tag_++);
             return true;
         }
+    private:
 
         MPI_Comm communicator_;
         // handle messages

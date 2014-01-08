@@ -15,13 +15,16 @@ namespace hpx
     
     template <typename F>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F()>::value
+        traits::detail::is_callable_not_action<
+            typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F()>
+      , detail::create_future<typename util::decay<F>::type()>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F()>::type result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type()
+        >::type result_type;
         if (policy == launch::sync)
         {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -35,13 +38,16 @@ namespace hpx
     }
     template <typename F>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F()>::value
+        traits::detail::is_callable_not_action<
+            typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F()>
+      , detail::create_future<typename util::decay<F>::type()>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F()>::type result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type()
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             boost::forward<F>(f));
         p.apply();
@@ -49,15 +55,15 @@ namespace hpx
     }
     template <typename F>
     typename boost::lazy_enable_if_c<
-        traits::detail::is_callable_not_action<F()>::value
+        traits::detail::is_callable_not_action<
+            typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F()>
+      , detail::create_future<typename util::decay<F>::type()>
     >::type
     async(BOOST_FWD_REF(F) f)
     {
         return async(launch::all, boost::forward<F>(f));
     }
-    
     
     
     
@@ -81,15 +87,18 @@ namespace hpx
     template <typename F, typename A0>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0)
     {
         typedef typename boost::result_of<
-            F(A0)
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -107,15 +116,19 @@ namespace hpx
     template <typename F, typename A0>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type)>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0)
     {
-        typedef typename boost::result_of<F(A0)>::type
-            result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type)
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 )));
@@ -125,9 +138,11 @@ namespace hpx
     template <typename F, typename A0>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type)>
     >::type
     async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0)
     {
@@ -161,15 +176,18 @@ namespace hpx
     template <typename F, typename A0 , typename A1>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
         typedef typename boost::result_of<
-            F(A0 , A1)
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -187,15 +205,19 @@ namespace hpx
     template <typename F, typename A0 , typename A1>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type)>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
-        typedef typename boost::result_of<F(A0 , A1)>::type
-            result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type)
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )));
@@ -205,9 +227,11 @@ namespace hpx
     template <typename F, typename A0 , typename A1>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type)>
     >::type
     async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
@@ -241,15 +265,18 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
         typedef typename boost::result_of<
-            F(A0 , A1 , A2)
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -267,15 +294,19 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
-        typedef typename boost::result_of<F(A0 , A1 , A2)>::type
-            result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )));
@@ -285,9 +316,11 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>
     >::type
     async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
@@ -321,15 +354,18 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
         typedef typename boost::result_of<
-            F(A0 , A1 , A2 , A3)
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -347,15 +383,19 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
-        typedef typename boost::result_of<F(A0 , A1 , A2 , A3)>::type
-            result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )));
@@ -365,9 +405,11 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>
     >::type
     async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
@@ -401,15 +443,18 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
         typedef typename boost::result_of<
-            F(A0 , A1 , A2 , A3 , A4)
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -427,15 +472,19 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
-        typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4)>::type
-            result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )));
@@ -445,9 +494,11 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>
     >::type
     async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
@@ -481,15 +532,18 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
         typedef typename boost::result_of<
-            F(A0 , A1 , A2 , A3 , A4 , A5)
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -507,15 +561,19 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type)>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
-        typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5)>::type
-            result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type)
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )));
@@ -525,9 +583,11 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type)>
     >::type
     async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
@@ -561,15 +621,18 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
         typedef typename boost::result_of<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6)
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -587,15 +650,19 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type)>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
-        typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::type
-            result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type)
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )));
@@ -605,9 +672,11 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type)>
     >::type
     async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
@@ -641,15 +710,18 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
         typedef typename boost::result_of<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -667,15 +739,19 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type)>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
-        typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::type
-            result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type)
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 )));
@@ -685,9 +761,11 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type)>
     >::type
     async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
@@ -721,15 +799,18 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
     {
         typedef typename boost::result_of<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -747,15 +828,19 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type)>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
     {
-        typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::type
-            result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type)
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 )));
@@ -765,9 +850,11 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type)>
     >::type
     async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
     {
@@ -801,15 +888,18 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
     {
         typedef typename boost::result_of<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -827,15 +917,19 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type)>
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
     {
-        typedef typename boost::result_of<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::type
-            result_type;
+        typedef typename boost::result_of<
+            typename util::decay<F>::type
+                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type)
+        >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::bind(util::one_shot(boost::forward<F>(f)),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 )));
@@ -845,9 +939,11 @@ namespace hpx
     template <typename F, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     typename boost::lazy_enable_if_c<
         traits::detail::is_callable_not_action<
-            F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>::value
+            typename util::decay<F>::type(
+                typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<F(A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9)>
+      , detail::create_future<typename util::decay<F>::type
+            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type)>
     >::type
     async(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
     {

@@ -92,12 +92,9 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    // The arguments are moved here. This function is called from a
-                    // bound functor. In order to do true perfect forwarding in an
-                    // asynchronous operation. These bound variables must be moved
-                    // out of the bound object.
+
                     (get_lva<Component>::call(lva)->*F)(
-                        HPX_ENUM_MOVE_ARGS(N, arg));
+                        HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
                 }
                 catch (hpx::thread_interrupted const&) {
                     /* swallow this exception */
@@ -144,7 +141,7 @@ namespace hpx { namespace actions
             BOOST_FWD_REF(Arguments) args)
         {
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(),
+                util::bind(util::one_shot(typename Derived::thread_function()),
                     lva, BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)), lva);
         }
 
@@ -301,12 +298,9 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    // The arguments are moved here. This function is called from a
-                    // bound functor. In order to do true perfect forwarding in an
-                    // asynchronous operation. These bound variables must be moved
-                    // out of the bound object.
+
                     (get_lva<Component>::call(lva)->*F)(
-                        HPX_ENUM_MOVE_ARGS(N, arg));
+                        HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
                 }
                 catch (hpx::thread_interrupted const&) {
                     /* swallow this exception */
@@ -353,7 +347,7 @@ namespace hpx { namespace actions
             // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                util::bind(util::one_shot(typename Derived::thread_function()), lva,
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)), lva);
         }
 

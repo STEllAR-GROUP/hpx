@@ -61,13 +61,13 @@ namespace hpx { namespace parcelset { namespace mpi {
         bool done(Parcelport & pp)
         {
             int completed = 0;
-#ifdef HPX_DEBUG
             MPI_Status status;
-            MPI_Test(&request_, &completed, &status);
+#ifdef HPX_DEBUG
+            HPX_ASSERT(MPI_Test(&request_, &completed, &status) == MPI_SUCCESS);
 #else
-            MPI_Test(&request_, &completed, MPI_STATUS_IGNORE);
+            MPI_Test(&request_, &completed, &status);
 #endif
-            if(completed)
+            if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
             {
                 HPX_ASSERT(status.MPI_SOURCE == header_.rank());
                 HPX_ASSERT(status.MPI_SOURCE != util::mpi_environment::rank());

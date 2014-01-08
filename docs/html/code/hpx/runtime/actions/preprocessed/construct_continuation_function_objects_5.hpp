@@ -30,10 +30,6 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 func();
                 cont->trigger();
             }
@@ -55,8 +51,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_void_0<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_void_0<Action>()),
                 cont, boost::forward<Func>(func)
               
                     );
@@ -77,10 +73,6 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<typename Action::result_type>(
                     func()
                 ));
@@ -100,8 +92,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_0<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_0<Action>()),
                 cont, boost::forward<Func>(func)
               
                     );
@@ -130,11 +122,7 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                func(boost::move(arg0));
+                func(boost::forward<Arg0>( arg0 ));
                 cont->trigger();
             }
             catch (...) {
@@ -155,8 +143,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_void_1<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_void_1<Action>()),
                 cont, boost::forward<Func>(func)
               ,
                     util::get< 0>(boost::forward<Arguments>( args)));
@@ -177,12 +165,8 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<typename Action::result_type>(
-                    func(boost::move(arg0))
+                    func(boost::forward<Arg0>( arg0 ))
                 ));
             }
             catch (...) {
@@ -200,8 +184,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_1<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_1<Action>()),
                 cont, boost::forward<Func>(func)
               ,
                     util::get< 0>(boost::forward<Arguments>( args)));
@@ -230,11 +214,7 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                func(boost::move(arg0) , boost::move(arg1));
+                func(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
                 cont->trigger();
             }
             catch (...) {
@@ -255,8 +235,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_void_2<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_void_2<Action>()),
                 cont, boost::forward<Func>(func)
               ,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)));
@@ -277,12 +257,8 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<typename Action::result_type>(
-                    func(boost::move(arg0) , boost::move(arg1))
+                    func(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))
                 ));
             }
             catch (...) {
@@ -300,8 +276,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_2<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_2<Action>()),
                 cont, boost::forward<Func>(func)
               ,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)));
@@ -330,11 +306,7 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
+                func(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
                 cont->trigger();
             }
             catch (...) {
@@ -355,8 +327,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_void_3<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_void_3<Action>()),
                 cont, boost::forward<Func>(func)
               ,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)));
@@ -377,12 +349,8 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<typename Action::result_type>(
-                    func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2))
+                    func(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))
                 ));
             }
             catch (...) {
@@ -400,8 +368,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_3<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_3<Action>()),
                 cont, boost::forward<Func>(func)
               ,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)));
@@ -430,11 +398,7 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
+                func(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
                 cont->trigger();
             }
             catch (...) {
@@ -455,8 +419,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_void_4<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_void_4<Action>()),
                 cont, boost::forward<Func>(func)
               ,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)));
@@ -477,12 +441,8 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<typename Action::result_type>(
-                    func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3))
+                    func(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))
                 ));
             }
             catch (...) {
@@ -500,8 +460,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_4<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_4<Action>()),
                 cont, boost::forward<Func>(func)
               ,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)));
@@ -530,11 +490,7 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
-                func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
+                func(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
                 cont->trigger();
             }
             catch (...) {
@@ -555,8 +511,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_void_5<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_void_5<Action>()),
                 cont, boost::forward<Func>(func)
               ,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)));
@@ -577,12 +533,8 @@ namespace detail
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                
-                
-                
-                
                 cont->trigger(boost::forward<typename Action::result_type>(
-                    func(boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4))
+                    func(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))
                 ));
             }
             catch (...) {
@@ -600,8 +552,8 @@ namespace detail
         call(continuation_type cont, BOOST_FWD_REF(Func) func,
             BOOST_FWD_REF(Arguments) args)
         {
-            return HPX_STD_BIND(
-                continuation_thread_function_5<Action>(),
+            return util::bind(util::one_shot(
+                continuation_thread_function_5<Action>()),
                 cont, boost::forward<Func>(func)
               ,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)));

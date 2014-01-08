@@ -47,12 +47,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    
-                    
-                    
-                    
                     (get_lva<Component>::call(lva)->*F)(
-                        boost::move(arg0));
+                        boost::forward<Arg0>( arg0 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -94,7 +90,7 @@ namespace hpx { namespace actions
             BOOST_FWD_REF(Arguments) args)
         {
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(),
+                util::bind(util::one_shot(typename Derived::thread_function()),
                     lva, util::get< 0>(boost::forward<Arguments>( args))), lva);
         }
         
@@ -237,12 +233,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    
-                    
-                    
-                    
                     (get_lva<Component>::call(lva)->*F)(
-                        boost::move(arg0));
+                        boost::forward<Arg0>( arg0 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -285,7 +277,7 @@ namespace hpx { namespace actions
             
             
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                util::bind(util::one_shot(typename Derived::thread_function()), lva,
                     util::get< 0>(boost::forward<Arguments>( args))), lva);
         }
         
@@ -443,12 +435,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    
-                    
-                    
-                    
                     (get_lva<Component>::call(lva)->*F)(
-                        boost::move(arg0) , boost::move(arg1));
+                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -490,7 +478,7 @@ namespace hpx { namespace actions
             BOOST_FWD_REF(Arguments) args)
         {
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(),
+                util::bind(util::one_shot(typename Derived::thread_function()),
                     lva, util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args))), lva);
         }
         
@@ -633,12 +621,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    
-                    
-                    
-                    
                     (get_lva<Component>::call(lva)->*F)(
-                        boost::move(arg0) , boost::move(arg1));
+                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -681,7 +665,7 @@ namespace hpx { namespace actions
             
             
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                util::bind(util::one_shot(typename Derived::thread_function()), lva,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args))), lva);
         }
         
@@ -839,12 +823,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    
-                    
-                    
-                    
                     (get_lva<Component>::call(lva)->*F)(
-                        boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
+                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -886,7 +866,7 @@ namespace hpx { namespace actions
             BOOST_FWD_REF(Arguments) args)
         {
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(),
+                util::bind(util::one_shot(typename Derived::thread_function()),
                     lva, util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args))), lva);
         }
         
@@ -1029,12 +1009,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    
-                    
-                    
-                    
                     (get_lva<Component>::call(lva)->*F)(
-                        boost::move(arg0) , boost::move(arg1) , boost::move(arg2));
+                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -1077,7 +1053,7 @@ namespace hpx { namespace actions
             
             
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                util::bind(util::one_shot(typename Derived::thread_function()), lva,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args))), lva);
         }
         
@@ -1235,12 +1211,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    
-                    
-                    
-                    
                     (get_lva<Component>::call(lva)->*F)(
-                        boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
+                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -1282,7 +1254,7 @@ namespace hpx { namespace actions
             BOOST_FWD_REF(Arguments) args)
         {
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(),
+                util::bind(util::one_shot(typename Derived::thread_function()),
                     lva, util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args))), lva);
         }
         
@@ -1425,12 +1397,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    
-                    
-                    
-                    
                     (get_lva<Component>::call(lva)->*F)(
-                        boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3));
+                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -1473,7 +1441,7 @@ namespace hpx { namespace actions
             
             
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                util::bind(util::one_shot(typename Derived::thread_function()), lva,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args))), lva);
         }
         
@@ -1631,12 +1599,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    
-                    
-                    
-                    
                     (get_lva<Component>::call(lva)->*F)(
-                        boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
+                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -1678,7 +1642,7 @@ namespace hpx { namespace actions
             BOOST_FWD_REF(Arguments) args)
         {
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(),
+                util::bind(util::one_shot(typename Derived::thread_function()),
                     lva, util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args))), lva);
         }
         
@@ -1821,12 +1785,8 @@ namespace hpx { namespace actions
                                 << detail::get_action_name<Derived>()
                                 << ") lva(" << reinterpret_cast<void const*>
                                     (get_lva<Component>::call(lva)) << ")";
-                    
-                    
-                    
-                    
                     (get_lva<Component>::call(lva)->*F)(
-                        boost::move(arg0) , boost::move(arg1) , boost::move(arg2) , boost::move(arg3) , boost::move(arg4));
+                        boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -1869,7 +1829,7 @@ namespace hpx { namespace actions
             
             
             return Derived::decorate_action(
-                HPX_STD_BIND(typename Derived::thread_function(), lva,
+                util::bind(util::one_shot(typename Derived::thread_function()), lva,
                     util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args))), lva);
         }
         

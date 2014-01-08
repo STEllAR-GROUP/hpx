@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -1044,7 +1044,8 @@ namespace hpx { namespace components { namespace server
                 boost::program_options::variables_map vm;
 
                 util::parse_commandline(ini, options, cmd_line, vm, std::size_t(-1),
-                    util::allow_unregistered, get_runtime_mode_from_name(runtime_mode));
+                    util::allow_unregistered | util::report_missing_config_file,
+                    get_runtime_mode_from_name(runtime_mode));
 
 #if defined(HPX_HAVE_HWLOC)
                 if (vm.count("hpx:print-bind")) {
