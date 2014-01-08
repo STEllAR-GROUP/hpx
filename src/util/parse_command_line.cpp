@@ -67,7 +67,7 @@ namespace hpx { namespace util
                 return false;
             }
 
-            // any --hpx: option without a second ':' ishandled elsewhere as well
+            // any --hpx: option without a second ':' is handled elsewhere as well
             std::string::size_type p = s.find_first_of(":", hpx_prefix_len);
             if (p == std::string::npos)
                 return false;
@@ -91,7 +91,7 @@ namespace hpx { namespace util
                 return true;
             }
 
-            // This option is specificly not for us, so we return an option
+            // This option is specifically not for us, so we return an option
             // which will be silently ignored.
             opt = std::make_pair(std::string("hpx:ignore"), std::string());
             return true;
@@ -263,8 +263,8 @@ namespace hpx { namespace util
         }
 
         // try to find a config file somewhere up the filesystem hierarchy
-        // starting with the input file path. This allows to use a general <app_name>.cfg
-        // file for all files in a certain project.
+        // starting with the input file path. This allows to use a general
+        // <app_name>.cfg file for all executables in a certain project.
         void handle_generic_config_options(std::string appname,
             boost::program_options::variables_map& vm,
             boost::program_options::options_description const& desc_cfgfile,
@@ -277,7 +277,7 @@ namespace hpx { namespace util
             boost::filesystem::path app (appname);
             appname = boost::filesystem::basename(app.filename());
 
-            // walk up the hierarchy, trying to find a file appname.cfg
+            // walk up the hierarchy, trying to find a file <appname>.cfg
             while (!dir.empty()) {
                 boost::filesystem::path filename = dir / (appname + ".cfg");
                 bool result = read_config_file_options(filename.string(),
@@ -573,7 +573,7 @@ namespace hpx { namespace util
             detail::handle_config_options(
                 vm, desc_cfgfile, rtcfg, node, error_mode);
 
-            // print help screen
+            // collect help information
             if (visible && vm.count("hpx:help")) {
                 (*visible)
                     .add(app_options).add(cmdline_options)
@@ -624,10 +624,6 @@ namespace hpx { namespace util
         boost::program_options::options_description const& app_options,
         boost::program_options::variables_map& vm)
     {
-        // To make this example at least minimally useful we analyze the
-        // command line options the application instance has been started with
-        // on this locality.
-        //
         // The command line for this application instance is available from
         // this configuration section:
         //
