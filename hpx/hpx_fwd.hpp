@@ -612,14 +612,19 @@ namespace hpx
             typename DirectExecute = typename Action::direct_execution>
         class deferred_packaged_task;
 
-        template <typename Result>
-        class future;
-        
         template <typename R>
         class unique_future;
         
         template <typename R>
         class shared_future;
+        
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
+        template <typename Result>
+        class future;
+#elif defined(HPX_UNIQUE_FUTURE_ALIAS)
+        template <typename Result>
+        using future = unique_future<Result>
+#endif
 
         template <typename ValueType>
         struct object_semaphore;
@@ -703,9 +708,11 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace
     using naming::id_type;
-    using lcos::future;
     using lcos::unique_future;
     using lcos::shared_future;
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
+    using lcos::future;
+#endif
     using lcos::promise;
 
     /// \endcond

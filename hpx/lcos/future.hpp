@@ -50,11 +50,13 @@ namespace hpx { namespace lcos { namespace detail
       : future_traits<Future>
     {};
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     template <typename T>
     struct future_traits<lcos::future<T> >
     {
         typedef T type;
     };
+#endif
 
     template <typename R>
     struct future_traits<lcos::unique_future<R> >
@@ -104,11 +106,12 @@ namespace hpx { namespace lcos { namespace detail
       : shared_state_ptr<R>
     {};
 
-    // hpx::future
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     template <typename R>
     struct shared_state_ptr_for<future<R> >
       : shared_state_ptr<R>
     {};
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     struct future_access
@@ -150,7 +153,7 @@ namespace hpx { namespace lcos { namespace detail
             return f.shared_state_;
         }
 
-        // hpx::future
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
         template <typename R>
         BOOST_FORCEINLINE static
         typename shared_state_ptr<R>::type const&
@@ -158,8 +161,10 @@ namespace hpx { namespace lcos { namespace detail
         {
             return f.future_data_;
         }
+#endif
     };
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     inline lcos::future<Result> make_future_from_data(
@@ -189,6 +194,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         return future_access::get_shared_state(f).get();
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename F, typename Enable = void>
@@ -226,6 +232,7 @@ namespace hpx { namespace lcos { namespace detail
             >::type> type;
     };
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     template <typename Result, typename F>
     struct future_then_result<
         future<Result>, F
@@ -244,6 +251,7 @@ namespace hpx { namespace lcos { namespace detail
             >::type
             type;
     };
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename Enable = void>
@@ -259,10 +267,12 @@ namespace hpx { namespace lcos { namespace detail
             >::type> type;
     };
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     template <typename Result>
     struct future_unwrap_result<future<Result> >
       : boost::mpl::if_<traits::is_future<Result>, Result, void>
     {};
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter>
@@ -275,9 +285,11 @@ namespace hpx { namespace lcos { namespace detail
         typedef future_traits<type> traits_type;
     };
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     template <typename T>
     struct future_iterator_traits<future<T> >
     {};
+#endif
 
     template <typename T>
     struct future_iterator_traits<unique_future<T> >
@@ -1068,6 +1080,7 @@ namespace hpx { namespace lcos
         {};
     }}
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     class future
@@ -1347,6 +1360,7 @@ namespace hpx { namespace lcos
     protected:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
@@ -1428,6 +1442,7 @@ namespace hpx { namespace lcos
             util::to_time_duration(d), boost::forward<Result>(init));
     }
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     ///////////////////////////////////////////////////////////////////////////
     template <>
     class future<void>
@@ -1630,6 +1645,7 @@ namespace hpx { namespace lcos
     protected:
         boost::intrusive_ptr<future_data_type> future_data_;
     };
+#endif
 
     // extension: create a pre-initialized future object
     inline unique_future<void> make_ready_future()
@@ -1680,9 +1696,11 @@ namespace hpx { namespace lcos
     }
 }}
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
 HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(
     hpx::lcos::future<void>,
     hpx_lcos_future_void_typed_continuation)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -1948,6 +1966,7 @@ namespace hpx { namespace actions
         mutable lcos::shared_future<void> deferred_result_;
     };
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     template <typename Result>
     struct typed_continuation<lcos::future<Result> > : continuation
     {
@@ -1993,10 +2012,10 @@ namespace hpx { namespace actions
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value(this->get_gid(), result.move());
+                hpx::set_lco_value(this->get_gid(), result.get());
             }
             else {
-                f_(this->get_gid(), result.move());
+                f_(this->get_gid(), result.get());
             }
         }
 
@@ -2168,6 +2187,7 @@ namespace hpx { namespace actions
         util::function<void(naming::id_type)> f_;
         mutable lcos::future<void> deferred_result_;
     };
+#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////

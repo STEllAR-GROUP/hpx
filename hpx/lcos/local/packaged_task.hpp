@@ -275,10 +275,12 @@ namespace hpx { namespace lcos { namespace local
             return get_future();
         }
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
         explicit operator lcos::future<Result>()
         {
             return get_future();
         }
+#endif
 #endif
 
     protected:
@@ -305,11 +307,13 @@ namespace hpx { namespace lcos
         shared_future<Result>(promise.get_future()).swap(*this);
     }
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     template <typename Result>
     inline future<Result>::future(local::promise<Result>& promise)
     {
         future<Result>(promise.get_future()).swap(*this);
     }
+#endif
 }}
 
 namespace hpx { namespace lcos { namespace local
@@ -467,10 +471,12 @@ namespace hpx { namespace lcos { namespace local
             return get_future();
         }
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
         explicit operator lcos::future<void>()
         {
             return get_future();
         }
+#endif
 #endif
 
     private:
@@ -497,10 +503,12 @@ namespace hpx { namespace lcos
         shared_future<void>(promise.get_future()).swap(*this);
     }
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
     inline future<void>::future(local::promise<void>& promise)
     {
         future<void>(promise.get_future()).swap(*this);
     }
+#endif
 }}
 
 namespace hpx { namespace lcos { namespace local
