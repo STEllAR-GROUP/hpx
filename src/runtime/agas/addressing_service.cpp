@@ -1714,8 +1714,7 @@ lcos::unique_future<bool> addressing_service::incref_async(
           , naming::id_type const&
         ) = &addressing_service::incref_async;
 
-        return async(util::bind(incref_async_ptr, this,
-            gid, credit, keep_alive));
+        return async(incref_async_ptr, this, gid, credit, keep_alive);
     }
 
     if (HPX_UNLIKELY(0 >= credit))

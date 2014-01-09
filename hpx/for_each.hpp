@@ -60,7 +60,7 @@ namespace hpx {
             std::size_t i = 0;
             BOOST_FOREACH(value_type const & v, range)
             {
-                futures[i] = hpx::async(HPX_STD_BIND(HPX_STD_PROTECT(f), v));
+                futures[i] = hpx::async(HPX_STD_PROTECT(f), v);
                 ++i;
             }
 
@@ -75,20 +75,16 @@ namespace hpx {
 
         lcos::unique_future<futures_type> left_future =
             hpx::async(
-                HPX_STD_BIND(
-                    for_each_impl
-                  , boost::make_iterator_range(begin, mid)
-                  , HPX_STD_PROTECT(f)
-                )
+                  for_each_impl
+                , boost::make_iterator_range(begin, mid)
+                , HPX_STD_PROTECT(f)
             );
 
         lcos::unique_future<futures_type> right_future =
             hpx::async(
-                HPX_STD_BIND(
-                    for_each_impl
-                  , boost::make_iterator_range(mid, end)
-                  , HPX_STD_PROTECT(f)
-                )
+                  for_each_impl
+                , boost::make_iterator_range(mid, end)
+                , HPX_STD_PROTECT(f)
             );
 
         typedef typename futures_type::iterator futures_iterator_type;

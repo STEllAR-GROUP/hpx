@@ -159,7 +159,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             }
             execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
-            hpx::apply(hpx::util::bind(f, this_, is_void()));
+            hpx::apply(f, this_, is_void());
         }
         template <typename Iter>
         BOOST_FORCEINLINE
@@ -171,7 +171,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 is_void;
             execute_function_type f = &dataflow_frame::execute;
             boost::intrusive_ptr<dataflow_frame> this_(this);
-            hpx::apply(sched, hpx::util::bind(f, this_, is_void()));
+            hpx::apply(sched, f, this_, is_void());
         }
 
         template <typename Iter>

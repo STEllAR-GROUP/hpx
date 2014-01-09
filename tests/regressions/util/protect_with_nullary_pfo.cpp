@@ -69,7 +69,7 @@ int hpx_main()
     std::size_t i = 0;
     BOOST_FOREACH(std::size_t const & v, my_range)
     {
-        hpx::async(HPX_STD_BIND(hpx::util::protect(print_obj<std::size_t>()), v));
+        hpx::async(hpx::util::protect(print_obj<std::size_t>()), v);
         ++i;
     }
 

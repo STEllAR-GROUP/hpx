@@ -66,7 +66,7 @@ void function_pointers()
     int_f1_count.store(0);
     int_f2_count.store(0);
 
-    unique_future<void> f1 = dataflow(unwrapped(&void_f1), async(bind(&int_f)));
+    unique_future<void> f1 = dataflow(unwrapped(&void_f1), async(&int_f));
     unique_future<int>
         f2 = dataflow(
             unwrapped(&int_f1)
@@ -158,7 +158,7 @@ void future_function_pointers()
 
     unique_future<void> f1
         = dataflow(
-            &future_void_f1, async(bind(&future_void_sf1, shared_future<void>(make_ready_future())))
+            &future_void_f1, async(&future_void_sf1, shared_future<void>(make_ready_future()))
         );
 
     hpx::wait(f1);
@@ -168,8 +168,8 @@ void future_function_pointers()
 
     unique_future<void> f2 = dataflow(
         &future_void_f2
-      , async(bind(&future_void_sf1, shared_future<void>(make_ready_future())))
-      , async(bind(&future_void_sf1, shared_future<void>(make_ready_future())))
+      , async(&future_void_sf1, shared_future<void>(make_ready_future()))
+      , async(&future_void_sf1, shared_future<void>(make_ready_future()))
     );
 
     hpx::wait(f2);

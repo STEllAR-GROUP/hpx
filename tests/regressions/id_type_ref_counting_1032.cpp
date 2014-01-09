@@ -44,7 +44,7 @@ struct test_server1
     ~test_server1()
     {
         void (*f)(hpx::id_type) = func<ComponentBase>;
-        hpx::apply(hpx::util::bind(f, other));
+        hpx::apply(f, other);
         alive = false;
     }
 
