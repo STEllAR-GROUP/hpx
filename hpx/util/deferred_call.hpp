@@ -67,7 +67,8 @@ namespace hpx { namespace util
 
             BOOST_FORCEINLINE result_type operator()()
             {
-                return util::invoke_fused(boost::move(_f), boost::move(_args));
+                return util::invoke_fused_r<result_type>(
+                    boost::move(_f), boost::move(_args));
             }
 
         public: // exposition-only
