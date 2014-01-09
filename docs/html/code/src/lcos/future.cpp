@@ -6,6 +6,8 @@
 
 #include <hpx/lcos/future.hpp>
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
 HPX_REGISTER_TYPED_CONTINUATION(
     hpx::lcos::future<void>,
     hpx_lcos_future_void_typed_continuation)
+#endif

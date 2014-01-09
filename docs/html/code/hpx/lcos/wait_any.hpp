@@ -72,8 +72,6 @@ namespace hpx
 
             result_type operator()()
             {
-                using lcos::detail::get_future_data;
-
                 index_.store(static_cast<std::size_t>(index_error));
 
                 std::size_t size = lazy_values_.size();

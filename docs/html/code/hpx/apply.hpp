@@ -14,8 +14,8 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/is_callable.hpp>
 
@@ -53,7 +53,9 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f)
     {
-        threads::register_thread(boost::forward<F>(f), "hpx::apply");
+        threads::register_thread(boost::bind(
+            util::deferred_call(boost::forward<F>(f))),
+            "hpx::apply");
         return false;   // executed locally
     }
 
@@ -103,7 +105,7 @@ namespace hpx
     apply(threads::executor& sched, BOOST_FWD_REF(F) f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        sched.add(util::bind(util::one_shot(boost::forward<F>(f)),
+        sched.add(util::deferred_call(boost::forward<F>(f),
             HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");
         return false;
     }
@@ -117,9 +119,9 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        threads::register_thread(util::bind(
-            util::one_shot(boost::forward<F>(f)),
-            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");
+        threads::register_thread(boost::bind(
+            util::deferred_call(boost::forward<F>(f),
+            HPX_ENUM_FORWARD_ARGS(N, A, a))), "hpx::apply");
         return false;
     }
 

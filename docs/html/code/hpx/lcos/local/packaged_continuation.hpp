@@ -333,6 +333,7 @@ namespace hpx { namespace lcos { namespace detail
     }
 }}}
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
@@ -433,6 +434,7 @@ namespace hpx { namespace lcos
     }
 
 }}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -547,6 +549,7 @@ namespace hpx { namespace lcos { namespace detail
     }
 }}}
 
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
@@ -571,5 +574,6 @@ namespace hpx { namespace lcos
         return lcos::detail::make_future_from_data<result_type>(boost::move(p));
     }
 }}
+#endif
 
 #endif

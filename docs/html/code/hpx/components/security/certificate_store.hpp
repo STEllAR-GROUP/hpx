@@ -10,6 +10,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/stringstream.hpp>
+#include <boost/format.hpp>
 
 #include <boost/noncopyable.hpp>
 
