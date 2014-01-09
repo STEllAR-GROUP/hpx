@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2013 Hartmut Kaiser
+    Copyright (C) 2007-2014 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,11 +12,22 @@
 
 [heading General Changes]
 
+* A major API breaking change for this release was introduced by implementing 
+  `hpx::future` and `hpx::shared_future` fully in conformance with the
+  __cpp11__. While `hpx::shared_future` is new and will not create any
+  compatibility problems, we revised the interface and implementation of the
+  existing `hpx::future` implementation. For more details please see the
+  [@http://mail.cct.lsu.edu/pipermail/hpx-users/2014-January/000141.html mailing list archive].
+
+
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1045] - Security missing headers
+* [issue 1044] - Native TLS on FreeBSD via __thread
 * [issue 1043] - async et.al. compute the wrong result type
+* [issue 1042] - async et.al. implicitly unwrap reference_wrappers
 * [issue 1041] - Remove redundant costly Kleene stars from regex searches
 * [issue 1040] - CMake script regex match patterns has unnecessary kleenes
 * [issue 1038] - Bump minimal required Boost to 1.49.0
