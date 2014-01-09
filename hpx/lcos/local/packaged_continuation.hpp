@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace detail
     void invoke_continuation(Func& func, Future& future, Destination& dest)
     {
         typedef typename boost::is_void<
-            typename boost::result_of<Func(Future)>::type
+            typename util::result_of<Func(Future)>::type
         >::type predicate;
 
         invoke_continuation(func, future, dest, predicate());
@@ -352,7 +352,7 @@ namespace hpx { namespace lcos
     inline typename detail::future_then_result<future<Result>, F>::type
     future<Result>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future)>::type result_type;
+        typedef typename util::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
 
         if (!future_data_) {
@@ -372,7 +372,7 @@ namespace hpx { namespace lcos
     inline typename detail::future_then_result<future<Result>, F>::type
     future<Result>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future)>::type result_type;
+        typedef typename util::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
 
         if (!future_data_) {
@@ -399,7 +399,7 @@ namespace hpx { namespace lcos
     inline typename detail::future_then_result<future<void>, F>::type
     future<void>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future)>::type result_type;
+        typedef typename util::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
 
         if (!future_data_) {
@@ -418,7 +418,7 @@ namespace hpx { namespace lcos
     inline typename detail::future_then_result<future<void>, F>::type
     future<void>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<F(future)>::type result_type;
+        typedef typename util::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
 
         if (!future_data_) {

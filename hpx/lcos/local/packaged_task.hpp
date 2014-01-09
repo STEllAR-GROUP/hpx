@@ -11,11 +11,11 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/utility/result_of.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>

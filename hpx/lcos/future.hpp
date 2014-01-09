@@ -12,13 +12,13 @@
 #include <hpx/traits/is_future.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/date_time_chrono.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/utility/result_of.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/function_types/result_type.hpp>
 #include <boost/detail/iterator.hpp>
@@ -218,11 +218,11 @@ namespace hpx { namespace lcos { namespace detail
     struct future_then_result<
         Future, F
       , typename util::always_void<
-            typename boost::result_of<F(Future)>::type
+            typename util::result_of<F(Future)>::type
         >::type
     >
     {
-        typedef typename boost::result_of<F(Future)>::type result;
+        typedef typename util::result_of<F(Future)>::type result;
 
         typedef lcos::unique_future<
             typename boost::mpl::eval_if<
@@ -237,11 +237,11 @@ namespace hpx { namespace lcos { namespace detail
     struct future_then_result<
         future<Result>, F
       , typename util::always_void<
-            typename boost::result_of<F(future<Result>)>::type
+            typename util::result_of<F(future<Result>)>::type
         >::type
     >
     {
-        typedef typename boost::result_of<F(future<Result>)>::type result;
+        typedef typename util::result_of<F(future<Result>)>::type result;
 
         typedef
             typename boost::mpl::if_<
@@ -534,7 +534,7 @@ namespace hpx { namespace lcos { namespace detail
                 return result_type();
             }
 
-            typedef typename boost::result_of<F(Derived)>::type result;
+            typedef typename util::result_of<F(Derived)>::type result;
             typedef typename shared_state_ptr<result>::type shared_state_ptr;
 
             shared_state_ptr p =
@@ -559,7 +559,7 @@ namespace hpx { namespace lcos { namespace detail
                 return result_type();
             }
 
-            typedef typename boost::result_of<F(Derived)>::type result;
+            typedef typename util::result_of<F(Derived)>::type result;
             typedef typename shared_state_ptr<result>::type shared_state_ptr;
 
             shared_state_ptr p =

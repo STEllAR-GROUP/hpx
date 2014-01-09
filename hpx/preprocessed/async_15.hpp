@@ -22,7 +22,7 @@ namespace hpx
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type()
         >::type result_type;
         if (policy == launch::sync)
@@ -45,7 +45,7 @@ namespace hpx
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type()
         >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
@@ -96,7 +96,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type)
         >::type result_type;
@@ -129,7 +129,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type)
         >::type result_type;
@@ -191,7 +191,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type)
         >::type result_type;
@@ -224,7 +224,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type)
         >::type result_type;
@@ -286,7 +286,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)
         >::type result_type;
@@ -319,7 +319,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)
         >::type result_type;
@@ -381,7 +381,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)
         >::type result_type;
@@ -414,7 +414,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)
         >::type result_type;
@@ -476,7 +476,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)
         >::type result_type;
@@ -509,7 +509,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)
         >::type result_type;
@@ -571,7 +571,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type)
         >::type result_type;
@@ -604,7 +604,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type)
         >::type result_type;
@@ -666,7 +666,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type)
         >::type result_type;
@@ -699,7 +699,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type)
         >::type result_type;
@@ -761,7 +761,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type)
         >::type result_type;
@@ -794,7 +794,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type)
         >::type result_type;
@@ -856,7 +856,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type)
         >::type result_type;
@@ -889,7 +889,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type)
         >::type result_type;
@@ -951,7 +951,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type)
         >::type result_type;
@@ -984,7 +984,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type)
         >::type result_type;
@@ -1046,7 +1046,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type)
         >::type result_type;
@@ -1079,7 +1079,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type)
         >::type result_type;
@@ -1141,7 +1141,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type)
         >::type result_type;
@@ -1174,7 +1174,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type)
         >::type result_type;
@@ -1236,7 +1236,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type)
         >::type result_type;
@@ -1269,7 +1269,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type)
         >::type result_type;
@@ -1331,7 +1331,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type)
         >::type result_type;
@@ -1364,7 +1364,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type)
         >::type result_type;
@@ -1426,7 +1426,7 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type)
         >::type result_type;
@@ -1459,7 +1459,7 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type , typename util::decay<A5>::type , typename util::decay<A6>::type , typename util::decay<A7>::type , typename util::decay<A8>::type , typename util::decay<A9>::type , typename util::decay<A10>::type , typename util::decay<A11>::type , typename util::decay<A12>::type , typename util::decay<A13>::type , typename util::decay<A14>::type)
         >::type result_type;

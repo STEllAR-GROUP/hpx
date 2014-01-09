@@ -38,7 +38,7 @@ namespace hpx {
     template <typename Range, typename F>
     inline std::vector<
         lcos::unique_future<
-            typename boost::result_of<
+            typename util::result_of<
                 F(typename boost::range_value<Range>::type)
             >::type
         >
@@ -46,7 +46,7 @@ namespace hpx {
     for_each(Range const & range, F f)
     {
         typedef typename boost::range_value<Range>::type value_type;
-        typedef typename boost::result_of<F(value_type)>::type result_type;
+        typedef typename util::result_of<F(value_type)>::type result_type;
         typedef lcos::unique_future<result_type> future_type;
         typedef std::vector<future_type> futures_type;
         typedef typename boost::range_iterator<Range const>::type iterator_type;

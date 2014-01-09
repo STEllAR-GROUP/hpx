@@ -11,31 +11,23 @@
 #include <hpx/config.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/util/void_guard.hpp>
-#include <hpx/util/detail/pp_strip_parens.hpp>
-#include <hpx/util/detail/qualify_as.hpp>
 
 #include <boost/get_pointer.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/or.hpp>
-#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iteration/iterate.hpp>
-#include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/ref.hpp>
 #include <boost/shared_ptr.hpp> // for get_pointer(shared_ptr<X>)
 #include <boost/type_traits/is_function.hpp>
 #include <boost/type_traits/is_base_of.hpp>
-#include <boost/type_traits/is_member_function_pointer.hpp>
-#include <boost/type_traits/is_member_object_pointer.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/utility/result_of.hpp>
 
 #if !defined(HPX_GCC_VERSION)
 #   define HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE BOOST_FORCEINLINE
@@ -45,108 +37,11 @@
 
 namespace hpx { namespace util
 {
-    namespace detail
-    {
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename Q = int, typename Enable = void>
-        struct get_member_pointer_object
-        {
-            typedef
-                typename detail::qualify_as<
-                    typename get_member_pointer_object<T>::type
-                  , typename boost::mpl::if_<
-                        boost::is_pointer<typename util::decay<Q>::type>
-                      , typename boost::remove_pointer<
-                            typename util::decay<Q>::type>::type&
-                      , Q
-                    >::type
-                >::type
-                type;
-        };
-
-        template <typename T, typename Q>
-        struct get_member_pointer_object<T, Q
-          , typename boost::enable_if<
-                boost::is_reference_wrapper<typename util::decay<Q>::type> >::type
-        > : get_member_pointer_object<T
-              , typename boost::unwrap_reference<typename util::decay<Q>::type>::type&>
-        {};
-
-        template <typename T, typename C>
-        struct get_member_pointer_object<T C::*>
-        {
-            typedef T type;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename FD, typename F, typename Enable = void>
-        struct invoke_result_of_impl
-          : boost::result_of<F>
-        {};
-
-#       define HPX_UTIL_INVOKE_RESULT_OF_IMPL(Z, N, D)                        \
-        template <typename FD                                                 \
-          , typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename Arg)>        \
-        struct invoke_result_of_impl<FD, F(BOOST_PP_ENUM_PARAMS(N, Arg))      \
-          , typename boost::enable_if<boost::is_reference_wrapper<FD> >::type \
-        > : boost::result_of<                                                 \
-                typename boost::unwrap_reference<FD>::type&                   \
-                    (BOOST_PP_ENUM_PARAMS(N, Arg))                            \
-            >                                                                 \
-        {};                                                                   \
-                                                                              \
-        /* workaround for tricking result_of into using decltype */           \
-        template <typename FD                                                 \
-          , typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename Arg)>        \
-        struct invoke_result_of_impl<FD, F(BOOST_PP_ENUM_PARAMS(N, Arg))      \
-          , typename boost::enable_if<                                        \
-                boost::mpl::or_<                                              \
-                    boost::is_function<typename boost::remove_pointer<FD>::type>\
-                  , boost::is_member_function_pointer<FD>                     \
-                >                                                             \
-            >::type                                                           \
-        > : boost::result_of<                                                 \
-                FD(BOOST_PP_ENUM_PARAMS(N, Arg))                              \
-            >                                                                 \
-        {};                                                                   \
-        /**/
-
-        BOOST_PP_REPEAT(
-            HPX_FUNCTION_ARGUMENT_LIMIT
-          , HPX_UTIL_INVOKE_RESULT_OF_IMPL, _
-        );
-
-#       undef HPX_UTIL_INVOKE_RESULT_OF_IMPL
-
-        // Note: boost::result_of differs form std::result_of,
-        // ignoring member-object-ptrs
-        template <typename FD, typename F, typename Class>
-        struct invoke_result_of_impl<FD, F(Class)
-          , typename boost::enable_if<boost::is_member_object_pointer<FD> >::type
-        > : detail::get_member_pointer_object<FD, Class>
-        {};
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    struct invoke_result_of;
-
-#   define HPX_UTIL_INVOKE_RESULT_OF(Z, N, D)                                 \
-    template <typename F BOOST_PP_ENUM_TRAILING_PARAMS(N, typename Arg)>      \
-    struct invoke_result_of<F(BOOST_PP_ENUM_PARAMS(N, Arg))>                  \
-      : detail::invoke_result_of_impl<                                        \
-            typename util::decay<F>::type                                     \
-          , F(BOOST_PP_ENUM_PARAMS(N, Arg))                                   \
-        >                                                                     \
-    {};                                                                       \
-    /**/
-
-    BOOST_PP_REPEAT(
-        HPX_FUNCTION_ARGUMENT_LIMIT
-      , HPX_UTIL_INVOKE_RESULT_OF, _
-    );
-
-#   undef HPX_UTIL_INVOKE_RESULT_OF
+    struct invoke_result_of
+      : hpx::util::result_of<F>
+    {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename R, typename FR>
