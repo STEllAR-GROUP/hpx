@@ -21,6 +21,8 @@
     #define HPX_NATIVE_TLS __thread
 #elif defined(BOOST_WINDOWS)
     #define HPX_NATIVE_TLS __declspec(thread)
+#elif defined(__FreeBSD__)
+    #define HPX_NATIVE_TLS __thread
 #else
     #error Unsupported platform.
 #endif
