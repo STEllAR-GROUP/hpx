@@ -53,9 +53,10 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f)
     {
-        threads::register_thread(boost::bind(
-            util::deferred_call(boost::forward<F>(f))),
-            "hpx::apply");
+        threads::register_thread(
+            boost::bind(util::deferred_call(
+                boost::forward<F>(f)
+            )), "hpx::apply");
         return false;   // executed locally
     }
 
@@ -105,8 +106,11 @@ namespace hpx
     apply(threads::executor& sched, BOOST_FWD_REF(F) f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        sched.add(util::deferred_call(boost::forward<F>(f),
-            HPX_ENUM_FORWARD_ARGS(N, A, a)), "hpx::apply");
+        sched.add(
+            util::deferred_call(
+                boost::forward<F>(f),
+                HPX_ENUM_FORWARD_ARGS(N, A, a)
+            ), "hpx::apply");
         return false;
     }
 
@@ -119,9 +123,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        threads::register_thread(boost::bind(
-            util::deferred_call(boost::forward<F>(f),
-            HPX_ENUM_FORWARD_ARGS(N, A, a))), "hpx::apply");
+        threads::register_thread(
+            boost::bind(util::deferred_call(
+                boost::forward<F>(f),
+                HPX_ENUM_FORWARD_ARGS(N, A, a)
+            )), "hpx::apply");
         return false;
     }
 

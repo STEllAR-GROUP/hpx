@@ -203,12 +203,17 @@ namespace hpx
 
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
-            return detail::call_sync(util::deferred_call(boost::forward<F>(f),
-                HPX_ENUM_FORWARD_ARGS(N, A, a)), predicate());
+            return detail::call_sync(
+                util::deferred_call(
+                    boost::forward<F>(f),
+                    HPX_ENUM_FORWARD_ARGS(N, A, a)
+                ), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::deferred_call(boost::forward<F>(f),
-                HPX_ENUM_FORWARD_ARGS(N, A, a)));
+            util::deferred_call(
+                boost::forward<F>(f),
+                HPX_ENUM_FORWARD_ARGS(N, A, a)
+            ));
         if (detail::has_async_policy(policy))
             p.apply();
         return p.get_future();
@@ -232,8 +237,10 @@ namespace hpx
         >::type result_type;
 
         lcos::local::futures_factory<result_type()> p(sched,
-            util::deferred_call(boost::forward<F>(f),
-                HPX_ENUM_FORWARD_ARGS(N, A, a)));
+            util::deferred_call(
+                boost::forward<F>(f),
+                HPX_ENUM_FORWARD_ARGS(N, A, a)
+            ));
         p.apply();
         return p.get_future();
     }
