@@ -133,7 +133,7 @@ if [[ $DOWNLOAD == "1" ]]; then
     if ! [[ $? == "0" ]]; then echo "ERROR: Unable to download Boost"; error; fi
 fi
 
-tar -xf boost_$US_VERSION.tar.bz2
+tar --no-same-owner -xf boost_$US_VERSION.tar.bz2
 if ! [[ $? == "0" ]]; then echo "ERROR: Unable to unpack `pwd`/boost_$US_VERSION.tar.bz2"; error; fi
 
 mv boost_$US_VERSION source
