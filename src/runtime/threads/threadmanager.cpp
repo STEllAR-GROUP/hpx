@@ -628,9 +628,6 @@ namespace hpx { namespace threads
             }
         }
 
-        // wait for all threads to start up before before starting HPX work
-        startup_->wait();
-
         // manage the number of this thread in its TSS
         init_tss_helper<SchedulingPolicy, NotificationPolicy>
             tss_helper(*this, num_thread, scheduler_.numa_sensitive());
@@ -638,6 +635,9 @@ namespace hpx { namespace threads
         // needs to be done as the first thing, otherwise logging won't work
         notifier_.on_start_thread(num_thread);       // notify runtime system of started thread
         scheduler_.on_start_thread(num_thread);
+
+        // wait for all threads to start up before before starting HPX work
+        startup_->wait();
 
         {
             LTM_(info) << "tfunc(" << num_thread << "): starting OS thread"; //-V128
