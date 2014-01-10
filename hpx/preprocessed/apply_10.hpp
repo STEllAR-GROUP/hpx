@@ -26,10 +26,10 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f)
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false; 
     }
     
@@ -71,11 +71,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f),
                 boost::forward<A0>( a0 )
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false;
     }
     
@@ -122,11 +122,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false;
     }
     
@@ -173,11 +173,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false;
     }
     
@@ -224,11 +224,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false;
     }
     
@@ -275,11 +275,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false;
     }
     
@@ -326,11 +326,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false;
     }
     
@@ -377,11 +377,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false;
     }
     
@@ -428,11 +428,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 )
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false;
     }
     
@@ -479,11 +479,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 )
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false;
     }
     
@@ -530,11 +530,11 @@ namespace hpx
     >::type
     apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
     {
-        threads::register_thread(
-            boost::bind(util::deferred_call(
+        threads::register_thread_nullary(
+            util::deferred_call(
                 boost::forward<F>(f),
                 boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 )
-            )), "hpx::apply");
+            ), "hpx::apply");
         return false;
     }
     
