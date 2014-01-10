@@ -178,7 +178,7 @@ struct channel
     }
 
     template <typename F>
-    hpx::unique_future<typename boost::result_of<F(hpx::unique_future<T>)>::type>
+    hpx::unique_future<typename util::result_of<F(hpx::unique_future<T>)>::type>
     then(BOOST_FWD_REF(F) f)
     {
         HPX_ASSERT(data_);
@@ -293,7 +293,7 @@ struct channel<void>
     }
 
     template <typename F>
-    hpx::unique_future<typename boost::result_of<F(hpx::unique_future<void>)>::type>
+    hpx::unique_future<typename util::result_of<F(hpx::unique_future<void>)>::type>
     then(BOOST_FWD_REF(F) f)
     {
         HPX_ASSERT(data_);

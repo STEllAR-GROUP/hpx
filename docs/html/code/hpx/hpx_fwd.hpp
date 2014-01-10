@@ -144,7 +144,7 @@ namespace hpx
 
     /// \namespace threads
     ///
-    /// The namespace \a threadmanager contains all the definitions required
+    /// The namespace \a thread-manager contains all the definitions required
     /// for the scheduling, execution and general management of \a
     /// hpx#threadmanager#thread's.
     namespace threads
@@ -209,10 +209,10 @@ namespace hpx
             suspended = 3,      /*!< thread has been suspended (waiting for
                                      synchronization event, but still
                                      known and under control of the
-                                     threadmanager) */
+                                     thread-manager) */
             depleted = 4,       /*!< thread has been depleted (deeply
                                      suspended, it is not known to the
-                                     thread manager) */
+                                     thread-manager) */
             terminated = 5,     /*!< thread has been stopped an may be
                                      garbage collected */
             staged = 6          /*!< this is not a real thread state, but
@@ -318,7 +318,7 @@ namespace hpx
         HPX_API_EXPORT thread_id_type get_self_id();
 
         /// The function \a get_parent_id returns the HPX thread id of the
-        /// current's thread parent (or zero if the current thread is not a
+        /// current thread's parent (or zero if the current thread is not a
         /// PX thread).
         ///
         /// \note This function will return a meaningful value only if the
@@ -327,7 +327,7 @@ namespace hpx
         HPX_API_EXPORT thread_id_repr_type get_parent_id();
 
         /// The function \a get_parent_phase returns the HPX phase of the
-        /// current's thread parent (or zero if the current thread is not a
+        /// current thread's parent (or zero if the current thread is not a
         /// PX thread).
         ///
         /// \note This function will return a meaningful value only if the
@@ -336,7 +336,7 @@ namespace hpx
         HPX_API_EXPORT std::size_t get_parent_phase();
 
         /// The function \a get_parent_locality_id returns the id of the locality of
-        /// the current's thread parent (or zero if the current thread is not a
+        /// the current thread's parent (or zero if the current thread is not a
         /// PX thread).
         ///
         /// \note This function will return a meaningful value only if the
@@ -614,10 +614,10 @@ namespace hpx
 
         template <typename R>
         class unique_future;
-        
+
         template <typename R>
         class shared_future;
-        
+
 #if defined(HPX_ENABLE_DEPRECATED_FUTURE)
         template <typename Result>
         class future;
@@ -708,9 +708,10 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace
     using naming::id_type;
+
     using lcos::unique_future;
     using lcos::shared_future;
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
+#if defined(HPX_ENABLE_DEPRECATED_FUTURE) || defined(HPX_UNIQUE_FUTURE_ALIAS)
     using lcos::future;
 #endif
     using lcos::promise;
@@ -1260,11 +1261,11 @@ namespace hpx
     /// of the given id.
     ///
     /// \param id [in] The global id of the locality for which the name should
-    ///           be retrievd
+    ///           be retrieved
     ///
     /// \returns  This function returns the name for the locality of the given 
     ///           id. The name is retrieved from the underlying networking layer
-    ///           and may be different for different parcelports.
+    ///           and may be different for different parcel ports.
     ///
     /// \see      \a std::string get_locality_name()
     HPX_API_EXPORT unique_future<std::string> get_locality_name(

@@ -58,7 +58,7 @@ namespace hpx { namespace components
 
         template <typename F>
         lcos::dataflow_base<
-            typename boost::result_of<typename util::decay<F>::type(T &)>::type
+            typename util::result_of<typename util::decay<F>::type(T &)>::type
         >
         apply(BOOST_FWD_REF(F) f) const
         {
@@ -78,7 +78,7 @@ namespace hpx { namespace components
 
         template <typename F, typename D>
         lcos::dataflow_base<
-            typename boost::result_of<typename util::decay<F>::type(T &)>::type
+            typename util::result_of<typename util::decay<F>::type(T &)>::type
         >
         apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(D) d) const
         {
@@ -100,7 +100,7 @@ namespace hpx { namespace components
 
         template <typename F, typename A>
         lcos::dataflow_base<
-            typename boost::result_of<typename util::decay<F>::type(T &, A)>::type
+            typename util::result_of<typename util::decay<F>::type(T &, A)>::type
         >
         apply2(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A) a) const
         {
@@ -123,7 +123,7 @@ namespace hpx { namespace components
 
         template <typename F, typename A0, typename A1>
         lcos::dataflow_base<
-            typename boost::result_of<typename util::decay<F>::type(T &)>::type
+            typename util::result_of<typename util::decay<F>::type(T &)>::type
         >
         apply3(BOOST_FWD_REF(F) f, A0 const & a0, A1 const & a1) const
         {
@@ -147,7 +147,7 @@ namespace hpx { namespace components
 
         template <typename F, typename A0, typename A1, typename A2>
         lcos::dataflow_base<
-            typename boost::result_of<typename util::decay<F>::type(T &)>::type
+            typename util::result_of<typename util::decay<F>::type(T &)>::type
         >
         apply4(BOOST_FWD_REF(F) f, A0 const & a0, A1 const & a1, A2 const & a2) const
         {
@@ -172,7 +172,7 @@ namespace hpx { namespace components
 
         template <typename F, typename A0, typename A1, typename A2, typename A3>
         lcos::dataflow_base<
-            typename boost::result_of<typename util::decay<F>::type(T &)>::type
+            typename util::result_of<typename util::decay<F>::type(T &)>::type
         >
         apply5(BOOST_FWD_REF(F) f, A0 const & a0, A1 const & a1, A2 const & a2, A3 const & a3) const
         {

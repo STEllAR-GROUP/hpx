@@ -22,7 +22,7 @@
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
 #include <hpx/util/tuple.hpp>
-#include <hpx/util/detail/result_of_or.hpp>
+#include <hpx/util/result_of.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>

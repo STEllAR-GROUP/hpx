@@ -61,7 +61,7 @@ namespace hpx { namespace qt {
 
     runtime::~runtime()
     {
-        apply(HPX_STD_BIND(::shutdown_hpx_now, impl_));
+        apply(&::shutdown_hpx_now, impl_);
         impl_->wait();
         delete impl_;
     }

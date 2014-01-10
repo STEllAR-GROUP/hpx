@@ -24,6 +24,16 @@
         <span class="phrase"><a name="hpx.whats_new.hpx_0_9_8.general_changes"></a></span><a class="link" href="hpx_0_9_8.html#hpx.whats_new.hpx_0_9_8.general_changes">General
         Changes</a>
       </h5>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+            A major API breaking change for this release was introduced by implementing
+            <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span></code> and <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">shared_future</span></code>
+            fully in conformance with the <a href="http://www.open-std.org/jtc1/sc22/wg21" target="_top">C++11
+            Standard</a>. While <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">shared_future</span></code>
+            is new and will not create any compatibility problems, we revised the
+            interface and implementation of the existing <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span></code>
+            implementation. For more details please see the <a href="http://mail.cct.lsu.edu/pipermail/hpx-users/2014-January/000141.html" target="_top">mailing
+            list archive</a>.
+          </li></ul></div>
 <h5>
 <a name="hpx.whats_new.hpx_0_9_8.h1"></a>
         <span class="phrase"><a name="hpx.whats_new.hpx_0_9_8.bug_fixes_closed_tickets"></a></span><a class="link" href="hpx_0_9_8.html#hpx.whats_new.hpx_0_9_8.bug_fixes_closed_tickets">Bug
@@ -34,7 +44,16 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
 <li class="listitem">
+            <a href="http://github.com/STEllAR-GROUP/hpx/issues/1045" target="_top">#1045</a> - Security missing headers
+          </li>
+<li class="listitem">
+            <a href="http://github.com/STEllAR-GROUP/hpx/issues/1044" target="_top">#1044</a> - Native TLS on FreeBSD via __thread
+          </li>
+<li class="listitem">
             <a href="http://github.com/STEllAR-GROUP/hpx/issues/1043" target="_top">#1043</a> - async et.al. compute the wrong result type
+          </li>
+<li class="listitem">
+            <a href="http://github.com/STEllAR-GROUP/hpx/issues/1042" target="_top">#1042</a> - async et.al. implicitly unwrap reference_wrappers
           </li>
 <li class="listitem">
             <a href="http://github.com/STEllAR-GROUP/hpx/issues/1041" target="_top">#1041</a> - Remove redundant costly Kleene stars from regex searches

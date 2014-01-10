@@ -12,11 +12,10 @@
 
 #include <boost/config.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
-#include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>
+#include <hpx/util/move.hpp>
 
 #include <boost/utility/enable_if.hpp>
-#include <boost/utility/result_of.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -104,14 +103,5 @@ namespace hpx { namespace util
 #   endif
 
 }} // namespace hpx::util
-
-namespace boost
-{
-    template <typename F>
-    struct result_of<hpx::util::detail::protected_bind<F>()>
-    {
-        typedef typename result_of<F()>::type type;
-    };
-}
 
 #endif

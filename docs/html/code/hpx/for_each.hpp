@@ -38,7 +38,7 @@ namespace hpx {
     template <typename Range, typename F>
     inline std::vector<
         lcos::unique_future<
-            typename boost::result_of<
+            typename util::result_of<
                 F(typename boost::range_value<Range>::type)
             >::type
         >
@@ -46,7 +46,7 @@ namespace hpx {
     for_each(Range const & range, F f)
     {
         typedef typename boost::range_value<Range>::type value_type;
-        typedef typename boost::result_of<F(value_type)>::type result_type;
+        typedef typename util::result_of<F(value_type)>::type result_type;
         typedef lcos::unique_future<result_type> future_type;
         typedef std::vector<future_type> futures_type;
         typedef typename boost::range_iterator<Range const>::type iterator_type;
@@ -60,7 +60,7 @@ namespace hpx {
             std::size_t i = 0;
             BOOST_FOREACH(value_type const & v, range)
             {
-                futures[i] = hpx::async(HPX_STD_BIND(HPX_STD_PROTECT(f), v));
+                futures[i] = hpx::async(HPX_STD_PROTECT(f), v);
                 ++i;
             }
 
@@ -75,20 +75,16 @@ namespace hpx {
 
         lcos::unique_future<futures_type> left_future =
             hpx::async(
-                HPX_STD_BIND(
-                    for_each_impl
-                  , boost::make_iterator_range(begin, mid)
-                  , HPX_STD_PROTECT(f)
-                )
+                  for_each_impl
+                , boost::make_iterator_range(begin, mid)
+                , HPX_STD_PROTECT(f)
             );
 
         lcos::unique_future<futures_type> right_future =
             hpx::async(
-                HPX_STD_BIND(
-                    for_each_impl
-                  , boost::make_iterator_range(mid, end)
-                  , HPX_STD_PROTECT(f)
-                )
+                  for_each_impl
+                , boost::make_iterator_range(mid, end)
+                , HPX_STD_PROTECT(f)
             );
 
         typedef typename futures_type::iterator futures_iterator_type;

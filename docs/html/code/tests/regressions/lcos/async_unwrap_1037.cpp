@@ -16,7 +16,7 @@ hpx::unique_future<int> f(int i)
 {
     if(i == 0)
     {
-        return hpx::async(hpx::util::bind(f, i+1));
+        return hpx::async(f, i+1);
     }
 
     return hpx::make_ready_future(i);

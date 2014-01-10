@@ -15,10 +15,10 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/traits/is_callable.hpp>
 
 #include <boost/utility/enable_if.hpp>
-#include <boost/utility/result_of.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
 #include <boost/preprocessor/enum.hpp>
@@ -30,20 +30,13 @@ namespace hpx { namespace detail
 {
     // Defer the evaluation of result_of during the SFINAE checks below
 #if defined(__clang__)
-    template <typename F, typename Result = typename boost::result_of<F>::type>
+    template <typename F, typename Result = typename util::result_of<F>::type>
     struct create_future
     {
         typedef lcos::unique_future<Result> type;
     };
-#elif _MSC_VER >= 1700
-    // VS2012 has a decent implementation of std::result_of<>
-    template <typename F, typename ResultOf = std::result_of<F> >
-    struct create_future
-    {
-        typedef lcos::unique_future<typename ResultOf::type> type;
-    };
 #else
-    template <typename F, typename ResultOf = boost::result_of<F> >
+    template <typename F, typename ResultOf = util::result_of<F> >
     struct create_future
     {
         typedef lcos::unique_future<typename ResultOf::type> type;
@@ -89,7 +82,7 @@ namespace hpx
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type()
         >::type result_type;
 
@@ -115,7 +108,7 @@ namespace hpx
     >::type
     async(threads::executor& sched, BOOST_FWD_REF(F) f)
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type()
         >::type result_type;
 
@@ -196,19 +189,24 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))
         >::type result_type;
 
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
-            return detail::call_sync(util::deferred_call(boost::forward<F>(f),
-                HPX_ENUM_FORWARD_ARGS(N, A, a)), predicate());
+            return detail::call_sync(
+                util::deferred_call(
+                    boost::forward<F>(f),
+                    HPX_ENUM_FORWARD_ARGS(N, A, a)
+                ), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
-            util::deferred_call(boost::forward<F>(f),
-                HPX_ENUM_FORWARD_ARGS(N, A, a)));
+            util::deferred_call(
+                boost::forward<F>(f),
+                HPX_ENUM_FORWARD_ARGS(N, A, a)
+            ));
         if (detail::has_async_policy(policy))
             p.apply();
         return p.get_future();
@@ -226,14 +224,16 @@ namespace hpx
     async(threads::executor& sched, BOOST_FWD_REF(F) f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        typedef typename boost::result_of<
+        typedef typename util::result_of<
             typename util::decay<F>::type
                 (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))
         >::type result_type;
 
         lcos::local::futures_factory<result_type()> p(sched,
-            util::deferred_call(boost::forward<F>(f),
-                HPX_ENUM_FORWARD_ARGS(N, A, a)));
+            util::deferred_call(
+                boost::forward<F>(f),
+                HPX_ENUM_FORWARD_ARGS(N, A, a)
+            ));
         p.apply();
         return p.get_future();
     }
