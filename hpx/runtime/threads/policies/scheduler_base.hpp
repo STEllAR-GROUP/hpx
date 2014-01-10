@@ -28,7 +28,17 @@ namespace hpx { namespace threads { namespace policies
         virtual threads::mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const = 0;
         virtual std::size_t get_pu_num(std::size_t num_thread) const = 0;
-        virtual std::size_t get_num_stolen_threads(std::size_t num_thread,
+        virtual std::size_t get_num_pending_misses(std::size_t num_thread,
+            bool reset) = 0;
+        virtual std::size_t get_num_pending_accesses(std::size_t num_thread,
+            bool reset) = 0;
+        virtual std::size_t get_num_stolen_from_pending(std::size_t num_thread,
+            bool reset) = 0;
+        virtual std::size_t get_num_stolen_to_pending(std::size_t num_thread,
+            bool reset) = 0;
+        virtual std::size_t get_num_stolen_from_staged(std::size_t num_thread,
+            bool reset) = 0;
+        virtual std::size_t get_num_stolen_to_staged(std::size_t num_thread,
             bool reset) = 0;
         virtual boost::int64_t get_queue_length(
             std::size_t num_thread = std::size_t(-1)) const = 0;

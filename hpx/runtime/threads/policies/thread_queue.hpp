@@ -401,7 +401,12 @@ namespace hpx { namespace threads { namespace policies
             new_tasks_wait_count_(0),
 #endif
             memory_pool_(64),
-            stolen_threads_(0),
+            pending_misses_(0),
+            pending_accesses_(0),
+            stolen_from_pending_(0),
+            stolen_from_staged_(0),
+            stolen_to_pending_(0),
+            stolen_to_staged_(0),
             add_new_logger_("thread_queue::add_new")
         {}
 
@@ -412,21 +417,25 @@ namespace hpx { namespace threads { namespace policies
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
+        // FIXME: RENAME
         boost::int64_t get_queue_length() const
         {
             return work_items_count_ + new_tasks_count_;
         }
 
         // This returns the current length of the work queue
+        // FIXME: RENAME
         boost::int64_t get_work_length() const
         {
             return work_items_count_;
         }
 
         // This returns the current length of the work queue
-        boost::int64_t get_task_length() const
+        // FIXME: RENAME
+        boost::int64_t get_task_length(
+            boost::memory_order order = boost::memory_order_seq_cst) const
         {
-            return new_tasks_count_;
+            return new_tasks_count_.load(order);
         }
 
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
@@ -446,15 +455,64 @@ namespace hpx { namespace threads { namespace policies
             return work_items_wait_ / count;
         }
 #endif
-
-        std::size_t get_num_stolen_threads(bool reset)
+        std::size_t get_num_pending_misses(bool reset)
         {
-            return util::get_and_reset_value(stolen_threads_, reset);
+            return util::get_and_reset_value(pending_misses_, reset);
         }
 
-        void increment_num_stolen_threads(std::size_t num = 1)
+        void increment_num_pending_misses(std::size_t num = 1)
         {
-            stolen_threads_ += num;
+            pending_misses_ += num;
+        }
+
+        std::size_t get_num_pending_accesses(bool reset)
+        {
+            return util::get_and_reset_value(pending_accesses_, reset);
+        }
+
+        void increment_num_pending_accesses(std::size_t num = 1)
+        {
+            pending_accesses_ += num;
+        }
+
+        std::size_t get_num_stolen_from_pending(bool reset)
+        {
+            return util::get_and_reset_value(stolen_from_pending_, reset);
+        }
+
+        void increment_num_stolen_from_pending(std::size_t num = 1)
+        {
+            stolen_from_pending_ += num;
+        }
+
+        std::size_t get_num_stolen_from_staged(bool reset)
+        {
+            return util::get_and_reset_value(stolen_from_staged_, reset);
+        }
+
+        void increment_num_stolen_from_staged(std::size_t num = 1)
+        {
+            stolen_from_staged_ += num;
+        }
+
+        std::size_t get_num_stolen_to_pending(bool reset)
+        {
+            return util::get_and_reset_value(stolen_to_pending_, reset);
+        }
+
+        void increment_num_stolen_to_pending(std::size_t num = 1)
+        {
+            stolen_to_pending_ += num;
+        }
+
+        std::size_t get_num_stolen_to_staged(bool reset)
+        {
+            return util::get_and_reset_value(stolen_to_staged_, reset);
+        }
+
+        void increment_num_stolen_to_staged(std::size_t num = 1)
+        {
+            stolen_to_staged_ += num;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -799,7 +857,15 @@ namespace hpx { namespace threads { namespace policies
         threads::thread_pool memory_pool_;          ///< OS thread local memory pools for
                                                     ///< HPX-threads
 
-        boost::atomic<boost::int64_t> stolen_threads_;        ///< count of threads stolen of this queue
+        // # of times our associated worker-thread couldn't find work in work_items 
+        boost::atomic<boost::int64_t> pending_misses_;  
+        // # of times our associated worker-thread looked for work in work_items 
+        boost::atomic<boost::int64_t> pending_accesses_; 
+
+        boost::atomic<boost::int64_t> stolen_from_pending_; ///< count of work_items stolen from this queue
+        boost::atomic<boost::int64_t> stolen_from_staged_; ///< count of new_tasks stolen from this queue
+        boost::atomic<boost::int64_t> stolen_to_pending_; ///< count of work_items stolen to this queue from other queues
+        boost::atomic<boost::int64_t> stolen_to_staged_; ///< count of new_tasks stolen to this queue from other queues
         util::block_profiler<add_new_tag> add_new_logger_;
     };
 }}}

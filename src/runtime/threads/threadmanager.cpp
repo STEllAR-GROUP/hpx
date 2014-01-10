@@ -1135,12 +1135,57 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "allocator", HPX_COROUTINE_NUM_ALL_HEAPS
             },
-            // /threads{locality#%d/total}/count/stolen
-            // /threads{locality#%d/worker-thread%d}/count/stolen
-            { "count/stolen",
-              HPX_STD_BIND(&spt::get_num_stolen_threads, &scheduler_,
+            // /threads{locality#%d/total}/count/pending-misses
+            // /threads{locality#%d/worker-thread%d}/count/pending-misses
+            { "count/pending-misses",
+              HPX_STD_BIND(&spt::get_num_pending_misses, &scheduler_,
                   std::size_t(-1), _1),
-              HPX_STD_BIND(&spt::get_num_stolen_threads, &scheduler_,
+              HPX_STD_BIND(&spt::get_num_pending_misses, &scheduler_,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/count/pending-accesses
+            // /threads{locality#%d/worker-thread%d}/count/pending-accesses
+            { "count/pending-accesses",
+              HPX_STD_BIND(&spt::get_num_pending_accesses, &scheduler_,
+                  std::size_t(-1), _1),
+              HPX_STD_BIND(&spt::get_num_pending_accesses, &scheduler_,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/count/stolen-from-pending
+            // /threads{locality#%d/worker-thread%d}/count/stolen-from-pending
+            { "count/stolen-from-pending",
+              HPX_STD_BIND(&spt::get_num_stolen_from_pending, &scheduler_,
+                  std::size_t(-1), _1),
+              HPX_STD_BIND(&spt::get_num_stolen_from_pending, &scheduler_,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/count/stolen-from-staged
+            // /threads{locality#%d/worker-thread%d}/count/stolen-from-staged
+            { "count/stolen-from-staged",
+              HPX_STD_BIND(&spt::get_num_stolen_from_staged, &scheduler_,
+                  std::size_t(-1), _1),
+              HPX_STD_BIND(&spt::get_num_stolen_from_staged, &scheduler_,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/count/stolen-to-pending
+            // /threads{locality#%d/worker-thread%d}/count/stolen-to-pending
+            { "count/stolen-to-pending",
+              HPX_STD_BIND(&spt::get_num_stolen_to_pending, &scheduler_,
+                  std::size_t(-1), _1),
+              HPX_STD_BIND(&spt::get_num_stolen_to_pending, &scheduler_,
+                  static_cast<std::size_t>(paths.instanceindex_), _1),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/count/stolen-to-staged
+            // /threads{locality#%d/worker-thread%d}/count/stolen-to-staged
+            { "count/stolen-to-staged",
+              HPX_STD_BIND(&spt::get_num_stolen_to_staged, &scheduler_,
+                  std::size_t(-1), _1),
+              HPX_STD_BIND(&spt::get_num_stolen_to_staged, &scheduler_,
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
@@ -1279,13 +1324,50 @@ namespace hpx { namespace threads
               &locality_allocator_counter_discoverer,
               ""
             },
-            { "/threads/count/stolen", performance_counters::counter_raw,
-              "returns the overall number of HPX-threads stolen from neighboring"
+            { "/threads/count/pending-misses", performance_counters::counter_raw,
+              "returns the number of times that the referenced worker-thread "
+              "on the referenced locality failed to find pending HPX-threads "
+              "in its associated queue",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
+            },
+            { "/threads/count/pending-accesses", performance_counters::counter_raw,
+              "returns the number of times that the referenced worker-thread "
+              "on the referenced locality looked for pending HPX-threads "
+              "in its associated queue",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
+            },
+            { "/threads/count/stolen-from-pending", performance_counters::counter_raw,
+              "returns the overall number of pending HPX-threads stolen by neighboring"
+              "schedulers from this scheduler for the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
+            },
+            { "/threads/count/stolen-from-staged", performance_counters::counter_raw,
+              "returns the overall number of task descriptions stolen by neighboring"
+              "schedulers from this scheduler for the referenced locality",
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
+            },
+            { "/threads/count/stolen-to-pending", performance_counters::counter_raw,
+              "returns the overall number of pending HPX-threads stolen from neighboring"
               "schedulers for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
               counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
               ""
             },
+            { "/threads/count/stolen-to-staged", performance_counters::counter_raw,
+              "returns the overall number of task descriptions stolen from neighboring"
+              "schedulers for the referenced locality", HPX_PERFORMANCE_COUNTER_V1,
+              counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              ""
+            }
         };
         performance_counters::install_counter_types(
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
@@ -1349,6 +1431,7 @@ namespace hpx { namespace threads
             topology const& topology_ = get_topology();
 
             std::size_t thread_num = num_threads;
+
             while (thread_num-- != 0) {
                 threads::mask_cref_type mask = get_pu_mask(topology_, thread_num);
 
@@ -1362,7 +1445,8 @@ namespace hpx { namespace threads
 
                 // create a new thread
                 threads_.push_back(new boost::thread(boost::bind(
-                    &threadmanager_impl::tfunc, this, thread_num, boost::ref(topology_))));
+                    &threadmanager_impl::tfunc, this, thread_num,
+                        boost::ref(topology_))));
 
                 // set the new threads affinity (on Windows systems)
                 error_code ec(lightweight);
