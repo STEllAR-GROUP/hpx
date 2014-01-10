@@ -12,6 +12,7 @@ set(tests
     thread_mf
     thread_stacksize
     thread_suspension_executor
+    lockfree_fifo
    )
 
 set(thread_affinity_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -27,6 +28,8 @@ set(thread_launching_PARAMETERS THREADS_PER_LOCALITY 4)
 set(thread_mf_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(thread_stacksize_PARAMETERS LOCALITIES 2)
+  
+set(lockfree_fifo_FLAGS NOLIBS DEPENDENCIES ${BOOST_FOUND_LIBRARIES})
 
 foreach(test ${tests})
   set(sources
