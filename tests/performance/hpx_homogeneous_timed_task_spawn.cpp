@@ -21,6 +21,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 #include "worker_timed.hpp"
 
@@ -56,33 +58,47 @@ boost::uint64_t delay = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
+std::string format_build_date(std::string timestamp)
+{
+    boost::gregorian::date d = boost::gregorian::from_us_string(timestamp);
+
+    char const* fmt = "%02i-%02i-%04i";
+
+    return boost::str(boost::format(fmt)
+                     % d.month().as_number() % d.day() % d.year());
+}
+
 void print_results(
     boost::uint64_t cores
   , double walltime
-  , std::vector<std::string> const& counters
+  , std::vector<std::string> const& counter_shortnames
   , boost::shared_ptr<hpx::util::activate_counters> ac 
     )
 {
     if (header)
     {
-        cout << "# VERSION: " << HPX_GIT_COMMIT << " " << __DATE__ << "\n"
+        cout << "# VERSION: " << HPX_GIT_COMMIT << " "
+             << format_build_date(__DATE__) << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to
         // change the constant that we add when printing out the field # for
         // performance counters below (e.g. the last_index part).
         cout <<
-                "## 0: Delay [micro-seconds] - Independent Variable\n"
-                "## 1: Tasks - Independent Variable\n"
-                "## 2: OS-threads - Independent Variable\n"
-                "## 3: Total Walltime [seconds]\n"
+                "## 0:DELAY:Delay [micro-seconds] - Independent Variable\n"
+                "## 1:TASKS:Tasks - Independent Variable\n"
+                "## 2:OSTHRDS:OS-threads - Independent Variable\n"
+                "## 3:WTIME:Total Walltime [seconds]\n"
                 ;
 
         boost::uint64_t const last_index = 3;
 
-        for (boost::uint64_t i = 0; i < counters.size(); ++i)
+        for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
         {
-            cout << "## " << (i + 1 + last_index) << ": " << ac->name(i);
+            cout << "## "
+                 << (i + 1 + last_index) << ":"
+                 << counter_shortnames[i] << ":"
+                 << ac->name(i);
 
             if (!ac->unit_of_measure(i).empty())
                 cout << " [" << ac->unit_of_measure(i) << "]";
@@ -106,7 +122,7 @@ void print_results(
         hpx::util::activate_counters::counter_values_type values
             = ac->evaluate_counters();
 
-        for (boost::uint64_t i = 0; i < counters.size(); ++i)
+        for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
             cout << ( boost::format(" %.14g")
                     % values[i].get().get_value<double>());
     }
@@ -123,24 +139,14 @@ int invoke_worker_timed(double delay_sec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/*
 void blocker(
-    boost::condition& entered_cond
-  , boost::mutex& entered_mut
-  , bool entered 
+    boost::barrier& entered
+  , boost::barrier& started
     )
 {
-    cout << "entered on " << hpx::get_worker_thread_num() << "\n" << flush;
-
-    {
-        boost::mutex::scoped_lock lock(mut);
-        ready = true;
-        cond.notify_all();
-    }
-
-    //block.wait();
+    entered.wait();
+    started.wait();
 }
-*/
 
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_tasks(hpx::lcos::local::barrier& finished)
@@ -157,6 +163,14 @@ void wait_for_tasks(hpx::lcos::local::barrier& finished)
         finished.wait();
 }
 
+void spawn_workers(boost::uint64_t local_tasks)
+{
+    for (boost::uint64_t i = 0; i < local_tasks; ++i)
+        register_work(boost::bind(&invoke_worker_timed
+                                , double(delay) * 1e-6)
+          , "invoke_worker_timed");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
@@ -166,9 +180,26 @@ int hpx_main(
         if (vm.count("no-header"))
             header = false;
 
+        std::vector<std::string> counter_shortnames;
         std::vector<std::string> counters;
         if (vm.count("counter"))
-            counters = vm["counter"].as<std::vector<std::string> >();
+        {
+            std::vector<std::string> raw_counters =
+                vm["counter"].as<std::vector<std::string> >();
+
+            for (boost::uint64_t i = 0; i < raw_counters.size(); ++i)
+            {
+                std::vector<std::string> entry;
+                boost::algorithm::split(entry, raw_counters[i],
+                    boost::algorithm::is_any_of(","),
+                    boost::algorithm::token_compress_on);
+
+                HPX_ASSERT(entry.size() == 2);
+
+                counter_shortnames.push_back(entry[0]);
+                counters.push_back(entry[1]);
+            }
+        }
 
         if (0 == tasks)
             throw std::invalid_argument("count of 0 tasks specified\n");
@@ -180,46 +211,39 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Block all other OS threads.
 /*
+        boost::barrier entered(get_os_thread_count());
+        boost::barrier started(get_os_thread_count());
+
         for (boost::uint64_t i = 0; i < (get_os_thread_count() - 1); ++i)
         {
-            cout << "spawning " << i << " on " << hpx::get_worker_thread_num() << "\n" << flush;
-            boost::condition entered_cond;
-            boost::mutex entered_mut;
-            bool entered = false;
-
-            register_thread_nullary(
-                boost::bind(&blocker
-                          , boost::ref(entered_cond)
-                          , boost::ref(entered_mut)
-                          , boost::ref(entered)
-                           ),
-                "blocker", hpx::threads::pending, true,
-                hpx::threads::thread_priority_normal,
-                i + 1);
-
-            {
-                boost::mutex::scoped_lock lock(entered_mut);
-                if (!entered)
-                    entered_cond.wait(lock);
-            }
-
-            cout << "spawned " << i << " on " << hpx::get_worker_thread_num() << "\n" << flush;
+            register_work(boost::bind(
+                &blocker, boost::ref(entered), boost::ref(started)));
         }
+
+        entered.wait();
 */
 
         ///////////////////////////////////////////////////////////////////////
+        // Start the clock.
+//        for (boost::uint64_t i = 0; i < tasks; ++i)
+//            register_work(boost::bind(&invoke_worker_timed
+//                                    , double(delay) * 1e-6)
+//              , "invoke_worker_timed");
+
+        high_resolution_timer t;
+
         if (ac)
             ac->reset_counters();
 
-        // Start the clock.
-        high_resolution_timer t;
+        for (boost::uint64_t i = 0; i < (get_os_thread_count() - 1); ++i)
+            register_work(boost::bind(&spawn_workers
+//                                    , tasks / get_os_thread_count())
+                                    , tasks)
+                , "spawn_workers");
 
-        for (boost::uint64_t i = 0; i < tasks; ++i)
-            register_work(boost::bind(&invoke_worker_timed
-                                    , double(delay) * 1e-6)
-              , "invoke_worker_timed");
+        spawn_workers(tasks);
 
-//        block.wait();
+//        started.wait();
 
         // Schedule a low-priority thread; when it is executed, it checks to
         // make sure all the tasks (which are normal priority) have been 
@@ -235,7 +259,8 @@ int hpx_main(
         // Stop the clock
         double time_elapsed = t.elapsed();
 
-        print_results(get_os_thread_count(), time_elapsed, counters, ac);
+        print_results(
+            get_os_thread_count(), time_elapsed, counter_shortnames, ac);
     }
 
     return finalize();
