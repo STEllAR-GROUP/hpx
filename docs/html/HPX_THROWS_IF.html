@@ -26,15 +26,15 @@
 
 </span>HPX_THROWS_IF(ec, errcode, f, msg)</pre></div>
 <div class="refsect1">
-<a name="idp16740528"></a><h2>Description</h2>
+<a name="idp17485296"></a><h2>Description</h2>
 <p>The macro <span class="emphasis"><em>HPX_THROWS_IF</em></span> can be used to either throw a <span class="emphasis"><em><a class="link" href="hpx/exception.html" title="Class exception">hpx::exception</a></em></span> or to initialize a <span class="emphasis"><em><a class="link" href="hpx/error_code.html" title="Class error_code">hpx::error_code</a></em></span> from the given parameters. If &amp;ec == &amp;hpx::throws, the semantics of this macro are equivalent to <span class="emphasis"><em>HPX_THROW_EXCEPTION</em></span>. If &amp;ec != &amp;hpx::throws, the <span class="emphasis"><em><a class="link" href="hpx/error_code.html" title="Class error_code">hpx::error_code</a></em></span> instance <code class="computeroutput">ec</code> is initialized instead.</p>
 <p>The parameter <code class="computeroutput">errcode</code> holds the hpx::error code from which the new exception should be initialized. The parameter <code class="computeroutput">f</code> is expected to hold the name of the function exception is thrown from and the parameter <code class="computeroutput">msg</code> holds the error message the new exception should encapsulate. </p>
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2013 The STE||AR Group,
-      Louisiana State University<p>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2014 The
+      STE||AR Group, Louisiana State University<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
         or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
