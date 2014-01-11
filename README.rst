@@ -302,7 +302,7 @@ So far we only support BGClang for compiling HPX on the BlueGene/Q.
    You can then use this as your build command::
 
       $ ./bootstrap.sh
-      $ ./b2 --build-dir=/tmp/build-boost --layout=versioned -j12
+      $ ./b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang -j12
 
 4) Clone the master HPX git repository (or a stable tag)::
 
