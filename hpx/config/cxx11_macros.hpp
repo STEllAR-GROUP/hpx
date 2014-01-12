@@ -292,4 +292,25 @@
 #endif
 //  ------------------ End of macros introduced at 1.54 ----------------------
 
+//  -------------------- Macros introduced at 1.55 ---------------------------
+#if BOOST_VERSION < 105500
+
+//  Define BOOST_NO_CXX11_ALIGNAS fallback
+#if !defined(BOOST_NO_CXX11_ALIGNAS)
+#  define BOOST_NO_CXX11_ALIGNAS
+#endif
+
+//  Define BOOST_NO_CXX11_INLINE_NAMESPACES fallback
+#if !defined(BOOST_NO_CXX11_INLINE_NAMESPACES)
+#  define BOOST_NO_CXX11_INLINE_NAMESPACES
+#endif
+
+//  Define BOOST_NO_CXX11_TRAILING_RESULT_TYPES fallback
+#if !defined(BOOST_NO_CXX11_TRAILING_RESULT_TYPES)
+#  define BOOST_NO_CXX11_TRAILING_RESULT_TYPES
+#endif
+
+#endif
+//  ------------------ End of macros introduced at 1.55 ----------------------
+
 #endif
