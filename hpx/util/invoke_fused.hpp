@@ -164,8 +164,7 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)> >::value == N
       , R
     >::type
-    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)>))) args)
+    invoke_fused_r(F && f, util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)>&& args)
     {
         return
             invoke_r<R>(std::forward<F>(f)
@@ -196,8 +195,7 @@ namespace hpx { namespace util
             F(BOOST_PP_ENUM_PARAMS(N, Arg))
         >::type
     >::type
-    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)>))) args)
+    invoke_fused(F && f, util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)>&& args)
     {
         return
             invoke(std::forward<F>(f)

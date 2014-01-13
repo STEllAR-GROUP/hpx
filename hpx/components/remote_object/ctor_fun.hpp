@@ -138,9 +138,6 @@ namespace hpx { namespace components { namespace remote_object
         }
 
         BOOST_PP_REPEAT(N, HPX_REMOTE_OBJECT_M2, _)
-
-    private:
-        (ctor_fun);
     };
 
 #undef N

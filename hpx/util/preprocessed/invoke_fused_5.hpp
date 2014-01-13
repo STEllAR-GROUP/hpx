@@ -43,8 +43,7 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0> >::value == 1
       , R
     >::type
-    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0>))) args)
+    invoke_fused_r(F && f, util::tuple<Arg0>&& args)
     {
         return
             invoke_r<R>(std::forward<F>(f)
@@ -73,8 +72,7 @@ namespace hpx { namespace util
             F(Arg0)
         >::type
     >::type
-    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0>))) args)
+    invoke_fused(F && f, util::tuple<Arg0>&& args)
     {
         return
             invoke(std::forward<F>(f)
@@ -116,8 +114,7 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1> >::value == 2
       , R
     >::type
-    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1>))) args)
+    invoke_fused_r(F && f, util::tuple<Arg0 , Arg1>&& args)
     {
         return
             invoke_r<R>(std::forward<F>(f)
@@ -146,8 +143,7 @@ namespace hpx { namespace util
             F(Arg0 , Arg1)
         >::type
     >::type
-    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1>))) args)
+    invoke_fused(F && f, util::tuple<Arg0 , Arg1>&& args)
     {
         return
             invoke(std::forward<F>(f)
@@ -189,8 +185,7 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2> >::value == 3
       , R
     >::type
-    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2>))) args)
+    invoke_fused_r(F && f, util::tuple<Arg0 , Arg1 , Arg2>&& args)
     {
         return
             invoke_r<R>(std::forward<F>(f)
@@ -219,8 +214,7 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2)
         >::type
     >::type
-    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2>))) args)
+    invoke_fused(F && f, util::tuple<Arg0 , Arg1 , Arg2>&& args)
     {
         return
             invoke(std::forward<F>(f)
@@ -262,8 +256,7 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3> >::value == 4
       , R
     >::type
-    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2 , Arg3>))) args)
+    invoke_fused_r(F && f, util::tuple<Arg0 , Arg1 , Arg2 , Arg3>&& args)
     {
         return
             invoke_r<R>(std::forward<F>(f)
@@ -292,8 +285,7 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3)
         >::type
     >::type
-    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2 , Arg3>))) args)
+    invoke_fused(F && f, util::tuple<Arg0 , Arg1 , Arg2 , Arg3>&& args)
     {
         return
             invoke(std::forward<F>(f)
@@ -335,8 +327,7 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> >::value == 5
       , R
     >::type
-    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>))) args)
+    invoke_fused_r(F && f, util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>&& args)
     {
         return
             invoke_r<R>(std::forward<F>(f)
@@ -365,8 +356,7 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4)
         >::type
     >::type
-    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>))) args)
+    invoke_fused(F && f, util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>&& args)
     {
         return
             invoke(std::forward<F>(f)
@@ -408,8 +398,7 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> >::value == 6
       , R
     >::type
-    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>))) args)
+    invoke_fused_r(F && f, util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>&& args)
     {
         return
             invoke_r<R>(std::forward<F>(f)
@@ -438,8 +427,7 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5)
         >::type
     >::type
-    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>))) args)
+    invoke_fused(F && f, util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>&& args)
     {
         return
             invoke(std::forward<F>(f)
@@ -481,8 +469,7 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> >::value == 7
       , R
     >::type
-    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>))) args)
+    invoke_fused_r(F && f, util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>&& args)
     {
         return
             invoke_r<R>(std::forward<F>(f)
@@ -511,8 +498,7 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6)
         >::type
     >::type
-    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>))) args)
+    invoke_fused(F && f, util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>&& args)
     {
         return
             invoke(std::forward<F>(f)
@@ -554,8 +540,7 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> >::value == 8
       , R
     >::type
-    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>))) args)
+    invoke_fused_r(F && f, util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>&& args)
     {
         return
             invoke_r<R>(std::forward<F>(f)
@@ -584,8 +569,7 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7)
         >::type
     >::type
-    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>))) args)
+    invoke_fused(F && f, util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>&& args)
     {
         return
             invoke(std::forward<F>(f)

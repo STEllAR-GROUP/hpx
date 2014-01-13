@@ -935,8 +935,6 @@ namespace hpx { namespace util
     class tuple
 #   endif
     {
-        (tuple);
-
     public: // exposition-only
 #       define HPX_UTIL_TUPLE_MEMBER(Z, N, D)                                 \
         detail::tuple_member<BOOST_PP_CAT(T, N)> BOOST_PP_CAT(_m, N);         \

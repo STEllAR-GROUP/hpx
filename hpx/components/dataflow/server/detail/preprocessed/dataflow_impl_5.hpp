@@ -117,7 +117,7 @@
         
         
         
-        void set_value(remote_result &&  r)
+        void set_value(remote_result && r)
         {
             remote_result tmp(r);
             result.set(std::move(r));
@@ -327,7 +327,7 @@
         
         
         
-        void set_value(remote_result &&  r)
+        void set_value(remote_result && r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
@@ -629,7 +629,7 @@
         
         
         
-        void set_value(remote_result &&  r)
+        void set_value(remote_result && r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
@@ -931,7 +931,7 @@
         
         
         
-        void set_value(remote_result &&  r)
+        void set_value(remote_result && r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
@@ -1233,7 +1233,7 @@
         
         
         
-        void set_value(remote_result &&  r)
+        void set_value(remote_result && r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
@@ -1535,7 +1535,7 @@
         
         
         
-        void set_value(remote_result &&  r)
+        void set_value(remote_result && r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
