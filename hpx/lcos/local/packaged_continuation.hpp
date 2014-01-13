@@ -17,7 +17,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/type_traits/remove_reference.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail
@@ -27,7 +27,7 @@ namespace hpx { namespace lcos { namespace detail
         boost::mpl::false_)
     {
         try {
-            dest.set_data(func(boost::move(future)));
+            dest.set_data(func(std::move(future)));
         }
         catch (...) {
             dest.set_exception(boost::current_exception());
@@ -39,7 +39,7 @@ namespace hpx { namespace lcos { namespace detail
         boost::mpl::true_)
     {
         try {
-            func(boost::move(future));
+            func(std::move(future));
             dest.set_data(util::unused);
         }
         catch (...) {
@@ -96,9 +96,9 @@ namespace hpx { namespace lcos { namespace detail
 
     public:
         template <typename Func>
-        continuation(BOOST_FWD_REF(Func) f)
+        continuation(Func && f)
           : started_(false), id_(threads::invalid_thread_id)
-          , f_(boost::forward<Func>(f))
+          , f_(std::forward<Func>(f))
         {}
 
         void run_impl(typename shared_state_ptr_for<Future>::type const& f)
@@ -162,7 +162,7 @@ namespace hpx { namespace lcos { namespace detail
             ) = &continuation::async_impl;
 
             applier::register_thread_plain(
-                HPX_STD_BIND(async_impl_ptr, boost::move(this_), f),
+                HPX_STD_BIND(async_impl_ptr, std::move(this_), f),
                 "continuation::async");
 
             if (&ec != &throws)
@@ -189,7 +189,7 @@ namespace hpx { namespace lcos { namespace detail
             ) = &continuation::async_impl;
 
             sched.add(
-                HPX_STD_BIND(async_impl_ptr, boost::move(this_), f),
+                HPX_STD_BIND(async_impl_ptr, std::move(this_), f),
                 "continuation::async");
 
             if (&ec != &throws)
@@ -277,7 +277,7 @@ namespace hpx { namespace lcos { namespace detail
 
             shared_state_ptr const& state =
                 future_access::get_shared_state(future);
-            state->set_on_completed(util::bind(cb, boost::move(this_), state));
+            state->set_on_completed(util::bind(cb, std::move(this_), state));
         }
 
         void attach(Future& future, threads::executor& sched)
@@ -294,7 +294,7 @@ namespace hpx { namespace lcos { namespace detail
 
             shared_state_ptr const& state =
                 future_access::get_shared_state(future);
-            state->set_on_completed(util::bind(cb, boost::move(this_), state, boost::ref(sched)));
+            state->set_on_completed(util::bind(cb, std::move(this_), state, boost::ref(sched)));
         }
 
     protected:
@@ -307,29 +307,29 @@ namespace hpx { namespace lcos { namespace detail
     template <typename ContResult, typename Future, typename F>
     inline typename shared_state_ptr<ContResult>::type
     make_continuation(Future& future, BOOST_SCOPED_ENUM(launch) policy,
-        BOOST_FWD_REF(F) f)
+        F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
 
         // create a continuation
         typename shared_state_ptr<ContResult>::type p(
-            new shared_state(boost::forward<F>(f)));
+            new shared_state(std::forward<F>(f)));
         static_cast<shared_state*>(p.get())->attach(future, policy);
-        return boost::move(p);
+        return std::move(p);
     }
 
     template <typename ContResult, typename Future, typename F>
     inline typename shared_state_ptr<ContResult>::type
     make_continuation(Future& future, threads::executor& sched,
-        BOOST_FWD_REF(F) f)
+        F && f)
     {
         typedef detail::continuation<Future, F, ContResult> shared_state;
 
         // create a continuation
         typename shared_state_ptr<ContResult>::type p(
-            new shared_state(boost::forward<F>(f)));
+            new shared_state(std::forward<F>(f)));
         static_cast<shared_state*>(p.get())->attach(future, sched);
-        return boost::move(p);
+        return std::move(p);
     }
 }}}
 
@@ -342,15 +342,15 @@ namespace hpx { namespace lcos
     template <typename Result>
     template <typename F>
     inline typename detail::future_then_result<future<Result>, F>::type
-    future<Result>::then(BOOST_FWD_REF(F) f)
+    future<Result>::then(F && f)
     {
-        return then(launch::all, boost::forward<F>(f));
+        return then(launch::all, std::forward<F>(f));
     }
 
     template <typename Result>
     template <typename F>
     inline typename detail::future_then_result<future<Result>, F>::type
-    future<Result>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
+    future<Result>::then(BOOST_SCOPED_ENUM(launch) policy, F && f)
     {
         typedef typename util::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
@@ -363,14 +363,14 @@ namespace hpx { namespace lcos
 
         boost::intrusive_ptr<future_data_type> p =
             detail::make_continuation<result_type>(
-                *this, policy, boost::forward<F>(f));
-        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
+                *this, policy, std::forward<F>(f));
+        return lcos::detail::make_future_from_data<result_type>(std::move(p));
     }
 
     template <typename Result>
     template <typename F>
     inline typename detail::future_then_result<future<Result>, F>::type
-    future<Result>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
+    future<Result>::then(threads::executor& sched, F && f)
     {
         typedef typename util::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
@@ -383,21 +383,21 @@ namespace hpx { namespace lcos
 
         boost::intrusive_ptr<future_data_type> p =
             detail::make_continuation<result_type>(
-                *this, sched, boost::forward<F>(f));
-        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
+                *this, sched, std::forward<F>(f));
+        return lcos::detail::make_future_from_data<result_type>(std::move(p));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
     inline typename detail::future_then_result<future<void>, F>::type
-    future<void>::then(BOOST_FWD_REF(F) f)
+    future<void>::then(F && f)
     {
-        return then(launch::all, boost::forward<F>(f));
+        return then(launch::all, std::forward<F>(f));
     }
 
     template <typename F>
     inline typename detail::future_then_result<future<void>, F>::type
-    future<void>::then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
+    future<void>::then(BOOST_SCOPED_ENUM(launch) policy, F && f)
     {
         typedef typename util::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
@@ -410,13 +410,13 @@ namespace hpx { namespace lcos
 
         boost::intrusive_ptr<future_data_type> p =
             detail::make_continuation<result_type>(
-                *this, policy, boost::forward<F>(f));
-        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
+                *this, policy, std::forward<F>(f));
+        return lcos::detail::make_future_from_data<result_type>(std::move(p));
     }
 
     template <typename F>
     inline typename detail::future_then_result<future<void>, F>::type
-    future<void>::then(threads::executor& sched, BOOST_FWD_REF(F) f)
+    future<void>::then(threads::executor& sched, F && f)
     {
         typedef typename util::result_of<F(future)>::type result_type;
         typedef lcos::detail::future_data<result_type> future_data_type;
@@ -429,8 +429,8 @@ namespace hpx { namespace lcos
 
         boost::intrusive_ptr<future_data_type> p =
             detail::make_continuation<result_type>(
-                *this, sched, boost::forward<F>(f));
-        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
+                *this, sched, std::forward<F>(f));
+        return lcos::detail::make_future_from_data<result_type>(std::move(p));
     }
 
 }}
@@ -505,7 +505,7 @@ namespace hpx { namespace lcos { namespace detail
                 inner_shared_state_ptr inner_state =
                     future_access::get_shared_state(outer.get());
                 inner_state->set_on_completed(
-                    util::bind(inner_ready, boost::move(this_), inner_state));
+                    util::bind(inner_ready, std::move(this_), inner_state));
             }
             catch (...) {
                 this->set_exception(boost::current_exception());
@@ -530,7 +530,7 @@ namespace hpx { namespace lcos { namespace detail
             outer_shared_state_ptr const& outer_state =
                 future_access::get_shared_state(future);
             outer_state->set_on_completed(
-                util::bind(outer_ready, boost::move(this_), outer_state));
+                util::bind(outer_ready, std::move(this_), outer_state));
         }
     };
 
@@ -545,7 +545,7 @@ namespace hpx { namespace lcos { namespace detail
         // create a continuation
         typename shared_state_ptr<result_type>::type p(new shared_state());
         static_cast<shared_state*>(p.get())->attach(future);
-        return boost::move(p);
+        return std::move(p);
     }
 }}}
 
@@ -571,7 +571,7 @@ namespace hpx { namespace lcos
         }
 
         boost::intrusive_ptr<future_data_type> p = detail::unwrap(*this, ec);
-        return lcos::detail::make_future_from_data<result_type>(boost::move(p));
+        return lcos::detail::make_future_from_data<result_type>(std::move(p));
     }
 }}
 #endif

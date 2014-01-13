@@ -215,19 +215,19 @@ namespace hpx { namespace lcos { namespace detail
         // helper functions for setting data (if successful) or the error (if
         // non-successful)
         template <typename T>
-        void set_local_data(BOOST_FWD_REF(T) result)
+        void set_local_data(T && result)
         {
-            return this->set_data(boost::forward<result_type>(result));
+            return this->set_data(std::forward<result_type>(result));
         }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         // trigger the future, set the result
-        void set_value (BOOST_RV_REF(RemoteResult) result)
+        void set_value (RemoteResult && result)
         {
             // set the received result, reset error status
-            this->set_data(boost::move(result));
+            this->set_data(std::move(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
@@ -311,19 +311,19 @@ namespace hpx { namespace lcos { namespace detail
         // helper functions for setting data (if successful) or the error (if
         // non-successful)
         template <typename T>
-        void set_local_data(BOOST_FWD_REF(T) result)
+        void set_local_data(T && result)
         {
-            return set_data(boost::forward<result_type>(result));
+            return set_data(std::forward<result_type>(result));
         }
 
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
         // trigger the future, set the result
-        void set_value (BOOST_RV_REF(util::unused_type) result)
+        void set_value (util::unused_type && result)
         {
             // set the received result, reset error status
-            set_data(boost::move(result));
+            set_data(std::move(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
@@ -536,9 +536,9 @@ namespace hpx { namespace lcos
 
         ///
         template <typename T>
-        void set_value(BOOST_FWD_REF(T) result)
+        void set_value(T && result)
         {
-            (*impl_)->set_data(boost::forward<T>(result));
+            (*impl_)->set_data(std::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
@@ -547,9 +547,9 @@ namespace hpx { namespace lcos
         }
 
         template <typename T>
-        void set_local_data(BOOST_FWD_REF(T) result)
+        void set_local_data(T && result)
         {
-            (*impl_)->set_local_data(boost::forward<Result>(result));
+            (*impl_)->set_local_data(std::forward<Result>(result));
         }
 
     protected:

@@ -16,7 +16,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/future.hpp>
 
-#include <boost/move/move.hpp>
+#include <utility>
 #include <boost/utility/enable_if.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
@@ -55,9 +55,6 @@ namespace hpx { namespace components
     template <typename Derived, typename Stub>
     class client_base : public detail::make_stub<Stub>::type
     {
-    private:
-        BOOST_COPYABLE_AND_MOVABLE(client_base);
-
     protected:
         typedef typename detail::make_stub<Stub>::type stub_type;
         typedef shared_future<naming::id_type> future_type;
@@ -73,57 +70,57 @@ namespace hpx { namespace components
         explicit client_base(naming::id_type const& gid)
           : gid_(lcos::make_ready_future(gid))
         {}
-        explicit client_base(BOOST_RV_REF(naming::id_type) gid)
-          : gid_(lcos::make_ready_future(boost::move(gid)))
+        explicit client_base(naming::id_type && gid)
+          : gid_(lcos::make_ready_future(std::move(gid)))
         {}
 
         explicit client_base(future_type const& gid)
           : gid_(gid)
         {}
-        explicit client_base(BOOST_RV_REF(future_type) gid)
-          : gid_(boost::move(gid))
+        explicit client_base(future_type && gid)
+          : gid_(std::move(gid))
         {}
 
         explicit client_base(client_base const& rhs)
           : gid_(rhs.gid_)
         {}
-        explicit client_base(BOOST_RV_REF(client_base) rhs)
-          : gid_(boost::move(rhs.gid_))
+        explicit client_base(client_base && rhs)
+          : gid_(std::move(rhs.gid_))
         {}
 
         // copy assignment and move assignment
-        client_base& operator=(BOOST_COPY_ASSIGN_REF(naming::id_type) gid)
+        client_base& operator=(naming::id_type const & gid)
         {
             gid_ = lcos::make_ready_future(gid);
             return *this;
         }
-        client_base& operator=(BOOST_RV_REF(naming::id_type) gid)
+        client_base& operator=(naming::id_type && gid)
         {
-            gid_ = lcos::make_ready_future(boost::move(gid));
+            gid_ = lcos::make_ready_future(std::move(gid));
             return *this;
         }
 
-        client_base& operator=(BOOST_COPY_ASSIGN_REF(future_type) gid)
+        client_base& operator=(future_type const & gid)
         {
             gid_ = gid;
             return *this;
         }
-        client_base& operator=(BOOST_RV_REF(future_type) gid)
+        client_base& operator=(future_type && gid)
         {
-            gid_ = boost::move(gid);
+            gid_ = std::move(gid);
             return *this;
         }
 
-        client_base& operator=(BOOST_COPY_ASSIGN_REF(client_base) rhs)
+        client_base& operator=(client_base const & rhs)
         {
             if (this != &rhs)
                 gid_ = rhs.gid_;
             return *this;
         }
-        client_base& operator=(BOOST_RV_REF(client_base) rhs)
+        client_base& operator=(client_base && rhs)
         {
             if (this != &rhs)
-                gid_ = boost::move(rhs.gid_);
+                gid_ = std::move(rhs.gid_);
             return *this;
         }
 

@@ -51,13 +51,13 @@ namespace hpx { namespace util
         bool
         bind_action_apply(
             BoundArgs& bound_args
-          , BOOST_FWD_REF(UnboundArgs) unbound_args
+          , UnboundArgs && unbound_args
         )
         {
             return
                 bind_action_apply_impl<Action, BoundArgs, UnboundArgs>::call(
                     bound_args
-                  , boost::forward<UnboundArgs>(unbound_args)
+                  , std::forward<UnboundArgs>(unbound_args)
                 );
         }
 
@@ -77,13 +77,13 @@ namespace hpx { namespace util
         >
         bind_action_async(
             BoundArgs& bound_args
-          , BOOST_FWD_REF(UnboundArgs) unbound_args
+          , UnboundArgs && unbound_args
         )
         {
             return
                 bind_action_async_impl<Action, BoundArgs, UnboundArgs>::call(
                     bound_args
-                  , boost::forward<UnboundArgs>(unbound_args)
+                  , std::forward<UnboundArgs>(unbound_args)
                 );
         }
 
@@ -95,13 +95,13 @@ namespace hpx { namespace util
         >::type
         bind_action_invoke(
             BoundArgs& bound_args
-          , BOOST_FWD_REF(UnboundArgs) unbound_args
+          , UnboundArgs && unbound_args
         )
         {
             return
                 bind_action_async_impl<Action, BoundArgs, UnboundArgs>::call(
                     bound_args
-                  , boost::forward<UnboundArgs>(unbound_args)
+                  , std::forward<UnboundArgs>(unbound_args)
                 ).get();
         }
 
@@ -109,8 +109,6 @@ namespace hpx { namespace util
         template <typename Action, typename BoundArgs>
         class bound_action
         {
-            BOOST_COPYABLE_AND_MOVABLE(bound_action);
-            
         public:
             typedef
                 typename traits::promise_local_result<
@@ -126,15 +124,15 @@ namespace hpx { namespace util
             template <typename BoundArgs_>
             explicit bound_action(
                 Action /*action*/
-              , BOOST_FWD_REF(BoundArgs_) bound_args
-            ) : _bound_args(boost::forward<BoundArgs_>(bound_args))
+              , BoundArgs_ && bound_args
+            ) : _bound_args(std::forward<BoundArgs_>(bound_args))
             {}
 
             bound_action(bound_action const& other)
               : _bound_args(other._bound_args)
             {}
-            bound_action(BOOST_RV_REF(bound_action) other)
-              : _bound_args(boost::move(other._bound_args))
+            bound_action(bound_action && other)
+              : _bound_args(std::move(other._bound_args))
             {}
 
             // bring in the definition for all overloads for apply, async, operator()
@@ -271,7 +269,7 @@ namespace hpx { namespace util
 #       define HPX_UTIL_BIND_EVAL(Z, N, D)                                    \
         detail::bind_eval<Action>(                                            \
             util::get<N>(bound_args)                                          \
-          , boost::forward<UnboundArgs>(unbound_args)                         \
+          , std::forward<UnboundArgs>(unbound_args)                         \
         )                                                                     \
         /**/
         template <typename Action, typename BoundArgs, typename UnboundArgs>
@@ -287,7 +285,7 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
                 return
@@ -316,7 +314,7 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
                 return

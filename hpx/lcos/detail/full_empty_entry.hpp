@@ -134,8 +134,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename T0>
-        explicit full_empty_entry(BOOST_FWD_REF(T0) t0)
-          : data_(boost::forward<T0>(t0)), state_(empty)
+        explicit full_empty_entry(T0 && t0)
+          : data_(std::forward<T0>(t0)), state_(empty)
         {
             ++full_empty_counter_data_.constructed_;
         }
@@ -284,7 +284,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // move the data to the destination
-            dest = boost::move(data_);
+            dest = std::move(data_);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -324,7 +324,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // move the data to the destination
-            dest = boost::move(data_);
+            dest = std::move(data_);
 
             set_empty_locked(ec);   // state_ = empty;
             if (ec) return;
@@ -368,7 +368,7 @@ namespace hpx { namespace lcos { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
         template <typename T>
-        void enqueue_if_full(BOOST_FWD_REF(T) src, error_code& ec = throws)
+        void enqueue_if_full(T && src, error_code& ec = throws)
         {
             typename mutex_type::scoped_lock l(mtx_);
 
@@ -393,7 +393,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // set the data
-            data_ = boost::forward<T>(src);
+            data_ = std::forward<T>(src);
 
             // make sure the entry is full
             set_full_locked(ec);    // state_ = full
@@ -439,12 +439,12 @@ namespace hpx { namespace lcos { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // unconditionally set the data and set the entry to full
         template <typename T>
-        void set_and_fill(BOOST_FWD_REF(T) src, error_code& ec = throws)
+        void set_and_fill(T && src, error_code& ec = throws)
         {
             typename mutex_type::scoped_lock l(mtx_);
 
             // set the data
-            data_ = boost::forward<T>(src);
+            data_ = std::forward<T>(src);
 
             // make sure the entry is full
             set_full_locked(ec);    // state_ = full
@@ -623,8 +623,8 @@ namespace hpx { namespace lcos { namespace detail
         }
 
         template <typename T0>
-        explicit full_empty_entry(BOOST_FWD_REF(T0) t0)
-          : data_(boost::forward<T0>(t0)), state_(empty)
+        explicit full_empty_entry(T0 && t0)
+          : data_(std::forward<T0>(t0)), state_(empty)
         {
             ++full_empty_counter_data_.constructed_;
         }
@@ -764,7 +764,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // move the data to the destination
-            dest = boost::move(data_);
+            dest = std::move(data_);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -803,7 +803,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // move the data to the destination
-            dest = boost::move(data_);
+            dest = std::move(data_);
 
             set_empty_locked(ec);   // state_ = empty;
             if (ec) return;
@@ -846,7 +846,7 @@ namespace hpx { namespace lcos { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // enqueue if entry is full, otherwise fill it
         template <typename T, typename Lock>
-        void enqueue_if_full(BOOST_FWD_REF(T) src, Lock& l, error_code& ec = throws)
+        void enqueue_if_full(T && src, Lock& l, error_code& ec = throws)
         {
             // block if this entry is already full
             if (state_ == full) {
@@ -869,7 +869,7 @@ namespace hpx { namespace lcos { namespace detail
             }
 
             // set the data
-            data_ = boost::forward<T>(src);
+            data_ = std::forward<T>(src);
 
             // make sure the entry is full
             set_full_locked(ec);    // state_ = full
@@ -914,10 +914,10 @@ namespace hpx { namespace lcos { namespace detail
         ///////////////////////////////////////////////////////////////////////
         // unconditionally set the data and set the entry to full
         template <typename T>
-        void set_and_fill(BOOST_FWD_REF(T) src, error_code& ec = throws)
+        void set_and_fill(T && src, error_code& ec = throws)
         {
             // set the data
-            data_ = boost::forward<T>(src);
+            data_ = std::forward<T>(src);
 
             // make sure the entry is full
             set_full_locked(ec);    // state_ = full

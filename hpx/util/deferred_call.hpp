@@ -36,8 +36,6 @@ namespace hpx { namespace util
         template <typename F, typename Args>
         class deferred_call_impl
         {
-            BOOST_COPYABLE_AND_MOVABLE(deferred_call_impl);
-
         public:
             // default constructor is needed for serialization
             deferred_call_impl()
@@ -45,10 +43,10 @@ namespace hpx { namespace util
 
             template <typename F_, typename Args_>
             explicit deferred_call_impl(
-                BOOST_FWD_REF(F_) f
-              , BOOST_FWD_REF(Args_) args
-            ) : _f(boost::forward<F_>(f))
-              , _args(boost::forward<Args_>(args))
+                F_ && f
+              , Args_ && args
+            ) : _f(std::forward<F_>(f))
+              , _args(std::forward<Args_>(args))
             {}
 
             deferred_call_impl(deferred_call_impl const& other)
@@ -56,9 +54,9 @@ namespace hpx { namespace util
               , _args(other._args)
             {}
 
-            deferred_call_impl(BOOST_RV_REF(deferred_call_impl) other)
-              : _f(boost::move(other._f))
-              , _args(boost::move(other._args))
+            deferred_call_impl(deferred_call_impl && other)
+              : _f(std::move(other._f))
+              , _args(std::move(other._args))
             {}
 
             typedef 
@@ -68,7 +66,7 @@ namespace hpx { namespace util
             BOOST_FORCEINLINE result_type operator()()
             {
                 return util::invoke_fused_r<result_type>(
-                    boost::move(_f), boost::move(_args));
+                    std::move(_f), std::move(_args));
             }
 
         public: // exposition-only
@@ -83,14 +81,14 @@ namespace hpx { namespace util
         typename util::decay<F>::type
       , util::tuple<>
     >
-    deferred_call(BOOST_FWD_REF(F) f)
+    deferred_call(F && f)
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
           , util::tuple<>
         > result_type;
 
-        return result_type(boost::forward<F>(f), util::forward_as_tuple());
+        return result_type(std::forward<F>(f), util::forward_as_tuple());
     }
 }}
 
@@ -160,14 +158,14 @@ namespace hpx { namespace util
         typename util::decay<F>::type
       , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_DEFERRED_CALL_DECAY, _)>
     >
-    deferred_call(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, T, t))
+    deferred_call(F && f, HPX_ENUM_FWD_ARGS(N, T, t))
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
           , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_DEFERRED_CALL_DECAY, _)>
         > result_type;
 
-        return result_type(boost::forward<F>(f)
+        return result_type(std::forward<F>(f)
           , util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, T, t)));
     }
 #   undef HPX_UTIL_DEFERRED_CALL_DECAY

@@ -55,7 +55,7 @@ namespace hpx { namespace lcos {
            
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
            
           , std::size_t)
@@ -65,7 +65,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                    
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -76,7 +76,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
            
           , std::size_t global_idx)
@@ -87,7 +87,7 @@ namespace hpx { namespace lcos {
                   , id
                    
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -133,7 +133,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                            
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -147,7 +147,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                            
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -209,7 +209,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                            
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -223,7 +223,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                            
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()
@@ -417,7 +417,7 @@ namespace hpx { namespace lcos {
           , typename A0
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           , A0 const & a0
           , std::size_t)
@@ -427,7 +427,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   , a0
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -438,7 +438,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           , A0 const & a0
           , std::size_t global_idx)
@@ -449,7 +449,7 @@ namespace hpx { namespace lcos {
                   , id
                   , a0
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -495,7 +495,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -509,7 +509,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -571,7 +571,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -585,7 +585,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()
@@ -779,7 +779,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1
           , std::size_t)
@@ -789,7 +789,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   , a0 , a1
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -800,7 +800,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1
           , std::size_t global_idx)
@@ -811,7 +811,7 @@ namespace hpx { namespace lcos {
                   , id
                   , a0 , a1
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -857,7 +857,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -871,7 +871,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -933,7 +933,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -947,7 +947,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()
@@ -1141,7 +1141,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2
           , std::size_t)
@@ -1151,7 +1151,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   , a0 , a1 , a2
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -1162,7 +1162,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2
           , std::size_t global_idx)
@@ -1173,7 +1173,7 @@ namespace hpx { namespace lcos {
                   , id
                   , a0 , a1 , a2
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -1219,7 +1219,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -1233,7 +1233,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -1295,7 +1295,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -1309,7 +1309,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()
@@ -1503,7 +1503,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
           , std::size_t)
@@ -1513,7 +1513,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   , a0 , a1 , a2 , a3
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -1524,7 +1524,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
           , std::size_t global_idx)
@@ -1535,7 +1535,7 @@ namespace hpx { namespace lcos {
                   , id
                   , a0 , a1 , a2 , a3
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -1581,7 +1581,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -1595,7 +1595,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -1657,7 +1657,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -1671,7 +1671,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()
@@ -1865,7 +1865,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
           , std::size_t)
@@ -1875,7 +1875,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   , a0 , a1 , a2 , a3 , a4
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -1886,7 +1886,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
           , std::size_t global_idx)
@@ -1897,7 +1897,7 @@ namespace hpx { namespace lcos {
                   , id
                   , a0 , a1 , a2 , a3 , a4
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -1943,7 +1943,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -1957,7 +1957,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -2019,7 +2019,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -2033,7 +2033,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()
@@ -2227,7 +2227,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
           , std::size_t)
@@ -2237,7 +2237,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   , a0 , a1 , a2 , a3 , a4 , a5
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -2248,7 +2248,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5
           , std::size_t global_idx)
@@ -2259,7 +2259,7 @@ namespace hpx { namespace lcos {
                   , id
                   , a0 , a1 , a2 , a3 , a4 , a5
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -2305,7 +2305,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4 , a5
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -2319,7 +2319,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -2381,7 +2381,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4 , a5
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -2395,7 +2395,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()
@@ -2589,7 +2589,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
           , std::size_t)
@@ -2599,7 +2599,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   , a0 , a1 , a2 , a3 , a4 , a5 , a6
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -2610,7 +2610,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6
           , std::size_t global_idx)
@@ -2621,7 +2621,7 @@ namespace hpx { namespace lcos {
                   , id
                   , a0 , a1 , a2 , a3 , a4 , a5 , a6
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -2667,7 +2667,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -2681,7 +2681,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -2743,7 +2743,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -2757,7 +2757,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()
@@ -2951,7 +2951,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
           , std::size_t)
@@ -2961,7 +2961,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -2972,7 +2972,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7
           , std::size_t global_idx)
@@ -2983,7 +2983,7 @@ namespace hpx { namespace lcos {
                   , id
                   , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -3029,7 +3029,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -3043,7 +3043,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -3105,7 +3105,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -3119,7 +3119,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()
@@ -3313,7 +3313,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
           , std::size_t)
@@ -3323,7 +3323,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -3334,7 +3334,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8
           , std::size_t global_idx)
@@ -3345,7 +3345,7 @@ namespace hpx { namespace lcos {
                   , id
                   , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -3391,7 +3391,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -3405,7 +3405,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -3467,7 +3467,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -3481,7 +3481,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()
@@ -3675,7 +3675,7 @@ namespace hpx { namespace lcos {
           , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
           , std::size_t)
@@ -3685,7 +3685,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -3696,7 +3696,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9
           , std::size_t global_idx)
@@ -3707,7 +3707,7 @@ namespace hpx { namespace lcos {
                   , id
                   , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
         template <
@@ -3753,7 +3753,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -3767,7 +3767,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -3829,7 +3829,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -3843,7 +3843,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()

@@ -26,7 +26,7 @@
 
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
     BOOST_PP_COMMA_IF(n)                                                      \
-    util::get<n>(boost::forward<Arguments_>(data))                            \
+    util::get<n>(std::forward<Arguments_>(data))                            \
     /**/
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
@@ -113,7 +113,7 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             BOOST_PP_CAT(continuation_thread_object_function_void_, N)()),
@@ -128,7 +128,7 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(BOOST_PP_ENUM_PARAMS(N, FArg)) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             BOOST_PP_CAT(continuation_thread_object_function_void_, N)()),
@@ -155,7 +155,7 @@
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
 
-                cont->trigger(boost::forward<Result>(
+                cont->trigger(std::forward<Result>(
                     (obj->*func)(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
                 ));
             }
@@ -180,7 +180,7 @@
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
 
-                cont->trigger(boost::forward<Result>(
+                cont->trigger(std::forward<Result>(
                     (obj->*func)(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
                 ));
             }
@@ -198,7 +198,7 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(BOOST_PP_ENUM_PARAMS(N, FArg)), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             BOOST_PP_CAT(continuation_thread_object_function_, N)()),
@@ -213,7 +213,7 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(BOOST_PP_ENUM_PARAMS(N, FArg)) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             BOOST_PP_CAT(continuation_thread_object_function_, N)()),

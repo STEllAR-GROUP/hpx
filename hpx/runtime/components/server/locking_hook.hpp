@@ -29,8 +29,8 @@ namespace hpx { namespace components
         locking_hook() : base_type() {}
 
         template <typename Arg>
-        locking_hook(BOOST_FWD_REF(Arg) arg)
-          : base_type(boost::forward<Arg>(arg))
+        locking_hook(Arg && arg)
+          : base_type(std::forward<Arg>(arg))
         {}
 
         /// This is the hook implementation for decorate_action which locks
@@ -44,7 +44,7 @@ namespace hpx { namespace components
 
             return HPX_STD_BIND(&locking_hook::thread_function,
                 get_lva<this_component_type>::call(lva), _1,
-                boost::move(base_type::wrap_action(boost::move(f), lva)));
+                std::move(base_type::wrap_action(std::move(f), lva)));
         }
 
     protected:
@@ -89,12 +89,12 @@ namespace hpx { namespace components
         struct decorate_wrapper
         {
             decorate_wrapper()
-              : yield_decorator_(boost::move(threads::get_self().undecorate_yield()))
+              : yield_decorator_(std::move(threads::get_self().undecorate_yield()))
             {}
 
             ~decorate_wrapper()
             {
-                threads::get_self().decorate_yield(boost::move(yield_decorator_));
+                threads::get_self().decorate_yield(std::move(yield_decorator_));
             }
 
             yield_decorator_type yield_decorator_;

@@ -14,7 +14,7 @@
 #include <vector>
 
 #include <boost/dynamic_bitset.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -51,8 +51,8 @@ namespace hpx { namespace util
         {
             if (!locals.test(i++))
             {
-                *gids_next++ = boost::move(*gids_it);
-                *addrs_next++ = boost::move(*addrs_it);
+                *gids_next++ = std::move(*gids_it);
+                *addrs_next++ = std::move(*addrs_it);
             }
         }
 

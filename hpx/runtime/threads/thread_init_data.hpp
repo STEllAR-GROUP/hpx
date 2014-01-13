@@ -37,8 +37,8 @@ namespace hpx { namespace threads
             scheduler_base(0)
         {}
 
-        thread_init_data(BOOST_RV_REF(thread_init_data) rhs)
-          : func(boost::move(rhs.func)),
+        thread_init_data(thread_init_data && rhs)
+          : func(std::move(rhs.func)),
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             lva(rhs.lva),
 #endif
@@ -52,19 +52,19 @@ namespace hpx { namespace threads
             priority(rhs.priority),
             num_os_thread(rhs.num_os_thread),
             stacksize(rhs.stacksize),
-            target(boost::move(rhs.target)),
+            target(std::move(rhs.target)),
             scheduler_base(rhs.scheduler_base)
         {}
 
         template <typename F>
-        thread_init_data(BOOST_FWD_REF(F) f, char const* desc,
+        thread_init_data(F && f, char const* desc,
                 naming::address::address_type lva_ = 0,
                 thread_priority priority_ = thread_priority_normal,
                 std::size_t os_thread = std::size_t(-1),
                 std::ptrdiff_t stacksize_ = std::ptrdiff_t(-1),
                 naming::id_type const& target_ = naming::invalid_id,
                 policies::scheduler_base* scheduler_base_ = 0)
-          : func(boost::forward<F>(f)),
+          : func(std::forward<F>(f)),
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             lva(lva_),
 #endif

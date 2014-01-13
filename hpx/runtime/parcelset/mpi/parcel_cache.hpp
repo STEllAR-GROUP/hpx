@@ -314,7 +314,7 @@ namespace hpx { namespace parcelset { namespace mpi { namespace detail
                     ph.second.clear();
                 }
             }
-            return boost::move(res);
+            return std::move(res);
         }
 
         mutex_type parcel_holders_mtx_;

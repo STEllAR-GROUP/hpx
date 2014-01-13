@@ -6,7 +6,7 @@
 #ifndef HPX_UTIL_REMOVE_REFERENCE_HPP
 #define HPX_UTIL_REMOVE_REFERENCE_HPP
 
-#include <boost/move/move.hpp>
+#include <utility>
 #include <boost/type_traits/remove_reference.hpp>
 
 namespace hpx { namespace util
@@ -18,7 +18,7 @@ namespace hpx { namespace util
     };
 
     template <typename T>
-    struct remove_reference<BOOST_RV_REF(T)>
+    struct remove_reference<T &&>
     {
         typedef T type;
     };

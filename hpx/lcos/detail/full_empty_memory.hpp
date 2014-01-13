@@ -66,8 +66,8 @@ namespace hpx { namespace lcos { namespace detail
         {}
 
         template <typename T0>
-        full_empty(BOOST_FWD_REF(T0) t0)
-          : data_(boost::forward<T0>(t0))
+        full_empty(T0 && t0)
+          : data_(std::forward<T0>(t0))
         {}
 
         /// \brief Destruct the full/empty data item
@@ -169,9 +169,9 @@ namespace hpx { namespace lcos { namespace detail
         ///         location to full using \a set might re-activate threads
         ///         waiting on this in a \a read or \a read_and_empty function.
         template <typename Target>
-        void set(BOOST_FWD_REF(Target) data)
+        void set(Target && data)
         {
-            data_.set_and_fill(boost::forward<Target>(data));
+            data_.set_and_fill(std::forward<Target>(data));
         }
 
         /// \brief  Waits for memory to become empty, and then fills it. If the
@@ -187,9 +187,9 @@ namespace hpx { namespace lcos { namespace detail
         /// \note   When memory becomes empty only one thread blocked like this
         ///         will be queued to run.
         template <typename Target>
-        void write(BOOST_FWD_REF(Target) data, error_code& ec = throws)
+        void write(Target && data, error_code& ec = throws)
         {
-            data_.enqueue_if_full(boost::forward<Target>(data), ec);
+            data_.enqueue_if_full(std::forward<Target>(data), ec);
         }
 
         /// \brief  Calls the supplied function passing along the stored data
@@ -222,8 +222,8 @@ namespace hpx { namespace lcos { namespace detail
         {}
 
         template <typename T0>
-        full_empty(BOOST_FWD_REF(T0) t0)
-          : data_(boost::forward<T0>(t0))
+        full_empty(T0 && t0)
+          : data_(std::forward<T0>(t0))
         {}
 
         /// \brief Destruct the full/empty data item
@@ -325,9 +325,9 @@ namespace hpx { namespace lcos { namespace detail
         ///         location to full using \a set might re-activate threads
         ///         waiting on this in a \a read or \a read_and_empty function.
         template <typename Target>
-        void set(BOOST_FWD_REF(Target) data)
+        void set(Target && data)
         {
-            data_.set_and_fill(boost::forward<Target>(data));
+            data_.set_and_fill(std::forward<Target>(data));
         }
 
         /// \brief  Waits for memory to become empty, and then fills it. If the
@@ -343,9 +343,9 @@ namespace hpx { namespace lcos { namespace detail
         /// \note   When memory becomes empty only one thread blocked like this
         ///         will be queued to run.
         template <typename Target, typename Lock>
-        void write(BOOST_FWD_REF(Target) data, Lock& l, error_code& ec = throws)
+        void write(Target && data, Lock& l, error_code& ec = throws)
         {
-            data_.enqueue_if_full(boost::forward<Target>(data), l, ec);
+            data_.enqueue_if_full(std::forward<Target>(data), l, ec);
         }
 
         /// \brief  Calls the supplied function passing along the stored data

@@ -53,17 +53,17 @@ struct movable_functor
         : obj(other.obj)
     {}
 
-    movable_functor(BOOST_RV_REF(movable_functor) other)
+    movable_functor(movable_functor && other)
         : obj(boost::move(other.obj))
     {}
 
-    movable_functor& operator=(BOOST_COPY_ASSIGN_REF(movable_functor) other)
+    movable_functor& operator=(movable_functor const & other)
     {
         obj = other.obj;
         return *this;
     }
 
-    movable_functor& operator=(BOOST_RV_REF(movable_functor) other)
+    movable_functor& operator=(movable_functor && other)
     {
         obj = boost::move(other.obj);
         return *this;
@@ -81,7 +81,7 @@ struct movable_functor
     }
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(movable_functor)
+        
 };
 
 template <typename Object>

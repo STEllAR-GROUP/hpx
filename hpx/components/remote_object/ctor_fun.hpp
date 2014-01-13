@@ -19,7 +19,7 @@
 namespace hpx { namespace components { namespace remote_object
 {
 #define HPX_REMOTE_OBJECT_M0(Z, N, D)                                           \
-    BOOST_PP_CAT(a, N)(boost::forward<BOOST_PP_CAT(Arg, N)>(BOOST_PP_CAT(arg, N)))\
+    BOOST_PP_CAT(a, N)(std::forward<BOOST_PP_CAT(Arg, N)>(BOOST_PP_CAT(arg, N)))\
 /**/
 
 #define HPX_REMOTE_OBJECT_COPY_CTOR(Z, N, D)                                    \
@@ -27,11 +27,11 @@ namespace hpx { namespace components { namespace remote_object
 /**/
 
 #define HPX_REMOTE_OBJECT_MOVE_CTOR(Z, N, D)                                    \
-    BOOST_PP_CAT(a, N)(boost::move(rhs. BOOST_PP_CAT(a, N)))                    \
+    BOOST_PP_CAT(a, N)(std::move(rhs. BOOST_PP_CAT(a, N)))                    \
 /**/
 
 #define HPX_REMOTE_OBJECT_RV(Z, N, D)                                           \
-    BOOST_RV_REF(BOOST_PP_CAT(A, N)) BOOST_PP_CAT(a, N)                         \
+    BOOST_PP_CAT(A, N &&) BOOST_PP_CAT(a, N)                         \
 /**/
 
 #define HPX_REMOTE_OBJECT_M1(Z, N, D)                                           \
@@ -117,11 +117,11 @@ namespace hpx { namespace components { namespace remote_object
             : BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_M0, _)
         {}
 
-        ctor_fun(BOOST_COPY_ASSIGN_REF(ctor_fun) rhs)
+        ctor_fun(ctor_fun const & rhs)
             : BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_COPY_CTOR, _)
         {}
 
-        ctor_fun(BOOST_RV_REF(ctor_fun) rhs)
+        ctor_fun(ctor_fun && rhs)
             : BOOST_PP_ENUM(N, HPX_REMOTE_OBJECT_MOVE_CTOR, _)
         {}
 
@@ -140,7 +140,7 @@ namespace hpx { namespace components { namespace remote_object
         BOOST_PP_REPEAT(N, HPX_REMOTE_OBJECT_M2, _)
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(ctor_fun);
+        (ctor_fun);
     };
 
 #undef N

@@ -45,7 +45,7 @@ namespace hpx { namespace components
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
-            return boost::move(f);
+            return std::move(f);
         }
     };
 
@@ -80,7 +80,7 @@ namespace hpx { namespace components
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
-            return boost::move(f);
+            return std::move(f);
         }
     };
 
@@ -116,7 +116,7 @@ namespace hpx { namespace components
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
-            return boost::move(f);
+            return std::move(f);
         }
     };
 }}

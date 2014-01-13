@@ -24,7 +24,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args))
+              , std::move(boost::fusion::at_c< 0>(args))
             );
         }
     };
@@ -45,7 +45,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args))
             );
         }
     };
@@ -66,7 +66,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args))
             );
         }
     };
@@ -87,7 +87,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args))
             );
         }
     };
@@ -108,7 +108,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args))
             );
         }
     };
@@ -129,7 +129,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args))
             );
         }
     };
@@ -150,7 +150,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args))
             );
         }
     };
@@ -171,7 +171,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args))
             );
         }
     };
@@ -192,7 +192,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args))
             );
         }
     };
@@ -213,7 +213,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args))
             );
         }
     };
@@ -234,7 +234,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args)) , boost::move(boost::fusion::at_c< 10>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args)) , std::move(boost::fusion::at_c< 10>(args))
             );
         }
     };
@@ -255,7 +255,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args)) , boost::move(boost::fusion::at_c< 10>(args)) , boost::move(boost::fusion::at_c< 11>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args)) , std::move(boost::fusion::at_c< 10>(args)) , std::move(boost::fusion::at_c< 11>(args))
             );
         }
     };
@@ -276,7 +276,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args)) , boost::move(boost::fusion::at_c< 10>(args)) , boost::move(boost::fusion::at_c< 11>(args)) , boost::move(boost::fusion::at_c< 12>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args)) , std::move(boost::fusion::at_c< 10>(args)) , std::move(boost::fusion::at_c< 11>(args)) , std::move(boost::fusion::at_c< 12>(args))
             );
         }
     };
@@ -297,7 +297,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args)) , boost::move(boost::fusion::at_c< 10>(args)) , boost::move(boost::fusion::at_c< 11>(args)) , boost::move(boost::fusion::at_c< 12>(args)) , boost::move(boost::fusion::at_c< 13>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args)) , std::move(boost::fusion::at_c< 10>(args)) , std::move(boost::fusion::at_c< 11>(args)) , std::move(boost::fusion::at_c< 12>(args)) , std::move(boost::fusion::at_c< 13>(args))
             );
         }
     };
@@ -318,7 +318,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args)) , boost::move(boost::fusion::at_c< 10>(args)) , boost::move(boost::fusion::at_c< 11>(args)) , boost::move(boost::fusion::at_c< 12>(args)) , boost::move(boost::fusion::at_c< 13>(args)) , boost::move(boost::fusion::at_c< 14>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args)) , std::move(boost::fusion::at_c< 10>(args)) , std::move(boost::fusion::at_c< 11>(args)) , std::move(boost::fusion::at_c< 12>(args)) , std::move(boost::fusion::at_c< 13>(args)) , std::move(boost::fusion::at_c< 14>(args))
             );
         }
     };
@@ -339,7 +339,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args)) , boost::move(boost::fusion::at_c< 10>(args)) , boost::move(boost::fusion::at_c< 11>(args)) , boost::move(boost::fusion::at_c< 12>(args)) , boost::move(boost::fusion::at_c< 13>(args)) , boost::move(boost::fusion::at_c< 14>(args)) , boost::move(boost::fusion::at_c< 15>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args)) , std::move(boost::fusion::at_c< 10>(args)) , std::move(boost::fusion::at_c< 11>(args)) , std::move(boost::fusion::at_c< 12>(args)) , std::move(boost::fusion::at_c< 13>(args)) , std::move(boost::fusion::at_c< 14>(args)) , std::move(boost::fusion::at_c< 15>(args))
             );
         }
     };
@@ -360,7 +360,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args)) , boost::move(boost::fusion::at_c< 10>(args)) , boost::move(boost::fusion::at_c< 11>(args)) , boost::move(boost::fusion::at_c< 12>(args)) , boost::move(boost::fusion::at_c< 13>(args)) , boost::move(boost::fusion::at_c< 14>(args)) , boost::move(boost::fusion::at_c< 15>(args)) , boost::move(boost::fusion::at_c< 16>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args)) , std::move(boost::fusion::at_c< 10>(args)) , std::move(boost::fusion::at_c< 11>(args)) , std::move(boost::fusion::at_c< 12>(args)) , std::move(boost::fusion::at_c< 13>(args)) , std::move(boost::fusion::at_c< 14>(args)) , std::move(boost::fusion::at_c< 15>(args)) , std::move(boost::fusion::at_c< 16>(args))
             );
         }
     };
@@ -381,7 +381,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args)) , boost::move(boost::fusion::at_c< 10>(args)) , boost::move(boost::fusion::at_c< 11>(args)) , boost::move(boost::fusion::at_c< 12>(args)) , boost::move(boost::fusion::at_c< 13>(args)) , boost::move(boost::fusion::at_c< 14>(args)) , boost::move(boost::fusion::at_c< 15>(args)) , boost::move(boost::fusion::at_c< 16>(args)) , boost::move(boost::fusion::at_c< 17>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args)) , std::move(boost::fusion::at_c< 10>(args)) , std::move(boost::fusion::at_c< 11>(args)) , std::move(boost::fusion::at_c< 12>(args)) , std::move(boost::fusion::at_c< 13>(args)) , std::move(boost::fusion::at_c< 14>(args)) , std::move(boost::fusion::at_c< 15>(args)) , std::move(boost::fusion::at_c< 16>(args)) , std::move(boost::fusion::at_c< 17>(args))
             );
         }
     };
@@ -402,7 +402,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args)) , boost::move(boost::fusion::at_c< 10>(args)) , boost::move(boost::fusion::at_c< 11>(args)) , boost::move(boost::fusion::at_c< 12>(args)) , boost::move(boost::fusion::at_c< 13>(args)) , boost::move(boost::fusion::at_c< 14>(args)) , boost::move(boost::fusion::at_c< 15>(args)) , boost::move(boost::fusion::at_c< 16>(args)) , boost::move(boost::fusion::at_c< 17>(args)) , boost::move(boost::fusion::at_c< 18>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args)) , std::move(boost::fusion::at_c< 10>(args)) , std::move(boost::fusion::at_c< 11>(args)) , std::move(boost::fusion::at_c< 12>(args)) , std::move(boost::fusion::at_c< 13>(args)) , std::move(boost::fusion::at_c< 14>(args)) , std::move(boost::fusion::at_c< 15>(args)) , std::move(boost::fusion::at_c< 16>(args)) , std::move(boost::fusion::at_c< 17>(args)) , std::move(boost::fusion::at_c< 18>(args))
             );
         }
     };
@@ -423,7 +423,7 @@
             hpx::apply_c<Action>(
                 cont
               , id
-              , boost::move(boost::fusion::at_c< 0>(args)) , boost::move(boost::fusion::at_c< 1>(args)) , boost::move(boost::fusion::at_c< 2>(args)) , boost::move(boost::fusion::at_c< 3>(args)) , boost::move(boost::fusion::at_c< 4>(args)) , boost::move(boost::fusion::at_c< 5>(args)) , boost::move(boost::fusion::at_c< 6>(args)) , boost::move(boost::fusion::at_c< 7>(args)) , boost::move(boost::fusion::at_c< 8>(args)) , boost::move(boost::fusion::at_c< 9>(args)) , boost::move(boost::fusion::at_c< 10>(args)) , boost::move(boost::fusion::at_c< 11>(args)) , boost::move(boost::fusion::at_c< 12>(args)) , boost::move(boost::fusion::at_c< 13>(args)) , boost::move(boost::fusion::at_c< 14>(args)) , boost::move(boost::fusion::at_c< 15>(args)) , boost::move(boost::fusion::at_c< 16>(args)) , boost::move(boost::fusion::at_c< 17>(args)) , boost::move(boost::fusion::at_c< 18>(args)) , boost::move(boost::fusion::at_c< 19>(args))
+              , std::move(boost::fusion::at_c< 0>(args)) , std::move(boost::fusion::at_c< 1>(args)) , std::move(boost::fusion::at_c< 2>(args)) , std::move(boost::fusion::at_c< 3>(args)) , std::move(boost::fusion::at_c< 4>(args)) , std::move(boost::fusion::at_c< 5>(args)) , std::move(boost::fusion::at_c< 6>(args)) , std::move(boost::fusion::at_c< 7>(args)) , std::move(boost::fusion::at_c< 8>(args)) , std::move(boost::fusion::at_c< 9>(args)) , std::move(boost::fusion::at_c< 10>(args)) , std::move(boost::fusion::at_c< 11>(args)) , std::move(boost::fusion::at_c< 12>(args)) , std::move(boost::fusion::at_c< 13>(args)) , std::move(boost::fusion::at_c< 14>(args)) , std::move(boost::fusion::at_c< 15>(args)) , std::move(boost::fusion::at_c< 16>(args)) , std::move(boost::fusion::at_c< 17>(args)) , std::move(boost::fusion::at_c< 18>(args)) , std::move(boost::fusion::at_c< 19>(args))
             );
         }
     };

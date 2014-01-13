@@ -158,14 +158,14 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // situations.
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add(
-        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f,
+        HPX_STD_FUNCTION<void()> && f,
         char const* desc, threads::thread_state_enum initial_state,
         bool run_now, threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new thread
         thread_init_data data(util::bind(
             &thread_pool_executor::thread_function_nullary, this,
-            boost::move(f)), desc);
+            std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         // update statistics
@@ -187,13 +187,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add_at(
         boost::posix_time::ptime const& abs_time,
-        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc,
+        HPX_STD_FUNCTION<void()> && f, char const* desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new suspended thread
         thread_init_data data(util::bind(
             &thread_pool_executor::thread_function_nullary, this,
-            boost::move(f)), desc);
+            std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         thread_id_type id = threads::detail::create_thread(
@@ -221,13 +221,13 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::add_after(
         boost::posix_time::time_duration const& rel_time,
-        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc,
+        HPX_STD_FUNCTION<void()> && f, char const* desc,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create a new suspended thread
         thread_init_data data(util::bind(
             &thread_pool_executor::thread_function_nullary, this,
-            boost::move(f)), desc);
+            std::move(f)), desc);
         data.stacksize = threads::get_stack_size(stacksize);
 
         thread_id_type id = threads::detail::create_thread(

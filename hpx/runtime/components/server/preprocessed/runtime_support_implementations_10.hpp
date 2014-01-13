@@ -74,7 +74,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor1<
                     typename Component::wrapping_type,
                     A0>(
-                        boost::forward<A0>( a0 )));
+                        std::forward<A0>( a0 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -144,7 +144,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor2<
                     typename Component::wrapping_type,
                     A0 , A1>(
-                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )));
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -214,7 +214,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor3<
                     typename Component::wrapping_type,
                     A0 , A1 , A2>(
-                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )));
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -284,7 +284,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor4<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3>(
-                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )));
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -354,7 +354,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor5<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4>(
-                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )));
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -424,7 +424,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor6<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4 , A5>(
-                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )));
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -494,7 +494,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor7<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4 , A5 , A6>(
-                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 )));
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -564,7 +564,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor8<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7>(
-                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 )));
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -634,7 +634,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor9<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8>(
-                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 )));
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);
@@ -704,7 +704,7 @@ namespace hpx { namespace components { namespace server
                 component_constructor_functor10<
                     typename Component::wrapping_type,
                     A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9>(
-                        boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 )));
+                        std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 )));
         }
         LRT_(info) << "successfully created component " << id
             << " of type: " << components::get_component_type_name(type);

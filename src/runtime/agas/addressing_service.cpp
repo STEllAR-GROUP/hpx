@@ -1910,7 +1910,7 @@ lcos::unique_future<bool> addressing_service::register_name_async(
         );
     }
 
-    return boost::move(f);
+    return std::move(f);
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////

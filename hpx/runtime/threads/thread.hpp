@@ -41,17 +41,17 @@ namespace hpx
         thread() BOOST_NOEXCEPT;
 
         template <typename F>
-        explicit thread(BOOST_FWD_REF(F) f)
+        explicit thread(F && f)
           : id_(uninitialized)
         {
-            start_thread(boost::move(HPX_STD_FUNCTION<void()>(boost::forward<F>(f))));
+            start_thread(HPX_STD_FUNCTION<void()>(std::forward<F>(f)));
         }
 
 // #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
 //         template <typename F, typename ...Args>
 //         explicit thread(F&& f, Args&&... args)
 //         {
-//             start_thead(HPX_STD_BIND(f, boost::forward<Args...>(args)));
+//             start_thead(HPX_STD_BIND(f, std::forward<Args...>(args)));
 //         }
 // #else
         // Vertical preprocessor repetition to define the remaining constructors
@@ -69,12 +69,12 @@ namespace hpx
         thread& operator=(thread const&) = delete;
 #else
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(thread);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(thread);
 #endif
 
     public:
-        thread(BOOST_RV_REF(thread)) BOOST_NOEXCEPT;
-        thread& operator=(BOOST_RV_REF(thread)) BOOST_NOEXCEPT;
+        thread(thread &&) BOOST_NOEXCEPT;
+        thread& operator=(thread &&) BOOST_NOEXCEPT;
 
         void swap(thread&) BOOST_NOEXCEPT;
         bool joinable() const BOOST_NOEXCEPT
@@ -114,7 +114,7 @@ namespace hpx
 #endif
 
     private:
-        void start_thread(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func);
+        void start_thread(HPX_STD_FUNCTION<void()> && func);
         static threads::thread_state_enum thread_function_nullary(
             HPX_STD_FUNCTION<void()> const& func);
 
@@ -263,10 +263,10 @@ namespace hpx
 #define N BOOST_PP_ITERATION()
 
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    thread(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    thread(F && f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : id_(uninitialized)
     {
-        start_thread(HPX_STD_BIND(boost::forward<F>(f),
+        start_thread(HPX_STD_BIND(std::forward<F>(f),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
     }
 

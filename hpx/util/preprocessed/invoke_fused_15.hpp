@@ -30,11 +30,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0> >::value == 1
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args));
     }
     template <typename R, typename F, typename Arg0>
@@ -43,12 +43,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0> >::value == 1
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)));
     }
     template <typename F, typename Arg0>
     BOOST_FORCEINLINE
@@ -58,11 +58,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args));
     }
     template <typename F, typename Arg0>
@@ -73,12 +73,12 @@ namespace hpx { namespace util
             F(Arg0)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -103,11 +103,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1> >::value == 2
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1>
@@ -116,12 +116,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1> >::value == 2
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1>
     BOOST_FORCEINLINE
@@ -131,11 +131,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args));
     }
     template <typename F, typename Arg0 , typename Arg1>
@@ -146,12 +146,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -176,11 +176,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2> >::value == 3
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2>
@@ -189,12 +189,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2> >::value == 3
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2>
     BOOST_FORCEINLINE
@@ -204,11 +204,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2>
@@ -219,12 +219,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -249,11 +249,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3> >::value == 4
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -262,12 +262,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3> >::value == 4
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     BOOST_FORCEINLINE
@@ -277,11 +277,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -292,12 +292,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -322,11 +322,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> >::value == 5
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -335,12 +335,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> >::value == 5
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     BOOST_FORCEINLINE
@@ -350,11 +350,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -365,12 +365,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -395,11 +395,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> >::value == 6
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
@@ -408,12 +408,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> >::value == 6
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     BOOST_FORCEINLINE
@@ -423,11 +423,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
@@ -438,12 +438,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -468,11 +468,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> >::value == 7
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
@@ -481,12 +481,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> >::value == 7
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     BOOST_FORCEINLINE
@@ -496,11 +496,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
@@ -511,12 +511,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -541,11 +541,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> >::value == 8
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
@@ -554,12 +554,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> >::value == 8
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     BOOST_FORCEINLINE
@@ -569,11 +569,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
@@ -584,12 +584,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -614,11 +614,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8> >::value == 9
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
@@ -627,12 +627,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8> >::value == 9
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     BOOST_FORCEINLINE
@@ -642,11 +642,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type , typename boost::add_const<Arg8>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
@@ -657,12 +657,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -687,11 +687,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9> >::value == 10
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
@@ -700,12 +700,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9> >::value == 10
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     BOOST_FORCEINLINE
@@ -715,11 +715,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type , typename boost::add_const<Arg8>::type , typename boost::add_const<Arg9>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
@@ -730,12 +730,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -760,11 +760,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10> >::value == 11
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
@@ -773,12 +773,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10> >::value == 11
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
     BOOST_FORCEINLINE
@@ -788,11 +788,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type , typename boost::add_const<Arg8>::type , typename boost::add_const<Arg9>::type , typename boost::add_const<Arg10>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10>
@@ -803,12 +803,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -833,11 +833,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11> >::value == 12
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
@@ -846,12 +846,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11> >::value == 12
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
     BOOST_FORCEINLINE
@@ -861,11 +861,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type , typename boost::add_const<Arg8>::type , typename boost::add_const<Arg9>::type , typename boost::add_const<Arg10>::type , typename boost::add_const<Arg11>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11>
@@ -876,12 +876,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -906,11 +906,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12> >::value == 13
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
@@ -919,12 +919,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12> >::value == 13
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
     BOOST_FORCEINLINE
@@ -934,11 +934,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type , typename boost::add_const<Arg8>::type , typename boost::add_const<Arg9>::type , typename boost::add_const<Arg10>::type , typename boost::add_const<Arg11>::type , typename boost::add_const<Arg12>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12>
@@ -949,12 +949,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -979,11 +979,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13> >::value == 14
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args) , util::get< 13>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
@@ -992,12 +992,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13> >::value == 14
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)) , util::get< 13>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)) , util::get< 13>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
     BOOST_FORCEINLINE
@@ -1007,11 +1007,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type , typename boost::add_const<Arg8>::type , typename boost::add_const<Arg9>::type , typename boost::add_const<Arg10>::type , typename boost::add_const<Arg11>::type , typename boost::add_const<Arg12>::type , typename boost::add_const<Arg13>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args) , util::get< 13>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13>
@@ -1022,12 +1022,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)) , util::get< 13>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)) , util::get< 13>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -1052,11 +1052,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14> >::value == 15
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args) , util::get< 13>(args) , util::get< 14>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
@@ -1065,12 +1065,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14> >::value == 15
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)) , util::get< 13>(boost::move(args)) , util::get< 14>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)) , util::get< 13>(std::move(args)) , util::get< 14>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
     BOOST_FORCEINLINE
@@ -1080,11 +1080,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type , typename boost::add_const<Arg8>::type , typename boost::add_const<Arg9>::type , typename boost::add_const<Arg10>::type , typename boost::add_const<Arg11>::type , typename boost::add_const<Arg12>::type , typename boost::add_const<Arg13>::type , typename boost::add_const<Arg14>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args) , util::get< 13>(args) , util::get< 14>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14>
@@ -1095,12 +1095,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)) , util::get< 13>(boost::move(args)) , util::get< 14>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)) , util::get< 13>(std::move(args)) , util::get< 14>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -1125,11 +1125,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15> >::value == 16
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args) , util::get< 13>(args) , util::get< 14>(args) , util::get< 15>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
@@ -1138,12 +1138,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15> >::value == 16
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)) , util::get< 13>(boost::move(args)) , util::get< 14>(boost::move(args)) , util::get< 15>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)) , util::get< 13>(std::move(args)) , util::get< 14>(std::move(args)) , util::get< 15>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
     BOOST_FORCEINLINE
@@ -1153,11 +1153,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type , typename boost::add_const<Arg8>::type , typename boost::add_const<Arg9>::type , typename boost::add_const<Arg10>::type , typename boost::add_const<Arg11>::type , typename boost::add_const<Arg12>::type , typename boost::add_const<Arg13>::type , typename boost::add_const<Arg14>::type , typename boost::add_const<Arg15>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args) , util::get< 13>(args) , util::get< 14>(args) , util::get< 15>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15>
@@ -1168,12 +1168,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)) , util::get< 13>(boost::move(args)) , util::get< 14>(boost::move(args)) , util::get< 15>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)) , util::get< 13>(std::move(args)) , util::get< 14>(std::move(args)) , util::get< 15>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -1198,11 +1198,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16> >::value == 17
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args) , util::get< 13>(args) , util::get< 14>(args) , util::get< 15>(args) , util::get< 16>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
@@ -1211,12 +1211,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16> >::value == 17
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)) , util::get< 13>(boost::move(args)) , util::get< 14>(boost::move(args)) , util::get< 15>(boost::move(args)) , util::get< 16>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)) , util::get< 13>(std::move(args)) , util::get< 14>(std::move(args)) , util::get< 15>(std::move(args)) , util::get< 16>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
     BOOST_FORCEINLINE
@@ -1226,11 +1226,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type , typename boost::add_const<Arg8>::type , typename boost::add_const<Arg9>::type , typename boost::add_const<Arg10>::type , typename boost::add_const<Arg11>::type , typename boost::add_const<Arg12>::type , typename boost::add_const<Arg13>::type , typename boost::add_const<Arg14>::type , typename boost::add_const<Arg15>::type , typename boost::add_const<Arg16>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args) , util::get< 13>(args) , util::get< 14>(args) , util::get< 15>(args) , util::get< 16>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16>
@@ -1241,12 +1241,12 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)) , util::get< 13>(boost::move(args)) , util::get< 14>(boost::move(args)) , util::get< 15>(boost::move(args)) , util::get< 16>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)) , util::get< 13>(std::move(args)) , util::get< 14>(std::move(args)) , util::get< 15>(std::move(args)) , util::get< 16>(std::move(args)));
     }
 }}
 namespace hpx { namespace util
@@ -1271,11 +1271,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17> >::value == 18
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args) , util::get< 13>(args) , util::get< 14>(args) , util::get< 15>(args) , util::get< 16>(args) , util::get< 17>(args));
     }
     template <typename R, typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
@@ -1284,12 +1284,12 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17> >::value == 18
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused_r(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17>))) args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)) , util::get< 13>(boost::move(args)) , util::get< 14>(boost::move(args)) , util::get< 15>(boost::move(args)) , util::get< 16>(boost::move(args)) , util::get< 17>(boost::move(args)));
+            invoke_r<R>(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)) , util::get< 13>(std::move(args)) , util::get< 14>(std::move(args)) , util::get< 15>(std::move(args)) , util::get< 16>(std::move(args)) , util::get< 17>(std::move(args)));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
     BOOST_FORCEINLINE
@@ -1299,11 +1299,11 @@ namespace hpx { namespace util
             F(typename boost::add_const<Arg0>::type , typename boost::add_const<Arg1>::type , typename boost::add_const<Arg2>::type , typename boost::add_const<Arg3>::type , typename boost::add_const<Arg4>::type , typename boost::add_const<Arg5>::type , typename boost::add_const<Arg6>::type , typename boost::add_const<Arg7>::type , typename boost::add_const<Arg8>::type , typename boost::add_const<Arg9>::type , typename boost::add_const<Arg10>::type , typename boost::add_const<Arg11>::type , typename boost::add_const<Arg12>::type , typename boost::add_const<Arg13>::type , typename boost::add_const<Arg14>::type , typename boost::add_const<Arg15>::type , typename boost::add_const<Arg16>::type , typename boost::add_const<Arg17>::type)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , util::get< 0>(args) , util::get< 1>(args) , util::get< 2>(args) , util::get< 3>(args) , util::get< 4>(args) , util::get< 5>(args) , util::get< 6>(args) , util::get< 7>(args) , util::get< 8>(args) , util::get< 9>(args) , util::get< 10>(args) , util::get< 11>(args) , util::get< 12>(args) , util::get< 13>(args) , util::get< 14>(args) , util::get< 15>(args) , util::get< 16>(args) , util::get< 17>(args));
     }
     template <typename F, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9 , typename Arg10 , typename Arg11 , typename Arg12 , typename Arg13 , typename Arg14 , typename Arg15 , typename Arg16 , typename Arg17>
@@ -1314,11 +1314,11 @@ namespace hpx { namespace util
             F(Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17)
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
+    invoke_fused(F && f, BOOST_RV_REF(HPX_UTIL_STRIP((
         util::tuple<Arg0 , Arg1 , Arg2 , Arg3 , Arg4 , Arg5 , Arg6 , Arg7 , Arg8 , Arg9 , Arg10 , Arg11 , Arg12 , Arg13 , Arg14 , Arg15 , Arg16 , Arg17>))) args)
     {
         return
-            invoke(boost::forward<F>(f)
-              , util::get< 0>(boost::move(args)) , util::get< 1>(boost::move(args)) , util::get< 2>(boost::move(args)) , util::get< 3>(boost::move(args)) , util::get< 4>(boost::move(args)) , util::get< 5>(boost::move(args)) , util::get< 6>(boost::move(args)) , util::get< 7>(boost::move(args)) , util::get< 8>(boost::move(args)) , util::get< 9>(boost::move(args)) , util::get< 10>(boost::move(args)) , util::get< 11>(boost::move(args)) , util::get< 12>(boost::move(args)) , util::get< 13>(boost::move(args)) , util::get< 14>(boost::move(args)) , util::get< 15>(boost::move(args)) , util::get< 16>(boost::move(args)) , util::get< 17>(boost::move(args)));
+            invoke(std::forward<F>(f)
+              , util::get< 0>(std::move(args)) , util::get< 1>(std::move(args)) , util::get< 2>(std::move(args)) , util::get< 3>(std::move(args)) , util::get< 4>(std::move(args)) , util::get< 5>(std::move(args)) , util::get< 6>(std::move(args)) , util::get< 7>(std::move(args)) , util::get< 8>(std::move(args)) , util::get< 9>(std::move(args)) , util::get< 10>(std::move(args)) , util::get< 11>(std::move(args)) , util::get< 12>(std::move(args)) , util::get< 13>(std::move(args)) , util::get< 14>(std::move(args)) , util::get< 15>(std::move(args)) , util::get< 16>(std::move(args)) , util::get< 17>(std::move(args)));
     }
 }}

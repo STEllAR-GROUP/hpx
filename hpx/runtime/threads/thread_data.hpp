@@ -575,7 +575,7 @@ namespace hpx { namespace threads
         thread_data(thread_init_data& init_data,
                pool_type& pool, thread_state_enum newstate)
           : thread_data_base(init_data, newstate),
-            coroutine_(boost::move(init_data.func), boost::move(init_data.target),
+            coroutine_(std::move(init_data.func), std::move(init_data.target),
                 this_(), init_data.stacksize),
             pool_(&pool)
         {
@@ -675,7 +675,7 @@ namespace hpx { namespace threads
         stackless_thread_data(thread_init_data& init_data,
                 void* pool, thread_state_enum newstate)
           : thread_data_base(init_data, newstate),
-            coroutine_(boost::move(init_data.func), boost::move(init_data.target), this_()),
+            coroutine_(std::move(init_data.func), std::move(init_data.target), this_()),
             pool_(pool)
         {
             HPX_ASSERT(init_data.stacksize == 0);

@@ -23,7 +23,7 @@ namespace hpx { namespace lcos { namespace detail
         {}
 
         explicit dataflow_base_impl(lcos::unique_future<naming::id_type> promise)
-            : gid_promise(boost::move(promise))
+            : gid_promise(std::move(promise))
             , count_(0)
         {}
 

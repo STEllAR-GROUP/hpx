@@ -16,10 +16,10 @@ namespace hpx { namespace applier
 template <typename Arg0>
 inline void trigger(
     naming::id_type const& k
-  , BOOST_FWD_REF(Arg0) arg0
+  , Arg0 && arg0
     )
 {
-    set_lco_value(k, boost::forward<Arg0>(arg0));
+    set_lco_value(k, std::forward<Arg0>(arg0));
 }
 
 inline void trigger(
@@ -39,7 +39,7 @@ inline void trigger_error(
 
 inline void trigger_error(
     naming::id_type const& k
-  , BOOST_RV_REF(boost::exception_ptr) e
+  , boost::exception_ptr && e
     )
 {
     set_lco_error(k, e);

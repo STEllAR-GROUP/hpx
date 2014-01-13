@@ -30,10 +30,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -55,7 +55,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0)
+    bind(F && f, T0 && t0)
     {
         typedef
             detail::bound<
@@ -65,8 +65,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ))
             );
     }
 }}
@@ -91,10 +91,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -116,7 +116,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1)
+    bind(F && f, T0 && t0 , T1 && t1)
     {
         typedef
             detail::bound<
@@ -126,8 +126,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ))
             );
     }
 }}
@@ -152,10 +152,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -177,7 +177,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2)
     {
         typedef
             detail::bound<
@@ -187,8 +187,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ))
             );
     }
 }}
@@ -213,10 +213,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -238,7 +238,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3)
     {
         typedef
             detail::bound<
@@ -248,8 +248,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ))
             );
     }
 }}
@@ -274,10 +274,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -299,7 +299,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4)
     {
         typedef
             detail::bound<
@@ -309,8 +309,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ))
             );
     }
 }}
@@ -335,10 +335,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -360,7 +360,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5)
     {
         typedef
             detail::bound<
@@ -370,8 +370,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ))
             );
     }
 }}
@@ -396,10 +396,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -421,7 +421,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6)
     {
         typedef
             detail::bound<
@@ -431,8 +431,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ))
             );
     }
 }}
@@ -457,10 +457,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -482,7 +482,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7)
     {
         typedef
             detail::bound<
@@ -492,8 +492,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ))
             );
     }
 }}
@@ -518,10 +518,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -543,7 +543,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8)
     {
         typedef
             detail::bound<
@@ -553,8 +553,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ) , boost::forward<T8>( t8 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ) , std::forward<T8>( t8 ))
             );
     }
 }}
@@ -579,10 +579,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -604,7 +604,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9)
     {
         typedef
             detail::bound<
@@ -614,8 +614,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ) , boost::forward<T8>( t8 ) , boost::forward<T9>( t9 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ) , std::forward<T8>( t8 ) , std::forward<T9>( t9 ))
             );
     }
 }}
@@ -640,10 +640,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -665,7 +665,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10)
     {
         typedef
             detail::bound<
@@ -675,8 +675,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ) , boost::forward<T8>( t8 ) , boost::forward<T9>( t9 ) , boost::forward<T10>( t10 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ) , std::forward<T8>( t8 ) , std::forward<T9>( t9 ) , std::forward<T10>( t10 ))
             );
     }
 }}
@@ -701,10 +701,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -726,7 +726,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11)
     {
         typedef
             detail::bound<
@@ -736,8 +736,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ) , boost::forward<T8>( t8 ) , boost::forward<T9>( t9 ) , boost::forward<T10>( t10 ) , boost::forward<T11>( t11 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ) , std::forward<T8>( t8 ) , std::forward<T9>( t9 ) , std::forward<T10>( t10 ) , std::forward<T11>( t11 ))
             );
     }
 }}
@@ -762,10 +762,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -787,7 +787,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11 , BOOST_FWD_REF(T12) t12)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12)
     {
         typedef
             detail::bound<
@@ -797,8 +797,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ) , boost::forward<T8>( t8 ) , boost::forward<T9>( t9 ) , boost::forward<T10>( t10 ) , boost::forward<T11>( t11 ) , boost::forward<T12>( t12 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ) , std::forward<T8>( t8 ) , std::forward<T9>( t9 ) , std::forward<T10>( t10 ) , std::forward<T11>( t11 ) , std::forward<T12>( t12 ))
             );
     }
 }}
@@ -823,10 +823,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 13>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 13>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -848,7 +848,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11 , BOOST_FWD_REF(T12) t12 , BOOST_FWD_REF(T13) t13)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13)
     {
         typedef
             detail::bound<
@@ -858,8 +858,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ) , boost::forward<T8>( t8 ) , boost::forward<T9>( t9 ) , boost::forward<T10>( t10 ) , boost::forward<T11>( t11 ) , boost::forward<T12>( t12 ) , boost::forward<T13>( t13 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ) , std::forward<T8>( t8 ) , std::forward<T9>( t9 ) , std::forward<T10>( t10 ) , std::forward<T11>( t11 ) , std::forward<T12>( t12 ) , std::forward<T13>( t13 ))
             );
     }
 }}
@@ -884,10 +884,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 13>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 14>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 13>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 14>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -909,7 +909,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11 , BOOST_FWD_REF(T12) t12 , BOOST_FWD_REF(T13) t13 , BOOST_FWD_REF(T14) t14)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14)
     {
         typedef
             detail::bound<
@@ -919,8 +919,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ) , boost::forward<T8>( t8 ) , boost::forward<T9>( t9 ) , boost::forward<T10>( t10 ) , boost::forward<T11>( t11 ) , boost::forward<T12>( t12 ) , boost::forward<T13>( t13 ) , boost::forward<T14>( t14 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ) , std::forward<T8>( t8 ) , std::forward<T9>( t9 ) , std::forward<T10>( t10 ) , std::forward<T11>( t11 ) , std::forward<T12>( t12 ) , std::forward<T13>( t13 ) , std::forward<T14>( t14 ))
             );
     }
 }}
@@ -945,10 +945,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 13>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 14>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 15>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 13>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 14>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 15>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -970,7 +970,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11 , BOOST_FWD_REF(T12) t12 , BOOST_FWD_REF(T13) t13 , BOOST_FWD_REF(T14) t14 , BOOST_FWD_REF(T15) t15)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15)
     {
         typedef
             detail::bound<
@@ -980,8 +980,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ) , boost::forward<T8>( t8 ) , boost::forward<T9>( t9 ) , boost::forward<T10>( t10 ) , boost::forward<T11>( t11 ) , boost::forward<T12>( t12 ) , boost::forward<T13>( t13 ) , boost::forward<T14>( t14 ) , boost::forward<T15>( t15 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ) , std::forward<T8>( t8 ) , std::forward<T9>( t9 ) , std::forward<T10>( t10 ) , std::forward<T11>( t11 ) , std::forward<T12>( t12 ) , std::forward<T13>( t13 ) , std::forward<T14>( t14 ) , std::forward<T15>( t15 ))
             );
     }
 }}
@@ -1006,10 +1006,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 13>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 14>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 15>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 16>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 13>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 14>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 15>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 16>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -1031,7 +1031,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11 , BOOST_FWD_REF(T12) t12 , BOOST_FWD_REF(T13) t13 , BOOST_FWD_REF(T14) t14 , BOOST_FWD_REF(T15) t15 , BOOST_FWD_REF(T16) t16)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15 , T16 && t16)
     {
         typedef
             detail::bound<
@@ -1041,8 +1041,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ) , boost::forward<T8>( t8 ) , boost::forward<T9>( t9 ) , boost::forward<T10>( t10 ) , boost::forward<T11>( t11 ) , boost::forward<T12>( t12 ) , boost::forward<T13>( t13 ) , boost::forward<T14>( t14 ) , boost::forward<T15>( t15 ) , boost::forward<T16>( t16 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ) , std::forward<T8>( t8 ) , std::forward<T9>( t9 ) , std::forward<T10>( t10 ) , std::forward<T11>( t11 ) , std::forward<T12>( t12 ) , std::forward<T13>( t13 ) , std::forward<T14>( t14 ) , std::forward<T15>( t15 ) , std::forward<T16>( t16 ))
             );
     }
 }}
@@ -1067,10 +1067,10 @@ namespace hpx { namespace util
             static BOOST_FORCEINLINE
             type call(
                 F& f, BoundArgs& bound_args
-              , BOOST_FWD_REF(UnboundArgs) unbound_args
+              , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 13>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 14>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 15>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 16>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 17>(bound_args) , boost::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 8>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 9>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 10>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 11>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 12>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 13>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 14>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 15>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 16>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 17>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -1092,7 +1092,7 @@ namespace hpx { namespace util
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type>
         >
     >::type
-    bind(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7 , BOOST_FWD_REF(T8) t8 , BOOST_FWD_REF(T9) t9 , BOOST_FWD_REF(T10) t10 , BOOST_FWD_REF(T11) t11 , BOOST_FWD_REF(T12) t12 , BOOST_FWD_REF(T13) t13 , BOOST_FWD_REF(T14) t14 , BOOST_FWD_REF(T15) t15 , BOOST_FWD_REF(T16) t16 , BOOST_FWD_REF(T17) t17)
+    bind(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15 , T16 && t16 , T17 && t17)
     {
         typedef
             detail::bound<
@@ -1102,8 +1102,8 @@ namespace hpx { namespace util
             result_type;
         return
             result_type(
-                boost::forward<F>(f)
-              , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 ) , boost::forward<T8>( t8 ) , boost::forward<T9>( t9 ) , boost::forward<T10>( t10 ) , boost::forward<T11>( t11 ) , boost::forward<T12>( t12 ) , boost::forward<T13>( t13 ) , boost::forward<T14>( t14 ) , boost::forward<T15>( t15 ) , boost::forward<T16>( t16 ) , boost::forward<T17>( t17 ))
+                std::forward<F>(f)
+              , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ) , std::forward<T8>( t8 ) , std::forward<T9>( t9 ) , std::forward<T10>( t10 ) , std::forward<T11>( t11 ) , std::forward<T12>( t12 ) , std::forward<T13>( t13 ) , std::forward<T14>( t14 ) , std::forward<T15>( t15 ) , std::forward<T16>( t16 ) , std::forward<T17>( t17 ))
             );
     }
 }}

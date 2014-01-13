@@ -10,7 +10,7 @@
 
     template <typename Arg0>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0)
+        Arg0 && arg0)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
@@ -20,8 +20,8 @@
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
-                boost::move(action_type::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ))))
+                std::move(action_type::execute_function(addr.address_,
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ))))
             );
         }
         else {
@@ -30,12 +30,12 @@
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
-                boost::forward<Arg0>( arg0 ));
+                std::forward<Arg0>( arg0 ));
         }
     }
     template <typename Arg0>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
-        naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
+        naming::id_type const& gid, Arg0 && arg0)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
@@ -44,8 +44,8 @@
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
-                boost::move(action_type::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ))))
+                std::move(action_type::execute_function(addr.address_,
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ))))
             );
         }
         else {
@@ -54,12 +54,12 @@
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
-                boost::forward<Arg0>( arg0 ));
+                std::forward<Arg0>( arg0 ));
         }
     }
     template <typename Arg0>
     packaged_action(naming::id_type const& gid,
-            BOOST_FWD_REF(Arg0) arg0)
+            Arg0 && arg0)
       : apply_logger_("packaged_action_direct::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
@@ -67,11 +67,11 @@
                     << ", "
                     << gid
                     << ") args(" << (1 + 1) << ")";
-        apply(launch::all, gid, boost::forward<Arg0>( arg0 ));
+        apply(launch::all, gid, std::forward<Arg0>( arg0 ));
     }
     template <typename Arg0 , typename Arg1>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+        Arg0 && arg0 , Arg1 && arg1)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
@@ -81,8 +81,8 @@
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
-                boost::move(action_type::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))))
+                std::move(action_type::execute_function(addr.address_,
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))))
             );
         }
         else {
@@ -91,12 +91,12 @@
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
     }
     template <typename Arg0 , typename Arg1>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
-        naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+        naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
@@ -105,8 +105,8 @@
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
-                boost::move(action_type::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))))
+                std::move(action_type::execute_function(addr.address_,
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))))
             );
         }
         else {
@@ -115,12 +115,12 @@
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
     }
     template <typename Arg0 , typename Arg1>
     packaged_action(naming::id_type const& gid,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+            Arg0 && arg0 , Arg1 && arg1)
       : apply_logger_("packaged_action_direct::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
@@ -128,11 +128,11 @@
                     << ", "
                     << gid
                     << ") args(" << (2 + 1) << ")";
-        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+        apply(launch::all, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+        Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
@@ -142,8 +142,8 @@
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
-                boost::move(action_type::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))))
+                std::move(action_type::execute_function(addr.address_,
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))))
             );
         }
         else {
@@ -152,12 +152,12 @@
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
-        naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+        naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
@@ -166,8 +166,8 @@
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
-                boost::move(action_type::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))))
+                std::move(action_type::execute_function(addr.address_,
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))))
             );
         }
         else {
@@ -176,12 +176,12 @@
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
     packaged_action(naming::id_type const& gid,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+            Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
       : apply_logger_("packaged_action_direct::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
@@ -189,11 +189,11 @@
                     << ", "
                     << gid
                     << ") args(" << (3 + 1) << ")";
-        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+        apply(launch::all, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+        Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
@@ -203,8 +203,8 @@
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
-                boost::move(action_type::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))))
+                std::move(action_type::execute_function(addr.address_,
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))))
             );
         }
         else {
@@ -213,12 +213,12 @@
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
-        naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+        naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
@@ -227,8 +227,8 @@
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
-                boost::move(action_type::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))))
+                std::move(action_type::execute_function(addr.address_,
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))))
             );
         }
         else {
@@ -237,12 +237,12 @@
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     packaged_action(naming::id_type const& gid,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+            Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
       : apply_logger_("packaged_action_direct::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
@@ -250,11 +250,11 @@
                     << ", "
                     << gid
                     << ") args(" << (4 + 1) << ")";
-        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+        apply(launch::all, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+        Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         naming::address addr;
@@ -264,8 +264,8 @@
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
-                boost::move(action_type::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))))
+                std::move(action_type::execute_function(addr.address_,
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))))
             );
         }
         else {
@@ -274,12 +274,12 @@
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
-        naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+        naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
@@ -288,8 +288,8 @@
                 components::get_component_type<
                     typename action_type::component_type>()));
             (*this->impl_)->set_data(
-                boost::move(action_type::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))))
+                std::move(action_type::execute_function(addr.address_,
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))))
             );
         }
         else {
@@ -298,12 +298,12 @@
                 addr, this->get_gid(), gid,
                 HPX_STD_BIND(&packaged_action::parcel_write_handler, this->impl_,
                     HPX_STD_PLACEHOLDERS::_1),
-                boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+                std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     packaged_action(naming::id_type const& gid,
-            BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+            Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
       : apply_logger_("packaged_action_direct::apply")
     {
         LLCO_(info) << "packaged_action::packaged_action("
@@ -311,5 +311,5 @@
                     << ", "
                     << gid
                     << ") args(" << (5 + 1) << ")";
-        apply(launch::all, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+        apply(launch::all, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }

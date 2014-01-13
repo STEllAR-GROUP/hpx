@@ -7,7 +7,7 @@
 #define HPX_UTIL_DETAIL_RESET_FUNCTION_OCT_22_2013_0854AM
 
 #include <hpx/config/function.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -27,13 +27,13 @@ namespace hpx { namespace util { namespace detail
     template <typename Sig>
     inline void reset_function(boost::function<Sig>& f)
     {
-        f = boost::move(boost::function<Sig>());
+        f = std::move(boost::function<Sig>());
     }
 #else
     template <typename Sig>
     inline void reset_function(std::function<Sig>& f)
     {
-        f = boost::move(std::function<Sig>());
+        f = std::move(std::function<Sig>());
     }
 #endif
 }}}

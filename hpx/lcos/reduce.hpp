@@ -155,7 +155,7 @@ namespace hpx { namespace lcos
             Result operator()(
                 hpx::unique_future<std::vector<hpx::unique_future<Result> > > r) const
             {
-                std::vector<hpx::unique_future<Result> > fres = boost::move(r.get());
+                std::vector<hpx::unique_future<Result> > fres = std::move(r.get());
 
                 HPX_ASSERT(!fres.empty());
 
@@ -166,7 +166,7 @@ namespace hpx { namespace lcos
                 for (std::size_t i = 2; i != fres.size(); ++i)
                     res = reduce_op_(res, fres[i].get());
 
-                return boost::move(res);
+                return std::move(res);
             }
 
             ReduceOp const& reduce_op_;
@@ -372,7 +372,7 @@ namespace hpx { namespace lcos
         BOOST_PP_CAT(reduce_impl, N)(
             Action const & act
           , std::vector<hpx::id_type> const & ids
-          , BOOST_FWD_REF(ReduceOp) reduce_op
+          , ReduceOp && reduce_op
           BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a)
           , std::size_t global_idx
         )
@@ -407,7 +407,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , reduce_op
                           BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
                           , global_idx + 1
@@ -422,7 +422,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , reduce_op
                           BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
                           , global_idx + half
@@ -516,7 +516,7 @@ namespace hpx { namespace lcos
     >
     reduce(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
@@ -535,7 +535,7 @@ namespace hpx { namespace lcos
                 dest
               , Action()
               , ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
               , 0
             );
@@ -557,12 +557,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > /* act */
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         return reduce<Derived>(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
             );
     }
@@ -577,12 +577,12 @@ namespace hpx { namespace lcos
     >
     reduce_with_index(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         return reduce<detail::reduce_with_index<Action> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
             );
     }
@@ -603,12 +603,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > /* act */
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         return reduce<detail::reduce_with_index<Derived> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
             );
     }

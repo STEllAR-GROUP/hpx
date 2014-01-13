@@ -387,7 +387,7 @@ namespace hpx { namespace components { namespace server
             using components::stubs::runtime_support;
             naming::id_type id(gid, naming::id_type::unmanaged);
             lazy_actions.push_back(
-                runtime_support::call_shutdown_functions_async(id, pre_shutdown));
+                std::move(runtime_support::call_shutdown_functions_async(id, pre_shutdown)));
         }
 
         // wait for all localities to finish executing their registered

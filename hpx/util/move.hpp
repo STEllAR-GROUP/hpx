@@ -8,38 +8,54 @@
 
 #include <hpx/config.hpp>
 
+#if defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
+#error HPX needs rvalue reference support
+#endif
+
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 #include <boost/preprocessor/tuple/rem.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
 
-#include <boost/move/move.hpp>
+#include <utility>
 
 #include <boost/type_traits/add_const.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_FWD_ARGS(z, n, d)                                                 \
-    BOOST_FWD_REF(BOOST_PP_CAT(BOOST_PP_TUPLE_ELEM(2, 0, d), n))              \
-    BOOST_PP_CAT(BOOST_PP_TUPLE_ELEM(2, 1, d), n)                             \
-    /**/
-#define HPX_FORWARD_ARGS(z, n, d)                                             \
-    boost::forward<BOOST_PP_CAT(BOOST_PP_TUPLE_ELEM(2, 0, d), n)>(            \
+#define HPX_FORWARD_ARGS_(z, n, d)                                            \
+    std::forward<BOOST_PP_CAT(BOOST_PP_TUPLE_ELEM(2, 0, d), n)>(              \
         BOOST_PP_CAT(BOOST_PP_TUPLE_ELEM(2, 1, d), n)                         \
     )                                                                         \
     /**/
-#define HPX_MOVE_ARGS(z, n, d)                                                \
-    boost::move(BOOST_PP_CAT(d, n))                                           \
+#define HPX_MOVE_ARGS_(z, n, d)                                               \
+    std::move(BOOST_PP_CAT(d, n))                                             \
     /**/
 
 #define HPX_ENUM_FWD_ARGS(N, A, B)                                            \
-    BOOST_PP_ENUM(N, HPX_FWD_ARGS, (A, B))                                    \
+    BOOST_PP_ENUM_BINARY_PARAMS(N, A, && B)                                   \
     /**/
+
 #define HPX_ENUM_FORWARD_ARGS(N, A, B)                                        \
-    BOOST_PP_ENUM(N, HPX_FORWARD_ARGS, (A, B))                                \
+    BOOST_PP_ENUM(N, HPX_FORWARD_ARGS_, (A, B))                               \
     /**/
 #define HPX_ENUM_MOVE_ARGS(N, A)                                              \
-    BOOST_PP_ENUM(N, HPX_MOVE_ARGS, A)                                        \
+    BOOST_PP_ENUM(N, HPX_MOVE_ARGS_, A)                                       \
     /**/
+
+#if defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
+#define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
+    private:                                                                  \
+        TYPE(TYPE const &);                                                   \
+        TYPE& operator=(TYPE const &);                                        \
+/**/
+#else
+#define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
+    public:                                                                   \
+        TYPE(TYPE const &) = delete;                                          \
+        TYPE& operator=(TYPE const &) = delete;                               \
+    private:                                                                  \
+/**/
+#endif
 
 namespace hpx { namespace util { namespace detail
 {
@@ -48,9 +64,9 @@ namespace hpx { namespace util { namespace detail
     struct make_temporary
     {
         template <typename U>
-        static BOOST_RV_REF(T) call(U& u)
+        static T && call(U& u)
         {
-            return boost::move(u);
+            return std::move(u);
         }
     };
 
@@ -72,12 +88,12 @@ namespace hpx { namespace util { namespace detail
     };
 
     template <typename T>
-    struct make_temporary<BOOST_RV_REF(T)>
+    struct make_temporary<T &&>
     {
         template <typename U>
-        static BOOST_RV_REF(T) call(U& u)
+        static T && call(U& u)
         {
-            return boost::move(u);
+            return std::move(u);
         }
     };
 
@@ -87,9 +103,9 @@ namespace hpx { namespace util { namespace detail
     struct copy_construct
     {
         template <typename A>
-        static T call(BOOST_FWD_REF(A) u)
+        static T call(A && u)
         {
-            return boost::forward<A>(u);
+            return std::forward<A>(u);
         }
     };
 
@@ -103,11 +119,11 @@ namespace hpx { namespace util { namespace detail
     };
 
     template <typename T, typename U>
-    struct copy_construct<BOOST_RV_REF(T), BOOST_RV_REF(U)>
+    struct copy_construct<T &&, U &&>
     {
-        static BOOST_RV_REF(T) call(U& u)
+        static T && call(U& u)
         {
-            return boost::move(u);
+            return std::move(u);
         }
     };
 }}}

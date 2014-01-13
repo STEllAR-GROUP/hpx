@@ -39,9 +39,9 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // simply launch the given function or function object asynchronously
     template <typename F>
-    bool apply(threads::executor& sched, BOOST_FWD_REF(F) f)
+    bool apply(threads::executor& sched, F && f)
     {
-        sched.add(boost::forward<F>(f), "hpx::apply");
+        sched.add(std::forward<F>(f), "hpx::apply");
         return false;   // executed locally
     }
 
@@ -51,11 +51,11 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(BOOST_FWD_REF(F) f)
+    apply(F && f)
     {
         threads::register_thread_nullary(
             util::deferred_call(
-                boost::forward<F>(f)
+                std::forward<F>(f)
             ), "hpx::apply");
         return false;   // executed locally
     }
@@ -103,12 +103,12 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(threads::executor& sched, BOOST_FWD_REF(F) f,
+    apply(threads::executor& sched, F && f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
         sched.add(
             util::deferred_call(
-                boost::forward<F>(f),
+                std::forward<F>(f),
                 HPX_ENUM_FORWARD_ARGS(N, A, a)
             ), "hpx::apply");
         return false;
@@ -121,11 +121,11 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))
+    apply(F && f, HPX_ENUM_FWD_ARGS(N, A, a))
     {
         threads::register_thread_nullary(
             util::deferred_call(
-                boost::forward<F>(f),
+                std::forward<F>(f),
                 HPX_ENUM_FORWARD_ARGS(N, A, a)
             ), "hpx::apply");
         return false;

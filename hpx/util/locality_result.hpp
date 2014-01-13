@@ -21,6 +21,7 @@
 #include <boost/foreach.hpp>
 
 #include <vector>
+#include <algorithm>
 
 #include <hpx/config/warnings_prefix.hpp>
 

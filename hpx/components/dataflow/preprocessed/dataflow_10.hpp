@@ -11,7 +11,7 @@
         template <typename A0>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0
+          , A0 && a0
           , boost::mpl::false_
         )
         {
@@ -26,13 +26,13 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 )
+                  , std::forward<A0>( a0 )
                 );
         }
         template <typename A0>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0
+          , A0 && a0
           , boost::mpl::true_
         )
         {
@@ -48,17 +48,17 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 )
+                  , std::forward<A0>( a0 )
                 );
         }
         template <typename A0>
         dataflow(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0
+          , A0 && a0
         )
             : base_type(
                 create_component(target
-                  , boost::forward<A0>( a0 )
+                  , std::forward<A0>( a0 )
                   , typename Action::direct_execution()
                 )
             )
@@ -67,7 +67,7 @@
         template <typename A0 , typename A1>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
+          , A0 && a0 , A1 && a1
           , boost::mpl::false_
         )
         {
@@ -82,13 +82,13 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 )
                 );
         }
         template <typename A0 , typename A1>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
+          , A0 && a0 , A1 && a1
           , boost::mpl::true_
         )
         {
@@ -104,17 +104,17 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 )
                 );
         }
         template <typename A0 , typename A1>
         dataflow(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
+          , A0 && a0 , A1 && a1
         )
             : base_type(
                 create_component(target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 )
                   , typename Action::direct_execution()
                 )
             )
@@ -123,7 +123,7 @@
         template <typename A0 , typename A1 , typename A2>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
+          , A0 && a0 , A1 && a1 , A2 && a2
           , boost::mpl::false_
         )
         {
@@ -138,13 +138,13 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 )
                 );
         }
         template <typename A0 , typename A1 , typename A2>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
+          , A0 && a0 , A1 && a1 , A2 && a2
           , boost::mpl::true_
         )
         {
@@ -160,17 +160,17 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 )
                 );
         }
         template <typename A0 , typename A1 , typename A2>
         dataflow(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
+          , A0 && a0 , A1 && a1 , A2 && a2
         )
             : base_type(
                 create_component(target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 )
                   , typename Action::direct_execution()
                 )
             )
@@ -179,7 +179,7 @@
         template <typename A0 , typename A1 , typename A2 , typename A3>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3
           , boost::mpl::false_
         )
         {
@@ -194,13 +194,13 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 )
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3
           , boost::mpl::true_
         )
         {
@@ -216,17 +216,17 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 )
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3>
         dataflow(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3
         )
             : base_type(
                 create_component(target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 )
                   , typename Action::direct_execution()
                 )
             )
@@ -235,7 +235,7 @@
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4
           , boost::mpl::false_
         )
         {
@@ -250,13 +250,13 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 )
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4
           , boost::mpl::true_
         )
         {
@@ -272,17 +272,17 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 )
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
         dataflow(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4
         )
             : base_type(
                 create_component(target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 )
                   , typename Action::direct_execution()
                 )
             )
@@ -291,7 +291,7 @@
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5
           , boost::mpl::false_
         )
         {
@@ -306,13 +306,13 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 )
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
         static inline lcos::unique_future<naming::id_type>
         create_component(naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5
           , boost::mpl::true_
         )
         {
@@ -328,17 +328,17 @@
                     naming::get_locality_from_id(target)
                   , detail::action_wrapper<Action>()
                   , target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 )
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
         dataflow(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5
         )
             : base_type(
                 create_component(target
-                  , boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 )
+                  , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 )
                   , typename Action::direct_execution()
                 )
             )

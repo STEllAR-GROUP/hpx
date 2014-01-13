@@ -1285,7 +1285,7 @@ namespace hpx
     ///           receive the given value.
     /// \param t  [in] this is the value which should be sent to the LCO.
     template <typename T>
-    void set_lco_value(naming::id_type const& id, BOOST_FWD_REF(T) t);
+    void set_lco_value(naming::id_type const& id, T && t);
 
     /// \brief Set the error state for the LCO referenced by the given id
     ///
@@ -1298,7 +1298,7 @@ namespace hpx
 
     /// \copydoc hpx::set_lco_error(naming::id_type const& id, boost::exception_ptr const& e)
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
-        BOOST_RV_REF(boost::exception_ptr) e);
+        boost::exception_ptr && e);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Start all active performance counters, optionally naming the

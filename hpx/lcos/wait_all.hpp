@@ -63,7 +63,7 @@ namespace hpx
 
     template <typename Future>
     lcos::unique_future<std::vector<Future> > //-V659
-    when_all(BOOST_RV_REF(std::vector<Future>) lazy_values,
+    when_all(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
         return when_all(lazy_values, ec);
@@ -131,7 +131,7 @@ namespace hpx
 
     template <typename Future>
     void
-    wait_all(BOOST_RV_REF(std::vector<Future>) lazy_values,
+    wait_all(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
         return wait_all(const_cast<std::vector<Future> const&>(lazy_values), ec);
@@ -157,7 +157,7 @@ namespace hpx
 
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), lazy_values_.size());
+                std::move(lazy_values_), lazy_values_.size());
 
         return (*f.get())();
     }
