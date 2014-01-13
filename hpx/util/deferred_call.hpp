@@ -13,6 +13,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
+#include <hpx/util/result_of.hpp>
 #include <hpx/util/tuple.hpp>
 
 #include <boost/mpl/bool.hpp>
@@ -32,6 +33,19 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename TD = typename util::decay<T>::type>
+        struct deferred_call_decay
+        {
+            typedef T type;
+        };
+
+        template <typename T, typename U>
+        struct deferred_call_decay<T, boost::reference_wrapper<U> >
+        {
+            typedef U& type;
+        };
+
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Args>
         class deferred_call_impl
@@ -74,6 +88,16 @@ namespace hpx { namespace util
             Args _args;
         };
     }
+    
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F>
+    struct deferred_call_result_of
+    {};
+
+    template <typename F>
+    struct deferred_call_result_of<F()>
+      : util::result_of<typename util::decay<F>::type()>
+    {};
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
@@ -151,8 +175,14 @@ namespace boost { namespace serialization
 namespace hpx { namespace util
 {
 #   define HPX_UTIL_DEFERRED_CALL_DECAY(Z, N, D)                              \
-    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
+    typename detail::deferred_call_decay<BOOST_PP_CAT(T, N)>::type            \
     /**/
+    template <typename F, BOOST_PP_ENUM_PARAMS(N, typename T)>
+    struct deferred_call_result_of<F(BOOST_PP_ENUM_PARAMS(N, T))>
+      : util::result_of<typename util::decay<F>::type(
+            BOOST_PP_ENUM(N, HPX_UTIL_DEFERRED_CALL_DECAY, _))>
+    {};
+
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename T)>
     detail::deferred_call_impl<
         typename util::decay<F>::type

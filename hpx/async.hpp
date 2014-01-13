@@ -15,7 +15,6 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/traits/is_callable.hpp>
 
 #include <boost/utility/enable_if.hpp>
@@ -30,13 +29,13 @@ namespace hpx { namespace detail
 {
     // Defer the evaluation of result_of during the SFINAE checks below
 #if defined(__clang__)
-    template <typename F, typename Result = typename util::result_of<F>::type>
+    template <typename F, typename Result = typename util::deferred_call_result_of<F>::type>
     struct create_future
     {
         typedef lcos::unique_future<Result> type;
     };
 #else
-    template <typename F, typename ResultOf = util::result_of<F> >
+    template <typename F, typename ResultOf = util::deferred_call_result_of<F> >
     struct create_future
     {
         typedef lcos::unique_future<typename ResultOf::type> type;
@@ -78,12 +77,12 @@ namespace hpx
         traits::detail::is_callable_not_action<
             typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type()>
+      , detail::create_future<F()>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, F && f)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type()
+        typedef typename util::deferred_call_result_of<
+            F()
         >::type result_type;
 
         if (policy == launch::sync)
@@ -104,12 +103,12 @@ namespace hpx
         traits::detail::is_callable_not_action<
             typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type()>
+      , detail::create_future<F()>
     >::type
     async(threads::executor& sched, F && f)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type()
+        typedef typename util::deferred_call_result_of<
+            F()
         >::type result_type;
 
         lcos::local::futures_factory<result_type()> p(sched,
@@ -123,7 +122,7 @@ namespace hpx
         traits::detail::is_callable_not_action<
             typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type()>
+      , detail::create_future<F()>
     >::type
     async(F && f)
     {
@@ -183,15 +182,13 @@ namespace hpx
             typename util::decay<F>::type(
                 BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>
+      , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, F && f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))
+        typedef typename util::deferred_call_result_of<
+            F(BOOST_PP_ENUM_PARAMS(N, A))
         >::type result_type;
 
         if (policy == launch::sync) {
@@ -218,15 +215,13 @@ namespace hpx
             typename util::decay<F>::type(
                 BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>
+      , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
     async(threads::executor& sched, F && f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))
+        typedef typename util::deferred_call_result_of<
+            F(BOOST_PP_ENUM_PARAMS(N, A))
         >::type result_type;
 
         lcos::local::futures_factory<result_type()> p(sched,
@@ -244,8 +239,7 @@ namespace hpx
             typename util::decay<F>::type(
                 BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>
+      , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
     async(F && f, HPX_ENUM_FWD_ARGS(N, A, a))
     {

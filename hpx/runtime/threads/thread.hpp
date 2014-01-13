@@ -10,8 +10,9 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
-#include <hpx/util/move.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/date_time_chrono.hpp>
+#include <hpx/util/move.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/thread/thread.hpp>
@@ -44,14 +45,15 @@ namespace hpx
         explicit thread(F && f)
           : id_(uninitialized)
         {
-            start_thread(HPX_STD_FUNCTION<void()>(std::forward<F>(f)));
+            start_thread(util::deferred_call(std::forward<F>(f)));
         }
 
 // #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
 //         template <typename F, typename ...Args>
 //         explicit thread(F&& f, Args&&... args)
 //         {
-//             start_thead(HPX_STD_BIND(f, std::forward<Args...>(args)));
+//             start_thead(util::deferred_call(
+//                std::forward<F>(f), std::forward<Args...>(args)));
 //         }
 // #else
         // Vertical preprocessor repetition to define the remaining constructors
@@ -266,7 +268,7 @@ namespace hpx
     thread(F && f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
       : id_(uninitialized)
     {
-        start_thread(HPX_STD_BIND(std::forward<F>(f),
+        start_thread(util::deferred_call(std::forward<F>(f),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
     }
 

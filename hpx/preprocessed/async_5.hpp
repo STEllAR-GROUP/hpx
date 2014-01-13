@@ -18,12 +18,12 @@ namespace hpx
         traits::detail::is_callable_not_action<
             typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type()>
+      , detail::create_future<F()>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, F && f)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type()
+        typedef typename util::deferred_call_result_of<
+            F()
         >::type result_type;
         if (policy == launch::sync)
         {
@@ -41,12 +41,12 @@ namespace hpx
         traits::detail::is_callable_not_action<
             typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type()>
+      , detail::create_future<F()>
     >::type
     async(threads::executor& sched, F && f)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type()
+        typedef typename util::deferred_call_result_of<
+            F()
         >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             std::forward<F>(f));
@@ -58,7 +58,7 @@ namespace hpx
         traits::detail::is_callable_not_action<
             typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type()>
+      , detail::create_future<F()>
     >::type
     async(F && f)
     {
@@ -90,15 +90,13 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type)>
+      , detail::create_future<F(A0)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, F && f,
         A0 && a0)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (typename util::decay<A0>::type)
+        typedef typename util::deferred_call_result_of<
+            F(A0)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -123,15 +121,13 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type)>
+      , detail::create_future<F(A0)>
     >::type
     async(threads::executor& sched, F && f,
         A0 && a0)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (typename util::decay<A0>::type)
+        typedef typename util::deferred_call_result_of<
+            F(A0)
         >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::deferred_call(
@@ -147,8 +143,7 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type)>
+      , detail::create_future<F(A0)>
     >::type
     async(F && f, A0 && a0)
     {
@@ -185,15 +180,13 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type)>
+      , detail::create_future<F(A0 , A1)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, F && f,
         A0 && a0 , A1 && a1)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (typename util::decay<A0>::type , typename util::decay<A1>::type)
+        typedef typename util::deferred_call_result_of<
+            F(A0 , A1)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -218,15 +211,13 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type)>
+      , detail::create_future<F(A0 , A1)>
     >::type
     async(threads::executor& sched, F && f,
         A0 && a0 , A1 && a1)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (typename util::decay<A0>::type , typename util::decay<A1>::type)
+        typedef typename util::deferred_call_result_of<
+            F(A0 , A1)
         >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::deferred_call(
@@ -242,8 +233,7 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type)>
+      , detail::create_future<F(A0 , A1)>
     >::type
     async(F && f, A0 && a0 , A1 && a1)
     {
@@ -280,15 +270,13 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>
+      , detail::create_future<F(A0 , A1 , A2)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, F && f,
         A0 && a0 , A1 && a1 , A2 && a2)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)
+        typedef typename util::deferred_call_result_of<
+            F(A0 , A1 , A2)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -313,15 +301,13 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>
+      , detail::create_future<F(A0 , A1 , A2)>
     >::type
     async(threads::executor& sched, F && f,
         A0 && a0 , A1 && a1 , A2 && a2)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)
+        typedef typename util::deferred_call_result_of<
+            F(A0 , A1 , A2)
         >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::deferred_call(
@@ -337,8 +323,7 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type)>
+      , detail::create_future<F(A0 , A1 , A2)>
     >::type
     async(F && f, A0 && a0 , A1 && a1 , A2 && a2)
     {
@@ -375,15 +360,13 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>
+      , detail::create_future<F(A0 , A1 , A2 , A3)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, F && f,
         A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)
+        typedef typename util::deferred_call_result_of<
+            F(A0 , A1 , A2 , A3)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -408,15 +391,13 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>
+      , detail::create_future<F(A0 , A1 , A2 , A3)>
     >::type
     async(threads::executor& sched, F && f,
         A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)
+        typedef typename util::deferred_call_result_of<
+            F(A0 , A1 , A2 , A3)
         >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::deferred_call(
@@ -432,8 +413,7 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type)>
+      , detail::create_future<F(A0 , A1 , A2 , A3)>
     >::type
     async(F && f, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
     {
@@ -470,15 +450,13 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>
+      , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
     >::type
     async(BOOST_SCOPED_ENUM(launch) policy, F && f,
         A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)
+        typedef typename util::deferred_call_result_of<
+            F(A0 , A1 , A2 , A3 , A4)
         >::type result_type;
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
@@ -503,15 +481,13 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>
+      , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
     >::type
     async(threads::executor& sched, F && f,
         A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)
+        typedef typename util::deferred_call_result_of<
+            F(A0 , A1 , A2 , A3 , A4)
         >::type result_type;
         lcos::local::futures_factory<result_type()> p(sched,
             util::deferred_call(
@@ -527,8 +503,7 @@ namespace hpx
             typename util::decay<F>::type(
                 typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (typename util::decay<A0>::type , typename util::decay<A1>::type , typename util::decay<A2>::type , typename util::decay<A3>::type , typename util::decay<A4>::type)>
+      , detail::create_future<F(A0 , A1 , A2 , A3 , A4)>
     >::type
     async(F && f, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
     {
