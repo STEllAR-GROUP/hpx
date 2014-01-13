@@ -708,6 +708,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     // Pulling important types into the main namespace
     using naming::id_type;
+    using naming::invalid_id;
 
     using lcos::unique_future;
     using lcos::shared_future;

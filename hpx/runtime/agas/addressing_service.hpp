@@ -97,6 +97,8 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     mutex_type refcnt_requests_mtx_;
     std::size_t refcnt_requests_count_;
+    bool enable_refcnt_caching_;
+
     boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
     boost::shared_ptr<incref_requests_type> incref_requests_;
 
@@ -1470,6 +1472,11 @@ public:
     /// \warning This function is for internal use only. It is dangerous and
     ///          may break your code if you use it.
     void clear_cache(
+        error_code& ec = throws
+        );
+
+    // Disable refcnt caching during shutdown
+    void start_shutdown(
         error_code& ec = throws
         );
 

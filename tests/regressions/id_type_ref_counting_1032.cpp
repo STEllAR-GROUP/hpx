@@ -32,28 +32,30 @@ struct test_server1
     test_server1()
     {
         HPX_ASSERT(!alive);
-        alive=true;
+        alive = true;
     }
     test_server1(hpx::id_type o)
       : other(o)
     {
         HPX_ASSERT(!alive);
-        alive=true;
+        alive = true;
     }
 
     ~test_server1()
     {
+        HPX_ASSERT(alive);
         void (*f)(hpx::id_type) = func<ComponentBase>;
         hpx::apply(f, other);
         alive = false;
+        other = hpx::invalid_id;
     }
 
     void test();
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
-        typedef hpx::actions::action0<
-            test_server1, &test_server1::test
-        > test_action;
+    typedef hpx::actions::action0<
+        test_server1, &test_server1::test
+    > test_action;
 #else
     HPX_DEFINE_COMPONENT_ACTION_TPL(test_server1, test, test_action);
 #endif
@@ -69,10 +71,11 @@ struct test_server2
     test_server2()
     {
         HPX_ASSERT(!alive);
-        alive=true;
+        alive = true;
     }
     ~test_server2()
     {
+        HPX_ASSERT(alive);
         alive = false;
     }
 
@@ -83,9 +86,9 @@ struct test_server2
     }
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
-        typedef hpx::actions::result_action0<
-            test_server2, hpx::id_type, &test_server2::create_test_server1
-        > create_test_server1_action;
+    typedef hpx::actions::result_action0<
+        test_server2, hpx::id_type, &test_server2::create_test_server1
+    > create_test_server1_action;
 #else
     HPX_DEFINE_COMPONENT_ACTION_TPL(test_server2, create_test_server1,
         create_test_server1_action);
@@ -125,26 +128,24 @@ void test_server1<ComponentBase>::test()
     HPX_TEST(other);
 }
 
+void ensure_garbage_collect()
+{
+    hpx::this_thread::sleep_for(boost::posix_time::millisec(500));
+    hpx::agas::garbage_collect();
+    hpx::this_thread::sleep_for(boost::posix_time::millisec(500));
+    hpx::agas::garbage_collect();
+    hpx::this_thread::sleep_for(boost::posix_time::millisec(500));
+    hpx::agas::garbage_collect();
+}
+
 template <template <typename> class ComponentBase>
 void func(hpx::id_type id)
 {
-    hpx::agas::garbage_collect();
-    hpx::agas::garbage_collect();
-    hpx::agas::garbage_collect();
+    ensure_garbage_collect();
 
     HPX_TEST(!test_server1<ComponentBase>::alive);
     HPX_TEST(test_server2<ComponentBase>::alive);
     HPX_TEST(id);
-}
-
-void ensure_garbage_collect()
-{
-    hpx::agas::garbage_collect();
-    hpx::this_thread::yield();
-    hpx::agas::garbage_collect();
-    hpx::this_thread::yield();
-    hpx::agas::garbage_collect();
-    hpx::this_thread::yield();
 }
 
 int hpx_main()
@@ -161,18 +162,15 @@ int hpx_main()
         // creating test_server1 instance
         hpx::id_type server1 = hpx::async(
             test_simple_server2::create_test_server1_action(), server2).get();
-        server2 = hpx::id_type();
+        server2 = hpx::invalid_id;
         ensure_garbage_collect();
 
         HPX_TEST(test_simple_server1::alive);
         HPX_TEST(test_simple_server2::alive);
 
         test_simple_server1::test_action()(server1);
-        server1 = hpx::id_type();
+        server1 = hpx::invalid_id;
         ensure_garbage_collect();
-
-        HPX_TEST(!test_simple_server1::alive);
-        HPX_TEST(!test_simple_server2::alive);
     }
     {
         HPX_TEST(!test_managed_server1::alive);
@@ -186,18 +184,15 @@ int hpx_main()
         // creating test_server1 instance
         hpx::id_type server1 = hpx::async(
             test_managed_server2::create_test_server1_action(), server2).get();
-        server2 = hpx::id_type();
+        server2 = hpx::invalid_id;
         ensure_garbage_collect();
 
         HPX_TEST(test_managed_server1::alive);
         HPX_TEST(test_managed_server2::alive);
 
         test_managed_server1::test_action()(server1);
-        server1 = hpx::id_type();
+        server1 = hpx::invalid_id;
         ensure_garbage_collect();
-
-        HPX_TEST(!test_managed_server1::alive);
-        HPX_TEST(!test_managed_server2::alive);
     }
 
     return hpx::finalize();
@@ -205,7 +200,7 @@ int hpx_main()
 
 int main(int argc, char **argv)
 {
-    hpx::init(argc, argv);
+    HPX_TEST_EQ(hpx::init(argc, argv), 0);
 
     HPX_TEST(!test_simple_server1::alive);
     HPX_TEST(!test_simple_server2::alive);
