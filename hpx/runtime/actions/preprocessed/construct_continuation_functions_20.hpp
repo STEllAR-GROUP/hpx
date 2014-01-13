@@ -63,7 +63,7 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_0()),
@@ -77,7 +77,7 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)() const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_0()),
@@ -101,7 +101,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
+                cont->trigger(std::forward<Result>(
                     (obj->*func)()
                 ));
             }
@@ -124,7 +124,7 @@
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
+                cont->trigger(std::forward<Result>(
                     (obj->*func)()
                 ));
             }
@@ -141,7 +141,7 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_0()),
@@ -155,7 +155,7 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)() const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_0()),
@@ -174,13 +174,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0) const
+          , Arg0 && arg0) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ));
                 cont->trigger();
             }
             catch (...) {
@@ -196,13 +196,13 @@
             void (Object::* const func)(
                 FArg0 arg0) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0) const
+          , Arg0 && arg0) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ));
                 cont->trigger();
             }
             catch (...) {
@@ -218,13 +218,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_1()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0>
@@ -232,13 +232,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_1()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_1
@@ -250,14 +250,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0) const
+          , Arg0 && arg0) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ))
                 ));
             }
             catch (...) {
@@ -273,14 +273,14 @@
             Result (Object::* const func)(
                 FArg0 arg0) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0) const
+          , Arg0 && arg0) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ))
                 ));
             }
             catch (...) {
@@ -296,13 +296,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_1()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0>
@@ -310,13 +310,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_1()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)));
     }
     
     
@@ -329,13 +329,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
+          , Arg0 && arg0 , Arg1 && arg1) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
                 cont->trigger();
             }
             catch (...) {
@@ -351,13 +351,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
+          , Arg0 && arg0 , Arg1 && arg1) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
                 cont->trigger();
             }
             catch (...) {
@@ -373,13 +373,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_2()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1>
@@ -387,13 +387,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_2()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_2
@@ -405,14 +405,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
+          , Arg0 && arg0 , Arg1 && arg1) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))
                 ));
             }
             catch (...) {
@@ -428,14 +428,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
+          , Arg0 && arg0 , Arg1 && arg1) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))
                 ));
             }
             catch (...) {
@@ -451,13 +451,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_2()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1>
@@ -465,13 +465,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_2()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)));
     }
     
     
@@ -484,13 +484,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
                 cont->trigger();
             }
             catch (...) {
@@ -506,13 +506,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
                 cont->trigger();
             }
             catch (...) {
@@ -528,13 +528,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_3()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2>
@@ -542,13 +542,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_3()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_3
@@ -560,14 +560,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))
                 ));
             }
             catch (...) {
@@ -583,14 +583,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))
                 ));
             }
             catch (...) {
@@ -606,13 +606,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_3()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2>
@@ -620,13 +620,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_3()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)));
     }
     
     
@@ -639,13 +639,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
                 cont->trigger();
             }
             catch (...) {
@@ -661,13 +661,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
                 cont->trigger();
             }
             catch (...) {
@@ -683,13 +683,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_4()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
@@ -697,13 +697,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_4()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_4
@@ -715,14 +715,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))
                 ));
             }
             catch (...) {
@@ -738,14 +738,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))
                 ));
             }
             catch (...) {
@@ -761,13 +761,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_4()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3>
@@ -775,13 +775,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_4()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)));
     }
     
     
@@ -794,13 +794,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
                 cont->trigger();
             }
             catch (...) {
@@ -816,13 +816,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
                 cont->trigger();
             }
             catch (...) {
@@ -838,13 +838,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_5()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
@@ -852,13 +852,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_5()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_5
@@ -870,14 +870,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))
                 ));
             }
             catch (...) {
@@ -893,14 +893,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))
                 ));
             }
             catch (...) {
@@ -916,13 +916,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_5()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4>
@@ -930,13 +930,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_5()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)));
     }
     
     
@@ -949,13 +949,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
                 cont->trigger();
             }
             catch (...) {
@@ -971,13 +971,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
                 cont->trigger();
             }
             catch (...) {
@@ -993,13 +993,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_6()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5>
@@ -1007,13 +1007,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_6()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_6
@@ -1025,14 +1025,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ))
                 ));
             }
             catch (...) {
@@ -1048,14 +1048,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ))
                 ));
             }
             catch (...) {
@@ -1071,13 +1071,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_6()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5>
@@ -1085,13 +1085,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_6()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)));
     }
     
     
@@ -1104,13 +1104,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1126,13 +1126,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1148,13 +1148,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_7()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6>
@@ -1162,13 +1162,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_7()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_7
@@ -1180,14 +1180,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ))
                 ));
             }
             catch (...) {
@@ -1203,14 +1203,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ))
                 ));
             }
             catch (...) {
@@ -1226,13 +1226,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_7()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6>
@@ -1240,13 +1240,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_7()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)));
     }
     
     
@@ -1259,13 +1259,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1281,13 +1281,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1303,13 +1303,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_8()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7>
@@ -1317,13 +1317,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_8()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_8
@@ -1335,14 +1335,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ))
                 ));
             }
             catch (...) {
@@ -1358,14 +1358,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ))
                 ));
             }
             catch (...) {
@@ -1381,13 +1381,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_8()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7>
@@ -1395,13 +1395,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_8()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)));
     }
     
     
@@ -1414,13 +1414,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1436,13 +1436,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1458,13 +1458,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_9()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8>
@@ -1472,13 +1472,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_9()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_9
@@ -1490,14 +1490,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ))
                 ));
             }
             catch (...) {
@@ -1513,14 +1513,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ))
                 ));
             }
             catch (...) {
@@ -1536,13 +1536,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_9()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8>
@@ -1550,13 +1550,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_9()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)));
     }
     
     
@@ -1569,13 +1569,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1591,13 +1591,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1613,13 +1613,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_10()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9>
@@ -1627,13 +1627,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_10()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_10
@@ -1645,14 +1645,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ))
                 ));
             }
             catch (...) {
@@ -1668,14 +1668,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ))
                 ));
             }
             catch (...) {
@@ -1691,13 +1691,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_10()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9>
@@ -1705,13 +1705,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_10()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)));
     }
     
     
@@ -1724,13 +1724,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1746,13 +1746,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1768,13 +1768,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_11()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10>
@@ -1782,13 +1782,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_11()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_11
@@ -1800,14 +1800,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ))
                 ));
             }
             catch (...) {
@@ -1823,14 +1823,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ))
                 ));
             }
             catch (...) {
@@ -1846,13 +1846,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_11()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10>
@@ -1860,13 +1860,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_11()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)));
     }
     
     
@@ -1879,13 +1879,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1901,13 +1901,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
                 cont->trigger();
             }
             catch (...) {
@@ -1923,13 +1923,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_12()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11>
@@ -1937,13 +1937,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_12()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_12
@@ -1955,14 +1955,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ))
                 ));
             }
             catch (...) {
@@ -1978,14 +1978,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ))
                 ));
             }
             catch (...) {
@@ -2001,13 +2001,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_12()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11>
@@ -2015,13 +2015,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_12()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)));
     }
     
     
@@ -2034,13 +2034,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2056,13 +2056,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2078,13 +2078,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_13()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12>
@@ -2092,13 +2092,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_13()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_13
@@ -2110,14 +2110,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ))
                 ));
             }
             catch (...) {
@@ -2133,14 +2133,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ))
                 ));
             }
             catch (...) {
@@ -2156,13 +2156,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_13()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12>
@@ -2170,13 +2170,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_13()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)));
     }
     
     
@@ -2189,13 +2189,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2211,13 +2211,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2233,13 +2233,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_14()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13>
@@ -2247,13 +2247,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_14()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_14
@@ -2265,14 +2265,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ))
                 ));
             }
             catch (...) {
@@ -2288,14 +2288,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ))
                 ));
             }
             catch (...) {
@@ -2311,13 +2311,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_14()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13>
@@ -2325,13 +2325,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_14()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)));
     }
     
     
@@ -2344,13 +2344,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2366,13 +2366,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2388,13 +2388,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_15()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14>
@@ -2402,13 +2402,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_15()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_15
@@ -2420,14 +2420,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ))
                 ));
             }
             catch (...) {
@@ -2443,14 +2443,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ))
                 ));
             }
             catch (...) {
@@ -2466,13 +2466,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_15()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14>
@@ -2480,13 +2480,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_15()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)));
     }
     
     
@@ -2499,13 +2499,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2521,13 +2521,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2543,13 +2543,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_16()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15>
@@ -2557,13 +2557,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_16()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_16
@@ -2575,14 +2575,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ))
                 ));
             }
             catch (...) {
@@ -2598,14 +2598,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ))
                 ));
             }
             catch (...) {
@@ -2621,13 +2621,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_16()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15>
@@ -2635,13 +2635,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_16()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)));
     }
     
     
@@ -2654,13 +2654,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2676,13 +2676,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2698,13 +2698,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_17()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16>
@@ -2712,13 +2712,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_17()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_17
@@ -2730,14 +2730,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ))
                 ));
             }
             catch (...) {
@@ -2753,14 +2753,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ))
                 ));
             }
             catch (...) {
@@ -2776,13 +2776,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_17()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16>
@@ -2790,13 +2790,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_17()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)));
     }
     
     
@@ -2809,13 +2809,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2831,13 +2831,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2853,13 +2853,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_18()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17>
@@ -2867,13 +2867,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_18()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_18
@@ -2885,14 +2885,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ))
                 ));
             }
             catch (...) {
@@ -2908,14 +2908,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ))
                 ));
             }
             catch (...) {
@@ -2931,13 +2931,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_18()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17>
@@ -2945,13 +2945,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_18()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)));
     }
     
     
@@ -2964,13 +2964,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ));
                 cont->trigger();
             }
             catch (...) {
@@ -2986,13 +2986,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ));
                 cont->trigger();
             }
             catch (...) {
@@ -3008,13 +3008,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17 , FArg18), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_19()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)) , util::get< 18>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)) , util::get< 18>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18>
@@ -3022,13 +3022,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17 , FArg18) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_19()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)) , util::get< 18>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)) , util::get< 18>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_19
@@ -3040,14 +3040,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ))
                 ));
             }
             catch (...) {
@@ -3063,14 +3063,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ))
                 ));
             }
             catch (...) {
@@ -3086,13 +3086,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17 , FArg18), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_19()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)) , util::get< 18>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)) , util::get< 18>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18>
@@ -3100,13 +3100,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17 , FArg18) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_19()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)) , util::get< 18>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)) , util::get< 18>(std::forward<Arguments_>( args)));
     }
     
     
@@ -3119,13 +3119,13 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             void (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18 , FArg19 arg19),
             Object* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18 , BOOST_FWD_REF(Arg19) arg19) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ) , boost::forward<Arg19>( arg19 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ));
                 cont->trigger();
             }
             catch (...) {
@@ -3141,13 +3141,13 @@
             void (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18 , FArg19 arg19) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18 , BOOST_FWD_REF(Arg19) arg19) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ) , boost::forward<Arg19>( arg19 ));
+                (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ));
                 cont->trigger();
             }
             catch (...) {
@@ -3163,13 +3163,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17 , FArg18 , FArg19), Object* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_20()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)) , util::get< 18>(boost::forward<Arguments_>( args)) , util::get< 19>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)) , util::get< 18>(std::forward<Arguments_>( args)) , util::get< 19>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18 , typename FArg19>
@@ -3177,13 +3177,13 @@
     construct_continuation_thread_object_function_void(
         continuation_type cont,
         void (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17 , FArg18 , FArg19) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_void_20()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)) , util::get< 18>(boost::forward<Arguments_>( args)) , util::get< 19>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)) , util::get< 18>(std::forward<Arguments_>( args)) , util::get< 19>(std::forward<Arguments_>( args)));
     }
     
     struct continuation_thread_object_function_20
@@ -3195,14 +3195,14 @@
         BOOST_FORCEINLINE result_type operator()(continuation_type cont,
             Result (Object::* func)(FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18 , FArg19 arg19),
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18 , BOOST_FWD_REF(Arg19) arg19) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ) , boost::forward<Arg19>( arg19 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ))
                 ));
             }
             catch (...) {
@@ -3218,14 +3218,14 @@
             Result (Object::* const func)(
                 FArg0 arg0 , FArg1 arg1 , FArg2 arg2 , FArg3 arg3 , FArg4 arg4 , FArg5 arg5 , FArg6 arg6 , FArg7 arg7 , FArg8 arg8 , FArg9 arg9 , FArg10 arg10 , FArg11 arg11 , FArg12 arg12 , FArg13 arg13 , FArg14 arg14 , FArg15 arg15 , FArg16 arg16 , FArg17 arg17 , FArg18 arg18 , FArg19 arg19) const,
             Component* obj
-          , BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4 , BOOST_FWD_REF(Arg5) arg5 , BOOST_FWD_REF(Arg6) arg6 , BOOST_FWD_REF(Arg7) arg7 , BOOST_FWD_REF(Arg8) arg8 , BOOST_FWD_REF(Arg9) arg9 , BOOST_FWD_REF(Arg10) arg10 , BOOST_FWD_REF(Arg11) arg11 , BOOST_FWD_REF(Arg12) arg12 , BOOST_FWD_REF(Arg13) arg13 , BOOST_FWD_REF(Arg14) arg14 , BOOST_FWD_REF(Arg15) arg15 , BOOST_FWD_REF(Arg16) arg16 , BOOST_FWD_REF(Arg17) arg17 , BOOST_FWD_REF(Arg18) arg18 , BOOST_FWD_REF(Arg19) arg19) const
+          , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19) const
         {
             try {
                 LTM_(debug) << "Executing action("
                     << detail::get_action_name<derived_type>()
                     << ") with continuation(" << cont->get_gid() << ")";
-                cont->trigger(boost::forward<Result>(
-                    (obj->*func)(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ) , boost::forward<Arg5>( arg5 ) , boost::forward<Arg6>( arg6 ) , boost::forward<Arg7>( arg7 ) , boost::forward<Arg8>( arg8 ) , boost::forward<Arg9>( arg9 ) , boost::forward<Arg10>( arg10 ) , boost::forward<Arg11>( arg11 ) , boost::forward<Arg12>( arg12 ) , boost::forward<Arg13>( arg13 ) , boost::forward<Arg14>( arg14 ) , boost::forward<Arg15>( arg15 ) , boost::forward<Arg16>( arg16 ) , boost::forward<Arg17>( arg17 ) , boost::forward<Arg18>( arg18 ) , boost::forward<Arg19>( arg19 ))
+                cont->trigger(std::forward<Result>(
+                    (obj->*func)(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 ))
                 ));
             }
             catch (...) {
@@ -3241,13 +3241,13 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17 , FArg18 , FArg19), Component* obj,
-        BOOST_FWD_REF(Arguments_) args)
+        Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_20()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)) , util::get< 18>(boost::forward<Arguments_>( args)) , util::get< 19>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)) , util::get< 18>(std::forward<Arguments_>( args)) , util::get< 19>(std::forward<Arguments_>( args)));
     }
     template <typename Object, typename Arguments_
         , typename FArg0 , typename FArg1 , typename FArg2 , typename FArg3 , typename FArg4 , typename FArg5 , typename FArg6 , typename FArg7 , typename FArg8 , typename FArg9 , typename FArg10 , typename FArg11 , typename FArg12 , typename FArg13 , typename FArg14 , typename FArg15 , typename FArg16 , typename FArg17 , typename FArg18 , typename FArg19>
@@ -3255,11 +3255,11 @@
     construct_continuation_thread_object_function(
         continuation_type cont,
         Result (Object::* const func)(FArg0 , FArg1 , FArg2 , FArg3 , FArg4 , FArg5 , FArg6 , FArg7 , FArg8 , FArg9 , FArg10 , FArg11 , FArg12 , FArg13 , FArg14 , FArg15 , FArg16 , FArg17 , FArg18 , FArg19) const,
-        Component* obj, BOOST_FWD_REF(Arguments_) args)
+        Component* obj, Arguments_ && args)
     {
         return util::bind(util::one_shot(
             continuation_thread_object_function_20()),
             cont, func, obj
           ,
-                util::get< 0>(boost::forward<Arguments_>( args)) , util::get< 1>(boost::forward<Arguments_>( args)) , util::get< 2>(boost::forward<Arguments_>( args)) , util::get< 3>(boost::forward<Arguments_>( args)) , util::get< 4>(boost::forward<Arguments_>( args)) , util::get< 5>(boost::forward<Arguments_>( args)) , util::get< 6>(boost::forward<Arguments_>( args)) , util::get< 7>(boost::forward<Arguments_>( args)) , util::get< 8>(boost::forward<Arguments_>( args)) , util::get< 9>(boost::forward<Arguments_>( args)) , util::get< 10>(boost::forward<Arguments_>( args)) , util::get< 11>(boost::forward<Arguments_>( args)) , util::get< 12>(boost::forward<Arguments_>( args)) , util::get< 13>(boost::forward<Arguments_>( args)) , util::get< 14>(boost::forward<Arguments_>( args)) , util::get< 15>(boost::forward<Arguments_>( args)) , util::get< 16>(boost::forward<Arguments_>( args)) , util::get< 17>(boost::forward<Arguments_>( args)) , util::get< 18>(boost::forward<Arguments_>( args)) , util::get< 19>(boost::forward<Arguments_>( args)));
+                util::get< 0>(std::forward<Arguments_>( args)) , util::get< 1>(std::forward<Arguments_>( args)) , util::get< 2>(std::forward<Arguments_>( args)) , util::get< 3>(std::forward<Arguments_>( args)) , util::get< 4>(std::forward<Arguments_>( args)) , util::get< 5>(std::forward<Arguments_>( args)) , util::get< 6>(std::forward<Arguments_>( args)) , util::get< 7>(std::forward<Arguments_>( args)) , util::get< 8>(std::forward<Arguments_>( args)) , util::get< 9>(std::forward<Arguments_>( args)) , util::get< 10>(std::forward<Arguments_>( args)) , util::get< 11>(std::forward<Arguments_>( args)) , util::get< 12>(std::forward<Arguments_>( args)) , util::get< 13>(std::forward<Arguments_>( args)) , util::get< 14>(std::forward<Arguments_>( args)) , util::get< 15>(std::forward<Arguments_>( args)) , util::get< 16>(std::forward<Arguments_>( args)) , util::get< 17>(std::forward<Arguments_>( args)) , util::get< 18>(std::forward<Arguments_>( args)) , util::get< 19>(std::forward<Arguments_>( args)));
     }

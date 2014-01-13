@@ -63,7 +63,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
 #else // BOOST_PP_IS_ITERATING
 #define N BOOST_PP_ITERATION()
 #define HPX_LCOS_DATAFLOW_M0(Z, N, D)                                           \
-    boost::move(boost::fusion::at_c<N>(args))                                   \
+    std::move(boost::fusion::at_c<N>(args))                                   \
     /**/
 
     template <typename Action>

@@ -20,7 +20,7 @@
 
 #include <boost/function_types/components.hpp>
 #include <boost/function_types/function_pointer.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/not.hpp>
@@ -130,7 +130,7 @@ namespace hpx { namespace traits
                 BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
             R operator()(C&                                                   \
                 BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
-            R operator()(BOOST_RV_REF(C)                                      \
+            R operator()(C &&                                      \
                 BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
         };                                                                    \
                                                                               \
@@ -148,7 +148,7 @@ namespace hpx { namespace traits
                 BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
             R operator()(C const&                                             \
                 BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
-            R operator()(BOOST_RV_REF(C const)                                \
+            R operator()(C const &&                                \
                 BOOST_PP_ENUM_TRAILING_PARAMS(N, P)) const volatile;          \
         };                                                                    \
         /**/

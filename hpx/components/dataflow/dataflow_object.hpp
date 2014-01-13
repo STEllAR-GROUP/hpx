@@ -60,7 +60,7 @@ namespace hpx { namespace components
         lcos::dataflow_base<
             typename util::result_of<typename util::decay<F>::type(T &)>::type
         >
-        apply(BOOST_FWD_REF(F) f) const
+        apply(F && f) const
         {
             typedef
                 server::remote_object_apply_action1<
@@ -72,7 +72,7 @@ namespace hpx { namespace components
                 apply_action;
 
             return lcos::dataflow<apply_action>(gid_
-                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
+                  , std::move(remote_object::invoke_apply_fun<T, F>(std::forward<F>(f)))
                 );
         }
 
@@ -80,7 +80,7 @@ namespace hpx { namespace components
         lcos::dataflow_base<
             typename util::result_of<typename util::decay<F>::type(T &)>::type
         >
-        apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(D) d) const
+        apply(F && f, D && d) const
         {
             typedef
                 server::remote_object_apply_action1<
@@ -93,8 +93,8 @@ namespace hpx { namespace components
 
 
             return lcos::dataflow<apply_action>(gid_
-                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
-                  , boost::forward<D>(d)
+                  , std::move(remote_object::invoke_apply_fun<T, F>(std::forward<F>(f)))
+                  , std::forward<D>(d)
                 );
         }
 
@@ -102,7 +102,7 @@ namespace hpx { namespace components
         lcos::dataflow_base<
             typename util::result_of<typename util::decay<F>::type(T &, A)>::type
         >
-        apply2(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A) a) const
+        apply2(F && f, A && a) const
         {
             typedef
                 server::remote_object_apply_action2<
@@ -116,8 +116,8 @@ namespace hpx { namespace components
 
 
             return lcos::dataflow<apply_action>(gid_
-                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
-                  , boost::forward<A>(a)
+                  , std::move(remote_object::invoke_apply_fun<T, F>(std::forward<F>(f)))
+                  , std::forward<A>(a)
                 );
         }
 
@@ -125,7 +125,7 @@ namespace hpx { namespace components
         lcos::dataflow_base<
             typename util::result_of<typename util::decay<F>::type(T &)>::type
         >
-        apply3(BOOST_FWD_REF(F) f, A0 const & a0, A1 const & a1) const
+        apply3(F && f, A0 const & a0, A1 const & a1) const
         {
             typedef
                 server::remote_object_apply_action2<
@@ -139,7 +139,7 @@ namespace hpx { namespace components
 
 
             return lcos::dataflow<apply_action>(gid_
-                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
+                  , std::move(remote_object::invoke_apply_fun<T, F>(std::forward<F>(f)))
                   , a0
                   , a1
                 );
@@ -149,7 +149,7 @@ namespace hpx { namespace components
         lcos::dataflow_base<
             typename util::result_of<typename util::decay<F>::type(T &)>::type
         >
-        apply4(BOOST_FWD_REF(F) f, A0 const & a0, A1 const & a1, A2 const & a2) const
+        apply4(F && f, A0 const & a0, A1 const & a1, A2 const & a2) const
         {
             typedef
                 server::remote_object_apply_action2<
@@ -163,7 +163,7 @@ namespace hpx { namespace components
 
 
             return lcos::dataflow<apply_action>(gid_
-                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
+                  , std::move(remote_object::invoke_apply_fun<T, F>(std::forward<F>(f)))
                   , a0
                   , a1
                   , a2
@@ -174,7 +174,7 @@ namespace hpx { namespace components
         lcos::dataflow_base<
             typename util::result_of<typename util::decay<F>::type(T &)>::type
         >
-        apply5(BOOST_FWD_REF(F) f, A0 const & a0, A1 const & a1, A2 const & a2, A3 const & a3) const
+        apply5(F && f, A0 const & a0, A1 const & a1, A2 const & a2, A3 const & a3) const
         {
             typedef
                 server::remote_object_apply_action2<
@@ -188,7 +188,7 @@ namespace hpx { namespace components
 
 
             return lcos::dataflow<apply_action>(gid_
-                  , boost::move(remote_object::invoke_apply_fun<T, F>(boost::forward<F>(f)))
+                  , std::move(remote_object::invoke_apply_fun<T, F>(std::forward<F>(f)))
                   , a0
                   , a1
                   , a2

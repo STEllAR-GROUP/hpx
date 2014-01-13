@@ -58,9 +58,9 @@ namespace hpx { namespace util
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
     >::type
-    invoke_r(FR C::*f, BOOST_FWD_REF(T) t)
+    invoke_r(FR C::*f, T && t)
     {
-        return util::void_guard<R>(), (boost::forward<T>(t).*f);
+        return util::void_guard<R>(), (std::forward<T>(t).*f);
     }
     template <typename R, typename FR, typename C, typename T>
     BOOST_FORCEINLINE
@@ -68,10 +68,10 @@ namespace hpx { namespace util
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
     >::type
-    invoke_r(FR C::*f, BOOST_FWD_REF(T) t)
+    invoke_r(FR C::*f, T && t)
     {
         using boost::get_pointer;
-        return util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f);
+        return util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f);
     }
 
     template <typename R, typename FR, typename C, typename T>
@@ -80,9 +80,9 @@ namespace hpx { namespace util
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
     >::type
-    invoke_r(FR (C::*f)(), BOOST_FWD_REF(T) t)
+    invoke_r(FR (C::*f)(), T && t)
     {
-        return util::void_guard<R>(), (boost::forward<T>(t).*f)();
+        return util::void_guard<R>(), (std::forward<T>(t).*f)();
     }
     template <typename R, typename FR, typename C, typename T>
     HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
@@ -90,10 +90,10 @@ namespace hpx { namespace util
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
     >::type
-    invoke_r(FR (C::*f)(), BOOST_FWD_REF(T) t)
+    invoke_r(FR (C::*f)(), T && t)
     {
         using boost::get_pointer;
-        return util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f)();
+        return util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)();
     }
     template <typename R, typename FR, typename C, typename T>
     HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
@@ -101,9 +101,9 @@ namespace hpx { namespace util
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
     >::type
-    invoke_r(FR (C::*f)() const, BOOST_FWD_REF(T) t)
+    invoke_r(FR (C::*f)() const, T && t)
     {
-        return util::void_guard<R>(), (boost::forward<T>(t).*f)();
+        return util::void_guard<R>(), (std::forward<T>(t).*f)();
     }
     template <typename R, typename FR, typename C, typename T>
     HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
@@ -111,10 +111,10 @@ namespace hpx { namespace util
         boost::is_base_of<C, typename util::decay<T>::type>
       , R
     >::type
-    invoke_r(FR (C::*f)() const, BOOST_FWD_REF(T) t)
+    invoke_r(FR (C::*f)() const, T && t)
     {
         using boost::get_pointer;
-        return util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f)();
+        return util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)();
     }
 
     template <typename R, typename F>
@@ -123,7 +123,7 @@ namespace hpx { namespace util
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , R
     >::type
-    invoke_r(BOOST_FWD_REF(F) f)
+    invoke_r(F && f)
     {
         return util::void_guard<R>(), (f.get())();
     }
@@ -138,9 +138,9 @@ namespace hpx { namespace util
         >
       , R
     >::type
-    invoke_r(BOOST_FWD_REF(F) f)
+    invoke_r(F && f)
     {
-        return util::void_guard<R>(), boost::forward<F>(f)();
+        return util::void_guard<R>(), std::forward<F>(f)();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -155,28 +155,28 @@ namespace hpx { namespace util
     template <typename R, typename C, typename T>
     BOOST_FORCEINLINE
     typename invoke_result_of<R C::*(T)>::type
-    invoke(R C::*f, BOOST_FWD_REF(T) t)
+    invoke(R C::*f, T && t)
     {
         typedef
             typename invoke_result_of<R C::*(T)>::type
             result_type;
 
-        return util::invoke_r<result_type>(f, boost::forward<T>(t));
+        return util::invoke_r<result_type>(f, std::forward<T>(t));
     }
 
     template <typename R, typename C, typename T>
     HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
-    invoke(R (C::*f)(), BOOST_FWD_REF(T) t)
+    invoke(R (C::*f)(), T && t)
     {
-        return util::invoke_r<R>(f, boost::forward<T>(t));
+        return util::invoke_r<R>(f, std::forward<T>(t));
     }
     template <typename R, typename C, typename T>
     HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
-    invoke(R (C::*f)() const, BOOST_FWD_REF(T) t)
+    invoke(R (C::*f)() const, T && t)
     {
-        return util::invoke_r<R>(f, boost::forward<T>(t));
+        return util::invoke_r<R>(f, std::forward<T>(t));
     }
 
     template <typename F>
@@ -188,13 +188,13 @@ namespace hpx { namespace util
         >
       , typename invoke_result_of<F()>::type
     >::type
-    invoke(BOOST_FWD_REF(F) f)
+    invoke(F && f)
     {
         typedef
             typename invoke_result_of<F()>::type
             result_type;
 
-        return util::invoke_r<result_type>(boost::forward<F>(f));
+        return util::invoke_r<result_type>(std::forward<F>(f));
     }
 }}
 
@@ -258,10 +258,10 @@ namespace hpx { namespace util
       , R
     >::type
     invoke_r(FR (C::*f)(BOOST_PP_ENUM_PARAMS(N, A))
-      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+      , T && t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return
-            util::void_guard<R>(), (boost::forward<T>(t).*f)
+            util::void_guard<R>(), (std::forward<T>(t).*f)
                 (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
     template <typename R, typename FR
@@ -273,11 +273,11 @@ namespace hpx { namespace util
       , R
     >::type
     invoke_r(FR (C::*f)(BOOST_PP_ENUM_PARAMS(N, A))
-      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+      , T && t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
                 (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
     template <typename R, typename FR
@@ -289,10 +289,10 @@ namespace hpx { namespace util
       , R
     >::type
     invoke_r(FR (C::*f)(BOOST_PP_ENUM_PARAMS(N, A)) const
-      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+      , T && t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return
-            util::void_guard<R>(), (boost::forward<T>(t).*f)
+            util::void_guard<R>(), (std::forward<T>(t).*f)
                 (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
     template <typename R, typename FR
@@ -304,11 +304,11 @@ namespace hpx { namespace util
       , R
     >::type
     invoke_r(FR (C::*f)(BOOST_PP_ENUM_PARAMS(N, A)) const
-      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+      , T && t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         using boost::get_pointer;
         return
-            util::void_guard<R>(), ((*get_pointer(boost::forward<T>(t))).*f)
+            util::void_guard<R>(), ((*get_pointer(std::forward<T>(t))).*f)
                 (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 #   endif /*N < HPX_FUNCTION_ARGUMENT_LIMIT*/
@@ -319,7 +319,7 @@ namespace hpx { namespace util
         boost::is_reference_wrapper<typename util::decay<F>::type>
       , R
     >::type
-    invoke_r(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    invoke_r(F && f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return
             util::void_guard<R>(), (f.get())
@@ -336,10 +336,10 @@ namespace hpx { namespace util
         >
       , R
     >::type
-    invoke_r(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    invoke_r(F && f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return
-            util::void_guard<R>(), boost::forward<F>(f)
+            util::void_guard<R>(), std::forward<F>(f)
                 (HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -364,11 +364,11 @@ namespace hpx { namespace util
     HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(BOOST_PP_ENUM_PARAMS(N, A))
-      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+      , T && t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return
             util::invoke_r<R>(
-                f, boost::forward<T>(t)
+                f, std::forward<T>(t)
               , HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
             );
     }
@@ -377,11 +377,11 @@ namespace hpx { namespace util
     HPX_UTIL_INVOKE_MEM_FUN_PTR_FORCEINLINE
     R
     invoke(R (C::*f)(BOOST_PP_ENUM_PARAMS(N, A)) const
-      , BOOST_FWD_REF(T) t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+      , T && t, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return
             util::invoke_r<R>(
-                f, boost::forward<T>(t)
+                f, std::forward<T>(t)
               , HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
             );
     }
@@ -396,7 +396,7 @@ namespace hpx { namespace util
         >
       , typename invoke_result_of<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
     >::type
-    invoke(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+    invoke(F && f, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
             typename invoke_result_of<F(BOOST_PP_ENUM_PARAMS(N, Arg))>::type
@@ -404,7 +404,7 @@ namespace hpx { namespace util
 
         return
             util::invoke_r<result_type>(
-                boost::forward<F>(f)
+                std::forward<F>(f)
               , HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
             );
     }

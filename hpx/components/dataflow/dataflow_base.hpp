@@ -25,7 +25,7 @@ namespace hpx { namespace lcos
         {}
 
         explicit dataflow_base(lcos::unique_future<naming::id_type> promise)
-            : impl(new detail::dataflow_base_impl(boost::move(promise)))
+            : impl(new detail::dataflow_base_impl(std::move(promise)))
         {}
 
         void connect(naming::id_type const & id) const

@@ -105,7 +105,7 @@ struct foo_struct_coro
 };
 
 template <typename F>
-double test(BOOST_FWD_REF(F) f, int n)
+double test(F && f, int n)
 {
     global_int = 5;
     timer t;

@@ -403,7 +403,7 @@ struct HPX_EXPORT primary_namespace
     wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
         naming::address::address_type)
     {
-        return boost::move(f);
+        return std::move(f);
     }
 
     static parcelset::policies::message_handler* get_message_handler(

@@ -467,10 +467,6 @@ namespace hpx { namespace util
         typename Char = char>
     class basic_any
     {
-    private:
-        // Mark this class copyable and movable
-        BOOST_COPYABLE_AND_MOVABLE(basic_any)
-
     public:
         // constructors
         basic_any() BOOST_NOEXCEPT
@@ -530,9 +526,9 @@ namespace hpx { namespace util
             typedef typename util::decay<T>::type value_type;
 
             if (detail::any::get_table<value_type>::is_small::value)
-                new (&object) value_type(boost::forward<T>(x));
+                new (&object) value_type(std::forward<T>(x));
             else
-                object = new value_type(boost::forward<T>(x));
+                object = new value_type(std::forward<T>(x));
         }
 #endif
 
@@ -595,7 +591,7 @@ namespace hpx { namespace util
         template <typename T>
         basic_any& operator=(T&& rhs)
         {
-            basic_any(boost::forward<T>(rhs)).swap(*this);
+            basic_any(std::forward<T>(rhs)).swap(*this);
             return *this;
         }
 #endif
@@ -773,10 +769,6 @@ namespace hpx { namespace util
     template <typename Char> // default is char
     class basic_any<void, void, Char>
     {
-    private:
-        // Mark this class copyable and movable
-        BOOST_COPYABLE_AND_MOVABLE(basic_any)
-
     public:
         // constructors
         basic_any() BOOST_NOEXCEPT
@@ -836,9 +828,9 @@ namespace hpx { namespace util
             typedef typename util::decay<T>::type value_type;
 
             if (detail::any::get_table<value_type>::is_small::value)
-                new (&object) value_type(boost::forward<T>(x));
+                new (&object) value_type(std::forward<T>(x));
             else
-                object = new value_type(boost::forward<T>(x));
+                object = new value_type(std::forward<T>(x));
         }
 #endif
 
@@ -900,7 +892,7 @@ namespace hpx { namespace util
         template <typename T>
         basic_any& operator=(T&& rhs)
         {
-            basic_any(boost::forward<T>(rhs)).swap(*this);
+            basic_any(std::forward<T>(rhs)).swap(*this);
             return *this;
         }
 #endif

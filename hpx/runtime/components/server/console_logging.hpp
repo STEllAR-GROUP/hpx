@@ -65,12 +65,12 @@ namespace hpx { namespace components { namespace server
         template <typename Arguments>
         static util::unused_type
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             try {
                 // call the function, ignoring the return value
                 console_logging(
-                    boost::move(boost::fusion::at_c<0>(args)));
+                    std::move(boost::fusion::at_c<0>(args)));
             }
             catch (hpx::exception const& /*e*/) {
                 /**/;      // no logging!

@@ -30,15 +30,15 @@ namespace hpx { namespace test
         movable_object(movable_object const& other);
 
         // Move constructor.
-        movable_object(BOOST_RV_REF(movable_object) other);
+        movable_object(movable_object && other);
 
         ~movable_object();
 
         // Copy assignment.
-        movable_object& operator=(BOOST_COPY_ASSIGN_REF(movable_object) other);
+        movable_object& operator=(movable_object const & other);
 
         // Move assignment.
-        movable_object& operator=(BOOST_RV_REF(movable_object) other);
+        movable_object& operator=(movable_object && other);
 
         std::size_t get_count() const;
         void reset_count();
@@ -47,7 +47,7 @@ namespace hpx { namespace test
         void serialize(Archive& ar, const unsigned int);
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(movable_object)
+        
     };
 
     ///////////////////////////////////////////////////////////////////////////

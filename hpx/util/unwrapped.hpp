@@ -146,7 +146,7 @@ namespace hpx { namespace util
 
                 return
                     invoke(
-                        boost::move(t)
+                        std::move(t)
                       , boost::unwrap_ref(f)
                       , typename traits::is_future_range<future_type>::type()
                       , typename is_void_future<future_type>::type()
@@ -159,13 +159,13 @@ namespace hpx { namespace util
             {
                 HPX_ASSERT(f.is_ready());
                 typename lcos::detail::future_traits<Future>::type
-                    val(boost::move(f.get()));
+                    val(std::move(f.get()));
                 f = Future();
                 return
-                    boost::move(
+                    std::move(
                         boost::fusion::push_back(
-                            boost::move(t)
-                          , boost::move(val)
+                            std::move(t)
+                          , std::move(val)
                         )
                     );
             }
@@ -177,7 +177,7 @@ namespace hpx { namespace util
                 HPX_ASSERT(f.is_ready());
                 f.get();
                 f = Future();
-                return boost::move(t);
+                return std::move(t);
             }
 
             template <typename Tuple, typename Range>
@@ -191,15 +191,15 @@ namespace hpx { namespace util
                 BOOST_FOREACH(typename Range::value_type & f, r)
                 {
                     HPX_ASSERT(f.is_ready());
-                    res.push_back(boost::move(f.get()));
+                    res.push_back(std::move(f.get()));
                 }
                 r = Range();
 
                 return
-                    boost::move(
+                    std::move(
                         boost::fusion::push_back(
-                            boost::move(t)
-                          , boost::move(res)
+                            std::move(t)
+                          , std::move(res)
                         )
                     );
             }
@@ -215,7 +215,7 @@ namespace hpx { namespace util
                 }
                 r = Range();
 
-                return boost::move(t);
+                return std::move(t);
             }
         };
 
@@ -288,12 +288,12 @@ namespace hpx { namespace util
 
     template <typename F>
     detail::unwrapped_impl<typename util::decay<F>::type >
-    unwrapped(BOOST_FWD_REF(F) f)
+    unwrapped(F && f)
     {
         detail::unwrapped_impl<typename util::decay<F>::type >
-            res = {boost::forward<F>(f)};
+            res = {std::forward<F>(f)};
 
-        return boost::move(res);
+        return std::move(res);
     }
 }}
 

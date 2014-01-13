@@ -68,7 +68,7 @@ struct channel
 
     boost::intrusive_ptr<future_data> data_;
 
-    BOOST_COPYABLE_AND_MOVABLE(channel<T>);
+    (channel<T>);
 
   public:
     typedef typename future_data::completed_callback_type
@@ -78,9 +78,9 @@ struct channel
 
     channel(channel const& other) : data_(other.data_) {}
 
-    channel(BOOST_RV_REF(channel) other) : data_(boost::move(other.data_)) {}
+    channel(channel && other) : data_(std::move(other.data_)) {}
 
-    explicit channel(BOOST_RV_REF(T) init) : data_(new future_data())
+    explicit channel(T && init) : data_(new future_data())
     {
         data_->set_data(init);
     }
@@ -96,7 +96,7 @@ struct channel
             data_->deleting_owner();
     }
 
-    channel& operator=(BOOST_COPY_ASSIGN_REF(channel) other)
+    channel& operator=(channel const & other)
     {
         HPX_ASSERT(data_);
 
@@ -110,7 +110,7 @@ struct channel
         return *this;
     }
 
-    channel& operator=(BOOST_RV_REF(channel) other)
+    channel& operator=(channel && other)
     {
         HPX_ASSERT(data_);
 
@@ -118,7 +118,7 @@ struct channel
         {
             data_->deleting_owner();
 
-            data_ = boost::move(other.data_);
+            data_ = std::move(other.data_);
             other.data_.reset();
         }
 
@@ -151,17 +151,17 @@ struct channel
     {
         HPX_ASSERT(data_);
         T tmp = data_->get_data(ec);
-        return boost::move(tmp);
+        return std::move(tmp);
     }
 
     T move(hpx::error_code& ec = hpx::throws) const
     {
         HPX_ASSERT(data_);
         T tmp = data_->move_data(ec);
-        return boost::move(tmp);
+        return std::move(tmp);
     }
 
-    void post(BOOST_RV_REF(T) result)
+    void post(T && result)
     {
         HPX_ASSERT(data_);
         //if (data_->is_ready())
@@ -179,13 +179,13 @@ struct channel
 
     template <typename F>
     hpx::unique_future<typename util::result_of<F(hpx::unique_future<T>)>::type>
-    then(BOOST_FWD_REF(F) f)
+    then(F && f)
     {
         HPX_ASSERT(data_);
         
         using lcos::detail::future_access;
         return future_access::create<hpx::unique_future<T> >(data_).then
-            (boost::forward<F>(f));
+            (std::forward<F>(f));
     }
 
     bool is_ready() const
@@ -203,7 +203,7 @@ struct channel<void>
 
     boost::intrusive_ptr<future_data> data_;
 
-    BOOST_COPYABLE_AND_MOVABLE(channel<void>);
+    (channel<void>);
 
   public:
     typedef future_data::completed_callback_type
@@ -213,7 +213,7 @@ struct channel<void>
 
     channel(channel const& other) : data_(other.data_) {}
 
-    channel(BOOST_RV_REF(channel) other) : data_(boost::move(other.data_)) {}
+    channel(channel && other) : data_(std::move(other.data_)) {}
 
     ~channel()
     {
@@ -221,7 +221,7 @@ struct channel<void>
             data_->deleting_owner();
     }
 
-    channel& operator=(BOOST_COPY_ASSIGN_REF(channel) other)
+    channel& operator=(channel const & other)
     {
         HPX_ASSERT(data_);
 
@@ -235,7 +235,7 @@ struct channel<void>
         return *this;
     }
 
-    channel& operator=(BOOST_RV_REF(channel) other)
+    channel& operator=(channel && other)
     {
         HPX_ASSERT(data_);
 
@@ -243,7 +243,7 @@ struct channel<void>
         {
             data_->deleting_owner();
 
-            data_ = boost::move(other.data_);
+            data_ = std::move(other.data_);
             other.data_.reset();
         }
 
@@ -294,13 +294,13 @@ struct channel<void>
 
     template <typename F>
     hpx::unique_future<typename util::result_of<F(hpx::unique_future<void>)>::type>
-    then(BOOST_FWD_REF(F) f)
+    then(F && f)
     {
         HPX_ASSERT(data_);
         
         using lcos::detail::future_access;
         return future_access::create<hpx::unique_future<void> >(data_).then
-            (boost::forward<completed_callback_type>(f));
+            (std::forward<completed_callback_type>(f));
     }
 
     bool is_ready() const

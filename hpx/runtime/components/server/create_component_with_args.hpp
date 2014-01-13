@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace server
 {
 
 #define HPX_RUNTIME_SUPPORT_CTOR_M0(Z, N, D)                                  \
-        BOOST_PP_CAT(a, N)(boost::forward<BOOST_PP_CAT(T, N)>                 \
+        BOOST_PP_CAT(a, N)(std::forward<BOOST_PP_CAT(T, N)>                 \
             (BOOST_PP_CAT(t, N)))                                             \
     /**/
 #define HPX_RUNTIME_SUPPORT_CTOR_M1(Z, N, D)                                  \
@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace server
         BOOST_PP_CAT(a, N)(other. BOOST_PP_CAT(a, N))                         \
     /**/
 #define HPX_RUNTIME_SUPPORT_CTOR_M3(Z, N, D)                                  \
-        BOOST_PP_CAT(a, N)(boost::move(other. BOOST_PP_CAT(a, N)))            \
+        BOOST_PP_CAT(a, N)(std::move(other. BOOST_PP_CAT(a, N)))            \
     /**/
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -88,7 +88,7 @@ namespace hpx { namespace components { namespace server
             {}
 
             BOOST_PP_CAT(component_constructor_functor, N)(
-                BOOST_RV_REF(BOOST_PP_CAT(component_constructor_functor, N)) other)
+                BOOST_PP_CAT(component_constructor_functor, N &&) other)
               : BOOST_PP_ENUM(N, HPX_RUNTIME_SUPPORT_CTOR_M3, _)
             {}
 
@@ -115,9 +115,6 @@ namespace hpx { namespace components { namespace server
                 new (p) typename Component::derived_type(HPX_ENUM_MOVE_ARGS(N, a));
             }
             BOOST_PP_REPEAT(N, HPX_RUNTIME_SUPPORT_CTOR_M1, _)
-
-        private:
-            BOOST_COPYABLE_AND_MOVABLE(BOOST_PP_CAT(component_constructor_functor, N))
         };
 
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename A)>

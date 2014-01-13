@@ -17,7 +17,7 @@
 #include <hpx/runtime/applier/bind_naming_wrappers.hpp>
 #include <hpx/util/stringstream.hpp>
 
-#include <boost/move/move.hpp>
+#include <utility>
 
 namespace hpx { namespace detail
 {
@@ -140,7 +140,7 @@ namespace hpx { namespace components
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
-            return boost::move(f);
+            return std::move(f);
         }
 
 #if defined(HPX_HAVE_SECURITY)

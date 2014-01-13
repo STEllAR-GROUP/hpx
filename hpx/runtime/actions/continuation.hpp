@@ -32,7 +32,7 @@ namespace hpx
         typename Derived, typename Arg>
     inline bool
     apply(hpx::actions::action<Component, Result, Arguments, Derived>,
-        naming::id_type const&, BOOST_FWD_REF(Arg));
+        naming::id_type const&, Arg &&);
 
     // MSVC complains about async_continue beeing ambiguous if it sees this
     // forward declaration
@@ -42,7 +42,7 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(Arg1), BOOST_FWD_REF(Arg2));
+    apply(F && f, Arg1 &&, Arg2 &&);
 
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0, typename F>
@@ -51,22 +51,22 @@ namespace hpx
         bool
     >::type
     apply_continue(hpx::actions::action<Component, Result, Arguments, Derived>,
-        naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0,
-        BOOST_FWD_REF(F) f);
+        naming::id_type const& gid, Arg0 && arg0,
+        F && f);
 
     template <typename Component, typename Result, typename Arguments,
         typename Derived, typename Arg0>
     inline bool
     apply_c(hpx::actions::action<Component, Result, Arguments, Derived>,
         naming::id_type const& contgid, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0);
+        Arg0 && arg0);
 
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
     HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id);
 
     template <typename T>
-    void set_lco_value(naming::id_type const& id, BOOST_FWD_REF(T) t)
+    void set_lco_value(naming::id_type const& id, T && t)
     {
         typename lcos::base_lco_with_value<
             typename util::remove_reference<T>::type
@@ -168,8 +168,8 @@ namespace hpx { namespace actions
             HPX_ASSERT(gid_);
         }
 
-        explicit continuation(BOOST_RV_REF(naming::id_type) gid)
-          : gid_(boost::move(gid))
+        explicit continuation(naming::id_type && gid)
+          : gid_(std::move(gid))
         {
             // continuations with invalid id do not make sense
             HPX_ASSERT(gid_);
@@ -181,11 +181,11 @@ namespace hpx { namespace actions
         virtual void trigger() const;
 
         template <typename Arg0>
-        inline void trigger(BOOST_FWD_REF(Arg0) arg0) const;
+        inline void trigger(Arg0 && arg0) const;
 
         //
         virtual void trigger_error(boost::exception_ptr const& e) const;
-        virtual void trigger_error(BOOST_RV_REF(boost::exception_ptr) e) const;
+        virtual void trigger_error(boost::exception_ptr && e) const;
 
         virtual char const* get_continuation_name() const = 0;
 
@@ -215,9 +215,9 @@ namespace hpx { namespace actions
 
         template <typename T>
         BOOST_FORCEINLINE void operator()(id_type const& lco,
-            BOOST_FWD_REF(T) t) const
+            T && t) const
         {
-            hpx::set_lco_value(lco, boost::forward<T>(t));
+            hpx::set_lco_value(lco, std::forward<T>(t));
         }
     };
 
@@ -230,14 +230,14 @@ namespace hpx { namespace actions
         continuation_impl() {}
 
         template <typename Cont_>
-        continuation_impl(BOOST_FWD_REF(Cont_) cont, hpx::id_type const& target)
-          : cont_(boost::forward<Cont_>(cont)), target_(target)
+        continuation_impl(Cont_ && cont, hpx::id_type const& target)
+          : cont_(std::forward<Cont_>(cont)), target_(target)
         {}
 
         template <typename T>
-        void operator()(hpx::id_type const& lco, BOOST_FWD_REF(T) t) const
+        void operator()(hpx::id_type const& lco, T && t) const
         {
-            hpx::apply_c(cont_, lco, target_, boost::forward<T>(t));
+            hpx::apply_c(cont_, lco, target_, std::forward<T>(t));
         }
 
     private:
@@ -264,18 +264,18 @@ namespace hpx { namespace actions
         continuation2_impl() {}
 
         template <typename Cont_, typename F_>
-        continuation2_impl(BOOST_FWD_REF(Cont_) cont, hpx::id_type const& target,
-                BOOST_FWD_REF(F_) f)
-          : cont_(boost::forward<Cont_>(cont)),
+        continuation2_impl(Cont_ && cont, hpx::id_type const& target,
+                F_ && f)
+          : cont_(std::forward<Cont_>(cont)),
             target_(target),
-            f_(boost::forward<F_>(f))
+            f_(std::forward<F_>(f))
         {}
 
         template <typename T>
-        void operator()(hpx::id_type const& lco, BOOST_FWD_REF(T) t) const
+        void operator()(hpx::id_type const& lco, T && t) const
         {
             using hpx::util::placeholders::_2;
-            hpx::apply_continue(cont_, target_, boost::forward<T>(t), hpx::util::bind(f_, lco, _2));
+            hpx::apply_continue(cont_, target_, std::forward<T>(t), hpx::util::bind(f_, lco, _2));
         }
 
     private:
@@ -311,25 +311,25 @@ namespace hpx { namespace actions
           : continuation(gid)
         {}
 
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid)
-          : continuation(boost::move(gid))
+        explicit typed_continuation(naming::id_type && gid)
+          : continuation(std::move(gid))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(gid), f_(boost::forward<F>(f))
+                F && f)
+          : continuation(gid), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(boost::move(gid)), f_(boost::forward<F>(f))
+        explicit typed_continuation(naming::id_type && gid,
+                F && f)
+          : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(BOOST_FWD_REF(F) f)
-          : f_(boost::forward<F>(f))
+        explicit typed_continuation(F && f)
+          : f_(std::forward<F>(f))
         {}
 
         virtual ~typed_continuation()
@@ -337,7 +337,7 @@ namespace hpx { namespace actions
             init_registration<typed_continuation>::g.register_continuation();
         }
 
-        void trigger_value(BOOST_RV_REF(Result) result) const
+        void trigger_value(Result && result) const
         {
             LLCO_(info)
                 << "typed_continuation<Result>::trigger_value("
@@ -349,10 +349,10 @@ namespace hpx { namespace actions
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
-                hpx::set_lco_value(this->get_gid(), boost::move(result));
+                hpx::set_lco_value(this->get_gid(), std::move(result));
             }
             else {
-                f_(this->get_gid(), boost::move(result));
+                f_(this->get_gid(), std::move(result));
             }
         }
 
@@ -422,25 +422,25 @@ namespace hpx { namespace actions
           : continuation(gid)
         {}
 
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid)
-          : continuation(boost::move(gid))
+        explicit typed_continuation(naming::id_type && gid)
+          : continuation(std::move(gid))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(gid), f_(boost::forward<F>(f))
+                F && f)
+          : continuation(gid), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(boost::move(gid)), f_(boost::forward<F>(f))
+        explicit typed_continuation(naming::id_type && gid,
+                F && f)
+          : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(BOOST_FWD_REF(F) f)
-          : f_(boost::forward<F>(f))
+        explicit typed_continuation(F && f)
+          : f_(std::forward<F>(f))
         {}
 
         virtual ~typed_continuation()
@@ -467,7 +467,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(BOOST_RV_REF(util::unused_type)) const
+        void trigger_value(util::unused_type &&) const
         {
             this->trigger();
         }
@@ -509,12 +509,12 @@ namespace hpx { namespace actions
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Arg0>
-    void continuation::trigger(BOOST_FWD_REF(Arg0) arg0) const
+    void continuation::trigger(Arg0 && arg0) const
     {
         // The static_cast is safe as we know that Arg0 is the result type
         // of the executed action (see apply.hpp).
         static_cast<typed_continuation<Arg0> const*>(this)->trigger_value(
-            boost::forward<Arg0>(arg0));
+            std::forward<Arg0>(arg0));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -537,22 +537,22 @@ namespace hpx
     inline hpx::actions::continuation_impl<
         typename hpx::util::remove_reference<Cont>::type
     >
-    make_continuation(BOOST_FWD_REF(Cont) cont)
+    make_continuation(Cont && cont)
     {
         typedef typename hpx::util::remove_reference<Cont>::type cont_type;
         return hpx::actions::continuation_impl<cont_type>(
-            boost::forward<Cont>(cont), hpx::find_here());
+            std::forward<Cont>(cont), hpx::find_here());
     }
 
     template <typename Cont>
     inline hpx::actions::continuation_impl<
         typename hpx::util::remove_reference<Cont>::type
     >
-    make_continuation(BOOST_FWD_REF(Cont) f, hpx::id_type const& target)
+    make_continuation(Cont && f, hpx::id_type const& target)
     {
         typedef typename hpx::util::remove_reference<Cont>::type cont_type;
         return hpx::actions::continuation_impl<cont_type>(
-            boost::forward<Cont>(f), target);
+            std::forward<Cont>(f), target);
     }
 
     template <typename Cont, typename F>
@@ -566,13 +566,13 @@ namespace hpx
             typename hpx::util::remove_reference<F>::type
         >
     >::type
-    make_continuation(BOOST_FWD_REF(Cont) cont, BOOST_FWD_REF(F) f)
+    make_continuation(Cont && cont, F && f)
     {
         typedef typename hpx::util::remove_reference<Cont>::type cont_type;
         typedef typename hpx::util::remove_reference<F>::type function_type;
 
         return hpx::actions::continuation2_impl<cont_type, function_type>(
-            boost::forward<Cont>(cont), hpx::find_here(), boost::forward<F>(f));
+            std::forward<Cont>(cont), hpx::find_here(), std::forward<F>(f));
     }
 
     template <typename Cont, typename F>
@@ -580,14 +580,14 @@ namespace hpx
         typename hpx::util::remove_reference<Cont>::type,
         typename hpx::util::remove_reference<F>::type
     >
-    make_continuation(BOOST_FWD_REF(Cont) cont, hpx::id_type const& target,
-        BOOST_FWD_REF(F) f)
+    make_continuation(Cont && cont, hpx::id_type const& target,
+        F && f)
     {
         typedef typename hpx::util::remove_reference<Cont>::type cont_type;
         typedef typename hpx::util::remove_reference<F>::type function_type;
 
         return hpx::actions::continuation2_impl<cont_type, function_type>(
-            boost::forward<Cont>(cont), target, boost::forward<F>(f));
+            std::forward<Cont>(cont), target, std::forward<F>(f));
     }
 }
 

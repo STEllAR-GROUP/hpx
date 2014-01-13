@@ -12,7 +12,7 @@
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/move/move.hpp>
+#include <utility>
 
 namespace hpx { namespace lcos { namespace local
 {
@@ -24,7 +24,7 @@ namespace hpx { namespace lcos { namespace local
         typedef Mutex mutex_type;
 
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(base_trigger)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(base_trigger)
         typedef std::list<conditional_trigger*> condition_list_type;
 
     public:
@@ -33,23 +33,23 @@ namespace hpx { namespace lcos { namespace local
         {
         }
 
-        base_trigger(BOOST_RV_REF(base_trigger) rhs)
-          : promise_(boost::move(rhs.promise_)),
+        base_trigger(base_trigger && rhs)
+          : promise_(std::move(rhs.promise_)),
             generation_(rhs.generation_),
-            conditions_(boost::move(rhs.conditions_))
+            conditions_(std::move(rhs.conditions_))
         {
             rhs.generation_ = std::size_t(-1);
         }
 
-        base_trigger& operator=(BOOST_RV_REF(base_trigger) rhs)
+        base_trigger& operator=(base_trigger && rhs)
         {
             if (this != &rhs)
             {
                 typename mutex_type::scoped_lock l(rhs.mtx_);
-                promise_ = boost::move(rhs.promise_);
+                promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);
-                conditions_ = boost::move(rhs.conditions_);
+                conditions_ = std::move(rhs.conditions_);
             }
             return *this;
         }
@@ -220,7 +220,7 @@ namespace hpx { namespace lcos { namespace local
     struct trigger : public base_trigger<no_mutex>
     {
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(trigger)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(trigger)
         typedef base_trigger<no_mutex> base_type;
 
     public:
@@ -228,15 +228,15 @@ namespace hpx { namespace lcos { namespace local
         {
         }
 
-        trigger(BOOST_RV_REF(trigger) rhs)
-          : base_type(boost::move(static_cast<base_type&>(rhs)))
+        trigger(trigger && rhs)
+          : base_type(std::move(static_cast<base_type&>(rhs)))
         {
         }
 
-        trigger& operator=(BOOST_RV_REF(trigger) rhs)
+        trigger& operator=(trigger && rhs)
         {
             if (this != &rhs)
-                static_cast<base_type&>(*this) = boost::move(rhs);
+                static_cast<base_type&>(*this) = std::move(rhs);
             return *this;
         }
 

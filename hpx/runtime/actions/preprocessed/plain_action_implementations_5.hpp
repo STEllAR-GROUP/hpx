@@ -46,14 +46,14 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0>
             BOOST_FORCEINLINE result_type operator()(
-                BOOST_FWD_REF(Arg0) arg0) const
+                Arg0 && arg0) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     
-                    F(boost::forward<Arg0>( arg0 ));
+                    F(std::forward<Arg0>( arg0 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -88,11 +88,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             return Derived::decorate_action(
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(boost::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args))), lva);
         }
         
         
@@ -101,23 +101,23 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_function(
-                    cont, F, boost::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)), lva);
         }
         
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             LTM_(debug)
                 << "plain_base_result_action" << 1
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::get< 0>(boost::forward<Arguments>( args)));
+            return F(util::get< 0>(std::forward<Arguments>( args)));
         }
     };
     
@@ -219,14 +219,14 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0>
             BOOST_FORCEINLINE result_type operator()(
-                BOOST_FWD_REF(Arg0) arg0) const
+                Arg0 && arg0) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     
-                    F(boost::forward<Arg0>( arg0 ));
+                    F(std::forward<Arg0>( arg0 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -261,11 +261,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             return Derived::decorate_action(
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(boost::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args))), lva);
         }
         
         
@@ -274,23 +274,23 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, boost::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)), lva);
         }
         
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             LTM_(debug)
                 << "plain_base_action" << 1
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::get< 0>(boost::forward<Arguments>( args)));
+            F(util::get< 0>(std::forward<Arguments>( args)));
             return util::unused;
         }
     };
@@ -443,14 +443,14 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1>
             BOOST_FORCEINLINE result_type operator()(
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
+                Arg0 && arg0 , Arg1 && arg1) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     
-                    F(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+                    F(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -485,11 +485,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             return Derived::decorate_action(
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args))), lva);
         }
         
         
@@ -498,23 +498,23 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_function(
-                    cont, F, boost::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)), lva);
         }
         
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             LTM_(debug)
                 << "plain_base_result_action" << 2
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)));
+            return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)));
         }
     };
     
@@ -616,14 +616,14 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1>
             BOOST_FORCEINLINE result_type operator()(
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1) const
+                Arg0 && arg0 , Arg1 && arg1) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     
-                    F(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+                    F(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -658,11 +658,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             return Derived::decorate_action(
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args))), lva);
         }
         
         
@@ -671,23 +671,23 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, boost::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)), lva);
         }
         
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             LTM_(debug)
                 << "plain_base_action" << 2
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)));
+            F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)));
             return util::unused;
         }
     };
@@ -840,14 +840,14 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2>
             BOOST_FORCEINLINE result_type operator()(
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
+                Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     
-                    F(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+                    F(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -882,11 +882,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             return Derived::decorate_action(
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args))), lva);
         }
         
         
@@ -895,23 +895,23 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_function(
-                    cont, F, boost::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)), lva);
         }
         
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             LTM_(debug)
                 << "plain_base_result_action" << 3
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)));
+            return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)));
         }
     };
     
@@ -1013,14 +1013,14 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2>
             BOOST_FORCEINLINE result_type operator()(
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2) const
+                Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     
-                    F(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+                    F(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -1055,11 +1055,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             return Derived::decorate_action(
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args))), lva);
         }
         
         
@@ -1068,23 +1068,23 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, boost::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)), lva);
         }
         
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             LTM_(debug)
                 << "plain_base_action" << 3
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)));
+            F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)));
             return util::unused;
         }
     };
@@ -1237,14 +1237,14 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
             BOOST_FORCEINLINE result_type operator()(
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
+                Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     
-                    F(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+                    F(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -1279,11 +1279,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             return Derived::decorate_action(
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args))), lva);
         }
         
         
@@ -1292,23 +1292,23 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_function(
-                    cont, F, boost::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)), lva);
         }
         
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             LTM_(debug)
                 << "plain_base_result_action" << 4
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)));
+            return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)));
         }
     };
     
@@ -1410,14 +1410,14 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
             BOOST_FORCEINLINE result_type operator()(
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3) const
+                Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     
-                    F(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+                    F(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -1452,11 +1452,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             return Derived::decorate_action(
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args))), lva);
         }
         
         
@@ -1465,23 +1465,23 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, boost::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)), lva);
         }
         
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             LTM_(debug)
                 << "plain_base_action" << 4
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)));
+            F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)));
             return util::unused;
         }
     };
@@ -1634,14 +1634,14 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
             BOOST_FORCEINLINE result_type operator()(
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
+                Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     
-                    F(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+                    F(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -1676,11 +1676,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             return Derived::decorate_action(
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args))), lva);
         }
         
         
@@ -1689,23 +1689,23 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_function(
-                    cont, F, boost::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)), lva);
         }
         
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             LTM_(debug)
                 << "plain_base_result_action" << 5
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            return F(util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)));
+            return F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)));
         }
     };
     
@@ -1807,14 +1807,14 @@ namespace hpx { namespace actions
             typedef threads::thread_state_enum result_type;
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
             BOOST_FORCEINLINE result_type operator()(
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4) const
+                Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4) const
             {
                 try {
                     LTM_(debug) << "Executing plain action("
                                 << detail::get_action_name<Derived>()
                                 << ").";
                     
-                    F(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+                    F(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
                 }
                 catch (hpx::thread_interrupted const&) {
                      
@@ -1849,11 +1849,11 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             return Derived::decorate_action(
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args))), lva);
         }
         
         
@@ -1862,23 +1862,23 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, boost::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)), lva);
         }
         
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             LTM_(debug)
                 << "plain_base_action" << 5
                 << "::execute_function name("
                 << detail::get_action_name<Derived>() << ")";
-            F(util::get< 0>(boost::forward<Arguments>( args)) , util::get< 1>(boost::forward<Arguments>( args)) , util::get< 2>(boost::forward<Arguments>( args)) , util::get< 3>(boost::forward<Arguments>( args)) , util::get< 4>(boost::forward<Arguments>( args)));
+            F(util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)));
             return util::unused;
         }
     };

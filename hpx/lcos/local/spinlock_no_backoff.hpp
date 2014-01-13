@@ -36,7 +36,7 @@ namespace hpx { namespace lcos { namespace local
     private:
         boost::uint64_t v_;
 
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(spinlock_no_backoff)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(spinlock_no_backoff)
 
     public:
         spinlock_no_backoff() : v_(0)
@@ -44,7 +44,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock_no_backoff", "");
         }
 
-        spinlock_no_backoff(BOOST_RV_REF(spinlock_no_backoff) rhs)
+        spinlock_no_backoff(spinlock_no_backoff && rhs)
 #if defined(BOOST_WINDOWS)
           : v_(BOOST_INTERLOCKED_EXCHANGE(&rhs.v_, 0))
 #else
@@ -57,7 +57,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_DESTROY(this);
         }
 
-        spinlock_no_backoff& operator=(BOOST_RV_REF(spinlock_no_backoff) rhs)
+        spinlock_no_backoff& operator=(spinlock_no_backoff && rhs)
         {
             if (this != &rhs) {
                 unlock();

@@ -12,11 +12,11 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
-    void default_executor::add(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f,
+    void default_executor::add(HPX_STD_FUNCTION<void()> && f,
         char const* desc, threads::thread_state_enum initial_state,
         bool run_now, threads::thread_stacksize stacksize, error_code& ec)
     {
-        register_thread_nullary(boost::move(f), desc, initial_state, run_now,
+        register_thread_nullary(std::move(f), desc, initial_state, run_now,
             threads::thread_priority_normal, std::size_t(-1),
             stacksize, ec);
     }
@@ -26,12 +26,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     void default_executor::add_at(
         boost::posix_time::ptime const& abs_time,
-        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* description,
+        HPX_STD_FUNCTION<void()> && f, char const* description,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create new thread
         thread_id_type id = register_thread_nullary(
-            boost::move(f), description, suspended, false,
+            std::move(f), description, suspended, false,
             threads::thread_priority_normal, std::size_t(-1),
             stacksize, ec);
         if (ec) return;
@@ -47,12 +47,12 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     void default_executor::add_after(
         boost::posix_time::time_duration const& rel_time,
-        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* description,
+        HPX_STD_FUNCTION<void()> && f, char const* description,
         threads::thread_stacksize stacksize, error_code& ec)
     {
         // create new thread
         thread_id_type id = register_thread_nullary(
-            boost::move(f), description, suspended, false,
+            std::move(f), description, suspended, false,
             threads::thread_priority_normal, std::size_t(-1),
             stacksize, ec);
         if (ec) return;

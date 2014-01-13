@@ -415,6 +415,7 @@ namespace hpx { namespace agas { namespace detail
 
         // now handle all acknowledged credits and all delayed debits
         std::vector<hpx::unique_future<bool> > requests;
+        
         requests.reserve(2*matching_data.size());
 
         BOOST_FOREACH(incref_request_data const& data, matching_data)
@@ -429,7 +430,7 @@ namespace hpx { namespace agas { namespace detail
                 HPX_ASSERT(data.debit_ > 0);
 
                 requests.push_back(
-                    f(-data.debit_, raw, naming::invalid_locality_id)
+                    std::move(f(-data.debit_, raw, naming::invalid_locality_id))
                 );
             }
 

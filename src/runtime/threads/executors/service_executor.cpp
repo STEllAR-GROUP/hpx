@@ -42,20 +42,20 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // Schedule the specified function for execution in this executor.
     // Depending on the subclass implementation, this may block in some
     // situations.
-    void service_executor::add(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, 
+    void service_executor::add(HPX_STD_FUNCTION<void()> && f, 
         char const* desc, threads::thread_state_enum initial_state, 
         bool run_now, threads::thread_stacksize stacksize, error_code& ec)
     {
         ++task_count_;
 
         pool_->get_io_service().post(util::bind(
-            &service_executor::thread_wrapper, this, boost::move(f)));
+            &service_executor::thread_wrapper, this, std::move(f)));
     }
 
-    void service_executor::add_no_count(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f)
+    void service_executor::add_no_count(HPX_STD_FUNCTION<void()> && f)
     {
         pool_->get_io_service().post(util::bind(
-            &service_executor::thread_wrapper, this, boost::move(f)));
+            &service_executor::thread_wrapper, this, std::move(f)));
     }
 
     static void delayed_add(
@@ -63,7 +63,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
         HPX_STD_FUNCTION<void()> f,
         boost::shared_ptr<boost::asio::deadline_timer>)
     {
-        this_->add_no_count(boost::move(f));
+        this_->add_no_count(std::move(f));
     }
 
     // Schedule given function for execution in this executor no sooner
@@ -71,7 +71,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // bounds on the executor's queue size.
     void service_executor::add_at(
         boost::posix_time::ptime const& abs_time,
-        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc, 
+        HPX_STD_FUNCTION<void()> && f, char const* desc, 
         threads::thread_stacksize stacksize, error_code& ec)
     {
         ++task_count_;
@@ -80,7 +80,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             boost::make_shared<boost::asio::deadline_timer>(
                 pool_->get_io_service(), abs_time));
 
-        t->async_wait(util::bind(&delayed_add, this, boost::move(f), t));
+        t->async_wait(util::bind(&delayed_add, this, std::move(f), t));
     }
 
     // Schedule given function for execution in this executor no sooner
@@ -88,7 +88,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // violate bounds on the executor's queue size.
     void service_executor::add_after(
         boost::posix_time::time_duration const& rel_time,
-        BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* desc, 
+        HPX_STD_FUNCTION<void()> && f, char const* desc, 
         threads::thread_stacksize stacksize, error_code& ec)
     {
         ++task_count_;
@@ -97,7 +97,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             boost::make_shared<boost::asio::deadline_timer>(
                 pool_->get_io_service(), rel_time));
 
-        t->async_wait(util::bind(&delayed_add, this, boost::move(f), t));
+        t->async_wait(util::bind(&delayed_add, this, std::move(f), t));
     }
 
     // Return an estimate of the number of waiting tasks.

@@ -10,7 +10,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/move/move.hpp>
+#include <utility>
 
 namespace hpx { namespace lcos { namespace local
 {
@@ -18,24 +18,24 @@ namespace hpx { namespace lcos { namespace local
     struct conditional_trigger
     {
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(conditional_trigger)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(conditional_trigger)
 
     public:
         conditional_trigger()
         {
         }
 
-        conditional_trigger(BOOST_RV_REF(conditional_trigger) rhs)
-          : cond_(boost::move(rhs.cond_))
+        conditional_trigger(conditional_trigger && rhs)
+          : cond_(std::move(rhs.cond_))
         {
         }
 
-        conditional_trigger& operator=(BOOST_RV_REF(conditional_trigger) rhs)
+        conditional_trigger& operator=(conditional_trigger && rhs)
         {
             if (this != &rhs)
             {
-                promise_ = boost::move(rhs.promise_);
-                cond_ = boost::move(rhs.cond_);
+                promise_ = std::move(rhs.promise_);
+                cond_ = std::move(rhs.cond_);
             }
             return *this;
         }
@@ -50,7 +50,7 @@ namespace hpx { namespace lcos { namespace local
 
             set(ec);      // trigger as soon as possible
 
-            return boost::move(f);
+            return std::move(f);
         }
 
         void reset()

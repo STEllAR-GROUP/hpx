@@ -420,8 +420,8 @@ namespace hpx { namespace actions
 
         // construct an action from its arguments
         template <typename Args>
-        explicit transfer_action(BOOST_FWD_REF(Args) args)
-          : arguments_(boost::forward<Args>(args)),
+        explicit transfer_action(Args && args)
+          : arguments_(std::forward<Args>(args)),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
@@ -438,8 +438,8 @@ namespace hpx { namespace actions
         {}
 
         template <typename Args>
-        transfer_action(threads::thread_priority priority, BOOST_FWD_REF(Args) args)
-          : arguments_(boost::forward<Args>(args)),
+        transfer_action(threads::thread_priority priority, Args && args)
+          : arguments_(std::forward<Args>(args)),
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             parent_locality_(transfer_action::get_locality_id()),
             parent_id_(reinterpret_cast<boost::uint64_t>(threads::get_parent_id())),
@@ -507,7 +507,7 @@ namespace hpx { namespace actions
         get_thread_function(naming::address::address_type lva)
         {
             return Action::construct_thread_function(lva,
-                boost::move(arguments_));
+                std::move(arguments_));
         }
 
         /// The \a get_thread_function constructs a proper thread function for
@@ -530,7 +530,7 @@ namespace hpx { namespace actions
             naming::address::address_type lva)
         {
             return Action::construct_thread_function(cont, lva,
-                boost::move(arguments_));
+                std::move(arguments_));
         }
 
 #if !HPX_THREAD_MAINTAIN_PARENT_REFERENCE
@@ -792,27 +792,27 @@ namespace hpx { namespace actions
         template <typename Func, typename Arguments_>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_continuation_thread_function_void(
-            continuation_type cont, BOOST_FWD_REF(Func) func,
-            BOOST_FWD_REF(Arguments_) args)
+            continuation_type cont, Func && func,
+            Arguments_ && args)
         {
             typedef typename boost::remove_reference<Arguments_>::type arguments_type;
             return detail::construct_continuation_thread_function_voidN<
                     derived_type,
                     util::tuple_size<arguments_type>::value>::call(
-                cont, boost::forward<Func>(func), boost::forward<Arguments_>(args));
+                cont, std::forward<Func>(func), std::forward<Arguments_>(args));
         }
 
         template <typename Func, typename Arguments_>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_continuation_thread_function(
-            continuation_type cont, BOOST_FWD_REF(Func) func,
-            BOOST_FWD_REF(Arguments_) args)
+            continuation_type cont, Func && func,
+            Arguments_ && args)
         {
             typedef typename boost::remove_reference<Arguments_>::type arguments_type;
             return detail::construct_continuation_thread_functionN<
                     derived_type,
                     util::tuple_size<arguments_type>::value>::call(
-                cont, boost::forward<Func>(func), boost::forward<Arguments_>(args));
+                cont, std::forward<Func>(func), std::forward<Arguments_>(args));
         }
 
         // bring in all overloads for
@@ -850,7 +850,7 @@ namespace hpx { namespace actions
         decorate_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type lva)
         {
-            return Component::wrap_action(boost::move(f), lva);
+            return Component::wrap_action(std::move(f), lva);
         }
 
     private:

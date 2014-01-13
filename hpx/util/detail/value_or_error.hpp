@@ -60,7 +60,7 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        value_or_error(BOOST_RV_REF(value_or_error) rhs)
+        value_or_error(value_or_error && rhs)
           : state_(rhs.state_)
         {
             switch (rhs.state_)
@@ -83,10 +83,10 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
-        explicit value_or_error(BOOST_RV_REF(value_type) t)
+        explicit value_or_error(value_type && t)
           : state_(has_value)
         {
-            construct_value(boost::move(t));
+            construct_value(std::move(t));
         }
 
         explicit value_or_error(error_type const& e)
@@ -101,7 +101,7 @@ namespace hpx { namespace util { namespace detail
         }
 
         // assignment from another value_or_error instance
-        value_or_error& operator=(BOOST_COPY_ASSIGN_REF(value_or_error) rhs)
+        value_or_error& operator=(value_or_error const & rhs)
         {
             if (this != &rhs) {
                 destruct();
@@ -127,7 +127,7 @@ namespace hpx { namespace util { namespace detail
             }
             return *this;
         }
-        value_or_error& operator=(BOOST_RV_REF(value_or_error) rhs)
+        value_or_error& operator=(value_or_error && rhs)
         {
             if (this != &rhs) {
                 destruct();
@@ -156,7 +156,7 @@ namespace hpx { namespace util { namespace detail
         }
 
         // assign from value or error type
-        value_or_error& operator=(BOOST_COPY_ASSIGN_REF(value_type) t)
+        value_or_error& operator=(value_type const & t)
         {
             if (stores_value() && get_value_address() == &t)
                 return *this;
@@ -168,7 +168,7 @@ namespace hpx { namespace util { namespace detail
 
             return *this;
         }
-        value_or_error& operator=(BOOST_RV_REF(value_type) t)
+        value_or_error& operator=(value_type && t)
         {
             if (stores_value() && get_value_address() == &t)
                 return *this;
@@ -176,7 +176,7 @@ namespace hpx { namespace util { namespace detail
             destruct();
 
             state_ = has_value;
-            construct_value(boost::move(t));
+            construct_value(std::move(t));
 
             return *this;
         }
@@ -217,17 +217,17 @@ namespace hpx { namespace util { namespace detail
                     "value_or_error::move_value",
                     "unexpected retrieval of value")
             }
-            return boost::move(*get_value_address());
+            return std::move(*get_value_address());
         }
 #else
-        BOOST_RV_REF(value_type) move_value()
+        value_type && move_value()
         {
             if (!stores_value()) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "value_or_error::move_value",
                     "unexpected retrieval of value")
             }
-            return boost::move(*get_value_address());
+            return std::move(*get_value_address());
         }
 #endif
 
@@ -278,9 +278,9 @@ namespace hpx { namespace util { namespace detail
             ::new (get_value_address()) value_type(v);
         }
 
-        void construct_value(BOOST_RV_REF(value_type) v) //-V659
+        void construct_value(value_type && v) //-V659
         {
-            ::new (get_value_address()) value_type(boost::move(v));
+            ::new (get_value_address()) value_type(std::move(v));
         }
 
         void construct_error(error_type const& e)
@@ -370,8 +370,6 @@ namespace hpx { namespace util { namespace detail
         // member data
         storage_type data_;         // protected data
         state state_;            // none, value, or error
-
-        BOOST_COPYABLE_AND_MOVABLE(value_or_error)
     };
 }}}
 

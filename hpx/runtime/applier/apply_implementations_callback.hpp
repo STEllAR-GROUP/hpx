@@ -55,7 +55,7 @@ namespace hpx
             BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
         apply_r_p_cb(naming::address& addr, naming::id_type const& id,
-            threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
+            threads::thread_priority priority, Callback && cb,
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
@@ -68,7 +68,7 @@ namespace hpx
 
             // Send the parcel through the parcel handler
             hpx::applier::get_applier().get_parcel_handler()
-                .put_parcel(p, boost::forward<Callback>(cb));
+                .put_parcel(p, std::forward<Callback>(cb));
             return false;     // destinations are remote
         }
 
@@ -76,10 +76,10 @@ namespace hpx
             BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
         apply_r_cb(naming::address& addr, naming::id_type const& gid,
-            BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+            Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             return apply_r_p_cb<Action>(addr, gid,
-                actions::action_priority<Action>(), boost::forward<Callback>(cb),
+                actions::action_priority<Action>(), std::forward<Callback>(cb),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
     }}
@@ -89,7 +89,7 @@ namespace hpx
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
-        BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
@@ -111,17 +111,17 @@ namespace hpx
 
         // apply remotely
         return applier::detail::apply_r_p_cb<Action>(addr, gid, priority,
-            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <typename Action, typename Callback,
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
-    apply_cb(naming::id_type const& gid, BOOST_FWD_REF(Callback) cb,
+    apply_cb(naming::id_type const& gid, Callback && cb,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return apply_p_cb<Action>(gid, actions::action_priority<Action>(),
-            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <typename Component, typename Result,
@@ -132,11 +132,11 @@ namespace hpx
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > /*act*/,
-        naming::id_type const& gid, BOOST_FWD_REF(Callback) cb,
+        naming::id_type const& gid, Callback && cb,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return apply_p_cb<Derived>(gid, actions::action_priority<Derived>(),
-            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -147,7 +147,7 @@ namespace hpx
         inline bool
         apply_r_p_cb(naming::address& addr, actions::continuation* c,
             naming::id_type const& id, threads::thread_priority priority,
-            BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+            Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
 
@@ -161,7 +161,7 @@ namespace hpx
 
             // Send the parcel through the parcel handler
             hpx::applier::get_applier().get_parcel_handler()
-              .put_parcel(p, boost::forward<Callback>(cb));
+              .put_parcel(p, std::forward<Callback>(cb));
             return false;     // destination is remote
         }
 
@@ -169,11 +169,11 @@ namespace hpx
             BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
         apply_r_cb(naming::address& addr, actions::continuation* c,
-            naming::id_type const& gid, BOOST_FWD_REF(Callback) cb,
+            naming::id_type const& gid, Callback && cb,
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             return apply_r_p_cb<Action>(addr, c, gid,
-                actions::action_priority<Action>(), boost::forward<Callback>(cb),
+                actions::action_priority<Action>(), std::forward<Callback>(cb),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
     }}
@@ -184,7 +184,7 @@ namespace hpx
     inline bool
     apply_p_cb(actions::continuation* c, naming::address& addr,
         naming::id_type const& gid, threads::thread_priority priority,
-        BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         if (!Action::is_target_valid(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
@@ -205,14 +205,14 @@ namespace hpx
 
         // apply remotely
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
-            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <typename Action, typename Callback,
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_p_cb(actions::continuation* c, naming::id_type const& gid,
-        threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
+        threads::thread_priority priority, Callback && cb,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         if (!Action::is_target_valid(gid)) {
@@ -233,17 +233,17 @@ namespace hpx
 
         // apply remotely
         return applier::detail::apply_r_p_cb<Action>(addr, c, gid, priority,
-            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <typename Action, typename Callback,
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_cb(actions::continuation* c, naming::id_type const& gid,
-        BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return apply_p_cb<Action>(c, gid, actions::action_priority<Action>(),
-            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <typename Component, typename Result,
@@ -254,11 +254,11 @@ namespace hpx
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > /*act*/,
-        naming::id_type const& gid, BOOST_FWD_REF(Callback) cb,
+        naming::id_type const& gid, Callback && cb,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return apply_p<Derived>(c, gid, actions::action_priority<Derived>(),
-            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -269,7 +269,7 @@ namespace hpx
         inline bool
         apply_c_p_cb(naming::address& addr, naming::id_type const& contgid,
             naming::id_type const& gid, threads::thread_priority priority,
-            BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+            Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef
                 typename hpx::actions::extract_action<Action>::result_type
@@ -277,7 +277,7 @@ namespace hpx
 
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
-                gid, priority, boost::forward<Callback>(cb),
+                gid, priority, std::forward<Callback>(cb),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
 
@@ -285,7 +285,7 @@ namespace hpx
             BOOST_PP_ENUM_PARAMS(N, typename Arg)>
         inline bool
         apply_c_cb(naming::address& addr, naming::id_type const& contgid,
-            naming::id_type const& gid, BOOST_FWD_REF(Callback) cb,
+            naming::id_type const& gid, Callback && cb,
             HPX_ENUM_FWD_ARGS(N, Arg, arg))
         {
             typedef
@@ -295,7 +295,7 @@ namespace hpx
             return apply_r_p_cb<Action>(addr,
                 new actions::typed_continuation<result_type>(contgid),
                 gid, actions::action_priority<Action>(),
-                boost::forward<Callback>(cb),
+                std::forward<Callback>(cb),
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
         }
     }}
@@ -304,7 +304,7 @@ namespace hpx
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c_p_cb(naming::id_type const& contgid, naming::id_type const& gid,
-        threads::thread_priority priority, BOOST_FWD_REF(Callback) cb,
+        threads::thread_priority priority, Callback && cb,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
@@ -313,7 +313,7 @@ namespace hpx
 
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
-            gid, priority, boost::forward<Callback>(cb),
+            gid, priority, std::forward<Callback>(cb),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -321,7 +321,7 @@ namespace hpx
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c_cb(naming::id_type const& contgid, naming::id_type const& gid,
-        BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
             typename hpx::actions::extract_action<Action>::result_type
@@ -330,7 +330,7 @@ namespace hpx
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
             gid, actions::action_priority<Action>(),
-            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     template <typename Action, typename Callback,
@@ -338,7 +338,7 @@ namespace hpx
     inline bool
     apply_c_p_cb(naming::id_type const& contgid, naming::address& addr,
         naming::id_type const& gid, threads::thread_priority priority,
-        BOOST_FWD_REF(Callback) cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
+        Callback && cb, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
             typename hpx::actions::extract_action<Action>::result_type
@@ -346,7 +346,7 @@ namespace hpx
 
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
-            addr, gid, priority, boost::forward<Callback>(cb),
+            addr, gid, priority, std::forward<Callback>(cb),
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
@@ -354,7 +354,7 @@ namespace hpx
         BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     inline bool
     apply_c_cb(naming::id_type const& contgid, naming::address& addr,
-        naming::id_type const& gid, BOOST_FWD_REF(Callback) cb,
+        naming::id_type const& gid, Callback && cb,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
@@ -364,7 +364,7 @@ namespace hpx
         return apply_p_cb<Action>(
             new actions::typed_continuation<result_type>(contgid),
             addr, gid, actions::action_priority<Action>(),
-            boost::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+            std::forward<Callback>(cb), HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 }
 

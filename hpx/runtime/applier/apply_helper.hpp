@@ -39,11 +39,11 @@ namespace hpx { namespace applier { namespace detail
         template <typename Arguments>
         static void
         call (naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_priority priority, BOOST_FWD_REF(Arguments) args)
+            threads::thread_priority priority, Arguments && args)
         {
             hpx::applier::register_work_plain(
-                boost::move(Action::construct_thread_function(
-                    lva, boost::forward<Arguments>(args))),
+                std::move(Action::construct_thread_function(
+                    lva, std::forward<Arguments>(args))),
                 target, actions::detail::get_action_name<Action>(), lva,
                 threads::pending, fix_priority<Action>(priority), std::size_t(-1),
                 static_cast<threads::thread_stacksize>(
@@ -54,11 +54,11 @@ namespace hpx { namespace applier { namespace detail
         static void
         call (actions::continuation_type& c, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_priority priority,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             hpx::applier::register_work_plain(
-                boost::move(Action::construct_thread_function(c, lva,
-                    boost::forward<Arguments>(args))),
+                std::move(Action::construct_thread_function(c, lva,
+                    std::forward<Arguments>(args))),
                 target, actions::detail::get_action_name<Action>(), lva,
                 threads::pending, fix_priority<Action>(priority), std::size_t(-1),
                 static_cast<threads::thread_stacksize>(
@@ -73,20 +73,20 @@ namespace hpx { namespace applier { namespace detail
         template <typename Arguments>
         static void
         call (naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_priority, BOOST_FWD_REF(Arguments) args)
+            threads::thread_priority, Arguments && args)
         {
-            Action::execute_function(lva, boost::forward<Arguments>(args));
+            Action::execute_function(lva, std::forward<Arguments>(args));
         }
 
         template <typename Arguments>
         static void
         call (actions::continuation_type& c, naming::id_type const& target,
             naming::address::address_type lva, threads::thread_priority,
-            BOOST_FWD_REF(Arguments) args)
+            Arguments && args)
         {
             try {
-                c->trigger(boost::move(Action::execute_function(
-                    lva, boost::forward<Arguments>(args))));
+                c->trigger(std::move(Action::execute_function(
+                    lva, std::forward<Arguments>(args))));
             }
             catch (hpx::exception const& /*e*/) {
                 // make sure hpx::exceptions are propagated back to the client

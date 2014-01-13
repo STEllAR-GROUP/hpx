@@ -22,7 +22,7 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 
 #include <stdexcept>
 
@@ -277,7 +277,7 @@ namespace hpx { namespace components
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
-            return boost::move(f);
+            return std::move(f);
         }
     private:
         template <typename>

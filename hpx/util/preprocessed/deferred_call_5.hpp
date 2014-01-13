@@ -16,14 +16,14 @@ namespace hpx { namespace util
         typename util::decay<F>::type
       , util::tuple<typename util::decay<T0>::type>
     >
-    deferred_call(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0)
+    deferred_call(F && f, T0 && t0)
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type>
         > result_type;
-        return result_type(boost::forward<F>(f)
-          , util::forward_as_tuple(boost::forward<T0>( t0 )));
+        return result_type(std::forward<F>(f)
+          , util::forward_as_tuple(std::forward<T0>( t0 )));
     }
 }}
 namespace hpx { namespace util
@@ -33,14 +33,14 @@ namespace hpx { namespace util
         typename util::decay<F>::type
       , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type>
     >
-    deferred_call(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1)
+    deferred_call(F && f, T0 && t0 , T1 && t1)
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type>
         > result_type;
-        return result_type(boost::forward<F>(f)
-          , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 )));
+        return result_type(std::forward<F>(f)
+          , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 )));
     }
 }}
 namespace hpx { namespace util
@@ -50,14 +50,14 @@ namespace hpx { namespace util
         typename util::decay<F>::type
       , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type>
     >
-    deferred_call(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2)
+    deferred_call(F && f, T0 && t0 , T1 && t1 , T2 && t2)
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type>
         > result_type;
-        return result_type(boost::forward<F>(f)
-          , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 )));
+        return result_type(std::forward<F>(f)
+          , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 )));
     }
 }}
 namespace hpx { namespace util
@@ -67,14 +67,14 @@ namespace hpx { namespace util
         typename util::decay<F>::type
       , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type>
     >
-    deferred_call(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3)
+    deferred_call(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3)
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type>
         > result_type;
-        return result_type(boost::forward<F>(f)
-          , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 )));
+        return result_type(std::forward<F>(f)
+          , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 )));
     }
 }}
 namespace hpx { namespace util
@@ -84,14 +84,14 @@ namespace hpx { namespace util
         typename util::decay<F>::type
       , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type>
     >
-    deferred_call(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4)
+    deferred_call(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4)
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type>
         > result_type;
-        return result_type(boost::forward<F>(f)
-          , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 )));
+        return result_type(std::forward<F>(f)
+          , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 )));
     }
 }}
 namespace hpx { namespace util
@@ -101,14 +101,14 @@ namespace hpx { namespace util
         typename util::decay<F>::type
       , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type>
     >
-    deferred_call(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5)
+    deferred_call(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5)
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type>
         > result_type;
-        return result_type(boost::forward<F>(f)
-          , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 )));
+        return result_type(std::forward<F>(f)
+          , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 )));
     }
 }}
 namespace hpx { namespace util
@@ -118,14 +118,14 @@ namespace hpx { namespace util
         typename util::decay<F>::type
       , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type>
     >
-    deferred_call(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6)
+    deferred_call(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6)
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type>
         > result_type;
-        return result_type(boost::forward<F>(f)
-          , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 )));
+        return result_type(std::forward<F>(f)
+          , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 )));
     }
 }}
 namespace hpx { namespace util
@@ -135,13 +135,13 @@ namespace hpx { namespace util
         typename util::decay<F>::type
       , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type>
     >
-    deferred_call(BOOST_FWD_REF(F) f, BOOST_FWD_REF(T0) t0 , BOOST_FWD_REF(T1) t1 , BOOST_FWD_REF(T2) t2 , BOOST_FWD_REF(T3) t3 , BOOST_FWD_REF(T4) t4 , BOOST_FWD_REF(T5) t5 , BOOST_FWD_REF(T6) t6 , BOOST_FWD_REF(T7) t7)
+    deferred_call(F && f, T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7)
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type>
         > result_type;
-        return result_type(boost::forward<F>(f)
-          , util::forward_as_tuple(boost::forward<T0>( t0 ) , boost::forward<T1>( t1 ) , boost::forward<T2>( t2 ) , boost::forward<T3>( t3 ) , boost::forward<T4>( t4 ) , boost::forward<T5>( t5 ) , boost::forward<T6>( t6 ) , boost::forward<T7>( t7 )));
+        return result_type(std::forward<F>(f)
+          , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 )));
     }
 }}

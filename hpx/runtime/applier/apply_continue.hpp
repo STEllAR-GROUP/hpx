@@ -28,14 +28,14 @@ namespace hpx
         util::tuple_size<typename Action::arguments_type>::value == 0,
         bool
     >::type
-    apply_continue(naming::id_type const& gid, BOOST_FWD_REF(F) f)
+    apply_continue(naming::id_type const& gid, F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
 
         return apply<Action>(
             new hpx::actions::typed_continuation<result_type>(
-                boost::forward<F>(f))
+                std::forward<F>(f))
           , gid);
     }
 
@@ -49,9 +49,9 @@ namespace hpx
     apply_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid, BOOST_FWD_REF(F) f)
+        > /*act*/, naming::id_type const& gid, F && f)
     {
-        return apply_continue<Derived>(gid, boost::forward<F>(f));
+        return apply_continue<Derived>(gid, std::forward<F>(f));
     }
 }
 
@@ -95,14 +95,14 @@ namespace hpx
         bool
     >::type
     apply_continue(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
-        BOOST_FWD_REF(F) f)
+        F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
 
         return apply<Action>(
             new hpx::actions::typed_continuation<result_type>(
-                boost::forward<F>(f))
+                std::forward<F>(f))
           , gid
           , HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
@@ -118,10 +118,10 @@ namespace hpx
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
-        BOOST_FWD_REF(F) f)
+        F && f)
     {
         return apply_continue<Derived>(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg),
-            boost::forward<F>(f));
+            std::forward<F>(f));
     }
 }
 

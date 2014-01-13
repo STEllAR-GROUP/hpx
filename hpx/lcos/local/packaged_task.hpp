@@ -64,16 +64,16 @@ namespace hpx { namespace lcos { namespace local
               : f_(f)
             {}
 
-            task_object(BOOST_RV_REF(F) f)
-              : f_(boost::move(f))
+            task_object(F && f)
+              : f_(std::move(f))
             {}
 
             task_object(threads::executor& sched, F const& f)
               : base_type(sched), f_(f)
             {}
 
-            task_object(threads::executor& sched, BOOST_RV_REF(F) f)
-              : base_type(sched), f_(boost::move(f))
+            task_object(threads::executor& sched, F && f)
+              : base_type(sched), f_(std::move(f))
             {}
 
             void do_run()
@@ -101,16 +101,16 @@ namespace hpx { namespace lcos { namespace local
               : f_(f)
             {}
 
-            task_object(BOOST_RV_REF(F) f)
-              : f_(boost::move(f))
+            task_object(F && f)
+              : f_(std::move(f))
             {}
 
             task_object(threads::executor& sched, F const& f)
               : base_type(sched), f_(f)
             {}
 
-            task_object(threads::executor& sched, BOOST_RV_REF(F) f)
-              : base_type(sched), f_(boost::move(f))
+            task_object(threads::executor& sched, F && f)
+              : base_type(sched), f_(std::move(f))
             {}
 
             void do_run()
@@ -134,7 +134,7 @@ namespace hpx { namespace lcos { namespace local
         typedef lcos::detail::future_data<Result> task_impl_type;
 
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(promise)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
         typedef lcos::local::spinlock mutex_type;
 
     public:
@@ -159,17 +159,17 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // Assignment
-        promise(BOOST_RV_REF(promise) rhs)
+        promise(promise && rhs)
           : future_obtained_(false)
         {
             typename mutex_type::scoped_lock l(rhs.mtx_);
-            task_ = boost::move(rhs.task_);
+            task_ = std::move(rhs.task_);
             future_obtained_ = rhs.future_obtained_;
             rhs.future_obtained_ = false;
             rhs.task_.reset();
         }
 
-        promise& operator=(BOOST_RV_REF(promise) rhs)
+        promise& operator=(promise && rhs)
         {
             if (this != &rhs) {
                 typename mutex_type::scoped_lock l(rhs.mtx_);
@@ -185,7 +185,7 @@ namespace hpx { namespace lcos { namespace local
                     task_->deleting_owner();
                 }
 
-                task_ = boost::move(rhs.task_);
+                task_ = std::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
                 rhs.future_obtained_ = false;
                 rhs.task_.reset();
@@ -216,7 +216,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename T>
-        void set_value(BOOST_FWD_REF(T) result)
+        void set_value(T && result)
         {
             typename mutex_type::scoped_lock l(mtx_);
 
@@ -230,7 +230,7 @@ namespace hpx { namespace lcos { namespace local
             if (!task_)
                 task_ = new detail::future_object<Result>();
 
-            task_->set_data(boost::forward<T>(result));
+            task_->set_data(std::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
@@ -328,7 +328,7 @@ namespace hpx { namespace lcos { namespace local
         typedef lcos::detail::future_data<void> task_impl_type;
 
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(promise)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
         typedef lcos::local::spinlock mutex_type;
 
     public:
@@ -354,18 +354,18 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // Assignment
-        promise(BOOST_RV_REF(promise) rhs)
+        promise(promise && rhs)
           : future_obtained_(false)
         {
             mutex_type::scoped_lock l(rhs.mtx_);
 
-            task_ = boost::move(rhs.task_);
+            task_ = std::move(rhs.task_);
             future_obtained_ = rhs.future_obtained_;
             rhs.future_obtained_ = false;
             rhs.task_.reset();
         }
 
-        promise& operator=(BOOST_RV_REF(promise) rhs)
+        promise& operator=(promise && rhs)
         {
             if (this != &rhs) {
                 mutex_type::scoped_lock l(rhs.mtx_);
@@ -526,7 +526,7 @@ namespace hpx { namespace lcos { namespace local
         typedef lcos::detail::task_base<Result> task_impl_type;
 
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(packaged_task)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task)
 
     public:
         // support for result_of
@@ -536,8 +536,8 @@ namespace hpx { namespace lcos { namespace local
         packaged_task() {}
 
         template <typename F>
-        explicit packaged_task(threads::executor& sched, BOOST_FWD_REF(F) f)
-          : task_(new detail::task_object<Result, F>(sched, boost::forward<F>(f))),
+        explicit packaged_task(threads::executor& sched, F && f)
+          : task_(new detail::task_object<Result, F>(sched, std::forward<F>(f))),
             future_obtained_(false)
         {}
 
@@ -547,8 +547,8 @@ namespace hpx { namespace lcos { namespace local
         {}
 
         template <typename F>
-        explicit packaged_task(BOOST_FWD_REF(F) f)
-          : task_(new detail::task_object<Result, F>(boost::forward<F>(f))),
+        explicit packaged_task(F && f)
+          : task_(new detail::task_object<Result, F>(std::forward<F>(f))),
             future_obtained_(false)
         {}
 
@@ -571,15 +571,15 @@ namespace hpx { namespace lcos { namespace local
             }
         }
 
-        packaged_task(BOOST_RV_REF(packaged_task) rhs)
-          : task_(boost::move(rhs.task_)),
+        packaged_task(packaged_task && rhs)
+          : task_(std::move(rhs.task_)),
             future_obtained_(rhs.future_obtained_)
         {
             rhs.task_.reset();
             rhs.future_obtained_ = false;
         }
 
-        packaged_task& operator=(BOOST_RV_REF(packaged_task) rhs)
+        packaged_task& operator=(packaged_task && rhs)
         {
             if (this != &rhs) {
                 if (task_)
@@ -593,7 +593,7 @@ namespace hpx { namespace lcos { namespace local
                     task_->deleting_owner();
                 }
 
-                task_ = boost::move(rhs.task_);
+                task_ = std::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
 
                 rhs.task_.reset();
@@ -673,7 +673,7 @@ namespace hpx { namespace lcos { namespace local
         typedef lcos::detail::task_base<Result> task_impl_type;
 
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(futures_factory)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(futures_factory)
 
     public:
         // support for result_of
@@ -683,8 +683,8 @@ namespace hpx { namespace lcos { namespace local
         futures_factory() {}
 
         template <typename F>
-        explicit futures_factory(threads::executor& sched, BOOST_FWD_REF(F) f)
-          : task_(new detail::task_object<Result, F>(sched, boost::forward<F>(f))),
+        explicit futures_factory(threads::executor& sched, F && f)
+          : task_(new detail::task_object<Result, F>(sched, std::forward<F>(f))),
             future_obtained_(false)
         {}
 
@@ -694,8 +694,8 @@ namespace hpx { namespace lcos { namespace local
         {}
 
         template <typename F>
-        explicit futures_factory(BOOST_FWD_REF(F) f)
-          : task_(new detail::task_object<Result, F>(boost::forward<F>(f))),
+        explicit futures_factory(F && f)
+          : task_(new detail::task_object<Result, F>(std::forward<F>(f))),
             future_obtained_(false)
         {}
 
@@ -710,21 +710,21 @@ namespace hpx { namespace lcos { namespace local
                 task_->deleting_owner();
         }
 
-        futures_factory(BOOST_RV_REF(futures_factory) rhs)
-          : task_(boost::move(rhs.task_)),
+        futures_factory(futures_factory && rhs)
+          : task_(std::move(rhs.task_)),
             future_obtained_(rhs.future_obtained_)
         {
             rhs.task_.reset();
             rhs.future_obtained_ = false;
         }
 
-        futures_factory& operator=(BOOST_RV_REF(futures_factory) rhs)
+        futures_factory& operator=(futures_factory && rhs)
         {
             if (this != &rhs) {
                 if (task_ && !future_obtained_)
                     task_->deleting_owner();
 
-                task_ = boost::move(rhs.task_);
+                task_ = std::move(rhs.task_);
                 future_obtained_ = rhs.future_obtained_;
 
                 rhs.task_.reset();

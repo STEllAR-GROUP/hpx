@@ -32,7 +32,7 @@ public:
       : i(42)
     {}
 
-    X(BOOST_RV_REF(X) other)
+    X(X && other)
       : i(other.i)
     {
         other.i=0;

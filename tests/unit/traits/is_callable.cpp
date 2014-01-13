@@ -39,15 +39,15 @@ void functions_byval_params()
     HPX_TEST_MSG((is_callable<f(int)>::value == true), "fun-value/value");
     HPX_TEST_MSG((is_callable<f(int&)>::value == true), "fun-value/lvref");
     HPX_TEST_MSG((is_callable<f(int const&)>::value == true), "fun-value/const-lvref");
-    HPX_TEST_MSG((is_callable<f(BOOST_RV_REF(int))>::value == true), "fun-value/rvref");
-    HPX_TEST_MSG((is_callable<f(BOOST_RV_REF(int const))>::value == true), "fun-value/const-rvref");
+    HPX_TEST_MSG((is_callable<f(int &&)>::value == true), "fun-value/rvref");
+    HPX_TEST_MSG((is_callable<f(int const &&)>::value == true), "fun-value/const-rvref");
 
     typedef void (*fc)(int const);
     HPX_TEST_MSG((is_callable<fc(int)>::value == true), "fun-const-value/value");
     HPX_TEST_MSG((is_callable<fc(int&)>::value == true), "fun-const-value/lvref");
     HPX_TEST_MSG((is_callable<fc(int const&)>::value == true), "fun-const-value/const-lvref");
-    HPX_TEST_MSG((is_callable<fc(BOOST_RV_REF(int))>::value == true), "fun-const-value/rvref");
-    HPX_TEST_MSG((is_callable<fc(BOOST_RV_REF(int const))>::value == true), "fun-const-value/const-rvref");
+    HPX_TEST_MSG((is_callable<fc(int &&)>::value == true), "fun-const-value/rvref");
+    HPX_TEST_MSG((is_callable<fc(int const &&)>::value == true), "fun-const-value/const-rvref");
 }
 
 void functions_bylvref_params()
@@ -58,15 +58,15 @@ void functions_bylvref_params()
     HPX_TEST_MSG((is_callable<f(int)>::value == false), "fun-lvref/value");
     HPX_TEST_MSG((is_callable<f(int&)>::value == true), "fun-lvref/lvref");
     HPX_TEST_MSG((is_callable<f(int const&)>::value == false), "fun-lvref/const-lvref");
-    HPX_TEST_MSG((is_callable<f(BOOST_RV_REF(int))>::value == false), "fun-lvref/rvref");
-    HPX_TEST_MSG((is_callable<f(BOOST_RV_REF(int const))>::value == false), "fun-lvref/const-rvref");
+    HPX_TEST_MSG((is_callable<f(int &&)>::value == false), "fun-lvref/rvref");
+    HPX_TEST_MSG((is_callable<f(int const &&)>::value == false), "fun-lvref/const-rvref");
 
     typedef void (*fc)(int const&);
     HPX_TEST_MSG((is_callable<fc(int)>::value == true), "fun-const-lvref/value");
     HPX_TEST_MSG((is_callable<fc(int&)>::value == true), "fun-const-lvref/lvref");
     HPX_TEST_MSG((is_callable<fc(int const&)>::value == true), "fun-const-lvref/const-lvref");
-    HPX_TEST_MSG((is_callable<fc(BOOST_RV_REF(int))>::value == true), "fun-const-lvref/rvref");
-    HPX_TEST_MSG((is_callable<fc(BOOST_RV_REF(int const))>::value == true), "fun-const-lvref/const-rvref");
+    HPX_TEST_MSG((is_callable<fc(int &&)>::value == true), "fun-const-lvref/rvref");
+    HPX_TEST_MSG((is_callable<fc(int const &&)>::value == true), "fun-const-lvref/const-rvref");
 }
 
 void functions_byrvref_params()
@@ -80,8 +80,8 @@ void functions_byrvref_params()
     HPX_TEST_MSG((is_callable<f(int&)>::value == false), "fun-rvref/lvref");
 #   endif
     HPX_TEST_MSG((is_callable<f(int const&)>::value == false), "fun-rvref/const-lvref");
-    HPX_TEST_MSG((is_callable<f(BOOST_RV_REF(int))>::value == true), "fun-rvref/rvref");
-    HPX_TEST_MSG((is_callable<f(BOOST_RV_REF(int const))>::value == false), "fun-rvref/const-rvref");
+    HPX_TEST_MSG((is_callable<f(int &&)>::value == true), "fun-rvref/rvref");
+    HPX_TEST_MSG((is_callable<f(int const &&)>::value == false), "fun-rvref/const-rvref");
 
     typedef void (*fc)(int const&&);
     HPX_TEST_MSG((is_callable<fc(int)>::value == true), "fun-const-rvref/value");
@@ -89,8 +89,8 @@ void functions_byrvref_params()
     HPX_TEST_MSG((is_callable<fc(int&)>::value == false), "fun-const-rvref/lvref");
     HPX_TEST_MSG((is_callable<fc(int const&)>::value == false), "fun-const-rvref/const-lvref");
 #   endif
-    HPX_TEST_MSG((is_callable<fc(BOOST_RV_REF(int))>::value == true), "fun-const-rvref/rvref");
-    HPX_TEST_MSG((is_callable<fc(BOOST_RV_REF(int const))>::value == true), "fun-const-rvref/const-rvref");
+    HPX_TEST_MSG((is_callable<fc(int &&)>::value == true), "fun-const-rvref/rvref");
+    HPX_TEST_MSG((is_callable<fc(int const &&)>::value == true), "fun-const-rvref/const-rvref");
 #endif
 }
 
@@ -103,16 +103,16 @@ void member_function_pointers()
     HPX_TEST_MSG((is_callable<f(X const*, float)>::value == false), "mem-fun-ptr/const-ptr");
     HPX_TEST_MSG((is_callable<f(X&, float)>::value == true), "mem-fun-ptr/lvref");
     HPX_TEST_MSG((is_callable<f(X const&, float)>::value == false), "mem-fun-ptr/const-lvref");
-    HPX_TEST_MSG((is_callable<f(BOOST_RV_REF(X), float)>::value == true), "mem-fun-ptr/rvref");
-    HPX_TEST_MSG((is_callable<f(BOOST_RV_REF(X const), float)>::value == false), "mem-fun-ptr/const-rvref");
+    HPX_TEST_MSG((is_callable<f(X &&, float)>::value == true), "mem-fun-ptr/rvref");
+    HPX_TEST_MSG((is_callable<f(X const &&, float)>::value == false), "mem-fun-ptr/const-rvref");
 
     typedef int (X::*fc)(double) const;
     HPX_TEST_MSG((is_callable<fc(X*, float)>::value == true), "const-mem-fun-ptr/ptr");
     HPX_TEST_MSG((is_callable<fc(X const*, float)>::value == true), "const-mem-fun-ptr/const-ptr");
     HPX_TEST_MSG((is_callable<fc(X&, float)>::value == true), "const-mem-fun-ptr/lvref");
     HPX_TEST_MSG((is_callable<fc(X const&, float)>::value == true), "const-mem-fun-ptr/const-lvref");
-    HPX_TEST_MSG((is_callable<fc(BOOST_RV_REF(X), float)>::value == true), "const-mem-fun-ptr/rvref");
-    HPX_TEST_MSG((is_callable<fc(BOOST_RV_REF(X const), float)>::value == true), "const-mem-fun-ptr/const-rvref");
+    HPX_TEST_MSG((is_callable<fc(X &&, float)>::value == true), "const-mem-fun-ptr/rvref");
+    HPX_TEST_MSG((is_callable<fc(X const &&, float)>::value == true), "const-mem-fun-ptr/const-rvref");
 }
 
 void member_object_pointers()
@@ -124,8 +124,8 @@ void member_object_pointers()
     HPX_TEST_MSG((is_callable<f(X const*)>::value == true), "mem-obj-ptr/const-ptr");
     HPX_TEST_MSG((is_callable<f(X&)>::value == true), "mem-obj-ptr/lvref");
     HPX_TEST_MSG((is_callable<f(X const&)>::value == true), "mem-obj-ptr/const-lvref");
-    HPX_TEST_MSG((is_callable<f(BOOST_RV_REF(X))>::value == true), "mem-obj-ptr/rvref");
-    HPX_TEST_MSG((is_callable<f(BOOST_RV_REF(X const))>::value == true), "mem-obj-ptr/const-rvref");
+    HPX_TEST_MSG((is_callable<f(X &&)>::value == true), "mem-obj-ptr/rvref");
+    HPX_TEST_MSG((is_callable<f(X const &&)>::value == true), "mem-obj-ptr/const-rvref");
 }
 
 void function_objects()

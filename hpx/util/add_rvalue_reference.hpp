@@ -6,14 +6,14 @@
 #ifndef HPX_UTIL_ADD_RVALUE_REFERENCE_HPP
 #define HPX_UTIL_ADD_RVALUE_REFERENCE_HPP
 
-#include <boost/move/move.hpp>
+#include <utility>
 
 namespace hpx { namespace util
 {
     template <typename T>
     struct add_rvalue_reference
     {
-        typedef BOOST_RV_REF(T) type;
+        typedef T && type;
     };
 
     template <typename T>
@@ -23,9 +23,9 @@ namespace hpx { namespace util
     };
 
     template <typename T>
-    struct add_rvalue_reference<BOOST_RV_REF(T)>
+    struct add_rvalue_reference<T &&>
     {
-        typedef BOOST_RV_REF(T) type;
+        typedef T && type;
     };
 }}
 

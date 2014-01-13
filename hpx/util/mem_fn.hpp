@@ -10,7 +10,7 @@
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
 
-#include <boost/move/move.hpp>
+#include <utility>
 #include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
@@ -55,11 +55,11 @@ namespace hpx { namespace util
             typename util::invoke_result_of<                                  \
                 MemPtr(T BOOST_PP_ENUM_TRAILING_PARAMS(N, A))                 \
             >::type                                                           \
-            operator()(BOOST_FWD_REF(T) t                                     \
+            operator()(T && t                                     \
                 BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, A, a)) const        \
             {                                                                 \
                 return                                                        \
-                    util::invoke(f, boost::forward<T>(t)                      \
+                    util::invoke(f, std::forward<T>(t)                      \
                         BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, A, a)); \
             }                                                                 \
             /**/

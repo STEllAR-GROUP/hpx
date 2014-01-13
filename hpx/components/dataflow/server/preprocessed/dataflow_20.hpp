@@ -14,7 +14,7 @@
         template <typename Action, typename A0>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 
+          , A0 && a0 
         )
         {
             typedef
@@ -33,7 +33,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0));
+            (*w)->init(std::forward<A0>(a0));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0>
@@ -41,19 +41,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 
+          , A0 && a0 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0));
+            init<typename Action::type>(target, std::forward<A0>(a0));
         }
         
         template <typename Action, typename A0 , typename A1>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 
+          , A0 && a0 , A1 && a1 
         )
         {
             typedef
@@ -72,7 +72,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1>
@@ -80,19 +80,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 
+          , A0 && a0 , A1 && a1 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 
+          , A0 && a0 , A1 && a1 , A2 && a2 
         )
         {
             typedef
@@ -111,7 +111,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2>
@@ -119,19 +119,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 
+          , A0 && a0 , A1 && a1 , A2 && a2 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 
         )
         {
             typedef
@@ -150,7 +150,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3>
@@ -158,19 +158,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 
         )
         {
             typedef
@@ -189,7 +189,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
@@ -197,19 +197,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 
         )
         {
             typedef
@@ -228,7 +228,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
@@ -236,19 +236,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 
         )
         {
             typedef
@@ -267,7 +267,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
@@ -275,19 +275,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 
         )
         {
             typedef
@@ -306,7 +306,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
@@ -314,19 +314,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 
         )
         {
             typedef
@@ -345,7 +345,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
@@ -353,19 +353,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 
         )
         {
             typedef
@@ -384,7 +384,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
@@ -392,19 +392,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 
         )
         {
             typedef
@@ -423,7 +423,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
@@ -431,19 +431,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 
         )
         {
             typedef
@@ -462,7 +462,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
@@ -470,19 +470,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 
         )
         {
             typedef
@@ -501,7 +501,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
@@ -509,19 +509,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 
         )
         {
             typedef
@@ -540,7 +540,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
@@ -548,19 +548,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 
         )
         {
             typedef
@@ -579,7 +579,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14>
@@ -587,19 +587,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 
         )
         {
             typedef
@@ -618,7 +618,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14) , boost::forward<A15>(a15));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14) , std::forward<A15>(a15));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15>
@@ -626,19 +626,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14) , boost::forward<A15>(a15));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14) , std::forward<A15>(a15));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 , A16 && a16 
         )
         {
             typedef
@@ -657,7 +657,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14) , boost::forward<A15>(a15) , boost::forward<A16>(a16));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14) , std::forward<A15>(a15) , std::forward<A16>(a16));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16>
@@ -665,19 +665,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 , A16 && a16 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14) , boost::forward<A15>(a15) , boost::forward<A16>(a16));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14) , std::forward<A15>(a15) , std::forward<A16>(a16));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 , A16 && a16 , A17 && a17 
         )
         {
             typedef
@@ -696,7 +696,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14) , boost::forward<A15>(a15) , boost::forward<A16>(a16) , boost::forward<A17>(a17));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14) , std::forward<A15>(a15) , std::forward<A16>(a16) , std::forward<A17>(a17));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17>
@@ -704,19 +704,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 , A16 && a16 , A17 && a17 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14) , boost::forward<A15>(a15) , boost::forward<A16>(a16) , boost::forward<A17>(a17));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14) , std::forward<A15>(a15) , std::forward<A16>(a16) , std::forward<A17>(a17));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17 , BOOST_FWD_REF(A18) a18 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 , A16 && a16 , A17 && a17 , A18 && a18 
         )
         {
             typedef
@@ -735,7 +735,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14) , boost::forward<A15>(a15) , boost::forward<A16>(a16) , boost::forward<A17>(a17) , boost::forward<A18>(a18));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14) , std::forward<A15>(a15) , std::forward<A16>(a16) , std::forward<A17>(a17) , std::forward<A18>(a18));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18>
@@ -743,19 +743,19 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17 , BOOST_FWD_REF(A18) a18 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 , A16 && a16 , A17 && a17 , A18 && a18 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14) , boost::forward<A15>(a15) , boost::forward<A16>(a16) , boost::forward<A17>(a17) , boost::forward<A18>(a18));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14) , std::forward<A15>(a15) , std::forward<A16>(a16) , std::forward<A17>(a17) , std::forward<A18>(a18));
         }
         
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19>
         void init(
             naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17 , BOOST_FWD_REF(A18) a18 , BOOST_FWD_REF(A19) a19 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 , A16 && a16 , A17 && a17 , A18 && a18 , A19 && a19 
         )
         {
             typedef
@@ -774,7 +774,7 @@
                 lcos::local::spinlock::scoped_lock l(mtx);
                 component_ptr = w;
             }
-            (*w)->init(boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14) , boost::forward<A15>(a15) , boost::forward<A16>(a16) , boost::forward<A17>(a17) , boost::forward<A18>(a18) , boost::forward<A19>(a19));
+            (*w)->init(std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14) , std::forward<A15>(a15) , std::forward<A16>(a16) , std::forward<A17>(a17) , std::forward<A18>(a18) , std::forward<A19>(a19));
             detail::update_initialized_count();
         }
         template <typename Action, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17 , typename A18 , typename A19>
@@ -782,11 +782,11 @@
             component_type * back_ptr
           , Action
           , naming::id_type const & target
-          , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17 , BOOST_FWD_REF(A18) a18 , BOOST_FWD_REF(A19) a19 
+          , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 , A16 && a16 , A17 && a17 , A18 && a18 , A19 && a19 
         )
             : base_type(back_ptr)
             , component_ptr(0)
         {
             
-            init<typename Action::type>(target, boost::forward<A0>(a0) , boost::forward<A1>(a1) , boost::forward<A2>(a2) , boost::forward<A3>(a3) , boost::forward<A4>(a4) , boost::forward<A5>(a5) , boost::forward<A6>(a6) , boost::forward<A7>(a7) , boost::forward<A8>(a8) , boost::forward<A9>(a9) , boost::forward<A10>(a10) , boost::forward<A11>(a11) , boost::forward<A12>(a12) , boost::forward<A13>(a13) , boost::forward<A14>(a14) , boost::forward<A15>(a15) , boost::forward<A16>(a16) , boost::forward<A17>(a17) , boost::forward<A18>(a18) , boost::forward<A19>(a19));
+            init<typename Action::type>(target, std::forward<A0>(a0) , std::forward<A1>(a1) , std::forward<A2>(a2) , std::forward<A3>(a3) , std::forward<A4>(a4) , std::forward<A5>(a5) , std::forward<A6>(a6) , std::forward<A7>(a7) , std::forward<A8>(a8) , std::forward<A9>(a9) , std::forward<A10>(a10) , std::forward<A11>(a11) , std::forward<A12>(a12) , std::forward<A13>(a13) , std::forward<A14>(a14) , std::forward<A15>(a15) , std::forward<A16>(a16) , std::forward<A17>(a17) , std::forward<A18>(a18) , std::forward<A19>(a19));
         }

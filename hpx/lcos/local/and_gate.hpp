@@ -13,7 +13,7 @@
 #include <hpx/util/assert.hpp>
 
 #include <boost/dynamic_bitset.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 #include <boost/foreach.hpp>
 
 #include <list>
@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace local
         typedef Mutex mutex_type;
 
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(base_and_gate)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(base_and_gate)
         typedef std::list<conditional_trigger*> condition_list_type;
 
     public:
@@ -40,25 +40,25 @@ namespace hpx { namespace lcos { namespace local
         {
         }
 
-        base_and_gate(BOOST_RV_REF(base_and_gate) rhs)
-          : received_segments_(boost::move(rhs.received_segments_)),
-            promise_(boost::move(rhs.promise_)),
+        base_and_gate(base_and_gate && rhs)
+          : received_segments_(std::move(rhs.received_segments_)),
+            promise_(std::move(rhs.promise_)),
             generation_(rhs.generation_),
-            conditions_(boost::move(rhs.conditions_))
+            conditions_(std::move(rhs.conditions_))
         {
             rhs.generation_ = std::size_t(-1);
         }
 
-        base_and_gate& operator=(BOOST_RV_REF(base_and_gate) rhs)
+        base_and_gate& operator=(base_and_gate && rhs)
         {
             if (this != &rhs)
             {
                 typename mutex_type::scoped_lock l(rhs.mtx_);
-                received_segments_ = boost::move(rhs.received_segments_);
-                promise_ = boost::move(rhs.promise_);
+                received_segments_ = std::move(rhs.received_segments_);
+                promise_ = std::move(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);
-                conditions_ = boost::move(rhs.conditions_);
+                conditions_ = std::move(rhs.conditions_);
             }
             return *this;
         }
@@ -263,7 +263,7 @@ namespace hpx { namespace lcos { namespace local
     struct and_gate : public base_and_gate<no_mutex>
     {
     private:
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(and_gate)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(and_gate)
         typedef base_and_gate<no_mutex> base_type;
 
     public:
@@ -271,15 +271,15 @@ namespace hpx { namespace lcos { namespace local
         {
         }
 
-        and_gate(BOOST_RV_REF(and_gate) rhs)
-          : base_type(boost::move(static_cast<base_type&>(rhs)))
+        and_gate(and_gate && rhs)
+          : base_type(std::move(static_cast<base_type&>(rhs)))
         {
         }
 
-        and_gate& operator=(BOOST_RV_REF(and_gate) rhs)
+        and_gate& operator=(and_gate && rhs)
         {
             if (this != &rhs)
-                static_cast<base_type&>(*this) = boost::move(rhs);
+                static_cast<base_type&>(*this) = std::move(rhs);
             return *this;
         }
 

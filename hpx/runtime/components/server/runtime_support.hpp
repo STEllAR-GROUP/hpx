@@ -284,7 +284,7 @@ namespace hpx { namespace components { namespace server
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
-            return boost::move(f);
+            return std::move(f);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -440,7 +440,7 @@ namespace hpx { namespace components { namespace server
             if (!local_op) {
                 id = factory->create_with_args(
                     component_constructor_functor1<wrapping_type, Component>(
-                        boost::move(*p))
+                        std::move(*p))
                 );
             }
             else {

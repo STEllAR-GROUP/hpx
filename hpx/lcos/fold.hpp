@@ -243,7 +243,7 @@ namespace hpx { namespace lcos
             Result operator()(
                 hpx::unique_future<std::vector<hpx::unique_future<Result> > > r) const
             {
-                std::vector<hpx::unique_future<Result> > fres = boost::move(r.get());
+                std::vector<hpx::unique_future<Result> > fres = std::move(r.get());
                 HPX_ASSERT(!fres.empty());
 
                 // we're at the beginning of the folding chain, incroporate the initial
@@ -461,7 +461,7 @@ namespace hpx { namespace lcos
         BOOST_PP_CAT(fold_impl, N)(
             Action const & act
           , std::vector<hpx::id_type> const & ids
-          , BOOST_FWD_REF(FoldOp) fold_op
+          , FoldOp && fold_op
           , typename fold_result<Action>::type const& init
           BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a)
           , long global_idx
@@ -494,7 +494,7 @@ namespace hpx { namespace lcos
                         hpx::async<fold_impl_action>(
                             id
                           , act
-                          , boost::move(ids_next)
+                          , std::move(ids_next)
                           , fold_op
                           , init
                           BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
@@ -596,8 +596,8 @@ namespace hpx { namespace lcos
     >
     fold(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(FoldOp) fold_op
-      , BOOST_FWD_REF(Init) init
+      , FoldOp && fold_op
+      , Init && init
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         typedef
@@ -623,8 +623,8 @@ namespace hpx { namespace lcos
                 dest
               , Action()
               , ids
-              , boost::forward<FoldOp>(fold_op)
-              , boost::forward<Init>(init)
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
               , 0
             );
@@ -647,14 +647,14 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > /* act */
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(FoldOp) fold_op
-      , BOOST_FWD_REF(Init) init
+      , FoldOp && fold_op
+      , Init && init
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         return fold<Derived>(
                 ids
-              , boost::forward<FoldOp>(fold_op)
-              , boost::forward<Init>(init)
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
             );
     }
@@ -670,14 +670,14 @@ namespace hpx { namespace lcos
     >
     fold_with_index(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(FoldOp) fold_op
-      , BOOST_FWD_REF(Init) init
+      , FoldOp && fold_op
+      , Init && init
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         return fold<detail::fold_with_index<Action> >(
                 ids
-              , boost::forward<FoldOp>(fold_op)
-              , boost::forward<Init>(init)
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
             );
     }
@@ -699,14 +699,14 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > /* act */
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(FoldOp) fold_op
-      , BOOST_FWD_REF(Init) init
+      , FoldOp && fold_op
+      , Init && init
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         return fold<detail::fold_with_index<Derived> >(
                 ids
-              , boost::forward<FoldOp>(fold_op)
-              , boost::forward<Init>(init)
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
             );
     }
@@ -723,8 +723,8 @@ namespace hpx { namespace lcos
     >
     inverse_fold(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(FoldOp) fold_op
-      , BOOST_FWD_REF(Init) init
+      , FoldOp && fold_op
+      , Init && init
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         typedef
@@ -754,8 +754,8 @@ namespace hpx { namespace lcos
                 dest
               , Action()
               , inverted_ids
-              , boost::forward<FoldOp>(fold_op)
-              , boost::forward<Init>(init)
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
               , -static_cast<long>(inverted_ids.size()-1)
             );
@@ -778,14 +778,14 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > /* act */
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(FoldOp) fold_op
-      , BOOST_FWD_REF(Init) init
+      , FoldOp && fold_op
+      , Init && init
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         return inverse_fold<Derived>(
                 ids
-              , boost::forward<FoldOp>(fold_op)
-              , boost::forward<Init>(init)
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
             );
     }
@@ -801,14 +801,14 @@ namespace hpx { namespace lcos
     >
     inverse_fold_with_index(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(FoldOp) fold_op
-      , BOOST_FWD_REF(Init) init
+      , FoldOp && fold_op
+      , Init && init
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         return inverse_fold<detail::fold_with_index<Action> >(
                 ids
-              , boost::forward<FoldOp>(fold_op)
-              , boost::forward<Init>(init)
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
             );
     }
@@ -830,14 +830,14 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > /* act */
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(FoldOp) fold_op
-      , BOOST_FWD_REF(Init) init
+      , FoldOp && fold_op
+      , Init && init
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
         return inverse_fold<detail::fold_with_index<Derived> >(
                 ids
-              , boost::forward<FoldOp>(fold_op)
-              , boost::forward<Init>(init)
+              , std::forward<FoldOp>(fold_op)
+              , std::forward<Init>(init)
               BOOST_PP_ENUM_TRAILING_PARAMS(N, a)
             );
     }

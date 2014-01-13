@@ -40,7 +40,7 @@
 #include <boost/mpl/vector.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/call_traits.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 
 #include <hpx/util/coroutine/detail/arg_max.hpp>
 #include <hpx/util/coroutine/detail/coroutine_impl.hpp>
@@ -116,7 +116,7 @@ namespace hpx { namespace util { namespace coroutines
   class coroutine
   {
   private:
-    BOOST_MOVABLE_BUT_NOT_COPYABLE(coroutine);
+    HPX_MOVABLE_BUT_NOT_COPYABLE(coroutine);
 
   public:
     typedef coroutine<Signature, Heap, ContextImpl> type;
@@ -141,10 +141,10 @@ namespace hpx { namespace util { namespace coroutines
     coroutine() : m_pimpl(0) {}
 
     template <typename Functor>
-    coroutine (BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+    coroutine (Functor && f, naming::id_type && target,
             thread_id_repr_type id = 0, std::ptrdiff_t stack_size = detail::default_stack_size)
-      : m_pimpl(impl_type::create(boost::forward<Functor>(f),
-            boost::move(target), id, stack_size))
+      : m_pimpl(impl_type::create(std::forward<Functor>(f),
+            std::move(target), id, stack_size))
     {
         HPX_ASSERT(m_pimpl->is_ready());
     }
@@ -153,13 +153,13 @@ namespace hpx { namespace util { namespace coroutines
     //  : m_pimpl(p)
     //{}
 
-    coroutine(BOOST_RV_REF(coroutine) src)
+    coroutine(coroutine && src)
       : m_pimpl(src->m_pimpl)
     {
       src->m_pimpl = 0;
     }
 
-    coroutine& operator=(BOOST_RV_REF(coroutine) src)
+    coroutine& operator=(coroutine && src)
     {
       coroutine(src).swap(*this);
       return *this;

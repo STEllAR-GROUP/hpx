@@ -12,612 +12,612 @@
     template <typename U0>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0) const
+    apply(U0 && u0) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ))
             );
     }
     
     template <typename U0>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0) const
+    async(U0 && u0) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ))
             );
     }
     template <typename U0>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0) const
+    operator()(U0 && u0) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ))
             );
     }
     template <typename U0 , typename U1>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1) const
+    apply(U0 && u0 , U1 && u1) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ))
             );
     }
     
     template <typename U0 , typename U1>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1) const
+    async(U0 && u0 , U1 && u1) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ))
             );
     }
     template <typename U0 , typename U1>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1) const
+    operator()(U0 && u0 , U1 && u1) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ))
             );
     }
     template <typename U0 , typename U1 , typename U2>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2) const
+    async(U0 && u0 , U1 && u1 , U2 && u2) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ))
             );
     }
     template <typename U0 , typename U1 , typename U2>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14 , U15 && u15) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ) , std::forward<U15>( u15 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14 , U15 && u15) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ) , std::forward<U15>( u15 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14 , U15 && u15) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ) , std::forward<U15>( u15 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14 , U15 && u15 , U16 && u16) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ) , std::forward<U15>( u15 ) , std::forward<U16>( u16 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14 , U15 && u15 , U16 && u16) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ) , std::forward<U15>( u15 ) , std::forward<U16>( u16 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14 , U15 && u15 , U16 && u16) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ) , std::forward<U15>( u15 ) , std::forward<U16>( u16 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17>
     BOOST_FORCEINLINE
     bool
-    apply(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17) const
+    apply(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14 , U15 && u15 , U16 && u16 , U17 && u17) const
     {
         return
             detail::bind_action_apply<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ) , boost::forward<U17>( u17 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ) , std::forward<U15>( u15 ) , std::forward<U16>( u16 ) , std::forward<U17>( u17 ))
             );
     }
     
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
-    async(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17) const
+    async(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14 , U15 && u15 , U16 && u16 , U17 && u17) const
     {
         return
             detail::bind_action_async<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ) , boost::forward<U17>( u17 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ) , std::forward<U15>( u15 ) , std::forward<U16>( u16 ) , std::forward<U17>( u17 ))
             );
     }
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17>
     BOOST_FORCEINLINE
     result_type
-    operator()(BOOST_FWD_REF(U0) u0 , BOOST_FWD_REF(U1) u1 , BOOST_FWD_REF(U2) u2 , BOOST_FWD_REF(U3) u3 , BOOST_FWD_REF(U4) u4 , BOOST_FWD_REF(U5) u5 , BOOST_FWD_REF(U6) u6 , BOOST_FWD_REF(U7) u7 , BOOST_FWD_REF(U8) u8 , BOOST_FWD_REF(U9) u9 , BOOST_FWD_REF(U10) u10 , BOOST_FWD_REF(U11) u11 , BOOST_FWD_REF(U12) u12 , BOOST_FWD_REF(U13) u13 , BOOST_FWD_REF(U14) u14 , BOOST_FWD_REF(U15) u15 , BOOST_FWD_REF(U16) u16 , BOOST_FWD_REF(U17) u17) const
+    operator()(U0 && u0 , U1 && u1 , U2 && u2 , U3 && u3 , U4 && u4 , U5 && u5 , U6 && u6 , U7 && u7 , U8 && u8 , U9 && u9 , U10 && u10 , U11 && u11 , U12 && u12 , U13 && u13 , U14 && u14 , U15 && u15 , U16 && u16 , U17 && u17) const
     {
         return
             detail::bind_action_invoke<Action>(
                 _bound_args
-              , util::forward_as_tuple(boost::forward<U0>( u0 ) , boost::forward<U1>( u1 ) , boost::forward<U2>( u2 ) , boost::forward<U3>( u3 ) , boost::forward<U4>( u4 ) , boost::forward<U5>( u5 ) , boost::forward<U6>( u6 ) , boost::forward<U7>( u7 ) , boost::forward<U8>( u8 ) , boost::forward<U9>( u9 ) , boost::forward<U10>( u10 ) , boost::forward<U11>( u11 ) , boost::forward<U12>( u12 ) , boost::forward<U13>( u13 ) , boost::forward<U14>( u14 ) , boost::forward<U15>( u15 ) , boost::forward<U16>( u16 ) , boost::forward<U17>( u17 ))
+              , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ) , std::forward<U8>( u8 ) , std::forward<U9>( u9 ) , std::forward<U10>( u10 ) , std::forward<U11>( u11 ) , std::forward<U12>( u12 ) , std::forward<U13>( u13 ) , std::forward<U14>( u14 ) , std::forward<U15>( u15 ) , std::forward<U16>( u16 ) , std::forward<U17>( u17 ))
             );
     }

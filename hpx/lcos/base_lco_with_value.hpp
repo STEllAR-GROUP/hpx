@@ -47,7 +47,7 @@ namespace hpx { namespace lcos
             set_value(RemoteResult());
         }
 
-        virtual void set_value (BOOST_RV_REF(RemoteResult) result) = 0;
+        virtual void set_value (RemoteResult && result) = 0;
 
         virtual result_type const& get_value(error_code& ec = throws) = 0;
 
@@ -74,9 +74,9 @@ namespace hpx { namespace lcos
         ///
         /// \param result [in] The result value to be transferred from the
         ///               remote operation back to this LCO instance.
-        void set_value_nonvirt (BOOST_RV_REF(RemoteResult) result)
+        void set_value_nonvirt (RemoteResult && result)
         {
-            set_value(boost::move(result));
+            set_value(std::move(result));
         }
 
         /// The \a function get_result_nonvirt is called whenever a
@@ -102,7 +102,7 @@ namespace hpx { namespace lcos
         ///               back to this LCO instance.
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
         typedef hpx::actions::direct_action1<
-            base_lco_with_value, BOOST_RV_REF(RemoteResult),
+            base_lco_with_value, RemoteResult &&,
             &base_lco_with_value::set_value_nonvirt
         > set_value_action;
 #else

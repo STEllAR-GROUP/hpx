@@ -99,16 +99,16 @@ namespace hpx { namespace lcos {
             hpx::unique_future<std::vector<hpx::unique_future<std::vector<Result> > > > r)
         {
             std::vector<Result> res;
-            std::vector<hpx::unique_future<std::vector<Result> > > fres = boost::move(r.get());
+            std::vector<hpx::unique_future<std::vector<Result> > > fres = std::move(r.get());
 
             BOOST_FOREACH(hpx::unique_future<std::vector<Result> >& f, fres)
             {
-                std::vector<Result> t = boost::move(f.get());
+                std::vector<Result> t = std::move(f.get());
                 res.reserve(res.capacity() + t.size());
-                boost::move(t.begin(), t.end(), std::back_inserter(res));
+                std::move(t.begin(), t.end(), std::back_inserter(res));
             }
 
-            return boost::move(res);
+            return std::move(res);
         }
     }
 }}
@@ -302,7 +302,7 @@ namespace hpx { namespace lcos {
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
         >
         void
-        broadcast_invoke(Action act, Futures& futures, BOOST_FWD_REF(Cont) cont
+        broadcast_invoke(Action act, Futures& futures, Cont && cont
           , hpx::id_type const& id
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
           , std::size_t)
@@ -312,7 +312,7 @@ namespace hpx { namespace lcos {
                     act
                   , id
                   BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
 
@@ -324,7 +324,7 @@ namespace hpx { namespace lcos {
         >
         void
         broadcast_invoke(broadcast_with_index<Action>, Futures& futures
-          , BOOST_FWD_REF(Cont) cont
+          , Cont && cont
           , hpx::id_type const& id
           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_BINARY_PARAMS(N, A, const & a)
           , std::size_t global_idx)
@@ -335,7 +335,7 @@ namespace hpx { namespace lcos {
                   , id
                   BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                   , global_idx
-                ).then(boost::forward<Cont>(cont))
+                ).then(std::forward<Cont>(cont))
             );
         }
 
@@ -387,7 +387,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                           , global_idx + 1
                           , boost::integral_constant<bool, true>::type()
@@ -402,7 +402,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                           , global_idx + half
                           , boost::integral_constant<bool, true>::type()
@@ -472,7 +472,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                           , global_idx + 1
                           , boost::integral_constant<bool, false>::type()
@@ -487,7 +487,7 @@ namespace hpx { namespace lcos {
                         hpx::async<broadcast_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, a)
                           , global_idx + half
                           , boost::integral_constant<bool, false>::type()

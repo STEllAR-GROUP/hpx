@@ -239,7 +239,7 @@ namespace hpx { namespace lcos
                         typename action_type::component_type>()));
 
                 (*this->impl_)->set_data(
-                    boost::move(action_type::execute_function(addr.address_,
+                    std::move(action_type::execute_function(addr.address_,
                         util::forward_as_tuple())));
             }
             else {
@@ -264,7 +264,7 @@ namespace hpx { namespace lcos
                         typename action_type::component_type>()));
 
                 (*this->impl_)->set_data(
-                    boost::move(action_type::execute_function(addr.address_,
+                    std::move(action_type::execute_function(addr.address_,
                         util::forward_as_tuple())));
             }
             else {

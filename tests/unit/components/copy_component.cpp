@@ -25,10 +25,10 @@ struct test_server
     // it can be MoveConstructable in which case the serialized data
     // is moved into the components constructor.
     test_server(test_server const& rhs) {}
-    test_server(BOOST_RV_REF(test_server) rhs) {}
+    test_server(test_server && rhs) {}
 
-    test_server& operator=(BOOST_COPY_ASSIGN_REF(test_server)) { return *this; }
-    test_server& operator=(BOOST_RV_REF(test_server)) { return *this; }
+    test_server& operator=(test_server const &) { return *this; }
+    test_server& operator=(test_server &&) { return *this; }
 
     HPX_DEFINE_COMPONENT_CONST_ACTION(test_server, call, call_action);
 
@@ -36,7 +36,7 @@ struct test_server
     void serialize(Archive&ar, unsigned version) {}
 
 private:
-    BOOST_COPYABLE_AND_MOVABLE(test_server);
+    ;
 };
 
 typedef hpx::components::simple_component<test_server> server_type;

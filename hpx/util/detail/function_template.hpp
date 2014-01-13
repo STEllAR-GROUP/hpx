@@ -156,7 +156,7 @@ namespace hpx { namespace util
 
         template <typename Functor>
         function(
-            BOOST_FWD_REF(Functor) f
+            Functor && f
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function
@@ -164,34 +164,32 @@ namespace hpx { namespace util
                 >::type
             >::type * = 0
         )
-            : base_type(boost::forward<Functor>(f))
+            : base_type(std::forward<Functor>(f))
         {}
 
         function(function const & other)
             : base_type(static_cast<base_type const &>(other))
         {}
 
-        function(BOOST_RV_REF(function) other)
-            : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
+        function(function && other)
+            : base_type(std::move(static_cast<base_type &&>(other)))
         {}
 
-        function& operator=(BOOST_COPY_ASSIGN_REF(function) t)
+        function& operator=(function const & t)
         {
             this->base_type::operator=(t);
             return *this;
         }
 
-        function& operator=(BOOST_RV_REF(function) t)
+        function& operator=(function && t)
         {
-            this->base_type::operator=(boost::move(static_cast<BOOST_RV_REF(base_type)>(t)));
+            this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
 
         void clear() { reset(); }
 
     private:
-        BOOST_COPYABLE_AND_MOVABLE(function)
-
         friend class boost::serialization::access;
 
         void load(IArchive &ar, const unsigned version)
@@ -259,7 +257,7 @@ namespace hpx { namespace util
 
         template <typename Functor>
         function(
-            BOOST_FWD_REF(Functor) f
+            Functor && f
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function
@@ -267,33 +265,30 @@ namespace hpx { namespace util
                 >::type
             >::type * = 0
         )
-            : base_type(boost::forward<Functor>(f))
+            : base_type(std::forward<Functor>(f))
         {}
 
         function(function const & other)
-            : base_type(static_cast<BOOST_COPY_ASSIGN_REF(base_type)>(other))
+            : base_type(static_cast<base_type const &>(other))
         {}
 
-        function(BOOST_RV_REF(function) other)
-            : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
+        function(function && other)
+            : base_type(std::move(static_cast<base_type &&>(other)))
         {}
 
-        function& operator=(BOOST_COPY_ASSIGN_REF(function) t)
+        function& operator=(function const & t)
         {
             this->base_type::operator=(t);
             return *this;
         }
 
-        function& operator=(BOOST_RV_REF(function) t)
+        function& operator=(function && t)
         {
-            this->base_type::operator=(boost::move(static_cast<BOOST_RV_REF(base_type)>(t)));
+            this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
 
         void clear() { reset(); }
-
-    private:
-        BOOST_COPYABLE_AND_MOVABLE(function)
     };
 
 
@@ -311,7 +306,7 @@ namespace hpx { namespace util
 
         template <typename Functor>
         function_nonser(
-            BOOST_FWD_REF(Functor) f
+            Functor && f
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function_nonser
@@ -319,33 +314,30 @@ namespace hpx { namespace util
                 >::type
             >::type * = 0
         )
-            : base_type(boost::forward<Functor>(f))
+            : base_type(std::forward<Functor>(f))
         {}
 
         function_nonser(function_nonser const & other)
-            : base_type(static_cast<BOOST_COPY_ASSIGN_REF(base_type)>(other))
+            : base_type(static_cast<base_type const &>(other))
         {}
 
-        function_nonser(BOOST_RV_REF(function_nonser) other)
-            : base_type(boost::move(static_cast<BOOST_RV_REF(base_type)>(other)))
+        function_nonser(function_nonser && other)
+            : base_type(std::move(static_cast<base_type &&>(other)))
         {}
 
-        function_nonser& operator=(BOOST_COPY_ASSIGN_REF(function_nonser) t)
+        function_nonser& operator=(function_nonser const & t)
         {
             this->base_type::operator=(t);
             return *this;
         }
 
-        function_nonser& operator=(BOOST_RV_REF(function_nonser) t)
+        function_nonser& operator=(function_nonser && t)
         {
-            this->base_type::operator=(boost::move(static_cast<BOOST_RV_REF(base_type)>(t)));
+            this->base_type::operator=(std::move(static_cast<base_type &&>(t)));
             return *this;
         }
 
         void clear() { reset(); }
-
-    private:
-        BOOST_COPYABLE_AND_MOVABLE(function_nonser)
     };
 }}
 
@@ -425,7 +417,7 @@ namespace hpx { namespace util {
 
         template <typename Functor>
         explicit function_base(
-            BOOST_FWD_REF(Functor) f
+            Functor && f
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function_base
@@ -445,11 +437,11 @@ namespace hpx { namespace util {
                 vptr = get_table_ptr<functor_type>();
                 if (sizeof(functor_type) <= sizeof(void *))  // is_small
                 {
-                    new (&object) functor_type(boost::forward<Functor>(f));
+                    new (&object) functor_type(std::forward<Functor>(f));
                 }
                 else
                 {
-                    object = new functor_type(boost::forward<Functor>(f));
+                    object = new functor_type(std::forward<Functor>(f));
                 }
             }
         }
@@ -461,7 +453,7 @@ namespace hpx { namespace util {
             assign(other);
         }
 
-        function_base(BOOST_RV_REF(function_base) other)
+        function_base(function_base && other)
             : vptr(other.vptr)
             , object(other.object)
         {
@@ -491,7 +483,7 @@ namespace hpx { namespace util {
         }
 
         template <typename Functor>
-        function_base & assign(BOOST_FWD_REF(Functor) f)
+        function_base & assign(Functor && f)
         {
             if (this == &f)
                 return *this;
@@ -506,16 +498,16 @@ namespace hpx { namespace util {
                 if (sizeof(functor_type) <= sizeof(void *))  // is_small
                 {
                     vptr->destruct(&object);
-                    new (&object) functor_type(boost::forward<Functor>(f));
+                    new (&object) functor_type(std::forward<Functor>(f));
                 }
                 else if (object)
                 {
                     vptr->destruct(&object);
-                    new (object) functor_type(boost::forward<Functor>(f));
+                    new (object) functor_type(std::forward<Functor>(f));
                 }
                 else
                 {
-                    object = new functor_type(boost::forward<Functor>(f));
+                    object = new functor_type(std::forward<Functor>(f));
                 }
             }
             else
@@ -525,11 +517,11 @@ namespace hpx { namespace util {
                 {
                     if (sizeof(functor_type) <= sizeof(void *))  // is_small
                     {
-                        new (&object) functor_type(boost::forward<Functor>(f));
+                        new (&object) functor_type(std::forward<Functor>(f));
                     }
                     else
                     {
-                        object = new functor_type(boost::forward<Functor>(f));
+                        object = new functor_type(std::forward<Functor>(f));
                     }
                     vptr = f_vptr;
                 }
@@ -538,17 +530,17 @@ namespace hpx { namespace util {
         }
 
         template <typename T>
-        function_base & operator=(BOOST_FWD_REF(T) t)
+        function_base & operator=(T && t)
         {
-            return assign(boost::forward<T>(t));
+            return assign(std::forward<T>(t));
         }
 
-        function_base & operator=(BOOST_COPY_ASSIGN_REF(function_base) t)
+        function_base & operator=(function_base const & t)
         {
             return assign(t);
         }
 
-        function_base & operator=(BOOST_RV_REF(function_base) t)
+        function_base & operator=(function_base && t)
         {
             if(this != &t)
             {
@@ -660,9 +652,6 @@ namespace hpx { namespace util {
 
             return reinterpret_cast<functor_type const*>(object);
         }
-
-    private:
-        BOOST_COPYABLE_AND_MOVABLE(function_base);
 
     protected:
         vtable_ptr_type *vptr;

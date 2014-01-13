@@ -65,8 +65,8 @@ namespace hpx
             typedef std::vector<Future> result_type;
             typedef std::vector<Future> argument_type;
 
-            when_any_swapped(BOOST_RV_REF(argument_type) lazy_values)
-              : lazy_values_(boost::move(lazy_values))
+            when_any_swapped(argument_type && lazy_values)
+              : lazy_values_(std::move(lazy_values))
               , index_(static_cast<std::size_t>(index_error))
             {}
 
@@ -111,7 +111,7 @@ namespace hpx
                 HPX_ASSERT(index_.load() != static_cast<std::size_t>(index_error));
 
                 boost::swap(lazy_values_[index_], lazy_values_.back());
-                return boost::move(lazy_values_);
+                return std::move(lazy_values_);
             }
 
             std::vector<Future> lazy_values_;
@@ -153,7 +153,7 @@ namespace hpx
 
     template <typename Future>
     lcos::unique_future<std::vector<Future> > //-V659
-    when_any(BOOST_RV_REF(std::vector<Future>) lazy_values,
+    when_any(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
         return when_any(lazy_values, ec);
@@ -200,7 +200,7 @@ namespace hpx
         typedef std::vector<Future> result_type;
 
         if (lazy_values.empty())
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
 
         result_type lazy_values_;
         std::transform(lazy_values.begin(), lazy_values.end(),
@@ -209,7 +209,7 @@ namespace hpx
 
         boost::shared_ptr<detail::when_any_swapped<Future> > f =
             boost::make_shared<detail::when_any_swapped<Future> >(
-                boost::move(lazy_values_));
+                std::move(lazy_values_));
 
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_any_swapped<Future>::operator(), f));
@@ -220,7 +220,7 @@ namespace hpx
 
     template <typename Future>
     lcos::unique_future<std::vector<Future> > //-V659
-    when_any_swapped(BOOST_RV_REF(std::vector<Future>) lazy_values,
+    when_any_swapped(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
         return when_any_swapped(lazy_values, ec);
@@ -281,7 +281,7 @@ namespace hpx
 
     template <typename Future>
     void
-    wait_any(BOOST_RV_REF(std::vector<Future>) lazy_values,
+    wait_any(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
         return wait_any(const_cast<std::vector<Future> const&>(lazy_values), ec);

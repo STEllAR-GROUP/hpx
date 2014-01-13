@@ -34,7 +34,7 @@ namespace hpx { namespace components
           : base_type(gid)
         {}
         distributing_factory(lcos::unique_future<naming::id_type> gid)
-          : base_type(boost::move(gid))
+          : base_type(std::move(gid))
         {}
 
         ///////////////////////////////////////////////////////////////////////

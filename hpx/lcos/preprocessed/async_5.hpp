@@ -18,10 +18,10 @@ namespace hpx
             template <typename Arg0>
             BOOST_FORCEINLINE static lcos::unique_future<Result> call(
                 naming::id_type const& gid, naming::address const&,
-                BOOST_FWD_REF(Arg0) arg0)
+                Arg0 && arg0)
             {
                 lcos::packaged_action<Action, Result> p;
-                p.apply(launch::sync, gid, boost::forward<Arg0>( arg0 ));
+                p.apply(launch::sync, gid, std::forward<Arg0>( arg0 ));
                 return p.get_future();
             }
         };
@@ -31,13 +31,13 @@ namespace hpx
             template <typename Arg0>
             BOOST_FORCEINLINE static lcos::unique_future<R> call(
                 boost::mpl::true_, naming::id_type const&,
-                naming::address const& addr, BOOST_FWD_REF(Arg0) arg0)
+                naming::address const& addr, Arg0 && arg0)
             {
                 HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 )));
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 )));
             }
         };
     }
@@ -48,7 +48,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
     async(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0)
+        Arg0 && arg0)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -58,15 +58,15 @@ namespace hpx
         if (policy == launch::sync && agas::is_local_address(gid, addr))
         {
             return detail::sync_local_invoke_1<action_type, result_type>::
-                call(gid, addr, boost::forward<Arg0>( arg0 ));
+                call(gid, addr, std::forward<Arg0>( arg0 ));
         }
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, boost::forward<Arg0>( arg0 ));
+                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ));
             else
-                p.apply(policy, gid, boost::forward<Arg0>( arg0 ));
+                p.apply(policy, gid, std::forward<Arg0>( arg0 ));
         }
         return p.get_future();
     }
@@ -75,10 +75,10 @@ namespace hpx
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
+    async(naming::id_type const& gid, Arg0 && arg0)
     {
         return async<Action>(launch::all, gid,
-            boost::forward<Arg0>( arg0 ));
+            std::forward<Arg0>( arg0 ));
     }
     
     template <typename Component, typename Result,
@@ -90,10 +90,10 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > const & , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
+        > const & , naming::id_type const& gid, Arg0 && arg0)
     {
         return async<Derived>(policy, gid,
-            boost::forward<Arg0>( arg0 ));
+            std::forward<Arg0>( arg0 ));
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0>
@@ -104,10 +104,10 @@ namespace hpx
     async(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > const &, naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0)
+        > const &, naming::id_type const& gid, Arg0 && arg0)
     {
         return async<Derived>(launch::all, gid,
-            boost::forward<Arg0>( arg0 ));
+            std::forward<Arg0>( arg0 ));
     }
 }
 namespace hpx
@@ -120,10 +120,10 @@ namespace hpx
             template <typename Arg0 , typename Arg1>
             BOOST_FORCEINLINE static lcos::unique_future<Result> call(
                 naming::id_type const& gid, naming::address const&,
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+                Arg0 && arg0 , Arg1 && arg1)
             {
                 lcos::packaged_action<Action, Result> p;
-                p.apply(launch::sync, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+                p.apply(launch::sync, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
                 return p.get_future();
             }
         };
@@ -133,13 +133,13 @@ namespace hpx
             template <typename Arg0 , typename Arg1>
             BOOST_FORCEINLINE static lcos::unique_future<R> call(
                 boost::mpl::true_, naming::id_type const&,
-                naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+                naming::address const& addr, Arg0 && arg0 , Arg1 && arg1)
             {
                 HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 )));
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 )));
             }
         };
     }
@@ -150,7 +150,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
     async(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+        Arg0 && arg0 , Arg1 && arg1)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -160,15 +160,15 @@ namespace hpx
         if (policy == launch::sync && agas::is_local_address(gid, addr))
         {
             return detail::sync_local_invoke_2<action_type, result_type>::
-                call(gid, addr, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+                call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
             else
-                p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+                p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
         return p.get_future();
     }
@@ -177,10 +177,10 @@ namespace hpx
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+    async(naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1)
     {
         return async<Action>(launch::all, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     
     template <typename Component, typename Result,
@@ -192,10 +192,10 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > const & , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+        > const & , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1)
     {
         return async<Derived>(policy, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1>
@@ -206,10 +206,10 @@ namespace hpx
     async(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > const &, naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1)
+        > const &, naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1)
     {
         return async<Derived>(launch::all, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
 }
 namespace hpx
@@ -222,10 +222,10 @@ namespace hpx
             template <typename Arg0 , typename Arg1 , typename Arg2>
             BOOST_FORCEINLINE static lcos::unique_future<Result> call(
                 naming::id_type const& gid, naming::address const&,
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+                Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
             {
                 lcos::packaged_action<Action, Result> p;
-                p.apply(launch::sync, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+                p.apply(launch::sync, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
                 return p.get_future();
             }
         };
@@ -235,13 +235,13 @@ namespace hpx
             template <typename Arg0 , typename Arg1 , typename Arg2>
             BOOST_FORCEINLINE static lcos::unique_future<R> call(
                 boost::mpl::true_, naming::id_type const&,
-                naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+                naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
             {
                 HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 )));
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 )));
             }
         };
     }
@@ -252,7 +252,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
     async(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+        Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -262,15 +262,15 @@ namespace hpx
         if (policy == launch::sync && agas::is_local_address(gid, addr))
         {
             return detail::sync_local_invoke_3<action_type, result_type>::
-                call(gid, addr, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+                call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
             else
-                p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+                p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
         return p.get_future();
     }
@@ -279,10 +279,10 @@ namespace hpx
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+    async(naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         return async<Action>(launch::all, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     
     template <typename Component, typename Result,
@@ -294,10 +294,10 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > const & , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+        > const & , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         return async<Derived>(policy, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
@@ -308,10 +308,10 @@ namespace hpx
     async(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > const &, naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2)
+        > const &, naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         return async<Derived>(launch::all, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
 }
 namespace hpx
@@ -324,10 +324,10 @@ namespace hpx
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
             BOOST_FORCEINLINE static lcos::unique_future<Result> call(
                 naming::id_type const& gid, naming::address const&,
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+                Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
             {
                 lcos::packaged_action<Action, Result> p;
-                p.apply(launch::sync, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+                p.apply(launch::sync, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
                 return p.get_future();
             }
         };
@@ -337,13 +337,13 @@ namespace hpx
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
             BOOST_FORCEINLINE static lcos::unique_future<R> call(
                 boost::mpl::true_, naming::id_type const&,
-                naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+                naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
             {
                 HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 )));
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 )));
             }
         };
     }
@@ -354,7 +354,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
     async(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+        Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -364,15 +364,15 @@ namespace hpx
         if (policy == launch::sync && agas::is_local_address(gid, addr))
         {
             return detail::sync_local_invoke_4<action_type, result_type>::
-                call(gid, addr, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+                call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
             else
-                p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+                p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
         return p.get_future();
     }
@@ -381,10 +381,10 @@ namespace hpx
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+    async(naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         return async<Action>(launch::all, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     
     template <typename Component, typename Result,
@@ -396,10 +396,10 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > const & , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+        > const & , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         return async<Derived>(policy, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
@@ -410,10 +410,10 @@ namespace hpx
     async(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > const &, naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3)
+        > const &, naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         return async<Derived>(launch::all, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
 }
 namespace hpx
@@ -426,10 +426,10 @@ namespace hpx
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
             BOOST_FORCEINLINE static lcos::unique_future<Result> call(
                 naming::id_type const& gid, naming::address const&,
-                BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+                Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
             {
                 lcos::packaged_action<Action, Result> p;
-                p.apply(launch::sync, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+                p.apply(launch::sync, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
                 return p.get_future();
             }
         };
@@ -439,13 +439,13 @@ namespace hpx
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
             BOOST_FORCEINLINE static lcos::unique_future<R> call(
                 boost::mpl::true_, naming::id_type const&,
-                naming::address const& addr, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+                naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
             {
                 HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<
                         typename Action::component_type>()));
                 return Action::execute_function(addr.address_,
-                    util::forward_as_tuple(boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 )));
+                    util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 )));
             }
         };
     }
@@ -456,7 +456,7 @@ namespace hpx
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
     async(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
-        BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+        Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename traits::promise_local_result<
@@ -466,15 +466,15 @@ namespace hpx
         if (policy == launch::sync && agas::is_local_address(gid, addr))
         {
             return detail::sync_local_invoke_5<action_type, result_type>::
-                call(gid, addr, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+                call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
         lcos::packaged_action<action_type, result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy))
         {
             if (addr)
-                p.apply(policy, addr, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+                p.apply(policy, addr, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
             else
-                p.apply(policy, gid, boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+                p.apply(policy, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
         return p.get_future();
     }
@@ -483,10 +483,10 @@ namespace hpx
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
-    async(naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+    async(naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         return async<Action>(launch::all, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
     
     template <typename Component, typename Result,
@@ -498,10 +498,10 @@ namespace hpx
     async(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > const & , naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+        > const & , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         return async<Derived>(policy, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
@@ -512,9 +512,9 @@ namespace hpx
     async(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > const &, naming::id_type const& gid, BOOST_FWD_REF(Arg0) arg0 , BOOST_FWD_REF(Arg1) arg1 , BOOST_FWD_REF(Arg2) arg2 , BOOST_FWD_REF(Arg3) arg3 , BOOST_FWD_REF(Arg4) arg4)
+        > const &, naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         return async<Derived>(launch::all, gid,
-            boost::forward<Arg0>( arg0 ) , boost::forward<Arg1>( arg1 ) , boost::forward<Arg2>( arg2 ) , boost::forward<Arg3>( arg3 ) , boost::forward<Arg4>( arg4 ));
+            std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
 }
