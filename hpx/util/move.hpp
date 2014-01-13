@@ -45,8 +45,6 @@
 #if defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
 #define HPX_MOVABLE_BUT_NOT_COPYABLE(TYPE)                                    \
     private:                                                                  \
-        TYPE(TYPE &);                                                         \
-        TYPE& operator=(TYPE &);                                              \
         TYPE(TYPE const &);                                                   \
         TYPE& operator=(TYPE const &);                                        \
 /**/
