@@ -366,6 +366,13 @@ namespace hpx { namespace agas { namespace detail
                         }
                     }
                 }
+                else if(data.credit_ == 0)
+                {
+                    // we're done with handling the acknowledged credits
+                    credits = 0;
+
+                    ++r.first;
+                }
                 else
                 {
                     // This entry already stores a certain amount of
