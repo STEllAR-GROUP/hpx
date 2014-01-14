@@ -38,6 +38,8 @@ HPX_REGISTER_ACTION(test0_action);
 // Concrete
 struct B : A, hpx::components::managed_component_base<B>
 {
+    typedef hpx::components::managed_component_base<B>::wrapping_type wrapping_type;
+    using hpx::components::managed_component_base<B>::wrap_action;
     typedef B type_holder;
     typedef A base_type_holder;
 
@@ -112,10 +114,10 @@ int main()
         clientA obj(hpx::components::new_<B>(hpx::find_here()));
     
         HPX_TEST_EQ(obj.test0(), "B");
-    
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     }
+    
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
 
     reset_globals();
 
@@ -127,9 +129,10 @@ int main()
         HPX_TEST_EQ(obj.test0(), "B");
         HPX_TEST_EQ(obj.test1(), "B");
     
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
     }
+
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
 
     reset_globals();
 
