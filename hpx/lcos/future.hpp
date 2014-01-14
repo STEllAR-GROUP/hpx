@@ -1081,8 +1081,6 @@ namespace hpx { namespace lcos
     template <typename Result>
     class future
     {
-        (future)
-
     public:
         typedef lcos::detail::future_data<Result> future_data_type;
 
@@ -1443,8 +1441,6 @@ namespace hpx { namespace lcos
     template <>
     class future<void>
     {
-        (future)
-
     public:
         typedef lcos::detail::future_data<void> future_data_type;
         typedef future_data_type::data_type data_type;
