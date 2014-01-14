@@ -37,7 +37,7 @@ namespace hpx { namespace util
         template <typename T, typename TD = typename util::decay<T>::type>
         struct deferred_call_decay
         {
-            typedef T type;
+            typedef TD type;
         };
 
         template <typename T, typename U>

@@ -66,13 +66,7 @@ namespace hpx
 
         ~thread();
 
-#if !defined(BOOST_NO_CXX11_DELETED_FUNCTIONS)
-        thread(thread const&) = delete;
-        thread& operator=(thread const&) = delete;
-#else
-    private:
         HPX_MOVABLE_BUT_NOT_COPYABLE(thread);
-#endif
 
     public:
         thread(thread &&) BOOST_NOEXCEPT;
