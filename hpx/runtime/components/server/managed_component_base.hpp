@@ -279,7 +279,7 @@ namespace hpx { namespace components
         {
             return std::move(f);
         }
-    private:
+    protected:
         template <typename>
         friend struct detail_adl_barrier::init;
 
@@ -290,6 +290,7 @@ namespace hpx { namespace components
             back_ptr_ = bp;
         }
 
+    private:
         managed_component<Component, Wrapper>* back_ptr_;
     };
 
