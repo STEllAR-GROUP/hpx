@@ -42,12 +42,10 @@ namespace hpx { namespace traits
       : type_size<T>
     {};
 
-#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
     template <typename T>
     struct type_size<T&&>
       : type_size<T>
     {};
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // handle containers

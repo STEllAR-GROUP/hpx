@@ -71,7 +71,6 @@ namespace hpx { namespace util
     }
     
     // leave everything that is not a bind expression as is
-#   ifndef BOOST_NO_CXX_RVALUE_REFERENCES
     template <typename T>
     typename boost::disable_if<
         traits::is_bind_expression<typename util::decay<T>::type>
@@ -81,27 +80,6 @@ namespace hpx { namespace util
     {
         return std::forward<T>(v);
     }
-#   else
-    template <typename T>
-    typename boost::disable_if<
-        traits::is_bind_expression<typename util::decay<T>::type>
-      , T&
-    >::type
-    protect(T& v)
-    {
-        return v;
-    }
-    template <typename T>
-    typename boost::disable_if<
-        traits::is_bind_expression<typename util::decay<T>::type>
-      , T
-    >::type
-    protect(T && v)
-    {
-        return std::forward<T>(v);
-    }
-#   endif
-
 }} // namespace hpx::util
 
 #endif

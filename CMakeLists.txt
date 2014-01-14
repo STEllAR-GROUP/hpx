@@ -946,6 +946,8 @@ if(MSVC)
     hpx_option(HPX_HAVE_CXX11_RVALUE_REFERENCES BOOL "Compiler supports C++11 rvalue references (default: ON)." ON ADVANCED)
     if(HPX_HAVE_CXX11_RVALUE_REFERENCES)
       hpx_add_config_define(HPX_HAVE_CXX11_RVALUE_REFERENCES)
+    else()
+      hpx_error("HPX needs support for C++11 rvalue references")
     endif()
 
     hpx_option(HPX_HAVE_CXX11_LAMBDAS BOOL "Compiler supports C++11 lambda functions (default: ON)." ON ADVANCED)
@@ -1155,6 +1157,10 @@ else()
 
     hpx_check_for_cxx11_rvalue_references(HPX_HAVE_CXX11_RVALUE_REFERENCES
       DEFINITIONS HPX_HAVE_CXX11_RVALUE_REFERENCES)
+
+    if(NOT HPX_HAVE_CXX11_RVALUE_REFERENCES)
+      hpx_error("HPX needs support for C++11 rvalue references")
+    endif()
 
     hpx_check_for_cxx11_variadic_templates(HPX_HAVE_CXX11_VARIADIC_TEMPLATES
       DEFINITIONS HPX_HAVE_CXX11_VARIADIC_TEMPLATES)

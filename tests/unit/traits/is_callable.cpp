@@ -73,7 +73,6 @@ void functions_byrvref_params()
 {
     using hpx::traits::is_callable;
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     typedef void (*f)(int&&);
     HPX_TEST_MSG((is_callable<f(int)>::value == true), "fun-rvref/value");
 #   if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 40500
@@ -91,7 +90,6 @@ void functions_byrvref_params()
 #   endif
     HPX_TEST_MSG((is_callable<fc(int &&)>::value == true), "fun-const-rvref/rvref");
     HPX_TEST_MSG((is_callable<fc(int const &&)>::value == true), "fun-const-rvref/const-rvref");
-#endif
 }
 
 void member_function_pointers()
@@ -138,10 +136,8 @@ void function_objects()
     HPX_TEST_MSG((is_callable<X const*(int)>::value == false), "fun-obj/const-ptr");
     HPX_TEST_MSG((is_callable<X&(int)>::value == true), "fun-obj/lvref");
     HPX_TEST_MSG((is_callable<X const&(int)>::value == false), "fun-obj/const-lvref");
-#   ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     HPX_TEST_MSG((is_callable<X&&(int)>::value == true), "fun-obj/rvref");
     HPX_TEST_MSG((is_callable<X const&&(int)>::value == false), "fun-obj/const-rvref");
-#   endif
 
     HPX_TEST_MSG((is_callable<Xc(int)>::value == true), "const-fun-obj/value");
     HPX_TEST_MSG((is_callable<Xc const(int)>::value == true), "const-fun-obj/const-value");
@@ -149,10 +145,8 @@ void function_objects()
     HPX_TEST_MSG((is_callable<Xc const*(int)>::value == false), "const-fun-obj/const-ptr");
     HPX_TEST_MSG((is_callable<Xc&(int)>::value == true), "const-fun-obj/lvref");
     HPX_TEST_MSG((is_callable<Xc const&(int)>::value == true), "const-fun-obj/const-lvref");
-#   ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     HPX_TEST_MSG((is_callable<Xc&&(int)>::value == true), "const-fun-obj/rvref");
     HPX_TEST_MSG((is_callable<Xc const&&(int)>::value == true), "const-fun-obj/const-rvref");
-#   endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

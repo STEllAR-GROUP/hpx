@@ -499,7 +499,6 @@ namespace hpx { namespace util
                 object = new value_type(x);
         }
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
         // Move constructor
         basic_any(basic_any&& x) BOOST_NOEXCEPT
           : table(x.table),
@@ -530,7 +529,6 @@ namespace hpx { namespace util
             else
                 object = new value_type(std::forward<T>(x));
         }
-#endif
 
         ~basic_any()
         {
@@ -557,21 +555,6 @@ namespace hpx { namespace util
         }
 
     public:
-#ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
-        // copy assignment operator
-        basic_any& operator=(basic_any x)
-        {
-            basic_any(x).swap(*this);
-            return *this;
-        }
-
-        template <typename T>
-        basic_any& operator=(T const& rhs)
-        {
-            basic_any(rhs).swap(*this);
-            return *this;
-        }
-#else
         // copy assignment operator
         basic_any& operator=(basic_any const& x)
         {
@@ -594,7 +577,6 @@ namespace hpx { namespace util
             basic_any(std::forward<T>(rhs)).swap(*this);
             return *this;
         }
-#endif
 
         // equality operator
         friend bool operator==(basic_any const& x, basic_any const& y)
@@ -801,7 +783,6 @@ namespace hpx { namespace util
                 object = new value_type(x);
         }
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
         // Move constructor
         basic_any(basic_any&& x) BOOST_NOEXCEPT
           : table(x.table),
@@ -832,7 +813,6 @@ namespace hpx { namespace util
             else
                 object = new value_type(std::forward<T>(x));
         }
-#endif
 
         ~basic_any()
         {
@@ -858,21 +838,6 @@ namespace hpx { namespace util
         }
 
     public:
-#ifdef BOOST_NO_CXX11_RVALUE_REFERENCES
-        // copy assignment operator
-        basic_any& operator=(basic_any x)
-        {
-            basic_any(x).swap(*this);
-            return *this;
-        }
-
-        template <typename T>
-        basic_any& operator=(T const& rhs)
-        {
-            basic_any(rhs).swap(*this);
-            return *this;
-        }
-#else
         // copy assignment operator
         basic_any& operator=(basic_any const& x)
         {
@@ -895,7 +860,6 @@ namespace hpx { namespace util
             basic_any(std::forward<T>(rhs)).swap(*this);
             return *this;
         }
-#endif
 
         // equality operator
         friend bool operator==(basic_any const& x, basic_any const& y)
