@@ -41,6 +41,14 @@ HPX_REGISTER_ACTION(test0_action);
 // Concrete
 struct B : A, hpx::components::managed_component_base<B>
 {
+    typedef hpx::components::managed_component_base<B>::wrapping_type
+        wrapping_type;
+    typedef hpx::components::managed_component_base<B>::wrapped_type
+        wrapped_type;
+    using hpx::components::managed_component_base<B>::wrap_action;
+    using hpx::components::managed_component_base<B>::set_back_ptr;
+    using hpx::components::managed_component_base<B>::finalize;
+
     typedef B type_holder;
     typedef A base_type_holder;
 
@@ -65,6 +73,14 @@ HPX_REGISTER_ACTION(test1_action);
 // Concrete
 struct C : B, hpx::components::managed_component_base<C>
 {
+    typedef hpx::components::managed_component_base<C>::wrapping_type
+        wrapping_type;
+    typedef hpx::components::managed_component_base<C>::wrapped_type
+        wrapped_type;
+    using hpx::components::managed_component_base<C>::wrap_action;
+    using hpx::components::managed_component_base<C>::set_back_ptr;
+    using hpx::components::managed_component_base<C>::finalize;
+
     typedef C type_holder;
     typedef B base_type_holder;
 
@@ -171,11 +187,11 @@ int main()
         clientA obj(hpx::components::new_<A>(hpx::find_here()));
     
         HPX_TEST_EQ(obj.test0(), "A");
-    
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-        HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
     }
+    
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(!b_ctor); HPX_TEST(!b_dtor);
+    HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
 
     reset_globals();
 
@@ -185,11 +201,11 @@ int main()
         clientA obj(hpx::components::new_<B>(hpx::find_here()));
     
         HPX_TEST_EQ(obj.test0(), "B");
-    
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-        HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
     }
+    
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
+    HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
 
     reset_globals();
 
@@ -200,11 +216,11 @@ int main()
     
         HPX_TEST_EQ(obj.test0(), "B");
         HPX_TEST_EQ(obj.test1(), "B");
-    
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-        HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
     }
+    
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
+    HPX_TEST(!c_ctor); HPX_TEST(!c_dtor);
 
     reset_globals();
 
@@ -214,11 +230,11 @@ int main()
         clientA obj(hpx::components::new_<C>(hpx::find_here()));
     
         HPX_TEST_EQ(obj.test0(), "C");
-    
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-        HPX_TEST(c_ctor); HPX_TEST(c_dtor);
     }
+    
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
+    HPX_TEST(c_ctor); HPX_TEST(c_dtor);
 
     reset_globals();
 
@@ -229,11 +245,11 @@ int main()
     
         HPX_TEST_EQ(obj.test0(), "C");
         HPX_TEST_EQ(obj.test1(), "C");
-    
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-        HPX_TEST(c_ctor); HPX_TEST(c_dtor);
     }
+    
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
+    HPX_TEST(c_ctor); HPX_TEST(c_dtor);
 
     reset_globals();
 
@@ -245,11 +261,11 @@ int main()
         HPX_TEST_EQ(obj.test0(), "C");
         HPX_TEST_EQ(obj.test1(), "C");
         HPX_TEST_EQ(obj.test2(), "C");
-    
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-        HPX_TEST(c_ctor); HPX_TEST(c_dtor);
     }
+    
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
+    HPX_TEST(c_ctor); HPX_TEST(c_dtor);
 
     reset_globals();
 

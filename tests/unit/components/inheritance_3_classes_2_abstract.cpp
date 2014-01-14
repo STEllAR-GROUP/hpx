@@ -40,6 +40,10 @@ HPX_REGISTER_ACTION(test0_action);
 // Abstract
 struct B : A, hpx::components::abstract_managed_component_base<B>
 {
+    typedef hpx::components::abstract_managed_component_base<B>::wrapping_type
+        wrapping_type;
+    using hpx::components::abstract_managed_component_base<B>::wrap_action;
+
     typedef B type_holder;
     typedef A base_type_holder;
 
@@ -63,6 +67,10 @@ HPX_REGISTER_ACTION(test1_action);
 // Concrete
 struct C : B, hpx::components::managed_component_base<C>
 {
+    typedef hpx::components::managed_component_base<C>::wrapping_type
+        wrapping_type;
+    using hpx::components::managed_component_base<C>::wrap_action;
+
     typedef C type_holder;
     typedef B base_type_holder;
 
@@ -169,11 +177,11 @@ int main()
         clientA obj(hpx::components::new_<C>(hpx::find_here()));
     
         HPX_TEST_EQ(obj.test0(), "C");
-    
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-        HPX_TEST(c_ctor); HPX_TEST(c_dtor);
     }
+    
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
+    HPX_TEST(c_ctor); HPX_TEST(c_dtor);
 
     reset_globals();
 
@@ -184,11 +192,11 @@ int main()
     
         HPX_TEST_EQ(obj.test0(), "C");
         HPX_TEST_EQ(obj.test1(), "C");
-    
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-        HPX_TEST(c_ctor); HPX_TEST(c_dtor);
     }
+    
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
+    HPX_TEST(c_ctor); HPX_TEST(c_dtor);
 
     reset_globals();
 
@@ -200,11 +208,11 @@ int main()
         HPX_TEST_EQ(obj.test0(), "C");
         HPX_TEST_EQ(obj.test1(), "C");
         HPX_TEST_EQ(obj.test2(), "C");
-    
-        HPX_TEST(a_ctor); HPX_TEST(a_dtor);
-        HPX_TEST(b_ctor); HPX_TEST(b_dtor);
-        HPX_TEST(c_ctor); HPX_TEST(c_dtor);
     }
+    
+    HPX_TEST(a_ctor); HPX_TEST(a_dtor);
+    HPX_TEST(b_ctor); HPX_TEST(b_dtor);
+    HPX_TEST(c_ctor); HPX_TEST(c_dtor);
 
     reset_globals();
 
