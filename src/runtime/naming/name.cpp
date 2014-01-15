@@ -312,11 +312,6 @@ namespace hpx { namespace naming
                 // operations.
                 boost::uint64_t added_credit = detail::fill_credit_for_gid(gid);
 
-                // We unlock the lock as all operations on the local credit
-                // have been performed and we don't want the lock to be
-                // pending during the (possibly remote) AGAS operation.
-                l.unlock();
-
                 // Inform our incref tracking that part of a credit is going to
                 // be sent over the wire.
                 requires_incref_handling = agas::add_remote_incref_request(
@@ -324,6 +319,11 @@ namespace hpx { namespace naming
 
                 id_type id(const_cast<id_type_impl*>(this));
                 agas::add_incref_request(added_credit, id);
+
+                // We unlock the lock as all operations on the local credit
+                // have been performed and we don't want the lock to be
+                // pending during the (possibly remote) AGAS operation.
+                l.unlock();
 
                 // If something goes wrong during the reference count
                 // increment below we will have already added credits to
