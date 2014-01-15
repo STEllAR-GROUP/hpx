@@ -80,7 +80,9 @@ void functions_byrvref_params()
 #   endif
     HPX_TEST_MSG((is_callable<f(int const&)>::value == false), "fun-rvref/const-lvref");
     HPX_TEST_MSG((is_callable<f(int &&)>::value == true), "fun-rvref/rvref");
+#if !defined(BOOST_INTEL)
     HPX_TEST_MSG((is_callable<f(int const &&)>::value == false), "fun-rvref/const-rvref");
+#endif
 
     typedef void (*fc)(int const&&);
     HPX_TEST_MSG((is_callable<fc(int)>::value == true), "fun-const-rvref/value");
