@@ -33,13 +33,13 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 
 #include <hpx/config/function.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/remove_reference.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 

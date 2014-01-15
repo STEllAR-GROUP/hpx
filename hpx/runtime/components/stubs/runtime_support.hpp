@@ -16,11 +16,11 @@
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/async.hpp>
-#include <hpx/util/remove_reference.hpp>
 
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/enum_params.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 
 namespace hpx { namespace components { namespace stubs
 {
@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
 #define HPX_RUNTIME_SUPPORT_STUB_REMOVE_REFERENCE(Z, N, D)                    \
-        typename util::remove_reference<BOOST_PP_CAT(D, N)>::type             \
+        typename boost::remove_reference<BOOST_PP_CAT(D, N)>::type             \
 /**/
 #define HPX_RUNTIME_SUPPORT_STUB_CREATE(Z, N, D)                              \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>  \

@@ -12,7 +12,6 @@
 #include <hpx/config/forceinline.hpp>
 #include <hpx/util/invoke.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/add_rvalue_reference.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/punctuation/comma_if.hpp>
@@ -79,8 +78,7 @@ namespace hpx { namespace util { namespace detail {
         struct type;
 
 #       define BOOST_UTIL_DETAIL_VTABLE_ADD_RVALUE_REF(Z, N, D)                 \
-        typename util::add_rvalue_reference<BOOST_PP_CAT(D, N)>::type           \
-        BOOST_PP_CAT(a, N)                                                      \
+        BOOST_PP_CAT(D, N) && BOOST_PP_CAT(a, N)                                \
         /**/
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)

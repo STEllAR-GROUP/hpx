@@ -110,8 +110,8 @@ namespace detail
             f2_();
         }
 
-        typename util::remove_reference<F1>::type f1_;
-        typename util::remove_reference<F2>::type f2_;
+        typename boost::remove_reference<F1>::type f1_;
+        typename boost::remove_reference<F2>::type f2_;
     };
 
     template <typename F1, typename F2>

@@ -80,7 +80,7 @@
 #define N BOOST_PP_ITERATION()
 
 #   define HPX_UTIL_BIND_ADD_RVALUE_REF(Z, N, D)                              \
-    typename util::add_rvalue_reference<BOOST_PP_CAT(U, N)>::type             \
+    BOOST_PP_CAT(U, N) &&                                                    \
     /**/
 
     template <typename This, BOOST_PP_ENUM_PARAMS(N, typename U)>

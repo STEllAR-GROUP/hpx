@@ -13,7 +13,7 @@
     struct result<This(U0)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type>
+          , util::tuple<U0 &&>
         >
     {};
     template <typename U0>
@@ -31,7 +31,7 @@
     struct result<This const(U0)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type>
+          , util::tuple<U0 &&>
         >
     {};
     template <typename U0>
@@ -49,7 +49,7 @@
     struct result<This(U0 , U1)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type>
+          , util::tuple<U0 && , U1 &&>
         >
     {};
     template <typename U0 , typename U1>
@@ -67,7 +67,7 @@
     struct result<This const(U0 , U1)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type>
+          , util::tuple<U0 && , U1 &&>
         >
     {};
     template <typename U0 , typename U1>
@@ -85,7 +85,7 @@
     struct result<This(U0 , U1 , U2)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type>
+          , util::tuple<U0 && , U1 && , U2 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2>
@@ -103,7 +103,7 @@
     struct result<This const(U0 , U1 , U2)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type>
+          , util::tuple<U0 && , U1 && , U2 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2>
@@ -121,7 +121,7 @@
     struct result<This(U0 , U1 , U2 , U3)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3>
@@ -139,7 +139,7 @@
     struct result<This const(U0 , U1 , U2 , U3)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3>
@@ -157,7 +157,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4>
@@ -175,7 +175,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4>
@@ -193,7 +193,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5>
@@ -211,7 +211,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5>
@@ -229,7 +229,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6>
@@ -247,7 +247,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6>
@@ -265,7 +265,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7>
@@ -283,7 +283,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7>
@@ -301,7 +301,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8>
@@ -319,7 +319,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8>
@@ -337,7 +337,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9>
@@ -355,7 +355,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9>
@@ -373,7 +373,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10>
@@ -391,7 +391,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10>
@@ -409,7 +409,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11>
@@ -427,7 +427,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11>
@@ -445,7 +445,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12>
@@ -463,7 +463,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12>
@@ -481,7 +481,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13>
@@ -499,7 +499,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13>
@@ -517,7 +517,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14>
@@ -535,7 +535,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14>
@@ -553,7 +553,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15>
@@ -571,7 +571,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15>
@@ -589,7 +589,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16>
@@ -607,7 +607,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16>
@@ -625,7 +625,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17>
@@ -643,7 +643,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17>
@@ -661,7 +661,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 && , U18 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18>
@@ -679,7 +679,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 && , U18 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18>
@@ -697,7 +697,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 && , U18 && , U19 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19>
@@ -715,7 +715,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 && , U18 && , U19 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19>
@@ -733,7 +733,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 && , U18 && , U19 && , U20 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20>
@@ -751,7 +751,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 && , U18 && , U19 && , U20 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20>
@@ -769,7 +769,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type , typename util::add_rvalue_reference<U21>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 && , U18 && , U19 && , U20 && , U21 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21>
@@ -787,7 +787,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type , typename util::add_rvalue_reference<U21>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 && , U18 && , U19 && , U20 && , U21 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21>
@@ -805,7 +805,7 @@
     struct result<This(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21 , U22)>
       : bind_invoke_impl<
             F, BoundArgs
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type , typename util::add_rvalue_reference<U21>::type , typename util::add_rvalue_reference<U22>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 && , U18 && , U19 && , U20 && , U21 && , U22 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21 , typename U22>
@@ -823,7 +823,7 @@
     struct result<This const(U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21 , U22)>
       : bind_invoke_impl<
             F const, BoundArgs const
-          , util::tuple<typename util::add_rvalue_reference<U0>::type , typename util::add_rvalue_reference<U1>::type , typename util::add_rvalue_reference<U2>::type , typename util::add_rvalue_reference<U3>::type , typename util::add_rvalue_reference<U4>::type , typename util::add_rvalue_reference<U5>::type , typename util::add_rvalue_reference<U6>::type , typename util::add_rvalue_reference<U7>::type , typename util::add_rvalue_reference<U8>::type , typename util::add_rvalue_reference<U9>::type , typename util::add_rvalue_reference<U10>::type , typename util::add_rvalue_reference<U11>::type , typename util::add_rvalue_reference<U12>::type , typename util::add_rvalue_reference<U13>::type , typename util::add_rvalue_reference<U14>::type , typename util::add_rvalue_reference<U15>::type , typename util::add_rvalue_reference<U16>::type , typename util::add_rvalue_reference<U17>::type , typename util::add_rvalue_reference<U18>::type , typename util::add_rvalue_reference<U19>::type , typename util::add_rvalue_reference<U20>::type , typename util::add_rvalue_reference<U21>::type , typename util::add_rvalue_reference<U22>::type>
+          , util::tuple<U0 && , U1 && , U2 && , U3 && , U4 && , U5 && , U6 && , U7 && , U8 && , U9 && , U10 && , U11 && , U12 && , U13 && , U14 && , U15 && , U16 && , U17 && , U18 && , U19 && , U20 && , U21 && , U22 &&>
         >
     {};
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7 , typename U8 , typename U9 , typename U10 , typename U11 , typename U12 , typename U13 , typename U14 , typename U15 , typename U16 , typename U17 , typename U18 , typename U19 , typename U20 , typename U21 , typename U22>

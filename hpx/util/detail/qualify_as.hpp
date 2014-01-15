@@ -6,8 +6,6 @@
 #ifndef HPX_UTIL_DETAIL_QUALIFY_AS_HPP
 #define HPX_UTIL_DETAIL_QUALIFY_AS_HPP
 
-#include <hpx/util/add_lvalue_reference.hpp>
-#include <hpx/util/add_rvalue_reference.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <utility>
@@ -45,13 +43,15 @@ namespace hpx { namespace util { namespace detail
 
     template <typename T, typename U>
     struct qualify_as_impl<T, U&>
-      : util::add_lvalue_reference<typename qualify_as_impl<T, U>::type>
-    {};
+    {
+        typedef typename qualify_as_impl<T, U>::type& type;
+    };
 
     template <typename T, typename U>
     struct qualify_as_impl<T, U &&>
-      : util::add_rvalue_reference<typename qualify_as_impl<T, U>::type>
-    {};
+    {
+        typedef typename qualify_as_impl<T, U>::type&& type;
+    };
     
     ///////////////////////////////////////////////////////////////////////////
     /// creates a type `T` with the (cv-ref)qualifiers of `U`

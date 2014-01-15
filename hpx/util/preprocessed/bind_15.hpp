@@ -49,7 +49,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type>
@@ -110,7 +110,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type>
@@ -171,7 +171,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type>
@@ -232,7 +232,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type>
@@ -293,7 +293,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type>
@@ -354,7 +354,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type>
@@ -415,7 +415,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type>
@@ -476,7 +476,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type>
@@ -537,7 +537,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type>
@@ -598,7 +598,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type>
@@ -659,7 +659,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type>
@@ -720,7 +720,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type>
@@ -781,7 +781,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type>
@@ -842,7 +842,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type>
@@ -903,7 +903,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type>
@@ -964,7 +964,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type>
@@ -1025,7 +1025,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type>
@@ -1086,7 +1086,7 @@ namespace hpx { namespace util
     }
     template <typename F, typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type>
