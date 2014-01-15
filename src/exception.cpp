@@ -129,6 +129,10 @@ namespace hpx { namespace detail
         catch (...) {
             return boost::current_exception();
         }
+        
+        // need this return to silence a warning with icc
+        HPX_ASSERT(false);
+        return boost::exception_ptr();
     }
 
     template <typename Exception>
@@ -148,6 +152,10 @@ namespace hpx { namespace detail
         catch (...) {
             return boost::current_exception();
         }
+        
+        // need this return to silence a warning with icc
+        HPX_ASSERT(false);
+        return boost::exception_ptr();
     }
 
     template <typename Exception>
@@ -161,6 +169,10 @@ namespace hpx { namespace detail
         catch (...) {
             return boost::current_exception();
         }
+        
+        // need this return to silence a warning with icc
+        HPX_ASSERT(false);
+        return boost::exception_ptr();
     }
 
     template HPX_EXPORT boost::exception_ptr
