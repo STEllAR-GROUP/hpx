@@ -410,7 +410,6 @@ namespace hpx { namespace threads { namespace policies
                         return true;
                     }
                 }
-                return false;
             }
 
             else // not NUMA-sensitive
