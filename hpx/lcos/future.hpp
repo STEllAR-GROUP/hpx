@@ -302,8 +302,8 @@ namespace hpx { namespace lcos { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct future_value
+      : future_data_result<T>
     {
-        typedef T type;
         typedef T const& const_lvref;
 
         template <typename U>
@@ -321,14 +321,14 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename T>
     struct future_value<T&>
+      : future_data_result<T&>
     {
-        typedef T* type;
         typedef T& const_lvref;
 
         BOOST_FORCEINLINE static
-        T& get(T* u)
+        T& get(T& u)
         {
-            return *u;
+            return u;
         }
 
         static T& get_default()
@@ -340,8 +340,8 @@ namespace hpx { namespace lcos { namespace detail
 
     template <>
     struct future_value<void>
+      : future_data_result<void>
     {
-        typedef void type;
         typedef void const_lvref;
 
         BOOST_FORCEINLINE static
@@ -1359,14 +1359,14 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
     template <typename Result>
-    unique_future<typename util::decay<Result>::type>
+    unique_future<typename util::detail::decay_unwrap<Result>::type>
     make_ready_future(Result && init)
     {
-        typedef typename util::decay<Result>::type result_type;
+        typedef typename util::detail::decay_unwrap<Result>::type result_type;
         typedef lcos::detail::future_data<result_type> shared_state;
-
+        
         boost::intrusive_ptr<shared_state> p(new shared_state());
-        p->set_data(std::forward<Result>(init));
+        p->set_result(std::forward<Result>(init));
 
         using lcos::detail::future_access;
         return future_access::create<unique_future<result_type> >(
@@ -1376,10 +1376,10 @@ namespace hpx { namespace lcos
     // extension: create a pre-initialized future object which holds the
     // given error
     template <typename Result>
-    unique_future<Result>
+    unique_future<typename util::detail::decay_unwrap<Result>::type>
     make_error_future(boost::exception_ptr const& e)
     {
-        typedef typename util::decay<Result>::type result_type;
+        typedef typename util::detail::decay_unwrap<Result>::type result_type;
         typedef lcos::detail::future_data<result_type> shared_state;
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
@@ -1393,11 +1393,11 @@ namespace hpx { namespace lcos
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
     template <typename Result>
-    unique_future<typename util::decay<Result>::type>
+    unique_future<typename util::detail::decay_unwrap<Result>::type>
     make_ready_future_at(boost::posix_time::ptime const& at,
         Result && init)
     {
-        typedef typename util::decay<Result>::type result_type;
+        typedef typename util::detail::decay_unwrap<Result>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
         using lcos::detail::future_access;
@@ -1406,7 +1406,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Clock, typename Duration, typename Result>
-    unique_future<typename util::decay<Result>::type>
+    unique_future<typename util::detail::decay_unwrap<Result>::type>
     make_ready_future_at(boost::chrono::time_point<Clock, Duration> const& at,
         Result && init)
     {
@@ -1415,11 +1415,11 @@ namespace hpx { namespace lcos
     }
 
     template <typename Result>
-    unique_future<typename util::decay<Result>::type>
+    unique_future<typename util::detail::decay_unwrap<Result>::type>
     make_ready_future_after(boost::posix_time::time_duration const& d,
         Result && init)
     {
-        typedef typename util::decay<Result>::type result_type;
+        typedef typename util::detail::decay_unwrap<Result>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
         using lcos::detail::future_access;
@@ -1428,7 +1428,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Rep, typename Period, typename Result>
-    unique_future<typename util::decay<Result>::type>
+    unique_future<typename util::detail::decay_unwrap<Result>::type>
     make_ready_future_after(boost::chrono::duration<Rep, Period> const& d,
         Result && init)
     {
@@ -1645,7 +1645,7 @@ namespace hpx { namespace lcos
         typedef lcos::detail::future_data<void> shared_state;
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
-        p->set_data(util::unused);
+        p->set_result(util::unused);
 
         using lcos::detail::future_access;
         return future_access::create<unique_future<void> >(std::move(p));
