@@ -47,7 +47,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0)
+    distributed_new(std::size_t count, A0 && a0)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -70,7 +70,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ))
                 );
             }
             created_count += numcreate;
@@ -83,7 +83,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -106,7 +106,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ))
                 );
             }
             created_count += numcreate;
@@ -119,7 +119,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -142,7 +142,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ))
                 );
             }
             created_count += numcreate;
@@ -155,7 +155,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -178,7 +178,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ))
                 );
             }
             created_count += numcreate;
@@ -191,7 +191,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -214,7 +214,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ))
                 );
             }
             created_count += numcreate;
@@ -227,7 +227,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -250,7 +250,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ))
                 );
             }
             created_count += numcreate;
@@ -263,7 +263,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -286,7 +286,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ))
                 );
             }
             created_count += numcreate;
@@ -299,7 +299,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -322,7 +322,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ))
                 );
             }
             created_count += numcreate;
@@ -335,7 +335,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -358,7 +358,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ))
                 );
             }
             created_count += numcreate;
@@ -371,7 +371,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -394,7 +394,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ))
                 );
             }
             created_count += numcreate;
@@ -407,7 +407,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -430,7 +430,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ))
                 );
             }
             created_count += numcreate;
@@ -443,7 +443,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -466,7 +466,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ))
                 );
             }
             created_count += numcreate;
@@ -479,7 +479,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -502,7 +502,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 ))
                 );
             }
             created_count += numcreate;
@@ -515,7 +515,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -538,7 +538,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 ) , std::forward<A13>( a13 ))
                 );
             }
             created_count += numcreate;
@@ -551,7 +551,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -574,7 +574,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 ) , std::forward<A13>( a13 ) , std::forward<A14>( a14 ))
                 );
             }
             created_count += numcreate;
@@ -587,7 +587,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -610,7 +610,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 ) , std::forward<A13>( a13 ) , std::forward<A14>( a14 ) , std::forward<A15>( a15 ))
                 );
             }
             created_count += numcreate;
@@ -623,7 +623,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 , A16 && a16)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -646,7 +646,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 ) , std::forward<A13>( a13 ) , std::forward<A14>( a14 ) , std::forward<A15>( a15 ) , std::forward<A16>( a16 ))
                 );
             }
             created_count += numcreate;
@@ -659,7 +659,7 @@ namespace hpx { namespace components {
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14 , typename A15 , typename A16 , typename A17>
     std::vector<lcos::unique_future<object<T> > >
-    distributed_new(std::size_t count, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4 , BOOST_FWD_REF(A5) a5 , BOOST_FWD_REF(A6) a6 , BOOST_FWD_REF(A7) a7 , BOOST_FWD_REF(A8) a8 , BOOST_FWD_REF(A9) a9 , BOOST_FWD_REF(A10) a10 , BOOST_FWD_REF(A11) a11 , BOOST_FWD_REF(A12) a12 , BOOST_FWD_REF(A13) a13 , BOOST_FWD_REF(A14) a14 , BOOST_FWD_REF(A15) a15 , BOOST_FWD_REF(A16) a16 , BOOST_FWD_REF(A17) a17)
+    distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12 , A13 && a13 , A14 && a14 , A15 && a15 , A16 && a16 , A17 && a17)
     {
         hpx::components::component_type type
             = hpx::components::get_component_type<hpx::components::server::remote_object>();
@@ -682,7 +682,7 @@ namespace hpx { namespace components {
                 break;
             for (std::size_t i = 0; i < numcreate; ++i) {
                 res.push_back(
-                    new_<T>(prefix, boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ) , boost::forward<A5>( a5 ) , boost::forward<A6>( a6 ) , boost::forward<A7>( a7 ) , boost::forward<A8>( a8 ) , boost::forward<A9>( a9 ) , boost::forward<A10>( a10 ) , boost::forward<A11>( a11 ) , boost::forward<A12>( a12 ) , boost::forward<A13>( a13 ) , boost::forward<A14>( a14 ) , boost::forward<A15>( a15 ) , boost::forward<A16>( a16 ) , boost::forward<A17>( a17 ))
+                    new_<T>(prefix, std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 ) , std::forward<A13>( a13 ) , std::forward<A14>( a14 ) , std::forward<A15>( a15 ) , std::forward<A16>( a16 ) , std::forward<A17>( a17 ))
                 );
             }
             created_count += numcreate;

@@ -13,7 +13,7 @@ namespace hpx
     
     template <typename T0>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0,
+    when_n(std::size_t n, T0 && f0,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -22,7 +22,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 1)
         {
@@ -33,7 +33,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -41,7 +41,7 @@ namespace hpx
     }
     template <typename T0>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0,
+    wait_n(std::size_t n, T0 && f0,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -62,7 +62,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -71,7 +71,7 @@ namespace hpx
     
     template <typename T0 , typename T1>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1,
+    when_n(std::size_t n, T0 && f0 , T1 && f1,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -80,7 +80,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 2)
         {
@@ -91,7 +91,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -99,7 +99,7 @@ namespace hpx
     }
     template <typename T0 , typename T1>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -120,7 +120,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -129,7 +129,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -138,7 +138,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 3)
         {
@@ -149,7 +149,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -157,7 +157,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -178,7 +178,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -187,7 +187,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -196,7 +196,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 4)
         {
@@ -207,7 +207,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -215,7 +215,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -236,7 +236,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -245,7 +245,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -254,7 +254,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 5)
         {
@@ -265,7 +265,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -273,7 +273,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -294,7 +294,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -303,7 +303,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -312,7 +312,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 6)
         {
@@ -323,7 +323,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -331,7 +331,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -352,7 +352,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -361,7 +361,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -370,7 +370,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 7)
         {
@@ -381,7 +381,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -389,7 +389,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -410,7 +410,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -419,7 +419,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -428,7 +428,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 8)
         {
@@ -439,7 +439,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -447,7 +447,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -468,7 +468,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -477,7 +477,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -486,7 +486,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 9)
         {
@@ -497,7 +497,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -505,7 +505,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -526,7 +526,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -535,7 +535,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -544,7 +544,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 10)
         {
@@ -555,7 +555,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -563,7 +563,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -584,7 +584,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -593,7 +593,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -602,7 +602,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 11)
         {
@@ -613,7 +613,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -621,7 +621,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -642,7 +642,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -651,7 +651,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -660,7 +660,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 12)
         {
@@ -671,7 +671,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -679,7 +679,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -700,7 +700,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -709,7 +709,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -718,7 +718,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 13)
         {
@@ -729,7 +729,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -737,7 +737,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -758,7 +758,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -767,7 +767,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -776,7 +776,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 14)
         {
@@ -787,7 +787,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -795,7 +795,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -816,7 +816,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -825,7 +825,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -834,7 +834,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 15)
         {
@@ -845,7 +845,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -853,7 +853,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -874,7 +874,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -883,7 +883,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -892,7 +892,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 16)
         {
@@ -903,7 +903,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -911,7 +911,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -932,7 +932,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -941,7 +941,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -950,7 +950,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 17)
         {
@@ -961,7 +961,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -969,7 +969,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -990,7 +990,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -999,7 +999,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1008,7 +1008,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 18)
         {
@@ -1019,7 +1019,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -1027,7 +1027,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1048,7 +1048,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -1057,7 +1057,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type , typename util::decay<T18>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17 , BOOST_FWD_REF(T18) f18,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17 , T18 && f18,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1066,7 +1066,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17) , detail::when_acquire_future<T18>()(f18));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 19)
         {
@@ -1077,7 +1077,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -1085,7 +1085,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17 , BOOST_FWD_REF(T18) f18,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17 , T18 && f18,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1106,7 +1106,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -1115,7 +1115,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type , typename util::decay<T18>::type , typename util::decay<T19>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17 , BOOST_FWD_REF(T18) f18 , BOOST_FWD_REF(T19) f19,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17 , T18 && f18 , T19 && f19,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1124,7 +1124,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17) , detail::when_acquire_future<T18>()(f18) , detail::when_acquire_future<T19>()(f19));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 20)
         {
@@ -1135,7 +1135,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -1143,7 +1143,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17 , BOOST_FWD_REF(T18) f18 , BOOST_FWD_REF(T19) f19,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17 , T18 && f18 , T19 && f19,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1164,7 +1164,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -1173,7 +1173,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type , typename util::decay<T18>::type , typename util::decay<T19>::type , typename util::decay<T20>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17 , BOOST_FWD_REF(T18) f18 , BOOST_FWD_REF(T19) f19 , BOOST_FWD_REF(T20) f20,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17 , T18 && f18 , T19 && f19 , T20 && f20,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1182,7 +1182,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17) , detail::when_acquire_future<T18>()(f18) , detail::when_acquire_future<T19>()(f19) , detail::when_acquire_future<T20>()(f20));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 21)
         {
@@ -1193,7 +1193,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -1201,7 +1201,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17 , BOOST_FWD_REF(T18) f18 , BOOST_FWD_REF(T19) f19 , BOOST_FWD_REF(T20) f20,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17 , T18 && f18 , T19 && f19 , T20 && f20,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1222,7 +1222,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -1231,7 +1231,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type , typename util::decay<T18>::type , typename util::decay<T19>::type , typename util::decay<T20>::type , typename util::decay<T21>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17 , BOOST_FWD_REF(T18) f18 , BOOST_FWD_REF(T19) f19 , BOOST_FWD_REF(T20) f20 , BOOST_FWD_REF(T21) f21,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17 , T18 && f18 , T19 && f19 , T20 && f20 , T21 && f21,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1240,7 +1240,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17) , detail::when_acquire_future<T18>()(f18) , detail::when_acquire_future<T19>()(f19) , detail::when_acquire_future<T20>()(f20) , detail::when_acquire_future<T21>()(f21));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 22)
         {
@@ -1251,7 +1251,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -1259,7 +1259,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17 , BOOST_FWD_REF(T18) f18 , BOOST_FWD_REF(T19) f19 , BOOST_FWD_REF(T20) f20 , BOOST_FWD_REF(T21) f21,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17 , T18 && f18 , T19 && f19 , T20 && f20 , T21 && f21,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1280,7 +1280,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }
@@ -1289,7 +1289,7 @@ namespace hpx
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     lcos::unique_future<HPX_STD_TUPLE<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type , typename util::decay<T10>::type , typename util::decay<T11>::type , typename util::decay<T12>::type , typename util::decay<T13>::type , typename util::decay<T14>::type , typename util::decay<T15>::type , typename util::decay<T16>::type , typename util::decay<T17>::type , typename util::decay<T18>::type , typename util::decay<T19>::type , typename util::decay<T20>::type , typename util::decay<T21>::type , typename util::decay<T22>::type> >
-    when_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17 , BOOST_FWD_REF(T18) f18 , BOOST_FWD_REF(T19) f19 , BOOST_FWD_REF(T20) f20 , BOOST_FWD_REF(T21) f21 , BOOST_FWD_REF(T22) f22,
+    when_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17 , T18 && f18 , T19 && f19 , T20 && f20 , T21 && f21 , T22 && f22,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1298,7 +1298,7 @@ namespace hpx
         result_type lazy_values(detail::when_acquire_future<T0>()(f0) , detail::when_acquire_future<T1>()(f1) , detail::when_acquire_future<T2>()(f2) , detail::when_acquire_future<T3>()(f3) , detail::when_acquire_future<T4>()(f4) , detail::when_acquire_future<T5>()(f5) , detail::when_acquire_future<T6>()(f6) , detail::when_acquire_future<T7>()(f7) , detail::when_acquire_future<T8>()(f8) , detail::when_acquire_future<T9>()(f9) , detail::when_acquire_future<T10>()(f10) , detail::when_acquire_future<T11>()(f11) , detail::when_acquire_future<T12>()(f12) , detail::when_acquire_future<T13>()(f13) , detail::when_acquire_future<T14>()(f14) , detail::when_acquire_future<T15>()(f15) , detail::when_acquire_future<T16>()(f16) , detail::when_acquire_future<T17>()(f17) , detail::when_acquire_future<T18>()(f18) , detail::when_acquire_future<T19>()(f19) , detail::when_acquire_future<T20>()(f20) , detail::when_acquire_future<T21>()(f21) , detail::when_acquire_future<T22>()(f22));
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
         if (n > 23)
         {
@@ -1309,7 +1309,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
         p.apply();
@@ -1317,7 +1317,7 @@ namespace hpx
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     void
-    wait_n(std::size_t n, BOOST_FWD_REF(T0) f0 , BOOST_FWD_REF(T1) f1 , BOOST_FWD_REF(T2) f2 , BOOST_FWD_REF(T3) f3 , BOOST_FWD_REF(T4) f4 , BOOST_FWD_REF(T5) f5 , BOOST_FWD_REF(T6) f6 , BOOST_FWD_REF(T7) f7 , BOOST_FWD_REF(T8) f8 , BOOST_FWD_REF(T9) f9 , BOOST_FWD_REF(T10) f10 , BOOST_FWD_REF(T11) f11 , BOOST_FWD_REF(T12) f12 , BOOST_FWD_REF(T13) f13 , BOOST_FWD_REF(T14) f14 , BOOST_FWD_REF(T15) f15 , BOOST_FWD_REF(T16) f16 , BOOST_FWD_REF(T17) f17 , BOOST_FWD_REF(T18) f18 , BOOST_FWD_REF(T19) f19 , BOOST_FWD_REF(T20) f20 , BOOST_FWD_REF(T21) f21 , BOOST_FWD_REF(T22) f22,
+    wait_n(std::size_t n, T0 && f0 , T1 && f1 , T2 && f2 , T3 && f3 , T4 && f4 , T5 && f5 , T6 && f6 , T7 && f7 , T8 && f8 , T9 && f9 , T10 && f10 , T11 && f11 , T12 && f12 , T13 && f13 , T14 && f14 , T15 && f15 , T16 && f16 , T17 && f17 , T18 && f18 , T19 && f19 , T20 && f20 , T21 && f21 , T22 && f22,
         error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<
@@ -1338,7 +1338,7 @@ namespace hpx
         }
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
         return (*f.get())();
     }
 }

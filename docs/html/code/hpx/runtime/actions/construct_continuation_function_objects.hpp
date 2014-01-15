@@ -46,7 +46,7 @@ namespace detail
 
 #define HPX_ACTION_DIRECT_ARGUMENT(z, n, data)                                \
     BOOST_PP_COMMA_IF(n)                                                      \
-    util::get<n>(boost::forward<Arguments>(data))                             \
+    util::get<n>(std::forward<Arguments>(data))                             \
     /**/
 
 #include BOOST_PP_ITERATE()
@@ -111,12 +111,12 @@ namespace detail
     {
         template <typename Func, typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        call(continuation_type cont, BOOST_FWD_REF(Func) func,
-            BOOST_FWD_REF(Arguments) args)
+        call(continuation_type cont, Func && func,
+            Arguments && args)
         {
             return util::bind(util::one_shot(
                 BOOST_PP_CAT(continuation_thread_function_void_, N)<Action>()),
-                cont, boost::forward<Func>(func)
+                cont, std::forward<Func>(func)
               BOOST_PP_COMMA_IF(N)
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
         }
@@ -139,7 +139,7 @@ namespace detail
                     << detail::get_action_name<Action>()
                     << ") with continuation(" << cont->get_gid() << ")";
 
-                cont->trigger(boost::forward<typename Action::result_type>(
+                cont->trigger(std::forward<typename Action::result_type>(
                     func(HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
                 ));
             }
@@ -156,12 +156,12 @@ namespace detail
     {
         template <typename Func, typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        call(continuation_type cont, BOOST_FWD_REF(Func) func,
-            BOOST_FWD_REF(Arguments) args)
+        call(continuation_type cont, Func && func,
+            Arguments && args)
         {
             return util::bind(util::one_shot(
                 BOOST_PP_CAT(continuation_thread_function_, N)<Action>()),
-                cont, boost::forward<Func>(func)
+                cont, std::forward<Func>(func)
               BOOST_PP_COMMA_IF(N)
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args));
         }

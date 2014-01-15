@@ -15,7 +15,6 @@
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/result_of.hpp>
 #include <hpx/traits/is_callable.hpp>
 
 #include <boost/utility/enable_if.hpp>
@@ -30,13 +29,13 @@ namespace hpx { namespace detail
 {
     // Defer the evaluation of result_of during the SFINAE checks below
 #if defined(__clang__)
-    template <typename F, typename Result = typename util::result_of<F>::type>
+    template <typename F, typename Result = typename util::deferred_call_result_of<F>::type>
     struct create_future
     {
         typedef lcos::unique_future<Result> type;
     };
 #else
-    template <typename F, typename ResultOf = util::result_of<F> >
+    template <typename F, typename ResultOf = util::deferred_call_result_of<F> >
     struct create_future
     {
         typedef lcos::unique_future<typename ResultOf::type> type;
@@ -45,14 +44,14 @@ namespace hpx { namespace detail
 
     template <typename F>
     BOOST_FORCEINLINE typename detail::create_future<F()>::type
-    call_sync(BOOST_FWD_REF(F) f, boost::mpl::false_)
+    call_sync(F && f, boost::mpl::false_)
     {
         return lcos::make_ready_future(f());
     }
 
     template <typename F>
     BOOST_FORCEINLINE typename detail::create_future<F()>::type
-    call_sync(BOOST_FWD_REF(F) f, boost::mpl::true_)
+    call_sync(F && f, boost::mpl::true_)
     {
         f();
         return lcos::make_ready_future();
@@ -78,22 +77,22 @@ namespace hpx
         traits::detail::is_callable_not_action<
             typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type()>
+      , detail::create_future<F()>
     >::type
-    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
+    async(BOOST_SCOPED_ENUM(launch) policy, F && f)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type()
+        typedef typename util::deferred_call_result_of<
+            F()
         >::type result_type;
 
         if (policy == launch::sync)
         {
             typedef typename boost::is_void<result_type>::type predicate;
-            return detail::call_sync(boost::forward<F>(f), predicate());
+            return detail::call_sync(std::forward<F>(f), predicate());
         }
 
         lcos::local::futures_factory<result_type()> p(
-            boost::forward<F>(f));
+            std::forward<F>(f));
         if (detail::has_async_policy(policy))
             p.apply();
         return p.get_future();
@@ -104,16 +103,16 @@ namespace hpx
         traits::detail::is_callable_not_action<
             typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type()>
+      , detail::create_future<F()>
     >::type
-    async(threads::executor& sched, BOOST_FWD_REF(F) f)
+    async(threads::executor& sched, F && f)
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type()
+        typedef typename util::deferred_call_result_of<
+            F()
         >::type result_type;
 
         lcos::local::futures_factory<result_type()> p(sched,
-            boost::forward<F>(f));
+            std::forward<F>(f));
         p.apply();
         return p.get_future();
     }
@@ -123,11 +122,11 @@ namespace hpx
         traits::detail::is_callable_not_action<
             typename util::decay<F>::type()>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type()>
+      , detail::create_future<F()>
     >::type
-    async(BOOST_FWD_REF(F) f)
+    async(F && f)
     {
-        return async(launch::all, boost::forward<F>(f));
+        return async(launch::all, std::forward<F>(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -183,28 +182,26 @@ namespace hpx
             typename util::decay<F>::type(
                 BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>
+      , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
-    async(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f,
+    async(BOOST_SCOPED_ENUM(launch) policy, F && f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))
+        typedef typename util::deferred_call_result_of<
+            F(BOOST_PP_ENUM_PARAMS(N, A))
         >::type result_type;
 
         if (policy == launch::sync) {
             typedef typename boost::is_void<result_type>::type predicate;
             return detail::call_sync(
                 util::deferred_call(
-                    boost::forward<F>(f),
+                    std::forward<F>(f),
                     HPX_ENUM_FORWARD_ARGS(N, A, a)
                 ), predicate());
         }
         lcos::local::futures_factory<result_type()> p(
             util::deferred_call(
-                boost::forward<F>(f),
+                std::forward<F>(f),
                 HPX_ENUM_FORWARD_ARGS(N, A, a)
             ));
         if (detail::has_async_policy(policy))
@@ -218,20 +215,18 @@ namespace hpx
             typename util::decay<F>::type(
                 BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>
+      , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
-    async(threads::executor& sched, BOOST_FWD_REF(F) f,
+    async(threads::executor& sched, F && f,
         HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        typedef typename util::result_of<
-            typename util::decay<F>::type
-                (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))
+        typedef typename util::deferred_call_result_of<
+            F(BOOST_PP_ENUM_PARAMS(N, A))
         >::type result_type;
 
         lcos::local::futures_factory<result_type()> p(sched,
             util::deferred_call(
-                boost::forward<F>(f),
+                std::forward<F>(f),
                 HPX_ENUM_FORWARD_ARGS(N, A, a)
             ));
         p.apply();
@@ -244,12 +239,11 @@ namespace hpx
             typename util::decay<F>::type(
                 BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>::value
      && !traits::is_bound_action<typename util::decay<F>::type>::value
-      , detail::create_future<typename util::decay<F>::type
-            (BOOST_PP_ENUM(N, HPX_ASYNC_DECAY_ARG, A))>
+      , detail::create_future<F(BOOST_PP_ENUM_PARAMS(N, A))>
     >::type
-    async(BOOST_FWD_REF(F) f, HPX_ENUM_FWD_ARGS(N, A, a))
+    async(F && f, HPX_ENUM_FWD_ARGS(N, A, a))
     {
-        return async(launch::all, boost::forward<F>(f),
+        return async(launch::all, std::forward<F>(f),
             HPX_ENUM_FORWARD_ARGS(N, A, a));
     }
 

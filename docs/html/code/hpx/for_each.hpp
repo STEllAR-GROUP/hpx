@@ -30,7 +30,7 @@ namespace hpx {
             {
                 R futures = f.get();
 
-                boost::move(futures.begin(), futures.end(), out_);
+                std::move(futures.begin(), futures.end(), out_);
             }
         };
     }

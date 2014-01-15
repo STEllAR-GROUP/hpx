@@ -13,9 +13,9 @@ namespace hpx
     
     
     template <typename F>
-    bool apply(threads::executor& sched, BOOST_FWD_REF(F) f)
+    bool apply(threads::executor& sched, F && f)
     {
-        sched.add(boost::forward<F>(f), "hpx::apply");
+        sched.add(std::forward<F>(f), "hpx::apply");
         return false; 
     }
     template <typename F>
@@ -24,11 +24,11 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(BOOST_FWD_REF(F) f)
+    apply(F && f)
     {
         threads::register_thread_nullary(
             util::deferred_call(
-                boost::forward<F>(f)
+                std::forward<F>(f)
             ), "hpx::apply");
         return false; 
     }
@@ -52,13 +52,13 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(threads::executor& sched, BOOST_FWD_REF(F) f,
-        BOOST_FWD_REF(A0) a0)
+    apply(threads::executor& sched, F && f,
+        A0 && a0)
     {
         sched.add(
             util::deferred_call(
-                boost::forward<F>(f),
-                boost::forward<A0>( a0 )
+                std::forward<F>(f),
+                std::forward<A0>( a0 )
             ), "hpx::apply");
         return false;
     }
@@ -69,12 +69,12 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0)
+    apply(F && f, A0 && a0)
     {
         threads::register_thread_nullary(
             util::deferred_call(
-                boost::forward<F>(f),
-                boost::forward<A0>( a0 )
+                std::forward<F>(f),
+                std::forward<A0>( a0 )
             ), "hpx::apply");
         return false;
     }
@@ -85,10 +85,10 @@ namespace hpx
     >
     bool apply(
         hpx::util::detail::bound_action<Action, BoundArgs> const& bound
-      , BOOST_FWD_REF(A0) a0
+      , A0 && a0
     )
     {
-        return bound.apply(boost::forward<A0>( a0 ));
+        return bound.apply(std::forward<A0>( a0 ));
     }
 }
 namespace hpx
@@ -103,13 +103,13 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(threads::executor& sched, BOOST_FWD_REF(F) f,
-        BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    apply(threads::executor& sched, F && f,
+        A0 && a0 , A1 && a1)
     {
         sched.add(
             util::deferred_call(
-                boost::forward<F>(f),
-                boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )
+                std::forward<F>(f),
+                std::forward<A0>( a0 ) , std::forward<A1>( a1 )
             ), "hpx::apply");
         return false;
     }
@@ -120,12 +120,12 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1)
+    apply(F && f, A0 && a0 , A1 && a1)
     {
         threads::register_thread_nullary(
             util::deferred_call(
-                boost::forward<F>(f),
-                boost::forward<A0>( a0 ) , boost::forward<A1>( a1 )
+                std::forward<F>(f),
+                std::forward<A0>( a0 ) , std::forward<A1>( a1 )
             ), "hpx::apply");
         return false;
     }
@@ -136,10 +136,10 @@ namespace hpx
     >
     bool apply(
         hpx::util::detail::bound_action<Action, BoundArgs> const& bound
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1
+      , A0 && a0 , A1 && a1
     )
     {
-        return bound.apply(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ));
+        return bound.apply(std::forward<A0>( a0 ) , std::forward<A1>( a1 ));
     }
 }
 namespace hpx
@@ -154,13 +154,13 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(threads::executor& sched, BOOST_FWD_REF(F) f,
-        BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    apply(threads::executor& sched, F && f,
+        A0 && a0 , A1 && a1 , A2 && a2)
     {
         sched.add(
             util::deferred_call(
-                boost::forward<F>(f),
-                boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )
+                std::forward<F>(f),
+                std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 )
             ), "hpx::apply");
         return false;
     }
@@ -171,12 +171,12 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2)
+    apply(F && f, A0 && a0 , A1 && a1 , A2 && a2)
     {
         threads::register_thread_nullary(
             util::deferred_call(
-                boost::forward<F>(f),
-                boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 )
+                std::forward<F>(f),
+                std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 )
             ), "hpx::apply");
         return false;
     }
@@ -187,10 +187,10 @@ namespace hpx
     >
     bool apply(
         hpx::util::detail::bound_action<Action, BoundArgs> const& bound
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2
+      , A0 && a0 , A1 && a1 , A2 && a2
     )
     {
-        return bound.apply(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ));
+        return bound.apply(std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ));
     }
 }
 namespace hpx
@@ -205,13 +205,13 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(threads::executor& sched, BOOST_FWD_REF(F) f,
-        BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    apply(threads::executor& sched, F && f,
+        A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
     {
         sched.add(
             util::deferred_call(
-                boost::forward<F>(f),
-                boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )
+                std::forward<F>(f),
+                std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 )
             ), "hpx::apply");
         return false;
     }
@@ -222,12 +222,12 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3)
+    apply(F && f, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
     {
         threads::register_thread_nullary(
             util::deferred_call(
-                boost::forward<F>(f),
-                boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 )
+                std::forward<F>(f),
+                std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 )
             ), "hpx::apply");
         return false;
     }
@@ -238,10 +238,10 @@ namespace hpx
     >
     bool apply(
         hpx::util::detail::bound_action<Action, BoundArgs> const& bound
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3
+      , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3
     )
     {
-        return bound.apply(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ));
+        return bound.apply(std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ));
     }
 }
 namespace hpx
@@ -256,13 +256,13 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(threads::executor& sched, BOOST_FWD_REF(F) f,
-        BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    apply(threads::executor& sched, F && f,
+        A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
     {
         sched.add(
             util::deferred_call(
-                boost::forward<F>(f),
-                boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )
+                std::forward<F>(f),
+                std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 )
             ), "hpx::apply");
         return false;
     }
@@ -273,12 +273,12 @@ namespace hpx
      && !traits::is_bound_action<typename util::decay<F>::type>::value
       , bool
     >::type
-    apply(BOOST_FWD_REF(F) f, BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4)
+    apply(F && f, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
     {
         threads::register_thread_nullary(
             util::deferred_call(
-                boost::forward<F>(f),
-                boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 )
+                std::forward<F>(f),
+                std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 )
             ), "hpx::apply");
         return false;
     }
@@ -289,9 +289,9 @@ namespace hpx
     >
     bool apply(
         hpx::util::detail::bound_action<Action, BoundArgs> const& bound
-      , BOOST_FWD_REF(A0) a0 , BOOST_FWD_REF(A1) a1 , BOOST_FWD_REF(A2) a2 , BOOST_FWD_REF(A3) a3 , BOOST_FWD_REF(A4) a4
+      , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4
     )
     {
-        return bound.apply(boost::forward<A0>( a0 ) , boost::forward<A1>( a1 ) , boost::forward<A2>( a2 ) , boost::forward<A3>( a3 ) , boost::forward<A4>( a4 ));
+        return bound.apply(std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ));
     }
 }

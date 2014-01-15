@@ -22,7 +22,7 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 
 #include <stdexcept>
 
@@ -277,9 +277,9 @@ namespace hpx { namespace components
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type)
         {
-            return boost::move(f);
+            return std::move(f);
         }
-    private:
+    protected:
         template <typename>
         friend struct detail_adl_barrier::init;
 
@@ -290,6 +290,7 @@ namespace hpx { namespace components
             back_ptr_ = bp;
         }
 
+    private:
         managed_component<Component, Wrapper>* back_ptr_;
     };
 

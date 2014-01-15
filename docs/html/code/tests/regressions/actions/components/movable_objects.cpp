@@ -25,20 +25,20 @@ namespace hpx { namespace test
     }
 
     // Move constructor.
-    movable_object::movable_object(BOOST_RV_REF(movable_object)) {}
+    movable_object::movable_object(movable_object &&) {}
 
     movable_object::~movable_object() {}
 
     // Copy assignment.
     movable_object& movable_object::operator=(
-        BOOST_COPY_ASSIGN_REF(movable_object))
+        movable_object const &)
     {
         ++count;
         return *this;
     }
 
     // Move assignment.
-    movable_object& movable_object::operator=(BOOST_RV_REF(movable_object))
+    movable_object& movable_object::operator=(movable_object &&)
     {
         return *this;
     }

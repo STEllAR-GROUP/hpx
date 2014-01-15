@@ -47,7 +47,7 @@ namespace hpx { namespace lcos
         {
             HPX_ASSERT(this->get_gid());
             RemoteType tmp(val);
-            return this->base_type::set_value_async(this->get_gid(), boost::move(tmp));
+            return this->base_type::set_value_async(this->get_gid(), std::move(tmp));
         }
 
         lcos::unique_future<void>
@@ -68,10 +68,10 @@ namespace hpx { namespace lcos
         {
             HPX_ASSERT(this->get_gid());
             RemoteType tmp(val);
-            this->base_type::set_value_sync(this->get_gid(), boost::move(tmp));
+            this->base_type::set_value_sync(this->get_gid(), std::move(tmp));
         }
 
-        void set_value_sync(BOOST_RV_REF(RemoteType) val) //-V659
+        void set_value_sync(RemoteType && val) //-V659
         {
             HPX_ASSERT(this->get_gid());
             this->base_type::set_value_sync(this->get_gid(), val);
@@ -86,9 +86,9 @@ namespace hpx { namespace lcos
         void set_value(RemoteType const& val)
         {
             RemoteType tmp(val);
-            this->base_type::set_value(this->get_gid(), boost::move(tmp));
+            this->base_type::set_value(this->get_gid(), std::move(tmp));
         }
-        void set_value(BOOST_RV_REF(RemoteType) val) //-V659
+        void set_value(RemoteType && val) //-V659
         {
             this->base_type::set_value(this->get_gid(), val);
         }

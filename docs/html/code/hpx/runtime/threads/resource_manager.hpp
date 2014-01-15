@@ -93,13 +93,10 @@ namespace hpx { namespace  threads
         // each of the scheduler proxies attached to this resource manager.
         struct proxy_data
         {
-        private:
-            BOOST_COPYABLE_AND_MOVABLE(proxy_data);
-
         public:
             proxy_data(detail::manage_executor* proxy, 
-                    BOOST_RV_REF(std::vector<coreids_type>) core_ids)
-              : proxy_(proxy), core_ids_(boost::move(core_ids))
+                    std::vector<coreids_type> && core_ids)
+              : proxy_(proxy), core_ids_(std::move(core_ids))
             {}
 
             proxy_data(proxy_data const& rhs)
@@ -107,9 +104,9 @@ namespace hpx { namespace  threads
                 core_ids_(rhs.core_ids_)
             {}
 
-            proxy_data(BOOST_RV_REF(proxy_data) rhs)
-              : proxy_(boost::move(rhs.proxy_)),
-                core_ids_(boost::move(rhs.core_ids_))
+            proxy_data(proxy_data && rhs)
+              : proxy_(std::move(rhs.proxy_)),
+                core_ids_(std::move(rhs.core_ids_))
             {}
 
             proxy_data& operator=(proxy_data const& rhs)
@@ -121,11 +118,11 @@ namespace hpx { namespace  threads
                 return *this;
             }
 
-            proxy_data& operator=(BOOST_RV_REF(proxy_data) rhs)
+            proxy_data& operator=(proxy_data && rhs)
             {
                 if (this != &rhs) {
-                    proxy_ = boost::move(rhs.proxy_);
-                    core_ids_ = boost::move(rhs.core_ids_);
+                    proxy_ = std::move(rhs.proxy_);
+                    core_ids_ = std::move(rhs.core_ids_);
                 }
                 return *this;
             }

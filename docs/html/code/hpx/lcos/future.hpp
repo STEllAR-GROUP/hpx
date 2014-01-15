@@ -92,7 +92,7 @@ namespace hpx { namespace lcos { namespace detail
     {};
     
     template <typename Future>
-    struct shared_state_ptr_for<BOOST_RV_REF(Future)>
+    struct shared_state_ptr_for<Future &&>
       : shared_state_ptr_for<Future>
     {};
 
@@ -125,9 +125,9 @@ namespace hpx { namespace lcos { namespace detail
 
         template <typename Future, typename SharedState>
         static Future
-        create(BOOST_RV_REF(boost::intrusive_ptr<SharedState>) shared_state)
+        create(boost::intrusive_ptr<SharedState> && shared_state)
         {
-            return Future(boost::move(shared_state));
+            return Future(std::move(shared_state));
         }
 
         template <typename Future, typename SharedState>
@@ -175,9 +175,9 @@ namespace hpx { namespace lcos { namespace detail
 
     template <typename Result>
     inline lcos::future<Result> make_future_from_data( //-V659
-        BOOST_RV_REF(boost::intrusive_ptr<detail::future_data<Result> >) p)
+        boost::intrusive_ptr<detail::future_data<Result> > && p)
     {
-        return future_access::create<lcos::future<Result> >(boost::move(p));
+        return future_access::create<lcos::future<Result> >(std::move(p));
     }
 
     template <typename Result>
@@ -185,7 +185,7 @@ namespace hpx { namespace lcos { namespace detail
         detail::future_data<Result>* p)
     {
         boost::intrusive_ptr<detail::future_data<Result> > shared_state_ptr(p);
-        return future_access::create<lcos::future<Result> >(boost::move(shared_state_ptr));
+        return future_access::create<lcos::future<Result> >(std::move(shared_state_ptr));
     }
 
     template <typename Result>
@@ -308,9 +308,9 @@ namespace hpx { namespace lcos { namespace detail
 
         template <typename U>
         BOOST_FORCEINLINE static
-        U get(BOOST_FWD_REF(U) u)
+        U get(U && u)
         {
-            return boost::forward<U>(u);
+            return std::forward<U>(u);
         }
 
         static T get_default()
@@ -359,12 +359,12 @@ namespace hpx { namespace lcos { namespace detail
     template <typename ContResult, typename Future, typename F>
     inline typename shared_state_ptr<ContResult>::type
     make_continuation(Future& future, BOOST_SCOPED_ENUM(launch) policy,
-        BOOST_FWD_REF(F) f);
+        F && f);
 
     template <typename ContResult, typename Future, typename F>
     inline typename shared_state_ptr<ContResult>::type
     make_continuation(Future& future, threads::executor& sched,
-        BOOST_FWD_REF(F) f);
+        F && f);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
@@ -389,8 +389,6 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Derived, typename R>
     class future_base
     {
-        BOOST_COPYABLE_AND_MOVABLE(future_base);
-
     public:
         typedef R result_type;
         typedef future_data<R> shared_state_type;
@@ -406,16 +404,16 @@ namespace hpx { namespace lcos { namespace detail
         {}
 
         explicit future_base(
-            BOOST_RV_REF(boost::intrusive_ptr<shared_state_type>) p
-        ) : shared_state_(boost::move(p))
+            boost::intrusive_ptr<shared_state_type> && p
+        ) : shared_state_(std::move(p))
         {}
 
         future_base(future_base const& other)
           : shared_state_(other.shared_state_)
         {}
 
-        future_base(BOOST_RV_REF(future_base) other) BOOST_NOEXCEPT
-          : shared_state_(boost::move(other.shared_state_))
+        future_base(future_base && other) BOOST_NOEXCEPT
+          : shared_state_(std::move(other.shared_state_))
         {
             other.shared_state_ = 0;
         }
@@ -425,7 +423,7 @@ namespace hpx { namespace lcos { namespace detail
             shared_state_.swap(other.shared_state_);
         }
 
-        future_base& operator=(BOOST_COPY_ASSIGN_REF(future_base) other)
+        future_base& operator=(future_base const & other)
         {
             if (this != &other)
             {
@@ -434,11 +432,11 @@ namespace hpx { namespace lcos { namespace detail
             return *this;
         }
 
-        future_base& operator=(BOOST_RV_REF(future_base) other) BOOST_NOEXCEPT
+        future_base& operator=(future_base && other) BOOST_NOEXCEPT
         {
             if (this != &other)
             {
-                shared_state_ = boost::move(other.shared_state_);
+                shared_state_ = std::move(other.shared_state_);
                 other.shared_state_ = 0;
             }
             return *this;
@@ -513,14 +511,14 @@ namespace hpx { namespace lcos { namespace detail
         //     returns.
         template <typename F>
         typename future_then_result<Derived, F>::type
-        then(BOOST_FWD_REF(F) f)
+        then(F && f)
         {
-            return then(launch::all, boost::forward<F>(f));
+            return then(launch::all, std::forward<F>(f));
         }
 
         template <typename F>
         typename future_then_result<Derived, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
+        then(BOOST_SCOPED_ENUM(launch) policy, F && f)
         {
             typedef
                 typename future_then_result<Derived, F>::type
@@ -539,13 +537,13 @@ namespace hpx { namespace lcos { namespace detail
 
             shared_state_ptr p =
                 detail::make_continuation<result>(*static_cast<Derived*>(this),
-                    policy, boost::forward<F>(f));
-            return future_access::create<unique_future<result> >(boost::move(p));
+                    policy, std::forward<F>(f));
+            return future_access::create<unique_future<result> >(std::move(p));
         }
 
         template <typename F>
         typename future_then_result<Derived, F>::type
-        then(threads::executor& sched, BOOST_FWD_REF(F) f)
+        then(threads::executor& sched, F && f)
         {
             typedef
                 typename future_then_result<Derived, F>::type
@@ -564,8 +562,8 @@ namespace hpx { namespace lcos { namespace detail
 
             shared_state_ptr p =
                 detail::make_continuation<result>(*static_cast<Derived*>(this),
-                    sched, boost::forward<F>(f));
-            return future_access::create<unique_future<result> >(boost::move(p));
+                    sched, std::forward<F>(f));
+            return future_access::create<unique_future<result> >(std::move(p));
         }
 
         // Notes:
@@ -617,7 +615,7 @@ namespace hpx { namespace lcos { namespace detail
 
             shared_state_ptr state =
                 lcos::detail::unwrap(*static_cast<Derived*>(this), ec);
-            return future_access::create<result_type>(boost::move(state));
+            return future_access::create<result_type>(std::move(state));
         }
 
         // Effects: blocks until the shared state is ready.
@@ -716,7 +714,7 @@ namespace hpx { namespace lcos
     template <typename R>
     class unique_future : public detail::future_base<unique_future<R>, R>
     {
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(unique_future);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(unique_future);
 
         typedef detail::future_base<unique_future<R>, R> base_type;
 
@@ -749,8 +747,8 @@ namespace hpx { namespace lcos
         {}
 
         explicit unique_future(
-            BOOST_RV_REF(boost::intrusive_ptr<shared_state_type>) state
-        ) : base_type(boost::move(state))
+            boost::intrusive_ptr<shared_state_type> && state
+        ) : base_type(std::move(state))
         {}
 
         template <typename SharedState>
@@ -772,8 +770,8 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        unique_future(BOOST_RV_REF(unique_future) other) BOOST_NOEXCEPT
-          : base_type(boost::move(other))
+        unique_future(unique_future && other) BOOST_NOEXCEPT
+          : base_type(std::move(other))
         {}
 
         // Effects: constructs a future object by moving the instance referred
@@ -782,8 +780,8 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        unique_future(BOOST_RV_REF(unique_future<unique_future>) other) BOOST_NOEXCEPT
-          : base_type(boost::move(other.unwrap()))
+        unique_future(unique_future<unique_future> && other) BOOST_NOEXCEPT
+          : base_type(std::move(other.unwrap()))
         {}
 
         // Effects:
@@ -806,9 +804,9 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     assignment.
         //   - other.valid() == false.
-        unique_future& operator=(BOOST_RV_REF(unique_future) other) BOOST_NOEXCEPT
+        unique_future& operator=(unique_future && other) BOOST_NOEXCEPT
         {
-            base_type::operator=(boost::move(other));
+            base_type::operator=(std::move(other));
             return *this;
         }
 
@@ -816,7 +814,7 @@ namespace hpx { namespace lcos
         // Postcondition: valid() == false.
         shared_future<R> share()
         {
-            return shared_future<R>(boost::move(*this));
+            return shared_future<R>(std::move(*this));
         }
 
         // Effects: wait()s until the shared state is ready, then retrieves
@@ -875,26 +873,26 @@ namespace hpx { namespace lcos
 
         template <typename F>
         typename detail::future_then_result<unique_future, F>::type
-        then(BOOST_FWD_REF(F) f)
+        then(F && f)
         {
             invalidate on_exit(*this);
-            return base_type::then(boost::forward<F>(f));
+            return base_type::then(std::forward<F>(f));
         }
 
         template <typename F>
         typename detail::future_then_result<unique_future, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f)
+        then(BOOST_SCOPED_ENUM(launch) policy, F && f)
         {
             invalidate on_exit(*this);
-            return base_type::then(policy, boost::forward<F>(f));
+            return base_type::then(policy, std::forward<F>(f));
         }
 
         template <typename F>
         typename detail::future_then_result<unique_future, F>::type
-        then(threads::executor& sched, BOOST_FWD_REF(F) f)
+        then(threads::executor& sched, F && f)
         {
             invalidate on_exit(*this);
-            return base_type::then(sched, boost::forward<F>(f));
+            return base_type::then(sched, std::forward<F>(f));
         }
 
         typename detail::future_unwrap_result<unique_future>::type
@@ -913,8 +911,6 @@ namespace hpx { namespace lcos
     template <typename R>
     class shared_future : public detail::future_base<shared_future<R>, R>
     {
-        BOOST_COPYABLE_AND_MOVABLE(shared_future);
-
         typedef detail::future_base<shared_future<R>, R> base_type;
 
     public:
@@ -931,8 +927,8 @@ namespace hpx { namespace lcos
         {}
 
         explicit shared_future(
-            BOOST_RV_REF(boost::intrusive_ptr<shared_state_type>) state
-        ) : base_type(boost::move(state))
+            boost::intrusive_ptr<shared_state_type> && state
+        ) : base_type(std::move(state))
         {}
 
         template <typename SharedState>
@@ -961,11 +957,11 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        shared_future(BOOST_RV_REF(shared_future) other) BOOST_NOEXCEPT
-          : base_type(boost::move(other))
+        shared_future(shared_future && other) BOOST_NOEXCEPT
+          : base_type(std::move(other))
         {}
 
-        shared_future(BOOST_RV_REF(unique_future<R>) other) BOOST_NOEXCEPT
+        shared_future(unique_future<R> && other) BOOST_NOEXCEPT
           : base_type(detail::future_access::get_shared_state(other))
         {
             other = unique_future<R>();
@@ -990,7 +986,7 @@ namespace hpx { namespace lcos
         //     refers to the same shared state as other (if any).
         // Postconditions:
         //   - valid() == other.valid().
-        shared_future& operator=(BOOST_COPY_ASSIGN_REF(shared_future) other)
+        shared_future& operator=(shared_future const & other)
         {
             base_type::operator=(other);
             return *this;
@@ -1003,9 +999,9 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     assignment.
         //   - other.valid() == false.
-        shared_future& operator=(BOOST_RV_REF(shared_future) other) BOOST_NOEXCEPT
+        shared_future& operator=(shared_future && other) BOOST_NOEXCEPT
         {
-            base_type::operator=(boost::move(other));
+            base_type::operator=(std::move(other));
             return *this;
         }
 
@@ -1085,8 +1081,6 @@ namespace hpx { namespace lcos
     template <typename Result>
     class future
     {
-        BOOST_COPYABLE_AND_MOVABLE(future)
-
     public:
         typedef lcos::detail::future_data<Result> future_data_type;
 
@@ -1099,8 +1093,8 @@ namespace hpx { namespace lcos
         {}
 
         explicit future(
-            BOOST_RV_REF(boost::intrusive_ptr<future_data_type>) future_data
-        ) : future_data_(boost::move(future_data))
+            boost::intrusive_ptr<future_data_type> && future_data
+        ) : future_data_(std::move(future_data))
         {}
 
         template <typename U>
@@ -1122,30 +1116,30 @@ namespace hpx { namespace lcos
         {
         }
 
-        future(BOOST_RV_REF(future) other)
+        future(future && other)
           : future_data_(other.future_data_)
         {
             other.future_data_.reset();
         }
 
         // accept unique_future future
-        future(BOOST_RV_REF(unique_future<Result>) other)
+        future(unique_future<Result> && other)
           : future_data_(detail::future_access::get_shared_state(other))
         {
             other = unique_future<Result>();
         }
 
         // accept wrapped future
-        future(BOOST_RV_REF(future<future>) other)
+        future(future<future> && other)
         {
             future f = other.unwrap();
-            future_data_ = boost::move(f.future_data_);
+            future_data_ = std::move(f.future_data_);
         }
 
-        future(BOOST_RV_REF(unique_future<future>) other)
+        future(unique_future<future> && other)
         {
             future f = other.unwrap();
-            future_data_ = boost::move(f.future_data_);
+            future_data_ = std::move(f.future_data_);
         }
 
         typedef lcos::local::promise<Result> promise_type;
@@ -1155,14 +1149,14 @@ namespace hpx { namespace lcos
 #endif
 
         // assignment
-        future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
+        future& operator=(future const & other)
         {
             if (this != &other)
                 future_data_ = other.future_data_;
             return *this;
         }
 
-        future& operator=(BOOST_RV_REF(future) other)
+        future& operator=(future && other)
         {
             if (this != &other)
             {
@@ -1312,15 +1306,15 @@ namespace hpx { namespace lcos
         // continuation support
         template <typename F>
         typename detail::future_then_result<future, F>::type
-        then(BOOST_FWD_REF(F) f);
+        then(F && f);
 
         template <typename F>
         typename detail::future_then_result<future, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
+        then(BOOST_SCOPED_ENUM(launch) policy, F && f);
 
         template <typename F>
         typename detail::future_then_result<future, F>::type
-        then(threads::executor& sched, BOOST_FWD_REF(F) f);
+        then(threads::executor& sched, F && f);
 
         // wait support
         void wait() const
@@ -1366,17 +1360,17 @@ namespace hpx { namespace lcos
     // extension: create a pre-initialized future object
     template <typename Result>
     unique_future<typename util::decay<Result>::type>
-    make_ready_future(BOOST_FWD_REF(Result) init)
+    make_ready_future(Result && init)
     {
         typedef typename util::decay<Result>::type result_type;
         typedef lcos::detail::future_data<result_type> shared_state;
 
         boost::intrusive_ptr<shared_state> p(new shared_state());
-        p->set_data(boost::forward<Result>(init));
+        p->set_data(std::forward<Result>(init));
 
         using lcos::detail::future_access;
         return future_access::create<unique_future<result_type> >(
-            boost::move(p));
+            std::move(p));
     }
 
     // extension: create a pre-initialized future object which holds the
@@ -1393,7 +1387,7 @@ namespace hpx { namespace lcos
 
         using lcos::detail::future_access;
         return future_access::create<unique_future<result_type> >(
-            boost::move(p));
+            std::move(p));
     }
 
     // extension: create a pre-initialized future object which gets ready at
@@ -1401,45 +1395,45 @@ namespace hpx { namespace lcos
     template <typename Result>
     unique_future<typename util::decay<Result>::type>
     make_ready_future_at(boost::posix_time::ptime const& at,
-        BOOST_FWD_REF(Result) init)
+        Result && init)
     {
         typedef typename util::decay<Result>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
         using lcos::detail::future_access;
         return future_access::create<unique_future<result_type> >(
-            new shared_state(at, boost::forward<Result>(init)));
+            new shared_state(at, std::forward<Result>(init)));
     }
 
     template <typename Clock, typename Duration, typename Result>
     unique_future<typename util::decay<Result>::type>
     make_ready_future_at(boost::chrono::time_point<Clock, Duration> const& at,
-        BOOST_FWD_REF(Result) init)
+        Result && init)
     {
         return make_ready_future_at(
-            util::to_ptime(at), boost::forward<Result>(init));
+            util::to_ptime(at), std::forward<Result>(init));
     }
 
     template <typename Result>
     unique_future<typename util::decay<Result>::type>
     make_ready_future_after(boost::posix_time::time_duration const& d,
-        BOOST_FWD_REF(Result) init)
+        Result && init)
     {
         typedef typename util::decay<Result>::type result_type;
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
         using lcos::detail::future_access;
         return future_access::create<unique_future<result_type> >(
-            new shared_state(d, boost::forward<Result>(init)));
+            new shared_state(d, std::forward<Result>(init)));
     }
 
     template <typename Rep, typename Period, typename Result>
     unique_future<typename util::decay<Result>::type>
     make_ready_future_after(boost::chrono::duration<Rep, Period> const& d,
-        BOOST_FWD_REF(Result) init)
+        Result && init)
     {
         return make_ready_future_at(
-            util::to_time_duration(d), boost::forward<Result>(init));
+            util::to_time_duration(d), std::forward<Result>(init));
     }
 
 #if defined(HPX_ENABLE_DEPRECATED_FUTURE)
@@ -1447,8 +1441,6 @@ namespace hpx { namespace lcos
     template <>
     class future<void>
     {
-        BOOST_COPYABLE_AND_MOVABLE(future)
-
     public:
         typedef lcos::detail::future_data<void> future_data_type;
         typedef future_data_type::data_type data_type;
@@ -1475,30 +1467,30 @@ namespace hpx { namespace lcos
         {
         }
 
-        future(BOOST_RV_REF(future) other)
+        future(future && other)
           : future_data_(other.future_data_)
         {
             other.future_data_.reset();
         }
 
         // accept unique_future future
-        future(BOOST_RV_REF(unique_future<void>) other)
+        future(unique_future<void> && other)
           : future_data_(detail::future_access::get_shared_state(other))
         {
             other = unique_future<void>();
         }
 
         // extension: accept wrapped future
-        future(BOOST_RV_REF(future<future>) other)
+        future(future<future> && other)
         {
             future f = other.unwrap();
-            future_data_ = boost::move(f.future_data_);
+            future_data_ = std::move(f.future_data_);
         }
 
-        future(BOOST_RV_REF(unique_future<future>) other)
+        future(unique_future<future> && other)
         {
             future f = other.unwrap();
-            future_data_ = boost::move(f.future_data_);
+            future_data_ = std::move(f.future_data_);
         }
 
         typedef lcos::local::promise<void> promise_type;
@@ -1508,14 +1500,14 @@ namespace hpx { namespace lcos
 #endif
 
         // assignment
-        future& operator=(BOOST_COPY_ASSIGN_REF(future) other)
+        future& operator=(future const & other)
         {
             if (this != &other)
                 future_data_ = other.future_data_;
             return *this;
         }
 
-        future& operator=(BOOST_RV_REF(future) other)
+        future& operator=(future && other)
         {
             if (this != &other)
             {
@@ -1600,15 +1592,15 @@ namespace hpx { namespace lcos
         // continuation support
         template <typename F>
         typename detail::future_then_result<future, F>::type
-        then(BOOST_FWD_REF(F) f);
+        then(F && f);
 
         template <typename F>
         typename detail::future_then_result<future, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(F) f);
+        then(BOOST_SCOPED_ENUM(launch) policy, F && f);
 
         template <typename F>
         typename detail::future_then_result<future, F>::type
-        then(threads::executor& sched, BOOST_FWD_REF(F) f);
+        then(threads::executor& sched, F && f);
 
         // wait support
         void wait() const
@@ -1656,7 +1648,7 @@ namespace hpx { namespace lcos
         p->set_data(util::unused);
 
         using lcos::detail::future_access;
-        return future_access::create<unique_future<void> >(boost::move(p));
+        return future_access::create<unique_future<void> >(std::move(p));
     }
 
     // extension: create a pre-initialized future object which gets ready at
@@ -1715,24 +1707,24 @@ namespace hpx { namespace actions
         explicit typed_continuation(naming::id_type const& gid)
           : continuation(gid)
         {}
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid)
-          : continuation(boost::move(gid))
+        explicit typed_continuation(naming::id_type && gid)
+          : continuation(std::move(gid))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(gid), f_(boost::forward<F>(f))
+                F && f)
+          : continuation(gid), f_(std::forward<F>(f))
         {}
         template <typename F>
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(boost::move(gid)), f_(boost::forward<F>(f))
+        explicit typed_continuation(naming::id_type && gid,
+                F && f)
+          : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(BOOST_FWD_REF(F) f)
-          : f_(boost::forward<F>(f))
+        explicit typed_continuation(F && f)
+          : f_(std::forward<F>(f))
         {}
 
         ~typed_continuation()
@@ -1774,7 +1766,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(BOOST_RV_REF(lcos::unique_future<R>) result) const
+        void trigger_value(lcos::unique_future<R> && result) const
         {
             LLCO_(info)
                 << "typed_continuation<lcos::unique_future<R> >::trigger("
@@ -1784,7 +1776,7 @@ namespace hpx { namespace actions
 
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {
-                deferred_trigger(boost::move(result), predicate());
+                deferred_trigger(std::move(result), predicate());
                 return;
             }
 
@@ -1845,24 +1837,24 @@ namespace hpx { namespace actions
         explicit typed_continuation(naming::id_type const& gid)
           : continuation(gid)
         {}
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid)
-          : continuation(boost::move(gid))
+        explicit typed_continuation(naming::id_type && gid)
+          : continuation(std::move(gid))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(gid), f_(boost::forward<F>(f))
+                F && f)
+          : continuation(gid), f_(std::forward<F>(f))
         {}
         template <typename F>
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(boost::move(gid)), f_(boost::forward<F>(f))
+        explicit typed_continuation(naming::id_type && gid,
+                F && f)
+          : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(BOOST_FWD_REF(F) f)
-          : f_(boost::forward<F>(f))
+        explicit typed_continuation(F && f)
+          : f_(std::forward<F>(f))
         {}
 
         ~typed_continuation()
@@ -1904,7 +1896,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(BOOST_RV_REF(lcos::shared_future<R>) result) const
+        void trigger_value(lcos::shared_future<R> && result) const
         {
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
@@ -1914,7 +1906,7 @@ namespace hpx { namespace actions
 
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {
-                deferred_trigger(boost::move(result), predicate());
+                deferred_trigger(std::move(result), predicate());
                 return;
             }
 
@@ -1977,25 +1969,25 @@ namespace hpx { namespace actions
           : continuation(gid)
         {}
 
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid)
-          : continuation(boost::move(gid))
+        explicit typed_continuation(naming::id_type && gid)
+          : continuation(std::move(gid))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(gid), f_(boost::forward<F>(f))
+                F && f)
+          : continuation(gid), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(boost::move(gid)), f_(boost::forward<F>(f))
+        explicit typed_continuation(naming::id_type && gid,
+                F && f)
+          : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(BOOST_FWD_REF(F) f)
-          : f_(boost::forward<F>(f))
+        explicit typed_continuation(F && f)
+          : f_(std::forward<F>(f))
         {}
 
         ~typed_continuation()
@@ -2019,7 +2011,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(BOOST_RV_REF(lcos::future<Result>) result) const
+        void trigger_value(lcos::future<Result> && result) const
         {
             LLCO_(info)
                 << "typed_continuation<lcos::future<hpx::lcos::future<Result> > >::trigger("
@@ -2087,25 +2079,25 @@ namespace hpx { namespace actions
           : continuation(gid)
         {}
 
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid)
-          : continuation(boost::move(gid))
+        explicit typed_continuation(naming::id_type && gid)
+          : continuation(std::move(gid))
         {}
 
         template <typename F>
         explicit typed_continuation(naming::id_type const& gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(gid), f_(boost::forward<F>(f))
+                F && f)
+          : continuation(gid), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(BOOST_RV_REF(naming::id_type) gid,
-                BOOST_FWD_REF(F) f)
-          : continuation(boost::move(gid)), f_(boost::forward<F>(f))
+        explicit typed_continuation(naming::id_type && gid,
+                F && f)
+          : continuation(std::move(gid)), f_(std::forward<F>(f))
         {}
 
         template <typename F>
-        explicit typed_continuation(BOOST_FWD_REF(F) f)
-          : f_(boost::forward<F>(f))
+        explicit typed_continuation(F && f)
+          : f_(std::forward<F>(f))
         {}
 
         ~typed_continuation()
@@ -2131,7 +2123,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(BOOST_RV_REF(lcos::future<void>) result) const
+        void trigger_value(lcos::future<void> && result) const
         {
             LLCO_(info)
                 << "typed_continuation<lcos::future<hpx::lcos::future<void> > >::trigger("

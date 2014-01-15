@@ -4,6 +4,11 @@
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    inheritance_2_classes_abstract
+    inheritance_2_classes_concrete
+    inheritance_3_classes_1_abstract
+    inheritance_3_classes_2_abstract
+    inheritance_3_classes_concrete
     copy_component
     get_gid
     get_ptr

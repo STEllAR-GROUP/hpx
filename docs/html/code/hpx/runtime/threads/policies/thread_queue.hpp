@@ -518,12 +518,12 @@ namespace hpx { namespace threads { namespace policies
 
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             new_tasks_.enqueue(new task_description(
-                boost::move(data), initial_state,
+                std::move(data), initial_state,
                 util::high_resolution_clock::now()
             ));
 #else
             new_tasks_.enqueue(new task_description(
-                boost::move(data), initial_state));
+                std::move(data), initial_state));
 #endif
             if (&ec != &throws)
                 ec = make_success_code();

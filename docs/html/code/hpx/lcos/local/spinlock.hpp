@@ -42,7 +42,7 @@ namespace hpx { namespace lcos { namespace local
         boost::uint64_t v_;
 #endif
 
-        BOOST_MOVABLE_BUT_NOT_COPYABLE(spinlock)
+        HPX_MOVABLE_BUT_NOT_COPYABLE(spinlock)
 
         ///////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k)
@@ -107,7 +107,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock", "");
         }
 
-        spinlock(BOOST_RV_REF(spinlock) rhs)
+        spinlock(spinlock && rhs)
 #if defined(BOOST_WINDOWS)
           : v_(BOOST_INTERLOCKED_EXCHANGE(&rhs.v_, 0))
 #else
@@ -120,7 +120,7 @@ namespace hpx { namespace lcos { namespace local
             HPX_ITT_SYNC_DESTROY(this);
         }
 
-        spinlock& operator=(BOOST_RV_REF(spinlock) rhs)
+        spinlock& operator=(spinlock && rhs)
         {
             if (this != &rhs) {
                 unlock();

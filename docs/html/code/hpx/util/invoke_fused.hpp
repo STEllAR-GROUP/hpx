@@ -54,17 +54,17 @@ namespace hpx { namespace util
     template <typename R, typename F>
     BOOST_FORCEINLINE
     R
-    invoke_fused_r(BOOST_FWD_REF(F) f, util::tuple<>)
+    invoke_fused_r(F && f, util::tuple<>)
     {
-        return invoke_r<R>(boost::forward<F>(f));
+        return invoke_r<R>(std::forward<F>(f));
     }
 
     template <typename F>
     BOOST_FORCEINLINE
     typename invoke_result_of<F()>::type
-    invoke_fused(BOOST_FWD_REF(F) f, util::tuple<>)
+    invoke_fused(F && f, util::tuple<>)
     {
-        return invoke(boost::forward<F>(f));
+        return invoke(std::forward<F>(f));
     }
 }}
 
@@ -81,7 +81,7 @@ namespace hpx { namespace util
     /**/
 
 #define HPX_UTIL_INVOKE_FUSED_FWD_ARG(Z, N, D)                                \
-    util::get<N>(boost::move(args))                                           \
+    util::get<N>(std::move(args))                                           \
     /**/
 
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
@@ -150,11 +150,11 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)> >::value == N
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f
+    invoke_fused_r(F && f
       , util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)> const& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , BOOST_PP_ENUM(N, HPX_UTIL_INVOKE_FUSED_ARG, _));
     }
 
@@ -164,11 +164,10 @@ namespace hpx { namespace util
         util::tuple_size<util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)> >::value == N
       , R
     >::type
-    invoke_fused_r(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)>))) args)
+    invoke_fused_r(F && f, util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)>&& args)
     {
         return
-            invoke_r<R>(boost::forward<F>(f)
+            invoke_r<R>(std::forward<F>(f)
               , BOOST_PP_ENUM(N, HPX_UTIL_INVOKE_FUSED_FWD_ARG, _));
     }
 
@@ -180,11 +179,11 @@ namespace hpx { namespace util
             F(BOOST_PP_ENUM(N, HPX_UTIL_INVOKE_FUSED_ARG_RESULT, _))
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f
+    invoke_fused(F && f
       , util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)> const& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , BOOST_PP_ENUM(N, HPX_UTIL_INVOKE_FUSED_ARG, _));
     }
 
@@ -196,11 +195,10 @@ namespace hpx { namespace util
             F(BOOST_PP_ENUM_PARAMS(N, Arg))
         >::type
     >::type
-    invoke_fused(BOOST_FWD_REF(F) f, BOOST_RV_REF(HPX_UTIL_STRIP((
-        util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)>))) args)
+    invoke_fused(F && f, util::tuple<BOOST_PP_ENUM_PARAMS(N, Arg)>&& args)
     {
         return
-            invoke(boost::forward<F>(f)
+            invoke(std::forward<F>(f)
               , BOOST_PP_ENUM(N, HPX_UTIL_INVOKE_FUSED_FWD_ARG, _));
     }
 }}

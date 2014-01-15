@@ -16,7 +16,10 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     struct reinit_functions_storage
     {
-        typedef lcos::local::spinlock mutex_type;
+        // Use util::spinlock instead of lcos::local::spinlock to avoid possible
+        // suspensions of HPX threads as this will cause a deadlock when the
+        // register_functions function is called from within boost::call_once
+        typedef util::spinlock mutex_type;
 
         typedef HPX_STD_FUNCTION<void()> construct_type;
         typedef HPX_STD_FUNCTION<void()> destruct_type;

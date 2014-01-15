@@ -27,8 +27,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0
+      , Func && func
+      , F0 && f0
     )
     {
         typedef
@@ -42,13 +42,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0>
     BOOST_FORCEINLINE
@@ -66,8 +66,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0
+      , Func && func
+      , F0 && f0
     )
     {
         typedef
@@ -81,13 +81,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0>
     BOOST_FORCEINLINE
@@ -103,7 +103,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0)
+    dataflow(Func && func, F0 && f0)
     {
         typedef
             detail::dataflow_frame<
@@ -116,13 +116,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -144,8 +144,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1
+      , Func && func
+      , F0 && f0 , F1 && f1
     )
     {
         typedef
@@ -159,13 +159,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
@@ -183,8 +183,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1
+      , Func && func
+      , F0 && f0 , F1 && f1
     )
     {
         typedef
@@ -198,13 +198,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1>
     BOOST_FORCEINLINE
@@ -220,7 +220,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1)
+    dataflow(Func && func, F0 && f0 , F1 && f1)
     {
         typedef
             detail::dataflow_frame<
@@ -233,13 +233,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -261,8 +261,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2
     )
     {
         typedef
@@ -276,13 +276,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
@@ -300,8 +300,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2
     )
     {
         typedef
@@ -315,13 +315,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2>
     BOOST_FORCEINLINE
@@ -337,7 +337,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2)
     {
         typedef
             detail::dataflow_frame<
@@ -350,13 +350,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -378,8 +378,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3
     )
     {
         typedef
@@ -393,13 +393,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
@@ -417,8 +417,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3
     )
     {
         typedef
@@ -432,13 +432,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3>
     BOOST_FORCEINLINE
@@ -454,7 +454,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3)
     {
         typedef
             detail::dataflow_frame<
@@ -467,13 +467,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -495,8 +495,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4
     )
     {
         typedef
@@ -510,13 +510,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
@@ -534,8 +534,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4
     )
     {
         typedef
@@ -549,13 +549,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4>
     BOOST_FORCEINLINE
@@ -571,7 +571,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4)
     {
         typedef
             detail::dataflow_frame<
@@ -584,13 +584,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -612,8 +612,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5
     )
     {
         typedef
@@ -627,13 +627,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
@@ -651,8 +651,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5
     )
     {
         typedef
@@ -666,13 +666,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5>
     BOOST_FORCEINLINE
@@ -688,7 +688,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5)
     {
         typedef
             detail::dataflow_frame<
@@ -701,13 +701,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -729,8 +729,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6
     )
     {
         typedef
@@ -744,13 +744,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
@@ -768,8 +768,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6
     )
     {
         typedef
@@ -783,13 +783,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6>
     BOOST_FORCEINLINE
@@ -805,7 +805,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6)
     {
         typedef
             detail::dataflow_frame<
@@ -818,13 +818,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -846,8 +846,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7
     )
     {
         typedef
@@ -861,13 +861,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
@@ -885,8 +885,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7
     )
     {
         typedef
@@ -900,13 +900,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7>
     BOOST_FORCEINLINE
@@ -922,7 +922,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7)
     {
         typedef
             detail::dataflow_frame<
@@ -935,13 +935,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -963,8 +963,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8
     )
     {
         typedef
@@ -978,13 +978,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
@@ -1002,8 +1002,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8
     )
     {
         typedef
@@ -1017,13 +1017,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8>
     BOOST_FORCEINLINE
@@ -1039,7 +1039,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8)
     {
         typedef
             detail::dataflow_frame<
@@ -1052,13 +1052,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -1080,8 +1080,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9
     )
     {
         typedef
@@ -1095,13 +1095,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
@@ -1119,8 +1119,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9
     )
     {
         typedef
@@ -1134,13 +1134,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9>
     BOOST_FORCEINLINE
@@ -1156,7 +1156,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9)
     {
         typedef
             detail::dataflow_frame<
@@ -1169,13 +1169,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -1197,8 +1197,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10
     )
     {
         typedef
@@ -1212,13 +1212,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
     BOOST_FORCEINLINE
@@ -1236,8 +1236,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10
     )
     {
         typedef
@@ -1251,13 +1251,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10>
     BOOST_FORCEINLINE
@@ -1273,7 +1273,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10)
     {
         typedef
             detail::dataflow_frame<
@@ -1286,13 +1286,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -1314,8 +1314,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11
     )
     {
         typedef
@@ -1329,13 +1329,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
     BOOST_FORCEINLINE
@@ -1353,8 +1353,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11
     )
     {
         typedef
@@ -1368,13 +1368,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11>
     BOOST_FORCEINLINE
@@ -1390,7 +1390,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11)
     {
         typedef
             detail::dataflow_frame<
@@ -1403,13 +1403,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -1431,8 +1431,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12
     )
     {
         typedef
@@ -1446,13 +1446,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
     BOOST_FORCEINLINE
@@ -1470,8 +1470,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12
     )
     {
         typedef
@@ -1485,13 +1485,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12>
     BOOST_FORCEINLINE
@@ -1507,7 +1507,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12)
     {
         typedef
             detail::dataflow_frame<
@@ -1520,13 +1520,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -1548,8 +1548,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13
     )
     {
         typedef
@@ -1563,13 +1563,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
     BOOST_FORCEINLINE
@@ -1587,8 +1587,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13
     )
     {
         typedef
@@ -1602,13 +1602,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13>
     BOOST_FORCEINLINE
@@ -1624,7 +1624,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13)
     {
         typedef
             detail::dataflow_frame<
@@ -1637,13 +1637,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -1665,8 +1665,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14
     )
     {
         typedef
@@ -1680,13 +1680,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
     BOOST_FORCEINLINE
@@ -1704,8 +1704,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14
     )
     {
         typedef
@@ -1719,13 +1719,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14>
     BOOST_FORCEINLINE
@@ -1741,7 +1741,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14)
     {
         typedef
             detail::dataflow_frame<
@@ -1754,13 +1754,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -1782,8 +1782,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15
     )
     {
         typedef
@@ -1797,13 +1797,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15>
     BOOST_FORCEINLINE
@@ -1821,8 +1821,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15
     )
     {
         typedef
@@ -1836,13 +1836,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15>
     BOOST_FORCEINLINE
@@ -1858,7 +1858,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15)
     {
         typedef
             detail::dataflow_frame<
@@ -1871,13 +1871,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -1899,8 +1899,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16
     )
     {
         typedef
@@ -1914,13 +1914,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16>
     BOOST_FORCEINLINE
@@ -1938,8 +1938,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16
     )
     {
         typedef
@@ -1953,13 +1953,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16>
     BOOST_FORCEINLINE
@@ -1975,7 +1975,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16)
     {
         typedef
             detail::dataflow_frame<
@@ -1988,13 +1988,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -2016,8 +2016,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16 , BOOST_FWD_REF(F17) f17
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17
     )
     {
         typedef
@@ -2031,13 +2031,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ) , boost::forward<F17>( f17 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17>
     BOOST_FORCEINLINE
@@ -2055,8 +2055,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16 , BOOST_FWD_REF(F17) f17
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17
     )
     {
         typedef
@@ -2070,13 +2070,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ) , boost::forward<F17>( f17 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17>
     BOOST_FORCEINLINE
@@ -2092,7 +2092,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16 , BOOST_FWD_REF(F17) f17)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17)
     {
         typedef
             detail::dataflow_frame<
@@ -2105,13 +2105,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ) , boost::forward<F17>( f17 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -2133,8 +2133,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16 , BOOST_FWD_REF(F17) f17 , BOOST_FWD_REF(F18) f18
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17 , F18 && f18
     )
     {
         typedef
@@ -2148,13 +2148,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ) , boost::forward<F17>( f17 ) , boost::forward<F18>( f18 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ) , std::forward<F18>( f18 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18>
     BOOST_FORCEINLINE
@@ -2172,8 +2172,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16 , BOOST_FWD_REF(F17) f17 , BOOST_FWD_REF(F18) f18
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17 , F18 && f18
     )
     {
         typedef
@@ -2187,13 +2187,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ) , boost::forward<F17>( f17 ) , boost::forward<F18>( f18 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ) , std::forward<F18>( f18 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18>
     BOOST_FORCEINLINE
@@ -2209,7 +2209,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16 , BOOST_FWD_REF(F17) f17 , BOOST_FWD_REF(F18) f18)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17 , F18 && f18)
     {
         typedef
             detail::dataflow_frame<
@@ -2222,13 +2222,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ) , boost::forward<F17>( f17 ) , boost::forward<F18>( f18 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ) , std::forward<F18>( f18 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 namespace hpx { namespace lcos { namespace local
@@ -2250,8 +2250,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16 , BOOST_FWD_REF(F17) f17 , BOOST_FWD_REF(F18) f18 , BOOST_FWD_REF(F19) f19
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17 , F18 && f18 , F19 && f19
     )
     {
         typedef
@@ -2265,13 +2265,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ) , boost::forward<F17>( f17 ) , boost::forward<F18>( f18 ) , boost::forward<F19>( f19 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ) , std::forward<F18>( f18 ) , std::forward<F19>( f19 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18 , typename F19>
     BOOST_FORCEINLINE
@@ -2289,8 +2289,8 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
-      , BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16 , BOOST_FWD_REF(F17) f17 , BOOST_FWD_REF(F18) f18 , BOOST_FWD_REF(F19) f19
+      , Func && func
+      , F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17 , F18 && f18 , F19 && f19
     )
     {
         typedef
@@ -2304,13 +2304,13 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ) , boost::forward<F17>( f17 ) , boost::forward<F18>( f18 ) , boost::forward<F19>( f19 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ) , std::forward<F18>( f18 ) , std::forward<F19>( f19 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
     template <typename Func, typename F0 , typename F1 , typename F2 , typename F3 , typename F4 , typename F5 , typename F6 , typename F7 , typename F8 , typename F9 , typename F10 , typename F11 , typename F12 , typename F13 , typename F14 , typename F15 , typename F16 , typename F17 , typename F18 , typename F19>
     BOOST_FORCEINLINE
@@ -2326,7 +2326,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, BOOST_FWD_REF(F0) f0 , BOOST_FWD_REF(F1) f1 , BOOST_FWD_REF(F2) f2 , BOOST_FWD_REF(F3) f3 , BOOST_FWD_REF(F4) f4 , BOOST_FWD_REF(F5) f5 , BOOST_FWD_REF(F6) f6 , BOOST_FWD_REF(F7) f7 , BOOST_FWD_REF(F8) f8 , BOOST_FWD_REF(F9) f9 , BOOST_FWD_REF(F10) f10 , BOOST_FWD_REF(F11) f11 , BOOST_FWD_REF(F12) f12 , BOOST_FWD_REF(F13) f13 , BOOST_FWD_REF(F14) f14 , BOOST_FWD_REF(F15) f15 , BOOST_FWD_REF(F16) f16 , BOOST_FWD_REF(F17) f17 , BOOST_FWD_REF(F18) f18 , BOOST_FWD_REF(F19) f19)
+    dataflow(Func && func, F0 && f0 , F1 && f1 , F2 && f2 , F3 && f3 , F4 && f4 , F5 && f5 , F6 && f6 , F7 && f7 , F8 && f8 , F9 && f9 , F10 && f10 , F11 && f11 , F12 && f12 , F13 && f13 , F14 && f14 , F15 && f15 , F16 && f16 , F17 && f17 , F18 && f18 , F19 && f19)
     {
         typedef
             detail::dataflow_frame<
@@ -2339,12 +2339,12 @@ namespace hpx { namespace lcos { namespace local
             frame_type;
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
-              , hpx::util::forward_as_tuple(boost::forward<F0>( f0 ) , boost::forward<F1>( f1 ) , boost::forward<F2>( f2 ) , boost::forward<F3>( f3 ) , boost::forward<F4>( f4 ) , boost::forward<F5>( f5 ) , boost::forward<F6>( f6 ) , boost::forward<F7>( f7 ) , boost::forward<F8>( f8 ) , boost::forward<F9>( f9 ) , boost::forward<F10>( f10 ) , boost::forward<F11>( f11 ) , boost::forward<F12>( f12 ) , boost::forward<F13>( f13 ) , boost::forward<F14>( f14 ) , boost::forward<F15>( f15 ) , boost::forward<F16>( f16 ) , boost::forward<F17>( f17 ) , boost::forward<F18>( f18 ) , boost::forward<F19>( f19 ))
+              , std::forward<Func>(func)
+              , hpx::util::forward_as_tuple(std::forward<F0>( f0 ) , std::forward<F1>( f1 ) , std::forward<F2>( f2 ) , std::forward<F3>( f3 ) , std::forward<F4>( f4 ) , std::forward<F5>( f5 ) , std::forward<F6>( f6 ) , std::forward<F7>( f7 ) , std::forward<F8>( f8 ) , std::forward<F9>( f9 ) , std::forward<F10>( f10 ) , std::forward<F11>( f11 ) , std::forward<F12>( f12 ) , std::forward<F13>( f13 ) , std::forward<F14>( f14 ) , std::forward<F15>( f15 ) , std::forward<F16>( f16 ) , std::forward<F17>( f17 ) , std::forward<F18>( f18 ) , std::forward<F19>( f19 ))
             ));
         p->await();
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}

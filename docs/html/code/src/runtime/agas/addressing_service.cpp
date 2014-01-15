@@ -207,6 +207,7 @@ addressing_service::addressing_service(
   , console_cache_(0)
   , max_refcnt_requests_(ini_.get_agas_max_pending_refcnt_requests())
   , refcnt_requests_count_(0)
+  , enable_refcnt_caching_(true)
   , refcnt_requests_(new refcnt_requests_type)
   , incref_requests_(new incref_requests_type)
   , service_type(ini_.get_agas_service_mode())
@@ -1909,7 +1910,7 @@ lcos::unique_future<bool> addressing_service::register_name_async(
         );
     }
 
-    return boost::move(f);
+    return std::move(f);
 } // }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2201,6 +2202,19 @@ void addressing_service::clear_cache(
     }
 } // }}}
 
+// Disable refcnt caching during shutdown
+void addressing_service::start_shutdown(error_code& ec)
+{
+    // If caching is disabled, we silently pretend success.
+    if (!caching_)
+        return;
+
+    mutex_type::scoped_lock l(refcnt_requests_mtx_);
+    send_refcnt_requests_sync(l, ec);
+
+    enable_refcnt_caching_ = false;
+}
+
 namespace detail
 {
     // get action code from counter type
@@ -2479,7 +2493,7 @@ void addressing_service::send_refcnt_requests(
         return;
     }
 
-    if (max_refcnt_requests_ == ++refcnt_requests_count_)
+    if (enable_refcnt_caching_ || max_refcnt_requests_ == ++refcnt_requests_count_)
         send_refcnt_requests_non_blocking(l, ec);
 
     else if (&ec != &throws)

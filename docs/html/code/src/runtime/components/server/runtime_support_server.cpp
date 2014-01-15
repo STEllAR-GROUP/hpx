@@ -387,7 +387,7 @@ namespace hpx { namespace components { namespace server
             using components::stubs::runtime_support;
             naming::id_type id(gid, naming::id_type::unmanaged);
             lazy_actions.push_back(
-                runtime_support::call_shutdown_functions_async(id, pre_shutdown));
+                std::move(runtime_support::call_shutdown_functions_async(id, pre_shutdown)));
         }
 
         // wait for all localities to finish executing their registered
@@ -399,7 +399,11 @@ namespace hpx { namespace components { namespace server
     {
         std::vector<naming::gid_type> locality_ids;
         applier::applier& appl = hpx::applier::get_applier();
-        appl.get_agas_client().get_localities(locality_ids);
+        naming::resolver_client& agas_client = appl.get_agas_client();
+
+        agas_client.start_shutdown();
+
+        agas_client.get_localities(locality_ids);
         std::reverse(locality_ids.begin(), locality_ids.end());
 
         // execute registered shutdown functions on all localities
@@ -603,14 +607,16 @@ namespace hpx { namespace components { namespace server
 
             HPX_ASSERT(!terminated_);
 
-            stopped_ = true;
-
             applier::applier& appl = hpx::applier::get_applier();
             threads::threadmanager_base& tm = appl.get_thread_manager();
+            naming::resolver_client& agas_client = appl.get_agas_client();
 
             util::high_resolution_timer t;
             double start_time = t.elapsed();
             bool timed_out = false;
+            error_code ec(lightweight);
+
+            stopped_ = true;
 
             while (tm.get_thread_count() > 1) {
                 // let thread-manager clean up threads
@@ -636,12 +642,6 @@ namespace hpx { namespace components { namespace server
                     cleanup_threads(tm, l);
                 }
             }
-
-            //remove all entries for this locality from AGAS
-            naming::resolver_client& agas_client =
-                get_runtime().get_agas_client();
-
-            error_code ec(lightweight);
 
             // Drop the locality from the partition table.
             agas_client.unregister_locality(appl.here(), ec);

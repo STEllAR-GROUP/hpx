@@ -369,12 +369,12 @@ struct thread_deque
         // later thread creation
 // #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
 //         enqueue(new_tasks_, new task_description(
-//             boost::move(data), initial_state,
+//             std::move(data), initial_state,
 //             util::high_resolution_clock::now()
 //         ));
 // #else
         enqueue(new_tasks_, new task_description(
-            boost::move(data), initial_state));
+            std::move(data), initial_state));
 // #endif
         ++new_tasks_count_;
 

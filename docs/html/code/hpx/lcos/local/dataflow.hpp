@@ -69,13 +69,13 @@ namespace hpx { namespace lcos { namespace local { namespace detail
     struct dataflow_frame
       : hpx::lcos::detail::future_data<
             typename hpx::util::invoke_fused_result_of<
-                Func(BOOST_RV_REF(Futures))
+                Func(Futures &&)
             >::type
         >
     {
         typedef
             typename hpx::util::invoke_fused_result_of<
-                Func(BOOST_RV_REF(Futures))
+                Func(Futures &&)
             >::type
             result_type;
 
@@ -102,12 +102,12 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         template <typename FFunc, typename FFutures>
         dataflow_frame(
             Policy policy
-          , BOOST_FWD_REF(FFunc) func
-          , BOOST_FWD_REF(FFutures) futures
+          , FFunc && func
+          , FFutures && futures
         )
-          : policy_(boost::move(policy))
-          , func_(boost::forward<FFunc>(func))
-          , futures_(boost::forward<FFutures>(futures))
+          : policy_(std::move(policy))
+          , func_(std::forward<FFunc>(func))
+          , futures_(std::forward<FFutures>(futures))
         {}
 
         BOOST_FORCEINLINE
@@ -116,7 +116,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             try {
                 result_type res =
                     hpx::util::invoke_fused_r<result_type>(
-                        func_, boost::move(futures_));
+                        func_, std::move(futures_));
 
                 // reset futures
                 boost::fusion::for_each(futures_, reset_dataflow_future());
@@ -133,7 +133,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         {
             try {
                 hpx::util::invoke_fused_r<result_type>(
-                    func_, boost::move(futures_));
+                    func_, std::move(futures_));
 
                 // reset futures
                 boost::fusion::for_each(futures_, reset_dataflow_future());
@@ -147,7 +147,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         template <typename Iter>
         BOOST_FORCEINLINE
         void await(
-            BOOST_SCOPED_ENUM(launch) policy, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            BOOST_SCOPED_ENUM(launch) policy, Iter && iter, boost::mpl::true_)
         {
             typedef
                 boost::mpl::bool_<boost::is_void<result_type>::value>
@@ -164,7 +164,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         template <typename Iter>
         BOOST_FORCEINLINE
         void await(
-            threads::executor& sched, BOOST_FWD_REF(Iter) iter, boost::mpl::true_)
+            threads::executor& sched, Iter && iter, boost::mpl::true_)
         {
             typedef
                 boost::mpl::bool_<boost::is_void<result_type>::value>
@@ -203,12 +203,12 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 boost::intrusive_ptr<dataflow_frame> this_(this);
                 next_future_data->set_on_completed(
-                    boost::move(
+                    std::move(
                         boost::bind(
                             f
                           , this_
-                          , boost::move(next)
-                          , boost::move(end)
+                          , std::move(next)
+                          , std::move(end)
                         )
                     )
                 );
@@ -216,7 +216,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 return;
             }
 
-            await_range(boost::move(++next), boost::move(end));
+            await_range(std::move(++next), std::move(end));
         }
 
         template <typename Iter>
@@ -277,11 +277,11 @@ namespace hpx { namespace lcos { namespace local { namespace detail
 
                 boost::intrusive_ptr<dataflow_frame> this_(this);
                 next_future_data->set_on_completed(
-                    boost::move(
+                    std::move(
                         hpx::util::bind(
                             f
                           , this_
-                          , boost::move(iter)
+                          , std::move(iter)
                           , boost::mpl::false_()
                         )
                     )
@@ -315,7 +315,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 future_type
             >::type is_range;
 
-            await_next(boost::move(iter), is_range());
+            await_next(std::move(iter), is_range());
         }
 
         BOOST_FORCEINLINE void await()
@@ -391,7 +391,7 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         BOOST_SCOPED_ENUM(launch) policy
-      , BOOST_FWD_REF(Func) func
+      , Func && func
       , HPX_ENUM_FWD_ARGS(N, F, f)
     )
     {
@@ -407,14 +407,14 @@ namespace hpx { namespace lcos { namespace local
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 policy
-              , boost::forward<Func>(func)
+              , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, F, f))
             ));
         p->await();
 
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 
     template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
@@ -433,7 +433,7 @@ namespace hpx { namespace lcos { namespace local
     >::type
     dataflow(
         threads::executor& sched
-      , BOOST_FWD_REF(Func) func
+      , Func && func
       , HPX_ENUM_FWD_ARGS(N, F, f)
     )
     {
@@ -449,14 +449,14 @@ namespace hpx { namespace lcos { namespace local
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 sched
-              , boost::forward<Func>(func)
+              , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, F, f))
             ));
         p->await();
 
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 
     template <typename Func, BOOST_PP_ENUM_PARAMS(N, typename F)>
@@ -473,7 +473,7 @@ namespace hpx { namespace lcos { namespace local
             >
         >
     >::type
-    dataflow(BOOST_FWD_REF(Func) func, HPX_ENUM_FWD_ARGS(N, F, f))
+    dataflow(Func && func, HPX_ENUM_FWD_ARGS(N, F, f))
     {
         typedef
             detail::dataflow_frame<
@@ -487,14 +487,14 @@ namespace hpx { namespace lcos { namespace local
 
         boost::intrusive_ptr<frame_type> p(new frame_type(
                 launch::all
-              , boost::forward<Func>(func)
+              , std::forward<Func>(func)
               , hpx::util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, F, f))
             ));
         p->await();
 
         using lcos::detail::future_access;
         return future_access::create<typename frame_type::type>(
-            boost::move(p));
+            std::move(p));
     }
 }}}
 

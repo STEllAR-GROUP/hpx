@@ -112,7 +112,7 @@ struct object_semaphore
                 util::scoped_unlock<mutex_type::scoped_lock> ul(l);
 
                 // set the LCO's result
-                applier::trigger(id, boost::move(value));
+                applier::trigger(id, std::move(value));
             }
         }
     } // }}}

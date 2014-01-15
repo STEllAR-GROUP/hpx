@@ -191,8 +191,8 @@ namespace hpx { namespace lcos { namespace server
 #define N BOOST_PP_ITERATION()
         // TODO: get rid of the call to impl_ptr->init
 
-#define M0(Z, N, D) BOOST_FWD_REF(BOOST_PP_CAT(A, N)) BOOST_PP_CAT(a, N)
-#define M1(Z, N, D) boost::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N))
+#define M0(Z, N, D) BOOST_PP_CAT(A, N &&) BOOST_PP_CAT(a, N)
+#define M1(Z, N, D) std::forward<BOOST_PP_CAT(A, N)>(BOOST_PP_CAT(a, N))
 #define M2(Z, N, D)                                                             \
     typename util::decay<BOOST_PP_CAT(A, N)>::type                              \
 /**/

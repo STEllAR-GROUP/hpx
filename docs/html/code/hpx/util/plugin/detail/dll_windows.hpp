@@ -19,7 +19,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 
 #include <hpx/util/plugin/config.hpp>
 #include <hpx/exception.hpp>
@@ -53,9 +53,6 @@ namespace hpx { namespace util { namespace plugin {
 
     class dll
     {
-    private:
-        BOOST_COPYABLE_AND_MOVABLE(dll)
-
     public:
         dll()
         :   dll_handle(NULL)
@@ -88,15 +85,15 @@ namespace hpx { namespace util { namespace plugin {
         :   dll_name(libname), map_name(mapname), dll_handle(NULL)
         {}
 
-        dll(BOOST_RV_REF(dll) rhs)
-          : dll_name(boost::move(rhs.dll_name))
-          , map_name(boost::move(rhs.map_name))
+        dll(dll && rhs)
+          : dll_name(std::move(rhs.dll_name))
+          , map_name(std::move(rhs.map_name))
           , dll_handle(rhs.dll_handle)
         {
             rhs.dll_handle = NULL;
         }
 
-        dll &operator=(BOOST_COPY_ASSIGN_REF(dll) rhs)
+        dll &operator=(dll const & rhs)
         {
             if (this != &rhs) {
             //  free any existing dll_handle
@@ -110,11 +107,11 @@ namespace hpx { namespace util { namespace plugin {
             return *this;
         }
 
-        dll &operator=(BOOST_RV_REF(dll) rhs)
+        dll &operator=(dll && rhs)
         {
             if (&rhs != this) {
-                dll_name = boost::move(rhs.dll_name);
-                map_name = boost::move(rhs.map_name);
+                dll_name = std::move(rhs.dll_name);
+                map_name = std::move(rhs.map_name);
                 dll_handle = rhs.dll_handle;
                 rhs.dll_handle = NULL;
             }

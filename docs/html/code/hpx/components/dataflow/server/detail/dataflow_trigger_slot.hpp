@@ -49,7 +49,7 @@ namespace hpx { namespace lcos { namespace server { namespace detail
         {
         }
 
-        void set_value(BOOST_RV_REF(remote_result) r)
+        void set_value(remote_result && r)
         {
             dataflow_sink->set_slot(
                     traits::get_remote_result<result_type, remote_result>

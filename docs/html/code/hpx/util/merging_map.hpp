@@ -50,10 +50,10 @@ struct mapping
     >
     mapping(
         key_type const& k
-      , BOOST_FWD_REF(T) d
+      , T && d
         )
       : key_(k)
-      , data_(boost::forward<T>(d))
+      , data_(std::forward<T>(d))
     {}
 
     template <
@@ -62,10 +62,10 @@ struct mapping
     mapping(
         Key const& lower
       , Key const& upper
-      , BOOST_FWD_REF(T) d
+      , T && d
         )
       : key_(lower, upper)
-      , data_(boost::forward<T>(d))
+      , data_(std::forward<T>(d))
     {}
 
     friend bool operator<(
@@ -226,10 +226,10 @@ struct merging_map : boost::noncopyable
     iterator insert_before(
         const_iterator pos
       , key_type const& key
-      , BOOST_FWD_REF(T) data
+      , T && data
         )
     {
-        value_type* node = new value_type(key, boost::forward<T>(data));
+        value_type* node = new value_type(key, std::forward<T>(data));
         return map_.insert_before(pos, *node);
     }
 
@@ -326,7 +326,7 @@ struct merging_map : boost::noncopyable
     iterator remap(
         iterator pos
       , key_type const& sub
-      , BOOST_FWD_REF(T) data
+      , T && data
         )
     { // {{{
         const_iterator cpos(pos);
@@ -357,7 +357,7 @@ struct merging_map : boost::noncopyable
         // |c     d|
         else if (a == c && b == d)
         {
-            pos->data_ = boost::forward<T>(data);
+            pos->data_ = std::forward<T>(data);
 
             // We've updated the existing mappings data, so we might now be
             // able to merge with one of our neighbors.
@@ -381,7 +381,7 @@ struct merging_map : boost::noncopyable
             // because that's the existing mapping, and we know the data of the
             // existing and the new mappings are different if we've reached this
             // point in the code.
-            return lower_merge(insert_before(cpos, sub, boost::forward<T>(data)));
+            return lower_merge(insert_before(cpos, sub, std::forward<T>(data)));
         }
 
         // a < c, so c != 0
@@ -402,7 +402,7 @@ struct merging_map : boost::noncopyable
 
             // Replace the existing mapping with new mapping.
             pos->key_ = sub;
-            pos->data_ = boost::forward<T>(data);
+            pos->data_ = std::forward<T>(data);
 
             // We don't try to do a merge with the next lowest node,
             // because that's the existing mapping, and we know the data of the
@@ -423,7 +423,7 @@ struct merging_map : boost::noncopyable
             pos->key_ = db;
 
             // Add the new mapping before the existing mapping.
-            iterator r = insert_before(cpos, sub, boost::forward<T>(data));
+            iterator r = insert_before(cpos, sub, std::forward<T>(data));
 
             // Add a modified copy of the existing mapping before the new
             // mapping.
@@ -576,11 +576,11 @@ struct merging_map : boost::noncopyable
     iterator bind(
         Key const& lower
       , Key const& upper
-      , BOOST_FWD_REF(T) data
+      , T && data
         )
     {
         key_type const key(lower, upper);
-        return bind(key, boost::forward<T>(data));
+        return bind(key, std::forward<T>(data));
     }
 
     /// Bind \p key to \p data, remapping any existing mappings that overlap.
@@ -590,14 +590,14 @@ struct merging_map : boost::noncopyable
     >
     iterator bind(
         key_type const& key
-      , BOOST_FWD_REF(T) data
+      , T && data
         )
     { // {{{
         std::pair<iterator, iterator> matches = find(key);
 
         if (matches.first == end() && matches.second == end())
         {
-            value_type* node = new value_type(key, boost::forward<T>(data));
+            value_type* node = new value_type(key, std::forward<T>(data));
             std::pair<iterator, bool> r = map_.insert(*node);
             HPX_ASSERT(r.second);
             return merge(r.first);
@@ -609,7 +609,7 @@ struct merging_map : boost::noncopyable
 
             // Is key a subset of match?
             if (boost::icl::contains(match, key))
-                return remap(matches.first, key, boost::forward<T>(data));
+                return remap(matches.first, key, std::forward<T>(data));
 
             // Is match a subset of key?
             if (boost::icl::contains(key, match))
@@ -652,7 +652,7 @@ struct merging_map : boost::noncopyable
             ++matches.first;
         }
 
-        value_type* node = new value_type(key, boost::forward<T>(data));
+        value_type* node = new value_type(key, std::forward<T>(data));
         // TODO: Check for insertion failure?
         return merge(map_.insert(*node).first);
     }

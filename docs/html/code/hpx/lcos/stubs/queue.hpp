@@ -32,12 +32,12 @@ namespace hpx { namespace lcos { namespace stubs
         }
 
         static lcos::unique_future<void>
-        set_value_async(naming::id_type const& gid, BOOST_RV_REF(RemoteType) val)
+        set_value_async(naming::id_type const& gid, RemoteType && val)
         {
             typedef typename
                 lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action
             action_type;
-            return hpx::async<action_type>(gid, boost::move(val));
+            return hpx::async<action_type>(gid, std::move(val));
         }
 
         static lcos::unique_future<void>
@@ -54,9 +54,9 @@ namespace hpx { namespace lcos { namespace stubs
             return get_value_async(gid).get();
         }
 
-        static void set_value_sync(naming::id_type const& gid, BOOST_RV_REF(RemoteType) val)
+        static void set_value_sync(naming::id_type const& gid, RemoteType && val)
         {
-            set_value_async(gid, boost::move(val)).get();
+            set_value_async(gid, std::move(val)).get();
         }
 
         static void abort_pending_sync(naming::id_type const& gid,
@@ -66,7 +66,7 @@ namespace hpx { namespace lcos { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static void set_value(naming::id_type const& gid, BOOST_RV_REF(RemoteType) val)
+        static void set_value(naming::id_type const& gid, RemoteType && val)
         {
             typedef typename
                 lcos::base_lco_with_value<ValueType, RemoteType>::set_value_action

@@ -30,27 +30,27 @@ namespace hpx { namespace util { namespace detail
         {}
 
         // move constructor
-        protected_bind(BOOST_RV_REF(protected_bind) other)
-          : F(boost::move(other))
+        protected_bind(protected_bind && other)
+          : F(std::move(other))
         {}
 
         explicit protected_bind(F const & f)
           : F(f)
         {}
 
-        explicit protected_bind(BOOST_RV_REF(F) f)
-          : F(boost::move(f))
+        explicit protected_bind(F && f)
+          : F(std::move(f))
         {}
 
-        protected_bind& operator=(BOOST_COPY_ASSIGN_REF(protected_bind) rhs)
+        protected_bind& operator=(protected_bind const & rhs)
         {
             F::operator=(rhs);
             return *this;
         }
 
-        protected_bind& operator=(BOOST_RV_REF(protected_bind) rhs)
+        protected_bind& operator=(protected_bind && rhs)
         {
-            F::operator=(boost::move(rhs));
+            F::operator=(std::move(rhs));
             return *this;
         }
     };
@@ -63,15 +63,14 @@ namespace hpx { namespace util
         traits::is_bind_expression<typename util::decay<T>::type>
       , detail::protected_bind<typename util::decay<T>::type>
     >::type
-    protect(BOOST_FWD_REF(T) f)
+    protect(T && f)
     {
         return detail::protected_bind<
             typename util::decay<T>::type
-        >(boost::forward<T>(f));
+        >(std::forward<T>(f));
     }
     
     // leave everything that is not a bind expression as is
-#   ifndef BOOST_NO_CXX_RVALUE_REFERENCES
     template <typename T>
     typename boost::disable_if<
         traits::is_bind_expression<typename util::decay<T>::type>
@@ -79,29 +78,8 @@ namespace hpx { namespace util
     >::type
     protect(T&& v)
     {
-        return boost::forward<T>(v);
+        return std::forward<T>(v);
     }
-#   else
-    template <typename T>
-    typename boost::disable_if<
-        traits::is_bind_expression<typename util::decay<T>::type>
-      , T&
-    >::type
-    protect(T& v)
-    {
-        return v;
-    }
-    template <typename T>
-    typename boost::disable_if<
-        traits::is_bind_expression<typename util::decay<T>::type>
-      , T
-    >::type
-    protect(BOOST_FWD_REF(T) v)
-    {
-        return boost::forward<T>(v);
-    }
-#   endif
-
 }} // namespace hpx::util
 
 #endif

@@ -35,7 +35,7 @@
 #include <hpx/util/function.hpp>
 
 #include <boost/noncopyable.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
@@ -130,31 +130,31 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 
     template <typename F>
-    yield_decorator_type decorate_yield(BOOST_FWD_REF(F) f)
+    yield_decorator_type decorate_yield(F && f)
     {
-        yield_decorator_type tmp(boost::forward<F>(f));
+        yield_decorator_type tmp(std::forward<F>(f));
         std::swap(tmp, yield_decorator_);
-        return boost::move(tmp);
+        return std::move(tmp);
     }
 
     yield_decorator_type decorate_yield(yield_decorator_type const& f)
     {
         yield_decorator_type tmp(f);
         std::swap(tmp, yield_decorator_);
-        return boost::move(tmp);
+        return std::move(tmp);
     }
 
-    yield_decorator_type decorate_yield(BOOST_RV_REF(yield_decorator_type) f)
+    yield_decorator_type decorate_yield(yield_decorator_type && f)
     {
         std::swap(f, yield_decorator_);
-        return boost::move(f);
+        return std::move(f);
     }
 
     yield_decorator_type undecorate_yield()
     {
         yield_decorator_type tmp;
         std::swap(tmp, yield_decorator_);
-        return boost::move(tmp);
+        return std::move(tmp);
     }
 
 #endif

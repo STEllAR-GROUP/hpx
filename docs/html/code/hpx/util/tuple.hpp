@@ -22,7 +22,7 @@
 
 #include <boost/array.hpp>
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/size_t.hpp>
@@ -85,8 +85,6 @@ namespace hpx { namespace util
         template <typename T, typename Enable = void>
         struct tuple_member
         {
-            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
-
         public: // exposition-only
             T _value;
 
@@ -97,23 +95,21 @@ namespace hpx { namespace util
             {}
 
             template <typename U>
-            BOOST_CONSTEXPR explicit tuple_member(BOOST_FWD_REF(U) value)
-              : _value(boost::forward<U>(value))
+            BOOST_CONSTEXPR explicit tuple_member(U && value)
+              : _value(std::forward<U>(value))
             {}
 
             BOOST_CONSTEXPR tuple_member(tuple_member const& other)
               : _value(other._value)
             {}
-            BOOST_CONSTEXPR tuple_member(BOOST_RV_REF(tuple_member) other)
-              : _value(boost::forward<T>(other._value))
+            BOOST_CONSTEXPR tuple_member(tuple_member && other)
+              : _value(std::forward<T>(other._value))
             {}
         };
 
         template <typename T>
         struct tuple_member<T&>
         {
-            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
-
         public: // exposition-only
             T& _value;
 
@@ -131,45 +127,41 @@ namespace hpx { namespace util
 #       if (defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600)              \
         || (defined(BOOST_MSVC) && BOOST_MSVC < 1800)
         template <typename T>
-        struct tuple_member<BOOST_RV_REF(T),
+        struct tuple_member<T &&,
             typename boost::disable_if_c<
                 boost::is_fundamental<T>::value || boost::is_pointer<T>::value
             >::type
         >
         {
-            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
-
         public: // exposition-only
-            BOOST_RV_REF(T) _value;
+            T && _value;
 
         public:
             // 20.4.2.1, tuple construction
-            BOOST_CONSTEXPR explicit tuple_member(BOOST_RV_REF(T) value)
-              : _value(boost::forward<T>(value))
+            BOOST_CONSTEXPR explicit tuple_member(T && value)
+              : _value(std::forward<T>(value))
             {}
 
             BOOST_CONSTEXPR tuple_member(tuple_member const& other)
-              : _value(boost::forward<T>(other._value))
+              : _value(std::forward<T>(other._value))
             {}
         };
 
         template <typename T>
         struct tuple_member<
-            BOOST_RV_REF(T)
+            T &&
           , typename boost::enable_if_c<
                 boost::is_fundamental<T>::value || boost::is_pointer<T>::value
             >::type
         >
         {
-            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
-
         public: // exposition-only
             T _value;
 
         public:
             // 20.4.2.1, tuple construction
-            BOOST_CONSTEXPR explicit tuple_member(BOOST_RV_REF(T) value)
-              : _value(boost::forward<T>(value))
+            BOOST_CONSTEXPR explicit tuple_member(T && value)
+              : _value(std::forward<T>(value))
             {}
 
             BOOST_CONSTEXPR tuple_member(tuple_member const& other)
@@ -178,21 +170,19 @@ namespace hpx { namespace util
         };
 #       else
         template <typename T>
-        struct tuple_member<BOOST_RV_REF(T)>
+        struct tuple_member<T &&>
         {
-            BOOST_COPYABLE_AND_MOVABLE(tuple_member);
-
         public: // exposition-only
-            BOOST_RV_REF(T) _value;
+            T && _value;
 
         public:
             // 20.4.2.1, tuple construction
-            BOOST_CONSTEXPR explicit tuple_member(BOOST_RV_REF(T) value)
-              : _value(boost::forward<T>(value))
+            BOOST_CONSTEXPR explicit tuple_member(T && value)
+              : _value(std::forward<T>(value))
             {}
 
             BOOST_CONSTEXPR tuple_member(tuple_member const& other)
-              : _value(boost::forward<T>(other._value))
+              : _value(std::forward<T>(other._value))
             {}
         };
 #       endif
@@ -216,7 +206,7 @@ namespace hpx { namespace util
         struct ignore_type
         {
             template <typename T>
-            void operator=(BOOST_FWD_REF(T) t) const
+            void operator=(T && t) const
             {}
         };
     }
@@ -242,7 +232,7 @@ namespace hpx { namespace util
         // tuple(tuple&& u) = default;
         // For all i, initializes the ith element of *this with
         // std::forward<Ti>(get<i>(u)).
-        BOOST_CONSTEXPR tuple(BOOST_RV_REF(tuple) other)
+        BOOST_CONSTEXPR tuple(tuple && other)
         {}
 
         // 20.4.2.2, tuple assignment
@@ -256,7 +246,7 @@ namespace hpx { namespace util
 
         // tuple& operator=(tuple&& u) noexcept(see below );
         // For all i, assigns std::forward<Ti>(get<i>(u)) to get<i>(*this).
-        tuple& operator=(BOOST_RV_REF(tuple) other) BOOST_NOEXCEPT
+        tuple& operator=(tuple && other) BOOST_NOEXCEPT
         {
             return *this;
         }
@@ -268,8 +258,6 @@ namespace hpx { namespace util
         // in rhs.
         void swap(tuple& other) BOOST_NOEXCEPT
         {}
-
-    public: // exposition-only
     };
 
     // 20.4.2.5, tuple helper classes
@@ -406,11 +394,11 @@ namespace hpx { namespace util
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::qualify_as<
         typename tuple_element<I, Tuple>::type
-      , BOOST_RV_REF(Tuple)
+      , Tuple &&
     >::type
-    get(BOOST_RV_REF(Tuple) t) BOOST_NOEXCEPT
+    get(Tuple && t) BOOST_NOEXCEPT
     {
-        return boost::forward<
+        return std::forward<
             typename tuple_element<I, Tuple>::type>(util::get<I>(t));
     }
 
@@ -495,9 +483,9 @@ namespace hpx { namespace util
                 type
               , typename add_rvalue_reference<TTuple>::type
             >::type
-            call(BOOST_FWD_REF(TTuple) t, BOOST_FWD_REF(UTuple) u)
+            call(TTuple && t, UTuple && u)
             {
-                return util::get<I>(boost::forward<TTuple>(t));
+                return util::get<I>(std::forward<TTuple>(t));
             }
         };
 
@@ -526,9 +514,9 @@ namespace hpx { namespace util
                 type
               , typename add_rvalue_reference<UTuple>::type
             >::type
-            call(BOOST_FWD_REF(TTuple) t, BOOST_FWD_REF(UTuple) u)
+            call(TTuple && t, UTuple && u)
             {
-                return util::get<I - offset>(boost::forward<UTuple>(u));
+                return util::get<I - offset>(std::forward<UTuple>(u));
             }
         };
 
@@ -582,9 +570,9 @@ namespace hpx { namespace util
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     tuple<BOOST_PP_ENUM_PARAMS(N, T)>
-    tuple_cat(BOOST_RV_REF(tuple<BOOST_PP_ENUM_PARAMS(N, T)>) t)
+    tuple_cat(tuple<BOOST_PP_ENUM_PARAMS(N, T)> && t)
     {
-        return boost::move(t);
+        return std::move(t);
     }
 
     template <typename Tuple>
@@ -593,7 +581,7 @@ namespace hpx { namespace util
         tuple_size<typename remove_reference<Tuple>::type>::value == 0
       , tuple<>
     >::type
-    tuple_cat(BOOST_FWD_REF(Tuple) t)
+    tuple_cat(Tuple && t)
     {
         return tuple<>();
     }
@@ -605,7 +593,7 @@ namespace hpx { namespace util
       + tuple_size<typename remove_reference<UTuple>::type>::value == 0
       , tuple<>
     >::type
-    tuple_cat(BOOST_FWD_REF(TTuple) /*t*/, BOOST_FWD_REF(UTuple) /*u*/)
+    tuple_cat(TTuple && /*t*/, UTuple && /*u*/)
     {
         return tuple<>();
     }
@@ -947,8 +935,6 @@ namespace hpx { namespace util
     class tuple
 #   endif
     {
-        BOOST_COPYABLE_AND_MOVABLE(tuple);
-
     public: // exposition-only
 #       define HPX_UTIL_TUPLE_MEMBER(Z, N, D)                                 \
         detail::tuple_member<BOOST_PP_CAT(T, N)> BOOST_PP_CAT(_m, N);         \
@@ -995,11 +981,11 @@ namespace hpx { namespace util
         // unless each type in UTypes is implicitly convertible to its
         // corresponding type in Types.
 #       define HPX_UTIL_TUPLE_FWD_REF_PARAM(Z, N, D)                          \
-        BOOST_FWD_REF(BOOST_PP_CAT(U, N)) BOOST_PP_CAT(u, N)                  \
+        BOOST_PP_CAT(U, N &&) BOOST_PP_CAT(u, N)                  \
         /**/
 #       define HPX_UTIL_TUPLE_FORWARD_CONSTRUCT(Z, N, D)                      \
         BOOST_PP_CAT(_m, N)                                                   \
-            (boost::forward<BOOST_PP_CAT(U, N)>(BOOST_PP_CAT(u, N)))          \
+            (std::forward<BOOST_PP_CAT(U, N)>(BOOST_PP_CAT(u, N)))          \
         /**/
         template <BOOST_PP_ENUM_PARAMS(N, typename U)>
         BOOST_CONSTEXPR explicit tuple(
@@ -1041,9 +1027,9 @@ namespace hpx { namespace util
         // For all i, initializes the ith element of *this with
         // std::forward<Ti>(get<i>(u)).
 #       define HPX_UTIL_TUPLE_MOVE_CONSTRUCT(Z, N, D)                         \
-        BOOST_PP_CAT(_m, N)(boost::move(BOOST_PP_CAT(other._m, N)))           \
+        BOOST_PP_CAT(_m, N)(std::move(BOOST_PP_CAT(other._m, N)))           \
         /**/
-        BOOST_CONSTEXPR tuple(BOOST_RV_REF(tuple) other)
+        BOOST_CONSTEXPR tuple(tuple && other)
           : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_MOVE_CONSTRUCT, _)
         {}
 #       undef HPX_UTIL_TUPLE_MOVE_CONSTRUCT
@@ -1056,11 +1042,11 @@ namespace hpx { namespace util
         // unless each type in UTypes is implicitly convertible to its
         // corresponding type in Types
 #       define HPX_UTIL_TUPLE_GET_CONSTRUCT(Z, N, D)                          \
-        BOOST_PP_CAT(_m, N)(util::get<N>(boost::forward<UTuple>(other)))      \
+        BOOST_PP_CAT(_m, N)(util::get<N>(std::forward<UTuple>(other)))      \
         /**/
         template <typename UTuple>
         BOOST_CONSTEXPR tuple(
-            BOOST_FWD_REF(UTuple) other
+            UTuple && other
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
@@ -1101,16 +1087,16 @@ namespace hpx { namespace util
 #       define HPX_UTIL_TUPLE_MOVE_ASSIGN_NOEXCEPT(Z, N, D)                   \
          && BOOST_NOEXCEPT_EXPR((                                             \
                 BOOST_PP_CAT(_m, N)._value =                                  \
-                    boost::forward<BOOST_PP_CAT(T, N)>                        \
+                    std::forward<BOOST_PP_CAT(T, N)>                        \
                         (BOOST_PP_CAT(other._m, N)._value)                    \
             ))                                                                \
         /**/
 #       define HPX_UTIL_TUPLE_MOVE_ASSIGN(Z, N, D)                            \
         BOOST_PP_CAT(_m, N)._value =                                          \
-            boost::forward<BOOST_PP_CAT(T, N)>                                \
+            std::forward<BOOST_PP_CAT(T, N)>                                \
                 (BOOST_PP_CAT(other._m, N)._value);                           \
         /**/
-        tuple& operator=(BOOST_RV_REF(tuple) other)
+        tuple& operator=(tuple && other)
             HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
                 true BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_MOVE_ASSIGN_NOEXCEPT, _)
             )
@@ -1127,19 +1113,19 @@ namespace hpx { namespace util
 #       define HPX_UTIL_TUPLE_GET_ASSIGN_NOEXCEPT(Z, N, D)                    \
          && BOOST_NOEXCEPT_EXPR((                                             \
                 BOOST_PP_CAT(_m, N)._value =                                  \
-                    util::get<N>(boost::forward<UTuple>(other))               \
+                    util::get<N>(std::forward<UTuple>(other))               \
             ))                                                                \
         /**/
 #       define HPX_UTIL_TUPLE_GET_ASSIGN(Z, N, D)                             \
         BOOST_PP_CAT(_m, N)._value =                                          \
-            util::get<N>(boost::forward<UTuple>(other));                      \
+            util::get<N>(std::forward<UTuple>(other));                      \
         /**/
         template <typename UTuple>
         typename boost::enable_if_c<
             tuple_size<typename remove_reference<UTuple>::type>::value == N
           , tuple&
         >::type
-        operator=(BOOST_FWD_REF(UTuple) other)
+        operator=(UTuple && other)
             HPX_UTIL_TUPLE_SFINAE_NOEXCEPT_IF(
                 true BOOST_PP_REPEAT(N, HPX_UTIL_TUPLE_GET_ASSIGN_NOEXCEPT, _)
             )
@@ -1305,7 +1291,7 @@ namespace hpx { namespace util
     }
 
 #   define HPX_UTIL_TUPLE_CAT_ELEMENT_CALL(Z, N, D)                           \
-    util::get<N>(boost::forward<Tuple>(t))                                    \
+    util::get<N>(std::forward<Tuple>(t))                                    \
     /**/
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
@@ -1315,7 +1301,7 @@ namespace hpx { namespace util
             typename remove_reference<Tuple>::type
         >
     >::type
-    tuple_cat(BOOST_FWD_REF(Tuple) t)
+    tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
@@ -1331,7 +1317,7 @@ namespace hpx { namespace util
         N                                                                     \
       , typename remove_reference<TTuple>::type                               \
       , typename remove_reference<UTuple>::type                               \
-    >::call(boost::forward<TTuple>(t), boost::forward<UTuple>(u))             \
+    >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))             \
     /**/
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
@@ -1343,7 +1329,7 @@ namespace hpx { namespace util
           , typename remove_reference<UTuple>::type
         >
     >::type
-    tuple_cat(BOOST_FWD_REF(TTuple) t, BOOST_FWD_REF(UTuple) u)
+    tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
@@ -1361,9 +1347,9 @@ namespace hpx { namespace util
     /**/
 #   define HPX_UTIL_TUPLE_CAT(Z, N, D)                                        \
     BOOST_PP_COMMA_IF(N) util::tuple_cat(                                     \
-        boost::forward<BOOST_PP_CAT(T, BOOST_PP_MUL(N, 2))>                   \
+        std::forward<BOOST_PP_CAT(T, BOOST_PP_MUL(N, 2))>                   \
             (BOOST_PP_CAT(t, BOOST_PP_MUL(N, 2)))                             \
-      , boost::forward<BOOST_PP_CAT(T, BOOST_PP_INC(BOOST_PP_MUL(N, 2)))>     \
+      , std::forward<BOOST_PP_CAT(T, BOOST_PP_INC(BOOST_PP_MUL(N, 2)))>     \
             (BOOST_PP_CAT(t, BOOST_PP_INC(BOOST_PP_MUL(N, 2)))))              \
     /**/
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
@@ -1377,7 +1363,7 @@ namespace hpx { namespace util
             util::tuple_cat(
                 BOOST_PP_REPEAT(BOOST_PP_DIV(N, 2), HPX_UTIL_TUPLE_CAT, _)
 #           if N % 2 != 0
-              , boost::forward<BOOST_PP_CAT(T, BOOST_PP_DEC(N))>
+              , std::forward<BOOST_PP_CAT(T, BOOST_PP_DEC(N))>
                     (BOOST_PP_CAT(t, BOOST_PP_DEC(N)))
 #           endif
             );

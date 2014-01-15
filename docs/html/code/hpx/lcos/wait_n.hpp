@@ -51,7 +51,7 @@ namespace hpx
             BOOST_FORCEINLINE hpx::unique_future<R>
             operator()(hpx::unique_future<R>& future) const
             {
-                return boost::move(future);
+                return std::move(future);
             }
 
             template <typename R>
@@ -173,8 +173,8 @@ namespace hpx
             typedef Sequence argument_type;
             typedef Sequence result_type;
 
-            when_n(BOOST_RV_REF(argument_type) lazy_values, std::size_t n)
-              : lazy_values_(boost::move(lazy_values))
+            when_n(argument_type && lazy_values, std::size_t n)
+              : lazy_values_(std::move(lazy_values))
               , count_(0)
               , needed_count_(n)
             {}
@@ -199,7 +199,7 @@ namespace hpx
                 // at least N futures should be ready
                 HPX_ASSERT(count_.load(boost::memory_order_acquire) >= needed_count_);
 
-                return boost::move(lazy_values_);
+                return std::move(lazy_values_);
             }
 
             result_type lazy_values_;
@@ -285,8 +285,8 @@ namespace hpx
             typedef Sequence argument_type;
             typedef void result_type;
 
-            wait_n(BOOST_RV_REF(argument_type) lazy_values, std::size_t n)
-              : lazy_values_(boost::move(lazy_values))
+            wait_n(argument_type && lazy_values, std::size_t n)
+              : lazy_values_(std::move(lazy_values))
               , count_(0)
               , needed_count_(n)
             {}
@@ -350,7 +350,7 @@ namespace hpx
 
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
 
         if (n > lazy_values.size())
@@ -369,7 +369,7 @@ namespace hpx
 
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
 
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
@@ -381,7 +381,7 @@ namespace hpx
     template <typename Future>
     lcos::unique_future<std::vector<Future> > //-V659
     when_n(std::size_t n,
-        BOOST_RV_REF(std::vector<Future>) lazy_values,
+        std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
         return when_n(n, lazy_values, ec);
@@ -414,7 +414,7 @@ namespace hpx
 
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
 
         //if (n > 0)
@@ -478,7 +478,7 @@ namespace hpx
 
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
 
         return (*f.get())();
     }
@@ -495,7 +495,7 @@ namespace hpx
     template <typename Future>
     void
     wait_n(std::size_t n,
-        BOOST_RV_REF(std::vector<Future>) lazy_values,
+        std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
         return wait_n(n, const_cast<std::vector<Future> const&>(lazy_values), ec);
@@ -522,7 +522,7 @@ namespace hpx
 
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
 
         return (*f.get())();
     }
@@ -599,7 +599,7 @@ namespace hpx
 
         if (n == 0)
         {
-            return lcos::make_ready_future(boost::move(lazy_values));
+            return lcos::make_ready_future(std::move(lazy_values));
         }
 
         if (n > N)
@@ -612,7 +612,7 @@ namespace hpx
 
         boost::shared_ptr<detail::when_n<result_type> > f =
             boost::make_shared<detail::when_n<result_type> >(
-                boost::move(lazy_values), n);
+                std::move(lazy_values), n);
 
         lcos::local::futures_factory<result_type()> p(
             util::bind(&detail::when_n<result_type>::operator(), f));
@@ -648,7 +648,7 @@ namespace hpx
 
         boost::shared_ptr<detail::wait_n<result_type> > f =
             boost::make_shared<detail::wait_n<result_type> >(
-                boost::move(lazy_values_), n);
+                std::move(lazy_values_), n);
 
         return (*f.get())();
     }

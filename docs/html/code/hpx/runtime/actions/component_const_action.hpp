@@ -92,7 +92,7 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) /*args*/)
+            Arguments && /*args*/)
         {
             threads::thread_state_enum (*f)(naming::address::address_type) =
                 &Derived::template thread_function<naming::address::address_type>;
@@ -107,19 +107,19 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_object_function(
                     cont, F, get_lva<Component const>::call(lva),
-                    boost::forward<Arguments>(args)), lva);
+                    std::forward<Arguments>(args)), lva);
         }
 
         // direct execution
         template <typename Arguments>
         BOOST_FORCEINLINE static Result
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments))
+            Arguments &&)
         {
             LTM_(debug)
                 << "base_result_action0::execute_function: name("
@@ -289,7 +289,7 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments) /*args*/)
+            Arguments && /*args*/)
         {
             threads::thread_state_enum (*f)(naming::address::address_type) =
                 &Derived::template thread_function<naming::address::address_type>;
@@ -304,19 +304,19 @@ namespace hpx { namespace actions
         template <typename Arguments>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         construct_thread_function(continuation_type& cont,
-            naming::address::address_type lva, BOOST_FWD_REF(Arguments) args)
+            naming::address::address_type lva, Arguments && args)
         {
             return Derived::decorate_action(
                 base_type::construct_continuation_thread_object_function_void(
                     cont, F, get_lva<Component const>::call(lva),
-                    boost::forward<Arguments>(args)), lva);
+                    std::forward<Arguments>(args)), lva);
         }
 
         // direct execution
         template <typename Arguments>
         BOOST_FORCEINLINE static util::unused_type
         execute_function(naming::address::address_type lva,
-            BOOST_FWD_REF(Arguments))
+            Arguments &&)
         {
             LTM_(debug)
                 << "base_action0::execute_function: name("

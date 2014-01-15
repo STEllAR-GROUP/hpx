@@ -61,7 +61,7 @@ namespace hpx { namespace lcos
         reduce_impl0(
             Action const & act
           , std::vector<hpx::id_type> const & ids
-          , BOOST_FWD_REF(ReduceOp) reduce_op
+          , ReduceOp && reduce_op
           
           , std::size_t global_idx
         )
@@ -91,7 +91,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , reduce_op
                           
                           , global_idx + 1
@@ -105,7 +105,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , reduce_op
                           
                           , global_idx + half
@@ -187,7 +187,7 @@ namespace hpx { namespace lcos
     >
     reduce(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       )
     {
         hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
@@ -203,7 +203,7 @@ namespace hpx { namespace lcos
                 dest
               , Action()
               , ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               
               , 0
             );
@@ -224,12 +224,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       )
     {
         return reduce<Derived>(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               
             );
     }
@@ -243,12 +243,12 @@ namespace hpx { namespace lcos
     >
     reduce_with_index(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       )
     {
         return reduce<detail::reduce_with_index<Action> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               
             );
     }
@@ -268,12 +268,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       )
     {
         return reduce<detail::reduce_with_index<Derived> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               
             );
     }
@@ -331,7 +331,7 @@ namespace hpx { namespace lcos
         reduce_impl1(
             Action const & act
           , std::vector<hpx::id_type> const & ids
-          , BOOST_FWD_REF(ReduceOp) reduce_op
+          , ReduceOp && reduce_op
           , A0 const & a0
           , std::size_t global_idx
         )
@@ -361,7 +361,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , reduce_op
                           , a0
                           , global_idx + 1
@@ -375,7 +375,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , reduce_op
                           , a0
                           , global_idx + half
@@ -457,7 +457,7 @@ namespace hpx { namespace lcos
     >
     reduce(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0)
     {
         hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
@@ -473,7 +473,7 @@ namespace hpx { namespace lcos
                 dest
               , Action()
               , ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0
               , 0
             );
@@ -494,12 +494,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0)
     {
         return reduce<Derived>(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0
             );
     }
@@ -513,12 +513,12 @@ namespace hpx { namespace lcos
     >
     reduce_with_index(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0)
     {
         return reduce<detail::reduce_with_index<Action> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0
             );
     }
@@ -538,12 +538,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0)
     {
         return reduce<detail::reduce_with_index<Derived> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0
             );
     }
@@ -601,7 +601,7 @@ namespace hpx { namespace lcos
         reduce_impl2(
             Action const & act
           , std::vector<hpx::id_type> const & ids
-          , BOOST_FWD_REF(ReduceOp) reduce_op
+          , ReduceOp && reduce_op
           , A0 const & a0 , A1 const & a1
           , std::size_t global_idx
         )
@@ -631,7 +631,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , reduce_op
                           , a0 , a1
                           , global_idx + 1
@@ -645,7 +645,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , reduce_op
                           , a0 , a1
                           , global_idx + half
@@ -727,7 +727,7 @@ namespace hpx { namespace lcos
     >
     reduce(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1)
     {
         hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
@@ -743,7 +743,7 @@ namespace hpx { namespace lcos
                 dest
               , Action()
               , ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1
               , 0
             );
@@ -764,12 +764,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1)
     {
         return reduce<Derived>(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1
             );
     }
@@ -783,12 +783,12 @@ namespace hpx { namespace lcos
     >
     reduce_with_index(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1)
     {
         return reduce<detail::reduce_with_index<Action> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1
             );
     }
@@ -808,12 +808,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1)
     {
         return reduce<detail::reduce_with_index<Derived> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1
             );
     }
@@ -871,7 +871,7 @@ namespace hpx { namespace lcos
         reduce_impl3(
             Action const & act
           , std::vector<hpx::id_type> const & ids
-          , BOOST_FWD_REF(ReduceOp) reduce_op
+          , ReduceOp && reduce_op
           , A0 const & a0 , A1 const & a1 , A2 const & a2
           , std::size_t global_idx
         )
@@ -901,7 +901,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , reduce_op
                           , a0 , a1 , a2
                           , global_idx + 1
@@ -915,7 +915,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , reduce_op
                           , a0 , a1 , a2
                           , global_idx + half
@@ -997,7 +997,7 @@ namespace hpx { namespace lcos
     >
     reduce(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
         hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
@@ -1013,7 +1013,7 @@ namespace hpx { namespace lcos
                 dest
               , Action()
               , ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2
               , 0
             );
@@ -1034,12 +1034,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
         return reduce<Derived>(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2
             );
     }
@@ -1053,12 +1053,12 @@ namespace hpx { namespace lcos
     >
     reduce_with_index(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
         return reduce<detail::reduce_with_index<Action> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2
             );
     }
@@ -1078,12 +1078,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
         return reduce<detail::reduce_with_index<Derived> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2
             );
     }
@@ -1141,7 +1141,7 @@ namespace hpx { namespace lcos
         reduce_impl4(
             Action const & act
           , std::vector<hpx::id_type> const & ids
-          , BOOST_FWD_REF(ReduceOp) reduce_op
+          , ReduceOp && reduce_op
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3
           , std::size_t global_idx
         )
@@ -1171,7 +1171,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , reduce_op
                           , a0 , a1 , a2 , a3
                           , global_idx + 1
@@ -1185,7 +1185,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , reduce_op
                           , a0 , a1 , a2 , a3
                           , global_idx + half
@@ -1267,7 +1267,7 @@ namespace hpx { namespace lcos
     >
     reduce(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
         hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
@@ -1283,7 +1283,7 @@ namespace hpx { namespace lcos
                 dest
               , Action()
               , ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2 , a3
               , 0
             );
@@ -1304,12 +1304,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
         return reduce<Derived>(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2 , a3
             );
     }
@@ -1323,12 +1323,12 @@ namespace hpx { namespace lcos
     >
     reduce_with_index(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
         return reduce<detail::reduce_with_index<Action> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2 , a3
             );
     }
@@ -1348,12 +1348,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
         return reduce<detail::reduce_with_index<Derived> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2 , a3
             );
     }
@@ -1411,7 +1411,7 @@ namespace hpx { namespace lcos
         reduce_impl5(
             Action const & act
           , std::vector<hpx::id_type> const & ids
-          , BOOST_FWD_REF(ReduceOp) reduce_op
+          , ReduceOp && reduce_op
           , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4
           , std::size_t global_idx
         )
@@ -1441,7 +1441,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_first)
+                          , std::move(ids_first)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4
                           , global_idx + 1
@@ -1455,7 +1455,7 @@ namespace hpx { namespace lcos
                         hpx::async<reduce_impl_action>(
                             id
                           , act
-                          , boost::move(ids_second)
+                          , std::move(ids_second)
                           , reduce_op
                           , a0 , a1 , a2 , a3 , a4
                           , global_idx + half
@@ -1537,7 +1537,7 @@ namespace hpx { namespace lcos
     >
     reduce(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
         hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
@@ -1553,7 +1553,7 @@ namespace hpx { namespace lcos
                 dest
               , Action()
               , ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2 , a3 , a4
               , 0
             );
@@ -1574,12 +1574,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
         return reduce<Derived>(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2 , a3 , a4
             );
     }
@@ -1593,12 +1593,12 @@ namespace hpx { namespace lcos
     >
     reduce_with_index(
         std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
         return reduce<detail::reduce_with_index<Action> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2 , a3 , a4
             );
     }
@@ -1618,12 +1618,12 @@ namespace hpx { namespace lcos
             Component, Result, Arguments, Derived
         > 
       , std::vector<hpx::id_type> const & ids
-      , BOOST_FWD_REF(ReduceOp) reduce_op
+      , ReduceOp && reduce_op
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
         return reduce<detail::reduce_with_index<Derived> >(
                 ids
-              , boost::forward<ReduceOp>(reduce_op)
+              , std::forward<ReduceOp>(reduce_op)
               , a0 , a1 , a2 , a3 , a4
             );
     }

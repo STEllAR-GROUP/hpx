@@ -10,7 +10,7 @@
 #include <hpx/util/add_rvalue_reference.hpp>
 #include <hpx/util/decay.hpp>
 
-#include <boost/move/move.hpp>
+#include <utility>
 
 #include <boost/ref.hpp>
 
@@ -49,7 +49,7 @@ namespace hpx { namespace util { namespace detail
     {};
 
     template <typename T, typename U>
-    struct qualify_as_impl<T, BOOST_FWD_REF(U)>
+    struct qualify_as_impl<T, U &&>
       : util::add_rvalue_reference<typename qualify_as_impl<T, U>::type>
     {};
     

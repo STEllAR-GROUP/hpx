@@ -31,7 +31,7 @@ namespace hpx { namespace threads { namespace executors
             // Schedule the specified function for execution in this executor.
             // Depending on the subclass implementation, this may block in some
             // situations.
-            void add(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) f, char const* description,
+            void add(HPX_STD_FUNCTION<void()> && f, char const* description,
                 threads::thread_state_enum initial_state, bool run_now,
                 threads::thread_stacksize stacksize, error_code& ec);
 

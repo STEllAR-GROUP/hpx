@@ -98,7 +98,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(t[i], boost::move(r));
+                    hpx::apply<action_type>(t[i], std::move(r));
                 }
             }
         }
@@ -117,10 +117,10 @@
         
         
         
-        void set_value(BOOST_RV_REF(remote_result) r)
+        void set_value(remote_result && r)
         {
             remote_result tmp(r);
-            result.set(boost::move(r));
+            result.set(std::move(r));
             forward_results(tmp);
         }
         void forward_results(remote_result & r)
@@ -137,7 +137,7 @@
             {
                 typedef typename lco_type::set_value_action action_type;
                 result_type tmp = r;
-                hpx::apply<action_type>(t[i], boost::move(tmp));
+                hpx::apply<action_type>(t[i], std::move(tmp));
             }
         }
         
@@ -166,7 +166,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(target, boost::move(r));
+                    hpx::apply<action_type>(target, std::move(r));
                 }
             }
             else
@@ -307,7 +307,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(t[i], boost::move(r));
+                    hpx::apply<action_type>(t[i], std::move(r));
                 }
             }
         }
@@ -327,7 +327,7 @@
         
         
         
-        void set_value(BOOST_RV_REF(remote_result) r)
+        void set_value(remote_result && r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
@@ -335,7 +335,7 @@
             }
             future_slots.clear();
             remote_result tmp(r);
-            result.set(boost::move(r));
+            result.set(std::move(r));
             forward_results(tmp);
         }
         void forward_results(remote_result & r)
@@ -352,7 +352,7 @@
             {
                 typedef typename lco_type::set_value_action action_type;
                 result_type tmp = r;
-                hpx::apply<action_type>(t[i], boost::move(tmp));
+                hpx::apply<action_type>(t[i], std::move(tmp));
             }
         }
         
@@ -381,7 +381,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(target, boost::move(r));
+                    hpx::apply<action_type>(target, std::move(r));
                 }
             }
             else
@@ -391,7 +391,7 @@
         }
         
         template <int Slot, typename A>
-        void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
+        void set_slot(A && a, boost::mpl::true_)
         {
             typedef
                 typename util::decay<A>::type
@@ -402,7 +402,7 @@
             typedef
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
-            component_type * c = new component_type(this, boost::forward<A>(a));
+            component_type * c = new component_type(this, std::forward<A>(a));
             future_slots.push_back(c);
             (*c)->connect_();
         };
@@ -414,14 +414,14 @@
         typename boost::enable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_slot(BOOST_FWD_REF(A) a, boost::mpl::false_)
+        set_slot(A && a, boost::mpl::false_)
         {
             boost::fusion::at<
                 typename boost::mpl::at<
                     slot_to_args_map
                   , boost::mpl::int_<Slot>
                 >::type
-            >(slots) = boost::forward<A>(a);
+            >(slots) = std::forward<A>(a);
             maybe_apply<Slot>();
         };
         
@@ -432,7 +432,7 @@
         typename boost::disable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_slot(BOOST_FWD_REF(A), boost::mpl::false_)
+        set_slot(A &&, boost::mpl::false_)
         {
             maybe_apply<Slot>();
         };
@@ -609,7 +609,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(t[i], boost::move(r));
+                    hpx::apply<action_type>(t[i], std::move(r));
                 }
             }
         }
@@ -629,7 +629,7 @@
         
         
         
-        void set_value(BOOST_RV_REF(remote_result) r)
+        void set_value(remote_result && r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
@@ -637,7 +637,7 @@
             }
             future_slots.clear();
             remote_result tmp(r);
-            result.set(boost::move(r));
+            result.set(std::move(r));
             forward_results(tmp);
         }
         void forward_results(remote_result & r)
@@ -654,7 +654,7 @@
             {
                 typedef typename lco_type::set_value_action action_type;
                 result_type tmp = r;
-                hpx::apply<action_type>(t[i], boost::move(tmp));
+                hpx::apply<action_type>(t[i], std::move(tmp));
             }
         }
         
@@ -683,7 +683,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(target, boost::move(r));
+                    hpx::apply<action_type>(target, std::move(r));
                 }
             }
             else
@@ -693,7 +693,7 @@
         }
         
         template <int Slot, typename A>
-        void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
+        void set_slot(A && a, boost::mpl::true_)
         {
             typedef
                 typename util::decay<A>::type
@@ -704,7 +704,7 @@
             typedef
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
-            component_type * c = new component_type(this, boost::forward<A>(a));
+            component_type * c = new component_type(this, std::forward<A>(a));
             future_slots.push_back(c);
             (*c)->connect_();
         };
@@ -716,14 +716,14 @@
         typename boost::enable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_slot(BOOST_FWD_REF(A) a, boost::mpl::false_)
+        set_slot(A && a, boost::mpl::false_)
         {
             boost::fusion::at<
                 typename boost::mpl::at<
                     slot_to_args_map
                   , boost::mpl::int_<Slot>
                 >::type
-            >(slots) = boost::forward<A>(a);
+            >(slots) = std::forward<A>(a);
             maybe_apply<Slot>();
         };
         
@@ -734,7 +734,7 @@
         typename boost::disable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_slot(BOOST_FWD_REF(A), boost::mpl::false_)
+        set_slot(A &&, boost::mpl::false_)
         {
             maybe_apply<Slot>();
         };
@@ -911,7 +911,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(t[i], boost::move(r));
+                    hpx::apply<action_type>(t[i], std::move(r));
                 }
             }
         }
@@ -931,7 +931,7 @@
         
         
         
-        void set_value(BOOST_RV_REF(remote_result) r)
+        void set_value(remote_result && r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
@@ -939,7 +939,7 @@
             }
             future_slots.clear();
             remote_result tmp(r);
-            result.set(boost::move(r));
+            result.set(std::move(r));
             forward_results(tmp);
         }
         void forward_results(remote_result & r)
@@ -956,7 +956,7 @@
             {
                 typedef typename lco_type::set_value_action action_type;
                 result_type tmp = r;
-                hpx::apply<action_type>(t[i], boost::move(tmp));
+                hpx::apply<action_type>(t[i], std::move(tmp));
             }
         }
         
@@ -985,7 +985,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(target, boost::move(r));
+                    hpx::apply<action_type>(target, std::move(r));
                 }
             }
             else
@@ -995,7 +995,7 @@
         }
         
         template <int Slot, typename A>
-        void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
+        void set_slot(A && a, boost::mpl::true_)
         {
             typedef
                 typename util::decay<A>::type
@@ -1006,7 +1006,7 @@
             typedef
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
-            component_type * c = new component_type(this, boost::forward<A>(a));
+            component_type * c = new component_type(this, std::forward<A>(a));
             future_slots.push_back(c);
             (*c)->connect_();
         };
@@ -1018,14 +1018,14 @@
         typename boost::enable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_slot(BOOST_FWD_REF(A) a, boost::mpl::false_)
+        set_slot(A && a, boost::mpl::false_)
         {
             boost::fusion::at<
                 typename boost::mpl::at<
                     slot_to_args_map
                   , boost::mpl::int_<Slot>
                 >::type
-            >(slots) = boost::forward<A>(a);
+            >(slots) = std::forward<A>(a);
             maybe_apply<Slot>();
         };
         
@@ -1036,7 +1036,7 @@
         typename boost::disable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_slot(BOOST_FWD_REF(A), boost::mpl::false_)
+        set_slot(A &&, boost::mpl::false_)
         {
             maybe_apply<Slot>();
         };
@@ -1213,7 +1213,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(t[i], boost::move(r));
+                    hpx::apply<action_type>(t[i], std::move(r));
                 }
             }
         }
@@ -1233,7 +1233,7 @@
         
         
         
-        void set_value(BOOST_RV_REF(remote_result) r)
+        void set_value(remote_result && r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
@@ -1241,7 +1241,7 @@
             }
             future_slots.clear();
             remote_result tmp(r);
-            result.set(boost::move(r));
+            result.set(std::move(r));
             forward_results(tmp);
         }
         void forward_results(remote_result & r)
@@ -1258,7 +1258,7 @@
             {
                 typedef typename lco_type::set_value_action action_type;
                 result_type tmp = r;
-                hpx::apply<action_type>(t[i], boost::move(tmp));
+                hpx::apply<action_type>(t[i], std::move(tmp));
             }
         }
         
@@ -1287,7 +1287,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(target, boost::move(r));
+                    hpx::apply<action_type>(target, std::move(r));
                 }
             }
             else
@@ -1297,7 +1297,7 @@
         }
         
         template <int Slot, typename A>
-        void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
+        void set_slot(A && a, boost::mpl::true_)
         {
             typedef
                 typename util::decay<A>::type
@@ -1308,7 +1308,7 @@
             typedef
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
-            component_type * c = new component_type(this, boost::forward<A>(a));
+            component_type * c = new component_type(this, std::forward<A>(a));
             future_slots.push_back(c);
             (*c)->connect_();
         };
@@ -1320,14 +1320,14 @@
         typename boost::enable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_slot(BOOST_FWD_REF(A) a, boost::mpl::false_)
+        set_slot(A && a, boost::mpl::false_)
         {
             boost::fusion::at<
                 typename boost::mpl::at<
                     slot_to_args_map
                   , boost::mpl::int_<Slot>
                 >::type
-            >(slots) = boost::forward<A>(a);
+            >(slots) = std::forward<A>(a);
             maybe_apply<Slot>();
         };
         
@@ -1338,7 +1338,7 @@
         typename boost::disable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_slot(BOOST_FWD_REF(A), boost::mpl::false_)
+        set_slot(A &&, boost::mpl::false_)
         {
             maybe_apply<Slot>();
         };
@@ -1515,7 +1515,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(t[i], boost::move(r));
+                    hpx::apply<action_type>(t[i], std::move(r));
                 }
             }
         }
@@ -1535,7 +1535,7 @@
         
         
         
-        void set_value(BOOST_RV_REF(remote_result) r)
+        void set_value(remote_result && r)
         {
             BOOST_FOREACH(detail::component_wrapper_base *p, future_slots)
             {
@@ -1543,7 +1543,7 @@
             }
             future_slots.clear();
             remote_result tmp(r);
-            result.set(boost::move(r));
+            result.set(std::move(r));
             forward_results(tmp);
         }
         void forward_results(remote_result & r)
@@ -1560,7 +1560,7 @@
             {
                 typedef typename lco_type::set_value_action action_type;
                 result_type tmp = r;
-                hpx::apply<action_type>(t[i], boost::move(tmp));
+                hpx::apply<action_type>(t[i], std::move(tmp));
             }
         }
         
@@ -1589,7 +1589,7 @@
                     HPX_ASSERT(d.stores_value()); 
                     typedef typename lco_type::set_value_action action_type;
                     result_type r = d.get_value();
-                    hpx::apply<action_type>(target, boost::move(r));
+                    hpx::apply<action_type>(target, std::move(r));
                 }
             }
             else
@@ -1599,7 +1599,7 @@
         }
         
         template <int Slot, typename A>
-        void set_slot(BOOST_FWD_REF(A) a, boost::mpl::true_)
+        void set_slot(A && a, boost::mpl::true_)
         {
             typedef
                 typename util::decay<A>::type
@@ -1610,7 +1610,7 @@
             typedef
                 detail::component_wrapper<dataflow_slot_type>
                 component_type;
-            component_type * c = new component_type(this, boost::forward<A>(a));
+            component_type * c = new component_type(this, std::forward<A>(a));
             future_slots.push_back(c);
             (*c)->connect_();
         };
@@ -1622,14 +1622,14 @@
         typename boost::enable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_slot(BOOST_FWD_REF(A) a, boost::mpl::false_)
+        set_slot(A && a, boost::mpl::false_)
         {
             boost::fusion::at<
                 typename boost::mpl::at<
                     slot_to_args_map
                   , boost::mpl::int_<Slot>
                 >::type
-            >(slots) = boost::forward<A>(a);
+            >(slots) = std::forward<A>(a);
             maybe_apply<Slot>();
         };
         
@@ -1640,7 +1640,7 @@
         typename boost::disable_if<
             typename boost::mpl::has_key<slot_to_args_map, boost::mpl::int_<Slot> >::type
         >::type
-        set_slot(BOOST_FWD_REF(A), boost::mpl::false_)
+        set_slot(A &&, boost::mpl::false_)
         {
             maybe_apply<Slot>();
         };

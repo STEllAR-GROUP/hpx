@@ -103,9 +103,9 @@ namespace detail
     struct compose_cb_impl
     {
         template <typename A1, typename A2>
-        compose_cb_impl(BOOST_FWD_REF(A1) f1, BOOST_FWD_REF(A2) f2)
-          : f1_(boost::forward<A1>(f1))
-          , f2_(boost::forward<A2>(f2))
+        compose_cb_impl(A1 && f1, A2 && f2)
+          : f1_(std::forward<A1>(f1))
+          , f2_(std::forward<A2>(f2))
         {}
 
         typedef void result_type;
@@ -122,16 +122,16 @@ namespace detail
 
     template <typename F1, typename F2>
     static BOOST_FORCEINLINE HPX_STD_FUNCTION<void()>
-    compose_cb(BOOST_FWD_REF(F1) f1, BOOST_FWD_REF(F2) f2)
+    compose_cb(F1 && f1, F2 && f2)
     {
         if (f1.empty())
-            return boost::forward<F2>(f2);
+            return std::forward<F2>(f2);
         else if (f2.empty())
-            return boost::forward<F1>(f1);
+            return std::forward<F1>(f1);
 
         // otherwise create a combined callback
         return compose_cb_impl<F1, F2>(
-            boost::forward<F1>(f1), boost::forward<F2>(f2));
+            std::forward<F1>(f1), std::forward<F2>(f2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -212,7 +212,7 @@ namespace detail
 
         /// Set the result of the requested action.
         template <typename Target>
-        void set_result(BOOST_FWD_REF(Target) data, error_code& ec = throws)
+        void set_result(Target && data, error_code& ec = throws)
         {
             completed_callback_type on_completed;
             {
@@ -226,10 +226,10 @@ namespace detail
                     return;
                 }
 
-                on_completed = boost::move(this->on_completed_);
+                on_completed = std::move(this->on_completed_);
 
                 // set the data
-                data_ = boost::forward<Target>(data);
+                data_ = std::forward<Target>(data);
 
                 // make sure the entry is full
                 state_ = full;
@@ -246,7 +246,7 @@ namespace detail
         // helper functions for setting data (if successful) or the error (if
         // non-successful)
         template <typename T>
-        void set_data(BOOST_FWD_REF(T) result)
+        void set_data(T && result)
         {
             // set the received result, reset error status
             try {
@@ -257,8 +257,8 @@ namespace detail
                 > get_remote_result_type;
 
                 // store the value
-                set_result(boost::move(get_remote_result_type::call(
-                        boost::forward<T>(result))));
+                set_result(std::move(get_remote_result_type::call(
+                        std::forward<T>(result))));
             }
             catch (hpx::exception const&) {
                 // store the error instead
@@ -302,7 +302,7 @@ namespace detail
         {
             typename mutex_type::scoped_lock l(this->mtx_);
 
-            completed_callback_type retval = boost::move(this->on_completed_);
+            completed_callback_type retval = std::move(this->on_completed_);
 
             if (!data_sink.empty() && is_ready_locked()) {
                 // invoke the callback (continuation) function right away
@@ -314,24 +314,24 @@ namespace detail
             }
             else if (!retval.empty()) {
                 // store a combined callback wrapping the old and the new one
-                this->on_completed_ = boost::move(
-                    compose_cb(boost::move(data_sink), retval));
+                this->on_completed_ = std::move(
+                    compose_cb(std::move(data_sink), retval));
 
                 l.unlock();
             }
             else {
                 // store the new callback
-                this->on_completed_ = boost::move(data_sink);
+                this->on_completed_ = std::move(data_sink);
 
                 l.unlock();
             }
 
-            return boost::move(retval);
+            return std::move(retval);
         }
 
         completed_callback_type reset_on_completed_locked()
         {
-            return boost::move(this->on_completed_);
+            return std::move(this->on_completed_);
         }
 
         virtual void wait(error_code& ec = throws)
@@ -446,16 +446,16 @@ namespace detail
 
         template <typename Result_>
         timed_future_data(boost::posix_time::ptime const& at,
-            BOOST_FWD_REF(Result_) init)
+            Result_ && init)
         {
-            at_time(at, boost::forward<Result_>(init));
+            at_time(at, std::forward<Result_>(init));
         }
 
         template <typename Result_>
         timed_future_data(boost::posix_time::time_duration const& d,
-            BOOST_RV_REF(Result_) init)
+            Result_ && init)
         {
-            at_time(d, boost::forward<Result_>(init));
+            at_time(d, std::forward<Result_>(init));
         }
 
         void set_data(result_type const& value)
@@ -464,14 +464,14 @@ namespace detail
         }
 
         template <typename TimeSpec, typename Result_>
-        void at_time(TimeSpec const& tpoint, BOOST_FWD_REF(Result_) init)
+        void at_time(TimeSpec const& tpoint, Result_ && init)
         {
             boost::intrusive_ptr<timed_future_data> this_(this);
 
             error_code ec;
             threads::thread_id_type id = threads::register_thread_nullary(
                 HPX_STD_BIND(&timed_future_data::set_data, this_,
-                    boost::forward<Result_>(init)),
+                    std::forward<Result_>(init)),
                 "timed_future_data<Result>::timed_future_data",
                 threads::suspended, true, threads::thread_priority_normal,
                 std::size_t(-1), threads::thread_stacksize_default, ec);
@@ -639,10 +639,10 @@ namespace detail
         }
 
         template <typename T>
-        void set_data(BOOST_FWD_REF(T) result)
+        void set_data(T && result)
         {
             HPX_ASSERT(started_);
-            this->future_data<Result>::set_data(boost::forward<T>(result));
+            this->future_data<Result>::set_data(std::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)

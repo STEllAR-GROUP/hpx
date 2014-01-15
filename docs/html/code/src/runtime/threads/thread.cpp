@@ -28,15 +28,15 @@ namespace hpx
       : id_(uninitialized)
     {}
 
-    thread::thread(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
+    thread::thread(thread && rhs) BOOST_NOEXCEPT
       : id_(uninitialized)   // the rhs needs to end up with an invalid_id
     {
         rhs.swap(*this);
     }
 
-    thread& thread::operator=(BOOST_RV_REF(thread) rhs) BOOST_NOEXCEPT
+    thread& thread::operator=(thread && rhs) BOOST_NOEXCEPT
     {
-        thread tmp(boost::move(rhs));
+        thread tmp(std::move(rhs));
         swap(tmp);
         return *this;
     }
@@ -127,10 +127,10 @@ namespace hpx
         return hpx::threads::hardware_concurrency();
     }
 
-    void thread::start_thread(BOOST_RV_REF(HPX_STD_FUNCTION<void()>) func)
+    void thread::start_thread(HPX_STD_FUNCTION<void()> && func)
     {
         threads::thread_init_data data(
-            HPX_STD_BIND(&thread::thread_function_nullary, boost::move(func)),
+            HPX_STD_BIND(&thread::thread_function_nullary, std::move(func)),
             "thread::thread_function_nullary");
 
         error_code ec(lightweight);
@@ -305,7 +305,7 @@ namespace hpx
         }
 
         using lcos::detail::future_access;
-        return future_access::create<lcos::unique_future<void> >(boost::move(base));
+        return future_access::create<lcos::unique_future<void> >(std::move(base));
     }
 
     ///////////////////////////////////////////////////////////////////////////

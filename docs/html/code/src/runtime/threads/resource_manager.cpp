@@ -58,7 +58,7 @@ namespace hpx { namespace threads
         // attach the given proxy to this resource manager
         std::size_t cookie = ++next_cookie_;
         proxies_.insert(proxies_map_type::value_type(
-            cookie, proxy_data(proxy, boost::move(cores))));
+            cookie, proxy_data(proxy, std::move(cores))));
 
         if (&ec != &throws)
             ec = make_success_code();

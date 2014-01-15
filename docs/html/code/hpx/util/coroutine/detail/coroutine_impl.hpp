@@ -50,7 +50,7 @@
 #include <cstddef>
 #include <boost/optional.hpp>
 #include <boost/config.hpp>
-#include <boost/move/move.hpp>
+#include <utility>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
@@ -89,8 +89,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     {}
 
     template <typename Functor>
-    static inline type* create(BOOST_FWD_REF(Functor),
-        BOOST_RV_REF(naming::id_type) target, thread_id_repr_type = 0,
+    static inline type* create(Functor &&,
+        naming::id_type && target, thread_id_repr_type = 0,
         std::ptrdiff_t = default_stack_size);
 
 #if HPX_COROUTINE_ARG_MAX > 1
@@ -271,11 +271,11 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     typedef typename util::decay<FunctorType>::type functor_type;
 
     template <typename Functor>
-    coroutine_impl_wrapper(BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+    coroutine_impl_wrapper(Functor && f, naming::id_type && target,
             thread_id_repr_type id, std::ptrdiff_t stack_size)
       : super_type(this, id, stack_size),
-        m_fun(boost::forward<Functor>(f)),
-        target_(boost::move(target))
+        m_fun(std::forward<Functor>(f)),
+        target_(std::move(target))
     {}
 
     ~coroutine_impl_wrapper()
@@ -449,12 +449,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     }
 
     template <typename Functor>
-    void rebind(BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+    void rebind(Functor && f, naming::id_type && target,
         thread_id_repr_type id)
     {
         this->rebind_stack();     // count how often a coroutines object was reused
-        m_fun = boost::forward<Functor>(f);
-        target_ = boost::move(target);
+        m_fun = std::forward<Functor>(f);
+        target_ = std::move(target);
         this->super_type::rebind(id);
     }
 
@@ -530,7 +530,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
   template<typename Functor>
   inline typename coroutine_impl<CoroutineType, ContextImpl, Heap>::type*
   coroutine_impl<CoroutineType, ContextImpl, Heap>::
-      create(BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+      create(Functor && f, naming::id_type && target,
           thread_id_repr_type id, std::ptrdiff_t stack_size)
   {
       typedef typename hpx::util::decay<Functor>::type functor_type;
@@ -553,12 +553,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       // allocate a new coroutine object, if non is available (or all heaps are locked)
       if (NULL == wrapper) {
           context_base<ContextImpl>::increment_allocation_count(heap_num);
-          return new wrapper_type(boost::forward<Functor>(f), boost::move(target),
+          return new wrapper_type(std::forward<Functor>(f), std::move(target),
               id, stack_size);
       }
 
       // if we reuse an existing  object, we need to rebind its function
-      wrapper->rebind(boost::forward<Functor>(f), boost::move(target), id);
+      wrapper->rebind(std::forward<Functor>(f), std::move(target), id);
       return wrapper;
   }
 

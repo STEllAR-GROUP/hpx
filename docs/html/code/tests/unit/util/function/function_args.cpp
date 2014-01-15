@@ -33,13 +33,13 @@ struct counter
 
     counter(){ ++default_constructions; }
     counter(counter const&){ ++copy_constructions; }
-    counter(BOOST_RV_REF(counter)){ ++move_constructions; }
+    counter(counter &&){ ++move_constructions; }
 
 private:
-    BOOST_COPYABLE_AND_MOVABLE(counter);
+    ;
 
 	counter& operator=(counter const&);
-	counter& operator=(BOOST_RV_REF(counter));
+	counter& operator=(counter &&);
 };
 
 int counter::default_constructions = 0;
@@ -104,11 +104,11 @@ void test_by_const_lvalue_ref()
 	counter::print();
 }
 
-void f_rvalue_ref(BOOST_RV_REF(counter)){}
+void f_rvalue_ref(counter &&){}
 
 void test_by_rvalue_ref()
 {
-    hpx::util::function_nonser<void(BOOST_RV_REF(counter))> f = f_rvalue_ref;
+    hpx::util::function_nonser<void(counter &&)> f = f_rvalue_ref;
     
 	counter::reset();
 

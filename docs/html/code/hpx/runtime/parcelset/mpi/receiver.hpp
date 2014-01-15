@@ -10,7 +10,7 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
-#include <boost/move/move.hpp>
+#include <utility>
 #include <boost/noncopyable.hpp>
 
 #include <vector>

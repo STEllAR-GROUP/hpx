@@ -32,14 +32,14 @@ namespace hpx { namespace components { namespace stubs
                 action_type;
             //using namespace boost::archive::detail::extra_detail;
             //init_guid<hpx::actions::transfer_action<action_type> >::g.initialize();
-            return hpx::async<action_type>(target_id, boost::move(f));
+            return hpx::async<action_type>(target_id, std::move(f));
         }
 
         template <typename F>
         static typename F::result_type
         apply(naming::id_type const & target_id, F f)
         {
-            return apply_async(target_id, boost::move(f)).get();
+            return apply_async(target_id, std::move(f)).get();
         }
 
         template <typename F>

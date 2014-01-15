@@ -736,7 +736,6 @@ static void test_move_semantics()
     HPX_TEST(!f1.empty());
     HPX_TEST(global_int == 1);
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     // Testing rvalue constructors
     f1_type f2(static_cast<f1_type&&>(f1));
     HPX_TEST(f1.empty());
@@ -778,8 +777,6 @@ static void test_move_semantics()
     HPX_TEST(global_int == 5);
     f4 = static_cast<f1_type&&>(f5);
     HPX_TEST(global_int == 4);
-
-#endif
 }
 
 int main(int, char* [])
