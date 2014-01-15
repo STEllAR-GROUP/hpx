@@ -760,7 +760,8 @@ namespace hpx { namespace threads { namespace policies
                 if (test(steals_in_numa_domain_, num_thread))
 #endif
                 {
-                    mask_cref_type numa_domain = numa_domain_masks_[num_thread];
+                    mask_cref_type numa_domain_mask =
+                        numa_domain_masks_[num_thread];
                     for (std::size_t i = 0; i < queues_size; ++i)
                     {
                         if (i == num_thread ||
@@ -798,7 +799,7 @@ namespace hpx { namespace threads { namespace policies
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
                 // if nothing found, ask everybody else
                 if (test(steals_outside_numa_domain_, num_thread)) {
-                    mask_cref_type numa_domain =
+                    mask_cref_type numa_domain_mask =
                         outside_numa_domain_masks_[num_thread];
                     for (std::size_t i = 0; i < queues_size; ++i)
                     {
