@@ -199,12 +199,14 @@ namespace hpx { namespace util { namespace coroutines
     }
 #endif
 
-    //template <typename Functor>
-    //void rebind(Functor f, thread_id_repr_type id = 0)
-    //{
-    //    HPX_ASSERT(exited());
-    //    impl_type::rebind(m_pimpl, f, id);
-    //}
+    template <typename Functor>
+    void rebind(BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+        thread_id_repr_type id = 0)
+    {
+        HPX_ASSERT(exited());
+        impl_type::rebind(m_pimpl.get(), boost::forward<Functor>(f),
+            boost::move(target), id);
+    }
 
     //void reset()
     //{

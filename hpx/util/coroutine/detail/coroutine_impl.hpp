@@ -55,7 +55,7 @@
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
   /////////////////////////////////////////////////////////////////////////////
-  // This class augment the contest_base class with
+  // This class augment the context_base class with
   // the coroutine signature type.
   // This is mostly just a place to put
   // typesafe argument and result type pointers.
@@ -92,6 +92,10 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     static inline type* create(BOOST_FWD_REF(Functor),
         BOOST_RV_REF(naming::id_type) target, thread_id_repr_type = 0,
         std::ptrdiff_t = default_stack_size);
+
+    template <typename Functor>
+    static inline void rebind(type* p, BOOST_FWD_REF(Functor),
+        BOOST_RV_REF(naming::id_type) target, thread_id_repr_type = 0);
 
 #if HPX_COROUTINE_ARG_MAX > 1
     result_slot_type * result() {
@@ -455,7 +459,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         this->rebind_stack();     // count how often a coroutines object was reused
         m_fun = boost::forward<Functor>(f);
         target_ = boost::move(target);
-        this->super_type::rebind(id);
+        this->super_type::rebind_base(id);
     }
 
     // the memory for the threads is managed by a lockfree caching_freelist
@@ -477,6 +481,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     static heap_type& get_heap(std::size_t i, ptrdiff_t stacksize)
     {
+        // FIXME: This should check the sizes in runtime_configuration, not the
+        // default macro sizes
         if (stacksize > HPX_MEDIUM_STACK_SIZE) {
             if (stacksize > HPX_LARGE_STACK_SIZE)
                 return get_heap<HPX_COROUTINE_NUM_HEAPS/4, heap_tag_huge>(i % (HPX_COROUTINE_NUM_HEAPS/4)); //-V112
@@ -560,6 +566,23 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       // if we reuse an existing  object, we need to rebind its function
       wrapper->rebind(boost::forward<Functor>(f), boost::move(target), id);
       return wrapper;
+  }
+
+  template<typename CoroutineType, typename ContextImpl, template <typename> class Heap>
+  template<typename Functor>
+  inline void coroutine_impl<CoroutineType, ContextImpl, Heap>::
+      rebind(typename coroutine_impl<CoroutineType, ContextImpl, Heap>::type* p,
+        BOOST_FWD_REF(Functor) f, BOOST_RV_REF(naming::id_type) target,
+        thread_id_repr_type id)
+  {
+      typedef typename hpx::util::decay<Functor>::type functor_type;
+
+      typedef coroutine_impl_wrapper<
+          functor_type, CoroutineType, ContextImpl, Heap> wrapper_type;
+
+      wrapper_type* wrapper = static_cast<wrapper_type*>(p);
+
+      wrapper->rebind(boost::forward<Functor>(f), boost::move(target), id);
   }
 
   template<typename Functor, typename CoroutineType, typename ContextImpl,
