@@ -11,7 +11,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
-#include <hpx/util/add_rvalue_reference.hpp>
 #include <hpx/util/polymorphic_factory.hpp>
 #include <hpx/util/demangle_helper.hpp>
 #include <hpx/util/move.hpp>
@@ -139,7 +138,7 @@ namespace boost { namespace serialization {
 }}
 
 #define BOOST_UTIL_DETAIL_VTABLE_PTR_BASE_ADD_RVALUE_REF(Z, N, D)               \
-    typename util::add_rvalue_reference<BOOST_PP_CAT(D, N)>::type               \
+    BOOST_PP_CAT(D, N) &&                                                       \
     /**/
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)

@@ -131,7 +131,6 @@ namespace boost { namespace fusion
 
 ///////////////////////////////////////////////////////////////////////////////
 /// hpx_tuple_iterator.hpp
-#include <hpx/util/add_lvalue_reference.hpp>
 #include <boost/fusion/iterator/iterator_facade.hpp>
 #include <boost/mpl/int.hpp>
 
@@ -177,9 +176,7 @@ namespace boost { namespace fusion
                   , typename Iterator::tuple_type
                 >::type
                 element;
-            typedef typename
-                hpx::util::add_lvalue_reference<element>::type
-                type;
+            typedef element& type;
 
             static type call(Iterator const& iter)
             {
@@ -230,7 +227,6 @@ namespace boost { namespace fusion
 
 ///////////////////////////////////////////////////////////////////////////////
 /// at_impl.hpp
-#include <hpx/util/add_lvalue_reference.hpp>
 
 namespace boost { namespace fusion
 {
@@ -248,9 +244,7 @@ namespace boost { namespace fusion
                 typedef typename 
                     hpx::util::tuple_element<I::value, Sequence>::type
                     element;
-                typedef typename
-                    hpx::util::add_lvalue_reference<element>::type
-                    type;
+                typedef element& type;
 
                 static type call(Sequence& seq)
                 {

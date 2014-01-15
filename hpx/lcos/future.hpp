@@ -80,17 +80,17 @@ namespace hpx { namespace lcos { namespace detail
     template <typename Future>
     struct shared_state_ptr_for
     {};
-    
+
     template <typename Future>
     struct shared_state_ptr_for<Future const>
       : shared_state_ptr_for<Future>
     {};
-    
+
     template <typename Future>
     struct shared_state_ptr_for<Future&>
       : shared_state_ptr_for<Future>
     {};
-    
+
     template <typename Future>
     struct shared_state_ptr_for<Future &&>
       : shared_state_ptr_for<Future>
@@ -1364,7 +1364,7 @@ namespace hpx { namespace lcos
     {
         typedef typename util::detail::decay_unwrap<Result>::type result_type;
         typedef lcos::detail::future_data<result_type> shared_state;
-        
+
         boost::intrusive_ptr<shared_state> p(new shared_state());
         p->set_result(std::forward<Result>(init));
 
@@ -1771,7 +1771,7 @@ namespace hpx { namespace actions
             LLCO_(info)
                 << "typed_continuation<lcos::unique_future<R> >::trigger("
                 << this->get_gid() << ")";
-            
+
             typedef boost::mpl::bool_<boost::is_void<R>::value> predicate;
 
             // if the future is ready, send the result back immediately
@@ -1901,7 +1901,7 @@ namespace hpx { namespace actions
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
                 << this->get_gid() << ")";
-            
+
             typedef boost::mpl::bool_<boost::is_void<R>::value> predicate;
 
             // if the future is ready, send the result back immediately

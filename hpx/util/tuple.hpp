@@ -12,10 +12,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/util/decay.hpp>
-#include <hpx/util/add_lvalue_reference.hpp>
-#include <hpx/util/add_rvalue_reference.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/remove_reference.hpp>
 #include <hpx/util/serialize_sequence.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/detail/qualify_as.hpp>
@@ -197,7 +194,7 @@ namespace hpx { namespace util
         struct are_tuples_compatible<
             tuple<>, UTuple
           , typename boost::enable_if_c<
-                tuple_size<typename remove_reference<UTuple>::type>::value == 0
+                tuple_size<typename boost::remove_reference<UTuple>::type>::value == 0
             >::type
         > : boost::mpl::true_
         {};
@@ -479,10 +476,7 @@ namespace hpx { namespace util
 
             template <typename TTuple, typename UTuple>
             static BOOST_FORCEINLINE
-            typename detail::qualify_as<
-                type
-              , typename add_rvalue_reference<TTuple>::type
-            >::type
+            typename detail::qualify_as<type, TTuple&&>::type
             call(TTuple && t, UTuple && u)
             {
                 return util::get<I>(std::forward<TTuple>(t));
@@ -510,10 +504,7 @@ namespace hpx { namespace util
 
             template <typename TTuple, typename UTuple>
             static BOOST_FORCEINLINE
-            typename detail::qualify_as<
-                type
-              , typename add_rvalue_reference<UTuple>::type
-            >::type
+            typename detail::qualify_as<type, UTuple&&>::type
             call(TTuple && t, UTuple && u)
             {
                 return util::get<I - offset>(std::forward<UTuple>(u));
@@ -578,7 +569,7 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 0
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 0
       , tuple<>
     >::type
     tuple_cat(Tuple && t)
@@ -589,8 +580,8 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 0
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 0
       , tuple<>
     >::type
     tuple_cat(TTuple && /*t*/, UTuple && /*u*/)
@@ -904,7 +895,7 @@ namespace hpx { namespace util
             tuple<BOOST_PP_ENUM_PARAMS(N, T)>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<BOOST_PP_ENUM_PARAMS(N, T)> >::value == N
-             && tuple_size<typename remove_reference<UTuple>::type>::value == N
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == N
             >::type
         >
         {
@@ -958,19 +949,17 @@ namespace hpx { namespace util
         // explicit constexpr tuple(const Types&...);
         // Initializes each element with the value of the corresponding
         // parameter.
-#       define HPX_UTIL_TUPLE_CONST_LV_PARAM(Z, N, D)                         \
-        typename add_lvalue_reference<                                        \
-            typename boost::add_const<BOOST_PP_CAT(T, N)>::type               \
-        >::type BOOST_PP_CAT(v, N)                                            \
+#       define HPX_UTIL_TUPLE_CONST_LVREF_PARAM(Z, N, D)                      \
+        BOOST_PP_CAT(T, N) const& BOOST_PP_CAT(v, N)                          \
         /**/
 #       define HPX_UTIL_TUPLE_COPY_CONSTRUCT(Z, N, D)                         \
         BOOST_PP_CAT(_m, N)(BOOST_PP_CAT(v, N))                               \
         /**/
         BOOST_CONSTEXPR explicit tuple(
-            BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CONST_LV_PARAM, _)
+            BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CONST_LVREF_PARAM, _)
         ) : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_COPY_CONSTRUCT, _)
         {}
-#       undef HPX_UTIL_TUPLE_CONST_LV_PARAM
+#       undef HPX_UTIL_TUPLE_CONST_LVREF_PARAM
 #       undef HPX_UTIL_TUPLE_COPY_CONSTRUCT
 
         // template <class... UTypes>
@@ -993,18 +982,13 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<BOOST_PP_ENUM_PARAMS(N, U)>
-                    >::type
+                  , tuple<BOOST_PP_ENUM_PARAMS(N, U)>&&
                 >::value
 #       if N == 1
              && !boost::is_base_of<
-                    tuple, typename remove_reference<U0>::type
+                    tuple, typename boost::remove_reference<U0>::type
                  >::value
-             && !detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<U0>::type
-                >::value
+             && !detail::are_tuples_compatible<tuple, U0&&>::value
 #       endif
             >::type* = 0
         ) : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_FORWARD_CONSTRUCT, _)
@@ -1048,10 +1032,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_GET_CONSTRUCT, _)
         {}
@@ -1122,7 +1103,7 @@ namespace hpx { namespace util
         /**/
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == N
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == N
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -1220,7 +1201,7 @@ namespace hpx { namespace util
     // references to temporary variables, a program shall ensure that the
     // return value of this function does not outlive any of its arguments.
 #   define HPX_UTIL_FORWARD_AS_TUPLE_ELEMENT(Z, N, D)                         \
-    typename add_rvalue_reference<BOOST_PP_CAT(T, N)>::type                   \
+    BOOST_PP_CAT(T, N) &&                                                     \
     /**/
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     BOOST_FORCEINLINE
@@ -1237,7 +1218,7 @@ namespace hpx { namespace util
     // template<class... Types>
     // tuple<Types&...> tie(Types&... t) noexcept;
 #   define HPX_UTIL_TIE_ELEMENT(Z, N, D)                                      \
-    typename util::add_lvalue_reference<BOOST_PP_CAT(T, N)>::type             \
+    BOOST_PP_CAT(T, N) &                                                      \
     /**/
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     BOOST_FORCEINLINE
@@ -1291,21 +1272,21 @@ namespace hpx { namespace util
     }
 
 #   define HPX_UTIL_TUPLE_CAT_ELEMENT_CALL(Z, N, D)                           \
-    util::get<N>(std::forward<Tuple>(t))                                    \
+    util::get<N>(std::forward<Tuple>(t))                                      \
     /**/
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == N
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == N
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CAT_ELEMENT_CALL, _)
             );
@@ -1315,26 +1296,26 @@ namespace hpx { namespace util
 #   define HPX_UTIL_TUPLE_CAT_ELEMENT_CALL(Z, N, D)                           \
     detail::tuple_cat_element<                                                \
         N                                                                     \
-      , typename remove_reference<TTuple>::type                               \
-      , typename remove_reference<UTuple>::type                               \
-    >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))             \
+      , typename boost::remove_reference<TTuple>::type                        \
+      , typename boost::remove_reference<UTuple>::type                        \
+    >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))                 \
     /**/
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == N
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == N
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
                 BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_CAT_ELEMENT_CALL, _)
             );
@@ -1343,13 +1324,13 @@ namespace hpx { namespace util
 
 #   if N > 2
 #   define HPX_UTIL_TUPLE_CAT_RESULT_ELEMENT(Z, N, D)                         \
-    typename remove_reference<BOOST_PP_CAT(T, N)>::type                       \
+    typename boost::remove_reference<BOOST_PP_CAT(T, N)>::type                \
     /**/
 #   define HPX_UTIL_TUPLE_CAT(Z, N, D)                                        \
     BOOST_PP_COMMA_IF(N) util::tuple_cat(                                     \
-        std::forward<BOOST_PP_CAT(T, BOOST_PP_MUL(N, 2))>                   \
+        std::forward<BOOST_PP_CAT(T, BOOST_PP_MUL(N, 2))>                     \
             (BOOST_PP_CAT(t, BOOST_PP_MUL(N, 2)))                             \
-      , std::forward<BOOST_PP_CAT(T, BOOST_PP_INC(BOOST_PP_MUL(N, 2)))>     \
+      , std::forward<BOOST_PP_CAT(T, BOOST_PP_INC(BOOST_PP_MUL(N, 2)))>       \
             (BOOST_PP_CAT(t, BOOST_PP_INC(BOOST_PP_MUL(N, 2)))))              \
     /**/
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>

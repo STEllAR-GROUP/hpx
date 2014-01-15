@@ -7,8 +7,6 @@
 #ifndef HPX_UTIL_DECAY_HPP
 #define HPX_UTIL_DECAY_HPP
 
-#include <hpx/util/remove_reference.hpp>
-
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/ref.hpp>
@@ -18,13 +16,14 @@
 #include <boost/type_traits/remove_bounds.hpp>
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/type_traits/remove_cv.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 
 namespace hpx { namespace util
 {
     template <typename T>
     struct decay
     {
-        typedef typename util::remove_reference<T>::type Ty;
+        typedef typename boost::remove_reference<T>::type Ty;
 
         typedef
             typename boost::mpl::eval_if<

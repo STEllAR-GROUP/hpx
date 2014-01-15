@@ -13,7 +13,6 @@
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/traits/is_placeholder.hpp>
-#include <hpx/util/add_rvalue_reference.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/invoke.hpp>
@@ -88,12 +87,10 @@ namespace hpx { namespace util
         struct bind_eval_placeholder_impl
         {
             typedef
-                typename util::add_rvalue_reference<
-                    typename util::tuple_element<
-                        I
-                      , typename util::decay<UnboundArgs>::type
-                    >::type
-                >::type
+                typename util::tuple_element<
+                    I
+                  , typename util::decay<UnboundArgs>::type
+                >::type&&
                 type;
 
             template <typename T>
@@ -421,7 +418,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<>
@@ -618,7 +615,7 @@ namespace hpx { namespace util
     /**/
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename T)>
     typename boost::disable_if_c<
-        traits::is_action<typename util::remove_reference<F>::type>::value
+        traits::is_action<typename boost::remove_reference<F>::type>::value
       , detail::bound<
             typename util::decay<F>::type
           , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_BIND_DECAY, _)>

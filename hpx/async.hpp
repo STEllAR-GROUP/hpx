@@ -18,8 +18,6 @@
 #include <hpx/traits/is_callable.hpp>
 
 #include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
