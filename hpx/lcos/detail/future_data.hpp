@@ -86,12 +86,6 @@ namespace detail
         typedef Result type;
     };
 
-    template <typename Result>
-    struct future_data_result<Result&>
-    {
-        typedef Result* type;
-    };
-
     template <>
     struct future_data_result<void>
     {
@@ -460,7 +454,7 @@ namespace detail
 
         void set_data(result_type const& value)
         {
-            this->base_type::set_data(value);
+            this->base_type::set_result(value);
         }
 
         template <typename TimeSpec, typename Result_>
@@ -642,7 +636,7 @@ namespace detail
         void set_data(T && result)
         {
             HPX_ASSERT(started_);
-            this->future_data<Result>::set_data(std::forward<T>(result));
+            this->future_data<Result>::set_result(std::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)

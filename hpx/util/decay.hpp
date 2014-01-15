@@ -9,6 +9,9 @@
 
 #include <hpx/util/remove_reference.hpp>
 
+#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/identity.hpp>
+#include <boost/ref.hpp>
 #include <boost/type_traits/config.hpp>
 #include <boost/type_traits/is_array.hpp>
 #include <boost/type_traits/is_function.hpp>
@@ -16,10 +19,8 @@
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/identity.hpp>
-
-namespace hpx { namespace util {
+namespace hpx { namespace util
+{
     template <typename T>
     struct decay
     {
@@ -37,6 +38,21 @@ namespace hpx { namespace util {
             >::type
             type;
     };
+
+    namespace detail
+    {
+        template <typename T, typename TD = typename decay<T>::type>
+        struct decay_unwrap
+        {
+            typedef TD type;
+        };
+
+        template <typename T, typename U>
+        struct decay_unwrap<T, boost::reference_wrapper<U> >
+        {
+            typedef U& type;
+        };
+    }
 }}
 
 #endif

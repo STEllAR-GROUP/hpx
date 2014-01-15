@@ -24,7 +24,6 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_trailing_params.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
-#include <boost/ref.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -33,19 +32,6 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename TD = typename util::decay<T>::type>
-        struct deferred_call_decay
-        {
-            typedef TD type;
-        };
-
-        template <typename T, typename U>
-        struct deferred_call_decay<T, boost::reference_wrapper<U> >
-        {
-            typedef U& type;
-        };
-
         ///////////////////////////////////////////////////////////////////////
         template <typename F, typename Args>
         class deferred_call_impl
@@ -73,7 +59,7 @@ namespace hpx { namespace util
               , _args(std::move(other._args))
             {}
 
-            typedef 
+            typedef
                 typename util::invoke_fused_result_of<F(Args)>::type
                 result_type;
 
@@ -88,7 +74,7 @@ namespace hpx { namespace util
             Args _args;
         };
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
     struct deferred_call_result_of
@@ -174,31 +160,31 @@ namespace boost { namespace serialization
 
 namespace hpx { namespace util
 {
-#   define HPX_UTIL_DEFERRED_CALL_DECAY(Z, N, D)                              \
-    typename detail::deferred_call_decay<BOOST_PP_CAT(T, N)>::type            \
+#   define HPX_UTIL_DECAY_UNWRAP(Z, N, D)                                     \
+    typename detail::decay_unwrap<BOOST_PP_CAT(T, N)>::type                   \
     /**/
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename T)>
     struct deferred_call_result_of<F(BOOST_PP_ENUM_PARAMS(N, T))>
       : util::result_of<typename util::decay<F>::type(
-            BOOST_PP_ENUM(N, HPX_UTIL_DEFERRED_CALL_DECAY, _))>
+            BOOST_PP_ENUM(N, HPX_UTIL_DECAY_UNWRAP, _))>
     {};
 
     template <typename F, BOOST_PP_ENUM_PARAMS(N, typename T)>
     detail::deferred_call_impl<
         typename util::decay<F>::type
-      , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_DEFERRED_CALL_DECAY, _)>
+      , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_DECAY_UNWRAP, _)>
     >
     deferred_call(F && f, HPX_ENUM_FWD_ARGS(N, T, t))
     {
         typedef detail::deferred_call_impl<
             typename util::decay<F>::type
-          , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_DEFERRED_CALL_DECAY, _)>
+          , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_DECAY_UNWRAP, _)>
         > result_type;
 
         return result_type(std::forward<F>(f)
           , util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, T, t)));
     }
-#   undef HPX_UTIL_DEFERRED_CALL_DECAY
+#   undef HPX_UTIL_DECAY_UNWRAP
 }}
 
 #undef N
