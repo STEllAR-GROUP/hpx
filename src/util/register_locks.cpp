@@ -29,6 +29,7 @@ namespace hpx { namespace util
 
         struct tls_tag {};
         static hpx::util::thread_specific_ptr<held_locks_map, tls_tag> held_locks_;
+        static hpx::util::thread_specific_ptr<std::size_t, tls_tag> held_lock_count_;
 
         static bool lock_detection_enabled_;
 
@@ -42,10 +43,24 @@ namespace hpx { namespace util
             HPX_ASSERT(NULL != held_locks_.get());
             return *held_locks_.get();
         }
+
+        static std::size_t& get_lock_count()
+        {
+            if(NULL == held_lock_count_.get())
+            {
+                held_lock_count_.reset(new std::size_t);
+                *held_lock_count_.get() = 0;
+            }
+
+            HPX_ASSERT(NULL != held_lock_count_.get());
+            return *held_lock_count_.get();
+        }
     };
 
     hpx::util::thread_specific_ptr<register_locks::held_locks_map, register_locks::tls_tag>
         register_locks::held_locks_;
+    hpx::util::thread_specific_ptr<std::size_t, register_locks::tls_tag>
+        register_locks::held_lock_count_;
     bool register_locks::lock_detection_enabled_ = false;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -57,6 +72,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     bool register_lock(void const* lock, util::register_lock_data* data)
     {
+        ++register_locks::get_lock_count();
         if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
@@ -81,6 +97,8 @@ namespace hpx { namespace util
     // unregister the given lock from this HPX-thread
     bool unregister_lock(void const* lock)
     {
+        HPX_ASSERT(register_locks::get_lock_count() > 0);
+        --register_locks::get_lock_count();
         if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
@@ -106,6 +124,7 @@ namespace hpx { namespace util
             // we create a log message if there are still registered locks for
             // this OS-thread
             if (!held_locks.empty()) {
+                std::cout << "locks held when suspending" << std::endl;
                 std::string back_trace(hpx::detail::backtrace_direct());
                 if (back_trace.empty()) {
                     LERR_(debug)
@@ -113,10 +132,12 @@ namespace hpx { namespace util
                            "(stack backtrace was disabled at compile time)";
                 }
                 else {
+                    std::cout << back_trace << std::endl;
                     LERR_(debug)
                         << "suspending thread while at least one lock is being held, "
                         << "stack backtrace: " << back_trace;
                 }
+                HPX_ASSERT(false);
             }
         }
     }
@@ -142,13 +163,37 @@ namespace hpx { namespace util
 //        }
     }
 #else
+    struct register_locks
+    {
+        struct tls_tag {};
+        static hpx::util::thread_specific_ptr<std::size_t, tls_tag> held_lock_count_;
+
+        static std::size_t& get_lock_count()
+        {
+            if(NULL == held_lock_count_.get())
+            {
+                held_lock_count_.reset(new std::size_t);
+                *held_lock_count_.get() = 0;
+            }
+
+            HPX_ASSERT(NULL != held_lock_count_.get());
+            return *held_lock_count_.get();
+        }
+    };
+
+    hpx::util::thread_specific_ptr<std::size_t, register_locks::tls_tag>
+        register_locks::held_lock_count_;
+
     bool register_lock(void const*, util::register_lock_data*)
     {
+        ++register_locks::get_lock_count();
         return true;
     }
 
     bool unregister_lock(void const*)
     {
+        HPX_ASSERT(register_locks::get_lock_count() > 0);
+        --register_locks::get_lock_count();
         return true;
     }
 
@@ -160,6 +205,11 @@ namespace hpx { namespace util
     {
     }
 #endif
+
+    std::size_t registered_lock_count()
+    {
+        return register_locks::get_lock_count();
+    }
 }}
 
 
