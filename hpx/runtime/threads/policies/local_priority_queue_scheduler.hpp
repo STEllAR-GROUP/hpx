@@ -383,19 +383,23 @@ namespace hpx { namespace threads { namespace policies
                 mask_cref_type numa_domain = outside_numa_domain_masks_[num_thread];
     
                 // steal thread from other queue
-                for (std::size_t i = 0; i < queues_size; ++i) {
-                    if (i == num_thread)
-                        continue;         // don't steal from ourselves
-                    if (!test(this_numa_domain, i) && !test(numa_domain, i))
+                for (std::size_t i = 1; i < queues_size; ++i)
+                {
+                    // FIXME: Do a better job here.
+                    std::size_t const idx = (i + num_thread) % queues_size;
+
+                    HPX_ASSERT(idx != num_thread);
+
+                    if (!test(this_numa_domain, idx) && !test(numa_domain, idx))
                         continue;
 
-                    if (i < high_priority_queues_.size())
+                    if (idx < high_priority_queues_.size())
                     {
-                        bool result = high_priority_queues_[i]->
+                        bool result = high_priority_queues_[idx]->
                             get_next_thread(thrd, num_thread);
                         if (result)
                         {
-                            high_priority_queues_[i]->
+                            high_priority_queues_[idx]->
                                 increment_num_stolen_from_pending();
                             high_priority_queues_[num_thread]->
                                 increment_num_stolen_to_pending();
@@ -403,9 +407,9 @@ namespace hpx { namespace threads { namespace policies
                         }
                     }
     
-                    if (queues_[i]->get_next_thread(thrd, num_thread))
+                    if (queues_[idx]->get_next_thread(thrd, num_thread))
                     {
-                        queues_[i]->increment_num_stolen_from_pending();
+                        queues_[idx]->increment_num_stolen_from_pending();
                         queues_[num_thread]->increment_num_stolen_to_pending();
                         return true;
                     }
@@ -762,22 +766,24 @@ namespace hpx { namespace threads { namespace policies
                 {
                     mask_cref_type numa_domain_mask =
                         numa_domain_masks_[num_thread];
-                    for (std::size_t i = 0; i < queues_size; ++i)
+                    for (std::size_t i = 1; i < queues_size; ++i)
                     {
-                        if (i == num_thread ||
-                            !test(numa_domain_mask, topology_.get_pu_number(i)))
-                        {
-                            continue;
-                        }
+                        // FIXME: Do a better job here.
+                        std::size_t const idx = (i + num_thread) % queues_size;
 
-                        if (i < high_priority_queues_.size())
+                        HPX_ASSERT(idx != num_thread);
+
+                        if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                            continue;
+
+                        if (idx < high_priority_queues_.size())
                         {
                             result = high_priority_queues_[num_thread]->
                                 wait_or_add_new(num_thread, running, idle_loop_count,
-                                    added, high_priority_queues_[i]) && result;
+                                    added, high_priority_queues_[idx]) && result;
                             if (0 != added)
                             {
-                                high_priority_queues_[i]->
+                                high_priority_queues_[idx]->
                                     increment_num_stolen_from_staged(added);
                                 high_priority_queues_[num_thread]->
                                     increment_num_stolen_to_staged(added);
@@ -786,10 +792,10 @@ namespace hpx { namespace threads { namespace policies
                         }
     
                         result = queues_[num_thread]->wait_or_add_new(num_thread,
-                            running, idle_loop_count, added, queues_[i]) && result;
+                            running, idle_loop_count, added, queues_[idx]) && result;
                         if (0 != added)
                         {
-                            queues_[i]->increment_num_stolen_from_staged(added);
+                            queues_[idx]->increment_num_stolen_from_staged(added);
                             queues_[num_thread]->increment_num_stolen_to_staged(added);
                             return result;
                         }
@@ -801,22 +807,24 @@ namespace hpx { namespace threads { namespace policies
                 if (test(steals_outside_numa_domain_, num_thread)) {
                     mask_cref_type numa_domain_mask =
                         outside_numa_domain_masks_[num_thread];
-                    for (std::size_t i = 0; i < queues_size; ++i)
+                    for (std::size_t i = 1; i < queues_size; ++i)
                     {
-                        if (i == num_thread ||
-                            !test(numa_domain_mask, topology_.get_pu_number(i)))
-                        {
-                            continue;
-                        }
+                        // FIXME: Do a better job here.
+                        std::size_t const idx = (i + num_thread) % queues_size;
 
-                        if (i < high_priority_queues_.size())
+                        HPX_ASSERT(idx != num_thread);
+
+                        if (!test(numa_domain_mask, topology_.get_pu_number(idx)))
+                            continue;
+
+                        if (idx < high_priority_queues_.size())
                         {
                             result = high_priority_queues_[num_thread]->
                                 wait_or_add_new(num_thread, running, idle_loop_count,
-                                    added, high_priority_queues_[i]) && result;
+                                    added, high_priority_queues_[idx]) && result;
                             if (0 != added)
                             {
-                                high_priority_queues_[i]->
+                                high_priority_queues_[idx]->
                                     increment_num_stolen_from_staged(added);
                                 high_priority_queues_[num_thread]->
                                     increment_num_stolen_to_staged(added);
@@ -825,10 +833,10 @@ namespace hpx { namespace threads { namespace policies
                         }
     
                         result = queues_[num_thread]->wait_or_add_new(num_thread,
-                            running, idle_loop_count, added, queues_[i]) && result;
+                            running, idle_loop_count, added, queues_[idx]) && result;
                         if (0 != added)
                         {
-                            queues_[i]->increment_num_stolen_from_staged(added);
+                            queues_[idx]->increment_num_stolen_from_staged(added);
                             queues_[num_thread]->increment_num_stolen_to_staged(added);
                             return result;
                         }
