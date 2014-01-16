@@ -15,7 +15,6 @@
 #include <hpx/traits/is_action.hpp>
 #include <hpx/traits/is_bind_expression.hpp>
 #include <hpx/traits/is_placeholder.hpp>
-#include <hpx/util/add_rvalue_reference.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
@@ -146,7 +145,7 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     typename boost::enable_if_c<
-        traits::is_action<typename util::remove_reference<Action>::type>::value
+        traits::is_action<typename boost::remove_reference<Action>::type>::value
       , detail::bound_action<
             typename util::decay<Action>::type
           , util::tuple<>
@@ -332,7 +331,7 @@ namespace hpx { namespace util
     /**/
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename T)>
     typename boost::enable_if_c<
-        traits::is_action<typename util::remove_reference<Action>::type>::value
+        traits::is_action<typename boost::remove_reference<Action>::type>::value
       , detail::bound_action<
             typename util::decay<Action>::type
           , util::tuple<BOOST_PP_ENUM(N, HPX_UTIL_BIND_DECAY, _)>

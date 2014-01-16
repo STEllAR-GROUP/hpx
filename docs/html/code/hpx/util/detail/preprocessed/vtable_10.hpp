@@ -72,7 +72,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0)
+                , A0 && a0)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ));
@@ -107,7 +107,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1)
+                , A0 && a0 , A1 && a1)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ));
@@ -142,7 +142,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2)
+                , A0 && a0 , A1 && a1 , A2 && a2)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ));
@@ -177,7 +177,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3)
+                , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ));
@@ -212,7 +212,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4)
+                , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ));
@@ -247,7 +247,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5)
+                , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ));
@@ -282,7 +282,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6)
+                , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ));
@@ -317,7 +317,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7)
+                , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ));
@@ -352,7 +352,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8)
+                , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ));
@@ -387,7 +387,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8 , typename util::add_rvalue_reference<A9>::type a9)
+                , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ));
@@ -422,7 +422,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8 , typename util::add_rvalue_reference<A9>::type a9 , typename util::add_rvalue_reference<A10>::type a10)
+                , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ));
@@ -457,7 +457,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8 , typename util::add_rvalue_reference<A9>::type a9 , typename util::add_rvalue_reference<A10>::type a10 , typename util::add_rvalue_reference<A11>::type a11)
+                , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ));
@@ -492,7 +492,7 @@
             }
             BOOST_FORCEINLINE static R
             invoke(void ** f
-                , typename util::add_rvalue_reference<A0>::type a0 , typename util::add_rvalue_reference<A1>::type a1 , typename util::add_rvalue_reference<A2>::type a2 , typename util::add_rvalue_reference<A3>::type a3 , typename util::add_rvalue_reference<A4>::type a4 , typename util::add_rvalue_reference<A5>::type a5 , typename util::add_rvalue_reference<A6>::type a6 , typename util::add_rvalue_reference<A7>::type a7 , typename util::add_rvalue_reference<A8>::type a8 , typename util::add_rvalue_reference<A9>::type a9 , typename util::add_rvalue_reference<A10>::type a10 , typename util::add_rvalue_reference<A11>::type a11 , typename util::add_rvalue_reference<A12>::type a12)
+                , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12)
             {
                 return util::invoke_r<R>((*reinterpret_cast<Functor*>(f))
                     , std::forward<A0>( a0 ) , std::forward<A1>( a1 ) , std::forward<A2>( a2 ) , std::forward<A3>( a3 ) , std::forward<A4>( a4 ) , std::forward<A5>( a5 ) , std::forward<A6>( a6 ) , std::forward<A7>( a7 ) , std::forward<A8>( a8 ) , std::forward<A9>( a9 ) , std::forward<A10>( a10 ) , std::forward<A11>( a11 ) , std::forward<A12>( a12 ));

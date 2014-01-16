@@ -18,8 +18,6 @@
 #include <hpx/traits/is_callable.hpp>
 
 #include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -43,7 +41,22 @@ namespace hpx { namespace detail
 #endif
 
     template <typename F>
-    BOOST_FORCEINLINE typename detail::create_future<F()>::type
+    BOOST_FORCEINLINE
+    typename boost::lazy_enable_if<
+        boost::is_reference<typename util::deferred_call_result_of<F()>::type>
+      , detail::create_future<F()>
+    >::type
+    call_sync(F && f, boost::mpl::false_)
+    {
+        return lcos::make_ready_future(boost::ref(f()));
+    }
+    
+    template <typename F>
+    BOOST_FORCEINLINE
+    typename boost::lazy_disable_if<
+        boost::is_reference<typename util::deferred_call_result_of<F()>::type>
+      , detail::create_future<F()>
+    >::type
     call_sync(F && f, boost::mpl::false_)
     {
         return lcos::make_ready_future(f());

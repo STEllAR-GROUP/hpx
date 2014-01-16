@@ -204,7 +204,7 @@ namespace hpx { namespace lcos
 
             std::vector<Future> lazy_values_;
             boost::atomic<std::size_t> ready_count_;
-            typename util::remove_reference<F>::type f_;
+            typename boost::remove_reference<F>::type f_;
             boost::atomic<std::size_t>* success_counter_;
         };
     }

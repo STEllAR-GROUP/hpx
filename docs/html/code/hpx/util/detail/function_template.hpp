@@ -13,7 +13,6 @@
 
 #include <hpx/util/portable_binary_iarchive.hpp>
 #include <hpx/util/portable_binary_oarchive.hpp>
-#include <hpx/util/remove_reference.hpp>
 #include <hpx/util/detail/vtable_ptr_base_fwd.hpp>
 #include <hpx/util/detail/vtable_ptr_fwd.hpp>
 #include <hpx/util/detail/serialization_registration.hpp>
@@ -39,6 +38,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/type_traits/is_member_pointer.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/or.hpp>
 
@@ -156,7 +156,7 @@ namespace hpx { namespace util
 
         template <typename Functor>
         function(
-            Functor && f
+            Functor f
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function
@@ -164,7 +164,7 @@ namespace hpx { namespace util
                 >::type
             >::type * = 0
         )
-            : base_type(std::forward<Functor>(f))
+            : base_type(std::move(f))
         {}
 
         function(function const & other)
@@ -177,7 +177,7 @@ namespace hpx { namespace util
 
         function& operator=(function const & t)
         {
-            this->base_type::operator=(t);
+            this->base_type::operator=(static_cast<base_type const &>(t));
             return *this;
         }
 
@@ -257,7 +257,7 @@ namespace hpx { namespace util
 
         template <typename Functor>
         function(
-            Functor && f
+            Functor f
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function
@@ -265,7 +265,7 @@ namespace hpx { namespace util
                 >::type
             >::type * = 0
         )
-            : base_type(std::forward<Functor>(f))
+            : base_type(std::move(f))
         {}
 
         function(function const & other)
@@ -278,7 +278,7 @@ namespace hpx { namespace util
 
         function& operator=(function const & t)
         {
-            this->base_type::operator=(t);
+            this->base_type::operator=(static_cast<base_type const &>(t));
             return *this;
         }
 
@@ -306,7 +306,7 @@ namespace hpx { namespace util
 
         template <typename Functor>
         function_nonser(
-            Functor && f
+            Functor f
           , typename ::boost::disable_if<
                 typename boost::is_same<
                     function_nonser
@@ -314,7 +314,7 @@ namespace hpx { namespace util
                 >::type
             >::type * = 0
         )
-            : base_type(std::forward<Functor>(f))
+            : base_type(std::move(f))
         {}
 
         function_nonser(function_nonser const & other)
@@ -327,7 +327,7 @@ namespace hpx { namespace util
 
         function_nonser& operator=(function_nonser const & t)
         {
-            this->base_type::operator=(t);
+            this->base_type::operator=(static_cast<base_type const &>(t));
             return *this;
         }
 

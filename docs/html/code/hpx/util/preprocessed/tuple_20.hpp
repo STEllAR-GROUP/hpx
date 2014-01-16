@@ -18,7 +18,7 @@ namespace hpx { namespace util
             tuple<T0>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0> >::value == 1
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 1
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 1
             >::type
         >
         {
@@ -50,7 +50,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0
+            T0 const& v0
         ) : _m0(v0)
         {}
         
@@ -66,17 +66,12 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0>
-                    >::type
+                  , tuple<U0>&&
                 >::value
              && !boost::is_base_of<
-                    tuple, typename remove_reference<U0>::type
+                    tuple, typename boost::remove_reference<U0>::type
                  >::value
-             && !detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<U0>::type
-                >::value
+             && !detail::are_tuples_compatible<tuple, U0&&>::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0))
         {}
@@ -103,10 +98,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other)))
         {}
@@ -136,7 +128,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 1
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 1
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -206,11 +198,11 @@ namespace hpx { namespace util
     
     template <typename T0>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type>
+    tuple<T0 &&>
     forward_as_tuple(T0 && v0) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type>(
+            tuple<T0 &&>(
                 std::forward<T0>( v0 )
             );
     }
@@ -218,11 +210,11 @@ namespace hpx { namespace util
     
     template <typename T0>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type>
+    tuple<T0 &>
     tie(T0 & v0) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type>(
+            tuple<T0 &>(
                 v0
             );
     }
@@ -244,16 +236,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 1
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 1
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t))
             );
@@ -261,21 +253,21 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 1
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 1
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
 }}
@@ -288,7 +280,7 @@ namespace hpx { namespace util
             tuple<T0 , T1>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1> >::value == 2
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 2
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 2
             >::type
         >
         {
@@ -320,7 +312,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1
+            T0 const& v0 , T1 const& v1
         ) : _m0(v0) , _m1(v1)
         {}
         
@@ -336,9 +328,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1>
-                    >::type
+                  , tuple<U0 , U1>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1))
@@ -366,10 +356,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other)))
         {}
@@ -399,7 +386,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 2
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 2
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -469,11 +456,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type>
+    tuple<T0 && , T1 &&>
     forward_as_tuple(T0 && v0 , T1 && v1) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type>(
+            tuple<T0 && , T1 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 )
             );
     }
@@ -481,11 +468,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type>
+    tuple<T0 & , T1 &>
     tie(T0 & v0 , T1 & v1) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type>(
+            tuple<T0 & , T1 &>(
                 v0 , v1
             );
     }
@@ -507,16 +494,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 2
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 2
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t))
             );
@@ -524,21 +511,21 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 2
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 2
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
 }}
@@ -551,7 +538,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2> >::value == 3
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 3
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 3
             >::type
         >
         {
@@ -583,7 +570,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2
+            T0 const& v0 , T1 const& v1 , T2 const& v2
         ) : _m0(v0) , _m1(v1) , _m2(v2)
         {}
         
@@ -599,9 +586,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2>
-                    >::type
+                  , tuple<U0 , U1 , U2>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2))
@@ -629,10 +614,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other)))
         {}
@@ -662,7 +644,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 3
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 3
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -732,11 +714,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type>
+    tuple<T0 && , T1 && , T2 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type>(
+            tuple<T0 && , T1 && , T2 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 )
             );
     }
@@ -744,11 +726,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type>
+    tuple<T0 & , T1 & , T2 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type>(
+            tuple<T0 & , T1 & , T2 &>(
                 v0 , v1 , v2
             );
     }
@@ -777,16 +759,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 3
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 3
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t))
             );
@@ -794,27 +776,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 3
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 3
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2)
     {
@@ -835,7 +817,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3> >::value == 4
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 4
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 4
             >::type
         >
         {
@@ -867,7 +849,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3)
         {}
         
@@ -883,9 +865,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3))
@@ -913,10 +893,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other)))
         {}
@@ -946,7 +923,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 4
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 4
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -1016,11 +993,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type>
+    tuple<T0 && , T1 && , T2 && , T3 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 )
             );
     }
@@ -1028,11 +1005,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type>
+    tuple<T0 & , T1 & , T2 & , T3 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 &>(
                 v0 , v1 , v2 , v3
             );
     }
@@ -1060,16 +1037,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 4
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 4
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t))
             );
@@ -1077,27 +1054,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 4
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 4
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3)
     {
@@ -1116,7 +1093,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4> >::value == 5
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 5
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 5
             >::type
         >
         {
@@ -1148,7 +1125,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4)
         {}
         
@@ -1164,9 +1141,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4))
@@ -1194,10 +1169,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other)))
         {}
@@ -1227,7 +1199,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 5
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 5
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -1297,11 +1269,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 )
             );
     }
@@ -1309,11 +1281,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 &>(
                 v0 , v1 , v2 , v3 , v4
             );
     }
@@ -1342,16 +1314,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 5
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 5
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t))
             );
@@ -1359,27 +1331,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 5
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 5
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4)
     {
@@ -1400,7 +1372,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5> >::value == 6
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 6
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 6
             >::type
         >
         {
@@ -1432,7 +1404,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5)
         {}
         
@@ -1448,9 +1420,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5))
@@ -1478,10 +1448,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other)))
         {}
@@ -1511,7 +1478,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 6
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 6
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -1581,11 +1548,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 )
             );
     }
@@ -1593,11 +1560,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 &>(
                 v0 , v1 , v2 , v3 , v4 , v5
             );
     }
@@ -1625,16 +1592,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 6
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 6
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t))
             );
@@ -1642,27 +1609,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 6
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 6
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5)
     {
@@ -1681,7 +1648,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6> >::value == 7
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 7
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 7
             >::type
         >
         {
@@ -1713,7 +1680,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6)
         {}
         
@@ -1729,9 +1696,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6))
@@ -1759,10 +1724,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other)))
         {}
@@ -1792,7 +1754,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 7
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 7
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -1862,11 +1824,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 )
             );
     }
@@ -1874,11 +1836,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6
             );
     }
@@ -1907,16 +1869,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 7
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 7
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t))
             );
@@ -1924,27 +1886,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 7
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 7
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6)
     {
@@ -1965,7 +1927,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7> >::value == 8
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 8
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 8
             >::type
         >
         {
@@ -1997,7 +1959,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7)
         {}
         
@@ -2013,9 +1975,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7))
@@ -2043,10 +2003,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other)))
         {}
@@ -2076,7 +2033,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 8
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 8
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -2146,11 +2103,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 )
             );
     }
@@ -2158,11 +2115,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7
             );
     }
@@ -2190,16 +2147,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 8
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 8
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t))
             );
@@ -2207,27 +2164,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 8
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 8
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7)
     {
@@ -2246,7 +2203,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8> >::value == 9
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 9
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 9
             >::type
         >
         {
@@ -2278,7 +2235,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8)
         {}
         
@@ -2294,9 +2251,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8))
@@ -2324,10 +2279,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other)))
         {}
@@ -2357,7 +2309,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 9
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 9
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -2427,11 +2379,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 )
             );
     }
@@ -2439,11 +2391,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8
             );
     }
@@ -2472,16 +2424,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 9
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 9
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t))
             );
@@ -2489,27 +2441,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 9
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 9
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8)
     {
@@ -2530,7 +2482,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9> >::value == 10
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 10
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 10
             >::type
         >
         {
@@ -2562,7 +2514,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9)
         {}
         
@@ -2578,9 +2530,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9))
@@ -2608,10 +2558,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other)))
         {}
@@ -2641,7 +2588,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 10
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 10
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -2711,11 +2658,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 )
             );
     }
@@ -2723,11 +2670,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9
             );
     }
@@ -2755,16 +2702,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 10
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 10
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t))
             );
@@ -2772,27 +2719,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 10
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 10
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9)
     {
@@ -2811,7 +2758,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10> >::value == 11
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 11
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 11
             >::type
         >
         {
@@ -2843,7 +2790,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10)
         {}
         
@@ -2859,9 +2806,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10))
@@ -2889,10 +2834,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other)))
         {}
@@ -2922,7 +2864,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 11
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 11
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -2992,11 +2934,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 )
             );
     }
@@ -3004,11 +2946,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10
             );
     }
@@ -3037,16 +2979,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 11
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 11
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t))
             );
@@ -3054,27 +2996,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 11
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 11
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10)
     {
@@ -3095,7 +3037,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11> >::value == 12
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 12
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 12
             >::type
         >
         {
@@ -3127,7 +3069,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11)
         {}
         
@@ -3143,9 +3085,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11))
@@ -3173,10 +3113,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other)))
         {}
@@ -3206,7 +3143,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 12
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 12
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -3276,11 +3213,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 )
             );
     }
@@ -3288,11 +3225,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11
             );
     }
@@ -3320,16 +3257,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 12
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 12
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t))
             );
@@ -3337,27 +3274,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 12
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 12
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11)
     {
@@ -3376,7 +3313,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12> >::value == 13
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 13
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 13
             >::type
         >
         {
@@ -3408,7 +3345,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12)
         {}
         
@@ -3424,9 +3361,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12))
@@ -3454,10 +3389,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other)))
         {}
@@ -3487,7 +3419,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 13
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 13
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -3557,11 +3489,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 )
             );
     }
@@ -3569,11 +3501,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12
             );
     }
@@ -3602,16 +3534,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 13
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 13
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t))
             );
@@ -3619,27 +3551,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 13
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 13
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12)
     {
@@ -3660,7 +3592,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13> >::value == 14
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 14
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 14
             >::type
         >
         {
@@ -3692,7 +3624,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13)
         {}
         
@@ -3708,9 +3640,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12)) , _m13 (std::forward<U13>(u13))
@@ -3738,10 +3668,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other))) , _m13(util::get< 13>(std::forward<UTuple>(other)))
         {}
@@ -3771,7 +3698,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 14
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 14
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -3841,11 +3768,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 )
             );
     }
@@ -3853,11 +3780,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13
             );
     }
@@ -3885,16 +3812,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 14
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 14
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t)) , util::get< 13>(std::forward<Tuple>(t))
             );
@@ -3902,27 +3829,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 14
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 14
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type , typename boost::remove_reference<T13>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13)
     {
@@ -3941,7 +3868,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14> >::value == 15
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 15
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 15
             >::type
         >
         {
@@ -3973,7 +3900,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14)
         {}
         
@@ -3989,9 +3916,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12)) , _m13 (std::forward<U13>(u13)) , _m14 (std::forward<U14>(u14))
@@ -4019,10 +3944,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other))) , _m13(util::get< 13>(std::forward<UTuple>(other))) , _m14(util::get< 14>(std::forward<UTuple>(other)))
         {}
@@ -4052,7 +3974,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 15
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 15
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -4122,11 +4044,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 )
             );
     }
@@ -4134,11 +4056,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14
             );
     }
@@ -4167,16 +4089,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 15
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 15
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t)) , util::get< 13>(std::forward<Tuple>(t)) , util::get< 14>(std::forward<Tuple>(t))
             );
@@ -4184,27 +4106,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 15
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 15
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type , typename boost::remove_reference<T13>::type , typename boost::remove_reference<T14>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14)
     {
@@ -4225,7 +4147,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15> >::value == 16
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 16
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 16
             >::type
         >
         {
@@ -4257,7 +4179,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15)
         {}
         
@@ -4273,9 +4195,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12)) , _m13 (std::forward<U13>(u13)) , _m14 (std::forward<U14>(u14)) , _m15 (std::forward<U15>(u15))
@@ -4303,10 +4223,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other))) , _m13(util::get< 13>(std::forward<UTuple>(other))) , _m14(util::get< 14>(std::forward<UTuple>(other))) , _m15(util::get< 15>(std::forward<UTuple>(other)))
         {}
@@ -4336,7 +4253,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 16
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 16
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -4406,11 +4323,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 )
             );
     }
@@ -4418,11 +4335,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15
             );
     }
@@ -4450,16 +4367,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 16
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 16
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t)) , util::get< 13>(std::forward<Tuple>(t)) , util::get< 14>(std::forward<Tuple>(t)) , util::get< 15>(std::forward<Tuple>(t))
             );
@@ -4467,27 +4384,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 16
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 16
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type , typename boost::remove_reference<T13>::type , typename boost::remove_reference<T14>::type , typename boost::remove_reference<T15>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15)
     {
@@ -4506,7 +4423,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16> >::value == 17
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 17
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 17
             >::type
         >
         {
@@ -4538,7 +4455,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15 , typename add_lvalue_reference< typename boost::add_const<T16>::type >::type v16
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15 , T16 const& v16
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15) , _m16(v16)
         {}
         
@@ -4554,9 +4471,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12)) , _m13 (std::forward<U13>(u13)) , _m14 (std::forward<U14>(u14)) , _m15 (std::forward<U15>(u15)) , _m16 (std::forward<U16>(u16))
@@ -4584,10 +4499,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other))) , _m13(util::get< 13>(std::forward<UTuple>(other))) , _m14(util::get< 14>(std::forward<UTuple>(other))) , _m15(util::get< 15>(std::forward<UTuple>(other))) , _m16(util::get< 16>(std::forward<UTuple>(other)))
         {}
@@ -4617,7 +4529,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 17
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 17
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -4687,11 +4599,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15 , T16 && v16) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 ) , std::forward<T16>( v16 )
             );
     }
@@ -4699,11 +4611,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15 , T16 & v16) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16
             );
     }
@@ -4732,16 +4644,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 17
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 17
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t)) , util::get< 13>(std::forward<Tuple>(t)) , util::get< 14>(std::forward<Tuple>(t)) , util::get< 15>(std::forward<Tuple>(t)) , util::get< 16>(std::forward<Tuple>(t))
             );
@@ -4749,27 +4661,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 17
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 17
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type , typename remove_reference<T16>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type , typename boost::remove_reference<T13>::type , typename boost::remove_reference<T14>::type , typename boost::remove_reference<T15>::type , typename boost::remove_reference<T16>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15 , T16 && t16)
     {
@@ -4790,7 +4702,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17> >::value == 18
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 18
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 18
             >::type
         >
         {
@@ -4822,7 +4734,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15 , typename add_lvalue_reference< typename boost::add_const<T16>::type >::type v16 , typename add_lvalue_reference< typename boost::add_const<T17>::type >::type v17
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15 , T16 const& v16 , T17 const& v17
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15) , _m16(v16) , _m17(v17)
         {}
         
@@ -4838,9 +4750,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12)) , _m13 (std::forward<U13>(u13)) , _m14 (std::forward<U14>(u14)) , _m15 (std::forward<U15>(u15)) , _m16 (std::forward<U16>(u16)) , _m17 (std::forward<U17>(u17))
@@ -4868,10 +4778,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other))) , _m13(util::get< 13>(std::forward<UTuple>(other))) , _m14(util::get< 14>(std::forward<UTuple>(other))) , _m15(util::get< 15>(std::forward<UTuple>(other))) , _m16(util::get< 16>(std::forward<UTuple>(other))) , _m17(util::get< 17>(std::forward<UTuple>(other)))
         {}
@@ -4901,7 +4808,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 18
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 18
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -4971,11 +4878,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15 , T16 && v16 , T17 && v17) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 ) , std::forward<T16>( v16 ) , std::forward<T17>( v17 )
             );
     }
@@ -4983,11 +4890,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15 , T16 & v16 , T17 & v17) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16 , v17
             );
     }
@@ -5015,16 +4922,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 18
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 18
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t)) , util::get< 13>(std::forward<Tuple>(t)) , util::get< 14>(std::forward<Tuple>(t)) , util::get< 15>(std::forward<Tuple>(t)) , util::get< 16>(std::forward<Tuple>(t)) , util::get< 17>(std::forward<Tuple>(t))
             );
@@ -5032,27 +4939,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 18
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 18
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type , typename remove_reference<T16>::type , typename remove_reference<T17>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type , typename boost::remove_reference<T13>::type , typename boost::remove_reference<T14>::type , typename boost::remove_reference<T15>::type , typename boost::remove_reference<T16>::type , typename boost::remove_reference<T17>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15 , T16 && t16 , T17 && t17)
     {
@@ -5071,7 +4978,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18> >::value == 19
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 19
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 19
             >::type
         >
         {
@@ -5103,7 +5010,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15 , typename add_lvalue_reference< typename boost::add_const<T16>::type >::type v16 , typename add_lvalue_reference< typename boost::add_const<T17>::type >::type v17 , typename add_lvalue_reference< typename boost::add_const<T18>::type >::type v18
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15 , T16 const& v16 , T17 const& v17 , T18 const& v18
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15) , _m16(v16) , _m17(v17) , _m18(v18)
         {}
         
@@ -5119,9 +5026,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12)) , _m13 (std::forward<U13>(u13)) , _m14 (std::forward<U14>(u14)) , _m15 (std::forward<U15>(u15)) , _m16 (std::forward<U16>(u16)) , _m17 (std::forward<U17>(u17)) , _m18 (std::forward<U18>(u18))
@@ -5149,10 +5054,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other))) , _m13(util::get< 13>(std::forward<UTuple>(other))) , _m14(util::get< 14>(std::forward<UTuple>(other))) , _m15(util::get< 15>(std::forward<UTuple>(other))) , _m16(util::get< 16>(std::forward<UTuple>(other))) , _m17(util::get< 17>(std::forward<UTuple>(other))) , _m18(util::get< 18>(std::forward<UTuple>(other)))
         {}
@@ -5182,7 +5084,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 19
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 19
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -5252,11 +5154,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 && , T18 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15 , T16 && v16 , T17 && v17 , T18 && v18) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 && , T18 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 ) , std::forward<T16>( v16 ) , std::forward<T17>( v17 ) , std::forward<T18>( v18 )
             );
     }
@@ -5264,11 +5166,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 & , T18 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15 , T16 & v16 , T17 & v17 , T18 & v18) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 & , T18 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16 , v17 , v18
             );
     }
@@ -5297,16 +5199,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 19
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 19
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t)) , util::get< 13>(std::forward<Tuple>(t)) , util::get< 14>(std::forward<Tuple>(t)) , util::get< 15>(std::forward<Tuple>(t)) , util::get< 16>(std::forward<Tuple>(t)) , util::get< 17>(std::forward<Tuple>(t)) , util::get< 18>(std::forward<Tuple>(t))
             );
@@ -5314,27 +5216,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 19
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 19
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type , typename remove_reference<T16>::type , typename remove_reference<T17>::type , typename remove_reference<T18>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type , typename boost::remove_reference<T13>::type , typename boost::remove_reference<T14>::type , typename boost::remove_reference<T15>::type , typename boost::remove_reference<T16>::type , typename boost::remove_reference<T17>::type , typename boost::remove_reference<T18>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15 , T16 && t16 , T17 && t17 , T18 && t18)
     {
@@ -5355,7 +5257,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19> >::value == 20
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 20
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 20
             >::type
         >
         {
@@ -5387,7 +5289,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15 , typename add_lvalue_reference< typename boost::add_const<T16>::type >::type v16 , typename add_lvalue_reference< typename boost::add_const<T17>::type >::type v17 , typename add_lvalue_reference< typename boost::add_const<T18>::type >::type v18 , typename add_lvalue_reference< typename boost::add_const<T19>::type >::type v19
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15 , T16 const& v16 , T17 const& v17 , T18 const& v18 , T19 const& v19
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15) , _m16(v16) , _m17(v17) , _m18(v18) , _m19(v19)
         {}
         
@@ -5403,9 +5305,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12)) , _m13 (std::forward<U13>(u13)) , _m14 (std::forward<U14>(u14)) , _m15 (std::forward<U15>(u15)) , _m16 (std::forward<U16>(u16)) , _m17 (std::forward<U17>(u17)) , _m18 (std::forward<U18>(u18)) , _m19 (std::forward<U19>(u19))
@@ -5433,10 +5333,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other))) , _m13(util::get< 13>(std::forward<UTuple>(other))) , _m14(util::get< 14>(std::forward<UTuple>(other))) , _m15(util::get< 15>(std::forward<UTuple>(other))) , _m16(util::get< 16>(std::forward<UTuple>(other))) , _m17(util::get< 17>(std::forward<UTuple>(other))) , _m18(util::get< 18>(std::forward<UTuple>(other))) , _m19(util::get< 19>(std::forward<UTuple>(other)))
         {}
@@ -5466,7 +5363,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 20
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 20
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -5536,11 +5433,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 && , T18 && , T19 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15 , T16 && v16 , T17 && v17 , T18 && v18 , T19 && v19) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 && , T18 && , T19 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 ) , std::forward<T16>( v16 ) , std::forward<T17>( v17 ) , std::forward<T18>( v18 ) , std::forward<T19>( v19 )
             );
     }
@@ -5548,11 +5445,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 & , T18 & , T19 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15 , T16 & v16 , T17 & v17 , T18 & v18 , T19 & v19) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 & , T18 & , T19 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16 , v17 , v18 , v19
             );
     }
@@ -5580,16 +5477,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 20
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 20
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t)) , util::get< 13>(std::forward<Tuple>(t)) , util::get< 14>(std::forward<Tuple>(t)) , util::get< 15>(std::forward<Tuple>(t)) , util::get< 16>(std::forward<Tuple>(t)) , util::get< 17>(std::forward<Tuple>(t)) , util::get< 18>(std::forward<Tuple>(t)) , util::get< 19>(std::forward<Tuple>(t))
             );
@@ -5597,27 +5494,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 20
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 20
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type , typename remove_reference<T16>::type , typename remove_reference<T17>::type , typename remove_reference<T18>::type , typename remove_reference<T19>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type , typename boost::remove_reference<T13>::type , typename boost::remove_reference<T14>::type , typename boost::remove_reference<T15>::type , typename boost::remove_reference<T16>::type , typename boost::remove_reference<T17>::type , typename boost::remove_reference<T18>::type , typename boost::remove_reference<T19>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15 , T16 && t16 , T17 && t17 , T18 && t18 , T19 && t19)
     {
@@ -5636,7 +5533,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20> >::value == 21
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 21
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 21
             >::type
         >
         {
@@ -5668,7 +5565,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15 , typename add_lvalue_reference< typename boost::add_const<T16>::type >::type v16 , typename add_lvalue_reference< typename boost::add_const<T17>::type >::type v17 , typename add_lvalue_reference< typename boost::add_const<T18>::type >::type v18 , typename add_lvalue_reference< typename boost::add_const<T19>::type >::type v19 , typename add_lvalue_reference< typename boost::add_const<T20>::type >::type v20
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15 , T16 const& v16 , T17 const& v17 , T18 const& v18 , T19 const& v19 , T20 const& v20
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15) , _m16(v16) , _m17(v17) , _m18(v18) , _m19(v19) , _m20(v20)
         {}
         
@@ -5684,9 +5581,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12)) , _m13 (std::forward<U13>(u13)) , _m14 (std::forward<U14>(u14)) , _m15 (std::forward<U15>(u15)) , _m16 (std::forward<U16>(u16)) , _m17 (std::forward<U17>(u17)) , _m18 (std::forward<U18>(u18)) , _m19 (std::forward<U19>(u19)) , _m20 (std::forward<U20>(u20))
@@ -5714,10 +5609,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other))) , _m13(util::get< 13>(std::forward<UTuple>(other))) , _m14(util::get< 14>(std::forward<UTuple>(other))) , _m15(util::get< 15>(std::forward<UTuple>(other))) , _m16(util::get< 16>(std::forward<UTuple>(other))) , _m17(util::get< 17>(std::forward<UTuple>(other))) , _m18(util::get< 18>(std::forward<UTuple>(other))) , _m19(util::get< 19>(std::forward<UTuple>(other))) , _m20(util::get< 20>(std::forward<UTuple>(other)))
         {}
@@ -5747,7 +5639,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 21
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 21
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -5817,11 +5709,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 && , T18 && , T19 && , T20 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15 , T16 && v16 , T17 && v17 , T18 && v18 , T19 && v19 , T20 && v20) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 && , T18 && , T19 && , T20 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 ) , std::forward<T16>( v16 ) , std::forward<T17>( v17 ) , std::forward<T18>( v18 ) , std::forward<T19>( v19 ) , std::forward<T20>( v20 )
             );
     }
@@ -5829,11 +5721,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 & , T18 & , T19 & , T20 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15 , T16 & v16 , T17 & v17 , T18 & v18 , T19 & v19 , T20 & v20) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 & , T18 & , T19 & , T20 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16 , v17 , v18 , v19 , v20
             );
     }
@@ -5862,16 +5754,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 21
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 21
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t)) , util::get< 13>(std::forward<Tuple>(t)) , util::get< 14>(std::forward<Tuple>(t)) , util::get< 15>(std::forward<Tuple>(t)) , util::get< 16>(std::forward<Tuple>(t)) , util::get< 17>(std::forward<Tuple>(t)) , util::get< 18>(std::forward<Tuple>(t)) , util::get< 19>(std::forward<Tuple>(t)) , util::get< 20>(std::forward<Tuple>(t))
             );
@@ -5879,27 +5771,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 21
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 21
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 20 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 20 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type , typename remove_reference<T16>::type , typename remove_reference<T17>::type , typename remove_reference<T18>::type , typename remove_reference<T19>::type , typename remove_reference<T20>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type , typename boost::remove_reference<T13>::type , typename boost::remove_reference<T14>::type , typename boost::remove_reference<T15>::type , typename boost::remove_reference<T16>::type , typename boost::remove_reference<T17>::type , typename boost::remove_reference<T18>::type , typename boost::remove_reference<T19>::type , typename boost::remove_reference<T20>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15 , T16 && t16 , T17 && t17 , T18 && t18 , T19 && t19 , T20 && t20)
     {
@@ -5920,7 +5812,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21> >::value == 22
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 22
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 22
             >::type
         >
         {
@@ -5952,7 +5844,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15 , typename add_lvalue_reference< typename boost::add_const<T16>::type >::type v16 , typename add_lvalue_reference< typename boost::add_const<T17>::type >::type v17 , typename add_lvalue_reference< typename boost::add_const<T18>::type >::type v18 , typename add_lvalue_reference< typename boost::add_const<T19>::type >::type v19 , typename add_lvalue_reference< typename boost::add_const<T20>::type >::type v20 , typename add_lvalue_reference< typename boost::add_const<T21>::type >::type v21
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15 , T16 const& v16 , T17 const& v17 , T18 const& v18 , T19 const& v19 , T20 const& v20 , T21 const& v21
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15) , _m16(v16) , _m17(v17) , _m18(v18) , _m19(v19) , _m20(v20) , _m21(v21)
         {}
         
@@ -5968,9 +5860,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12)) , _m13 (std::forward<U13>(u13)) , _m14 (std::forward<U14>(u14)) , _m15 (std::forward<U15>(u15)) , _m16 (std::forward<U16>(u16)) , _m17 (std::forward<U17>(u17)) , _m18 (std::forward<U18>(u18)) , _m19 (std::forward<U19>(u19)) , _m20 (std::forward<U20>(u20)) , _m21 (std::forward<U21>(u21))
@@ -5998,10 +5888,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other))) , _m13(util::get< 13>(std::forward<UTuple>(other))) , _m14(util::get< 14>(std::forward<UTuple>(other))) , _m15(util::get< 15>(std::forward<UTuple>(other))) , _m16(util::get< 16>(std::forward<UTuple>(other))) , _m17(util::get< 17>(std::forward<UTuple>(other))) , _m18(util::get< 18>(std::forward<UTuple>(other))) , _m19(util::get< 19>(std::forward<UTuple>(other))) , _m20(util::get< 20>(std::forward<UTuple>(other))) , _m21(util::get< 21>(std::forward<UTuple>(other)))
         {}
@@ -6031,7 +5918,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 22
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 22
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -6101,11 +5988,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type , typename add_rvalue_reference<T21>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 && , T18 && , T19 && , T20 && , T21 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15 , T16 && v16 , T17 && v17 , T18 && v18 , T19 && v19 , T20 && v20 , T21 && v21) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type , typename add_rvalue_reference<T21>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 && , T18 && , T19 && , T20 && , T21 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 ) , std::forward<T16>( v16 ) , std::forward<T17>( v17 ) , std::forward<T18>( v18 ) , std::forward<T19>( v19 ) , std::forward<T20>( v20 ) , std::forward<T21>( v21 )
             );
     }
@@ -6113,11 +6000,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type , typename util::add_lvalue_reference<T21>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 & , T18 & , T19 & , T20 & , T21 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15 , T16 & v16 , T17 & v17 , T18 & v18 , T19 & v19 , T20 & v20 , T21 & v21) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type , typename util::add_lvalue_reference<T21>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 & , T18 & , T19 & , T20 & , T21 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16 , v17 , v18 , v19 , v20 , v21
             );
     }
@@ -6145,16 +6032,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 22
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 22
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t)) , util::get< 13>(std::forward<Tuple>(t)) , util::get< 14>(std::forward<Tuple>(t)) , util::get< 15>(std::forward<Tuple>(t)) , util::get< 16>(std::forward<Tuple>(t)) , util::get< 17>(std::forward<Tuple>(t)) , util::get< 18>(std::forward<Tuple>(t)) , util::get< 19>(std::forward<Tuple>(t)) , util::get< 20>(std::forward<Tuple>(t)) , util::get< 21>(std::forward<Tuple>(t))
             );
@@ -6162,27 +6049,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 22
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 22
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 20 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 21 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 20 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 21 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type , typename remove_reference<T16>::type , typename remove_reference<T17>::type , typename remove_reference<T18>::type , typename remove_reference<T19>::type , typename remove_reference<T20>::type , typename remove_reference<T21>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type , typename boost::remove_reference<T13>::type , typename boost::remove_reference<T14>::type , typename boost::remove_reference<T15>::type , typename boost::remove_reference<T16>::type , typename boost::remove_reference<T17>::type , typename boost::remove_reference<T18>::type , typename boost::remove_reference<T19>::type , typename boost::remove_reference<T20>::type , typename boost::remove_reference<T21>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15 , T16 && t16 , T17 && t17 , T18 && t18 , T19 && t19 , T20 && t20 , T21 && t21)
     {
@@ -6201,7 +6088,7 @@ namespace hpx { namespace util
             tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22>, UTuple
           , typename boost::enable_if_c<
                 tuple_size<tuple<T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9 , T10 , T11 , T12 , T13 , T14 , T15 , T16 , T17 , T18 , T19 , T20 , T21 , T22> >::value == 23
-             && tuple_size<typename remove_reference<UTuple>::type>::value == 23
+             && tuple_size<typename boost::remove_reference<UTuple>::type>::value == 23
             >::type
         >
         {
@@ -6233,7 +6120,7 @@ namespace hpx { namespace util
         
         
         BOOST_CONSTEXPR explicit tuple(
-            typename add_lvalue_reference< typename boost::add_const<T0>::type >::type v0 , typename add_lvalue_reference< typename boost::add_const<T1>::type >::type v1 , typename add_lvalue_reference< typename boost::add_const<T2>::type >::type v2 , typename add_lvalue_reference< typename boost::add_const<T3>::type >::type v3 , typename add_lvalue_reference< typename boost::add_const<T4>::type >::type v4 , typename add_lvalue_reference< typename boost::add_const<T5>::type >::type v5 , typename add_lvalue_reference< typename boost::add_const<T6>::type >::type v6 , typename add_lvalue_reference< typename boost::add_const<T7>::type >::type v7 , typename add_lvalue_reference< typename boost::add_const<T8>::type >::type v8 , typename add_lvalue_reference< typename boost::add_const<T9>::type >::type v9 , typename add_lvalue_reference< typename boost::add_const<T10>::type >::type v10 , typename add_lvalue_reference< typename boost::add_const<T11>::type >::type v11 , typename add_lvalue_reference< typename boost::add_const<T12>::type >::type v12 , typename add_lvalue_reference< typename boost::add_const<T13>::type >::type v13 , typename add_lvalue_reference< typename boost::add_const<T14>::type >::type v14 , typename add_lvalue_reference< typename boost::add_const<T15>::type >::type v15 , typename add_lvalue_reference< typename boost::add_const<T16>::type >::type v16 , typename add_lvalue_reference< typename boost::add_const<T17>::type >::type v17 , typename add_lvalue_reference< typename boost::add_const<T18>::type >::type v18 , typename add_lvalue_reference< typename boost::add_const<T19>::type >::type v19 , typename add_lvalue_reference< typename boost::add_const<T20>::type >::type v20 , typename add_lvalue_reference< typename boost::add_const<T21>::type >::type v21 , typename add_lvalue_reference< typename boost::add_const<T22>::type >::type v22
+            T0 const& v0 , T1 const& v1 , T2 const& v2 , T3 const& v3 , T4 const& v4 , T5 const& v5 , T6 const& v6 , T7 const& v7 , T8 const& v8 , T9 const& v9 , T10 const& v10 , T11 const& v11 , T12 const& v12 , T13 const& v13 , T14 const& v14 , T15 const& v15 , T16 const& v16 , T17 const& v17 , T18 const& v18 , T19 const& v19 , T20 const& v20 , T21 const& v21 , T22 const& v22
         ) : _m0(v0) , _m1(v1) , _m2(v2) , _m3(v3) , _m4(v4) , _m5(v5) , _m6(v6) , _m7(v7) , _m8(v8) , _m9(v9) , _m10(v10) , _m11(v11) , _m12(v12) , _m13(v13) , _m14(v14) , _m15(v15) , _m16(v16) , _m17(v17) , _m18(v18) , _m19(v19) , _m20(v20) , _m21(v21) , _m22(v22)
         {}
         
@@ -6249,9 +6136,7 @@ namespace hpx { namespace util
           , typename boost::enable_if_c<
                 detail::are_tuples_compatible<
                     tuple
-                  , typename add_rvalue_reference<
-                        tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21 , U22>
-                    >::type
+                  , tuple<U0 , U1 , U2 , U3 , U4 , U5 , U6 , U7 , U8 , U9 , U10 , U11 , U12 , U13 , U14 , U15 , U16 , U17 , U18 , U19 , U20 , U21 , U22>&&
                 >::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0)) , _m1 (std::forward<U1>(u1)) , _m2 (std::forward<U2>(u2)) , _m3 (std::forward<U3>(u3)) , _m4 (std::forward<U4>(u4)) , _m5 (std::forward<U5>(u5)) , _m6 (std::forward<U6>(u6)) , _m7 (std::forward<U7>(u7)) , _m8 (std::forward<U8>(u8)) , _m9 (std::forward<U9>(u9)) , _m10 (std::forward<U10>(u10)) , _m11 (std::forward<U11>(u11)) , _m12 (std::forward<U12>(u12)) , _m13 (std::forward<U13>(u13)) , _m14 (std::forward<U14>(u14)) , _m15 (std::forward<U15>(u15)) , _m16 (std::forward<U16>(u16)) , _m17 (std::forward<U17>(u17)) , _m18 (std::forward<U18>(u18)) , _m19 (std::forward<U19>(u19)) , _m20 (std::forward<U20>(u20)) , _m21 (std::forward<U21>(u21)) , _m22 (std::forward<U22>(u22))
@@ -6279,10 +6164,7 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR tuple(
             UTuple && other
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , typename add_rvalue_reference<UTuple>::type
-                >::value
+                detail::are_tuples_compatible<tuple, UTuple&&>::value
             >::type* = 0
         ) : _m0(util::get< 0>(std::forward<UTuple>(other))) , _m1(util::get< 1>(std::forward<UTuple>(other))) , _m2(util::get< 2>(std::forward<UTuple>(other))) , _m3(util::get< 3>(std::forward<UTuple>(other))) , _m4(util::get< 4>(std::forward<UTuple>(other))) , _m5(util::get< 5>(std::forward<UTuple>(other))) , _m6(util::get< 6>(std::forward<UTuple>(other))) , _m7(util::get< 7>(std::forward<UTuple>(other))) , _m8(util::get< 8>(std::forward<UTuple>(other))) , _m9(util::get< 9>(std::forward<UTuple>(other))) , _m10(util::get< 10>(std::forward<UTuple>(other))) , _m11(util::get< 11>(std::forward<UTuple>(other))) , _m12(util::get< 12>(std::forward<UTuple>(other))) , _m13(util::get< 13>(std::forward<UTuple>(other))) , _m14(util::get< 14>(std::forward<UTuple>(other))) , _m15(util::get< 15>(std::forward<UTuple>(other))) , _m16(util::get< 16>(std::forward<UTuple>(other))) , _m17(util::get< 17>(std::forward<UTuple>(other))) , _m18(util::get< 18>(std::forward<UTuple>(other))) , _m19(util::get< 19>(std::forward<UTuple>(other))) , _m20(util::get< 20>(std::forward<UTuple>(other))) , _m21(util::get< 21>(std::forward<UTuple>(other))) , _m22(util::get< 22>(std::forward<UTuple>(other)))
         {}
@@ -6312,7 +6194,7 @@ namespace hpx { namespace util
         
         template <typename UTuple>
         typename boost::enable_if_c<
-            tuple_size<typename remove_reference<UTuple>::type>::value == 23
+            tuple_size<typename boost::remove_reference<UTuple>::type>::value == 23
           , tuple&
         >::type
         operator=(UTuple && other)
@@ -6382,11 +6264,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     BOOST_FORCEINLINE
-    tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type , typename add_rvalue_reference<T21>::type , typename add_rvalue_reference<T22>::type>
+    tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 && , T18 && , T19 && , T20 && , T21 && , T22 &&>
     forward_as_tuple(T0 && v0 , T1 && v1 , T2 && v2 , T3 && v3 , T4 && v4 , T5 && v5 , T6 && v6 , T7 && v7 , T8 && v8 , T9 && v9 , T10 && v10 , T11 && v11 , T12 && v12 , T13 && v13 , T14 && v14 , T15 && v15 , T16 && v16 , T17 && v17 , T18 && v18 , T19 && v19 , T20 && v20 , T21 && v21 , T22 && v22) BOOST_NOEXCEPT
     {
         return
-            tuple<typename add_rvalue_reference<T0>::type , typename add_rvalue_reference<T1>::type , typename add_rvalue_reference<T2>::type , typename add_rvalue_reference<T3>::type , typename add_rvalue_reference<T4>::type , typename add_rvalue_reference<T5>::type , typename add_rvalue_reference<T6>::type , typename add_rvalue_reference<T7>::type , typename add_rvalue_reference<T8>::type , typename add_rvalue_reference<T9>::type , typename add_rvalue_reference<T10>::type , typename add_rvalue_reference<T11>::type , typename add_rvalue_reference<T12>::type , typename add_rvalue_reference<T13>::type , typename add_rvalue_reference<T14>::type , typename add_rvalue_reference<T15>::type , typename add_rvalue_reference<T16>::type , typename add_rvalue_reference<T17>::type , typename add_rvalue_reference<T18>::type , typename add_rvalue_reference<T19>::type , typename add_rvalue_reference<T20>::type , typename add_rvalue_reference<T21>::type , typename add_rvalue_reference<T22>::type>(
+            tuple<T0 && , T1 && , T2 && , T3 && , T4 && , T5 && , T6 && , T7 && , T8 && , T9 && , T10 && , T11 && , T12 && , T13 && , T14 && , T15 && , T16 && , T17 && , T18 && , T19 && , T20 && , T21 && , T22 &&>(
                 std::forward<T0>( v0 ) , std::forward<T1>( v1 ) , std::forward<T2>( v2 ) , std::forward<T3>( v3 ) , std::forward<T4>( v4 ) , std::forward<T5>( v5 ) , std::forward<T6>( v6 ) , std::forward<T7>( v7 ) , std::forward<T8>( v8 ) , std::forward<T9>( v9 ) , std::forward<T10>( v10 ) , std::forward<T11>( v11 ) , std::forward<T12>( v12 ) , std::forward<T13>( v13 ) , std::forward<T14>( v14 ) , std::forward<T15>( v15 ) , std::forward<T16>( v16 ) , std::forward<T17>( v17 ) , std::forward<T18>( v18 ) , std::forward<T19>( v19 ) , std::forward<T20>( v20 ) , std::forward<T21>( v21 ) , std::forward<T22>( v22 )
             );
     }
@@ -6394,11 +6276,11 @@ namespace hpx { namespace util
     
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     BOOST_FORCEINLINE
-    tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type , typename util::add_lvalue_reference<T21>::type , typename util::add_lvalue_reference<T22>::type>
+    tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 & , T18 & , T19 & , T20 & , T21 & , T22 &>
     tie(T0 & v0 , T1 & v1 , T2 & v2 , T3 & v3 , T4 & v4 , T5 & v5 , T6 & v6 , T7 & v7 , T8 & v8 , T9 & v9 , T10 & v10 , T11 & v11 , T12 & v12 , T13 & v13 , T14 & v14 , T15 & v15 , T16 & v16 , T17 & v17 , T18 & v18 , T19 & v19 , T20 & v20 , T21 & v21 , T22 & v22) BOOST_NOEXCEPT
     {
         return
-            tuple<typename util::add_lvalue_reference<T0>::type , typename util::add_lvalue_reference<T1>::type , typename util::add_lvalue_reference<T2>::type , typename util::add_lvalue_reference<T3>::type , typename util::add_lvalue_reference<T4>::type , typename util::add_lvalue_reference<T5>::type , typename util::add_lvalue_reference<T6>::type , typename util::add_lvalue_reference<T7>::type , typename util::add_lvalue_reference<T8>::type , typename util::add_lvalue_reference<T9>::type , typename util::add_lvalue_reference<T10>::type , typename util::add_lvalue_reference<T11>::type , typename util::add_lvalue_reference<T12>::type , typename util::add_lvalue_reference<T13>::type , typename util::add_lvalue_reference<T14>::type , typename util::add_lvalue_reference<T15>::type , typename util::add_lvalue_reference<T16>::type , typename util::add_lvalue_reference<T17>::type , typename util::add_lvalue_reference<T18>::type , typename util::add_lvalue_reference<T19>::type , typename util::add_lvalue_reference<T20>::type , typename util::add_lvalue_reference<T21>::type , typename util::add_lvalue_reference<T22>::type>(
+            tuple<T0 & , T1 & , T2 & , T3 & , T4 & , T5 & , T6 & , T7 & , T8 & , T9 & , T10 & , T11 & , T12 & , T13 & , T14 & , T15 & , T16 & , T17 & , T18 & , T19 & , T20 & , T21 & , T22 &>(
                 v0 , v1 , v2 , v3 , v4 , v5 , v6 , v7 , v8 , v9 , v10 , v11 , v12 , v13 , v14 , v15 , v16 , v17 , v18 , v19 , v20 , v21 , v22
             );
     }
@@ -6427,16 +6309,16 @@ namespace hpx { namespace util
     template <typename Tuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<Tuple>::type>::value == 23
+        tuple_size<typename boost::remove_reference<Tuple>::type>::value == 23
       , detail::tuple_cat_result<
-            typename remove_reference<Tuple>::type
+            typename boost::remove_reference<Tuple>::type
         >
     >::type
     tuple_cat(Tuple && t)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<Tuple>::type
+                typename boost::remove_reference<Tuple>::type
             >::type(
                 util::get< 0>(std::forward<Tuple>(t)) , util::get< 1>(std::forward<Tuple>(t)) , util::get< 2>(std::forward<Tuple>(t)) , util::get< 3>(std::forward<Tuple>(t)) , util::get< 4>(std::forward<Tuple>(t)) , util::get< 5>(std::forward<Tuple>(t)) , util::get< 6>(std::forward<Tuple>(t)) , util::get< 7>(std::forward<Tuple>(t)) , util::get< 8>(std::forward<Tuple>(t)) , util::get< 9>(std::forward<Tuple>(t)) , util::get< 10>(std::forward<Tuple>(t)) , util::get< 11>(std::forward<Tuple>(t)) , util::get< 12>(std::forward<Tuple>(t)) , util::get< 13>(std::forward<Tuple>(t)) , util::get< 14>(std::forward<Tuple>(t)) , util::get< 15>(std::forward<Tuple>(t)) , util::get< 16>(std::forward<Tuple>(t)) , util::get< 17>(std::forward<Tuple>(t)) , util::get< 18>(std::forward<Tuple>(t)) , util::get< 19>(std::forward<Tuple>(t)) , util::get< 20>(std::forward<Tuple>(t)) , util::get< 21>(std::forward<Tuple>(t)) , util::get< 22>(std::forward<Tuple>(t))
             );
@@ -6444,27 +6326,27 @@ namespace hpx { namespace util
     template <typename TTuple, typename UTuple>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename boost::lazy_enable_if_c<
-        tuple_size<typename remove_reference<TTuple>::type>::value
-      + tuple_size<typename remove_reference<UTuple>::type>::value == 23
+        tuple_size<typename boost::remove_reference<TTuple>::type>::value
+      + tuple_size<typename boost::remove_reference<UTuple>::type>::value == 23
       , detail::tuple_cat_result<
-            typename remove_reference<TTuple>::type
-          , typename remove_reference<UTuple>::type
+            typename boost::remove_reference<TTuple>::type
+          , typename boost::remove_reference<UTuple>::type
         >
     >::type
     tuple_cat(TTuple && t, UTuple && u)
     {
         return
             typename detail::tuple_cat_result<
-                typename remove_reference<TTuple>::type
-              , typename remove_reference<UTuple>::type
+                typename boost::remove_reference<TTuple>::type
+              , typename boost::remove_reference<UTuple>::type
             >::type(
-                detail::tuple_cat_element< 0 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 20 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 21 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 22 , typename remove_reference<TTuple>::type , typename remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
+                detail::tuple_cat_element< 0 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 1 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 2 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 3 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 4 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 5 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 6 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 7 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 8 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 9 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 10 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 11 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 12 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 13 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 14 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 15 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 16 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 17 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 18 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 19 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 20 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 21 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u)) , detail::tuple_cat_element< 22 , typename boost::remove_reference<TTuple>::type , typename boost::remove_reference<UTuple>::type >::call(std::forward<TTuple>(t), std::forward<UTuple>(u))
             );
     }
     template <typename T0 , typename T1 , typename T2 , typename T3 , typename T4 , typename T5 , typename T6 , typename T7 , typename T8 , typename T9 , typename T10 , typename T11 , typename T12 , typename T13 , typename T14 , typename T15 , typename T16 , typename T17 , typename T18 , typename T19 , typename T20 , typename T21 , typename T22>
     BOOST_CONSTEXPR BOOST_FORCEINLINE
     typename detail::tuple_cat_result<
-        typename remove_reference<T0>::type , typename remove_reference<T1>::type , typename remove_reference<T2>::type , typename remove_reference<T3>::type , typename remove_reference<T4>::type , typename remove_reference<T5>::type , typename remove_reference<T6>::type , typename remove_reference<T7>::type , typename remove_reference<T8>::type , typename remove_reference<T9>::type , typename remove_reference<T10>::type , typename remove_reference<T11>::type , typename remove_reference<T12>::type , typename remove_reference<T13>::type , typename remove_reference<T14>::type , typename remove_reference<T15>::type , typename remove_reference<T16>::type , typename remove_reference<T17>::type , typename remove_reference<T18>::type , typename remove_reference<T19>::type , typename remove_reference<T20>::type , typename remove_reference<T21>::type , typename remove_reference<T22>::type
+        typename boost::remove_reference<T0>::type , typename boost::remove_reference<T1>::type , typename boost::remove_reference<T2>::type , typename boost::remove_reference<T3>::type , typename boost::remove_reference<T4>::type , typename boost::remove_reference<T5>::type , typename boost::remove_reference<T6>::type , typename boost::remove_reference<T7>::type , typename boost::remove_reference<T8>::type , typename boost::remove_reference<T9>::type , typename boost::remove_reference<T10>::type , typename boost::remove_reference<T11>::type , typename boost::remove_reference<T12>::type , typename boost::remove_reference<T13>::type , typename boost::remove_reference<T14>::type , typename boost::remove_reference<T15>::type , typename boost::remove_reference<T16>::type , typename boost::remove_reference<T17>::type , typename boost::remove_reference<T18>::type , typename boost::remove_reference<T19>::type , typename boost::remove_reference<T20>::type , typename boost::remove_reference<T21>::type , typename boost::remove_reference<T22>::type
     >::type
     tuple_cat(T0 && t0 , T1 && t1 , T2 && t2 , T3 && t3 , T4 && t4 , T5 && t5 , T6 && t6 , T7 && t7 , T8 && t8 , T9 && t9 , T10 && t10 , T11 && t11 , T12 && t12 , T13 && t13 , T14 && t14 , T15 && t15 , T16 && t16 , T17 && t17 , T18 && t18 , T19 && t19 , T20 && t20 , T21 && t21 , T22 && t22)
     {

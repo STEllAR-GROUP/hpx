@@ -51,17 +51,16 @@ namespace hpx {
         typedef std::vector<future_type> futures_type;
         typedef typename boost::range_iterator<Range const>::type iterator_type;
 
-        futures_type futures(boost::size(range));
+        futures_type futures;
+        futures.reserve(boost::size(range));
 
         std::size_t granularity = hpx::get_os_thread_count() == 1 ? 2 : hpx::get_os_thread_count();
 
         if(futures.size() < granularity)
         {
-            std::size_t i = 0;
             BOOST_FOREACH(value_type const & v, range)
             {
-                futures[i] = hpx::async(HPX_STD_PROTECT(f), v);
-                ++i;
+                futures.push_back(hpx::async(HPX_STD_PROTECT(f), v));
             }
 
             return futures;
