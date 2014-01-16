@@ -72,24 +72,27 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     bool register_lock(void const* lock, util::register_lock_data* data)
     {
-        ++register_locks::get_lock_count();
-        if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
+        if(threads::get_self_ptr() != 0)
         {
-            register_locks::held_locks_map& held_locks =
-                register_locks::get_lock_map();
+            ++register_locks::get_lock_count();
+            if (register_locks::lock_detection_enabled_)
+            {
+                register_locks::held_locks_map& held_locks =
+                    register_locks::get_lock_map();
 
-            register_locks::held_locks_map::iterator it = held_locks.find(lock);
-            if (it != held_locks.end())
-                return false;     // this lock is already registered
+                register_locks::held_locks_map::iterator it = held_locks.find(lock);
+                if (it != held_locks.end())
+                    return false;     // this lock is already registered
 
-            std::pair<register_locks::held_locks_map::iterator, bool> p;
-            if (!data) {
-                p = held_locks.insert(lock, new util::register_lock_data);
+                std::pair<register_locks::held_locks_map::iterator, bool> p;
+                if (!data) {
+                    p = held_locks.insert(lock, new util::register_lock_data);
+                }
+                else {
+                    p = held_locks.insert(lock, data);
+                }
+                return p.second;
             }
-            else {
-                p = held_locks.insert(lock, data);
-            }
-            return p.second;
         }
         return true;
     }
@@ -97,18 +100,21 @@ namespace hpx { namespace util
     // unregister the given lock from this HPX-thread
     bool unregister_lock(void const* lock)
     {
-        HPX_ASSERT(register_locks::get_lock_count() > 0);
-        --register_locks::get_lock_count();
-        if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
+        if(threads::get_self_ptr() != 0)
         {
-            register_locks::held_locks_map& held_locks =
-                register_locks::get_lock_map();
+            HPX_ASSERT(register_locks::get_lock_count() > 0);
+            --register_locks::get_lock_count();
+            if (register_locks::lock_detection_enabled_)
+            {
+                register_locks::held_locks_map& held_locks =
+                    register_locks::get_lock_map();
 
-            register_locks::held_locks_map::iterator it = held_locks.find(lock);
-            if (it == held_locks.end())
-                return false;     // this lock is not registered
+                register_locks::held_locks_map::iterator it = held_locks.find(lock);
+                if (it == held_locks.end())
+                    return false;     // this lock is not registered
 
-            held_locks.erase(lock);
+                held_locks.erase(lock);
+            }
         }
         return true;
     }
@@ -186,14 +192,21 @@ namespace hpx { namespace util
 
     bool register_lock(void const*, util::register_lock_data*)
     {
-        ++register_locks::get_lock_count();
+        if(threads::get_self_ptr() != 0)
+        {
+            HPX_ASSERT(register_locks::get_lock_count() > 0);
+            ++register_locks::get_lock_count();
+        }
         return true;
     }
 
     bool unregister_lock(void const*)
     {
-        HPX_ASSERT(register_locks::get_lock_count() > 0);
-        --register_locks::get_lock_count();
+        if(threads::get_self_ptr() != 0)
+        {
+            HPX_ASSERT(register_locks::get_lock_count() > 0);
+            --register_locks::get_lock_count();
+        }
         return true;
     }
 
