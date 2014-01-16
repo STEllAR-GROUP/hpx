@@ -44,6 +44,7 @@ namespace hpx { namespace lcos { namespace local
 
         HPX_MOVABLE_BUT_NOT_COPYABLE(spinlock)
 
+    public:
         ///////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k, bool suspend)
         {
@@ -101,7 +102,6 @@ namespace hpx { namespace lcos { namespace local
             }
         }
 
-    public:
         spinlock() : v_(0)
         {
             HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock", "");

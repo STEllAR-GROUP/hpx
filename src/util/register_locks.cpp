@@ -130,7 +130,6 @@ namespace hpx { namespace util
             // we create a log message if there are still registered locks for
             // this OS-thread
             if (!held_locks.empty()) {
-                std::cout << "locks held when suspending" << std::endl;
                 std::string back_trace(hpx::detail::backtrace_direct());
                 if (back_trace.empty()) {
                     LERR_(debug)
