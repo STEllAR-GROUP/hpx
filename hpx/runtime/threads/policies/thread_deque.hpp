@@ -373,7 +373,7 @@ struct thread_deque
 //             util::high_resolution_clock::now()
 //         ));
 // #else
-        enqueue(new_tasks_, new task_description(
+        enqueue(new_tasks_, new task_description( //-V106
             std::move(data), initial_state));
 // #endif
         ++new_tasks_count_;
@@ -416,7 +416,7 @@ struct thread_deque
     }
 
     // Destroy the passed thread as it has been terminated
-    bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count)
+    bool destroy_thread(threads::thread_data_base* thrd, boost::int64_t& busy_count) //-V669
     {
         if (thrd->is_created_from(&memory_pool_)) {
             terminated_items_.enqueue(thrd);

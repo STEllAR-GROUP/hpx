@@ -86,7 +86,7 @@ namespace hpx { namespace parcelset { namespace shmem
                         out_buffer_.get_buffer(), dest_locality_id, 0, archive_flags_);
 
                     std::size_t count = pv.size();
-                    archive << count;
+                    archive << count; //-V128
 
                     BOOST_FOREACH(parcel const & p, pv)
                     {

@@ -655,7 +655,7 @@ namespace hpx { namespace threads
             }
 
             unsigned idx = (obj->os_index != ~0x0u) ? obj->os_index : obj->logical_index;
-            if(!test(m, idx))
+            if(!test(m, idx)) //-V106
                 continue;
 
             if (first) {

@@ -145,8 +145,9 @@ namespace hpx { namespace parcelset { namespace shmem
         void send_pending_parcels_trampoline(
             boost::system::error_code const& ec,
             naming::locality const& prefix,
-            parcelport_connection_ptr client_connection);
-        void send_pending_parcels(parcelport_connection_ptr client_connection,
+            parcelport_connection_ptr const& client_connection);
+        void send_pending_parcels(
+            parcelport_connection_ptr const& client_connection,
             std::vector<parcel> const&, std::vector<write_handler_type> const&);
 
         /// \brief Retrieve a new connection
