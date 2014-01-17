@@ -165,10 +165,16 @@ void wait_for_tasks(hpx::lcos::local::barrier& finished)
 
 void spawn_workers(boost::uint64_t local_tasks)
 {
+//    boost::uint64_t num_thread = hpx::get_worker_thread_num();
+
     for (boost::uint64_t i = 0; i < local_tasks; ++i)
         register_work(boost::bind(&invoke_worker_timed
                                 , double(delay) * 1e-6)
-          , "invoke_worker_timed");
+          , "invoke_worker_timed"
+//          , hpx::threads::pending
+//          , hpx::threads::thread_priority_normal
+//          , num_thread
+            );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
