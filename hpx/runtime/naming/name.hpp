@@ -205,7 +205,7 @@ namespace hpx { namespace naming
         friend gid_type operator+ (gid_type const& lhs, gid_type const& rhs)
         {
             boost::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
-            boost::uint64_t msb = lhs.get_msb() + rhs.get_msb();
+            boost::uint64_t msb = lhs.id_msb_ + rhs.id_msb_;
             if (lsb < lhs.id_lsb_ || lsb < rhs.id_lsb_)
                 ++msb;
             return gid_type(msb, lsb);
@@ -223,7 +223,7 @@ namespace hpx { namespace naming
         friend gid_type operator- (gid_type const& lhs, gid_type const& rhs)
         {
             boost::uint64_t lsb = lhs.id_lsb_ - rhs.id_lsb_;
-            boost::uint64_t msb = lhs.get_msb() - rhs.get_msb();
+            boost::uint64_t msb = lhs.id_msb_ - rhs.id_msb_;
             if (lsb > lhs.id_lsb_)
                 --msb;
             return gid_type(msb, lsb);
@@ -239,7 +239,7 @@ namespace hpx { namespace naming
 
         friend gid_type operator& (gid_type const& lhs, boost::uint64_t rhs)
         {
-            return gid_type(lhs.get_msb(), lhs.id_lsb_ & rhs);
+            return gid_type(lhs.id_msb_, lhs.id_lsb_ & rhs);
         }
 
         // comparison is required as well
