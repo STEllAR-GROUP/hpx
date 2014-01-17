@@ -567,6 +567,13 @@ else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME 0)
 endif()
 
+hpx_option(HPX_THREAD_MAINTAIN_CREATION_CLEANUP_RATES BOOL "Enable measuring thread creation and cleanup times (default: OFF)" OFF ADVANCED)
+if(HPX_THREAD_MAINTAIN_CREATION_CLEANUP_RATES)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_CLEANUP_RATES 1)
+else()
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_CLEANUP_RATES 0)
+endif()
+
 hpx_option(HPX_AGAS_DUMP_REFCNT_ENTRIES BOOL "Enable dumps of the AGAS refcnt tables to logs (default: OFF)" OFF ADVANCED)
 
 if(HPX_AGAS_DUMP_REFCNT_ENTRIES)
