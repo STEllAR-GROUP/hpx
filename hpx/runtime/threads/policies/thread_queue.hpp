@@ -19,6 +19,10 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
 
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+#   include <hpx/util/tick_counter.hpp>
+#endif
+
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/atomic.hpp>
@@ -262,6 +266,10 @@ namespace hpx { namespace threads { namespace policies
         bool add_new_if_possible(std::size_t& added, thread_queue* addfrom,
             std::size_t num_thread, typename mutex_type::scoped_try_lock &lk)
         {
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+            util::tick_counter tc(add_new_time_);
+#endif
+
             if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
                 return false;
 
@@ -293,6 +301,10 @@ namespace hpx { namespace threads { namespace policies
         bool add_new_always(std::size_t& added, thread_queue* addfrom,
             std::size_t num_thread, typename mutex_type::scoped_try_lock &lk)
         {
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+            util::tick_counter tc(add_new_time_);
+#endif
+
             if (0 == addfrom->new_tasks_count_.load(boost::memory_order_relaxed))
                 return false;
 
@@ -366,6 +378,10 @@ namespace hpx { namespace threads { namespace policies
         /// (state is terminated) are properly destroyed
         bool cleanup_terminated_locked_helper(bool delete_all = false)
         {
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+            util::tick_counter tc(cleanup_terminated_time_);
+#endif
+
             if (thread_map_.empty())
                 return false;
 
@@ -479,6 +495,10 @@ namespace hpx { namespace threads { namespace policies
             thread_heap_large_(),
             thread_heap_huge_(),
             thread_heap_nostack_(),
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+            add_new_time_(0),
+            cleanup_terminated_time_(0),
+#endif
             pending_misses_(0),
             pending_accesses_(0),
             stolen_from_pending_(0),
@@ -492,6 +512,18 @@ namespace hpx { namespace threads { namespace policies
         {
             max_count_ = (0 == max_count) ? max_thread_count : max_count; //-V105
         }
+
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+        boost::uint64_t get_creation_time(bool reset)
+        {
+            return util::get_and_reset_value(add_new_time_, reset);
+        }
+
+        boost::uint64_t get_cleanup_time(bool reset)
+        {
+            return util::get_and_reset_value(cleanup_terminated_time_, reset);
+        }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
@@ -934,6 +966,11 @@ namespace hpx { namespace threads { namespace policies
         std::list<thread_id_type> thread_heap_large_;
         std::list<thread_id_type> thread_heap_huge_;
         std::list<thread_id_type> thread_heap_nostack_;
+
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+        boost::uint64_t add_new_time_;
+        boost::uint64_t cleanup_terminated_time_;
+#endif
 
         // # of times our associated worker-thread couldn't find work in work_items 
         boost::atomic<boost::int64_t> pending_misses_;  

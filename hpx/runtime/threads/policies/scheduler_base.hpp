@@ -28,10 +28,17 @@ namespace hpx { namespace threads { namespace policies
         virtual threads::mask_cref_type get_pu_mask(topology const& topology,
             std::size_t num_thread) const = 0;
         virtual std::size_t get_pu_num(std::size_t num_thread) const = 0;
+
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+        virtual boost::uint64_t get_creation_time(bool reset) = 0;
+        virtual boost::uint64_t get_cleanup_time(bool reset) = 0;
+#endif
+
         virtual std::size_t get_num_pending_misses(std::size_t num_thread,
             bool reset) = 0;
         virtual std::size_t get_num_pending_accesses(std::size_t num_thread,
             bool reset) = 0;
+
         virtual std::size_t get_num_stolen_from_pending(std::size_t num_thread,
             bool reset) = 0;
         virtual std::size_t get_num_stolen_to_pending(std::size_t num_thread,
@@ -40,11 +47,14 @@ namespace hpx { namespace threads { namespace policies
             bool reset) = 0;
         virtual std::size_t get_num_stolen_to_staged(std::size_t num_thread,
             bool reset) = 0;
+
         virtual boost::int64_t get_queue_length(
             std::size_t num_thread = std::size_t(-1)) const = 0;
+
         virtual boost::int64_t get_thread_count(thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default,
             std::size_t num_thread = std::size_t(-1), bool reset = false) const = 0;
+
         virtual void abort_all_suspended_threads() = 0;
 
         virtual bool cleanup_terminated(bool delete_all = false) = 0;

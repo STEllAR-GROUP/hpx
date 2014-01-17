@@ -140,6 +140,39 @@ namespace hpx { namespace threads { namespace policies
             return affinity_data_.get_pu_num(num_thread);
         }
 
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+        boost::uint64_t get_creation_time(bool reset)
+        {
+            boost::uint64_t time = 0;
+
+            for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+                time += high_priority_queues_[i]->get_creation_time(reset);
+
+            time += low_priority_queue_.get_creation_time(reset);
+
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+                time += queues_[i]->get_creation_time(reset);
+
+            return time;
+        }
+
+        boost::uint64_t get_cleanup_time(bool reset)
+        {
+            boost::uint64_t time = 0;
+
+            for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
+                time += high_priority_queues_[i]->
+                    get_cleanup_time(reset);
+
+            time += low_priority_queue_.get_cleanup_time(reset);
+
+            for (std::size_t i = 0; i < queues_.size(); ++i)
+                time += queues_[i]->get_cleanup_time(reset);
+
+            return time;
+        }
+#endif
+
         std::size_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
             std::size_t num_pending_misses = 0;
@@ -148,7 +181,6 @@ namespace hpx { namespace threads { namespace policies
                 for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                     num_pending_misses += high_priority_queues_[i]->
                         get_num_pending_misses(reset);
-
 
                 for (std::size_t i = 0; i < queues_.size(); ++i)
                     num_pending_misses += queues_[i]->
@@ -169,7 +201,6 @@ namespace hpx { namespace threads { namespace policies
                 for (std::size_t i = 0; i < high_priority_queues_.size(); ++i)
                     num_pending_accesses += high_priority_queues_[i]->
                         get_num_pending_accesses(reset);
-
 
                 for (std::size_t i = 0; i < queues_.size(); ++i)
                     num_pending_accesses += queues_[i]->

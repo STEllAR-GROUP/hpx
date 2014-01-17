@@ -1039,6 +1039,22 @@ namespace hpx { namespace threads
         std::size_t shepherd_count = threads_.size();
         creator_data data[] =
         {
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+            // /threads{locality#%d/total}/creation-idle-rate
+            // /threads{locality#%d/worker-thread%d}/creation-idle-rate
+            { "creation-idle-rate",
+              HPX_STD_BIND(&ti::avg_creation_idle_rate, this, _1),
+              HPX_STD_FUNCTION<boost::uint64_t(bool)>(),
+              "worker-thread", shepherd_count
+            },
+            // /threads{locality#%d/total}/cleanup-idle-rate
+            // /threads{locality#%d/worker-thread%d}/cleanup-idle-rate
+            { "cleanup-idle-rate",
+              HPX_STD_BIND(&ti::avg_cleanup_idle_rate, this, _1),
+              HPX_STD_FUNCTION<boost::uint64_t(bool)>(),
+              "worker-thread", shepherd_count
+            },
+#endif
             // /threads{locality#%d/total}/count/cumulative
             // /threads{locality#%d/worker-thread%d}/count/cumulative
             { "count/cumulative",
@@ -1047,9 +1063,9 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
-            // /threads{locality#%d/total}/count/cumulative_phases
-            // /threads{locality#%d/worker-thread%d}/count/cumulative_phases
-            { "count/cumulative_phases",
+            // /threads{locality#%d/total}/count/cumulative-phases
+            // /threads{locality#%d/worker-thread%d}/count/cumulative-phases
+            { "count/cumulative-phases",
               HPX_STD_BIND(&ti::get_executed_thread_phases, this, -1, _1),
               HPX_STD_BIND(&ti::get_executed_thread_phases, this,
                   static_cast<std::size_t>(paths.instanceindex_), _1),
@@ -1247,12 +1263,26 @@ namespace hpx { namespace threads
 #endif
             // idle rate
             { "/threads/idle-rate", performance_counters::counter_raw,
-              "returns the idle rate for the referenced object [0.1%]",
+              "returns the idle rate for the referenced object",
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::idle_rate_counter_creator, this, _1, _2),
               &performance_counters::locality_thread_counter_discoverer,
               "0.1%"
             },
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+            { "/threads/creation-idle-rate", performance_counters::counter_raw,
+              "returns the % of time spent creating HPX-threads in the scheduler", 
+              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "0.1%"
+            },
+            { "/threads/cleanup-idle-rate", performance_counters::counter_raw,
+              "returns the % of time spent cleaning up terminated HPX-threads in "
+              "the scheduler", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              &performance_counters::locality_thread_counter_discoverer,
+              "0.1%"
+            },
+#endif
             // thread counts
             { "/threads/count/cumulative", performance_counters::counter_raw,
               "returns the overall number of executed (retired) HPX-threads for "
@@ -1260,7 +1290,7 @@ namespace hpx { namespace threads
               &performance_counters::locality_thread_counter_discoverer,
               ""
             },
-            { "/threads/count/cumulative_phases", performance_counters::counter_raw,
+            { "/threads/count/cumulative-phases", performance_counters::counter_raw,
               "returns the overall number of HPX-thread phases executed for "
               "the referenced locality", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
@@ -1602,6 +1632,46 @@ namespace hpx { namespace threads
 
         return boost::int64_t(1000. * percent);   // 0.1 percent
     }
+
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        avg_creation_idle_rate(bool reset)
+    {
+        double const exec_total =
+            static_cast<double>(scheduler_.get_creation_time(reset)); 
+        double const tfunc_total =
+            std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
+
+        if (reset) 
+            std::fill(tfunc_times.begin(), tfunc_times.end(), 0);
+
+        if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
+            return 1000LL;
+
+        double const percent = (exec_total / tfunc_total);
+        return boost::int64_t(1000. * percent);    // 0.1 percent
+    }
+
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        avg_cleanup_idle_rate(bool reset)
+    {
+        double const exec_total =
+            static_cast<double>(scheduler_.get_cleanup_time(reset)); 
+        double const tfunc_total =
+            std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
+
+        if (reset) 
+            std::fill(tfunc_times.begin(), tfunc_times.end(), 0);
+
+        if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
+            return 1000LL;
+
+        double const percent = (exec_total / tfunc_total);
+        return boost::int64_t(1000. * percent);    // 0.1 percent
+    }
+#endif
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
