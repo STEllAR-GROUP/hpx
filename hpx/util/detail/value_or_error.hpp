@@ -651,10 +651,15 @@ namespace hpx { namespace util { namespace detail
 
         // type safe accessors to the stored data
         typedef typename boost::add_pointer<T*>::type pointer;
+        typedef typename boost::add_pointer<T* const>::type const_pointer;
 
         pointer get_value_address()
         {
             return static_cast<pointer>(data_.address());
+        }
+        const_pointer get_value_address() const
+        {
+            return static_cast<const_pointer>(data_.address());
         }
 
         // type safe accessors to the stored error data

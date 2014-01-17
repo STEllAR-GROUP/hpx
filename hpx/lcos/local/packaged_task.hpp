@@ -79,7 +79,7 @@ namespace hpx { namespace lcos { namespace local
             void do_run()
             {
                 try {
-                    this->set_data(f_());
+                    this->set_result(f_());
                 }
                 catch(...) {
                     this->set_exception(boost::current_exception());
@@ -117,7 +117,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 try {
                     f_();
-                    this->set_data(result_type());
+                    this->set_result(result_type());
                 }
                 catch(...) {
                     this->set_exception(boost::current_exception());
@@ -230,7 +230,7 @@ namespace hpx { namespace lcos { namespace local
             if (!task_)
                 task_ = new detail::future_object<Result>();
 
-            task_->set_data(std::forward<T>(result));
+            task_->set_result(std::forward<T>(result));
         }
 
         void set_exception(boost::exception_ptr const& e)
@@ -426,7 +426,7 @@ namespace hpx { namespace lcos { namespace local
             if (!task_)
                 task_ = new detail::future_object<void>();
 
-            task_->set_data(util::unused);
+            task_->set_result(util::unused);
         }
 
         void set_exception(boost::exception_ptr const& e)
