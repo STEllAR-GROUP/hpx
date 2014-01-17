@@ -149,7 +149,7 @@ namespace hpx { namespace util
 
             if (vm.count("hpx:localities")) {
                 std::size_t localities = vm["hpx:localities"].as<std::size_t>();
-                
+
                 if (localities == 0)
                 {
                     throw std::logic_error("Number of --hpx:localities "
@@ -297,10 +297,10 @@ namespace hpx { namespace util
 
         // The AGAS host name and port number are pre-initialized from
         //the command line
-        std::string agas_host = 
+        std::string agas_host =
             cfgmap.get_value<std::string>("hpx.agas.address", "");
         boost::uint16_t agas_port =
-            cfgmap.get_value<boost::uint16_t>("hpx.agas.port", 
+            cfgmap.get_value<boost::uint16_t>("hpx.agas.port",
                 HPX_INITIAL_IP_PORT);
 
         if (vm.count("hpx:agas")) {
@@ -359,13 +359,6 @@ namespace hpx { namespace util
         agas_host = env.agas_host_name(
             agas_host.empty() ? HPX_INITIAL_IP_ADDRESS : agas_host);
 
-        std::string hpx_host = 
-            cfgmap.get_value<std::string>("hpx.parcel.address",
-                env.host_name(HPX_INITIAL_IP_ADDRESS));
-        boost::uint16_t hpx_port =
-            cfgmap.get_value<boost::uint16_t>("hpx.parcel.port", 
-                HPX_INITIAL_IP_PORT);
-
         // handle number of cores and threads
         num_threads_ = detail::handle_num_threads(cfgmap, vm, env, using_nodelist);
         num_cores_ = detail::handle_num_cores(cfgmap, vm, num_threads_, env);
@@ -374,6 +367,15 @@ namespace hpx { namespace util
         // from MPI environment
         num_localities_ = detail::handle_num_localities(cfgmap, vm, env,
             using_nodelist, num_localities_);
+
+        // Determine our network port, use arbitrary port if running on one
+        // locality.
+        std::string hpx_host =
+            cfgmap.get_value<std::string>("hpx.parcel.address",
+                env.host_name(HPX_INITIAL_IP_ADDRESS));
+        boost::uint16_t hpx_port =
+            cfgmap.get_value<boost::uint16_t>("hpx.parcel.port",
+                num_localities_ == 1 ? 0 : HPX_INITIAL_IP_PORT);
 
         bool run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == std::size_t(-1))
@@ -419,7 +421,7 @@ namespace hpx { namespace util
 
             // do not execute any explicit hpx_main except if asked
             // otherwise
-            if (!vm.count("hpx:run-hpx-main") && 
+            if (!vm.count("hpx:run-hpx-main") &&
                 !cfgmap.get_value<int>("hpx.run_hpx_main", 0))
             {
                 util::detail::reset_function(hpx_main_f_);
