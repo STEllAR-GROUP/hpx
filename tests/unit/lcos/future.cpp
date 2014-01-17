@@ -23,7 +23,7 @@
 struct X
 {
 private:
-    BOOST_MOVABLE_BUT_NOT_COPYABLE(X);
+    HPX_MOVABLE_BUT_NOT_COPYABLE(X);
 
 public:
     int i;
@@ -311,18 +311,18 @@ void test_void_promise()
     HPX_TEST(f.get_status() == hpx::lcos::future_status::ready);
 }
 
-// void test_reference_promise()
-// {
-//     hpx::lcos::local::promise<int&> p;
-//     hpx::lcos::unique_future<int&> f = p.get_future();
-//     int i = 42;
-//     p.set_value(i);
-//     HPX_TEST(f.is_ready());
-//     HPX_TEST(f.has_value());
-//     HPX_TEST(!f.has_exception());
-//     HPX_TEST(f.get_status() == hpx::lcos::future_status::ready);
-//     HPX_TEST_EQ(&f.get(), &i);
-// }
+void test_reference_promise()
+{
+    hpx::lcos::local::promise<int&> p;
+    hpx::lcos::unique_future<int&> f = p.get_future();
+    int i = 42;
+    p.set_value(i);
+    HPX_TEST(f.is_ready());
+    HPX_TEST(f.has_value());
+    HPX_TEST(!f.has_exception());
+    HPX_TEST(f.get_status() == hpx::lcos::future_status::ready);
+    HPX_TEST_EQ(&f.get(), &i);
+}
 
 void do_nothing()
 {
@@ -341,27 +341,27 @@ void test_task_returning_void()
     HPX_TEST(fi.get_status() == hpx::lcos::future_status::ready);
 }
 
-// int global_ref_target = 0;
-//
-// int& return_ref()
-// {
-//     return global_ref_target;
-// }
-//
-// void test_task_returning_reference()
-// {
-//     hpx::lcos::local::packaged_task<int&> pt(return_ref);
-//     hpx::lcos::unique_future<int&> fi = pt.get_future();
-//
-//     pt();
-//
-//     HPX_TEST(fi.is_ready());
-//     HPX_TEST(fi.has_value());
-//     HPX_TEST(!fi.has_exception());
-//     HPX_TEST(fi.get_status() == hpx::lcos::future_status::ready);
-//     int& i = fi.get();
-//     HPX_TEST_EQ(&i, &global_ref_target);
-// }
+int global_ref_target = 0;
+
+int& return_ref()
+{
+    return global_ref_target;
+}
+
+void test_task_returning_reference()
+{
+    hpx::lcos::local::packaged_task<int&()> pt(return_ref);
+    hpx::lcos::unique_future<int&> fi = pt.get_future();
+
+    pt();
+
+    HPX_TEST(fi.is_ready());
+    HPX_TEST(fi.has_value());
+    HPX_TEST(!fi.has_exception());
+    HPX_TEST(fi.get_status() == hpx::lcos::future_status::ready);
+    int& i = fi.get();
+    HPX_TEST_EQ(&i, &global_ref_target);
+}
 
 void test_can_get_a_second_future_from_a_moved_promise()
 {
@@ -396,15 +396,15 @@ void test_can_get_a_second_future_from_a_moved_void_promise()
     HPX_TEST(fi2.is_ready());
 }
 
-// void test_unique_future_for_move_only_udt()
-// {
-//     hpx::lcos::local::promise<X> pt;
-//     hpx::lcos::unique_future<X> fi = pt.get_future();
-//
-//     pt.set_value(X());
-//     X res(fi.get());
-//     HPX_TEST_EQ(res.i, 42);
-// }
+void test_unique_future_for_move_only_udt()
+{
+    hpx::lcos::local::promise<X> pt;
+    hpx::lcos::unique_future<X> fi = pt.get_future();
+
+    pt.set_value(X());
+    X res(fi.get());
+    HPX_TEST_EQ(res.i, 42);
+}
 
 void test_unique_future_for_string()
 {
@@ -1613,12 +1613,12 @@ int hpx_main(variables_map&)
         test_cannot_get_future_twice_from_task();
         test_task_stores_exception_if_function_throws();
         test_void_promise();
-//         test_reference_promise();
+        test_reference_promise();
         test_task_returning_void();
-//         test_task_returning_reference();
+        test_task_returning_reference();
         test_can_get_a_second_future_from_a_moved_promise();
         test_can_get_a_second_future_from_a_moved_void_promise();
-//         test_unique_future_for_move_only_udt();
+        test_unique_future_for_move_only_udt();
         test_unique_future_for_string();
         test_wait_callback();
         test_wait_callback_with_timed_wait();
