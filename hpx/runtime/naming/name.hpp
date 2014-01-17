@@ -81,11 +81,13 @@ namespace hpx { namespace naming
             {
             private:
                 gid_type const *gid_;
+                bool owns_lock;
 
                 HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_lock);
             public:
                 scoped_lock(gid_type const *gid)
                   : gid_(gid)
+                  , owns_lock(false)
                 {
                     lock();
                 }
@@ -98,11 +100,16 @@ namespace hpx { namespace naming
                 void lock()
                 {
                     gid_type_mutex::lock(gid_);
+                    owns_lock = true;
                 }
 
                 void unlock()
                 {
-                    gid_type_mutex::unlock(gid_);
+                    if(owns_lock)
+                    {
+                        gid_type_mutex::unlock(gid_);
+                        owns_lock = false;
+                    }
                 }
             };
         };
@@ -126,7 +133,7 @@ namespace hpx { namespace naming
         static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
 
         static boost::uint64_t const lock_mask = 0x20000000ul; //-V112
-        static boost::uint64_t const lock_shift = 29;
+        static boost::uint16_t const lock_shift = 29;
 
         explicit gid_type (boost::uint64_t lsb_id = 0)
           : id_msb_(0), id_lsb_(lsb_id)
@@ -137,15 +144,30 @@ namespace hpx { namespace naming
         explicit gid_type (boost::uint64_t msb_id, boost::uint64_t lsb_id)
           : id_msb_(msb_id), id_lsb_(lsb_id)
         {
-            // explicitly clear the lock mask to avoid potential deadlocks
-            id_msb_ &= ~(1 << lock_shift);
+            // explicitly clear the lock bit to avoid potential deadlocks
+            clear_lock_bit();
+            HPX_ITT_SYNC_CREATE(this, "hpx::naming::gid_type", "");
+        }
+
+        gid_type (gid_type const & gid)
+          : id_msb_(gid.id_msb_), id_lsb_(gid.id_lsb_)
+        {
+            // explicitly clear the lock bit to avoid potential deadlocks
+            clear_lock_bit();
             HPX_ITT_SYNC_CREATE(this, "hpx::naming::gid_type", "");
         }
 
         gid_type& operator=(boost::uint64_t lsb_id)
         {
-            id_msb_ = 0;
+            set_msb(0);
             id_lsb_ = lsb_id;
+            return *this;
+        }
+
+        gid_type& operator=(gid_type const & gid)
+        {
+            set_msb(gid.id_msb_);
+            id_lsb_ = gid.id_lsb_;
             return *this;
         }
 
@@ -279,14 +301,10 @@ namespace hpx { namespace naming
         }
         void set_msb(boost::uint64_t msb)
         {
-            if(id_msb_ & (1 << lock_shift))
-            {
-                id_msb_ = msb | (1 << lock_shift);
-            }
-            else
-            {
-                id_msb_ = msb;
-            }
+            bool own_lock(owns_lock());
+            id_msb_ = msb;
+            if(own_lock) set_lock_bit();
+            else         clear_lock_bit();
         }
         boost::uint64_t get_lsb() const
         {
@@ -319,6 +337,19 @@ namespace hpx { namespace naming
         friend class boost::serialization::access;
         friend struct detail::gid_type_mutex<tag>;
 
+        bool owns_lock() const
+        {
+            return (id_msb_ & (1 << lock_shift));
+        }
+        void set_lock_bit() const
+        {
+            const_cast<gid_type *>(this)->id_msb_ |= (1 << lock_shift);
+        }
+        void clear_lock_bit() const
+        {
+            const_cast<gid_type *>(this)->id_msb_ &= ~(1 << lock_shift);
+        }
+
         template <typename Archive>
         void save(Archive& ar, const unsigned int /*version*/) const
         {
@@ -331,12 +362,13 @@ namespace hpx { namespace naming
         template <typename Archive>
         void load(Archive& ar, const unsigned int /*version*/)
         {
+            bool own_lock(owns_lock());
             if(ar.flags() & util::disable_array_optimization)
                 ar >> id_msb_ >> id_lsb_;
             else
                 ar.load(*this);
-            // explicitly clear the lock mask to avoid potential deadlocks
-            id_msb_ &= ~(1 << lock_shift);
+            if(own_lock) set_lock_bit();
+            else         clear_lock_bit();
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -575,15 +607,15 @@ namespace hpx { namespace naming
         {
             HPX_ITT_SYNC_PREPARE(const_cast<gid_type *>(gid));
             typename mutex_type::scoped_lock l(gid);
-            if(gid->id_msb_ & (1 << gid_type::lock_shift))
+            if(gid->owns_lock())
             {
                 HPX_ITT_SYNC_CANCEL(const_cast<gid_type *>(gid));
                 return false;
             }
             // set the lock bit, we have now acquired the mutex
-            const_cast<gid_type *>(gid)->id_msb_ |= (1 << gid_type::lock_shift);
+            gid->set_lock_bit();
             
-            HPX_ASSERT(gid->id_msb_ & (1 << gid_type::lock_shift));
+            HPX_ASSERT(gid->owns_lock());
                     
             HPX_ITT_SYNC_ACQUIRED(const_cast<gid_type *>(gid));
             
@@ -596,9 +628,9 @@ namespace hpx { namespace naming
         {
             HPX_ITT_SYNC_RELEASING(const_cast<gid_type *>(gid));
             typename mutex_type::scoped_lock l(gid);
-            HPX_ASSERT(gid->id_msb_ & (1 << gid_type::lock_shift));
+            HPX_ASSERT(gid->owns_lock());
             // clear the lock bit, we have now released the mutex
-            const_cast<gid_type *>(gid)->id_msb_ &= ~(1 << gid_type::lock_shift);
+            gid->clear_lock_bit();
             
             HPX_ITT_SYNC_RELEASED(const_cast<gid_type *>(gid));
             util::unregister_lock(gid);
