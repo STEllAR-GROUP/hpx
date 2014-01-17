@@ -1045,14 +1045,14 @@ namespace hpx { namespace threads
             { "creation-idle-rate",
               HPX_STD_BIND(&ti::avg_creation_idle_rate, this, _1),
               HPX_STD_FUNCTION<boost::uint64_t(bool)>(),
-              "worker-thread", shepherd_count
+              "", 0
             },
             // /threads{locality#%d/total}/cleanup-idle-rate
             // /threads{locality#%d/worker-thread%d}/cleanup-idle-rate
             { "cleanup-idle-rate",
               HPX_STD_BIND(&ti::avg_cleanup_idle_rate, this, _1),
               HPX_STD_FUNCTION<boost::uint64_t(bool)>(),
-              "worker-thread", shepherd_count
+              "", 0
             },
 #endif
             // /threads{locality#%d/total}/count/cumulative
