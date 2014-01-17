@@ -1,12 +1,4 @@
-#ifndef HPX_UTIL_SPINLOCK_POOL_HPP_INCLUDED
-#define HPX_UTIL_SPINLOCK_POOL_HPP_INCLUDED
-
-// MS compatible compilers support #pragma once
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1020)
-# pragma once
-#endif
-
+//  Copyright (c) 2012 Hartmut Kaiser
 //
 //  taken from:
 //  boost/detail/spinlock_pool.hpp
@@ -16,11 +8,15 @@
 //  Distributed under the Boost Software License, Version 1.0.
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
-//
-//  spinlock_pool<0> is reserved for atomic<>, when/if it arrives
-//  spinlock_pool<1> is reserved for shared_ptr reference counts
-//  spinlock_pool<2> is reserved for shared_ptr atomic access
-//
+
+#ifndef HPX_UTIL_SPINLOCK_POOL_HPP_INCLUDED
+#define HPX_UTIL_SPINLOCK_POOL_HPP_INCLUDED
+
+// MS compatible compilers support #pragma once
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# pragma once
+#endif
 
 #include <boost/config.hpp>
 #include <boost/version.hpp>
@@ -70,9 +66,7 @@ namespace hpx { namespace util
         private:
             boost::detail::spinlock & sp_;
 
-            scoped_lock( scoped_lock const & );
-            scoped_lock & operator=( scoped_lock const & );
-
+            HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_lock);
         public:
 
             explicit scoped_lock( void const * pv ): sp_( spinlock_for( pv ) )

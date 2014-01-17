@@ -22,8 +22,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/util/safe_bool.hpp>
-#include <hpx/util/spinlock_pool.hpp>
 #include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -233,7 +233,7 @@ namespace hpx { namespace naming
         }
 
         struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
+        typedef hpx::lcos::local::spinlock_pool<tag> mutex_type;
 
     private:
         friend std::ostream& operator<< (std::ostream& os, gid_type const& id);

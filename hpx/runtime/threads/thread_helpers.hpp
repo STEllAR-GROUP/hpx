@@ -12,7 +12,7 @@
 #include <hpx/util/move.hpp>
 #include <hpx/util/backtrace.hpp>
 #include <hpx/exception.hpp>
-#include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
@@ -22,6 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads
 {
+    struct thread_init_data;
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the
     ///         thread_id \a id.
