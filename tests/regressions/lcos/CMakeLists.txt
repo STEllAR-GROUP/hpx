@@ -83,3 +83,8 @@ foreach(test ${tests})
                               ${test}_test_exe)
 endforeach()
 
+add_hpx_test(
+  "tests.regressions.lcos" after_588_4
+  EXECUTABLE after_588
+  LOCALITIES 2
+  THREADS_PER_LOCALITY 4)

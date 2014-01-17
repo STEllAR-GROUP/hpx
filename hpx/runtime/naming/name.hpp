@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
@@ -23,7 +24,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/safe_bool.hpp>
-#include <hpx/util/spinlock_pool.hpp>
+#include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/runtime/naming/address.hpp>
@@ -40,11 +41,78 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace naming
 {
+    struct HPX_EXPORT gid_type;
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
         // forward declaration
         inline boost::uint64_t strip_credit_from_gid(boost::uint64_t msb) HPX_SUPER_PURE;
+
+        ///////////////////////////////////////////////////////////////////////
+        // A special lock type for gid_type:
+        // It uses a spinlock pool for mutual exclusive access to the gid's 
+        // credit count to mark that the gid is currently locked.
+        template <typename Tag>
+        struct gid_type_mutex
+        {
+        private:
+            typedef hpx::lcos::local::spinlock_pool<Tag> mutex_type;
+
+        public:
+            static bool try_lock(gid_type const *gid);
+            static void unlock(gid_type const *gid);
+            static void lock(gid_type const *gid)
+            {
+                HPX_ITT_SYNC_PREPARE(const_cast<gid_type *>(gid));
+
+                // only suspend in yield if there aren't any locks
+                // previously registered for this running HPX thread
+                bool suspend = (util::registered_lock_count() == 0);
+                for (std::size_t k = 0; !try_lock(gid); ++k)
+                {
+                    hpx::lcos::local::spinlock::yield(k, suspend);
+                }
+
+                HPX_ITT_SYNC_ACQUIRED(const_cast<gid_type *>(gid));
+                util::register_lock(gid);
+            }
+
+            struct scoped_lock
+            {
+            private:
+                gid_type const *gid_;
+                bool owns_lock;
+
+                HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_lock);
+            public:
+                scoped_lock(gid_type const *gid)
+                  : gid_(gid)
+                  , owns_lock(false)
+                {
+                    lock();
+                }
+                
+                ~scoped_lock()
+                {
+                    unlock();
+                }
+                
+                void lock()
+                {
+                    gid_type_mutex::lock(gid_);
+                    owns_lock = true;
+                }
+
+                void unlock()
+                {
+                    if(owns_lock)
+                    {
+                        gid_type_mutex::unlock(gid_);
+                        owns_lock = false;
+                    }
+                }
+            };
+        };
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -64,24 +132,48 @@ namespace hpx { namespace naming
 
         static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
 
+        static boost::uint64_t const lock_mask = 0x20000000ul; //-V112
+        static boost::uint16_t const lock_shift = 29;
+
         explicit gid_type (boost::uint64_t lsb_id = 0)
           : id_msb_(0), id_lsb_(lsb_id)
-        {}
+        {
+            HPX_ITT_SYNC_CREATE(this, "hpx::naming::gid_type", "");
+        }
 
         explicit gid_type (boost::uint64_t msb_id, boost::uint64_t lsb_id)
           : id_msb_(msb_id), id_lsb_(lsb_id)
-        {}
+        {
+            // explicitly clear the lock bit to avoid potential deadlocks
+            clear_lock_bit();
+            HPX_ITT_SYNC_CREATE(this, "hpx::naming::gid_type", "");
+        }
+
+        gid_type (gid_type const & gid)
+          : id_msb_(gid.id_msb_), id_lsb_(gid.id_lsb_)
+        {
+            // explicitly clear the lock bit to avoid potential deadlocks
+            clear_lock_bit();
+            HPX_ITT_SYNC_CREATE(this, "hpx::naming::gid_type", "");
+        }
 
         gid_type& operator=(boost::uint64_t lsb_id)
         {
-            id_msb_ = 0;
+            set_msb(0);
             id_lsb_ = lsb_id;
+            return *this;
+        }
+
+        gid_type& operator=(gid_type const & gid)
+        {
+            set_msb(gid.id_msb_);
+            id_lsb_ = gid.id_lsb_;
             return *this;
         }
 
         operator util::safe_bool<gid_type>::result_type() const
         {
-            return util::safe_bool<gid_type>()(0 != id_lsb_ || 0 != id_msb_);
+            return util::safe_bool<gid_type>()(0 != id_lsb_ || 0 != get_msb());
         }
 
         // We support increment, decrement, addition and subtraction
@@ -153,8 +245,8 @@ namespace hpx { namespace naming
         // comparison is required as well
         friend bool operator== (gid_type const& lhs, gid_type const& rhs)
         {
-            return (detail::strip_credit_from_gid(lhs.id_msb_) ==
-                    detail::strip_credit_from_gid(rhs.id_msb_)) &&
+            return (detail::strip_credit_from_gid(lhs.get_msb()) ==
+                    detail::strip_credit_from_gid(rhs.get_msb())) &&
                 (lhs.id_lsb_ == rhs.id_lsb_);
         }
         friend bool operator!= (gid_type const& lhs, gid_type const& rhs)
@@ -164,13 +256,13 @@ namespace hpx { namespace naming
 
         friend bool operator< (gid_type const& lhs, gid_type const& rhs)
         {
-            if (detail::strip_credit_from_gid(lhs.id_msb_) <
-                detail::strip_credit_from_gid(rhs.id_msb_))
+            if (detail::strip_credit_from_gid(lhs.get_msb()) <
+                detail::strip_credit_from_gid(rhs.get_msb()))
             {
                 return true;
             }
-            if (detail::strip_credit_from_gid(lhs.id_msb_) >
-                detail::strip_credit_from_gid(rhs.id_msb_))
+            if (detail::strip_credit_from_gid(lhs.get_msb()) >
+                detail::strip_credit_from_gid(rhs.get_msb()))
             {
                 return false;
             }
@@ -179,13 +271,13 @@ namespace hpx { namespace naming
 
         friend bool operator<= (gid_type const& lhs, gid_type const& rhs)
         {
-            if (detail::strip_credit_from_gid(lhs.id_msb_) <
-                detail::strip_credit_from_gid(rhs.id_msb_))
+            if (detail::strip_credit_from_gid(lhs.get_msb()) <
+                detail::strip_credit_from_gid(rhs.get_msb()))
             {
                 return true;
             }
-            if (detail::strip_credit_from_gid(lhs.id_msb_) >
-                detail::strip_credit_from_gid(rhs.id_msb_))
+            if (detail::strip_credit_from_gid(lhs.get_msb()) >
+                detail::strip_credit_from_gid(rhs.get_msb()))
             {
                 return false;
             }
@@ -204,11 +296,15 @@ namespace hpx { namespace naming
 
         boost::uint64_t get_msb() const
         {
-            return id_msb_;
+            // clear the lock bit upon returning the msb
+            return id_msb_ & ~(1 << lock_shift);
         }
         void set_msb(boost::uint64_t msb)
         {
+            bool own_lock(owns_lock());
             id_msb_ = msb;
+            if(own_lock) set_lock_bit();
+            else         clear_lock_bit();
         }
         boost::uint64_t get_lsb() const
         {
@@ -227,18 +323,32 @@ namespace hpx { namespace naming
         {
             hpx::util::osstream out;
             out << std::hex
-                << std::right << std::setfill('0') << std::setw(16) << id_msb_
+                << std::right << std::setfill('0') << std::setw(16) << get_msb()
                 << std::right << std::setfill('0') << std::setw(16) << id_lsb_;
             return hpx::util::osstream_get_string(out);
         }
 
         struct tag {};
-        typedef hpx::util::spinlock_pool<tag> mutex_type;
+        typedef detail::gid_type_mutex<tag> mutex_type;
 
     private:
         friend std::ostream& operator<< (std::ostream& os, gid_type const& id);
 
         friend class boost::serialization::access;
+        friend struct detail::gid_type_mutex<tag>;
+
+        bool owns_lock() const
+        {
+            return (id_msb_ & (1 << lock_shift));
+        }
+        void set_lock_bit() const
+        {
+            const_cast<gid_type *>(this)->id_msb_ |= (1 << lock_shift);
+        }
+        void clear_lock_bit() const
+        {
+            const_cast<gid_type *>(this)->id_msb_ &= ~(1 << lock_shift);
+        }
 
         template <typename Archive>
         void save(Archive& ar, const unsigned int /*version*/) const
@@ -252,10 +362,13 @@ namespace hpx { namespace naming
         template <typename Archive>
         void load(Archive& ar, const unsigned int /*version*/)
         {
+            bool own_lock(owns_lock());
             if(ar.flags() & util::disable_array_optimization)
                 ar >> id_msb_ >> id_lsb_;
             else
                 ar.load(*this);
+            if(own_lock) set_lock_bit();
+            else         clear_lock_bit();
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -488,6 +601,41 @@ namespace hpx { namespace naming
 
             return newid;
         }
+        
+        template <typename Tag>
+        bool gid_type_mutex<Tag>::try_lock(gid_type const *gid)
+        {
+            HPX_ITT_SYNC_PREPARE(const_cast<gid_type *>(gid));
+            typename mutex_type::scoped_lock l(gid);
+            if(gid->owns_lock())
+            {
+                HPX_ITT_SYNC_CANCEL(const_cast<gid_type *>(gid));
+                return false;
+            }
+            // set the lock bit, we have now acquired the mutex
+            gid->set_lock_bit();
+            
+            HPX_ASSERT(gid->owns_lock());
+                    
+            HPX_ITT_SYNC_ACQUIRED(const_cast<gid_type *>(gid));
+            
+            util::register_lock(gid);
+            return true;
+        }
+        
+        template <typename Tag>
+        void gid_type_mutex<Tag>::unlock(gid_type const *gid)
+        {
+            HPX_ITT_SYNC_RELEASING(const_cast<gid_type *>(gid));
+            typename mutex_type::scoped_lock l(gid);
+            HPX_ASSERT(gid->owns_lock());
+            // clear the lock bit, we have now released the mutex
+            gid->clear_lock_bit();
+            
+            HPX_ITT_SYNC_RELEASED(const_cast<gid_type *>(gid));
+            util::unregister_lock(gid);
+        }
+
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -501,7 +649,7 @@ namespace hpx { namespace naming
         {
             os << std::hex
                << "{" << std::right << std::setfill('0') << std::setw(16)
-                      << id.id_msb_ << ", "
+                      << id.get_msb() << ", "
                       << std::right << std::setfill('0') << std::setw(16)
                       << id.id_lsb_ << "}";
         }

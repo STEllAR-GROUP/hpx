@@ -70,9 +70,7 @@ namespace hpx { namespace util
         private:
             boost::detail::spinlock & sp_;
 
-            scoped_lock( scoped_lock const & );
-            scoped_lock & operator=( scoped_lock const & );
-
+            HPX_MOVABLE_BUT_NOT_COPYABLE(scoped_lock);
         public:
 
             explicit scoped_lock( void const * pv ): sp_( spinlock_for( pv ) )

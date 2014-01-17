@@ -1615,7 +1615,7 @@ void addressing_service::add_incref_request(
   , naming::id_type const& keep_alive
     )
 {
-    return incref_requests_->add_incref_request(credit, keep_alive);
+    incref_requests_->add_incref_request(credit, keep_alive);
 }
 
 bool addressing_service::add_remote_incref_request(
@@ -1832,11 +1832,11 @@ void addressing_service::decref(
     try {
         naming::gid_type raw = naming::detail::get_stripped_gid(gid);
 
-        mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
         // Match the decref request with entries in the incref table
         if (!incref_requests_->add_decref_request(credit, raw))
         {
+            mutex_type::scoped_lock l(refcnt_requests_mtx_);
             // file 'real' decref request only if there is no pending incref
             // request for this gid
             refcnt_requests_->apply(raw,
