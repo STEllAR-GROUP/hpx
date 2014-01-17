@@ -193,7 +193,6 @@ namespace hpx { namespace util
     {
         if(threads::get_self_ptr() != 0)
         {
-            HPX_ASSERT(register_locks::get_lock_count() > 0);
             ++register_locks::get_lock_count();
         }
         return true;

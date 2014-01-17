@@ -25,7 +25,7 @@ namespace hpx { namespace util
     // This function returns if there are already registered locks for this thread
     HPX_API_EXPORT std::size_t registered_lock_count();
 #else
-    std::size_t registered_lock_count()
+    inline std::size_t registered_lock_count()
     {
         return 0;
     }
