@@ -23,13 +23,7 @@ namespace hpx { namespace util
     HPX_API_EXPORT void verify_no_locks();
     HPX_API_EXPORT void force_error_on_lock();
     HPX_API_EXPORT void enable_lock_detection();
-    // This function returns if there are already registered locks for this thread
-    HPX_API_EXPORT std::size_t registered_lock_count();
 #else
-    inline std::size_t registered_lock_count()
-    {
-        return 0;
-    }
     inline bool register_lock(void const*, util::register_lock_data* = 0)
     {
         return true;
@@ -48,6 +42,9 @@ namespace hpx { namespace util
     {
     }
 #endif
+
+    // This function returns if there are already registered locks for this thread
+    HPX_API_EXPORT std::size_t registered_lock_count();
 }}
 
 #endif
