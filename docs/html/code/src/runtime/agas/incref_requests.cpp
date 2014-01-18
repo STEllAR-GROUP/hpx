@@ -281,20 +281,21 @@ namespace hpx { namespace agas { namespace detail
                     matching_data.push_back(data);
 
                     // not all pending credits were acknowledged
-                    matching_data.back().credit_ = credits;
+                    incref_request_data& back = matching_data.back();
+                    back.credit_ = credits;
 
                     // For local entries, handle as many decref requests as we
                     // have received.
                     if (debits != 0 && data.locality_ == naming::invalid_locality_id)
                     {
-                        if (matching_data.back().debit_ > debits)
+                        if (back.debit_ > debits)
                         {
                             // release available amount of decrefs
                             data.debit_ -= debits;
-                            matching_data.back().debit_ = debits;
+                            back.debit_ = debits;
                             debits = 0;
                         }
-                        else if (matching_data.back().debit_ != 0)
+                        else if (back.debit_ != 0)
                         {
                             // all pending decref requests can be released
                             data.debit_ = 0;
@@ -322,7 +323,8 @@ namespace hpx { namespace agas { namespace detail
                     iterator it = r.first++;
                     store_.erase(it);
 
-                    if (matching_data.back().debit_ != 0)
+                    incref_request_data& back = matching_data.back();
+                    if (back.debit_ != 0)
                     {
                         // This entry also stores some pending decref requests.
                         // We're allowed to release those decref requests only
@@ -336,23 +338,24 @@ namespace hpx { namespace agas { namespace detail
                         if (rr.first != rr.second)
                         {
                             // Reinsert the data as local pure decref requests
-                            decref_data.push_back(matching_data.back());
+                            decref_data.push_back(back);
                             decref_data.back().credit_ = 0;
 
                             // Don't release the decref request right now.
-                            matching_data.back().debit_ = 0;
+                            back.debit_ = 0;
                         }
                         else if (matching_data.back().debit_ > debits)
                         {
                             // Reinsert the data as local pure decref requests
                             // for the remaining amount.
-                            decref_data.push_back(matching_data.back());
-                            decref_data.back().credit_ = 0;
-                            decref_data.back().debit_ =
-                                matching_data.back().debit_ - debits;
+                            decref_data.push_back(back);
+
+                            incref_request_data& decref_back = decref_data.back();
+                            decref_back.credit_ = 0;
+                            decref_back.debit_ = back.debit_ - debits;
 
                             // Release the given amount of decrefs now.
-                            matching_data.back().debit_ = debits;
+                            back.debit_ = debits;
 
                             // Adjust remaining amount of decref requests.
                             debits = 0;
@@ -362,7 +365,7 @@ namespace hpx { namespace agas { namespace detail
                             // Adjust remaining amount of decref requests as
                             // we're releasing all of the decrefs of the
                             // current entry.
-                            debits -= matching_data.back().debit_;
+                            debits -= back.debit_;
                         }
                     }
                 }

@@ -360,7 +360,7 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         // set options
-        void set_option(basic_acceptor_options::msg_num opt,
+        void set_option(basic_acceptor_options::msg_num const& opt,
             boost::system::error_code &ec)
         {
             if (mq_) {
@@ -372,7 +372,7 @@ namespace hpx { namespace parcelset { namespace shmem
             }
         }
 
-        void set_option(basic_acceptor_options::manage opt,
+        void set_option(basic_acceptor_options::manage const& opt,
             boost::system::error_code &ec)
         {
             if (mq_) {

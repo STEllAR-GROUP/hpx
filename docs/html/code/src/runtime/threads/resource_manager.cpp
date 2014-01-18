@@ -112,7 +112,7 @@ namespace hpx { namespace threads
         std::size_t punit = 0;
         for (std::size_t i = 0; i != available_punits.size(); ++i)
         {
-            if (available_punits[i] == punit_status::reserved)
+            if (available_punits[i] == punit_status::reserved) //-V104
             {
                 proxy->add_processing_unit(punit, i, ec);
                 if (ec) break;

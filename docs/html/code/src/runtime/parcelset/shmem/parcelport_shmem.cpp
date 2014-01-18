@@ -355,7 +355,7 @@ namespace hpx { namespace parcelset { namespace shmem
     void parcelport::send_pending_parcels_trampoline(
         boost::system::error_code const& ec,
         naming::locality const& locality_id,
-        parcelport_connection_ptr client_connection)
+        parcelport_connection_ptr const& client_connection)
     {
         {
             lcos::local::spinlock::scoped_lock l(mtx_);
@@ -377,7 +377,7 @@ namespace hpx { namespace parcelset { namespace shmem
     }
 
     void parcelport::send_pending_parcels(
-        parcelport_connection_ptr client_connection,
+        parcelport_connection_ptr const& client_connection,
         std::vector<parcel> const & parcels,
         std::vector<write_handler_type> const & handlers)
     {
@@ -543,7 +543,7 @@ namespace hpx { namespace parcelset { namespace shmem
 
                     std::size_t parcel_count = 0;
 
-                    archive >> parcel_count;
+                    archive >> parcel_count; //-V128
                     for(std::size_t i = 0; i < parcel_count; ++i)
                     {
                         // de-serialize parcel and add it to incoming parcel queue

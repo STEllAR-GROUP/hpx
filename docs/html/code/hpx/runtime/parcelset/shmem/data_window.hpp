@@ -779,7 +779,7 @@ namespace hpx { namespace parcelset { namespace shmem
         }
 
         // set options
-        void set_option(basic_data_window_options::msg_num opt,
+        void set_option(basic_data_window_options::msg_num const& opt,
             boost::system::error_code &ec)
         {
             if (read_mq_ || write_mq_) {
@@ -791,7 +791,7 @@ namespace hpx { namespace parcelset { namespace shmem
             }
         }
 
-        void set_option(basic_data_window_options::bound_to opt,
+        void set_option(basic_data_window_options::bound_to const& opt,
             boost::system::error_code &ec)
         {
             if (read_mq_ || write_mq_) {
@@ -803,7 +803,7 @@ namespace hpx { namespace parcelset { namespace shmem
             }
         }
 
-        void set_option(basic_data_window_options::manage opt,
+        void set_option(basic_data_window_options::manage const& opt,
             boost::system::error_code &ec)
         {
             if (read_mq_ || write_mq_) {

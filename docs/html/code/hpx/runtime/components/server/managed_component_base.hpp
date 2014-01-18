@@ -279,6 +279,7 @@ namespace hpx { namespace components
         {
             return std::move(f);
         }
+
     protected:
         template <typename>
         friend struct detail_adl_barrier::init;
