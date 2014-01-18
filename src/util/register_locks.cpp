@@ -138,7 +138,7 @@ namespace hpx { namespace util
                            "(stack backtrace was disabled at compile time)";
                 }
                 else {
-                    std::cout << back_trace << std::endl;
+//                     std::cout << back_trace << std::endl;
                     LERR_(debug)
                         << "suspending thread while at least one lock is being held, "
                         << "stack backtrace: " << back_trace;
