@@ -67,7 +67,6 @@ std::string format_build_date(std::string timestamp)
 void print_results(
     boost::uint64_t cores
   , double walltime
-  , std::vector<std::string> const& counters
   , std::vector<std::string> const& counter_shortnames
   , boost::shared_ptr<hpx::util::activate_counters> ac 
     )
@@ -158,17 +157,15 @@ void wait_for_tasks(hpx::lcos::local::barrier& finished)
         finished.wait();
 }
 
-void spawn_workers(boost::uint64_t local_tasks)
+void spawn_workers(boost::uint64_t local_tasks, boost::uint64_t num_thread)
 {
-//    boost::uint64_t num_thread = hpx::get_worker_thread_num();
-
     for (boost::uint64_t i = 0; i < local_tasks; ++i)
         register_work(boost::bind(&invoke_worker_timed
                                 , double(delay) * 1e-6)
           , "invoke_worker_timed"
-//          , hpx::threads::pending
-//          , hpx::threads::thread_priority_normal
-//          , num_thread
+          , hpx::threads::pending
+          , hpx::threads::thread_priority_normal
+          , num_thread
             );
 }
 
@@ -256,20 +253,7 @@ int hpx_main(
         // performance counter reset above.
         boost::uint64_t const num_thread = hpx::get_worker_thread_num();
 
-        for (boost::uint64_t i = 0; i < os_thread_count; ++i)
-        {
-            if (num_thread == i) continue;
-
-            register_work(boost::bind(&spawn_workers
-                                    , tasks_per_feeder)
-                , "spawn_workers"
-                , hpx::threads::pending
-                , hpx::threads::thread_priority_normal
-                , i
-                  );
-        }
-
-        spawn_workers(tasks_per_feeder);
+        spawn_workers(total_tasks, num_thread);
 
 //        started.wait();
 

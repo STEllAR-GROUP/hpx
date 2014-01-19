@@ -12,6 +12,14 @@
 namespace hpx { namespace util
 {
     // helper function for counter evaluation
+    inline boost::uint64_t get_and_reset_value(boost::uint64_t& value, bool reset)
+    {
+        boost::uint64_t result = value;
+        if (reset)
+            value = 0;
+        return result;
+    }
+
     inline boost::int64_t get_and_reset_value(boost::int64_t& value, bool reset)
     {
         boost::int64_t result = value;

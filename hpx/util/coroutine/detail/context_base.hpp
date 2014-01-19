@@ -513,7 +513,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       ctx_exited_abnormally // process exited uncleanly.
     };
 
-    void rebind(thread_id_repr_type id)
+    void rebind_base(thread_id_repr_type id)
     {
 #if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
       HPX_ASSERT(exited() && 0 == m_wait_counter && !pending());

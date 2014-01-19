@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -67,7 +69,6 @@ std::string format_build_date(std::string timestamp)
 void print_results(
     boost::uint64_t cores
   , double walltime
-  , std::vector<std::string> const& counters
   , std::vector<std::string> const& counter_shortnames
   , boost::shared_ptr<hpx::util::activate_counters> ac 
     )
@@ -132,6 +133,10 @@ int invoke_worker_timed(double delay_sec)
 {
     volatile int i = 0;
     worker_timed(delay_sec, &i);
+
+    hpx::error_code ec(hpx::lightweight);
+    hpx::this_thread::suspend(hpx::threads::suspended, "suspend", ec);
+
     return i;
 }
 
@@ -146,11 +151,19 @@ void blocker(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void wait_for_tasks(hpx::lcos::local::barrier& finished)
+void wait_for_tasks(
+    hpx::lcos::local::barrier& finished
+  , boost::uint64_t wait_count
+    )
 {
-    if (get_thread_count(hpx::threads::thread_priority_normal) != 1)
+    boost::uint64_t const hpx_threads =
+        get_thread_count(hpx::threads::thread_priority_normal
+                       , hpx::threads::suspended);
+
+    if (hpx_threads != (wait_count + 1))
     {
-        register_work(boost::bind(&wait_for_tasks, boost::ref(finished)),
+        register_work(
+            boost::bind(&wait_for_tasks, boost::ref(finished), wait_count),
             "wait_for_tasks", hpx::threads::pending,
             hpx::threads::thread_priority_low);
     }
@@ -278,7 +291,11 @@ int hpx_main(
         // executed, and then it
         hpx::lcos::local::barrier finished(2);
 
-        register_work(boost::bind(&wait_for_tasks, boost::ref(finished)),
+        register_work(
+            boost::bind(&wait_for_tasks
+                      , boost::ref(finished)
+                      , total_tasks
+                        ),
             "wait_for_tasks", hpx::threads::pending,
             hpx::threads::thread_priority_low);
 
@@ -289,6 +306,9 @@ int hpx_main(
 
         print_results(os_thread_count, time_elapsed, counter_shortnames, ac);
     }
+
+    // Force termination of all suspended tasks.
+    hpx::get_runtime().get_thread_manager().abort_all_suspended_threads();
 
     return finalize();
 }

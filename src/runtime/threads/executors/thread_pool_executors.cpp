@@ -381,6 +381,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
 namespace hpx { namespace threads { namespace executors
 {
+#if defined(HPX_LOCAL_SCHEDULER)
     ///////////////////////////////////////////////////////////////////////////
     local_queue_executor::local_queue_executor(
             std::size_t max_punits, std::size_t min_punits)
@@ -388,6 +389,7 @@ namespace hpx { namespace threads { namespace executors
             policies::local_queue_scheduler<lcos::local::spinlock> >(
                 max_punits, min_punits))
     {}
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     local_priority_queue_executor::local_priority_queue_executor(

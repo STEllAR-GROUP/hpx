@@ -20,6 +20,8 @@ set(benchmarks
     hpx_homogeneous_task_spawn
     hpx_homogeneous_task_spawn_executors
     hpx_homogeneous_timed_task_spawn
+    hpx_homogeneous_timed_task_spawn_suspension
+    hpx_homogeneous_timed_task_spawn_starvation
     hpx_homogeneous_timed_task_spawn_executors
     hpx_heterogeneous_task_spawn
     native_tls_overhead
@@ -119,6 +121,8 @@ endif()
 set(hpx_homogeneous_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
 set(hpx_homogeneous_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component test_worker_lib)
 set(hpx_homogeneous_timed_task_spawn_FLAGS DEPENDENCIES test_worker_timed_lib)
+set(hpx_homogeneous_timed_task_spawn_suspension_FLAGS DEPENDENCIES test_worker_timed_lib)
+set(hpx_homogeneous_timed_task_spawn_starvation_FLAGS DEPENDENCIES test_worker_timed_lib)
 #set(hpx_homogeneous_timed_task_spawn_FLAGS DEPENDENCIES iostreams_component test_worker_timed_lib)
 set(hpx_homogeneous_timed_task_spawn_executors_FLAGS DEPENDENCIES iostreams_component test_worker_timed_lib)
 

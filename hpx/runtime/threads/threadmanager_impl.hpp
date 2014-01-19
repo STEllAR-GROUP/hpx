@@ -439,6 +439,11 @@ namespace hpx { namespace threads
         boost::int64_t avg_idle_rate(bool reset);
         boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
 
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+        boost::int64_t avg_creation_idle_rate(bool reset);
+        boost::int64_t avg_cleanup_idle_rate(bool reset);
+#endif
+
     protected:
         // this is the thread function executing the work items in the queue
         void tfunc(std::size_t num_thread, topology const& topology_);
