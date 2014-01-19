@@ -27,8 +27,24 @@ namespace hpx { namespace components { namespace server
           : locality_(locality_id)
         {}
 
+        // this should be generated implicitly
+        lazy_result(lazy_result&& other)
+          : locality_(std::move(other.locality_))
+          , gids_(std::move(other.gids_))
+        {}
+
+        lazy_result& operator=(lazy_result&& other)
+        {
+            if (this != &other)
+            {
+                locality_ = std::move(other.locality_);
+                gids_ = std::move(other.gids_);
+            }
+            return *this;
+        }
+
         naming::gid_type locality_;
-        lcos::shared_future<std::vector<naming::gid_type> > gids_;
+        lcos::unique_future<std::vector<naming::gid_type> > gids_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

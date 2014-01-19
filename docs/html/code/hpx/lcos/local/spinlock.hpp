@@ -59,12 +59,15 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SMT_PAUSE
             }
 #endif
-            else if(k < 32 || k & 1) //-V112
+            else if (k < 32 || (k & 1)) //-V112
             {
-                if(hpx::threads::get_self_ptr() && suspend)
+                if (hpx::threads::get_self_ptr())
                 {
-                    hpx::this_thread::suspend(hpx::threads::pending,
-                        "spinlock::yield");
+                    if (suspend)
+                    {
+                        hpx::this_thread::suspend(hpx::threads::pending,
+                            "spinlock::yield");
+                    }
                 }
                 else
                 {
@@ -78,10 +81,13 @@ namespace hpx { namespace lcos { namespace local
             }
             else
             {
-                if(hpx::threads::get_self_ptr() && suspend)
+                if (hpx::threads::get_self_ptr())
                 {
-                    hpx::this_thread::suspend(hpx::threads::pending,
-                        "spinlock::yield");
+                    if (suspend)
+                    {
+                        hpx::this_thread::suspend(hpx::threads::pending,
+                            "spinlock::yield");
+                    }
                 }
                 else
                 {

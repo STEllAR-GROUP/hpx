@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/util/decay.hpp>
+
 #if defined(BOOST_NO_CXX11_RVALUE_REFERENCES)
 #error HPX needs rvalue reference support
 #endif
@@ -18,8 +20,6 @@
 #include <boost/preprocessor/tuple/elem.hpp>
 
 #include <utility>
-
-#include <boost/type_traits/add_const.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_FORWARD_ARGS_(z, n, d)                                            \
@@ -61,71 +61,10 @@ namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct make_temporary
+    typename decay<T>::type decay_copy(T&& v)
     {
-        template <typename U>
-        static T && call(U& u)
-        {
-            return std::move(u);
-        }
-    };
-
-    template <typename T>
-    struct make_temporary<T&>
-    {
-        static T call(T& u)
-        {
-            return u;
-        }
-    };
-    template <typename T>
-    struct make_temporary<T const&>
-    {
-        static T call(T const& u)
-        {
-            return u;
-        }
-    };
-
-    template <typename T>
-    struct make_temporary<T &&>
-    {
-        template <typename U>
-        static T && call(U& u)
-        {
-            return std::move(u);
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    // See class.copy [12.8]/5
-    template <typename T, typename U = typename boost::add_const<T>::type>
-    struct copy_construct
-    {
-        template <typename A>
-        static T call(A && u)
-        {
-            return std::forward<A>(u);
-        }
-    };
-
-    template <typename T, typename U>
-    struct copy_construct<T&, U&>
-    {
-        static T& call(U& u)
-        {
-            return u;
-        }
-    };
-
-    template <typename T, typename U>
-    struct copy_construct<T &&, U &&>
-    {
-        static T && call(U& u)
-        {
-            return std::move(u);
-        }
-    };
+        return std::forward<T>(v);
+    }
 }}}
 
 #endif
