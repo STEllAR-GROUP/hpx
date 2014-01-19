@@ -19,7 +19,7 @@ usage()
     echo "  -b    Path to the benchmark."
     echo "  -t    Maximum number of cores to use." 
     echo "  -T    Space-separated list of task counts to use."
-    echo "  -d    Space-separated list of delays to use."
+    echo "  -d    Space-separated list of delays to use [microseconds]."
     echo "  -s    Number of samples to collect for each combination of parameters."
     echo "  -f    Path to a file containing options to pass to the benchmark."
 }
