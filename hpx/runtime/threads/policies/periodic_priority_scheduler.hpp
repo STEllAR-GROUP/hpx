@@ -57,7 +57,6 @@ namespace hpx { namespace threads { namespace policies
         // specified above.
         enum {
             max_thread_count = 1000,
-            min_thread_count = 10
         };
 
     public:
