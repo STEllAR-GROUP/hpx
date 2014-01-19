@@ -459,7 +459,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         this->rebind_stack();     // count how often a coroutines object was reused
         m_fun = std::forward<Functor>(f);
         target_ = std::move(target);
-        this->super_type::rebind(id);
+        this->super_type::rebind_base(id);
     }
 
     // the memory for the threads is managed by a lockfree caching_freelist

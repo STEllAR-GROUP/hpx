@@ -67,7 +67,6 @@ std::string format_build_date(std::string timestamp)
 void print_results(
     boost::uint64_t cores
   , double walltime
-  , std::vector<std::string> const& counters
   , std::vector<std::string> const& counter_shortnames
   , boost::shared_ptr<hpx::util::activate_counters> ac 
     )
