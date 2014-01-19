@@ -13,7 +13,6 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/util/activate_counters.hpp>
-//#include <hpx/include/iostreams.hpp>
 
 #include <stdexcept>
 
@@ -44,9 +43,6 @@ using hpx::util::high_resolution_timer;
 
 using hpx::reset_active_counters;
 using hpx::stop_active_counters;
-
-//using hpx::cout;
-//using hpx::flush;
 
 using std::cout;
 using std::flush;
@@ -152,8 +148,6 @@ void blocker(
 void wait_for_tasks(hpx::lcos::local::barrier& finished)
 {
     if (get_thread_count(hpx::threads::thread_priority_normal) != 1)
-//        HPX_THROW_EXCEPTION(hpx::assertion_failure, "wait_for_tasks",
-//            "tasks are not finished");
     {
         register_work(boost::bind(&wait_for_tasks, boost::ref(finished)),
             "wait_for_tasks", hpx::threads::pending,
@@ -183,8 +177,29 @@ int hpx_main(
     )
 {
     {
+        boost::uint64_t const os_thread_count = get_os_thread_count();
+
         if (vm.count("no-header"))
             header = false;
+
+        boost::uint64_t tasks_per_feeder = 0;
+        boost::uint64_t total_tasks = 0;
+        std::string const scaling = vm["scaling"].as<std::string>();
+
+        if ("strong" == scaling)
+        {
+            tasks_per_feeder = tasks / os_thread_count;
+            total_tasks      = tasks;
+        }
+        else if ("weak" == scaling)
+        {
+            tasks_per_feeder = tasks; 
+            total_tasks      = tasks * os_thread_count;
+        }
+        else
+            throw std::invalid_argument(
+                "invalid scaling type specified (valid options are \"strong\" "
+                "or \"weak\")");
 
         std::vector<std::string> counter_shortnames;
         std::vector<std::string> counters;
@@ -217,10 +232,10 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Block all other OS threads.
 /*
-        boost::barrier entered(get_os_thread_count());
-        boost::barrier started(get_os_thread_count());
+        boost::barrier entered(os_thread_count);
+        boost::barrier started(os_thread_count);
 
-        for (boost::uint64_t i = 0; i < (get_os_thread_count() - 1); ++i)
+        for (boost::uint64_t i = 0; i < (os_thread_count - 1); ++i)
         {
             register_work(boost::bind(
                 &blocker, boost::ref(entered), boost::ref(started)));
@@ -231,23 +246,29 @@ int hpx_main(
 
         ///////////////////////////////////////////////////////////////////////
         // Start the clock.
-//        for (boost::uint64_t i = 0; i < tasks; ++i)
-//            register_work(boost::bind(&invoke_worker_timed
-//                                    , double(delay) * 1e-6)
-//              , "invoke_worker_timed");
-
         high_resolution_timer t;
 
         if (ac)
             ac->reset_counters();
 
-        for (boost::uint64_t i = 0; i < (get_os_thread_count() - 1); ++i)
-            register_work(boost::bind(&spawn_workers
-//                                    , tasks / get_os_thread_count())
-                                    , tasks)
-                , "spawn_workers");
+        // This needs to stay here; we may have suspended as recently as the
+        // performance counter reset above.
+        boost::uint64_t const num_thread = hpx::get_worker_thread_num();
 
-        spawn_workers(tasks);
+        for (boost::uint64_t i = 0; i < os_thread_count; ++i)
+        {
+            if (num_thread == i) continue;
+
+            register_work(boost::bind(&spawn_workers
+                                    , tasks_per_feeder)
+                , "spawn_workers"
+                , hpx::threads::pending
+                , hpx::threads::thread_priority_normal
+                , i
+                  );
+        }
+
+        spawn_workers(tasks_per_feeder);
 
 //        started.wait();
 
@@ -265,8 +286,7 @@ int hpx_main(
         // Stop the clock
         double time_elapsed = t.elapsed();
 
-        print_results(
-            get_os_thread_count(), time_elapsed, counter_shortnames, ac);
+        print_results(os_thread_count, time_elapsed, counter_shortnames, ac);
     }
 
     return finalize();
@@ -282,9 +302,16 @@ int main(
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
     cmdline.add_options()
+        ( "scaling"
+        , value<std::string>()->default_value("weak")
+        , "type of scaling to benchmark (valid options are \"strong\" or "
+          "\"weak\")")
+
         ( "tasks"
         , value<boost::uint64_t>(&tasks)->default_value(500000)
-        , "number of tasks to invoke")
+        , "number of tasks to invoke (when strong-scaling, this is the total "
+          "number of tasks invoked; when weak-scaling, it is the number of "
+          "tasks per core)")
 
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
