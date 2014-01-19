@@ -1267,20 +1267,20 @@ namespace hpx { namespace threads
               HPX_PERFORMANCE_COUNTER_V1,
               boost::bind(&ti::idle_rate_counter_creator, this, _1, _2),
               &performance_counters::locality_thread_counter_discoverer,
-              "0.1%"
+              "0.01%"
             },
 #if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
             { "/threads/creation-idle-rate", performance_counters::counter_raw,
-              "returns the % of time spent creating HPX-threads in the scheduler", 
-              HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              "returns the % of idle-rate spent creating HPX-threads for the "
+              "referenced object", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
-              "0.1%"
+              "0.01%"
             },
             { "/threads/cleanup-idle-rate", performance_counters::counter_raw,
-              "returns the % of time spent cleaning up terminated HPX-threads in "
-              "the scheduler", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
+              "returns the % of time spent cleaning up terminated HPX-threads "
+              "for the referenced object", HPX_PERFORMANCE_COUNTER_V1, counts_creator,
               &performance_counters::locality_thread_counter_discoverer,
-              "0.1%"
+              "0.01%"
             },
 #endif
             // thread counts
@@ -1611,10 +1611,10 @@ namespace hpx { namespace threads
         }
 
         if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
-            return 1000LL;
+            return 10000LL;
 
         double const percent = 1. - (exec_total / tfunc_total);
-        return boost::int64_t(1000. * percent);    // 0.1 percent
+        return boost::int64_t(10000. * percent);    // 0.01 percent
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -1623,14 +1623,17 @@ namespace hpx { namespace threads
     {
         double const exec_time = static_cast<double>(exec_times[num_thread]);
         double const tfunc_time = static_cast<double>(tfunc_times[num_thread]);
-        double const percent = (tfunc_time != 0.) ? 1. - (exec_time / tfunc_time) : 1.; //-V550
 
         if (reset) {
             exec_times[num_thread] = 0;
             tfunc_times[num_thread] = 0;
         }
 
-        return boost::int64_t(1000. * percent);   // 0.1 percent
+        if (std::abs(tfunc_time) < 1e-16)   // avoid division by zero
+            return 10000LL;
+
+        double const percent = 1. - (exec_time / tfunc_time); 
+        return boost::int64_t(10000. * percent);   // 0.01 percent
     }
 
 #if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
@@ -1638,38 +1641,50 @@ namespace hpx { namespace threads
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         avg_creation_idle_rate(bool reset)
     {
-        double const exec_total =
+        double const creation_total =
             static_cast<double>(scheduler_.get_creation_time(reset)); 
+        double const exec_total =
+            std::accumulate(exec_times.begin(), exec_times.end(), 0.);
         double const tfunc_total =
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
-        if (reset) 
+        if (reset) {
+            std::fill(exec_times.begin(), exec_times.end(), 0);
             std::fill(tfunc_times.begin(), tfunc_times.end(), 0);
+        }
 
-        if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
-            return 1000LL;
+        // avoid division by zero
+        if (  (std::abs(exec_total) < 1e-16)
+           && (std::abs(exec_total) < 1e-16))  
+            return 10000LL;
 
-        double const percent = (exec_total / tfunc_total);
-        return boost::int64_t(1000. * percent);    // 0.1 percent
+        double const percent = (creation_total / (tfunc_total - exec_total));
+        return boost::int64_t(10000. * percent);    // 0.01 percent
     }
 
     template <typename SchedulingPolicy, typename NotificationPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         avg_cleanup_idle_rate(bool reset)
     {
-        double const exec_total =
+        double const cleanup_total =
             static_cast<double>(scheduler_.get_cleanup_time(reset)); 
+        double const exec_total =
+            std::accumulate(exec_times.begin(), exec_times.end(), 0.);
         double const tfunc_total =
             std::accumulate(tfunc_times.begin(), tfunc_times.end(), 0.);
 
-        if (reset) 
+        if (reset) {
+            std::fill(exec_times.begin(), exec_times.end(), 0);
             std::fill(tfunc_times.begin(), tfunc_times.end(), 0);
+        }
 
-        if (std::abs(tfunc_total) < 1e-16)   // avoid division by zero
-            return 1000LL;
+        // avoid division by zero
+        if (  (std::abs(exec_total) < 1e-16)
+           && (std::abs(exec_total) < 1e-16))  
+            return 10000LL;
 
-        double const percent = (exec_total / tfunc_total);
-        return boost::int64_t(1000. * percent);    // 0.1 percent
+        double const percent = (cleanup_total / (tfunc_total - exec_total));
+        return boost::int64_t(10000. * percent);    // 0.01 percent
     }
 #endif
 }}
