@@ -52,67 +52,75 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
 #ifdef HPX_ACCEL_QUEUING
     // hardware accelerated queuing
-    typedef accel::fifo<thread_data_base *> work_item_queue_type;
-
-    template <typename ThreadData>
-    inline void
-    enqueue(work_item_queue_type& work_items, ThreadData* thrd,
-        std::size_t num_thread)
+    struct hardware_fifo
     {
-        //printf("enqueue invoked by thread %ld\n", num_thread);
-        work_items.enqueue(thrd, num_thread);
-    }
+        template <typename T>
+        struct apply
+        {
+            typedef accel::fifo<T> type;
+        };
 
-    template <typename ThreadData>
-    inline bool
-    dequeue(work_item_queue_type& work_items, ThreadData*& thrd,
-        std::size_t num_thread)
-    {
-        return work_items.dequeue(thrd, num_thread);
-    }
-
-    inline bool
-    empty(work_item_queue_type& work_items, std::size_t num_thread)
-    {
-        return work_items.empty(num_thread);
-    }
-
-#else
-    // software queuing
-#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
-    typedef HPX_STD_TUPLE<thread_data_base*, boost::uint64_t> thread_description;
-#else
-    typedef thread_data_base thread_description;
+        template <typename T, typename ThreadData>
+        static bool
+        enqueue(accel::fifo<T>& work_items, ThreadData* thrd,
+            std::size_t num_thread = std::size_t(-1), bool steal = false)
+        {
+            return work_items.enqueue(thrd, num_thread);
+        }
+    
+        template <typename T, typename ThreadData>
+        static bool
+        dequeue(accel::fifo<T>& work_items, ThreadData*& thrd,
+            std::size_t num_thread = std::size_t(-1))
+        {
+            return work_items.dequeue(thrd, num_thread);
+        }
+   
+        template <typename T> 
+        static bool
+        empty(accel::fifo<T>& work_items,
+            std::size_t num_thread = std::size_t(-1))
+        {
+            return work_items.empty(num_thread);
+        }
+    };
 #endif
 
-    typedef boost::lockfree::fifo<thread_description*> work_item_queue_type;
-
-    template <typename ThreadData>
-    inline void
-    enqueue(work_item_queue_type& work_items, ThreadData* thrd,
-        std::size_t num_thread)
+    struct software_fifo
     {
-        work_items.enqueue(thrd);
-    }
+        template <typename T>
+        struct apply
+        {
+            typedef boost::lockfree::fifo<T> type;
+        };
 
-    template <typename ThreadData>
-    inline bool
-    dequeue(work_item_queue_type& work_items, ThreadData*& thrd,
-        std::size_t num_thread)
-    {
-        return work_items.dequeue(thrd);
-    }
-
-    inline bool
-    empty(work_item_queue_type& work_items, std::size_t num_thread)
-    {
-        return work_items.empty();
-    }
-
-#endif
+        template <typename T, typename ThreadData>
+        static bool
+        enqueue(boost::lockfree::fifo<T>& work_items, ThreadData* thrd,
+            std::size_t num_thread = std::size_t(-1), bool steal = false)
+        {
+            return work_items.enqueue(thrd);
+        }
+    
+        template <typename T, typename ThreadData>
+        static bool
+        dequeue(boost::lockfree::fifo<T>& work_items, ThreadData*& thrd,
+            std::size_t num_thread = std::size_t(-1))
+        {
+            return work_items.dequeue(thrd);
+        }
+   
+        template <typename T> 
+        static bool
+        empty(boost::lockfree::fifo<T>& work_items,
+            std::size_t num_thread = std::size_t(-1))
+        {
+            return work_items.empty();
+        }
+    };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Mutex = boost::mutex>
+    template <typename Mutex = boost::mutex, typename Queuing = software_fifo>
     class thread_queue
     {
     private:
@@ -126,9 +134,6 @@ namespace hpx { namespace threads { namespace policies
             max_add_new_count = 100,
             max_delete_count = 1000
         };
-
-        // this is the type of the queues of new or pending threads
-        typedef work_item_queue_type work_items_type;
 
         // this is the type of a map holding all threads (except depleted ones)
         typedef std::map<
@@ -145,8 +150,22 @@ namespace hpx { namespace threads { namespace policies
         typedef HPX_STD_TUPLE<thread_init_data, thread_state_enum> task_description;
 #endif
 
-        typedef boost::lockfree::fifo<task_description*> task_items_type;
-        typedef boost::lockfree::fifo<thread_data_base*> thread_id_queue_type;
+#if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
+        typedef HPX_STD_TUPLE<thread_data_base*, boost::uint64_t>
+            thread_description;
+#else
+        typedef thread_data_base thread_description;
+#endif
+
+        // this is the type of the queues of new or pending threads
+        typedef typename Queuing::template apply<thread_description*>::type
+            work_items_type;
+
+        typedef typename Queuing::template apply<task_description*>::type
+            task_items_type;
+
+        typedef typename Queuing::template apply<thread_data_base*>::type
+            thread_id_queue_type;
 
     protected:
         template <typename Lock>
@@ -207,7 +226,7 @@ namespace hpx { namespace threads { namespace policies
 
             std::size_t added = 0;
             task_description* task = 0;
-            while (add_count-- && addfrom->new_tasks_.dequeue(task))
+            while (add_count-- && Queuing::dequeue(addfrom->new_tasks_, task, num_thread))
             {
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
                 if (maintain_queue_wait_times) {
@@ -324,7 +343,7 @@ namespace hpx { namespace threads { namespace policies
                     if (add_count > max_add_new_count)
                         add_count = max_add_new_count;
                 }
-                else if (empty(work_items_, num_thread)) {
+                else if (Queuing::empty(work_items_, num_thread)) {
                     add_count = min_add_new_count;    // add this number of threads
                     max_count_ += min_add_new_count;  // increase max_count //-V101
                 }
@@ -391,7 +410,7 @@ namespace hpx { namespace threads { namespace policies
             if (delete_all) {
                 // delete all threads
                 thread_data_base* todelete;
-                while (terminated_items_.dequeue(todelete))
+                while (Queuing::dequeue(terminated_items_, todelete))
                 {
                     // this thread has to be in this map
                     HPX_ASSERT(thread_map_.find(todelete) != thread_map_.end());
@@ -412,7 +431,7 @@ namespace hpx { namespace threads { namespace policies
                         static_cast<boost::int64_t>(max_delete_count));
 
                 thread_data_base* todelete;
-                while (delete_count && terminated_items_.dequeue(todelete))
+                while (delete_count && Queuing::dequeue(terminated_items_, todelete))
                 {
                     thread_map_type::iterator it = thread_map_.find(todelete);
 
@@ -664,8 +683,6 @@ namespace hpx { namespace threads { namespace policies
                     HPX_ASSERT(thread_map_.find(thrd.get()) != thread_map_.end());
                     HPX_ASSERT(thrd->is_created_from(&memory_pool_));
 
-                    do_some_work();       // try to execute the new work item
-
                     if (&ec != &throws)
                         ec = make_success_code();
 
@@ -679,13 +696,13 @@ namespace hpx { namespace threads { namespace policies
             ++new_tasks_count_;
 
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
-            new_tasks_.enqueue(new task_description(
+            Queuing::enqueue(new_tasks_, new task_description(
                 std::move(data), initial_state,
                 util::high_resolution_clock::now()
-            ));
+            ), num_thread);
 #else
-            new_tasks_.enqueue(new task_description(
-                std::move(data), initial_state));
+            Queuing::enqueue(new_tasks_, new task_description(
+                std::move(data), initial_state), num_thread);
 #endif
             if (&ec != &throws)
                 ec = make_success_code();
@@ -697,7 +714,7 @@ namespace hpx { namespace threads { namespace policies
             boost::int64_t count, std::size_t num_thread)
         {
             thread_description* trd;
-            while (dequeue(src->work_items_, trd, num_thread))
+            while (Queuing::dequeue(src->work_items_, trd, num_thread))
             {
                 --src->work_items_count_;
 
@@ -711,7 +728,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
                 bool finished = count == ++work_items_count_;
-                enqueue(work_items_, trd, num_thread);
+                Queuing::enqueue(work_items_, trd, num_thread);
                 if (finished)
                     break;
             }
@@ -721,7 +738,7 @@ namespace hpx { namespace threads { namespace policies
             boost::int64_t count)
         {
             task_description* task;
-            while (src->new_tasks_.dequeue(task))
+            while (Queuing::dequeue(src->new_tasks_, task))
             {
                 --src->new_tasks_count_;
 
@@ -735,7 +752,7 @@ namespace hpx { namespace threads { namespace policies
 #endif
 
                 bool finish = count == ++new_tasks_count_;
-                if (new_tasks_.enqueue(task))
+                if (Queuing::enqueue(new_tasks_, task))
                 {
                     if (finish)
                         break;
@@ -754,7 +771,7 @@ namespace hpx { namespace threads { namespace policies
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
             thread_description* tdesc;
             if (0 != work_items_count_.load(boost::memory_order_relaxed) &&
-                dequeue(work_items_, tdesc, num_thread))
+                Queuing::dequeue(work_items_, tdesc, num_thread))
             {
                 --work_items_count_;
 
@@ -771,7 +788,7 @@ namespace hpx { namespace threads { namespace policies
             }
 #else
             if (0 != work_items_count_.load(boost::memory_order_relaxed) &&
-                dequeue(work_items_, thrd, num_thread))
+                Queuing::dequeue(work_items_, thrd, num_thread))
             {
                 --work_items_count_;
                 return true;
@@ -785,13 +802,12 @@ namespace hpx { namespace threads { namespace policies
         {
             ++work_items_count_;
 #if HPX_THREAD_MAINTAIN_QUEUE_WAITTIME
-            enqueue(work_items_,
+            Queuing::enqueue(work_items_,
                 new thread_description(thrd, util::high_resolution_clock::now()),
                 num_thread);
 #else
-            enqueue(work_items_, thrd, num_thread);
+            Queuing::enqueue(work_items_, thrd, num_thread);
 #endif
-            do_some_work();         // wake up sleeping threads
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -799,7 +815,7 @@ namespace hpx { namespace threads { namespace policies
         {
             if (thrd->is_created_from(&memory_pool_))
             {
-                terminated_items_.enqueue(thrd);
+                Queuing::enqueue(terminated_items_, thrd);
 
                 boost::int64_t count = ++terminated_items_count_;
                 if (count > HPX_MAX_TERMINATED_THREADS)
@@ -898,11 +914,6 @@ namespace hpx { namespace threads { namespace policies
             }
             return false;
         }
-
-        /// This function gets called by the thread-manager whenever new work
-        /// has been added, allowing the scheduler to reactivate one or more of
-        /// possibly idling OS threads
-        inline void do_some_work() {}
 
         ///////////////////////////////////////////////////////////////////////
         bool dump_suspended_threads(std::size_t num_thread
