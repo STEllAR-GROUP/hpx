@@ -314,14 +314,14 @@ namespace hpx { namespace threads { namespace policies
             return work_items_count_ + new_tasks_count_;
         }
 
-        // This returns the current length of the work queue
-        boost::int64_t get_work_length() const
+        // This returns the current length of the pending queue
+        boost::int64_t get_pending_queue_length() const
         {
             return work_items_count_;
         }
 
-        // This returns the current length of the work queue
-        boost::int64_t get_task_length() const
+        // This returns the current length of the staged queue
+        boost::int64_t get_staged_queue_length() const
         {
             return new_tasks_count_;
         }

@@ -303,12 +303,12 @@ struct thread_deque
         return work_items_count_ + new_tasks_count_;
     }
     // This returns the current length of the work queue
-    boost::int64_t get_work_length() const
+    boost::int64_t get_pending_queue_length() const
     {
         return work_items_count_;
     }
     // This returns the current length of the work queue
-    boost::int64_t get_task_length() const
+    boost::int64_t get_staged_queue_length() const
     {
         return new_tasks_count_;
     }

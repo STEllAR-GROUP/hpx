@@ -71,7 +71,7 @@ namespace hpx { namespace threads { namespace policies
                     this->queues_[num_thread]->increment_num_pending_misses();
 
                     bool have_staged = (this->queues_[num_thread]->
-                        get_task_length(boost::memory_order_relaxed) != 0);
+                        get_staged_queue_length(boost::memory_order_relaxed) != 0);
 
                     // Give up, we should have work to convert.
                     if (have_staged)

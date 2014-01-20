@@ -357,7 +357,7 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(parent < tree.at(level-1).size());
 
             thread_queue<> * tq = tree[level][idx];
-            boost::int64_t num = tq->get_work_length();
+            boost::int64_t num = tq->get_pending_queue_length();
             thread_queue<> * dest = tree[level-1][parent];
             if(num == 0)
             {
@@ -383,7 +383,7 @@ namespace hpx { namespace threads { namespace policies
 
             dest->move_work_items_from(
                 tq
-              , tq->get_work_length()/d + 1
+              , tq->get_pending_queue_length()/d + 1
               , num_thread
             );
         }
@@ -400,7 +400,7 @@ namespace hpx { namespace threads { namespace policies
             thread_queue<> * tq = tree[0][num_thread];
 
             // check if we need to collect new work from parents
-            if(tq->get_work_length() == 0)
+            if(tq->get_pending_queue_length() == 0)
             {
                 transfer_threads(num_thread/d, num_thread, 1, num_thread);
             }
@@ -456,7 +456,7 @@ namespace hpx { namespace threads { namespace policies
 
             thread_queue<> * tq = tree[level][idx];
 
-            boost::int64_t num = tq->get_task_length();
+            boost::int64_t num = tq->get_staged_queue_length();
             if(num == 0)
             {
                 if(task_flag_tree[level][idx] == false)
@@ -482,7 +482,7 @@ namespace hpx { namespace threads { namespace policies
             thread_queue<> * dest = tree[level-1][parent];
             dest->move_task_items_from(
                 tq
-              , tq->get_task_length()/d + 1
+              , tq->get_staged_queue_length()/d + 1
             );
         }
 
@@ -498,7 +498,7 @@ namespace hpx { namespace threads { namespace policies
             std::size_t added = 0;
 
             thread_queue<> * tq = tree[0][num_thread];
-            if(tq->get_task_length() == 0)
+            if(tq->get_staged_queue_length() == 0)
             {
                 transfer_tasks(num_thread/d, num_thread, 1);
             }
