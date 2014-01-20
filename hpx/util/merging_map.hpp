@@ -725,8 +725,6 @@ struct merging_map : boost::noncopyable
         return merge(map_.insert(*node).first);
     } // }}}
 
-    typedef util::function_nonser<data_type(key_type const&)> default_data_gen;
-
     static data_type default_data(key_type const&) { return data_type(); }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -737,17 +735,45 @@ struct merging_map : boost::noncopyable
     /// sequential. Merges any newly created or updated mappings if possible.
     /// Overwrites or splits other mappings as needed.
     template <
+        typename F, typename DefaultF
+    >
+    void apply(
+        Key const& lower
+      , Key const& upper
+      , F&& f
+      , DefaultF&& default_f
+        )
+    {
+        key_type const key(lower, upper);
+        apply(key, std::forward<F>(f), std::forward<DefaultF>(default_f));
+        return;
+    }
+
+    template <
+        typename F, typename DefaultF
+    >
+    void apply(
+        Key const& key_
+      , F&& f
+      , DefaultF&& default_f
+        )
+    {
+        key_type const key(key_, key_);
+        apply(key, std::forward<F>(f), std::forward<DefaultF>(default_f));
+        return;
+    }
+
+    template <
         typename F
     >
     void apply(
         Key const& lower
       , Key const& upper
-      , F f
-      , default_data_gen const& default_f = &merging_map::default_data
+      , F&& f
         )
     {
         key_type const key(lower, upper);
-        apply(key, f, default_f);
+        apply(key, std::forward<F>(f), &merging_map::default_data);
         return;
     }
 
@@ -756,12 +782,11 @@ struct merging_map : boost::noncopyable
     >
     void apply(
         Key const& key_
-      , F f
-      , default_data_gen const& default_f = &merging_map::default_data
+      , F&& f
         )
     {
         key_type const key(key_, key_);
-        apply(key, f, default_f);
+        apply(key, std::forward<F>(f), &merging_map::default_data);
         return;
     }
 
@@ -772,12 +797,23 @@ struct merging_map : boost::noncopyable
     /// Merges any newly created or updated mappings if possible. Overwrites
     /// or splits other mappings as needed.
     template <
-        typename F
+        typename F, typename DefaultF
     >
     void apply(
         key_type const& key
       , F f
-      , default_data_gen const& default_f = &merging_map::default_data
+        )
+    {
+        apply(key, std::forward<F>(f), &merging_map::default_data);
+    }
+
+    template <
+        typename F, typename DefaultF
+    >
+    void apply(
+        key_type const& key
+      , F&& f
+      , DefaultF&& default_f
         )
     { // {{{
         std::pair<iterator, iterator> matches = find(key);
