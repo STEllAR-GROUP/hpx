@@ -744,7 +744,7 @@ template class HPX_EXPORT hpx::runtime_impl<
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/periodic_priority_scheduler.hpp>
 template class HPX_EXPORT hpx::runtime_impl<
-    hpx::threads::policies::local_periodic_priority_scheduler,
+    hpx::threads::policies::local_periodic_priority_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 #endif
 

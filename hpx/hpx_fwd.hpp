@@ -153,11 +153,18 @@ namespace hpx
         {
             struct scheduler_base;
 
+            struct software_fifo;
+
+            template <typename Mutex = boost::mutex,
+                      typename Queuing = software_fifo>
+            class HPX_EXPORT local_priority_queue_scheduler;
+
 #if defined(HPX_GLOBAL_SCHEDULER)
             class HPX_EXPORT global_queue_scheduler;
 #endif
 #if defined(HPX_STATIC_PRIORITY_SCHEDULER)
-            template <typename Mutex = boost::mutex>
+            template <typename Mutex = boost::mutex,
+                      typename Queuing = software_fifo>
             class HPX_API_EXPORT static_priority_queue_scheduler;
 #endif
 #if defined(HPX_ABP_SCHEDULER)
@@ -170,14 +177,13 @@ namespace hpx
             template <typename Mutex = boost::mutex>
             class HPX_EXPORT local_queue_scheduler;
 
-            template <typename Mutex = boost::mutex>
-            class HPX_EXPORT local_priority_queue_scheduler;
-
 #if defined(HPX_HIERARCHY_SCHEDULER)
             class HPX_EXPORT hierarchy_scheduler;
 #endif
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
-            class HPX_EXPORT periodic_priority_scheduler;
+            template <typename Mutex = boost::mutex,
+                      typename Queuing = software_fifo>
+            class HPX_EXPORT local_periodic_priority_scheduler;
 #endif
 
             class HPX_EXPORT callback_notifier;

@@ -1751,7 +1751,7 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
 #include <hpx/runtime/threads/policies/periodic_priority_scheduler.hpp>
 
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
-    hpx::threads::policies::local_periodic_priority_scheduler,
+    hpx::threads::policies::local_periodic_priority_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 #endif
 
