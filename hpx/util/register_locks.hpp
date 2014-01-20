@@ -49,7 +49,6 @@ namespace hpx { namespace util
     }
     inline void ignore_while_checking(void const* lock)
     {
-        return false;
     }
 #endif
 }}
