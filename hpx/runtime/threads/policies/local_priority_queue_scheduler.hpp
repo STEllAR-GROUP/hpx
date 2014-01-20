@@ -60,6 +60,8 @@ namespace hpx { namespace threads { namespace policies
     public:
         typedef boost::mpl::false_ has_periodic_maintenance;
 
+        typedef thread_queue<Mutex, Queuing> thread_queue_type;
+
         // the scheduler type takes two initialization parameters:
         //    the number of queues
         //    the number of high priority queues
@@ -935,11 +937,11 @@ namespace hpx { namespace threads { namespace policies
         void on_start_thread(std::size_t num_thread)
         {
             queues_[num_thread] =
-                new thread_queue<Mutex>(max_queue_thread_count_);
+                new thread_queue_type(max_queue_thread_count_);
 
             if (num_thread < high_priority_queues_.size())
                 high_priority_queues_[num_thread] =
-                    new thread_queue<Mutex>(max_queue_thread_count_);
+                    new thread_queue_type(max_queue_thread_count_);
 
             // forward this call to all queues etc.
             if (num_thread < high_priority_queues_.size())
@@ -1004,9 +1006,9 @@ namespace hpx { namespace threads { namespace policies
 
     protected:
         std::size_t max_queue_thread_count_;
-        std::vector<thread_queue<Mutex>*> queues_;   ///< this manages all the PX threads
-        std::vector<thread_queue<Mutex>*> high_priority_queues_;
-        thread_queue<Mutex> low_priority_queue_;
+        std::vector<thread_queue_type*> queues_;   
+        std::vector<thread_queue_type*> high_priority_queues_;
+        thread_queue_type low_priority_queue_;
         boost::atomic<std::size_t> curr_queue_;
         bool numa_sensitive_;
 
