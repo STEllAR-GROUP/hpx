@@ -46,10 +46,10 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    template <typename Mutex>
+    template <typename Mutex, typename Queuing>
     class local_priority_queue_scheduler : public scheduler_base
     {
-    private:
+    protected:
         // The maximum number of active threads this thread manager should
         // create. This number will be a constraint only as long as the work
         // items queue is not empty. Otherwise the number of active threads
@@ -92,14 +92,13 @@ namespace hpx { namespace threads { namespace policies
         typedef init_parameter init_parameter_type;
 
         local_priority_queue_scheduler(init_parameter_type const& init)
-          : max_queue_thread_count_(init.max_queue_thread_count_), 
+          : scheduler_base(init.num_queues_),
+            max_queue_thread_count_(init.max_queue_thread_count_), 
             queues_(init.num_queues_),
             high_priority_queues_(init.num_high_priority_queues_),
             low_priority_queue_(init.max_queue_thread_count_),
             curr_queue_(0),
-            affinity_data_(init.num_queues_),
             numa_sensitive_(init.numa_sensitive_),
-            topology_(get_topology()),
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
             steals_in_numa_domain_(init.num_queues_),
             steals_outside_numa_domain_(init.num_queues_),
@@ -114,7 +113,7 @@ namespace hpx { namespace threads { namespace policies
         {
         }
 
-        ~local_priority_queue_scheduler()
+        virtual ~local_priority_queue_scheduler()
         {
             for (std::size_t i = 0; i < queues_.size(); ++i)
                 delete queues_[i];
@@ -122,23 +121,7 @@ namespace hpx { namespace threads { namespace policies
                 delete high_priority_queues_[i];
         }
 
-        std::size_t init(init_affinity_data const& data, topology const& topology)
-        {
-            return affinity_data_.init(data, topology);
-        }
-
         bool numa_sensitive() const { return numa_sensitive_; }
-
-        threads::mask_cref_type get_pu_mask(topology const& topology,
-            std::size_t num_thread) const
-        {
-            return affinity_data_.get_pu_mask(topology, num_thread, numa_sensitive_);
-        }
-
-        std::size_t get_pu_num(std::size_t num_thread) const
-        {
-            return affinity_data_.get_pu_num(num_thread);
-        }
 
 #if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
         boost::uint64_t get_creation_time(bool reset)
@@ -367,7 +350,7 @@ namespace hpx { namespace threads { namespace policies
 
         /// Return the next thread to be executed, return false if none is
         /// available
-        bool get_next_thread(std::size_t num_thread, bool running,
+        virtual bool get_next_thread(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
         {
             std::size_t queues_size = queues_.size();
@@ -766,7 +749,7 @@ namespace hpx { namespace threads { namespace policies
         /// manager to allow for maintenance tasks to be executed in the
         /// scheduler. Returns true if the OS thread calling this function
         /// has to be terminated (i.e. no more work has to be done).
-        bool wait_or_add_new(std::size_t num_thread, bool running,
+        virtual bool wait_or_add_new(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count)
         {
             std::size_t queues_size = queues_.size();
@@ -949,12 +932,6 @@ namespace hpx { namespace threads { namespace policies
         void do_some_work(std::size_t num_thread = std::size_t(-1)) {}
 
         ///////////////////////////////////////////////////////////////////////
-        void add_punit(std::size_t virt_core, std::size_t thread_num)
-        {
-            affinity_data_.add_punit(virt_core, thread_num, topology_);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)
         {
             queues_[num_thread] =
@@ -1025,15 +1002,13 @@ namespace hpx { namespace threads { namespace policies
             queues_[num_thread]->on_error(num_thread, e);
         }
 
-    private:
+    protected:
         std::size_t max_queue_thread_count_;
         std::vector<thread_queue<Mutex>*> queues_;   ///< this manages all the PX threads
         std::vector<thread_queue<Mutex>*> high_priority_queues_;
         thread_queue<Mutex> low_priority_queue_;
         boost::atomic<std::size_t> curr_queue_;
-        detail::affinity_data affinity_data_;
         bool numa_sensitive_;
-        topology const& topology_;
 
 #if !defined(HPX_NATIVE_MIC)        // we know that the MIC has one NUMA domain only
         mask_type steals_in_numa_domain_;
