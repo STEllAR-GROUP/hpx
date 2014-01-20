@@ -183,7 +183,7 @@ namespace hpx
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
             template <typename Mutex = boost::mutex,
                       typename Queuing = software_fifo>
-            class HPX_EXPORT local_periodic_priority_scheduler;
+            class HPX_EXPORT periodic_priority_queue_scheduler;
 #endif
 
             class HPX_EXPORT callback_notifier;

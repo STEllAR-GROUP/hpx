@@ -28,7 +28,7 @@
 #include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
 #endif
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
-#include <hpx/runtime/threads/policies/periodic_priority_scheduler.hpp>
+#include <hpx/runtime/threads/policies/periodic_priority_queue_scheduler.hpp>
 #endif
 
 #endif

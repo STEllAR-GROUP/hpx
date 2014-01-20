@@ -1022,7 +1022,7 @@ namespace hpx
                 numa_sensitive = true;
 
             // scheduling policy
-            typedef hpx::threads::policies::local_periodic_priority_scheduler<>
+            typedef hpx::threads::policies::periodic_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(cfg.num_threads_,
                 num_high_priority_queues, 1000, numa_sensitive);

@@ -15,7 +15,7 @@
 namespace hpx { namespace threads { namespace policies
 {
     ///////////////////////////////////////////////////////////////////////////
-    /// The local_periodic_priority_scheduler maintains exactly one queue of work
+    /// The periodic_priority_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from. Additionally it maintains separate queues: several for high
     /// priority threads and one for low priority threads.
@@ -23,7 +23,7 @@ namespace hpx { namespace threads { namespace policies
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
     template <typename Mutex, typename Queuing>
-    class local_periodic_priority_scheduler
+    class periodic_priority_queue_scheduler
         : public local_priority_queue_scheduler<Mutex, Queuing>
     {
     public:
@@ -34,7 +34,7 @@ namespace hpx { namespace threads { namespace policies
         typedef typename base_type::init_parameter_type 
             init_parameter_type;
 
-        local_periodic_priority_scheduler(init_parameter_type const& init)
+        periodic_priority_queue_scheduler(init_parameter_type const& init)
           : base_type(init) 
         {}
 
