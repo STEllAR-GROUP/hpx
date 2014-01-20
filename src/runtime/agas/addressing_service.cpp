@@ -1867,15 +1867,13 @@ void addressing_service::decref(
 
     try {
         naming::gid_type raw = naming::detail::get_stripped_gid(gid);
-
+        mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
         // Match the decref request with entries in the incref table
         if (!incref_requests_->add_decref_request(credit, raw))
         {
             // file 'real' decref request only if there is no pending incref
             // request for this gid
-            mutex_type::scoped_lock l(refcnt_requests_mtx_);
-
             refcnt_requests_->apply(raw,
                 util::decrementer<boost::int64_t>(credit));
             send_refcnt_requests(l, ec);
