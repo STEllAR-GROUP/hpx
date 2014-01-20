@@ -725,6 +725,10 @@ struct merging_map : boost::noncopyable
         return merge(map_.insert(*node).first);
     } // }}}
 
+    typedef util::function_nonser<data_type(key_type const&)> default_data_gen;
+
+    static data_type default_data(key_type const&) { return data_type(); }
+
     ///////////////////////////////////////////////////////////////////////////
     /// Call \p f on the data mapped to [\p lower, \p upper]. For any subsets
     /// of [\p lower, \p upper] that are not mapped, a copy of \p default is
@@ -739,11 +743,11 @@ struct merging_map : boost::noncopyable
         Key const& lower
       , Key const& upper
       , F f
-      , data_type const& default_ = data_type()
+      , default_data_gen const& default_f = &merging_map::default_data
         )
     {
         key_type const key(lower, upper);
-        apply(key, f, default_);
+        apply(key, f, default_f);
         return;
     }
 
@@ -753,11 +757,11 @@ struct merging_map : boost::noncopyable
     void apply(
         Key const& key_
       , F f
-      , data_type const& default_ = data_type()
+      , default_data_gen const& default_f = &merging_map::default_data
         )
     {
         key_type const key(key_, key_);
-        apply(key, f, default_);
+        apply(key, f, default_f);
         return;
     }
 
@@ -773,7 +777,7 @@ struct merging_map : boost::noncopyable
     void apply(
         key_type const& key
       , F f
-      , data_type const& default_ = data_type()
+      , default_data_gen const& default_f = &merging_map::default_data
         )
     { // {{{
         std::pair<iterator, iterator> matches = find(key);
@@ -781,7 +785,7 @@ struct merging_map : boost::noncopyable
         if (matches.first == end() && matches.second == end())
         {
             // Insert a new mapping with default constructed data.
-            value_type* node = new value_type(key, default_);
+            value_type* node = new value_type(key, default_f(key));
             std::pair<iterator, bool> r = map_.insert(*node);
             HPX_ASSERT(r.second);
 
@@ -795,7 +799,7 @@ struct merging_map : boost::noncopyable
 
         std::list<value_type*> save_list;
 
-        for (; matches.first != matches.second;)
+        while (matches.first != matches.second)
         {
             key_type& match = matches.first->key_;
 
@@ -896,7 +900,7 @@ struct merging_map : boost::noncopyable
         // We've cleared out all the mappings that intersect with key, so now
         // we can insert the "baseline", a mapping that spans the entire key
         // with default constructed data that f has been applied to.
-        value_type* node = new value_type(key, default_);
+        value_type* node = new value_type(key, default_f(key));
 
         // Apply f to the baseline mapping.
         f(node->data_);

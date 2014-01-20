@@ -127,8 +127,8 @@ response component_namespace::service(
         case primary_ns_bind_gid:
         case primary_ns_resolve_gid:
         case primary_ns_unbind_gid:
-        case primary_ns_change_credit_non_blocking:
-        case primary_ns_change_credit_sync:
+        case primary_ns_increment_credit:
+        case primary_ns_change_credit:
         case primary_ns_allocate:
         {
             LAGAS_(warning) <<

@@ -88,6 +88,7 @@ namespace hpx { namespace agas
             >
             // 0x3
             // primary_ns_resolve_gid
+            // primary_ns_change_credit_one
           , util::tuple<
                 naming::gid_type // gid
             >
@@ -251,6 +252,7 @@ namespace hpx { namespace agas
         // TODO: verification of namespace_action_code
     }
 
+    // primary_ns_resolve_gid, primary_ns_change_credit_one
     request::request(
         namespace_action_code type_
       , naming::gid_type const& gid_
@@ -409,14 +411,29 @@ namespace hpx { namespace agas
                     "invalid operation for request type");
                 return 0;
             }
-        };
+        }
     } // }}}
 
     boost::int64_t request::get_credit(
         error_code& ec
         ) const
     {
-        return data->get_data<request_data::subtype_gid_gid_credit, 2>(ec);
+        switch (data->which())
+        {
+            case request_data::subtype_gid_gid_credit:
+                return data->get_data<request_data::subtype_gid_gid_credit, 2>(ec);
+
+            case request_data::subtype_gid_count:
+                return static_cast<boost::int64_t>(
+                    data->get_data<request_data::subtype_gid_count, 1>(ec));
+
+            default: {
+                HPX_THROWS_IF(ec, bad_parameter,
+                    "request::get_credit",
+                    "invalid operation for request type");
+                return 0;
+            }
+        }
     }
 
     components::component_type request::get_component_type(

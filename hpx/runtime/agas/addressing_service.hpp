@@ -212,9 +212,9 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     void* get_bootstrap_symbol_ns_ptr() const;
 
     bool synchronize_with_async_incref(
-        hpx::unique_future<bool> fut
+        hpx::unique_future<boost::int64_t> fut
       , naming::id_type const& id
-      , boost::int64_t credit
+      , boost::int64_t compensated_credit
         );
     hpx::unique_future<bool> propagate_acknowlegdements(
         boost::int64_t credit
