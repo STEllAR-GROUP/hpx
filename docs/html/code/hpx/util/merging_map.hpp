@@ -725,6 +725,8 @@ struct merging_map : boost::noncopyable
         return merge(map_.insert(*node).first);
     } // }}}
 
+    static data_type default_data(key_type const&) { return data_type(); }
+
     ///////////////////////////////////////////////////////////////////////////
     /// Call \p f on the data mapped to [\p lower, \p upper]. For any subsets
     /// of [\p lower, \p upper] that are not mapped, a copy of \p default is
@@ -733,17 +735,45 @@ struct merging_map : boost::noncopyable
     /// sequential. Merges any newly created or updated mappings if possible.
     /// Overwrites or splits other mappings as needed.
     template <
+        typename F, typename DefaultF
+    >
+    void apply(
+        Key const& lower
+      , Key const& upper
+      , F&& f
+      , DefaultF&& default_f
+        )
+    {
+        key_type const key(lower, upper);
+        apply(key, std::forward<F>(f), std::forward<DefaultF>(default_f));
+        return;
+    }
+
+    template <
+        typename F, typename DefaultF
+    >
+    void apply(
+        Key const& key_
+      , F&& f
+      , DefaultF&& default_f
+        )
+    {
+        key_type const key(key_, key_);
+        apply(key, std::forward<F>(f), std::forward<DefaultF>(default_f));
+        return;
+    }
+
+    template <
         typename F
     >
     void apply(
         Key const& lower
       , Key const& upper
-      , F f
-      , data_type const& default_ = data_type()
+      , F&& f
         )
     {
         key_type const key(lower, upper);
-        apply(key, f, default_);
+        apply(key, std::forward<F>(f), &merging_map::default_data);
         return;
     }
 
@@ -752,12 +782,11 @@ struct merging_map : boost::noncopyable
     >
     void apply(
         Key const& key_
-      , F f
-      , data_type const& default_ = data_type()
+      , F&& f
         )
     {
         key_type const key(key_, key_);
-        apply(key, f, default_);
+        apply(key, std::forward<F>(f), &merging_map::default_data);
         return;
     }
 
@@ -768,12 +797,23 @@ struct merging_map : boost::noncopyable
     /// Merges any newly created or updated mappings if possible. Overwrites
     /// or splits other mappings as needed.
     template <
-        typename F
+        typename F, typename DefaultF
     >
     void apply(
         key_type const& key
       , F f
-      , data_type const& default_ = data_type()
+        )
+    {
+        apply(key, std::forward<F>(f), &merging_map::default_data);
+    }
+
+    template <
+        typename F, typename DefaultF
+    >
+    void apply(
+        key_type const& key
+      , F&& f
+      , DefaultF&& default_f
         )
     { // {{{
         std::pair<iterator, iterator> matches = find(key);
@@ -781,7 +821,7 @@ struct merging_map : boost::noncopyable
         if (matches.first == end() && matches.second == end())
         {
             // Insert a new mapping with default constructed data.
-            value_type* node = new value_type(key, default_);
+            value_type* node = new value_type(key, default_f(key));
             std::pair<iterator, bool> r = map_.insert(*node);
             HPX_ASSERT(r.second);
 
@@ -795,7 +835,7 @@ struct merging_map : boost::noncopyable
 
         std::list<value_type*> save_list;
 
-        for (; matches.first != matches.second;)
+        while (matches.first != matches.second)
         {
             key_type& match = matches.first->key_;
 
@@ -896,7 +936,7 @@ struct merging_map : boost::noncopyable
         // We've cleared out all the mappings that intersect with key, so now
         // we can insert the "baseline", a mapping that spans the entire key
         // with default constructed data that f has been applied to.
-        value_type* node = new value_type(key, default_);
+        value_type* node = new value_type(key, default_f(key));
 
         // Apply f to the baseline mapping.
         f(node->data_);

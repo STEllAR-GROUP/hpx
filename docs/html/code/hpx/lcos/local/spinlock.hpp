@@ -46,9 +46,8 @@ namespace hpx { namespace lcos { namespace local
 
         HPX_MOVABLE_BUT_NOT_COPYABLE(spinlock)
 
-    public:
         ///////////////////////////////////////////////////////////////////////
-        static void yield(std::size_t k, bool suspend)
+        static void yield(std::size_t k)
         {
             if (k < 4) //-V112
             {
@@ -59,15 +58,12 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SMT_PAUSE
             }
 #endif
-            else if (k < 32 || (k & 1)) //-V112
+            else if(k < 32 || k & 1) //-V112
             {
-                if (hpx::threads::get_self_ptr())
+                if(hpx::threads::get_self_ptr())
                 {
-                    if (suspend)
-                    {
-                        hpx::this_thread::suspend(hpx::threads::pending,
-                            "spinlock::yield");
-                    }
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "spinlock::yield");
                 }
                 else
                 {
@@ -83,11 +79,8 @@ namespace hpx { namespace lcos { namespace local
             {
                 if (hpx::threads::get_self_ptr())
                 {
-                    if (suspend)
-                    {
-                        hpx::this_thread::suspend(hpx::threads::pending,
-                            "spinlock::yield");
-                    }
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "spinlock::yield");
                 }
                 else
                 {
@@ -110,6 +103,7 @@ namespace hpx { namespace lcos { namespace local
             }
         }
 
+    public:
         spinlock() : v_(0)
         {
             HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock", "");
@@ -145,12 +139,9 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            // only suspend in yield if there aren't any locks
-            // previously registered for this running HPX thread
-            bool suspend = (util::registered_lock_count() == 0);
             for (std::size_t k = 0; !try_lock(); ++k)
             {
-                spinlock::yield(k, suspend);
+                spinlock::yield(k);
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);

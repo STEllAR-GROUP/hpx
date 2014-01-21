@@ -1,5 +1,5 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
-//  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2014 Thomas Haller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,7 +11,12 @@
 
 namespace hpx { namespace util
 {
-    struct register_lock_data {};
+    struct register_lock_data
+    {
+        register_lock_data() : ignore_(false) {}
+
+        bool ignore_;       // will be ignored while checking for held locks
+    };
 
     // Always provide function exports, which guarantees ABI compatibility of
     // Debug and Release builds.
@@ -23,6 +28,7 @@ namespace hpx { namespace util
     HPX_API_EXPORT void verify_no_locks();
     HPX_API_EXPORT void force_error_on_lock();
     HPX_API_EXPORT void enable_lock_detection();
+    HPX_API_EXPORT void ignore_while_checking(void const* lock);
 #else
     inline bool register_lock(void const*, util::register_lock_data* = 0)
     {
@@ -41,10 +47,10 @@ namespace hpx { namespace util
     inline void enable_lock_detection()
     {
     }
+    inline void ignore_while_checking(void const* lock)
+    {
+    }
 #endif
-
-    // This function returns if there are already registered locks for this thread
-    HPX_API_EXPORT std::size_t registered_lock_count();
 }}
 
 #endif

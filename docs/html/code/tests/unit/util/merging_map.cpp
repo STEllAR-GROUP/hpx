@@ -118,6 +118,20 @@ void run_test(
     }
 }
 
+template <typename T>
+struct default_entry_value
+{
+    default_entry_value(T val) : val_(val) {}
+
+    template <typename Key>
+    T operator()(Key const&) const
+    {
+        return val_;
+    }
+
+    T val_;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
@@ -279,14 +293,14 @@ int main()
         table.bind(5, 6,  70U); // [5, 6]
         table.bind(8, 11, 60U); // [8, 11]
 
-        table.apply(3, 10, incrementer<boost::uint32_t>(35)); // [3, 10]
+        table.apply(3, 10, incrementer<boost::uint32_t>(35), &map_type::default_data); // [3, 10]
 
         BOOST_FOREACH(map_type::const_reference e, table)
         {
             std::cout << e.key_ << " -> " << e.data_ << "\n";
         }
 
-        table.apply(0, 11, decrementer<boost::uint32_t>(300)); // [0, 11]
+        table.apply(0, 11, decrementer<boost::uint32_t>(300), &map_type::default_data); // [0, 11]
 
         std::cout << "--\n";
 
@@ -316,7 +330,8 @@ int main()
             std::cout << e.key_ << " -> " << e.data_ << "\n";
         }
 
-        table.apply(3, 11, decrementer<boost::uint32_t>(50), 100U); // [3, 11]
+        table.apply(3, 11, decrementer<boost::uint32_t>(50),
+            default_entry_value<boost::int32_t>(100)); // [3, 11]
 
         std::cout << "-- [3, 11] -= 50 (default 100)\n";
 
@@ -325,7 +340,8 @@ int main()
             std::cout << e.key_ << " -> " << e.data_ << "\n";
         }
 
-        table.apply(3, 11, decrementer<boost::uint32_t>(60), 100U); // [3, 11]
+        table.apply(3, 11, decrementer<boost::uint32_t>(60),
+            default_entry_value<boost::int32_t>(100)); // [3, 11]
 
         std::cout << "-- [3, 11] -= 60 (default 100)\n";
 
@@ -355,7 +371,8 @@ int main()
             std::cout << e.key_ << " -> " << e.data_ << "\n";
         }
 
-        table.apply(5, 5, decrementer<boost::uint32_t>(50), 100U); // [5, 5]
+        table.apply(5, 5, decrementer<boost::uint32_t>(50),
+            default_entry_value<boost::uint32_t>(100)); // [5, 5]
 
         std::cout << "-- [5, 5] -= 50 (default 100)\n";
 
@@ -364,7 +381,8 @@ int main()
             std::cout << e.key_ << " -> " << e.data_ << "\n";
         }
 
-        table.apply(5, 5, decrementer<boost::uint32_t>(60), 100U); // [5, 5]
+        table.apply(5, 5, decrementer<boost::uint32_t>(60),
+            default_entry_value<boost::int32_t>(100)); // [5, 5]
 
         std::cout << "-- [5, 5] -= 60 (default 100)\n";
 
@@ -398,7 +416,8 @@ int main()
                               % e.data_);
         }
 
-        table.apply(key, decrementer<boost::uint32_t>(127), 255U);
+        table.apply(key, decrementer<boost::uint32_t>(127),
+            default_entry_value<boost::int32_t>(255));
 
         std::cout << "-- [0x00FF, 0x00FF] -= 127 (default 255)\n";
 
@@ -409,7 +428,8 @@ int main()
                               % e.data_);
         }
 
-        table.apply(key, decrementer<boost::uint32_t>(128), 255U);
+        table.apply(key, decrementer<boost::uint32_t>(128),
+            default_entry_value<boost::int32_t>(255));
 
         std::cout << "-- [0x00FF, 0x00FF] -= 128 (default 255)\n";
 
@@ -438,7 +458,7 @@ int main()
             std::cout << e.key_ << " -> " << e.data_ << "\n";
         }
 
-        table.apply(3, 3, incrementer<boost::uint32_t>(35)); // [3, 3]
+        table.apply(3, 3, incrementer<boost::uint32_t>(35), &map_type::default_data); // [3, 3]
 
         std::cout << "-- [3, 3] += 35";
 

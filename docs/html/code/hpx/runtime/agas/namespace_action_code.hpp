@@ -39,8 +39,8 @@ enum namespace_action_code
     primary_ns_bind_gid                     = BOOST_BINARY_U(1000011),
     primary_ns_resolve_gid                  = BOOST_BINARY_U(1000100),
     primary_ns_unbind_gid                   = BOOST_BINARY_U(1000101),
-    primary_ns_change_credit_non_blocking   = BOOST_BINARY_U(1000110),
-    primary_ns_change_credit_sync           = BOOST_BINARY_U(1000111),
+    primary_ns_change_credit                = BOOST_BINARY_U(1000110),
+    primary_ns_increment_credit             = BOOST_BINARY_U(1000111),
     primary_ns_allocate                     = BOOST_BINARY_U(1001000),
     primary_ns_statistics_counter           = BOOST_BINARY_U(1001001),
 
@@ -290,7 +290,7 @@ namespace detail
       , {   "count/change_credit"
           , ""
           , counter_target_count
-          , primary_ns_change_credit_non_blocking
+          , primary_ns_change_credit
           , primary_ns_statistics_counter }
       , {   "count/allocate"
           , ""
@@ -321,7 +321,7 @@ namespace detail
       , {   "time/change_credit"
           , "ns"
           , counter_target_time
-          , primary_ns_change_credit_non_blocking
+          , primary_ns_change_credit
           , primary_ns_statistics_counter }
       , {   "time/allocate"
           , "ns"

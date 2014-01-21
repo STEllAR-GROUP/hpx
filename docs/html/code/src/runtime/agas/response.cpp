@@ -29,6 +29,9 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/value_at.hpp>
 
+// The number of types that response's variant can represent.
+#define HPX_AGAS_RESPONSE_SUBTYPES 11
+
 namespace hpx { namespace agas
 {
     struct response::response_data
@@ -68,6 +71,7 @@ namespace hpx { namespace agas
           , subtype_void                = 0x7
           , subtype_string              = 0x8
           , subtype_resolved_localities = 0x9
+          , subtype_added_credits       = 0xa
           // update HPX_AGAS_RESPONSE_SUBTYPES is you add more subtypes
         };
 
@@ -136,6 +140,12 @@ namespace hpx { namespace agas
             // primary_ns_esolved_localities
           , util::tuple<
                 std::vector<naming::locality>
+            >
+            // 0xa
+            // primary_ns_change_credit_one
+          , util::tuple<
+                boost::int64_t  // added credits
+              , int             // dummy
             >
         > data_type;
 
@@ -323,6 +333,20 @@ namespace hpx { namespace agas
     }
 
     response::response(
+        namespace_action_code type_
+      , boost::int64_t added_credits_
+      , error status_
+        )
+      : mc(type_)
+      , status(status_)
+      , data(new response_data(util::make_tuple(added_credits_, 0)))
+    {
+        HPX_ASSERT(
+            type_ == primary_ns_increment_credit
+         || type_ == primary_ns_change_credit);
+    }
+
+    response::response(
         response const& other
         )
       : mc(other.mc)
@@ -383,6 +407,13 @@ namespace hpx { namespace agas
         ) const
     {
         return data->get_data<response_data::subtype_prefix, 0>(ec);
+    }
+
+    boost::int64_t response::get_added_credits(
+        error_code& ec
+        ) const
+    {
+        return data->get_data<response_data::subtype_added_credits, 0>(ec);
     }
 
     boost::uint32_t response::get_num_overall_threads(

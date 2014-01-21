@@ -190,7 +190,7 @@ struct HPX_EXPORT primary_namespace
         api_counter_data resolve_gid_;          // primary_ns_resolve_gid
         api_counter_data unbind_gid_;           // primary_ns_unbind_gid
         api_counter_data change_credit_;        // primary_ns_change_credit_non_blocking
-                                                // primary_ns_change_credit_sync
+                                                // primary_ns_change_credit
         api_counter_data allocate_;             // primary_ns_allocate
     };
     counter_data counter_data_;
@@ -301,12 +301,12 @@ struct HPX_EXPORT primary_namespace
       , error_code& ec = throws
         );
 
-    response change_credit_non_blocking(
+    response increment_credit(
         request const& req
       , error_code& ec = throws
         );
 
-    response change_credit_sync(
+    response change_credit(
         request const& req
       , error_code& ec = throws
         );
@@ -330,7 +330,7 @@ struct HPX_EXPORT primary_namespace
     void increment(
         naming::gid_type const& lower
       , naming::gid_type const& upper
-      , boost::int64_t credits
+      , boost::int64_t& credits
       , error_code& ec
         );
 
@@ -354,6 +354,15 @@ struct HPX_EXPORT primary_namespace
       , naming::gid_type    // count
     > free_entry;
 
+    void resolve_free_list(
+        mutex_type::scoped_lock& l
+      , std::list<refcnt_table_type::iterator> const& free_list
+      , std::list<free_entry>& free_entry_list
+      , naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , error_code& ec
+        );
+
     void decrement_sweep(
         std::list<free_entry>& free_list
       , naming::gid_type const& lower
@@ -362,14 +371,14 @@ struct HPX_EXPORT primary_namespace
       , error_code& ec
         );
 
-    void kill_non_blocking(
+    void free_components_non_blocking(
         std::list<free_entry>& free_list
       , naming::gid_type const& lower
       , naming::gid_type const& upper
       , error_code& ec
         );
 
-    void kill_sync(
+    void free_components_sync(
         std::list<free_entry>& free_list
       , naming::gid_type const& lower
       , naming::gid_type const& upper
@@ -388,8 +397,8 @@ struct HPX_EXPORT primary_namespace
       , namespace_bind_gid                      = primary_ns_bind_gid
       , namespace_resolve_gid                   = primary_ns_resolve_gid
       , namespace_unbind_gid                    = primary_ns_unbind_gid
-      , namespace_change_credit_non_blocking    = primary_ns_change_credit_non_blocking
-      , namespace_change_credit_sync            = primary_ns_change_credit_sync
+      , namespace_change_credit_non_blocking    = primary_ns_increment_credit
+      , namespace_change_credit_sync            = primary_ns_change_credit
       , namespace_allocate                      = primary_ns_allocate
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}

@@ -47,8 +47,9 @@ namespace hpx { namespace lcos { namespace local
         template <class Lock>
         void wait(Lock& lock, error_code& ec = throws)
         {
-            util::scoped_unlock<Lock> unlock(lock);
+            util::ignore_while_checking(&lock);
             mutex_type::scoped_lock l(mtx_);
+            util::scoped_unlock<Lock> unlock(lock);
             cond_.wait(l, ec);
         }
 
@@ -66,8 +67,9 @@ namespace hpx { namespace lcos { namespace local
         wait_until(Lock& lock,
             boost::posix_time::ptime const& at, error_code& ec = throws)
         {
-            util::scoped_unlock<Lock> unlock(lock);
+            util::ignore_while_checking(&lock);
             mutex_type::scoped_lock l(mtx_);
+            util::scoped_unlock<Lock> unlock(lock);
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_until(l, at, ec);
@@ -114,8 +116,9 @@ namespace hpx { namespace lcos { namespace local
             boost::posix_time::time_duration const& p,
             error_code& ec = throws)
         {
-            util::scoped_unlock<Lock> unlock(lock);
+            util::ignore_while_checking(&lock);
             mutex_type::scoped_lock l(mtx_);
+            util::scoped_unlock<Lock> unlock(lock);
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_for(l, p, ec);
