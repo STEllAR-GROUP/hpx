@@ -3,52 +3,35 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_LCOS_LOCAL_PROMISE_MAR_01_2012_0121PM)
-#define HPX_LCOS_LOCAL_PROMISE_MAR_01_2012_0121PM
+#if !BOOST_PP_IS_ITERATING
+
+#if !defined(HPX_LCOS_LOCAL_PACKAGED_TASK_MAR_01_2012_0121PM)
+#define HPX_LCOS_LOCAL_PACKAGED_TASK_MAR_01_2012_0121PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/local/promise.hpp>
+#include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/traits/is_callable.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/result_of.hpp>
 
-#include <boost/atomic.hpp>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/preprocessor/iteration/iterate.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_binary_params.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/is_void.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace lcos { namespace local
 {
     namespace detail
     {
-        ///////////////////////////////////////////////////////////////////////
-        template <typename Result>
-        struct future_object
-          : lcos::detail::future_data<Result>
-        {
-            typedef typename lcos::detail::future_data<Result>::result_type
-                result_type;
-
-            future_object()
-              : lcos::detail::future_data<Result>()
-            {}
-
-            // notify of owner going away, this sets an error as the future's
-            // result
-            void deleting_owner()
-            {
-                if (!this->is_ready()) {
-                    this->set_error(broken_promise,
-                        "future_object<Result>::deleting_owner",
-                        "deleting owner before future has become ready");
-                }
-            }
-        };
-
         ///////////////////////////////////////////////////////////////////////
         template <typename Result, typename F>
         struct task_object
@@ -125,537 +108,6 @@ namespace hpx { namespace lcos { namespace local
             }
         };
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
-    class promise
-    {
-    protected:
-        typedef lcos::detail::future_data<Result> task_impl_type;
-
-    private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
-        typedef lcos::local::spinlock mutex_type;
-
-    public:
-        // construction and destruction
-        promise()
-          : future_obtained_(false)
-        {}
-
-        ~promise()
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            if (task_)
-            {
-                if (task_->is_ready_locked() && !future_obtained_)
-                {
-                    task_->set_error(broken_promise,
-                        "promise<Result>::~promise()",
-                        "deleting owner before future has been retrieved");
-                }
-                task_->deleting_owner();
-            }
-        }
-
-        // Assignment
-        promise(promise && rhs)
-          : future_obtained_(false)
-        {
-            typename mutex_type::scoped_lock l(rhs.mtx_);
-            task_ = std::move(rhs.task_);
-            future_obtained_ = rhs.future_obtained_;
-            rhs.future_obtained_ = false;
-            rhs.task_.reset();
-        }
-
-        promise& operator=(promise && rhs)
-        {
-            if (this != &rhs) {
-                typename mutex_type::scoped_lock l(rhs.mtx_);
-
-                if (task_)
-                {
-                    if (task_->is_ready_locked() && !future_obtained_)
-                    {
-                        task_->set_error(broken_promise,
-                            "promise<Result>::operator=()",
-                            "deleting owner before future has been retrieved");
-                    }
-                    task_->deleting_owner();
-                }
-
-                task_ = std::move(rhs.task_);
-                future_obtained_ = rhs.future_obtained_;
-                rhs.future_obtained_ = false;
-                rhs.task_.reset();
-            }
-            return *this;
-        }
-
-        // Result retrieval
-        lcos::unique_future<Result> get_future(error_code& ec = throws)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-
-            if (!task_) {
-                future_obtained_ = false;
-                task_ = new detail::future_object<Result>();
-            }
-
-            if (future_obtained_) {
-                HPX_THROWS_IF(ec, future_already_retrieved,
-                    "promise<Result>::get_future",
-                    "future already has been retrieved from this promise");
-                return lcos::unique_future<Result>();
-            }
-
-            using lcos::detail::future_access;
-            future_obtained_ = true;
-            return future_access::create<unique_future<Result> >(task_);
-        }
-
-        template <typename T>
-        void set_value(T && result)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-
-            if (!task_ && future_obtained_) {
-                HPX_THROW_EXCEPTION(task_moved,
-                    "promise<Result>::set_value<T>",
-                    "promise invalid (has it been moved?)");
-                return;
-            }
-
-            if (!task_)
-                task_ = new detail::future_object<Result>();
-
-            task_->set_result(std::forward<T>(result));
-        }
-
-        void set_exception(boost::exception_ptr const& e)
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-
-            if (!task_ && future_obtained_) {
-                HPX_THROW_EXCEPTION(task_moved,
-                    "promise<Result>::set_exception",
-                    "promise invalid (has it been moved?)");
-                return;
-            }
-
-            if (!task_)
-                task_ = new detail::future_object<Result>();
-
-            task_->set_exception(e);
-        }
-
-        bool valid() const BOOST_NOEXCEPT
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            // avoid warning about conversion to bool
-            return task_.get() ? true : false;
-        }
-
-        bool is_ready() const
-        {
-            typename mutex_type::scoped_lock l(mtx_);
-            return task_->is_ready_locked();
-        }
-
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        // [N3722, 4.1] asks for this...
-        explicit operator lcos::unique_future<Result>()
-        {
-            return get_future();
-        }
-
-        explicit operator lcos::shared_future<Result>()
-        {
-            return get_future();
-        }
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-        explicit operator lcos::future<Result>()
-        {
-            return get_future();
-        }
-#endif
-#endif
-
-    protected:
-        boost::intrusive_ptr<task_impl_type> task_;
-        bool future_obtained_;
-        mutable mutex_type mtx_;
-    };
-
-#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-}}}
-
-namespace hpx { namespace lcos
-{
-    // [N3722, 4.1] asks for this...
-    template <typename Result>
-    inline unique_future<Result>::unique_future(local::promise<Result>& promise)
-    {
-        promise.get_future().swap(*this);
-    }
-
-    template <typename Result>
-    inline shared_future<Result>::shared_future(local::promise<Result>& promise)
-    {
-        shared_future<Result>(promise.get_future()).swap(*this);
-    }
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    template <typename Result>
-    inline future<Result>::future(local::promise<Result>& promise)
-    {
-        future<Result>(promise.get_future()).swap(*this);
-    }
-#endif
-}}
-
-namespace hpx { namespace lcos { namespace local
-{
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <>
-    class promise<void>
-    {
-    protected:
-        typedef lcos::detail::future_data<void> task_impl_type;
-
-    private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(promise)
-        typedef lcos::local::spinlock mutex_type;
-
-    public:
-        // construction and destruction
-        promise()
-          : future_obtained_(false)
-        {}
-
-        ~promise()
-        {
-            mutex_type::scoped_lock l(mtx_);
-
-            if (task_)
-            {
-                if (task_->is_ready_locked() && !future_obtained_)
-                {
-                    task_->set_error(broken_promise,
-                        "promise<Result>::operator=()",
-                        "deleting owner before future has been retrieved");
-                }
-                task_->deleting_owner();
-            }
-        }
-
-        // Assignment
-        promise(promise && rhs)
-          : future_obtained_(false)
-        {
-            mutex_type::scoped_lock l(rhs.mtx_);
-
-            task_ = std::move(rhs.task_);
-            future_obtained_ = rhs.future_obtained_;
-            rhs.future_obtained_ = false;
-            rhs.task_.reset();
-        }
-
-        promise& operator=(promise && rhs)
-        {
-            if (this != &rhs) {
-                mutex_type::scoped_lock l(rhs.mtx_);
-
-                if (task_)
-                {
-                    if (task_->is_ready_locked() && !future_obtained_)
-                    {
-                        task_->set_error(broken_promise,
-                            "promise<void>::operator=()",
-                            "deleting owner before future has been retrieved");
-                    }
-                    task_->deleting_owner();
-                }
-
-                task_ = rhs.task_;
-                future_obtained_ = rhs.future_obtained_;
-
-                rhs.future_obtained_ = false;
-                rhs.task_.reset();
-            }
-            return *this;
-        }
-
-        // Result retrieval
-        lcos::unique_future<void> get_future(error_code& ec = throws)
-        {
-            mutex_type::scoped_lock l(mtx_);
-
-            if (!task_) {
-                task_ = new detail::future_object<void>();
-                future_obtained_ = false;
-            }
-
-            if (future_obtained_) {
-                HPX_THROWS_IF(ec, future_already_retrieved,
-                    "promise<void>::get_future",
-                    "future already has been retrieved from this promise");
-                return lcos::unique_future<void>();
-            }
-
-            using lcos::detail::future_access;
-            future_obtained_ = true;
-            return future_access::create<unique_future<void> >(task_);
-        }
-
-        void set_value()
-        {
-            mutex_type::scoped_lock l(mtx_);
-
-            if (!task_ && future_obtained_) {
-                HPX_THROW_EXCEPTION(task_moved,
-                    "promise<void>::set_value",
-                    "promise invalid (has it been moved?)");
-                return;
-            }
-
-            if (!task_)
-                task_ = new detail::future_object<void>();
-
-            task_->set_result(util::unused);
-        }
-
-        void set_exception(boost::exception_ptr const& e)
-        {
-            mutex_type::scoped_lock l(mtx_);
-
-            if (!task_ && future_obtained_) {
-                HPX_THROW_EXCEPTION(task_moved,
-                    "promise<void>::set_exception",
-                    "promise invalid (has it been moved?)");
-                return;
-            }
-
-            if (!task_)
-                task_ = new detail::future_object<void>();
-
-            task_->set_exception(e);
-        }
-
-        bool valid() const BOOST_NOEXCEPT
-        {
-            mutex_type::scoped_lock l(mtx_);
-            // avoid warning about conversion to bool
-            return task_.get() ? true : false;
-        }
-
-        bool is_ready() const
-        {
-            mutex_type::scoped_lock l(mtx_);
-            return task_->is_ready_locked();
-        }
-
-#ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        // [N3722, 4.1] asks for this...
-        explicit operator lcos::unique_future<void>()
-        {
-            return get_future();
-        }
-
-        explicit operator lcos::shared_future<void>()
-        {
-            return get_future();
-        }
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-        explicit operator lcos::future<void>()
-        {
-            return get_future();
-        }
-#endif
-#endif
-
-    private:
-        boost::intrusive_ptr<task_impl_type> task_;
-        bool future_obtained_;
-        mutable mutex_type mtx_;
-    };
-
-#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-}}}
-
-namespace hpx { namespace lcos
-{
-    // [N3722, 4.1] asks for this...
-    template <>
-    inline unique_future<void>::unique_future(local::promise<void>& promise)
-    {
-        promise.get_future().swap(*this);
-    }
-
-    template <>
-    inline shared_future<void>::shared_future(local::promise<void>& promise)
-    {
-        shared_future<void>(promise.get_future()).swap(*this);
-    }
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    inline future<void>::future(local::promise<void>& promise)
-    {
-        future<void>(promise.get_future()).swap(*this);
-    }
-#endif
-}}
-
-namespace hpx { namespace lcos { namespace local
-{
-#endif
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Func>
-    class packaged_task;
-
-    template <typename Result>
-    class packaged_task<Result()>
-    {
-    protected:
-        typedef lcos::detail::task_base<Result> task_impl_type;
-
-    private:
-        HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task)
-
-    public:
-        // support for result_of
-        typedef Result result_type;
-
-        // construction and destruction
-        packaged_task() {}
-
-        template <typename F>
-        explicit packaged_task(threads::executor& sched, F && f)
-          : task_(new detail::task_object<Result, F>(sched, std::forward<F>(f))),
-            future_obtained_(false)
-        {}
-
-        explicit packaged_task(threads::executor& sched, Result (*f)())
-          : task_(new detail::task_object<Result , Result (*)()>(sched, f)),
-            future_obtained_(false)
-        {}
-
-        template <typename F>
-        explicit packaged_task(F && f)
-          : task_(new detail::task_object<Result, F>(std::forward<F>(f))),
-            future_obtained_(false)
-        {}
-
-        explicit packaged_task(Result (*f)())
-          : task_(new detail::task_object<Result , Result (*)()>(f)),
-            future_obtained_(false)
-        {}
-
-        ~packaged_task()
-        {
-            if (task_)
-            {
-                if (task_->is_ready() && !future_obtained_)
-                {
-                    task_->set_error(broken_promise,
-                        "packaged_task<Result()>::operator=()",
-                        "deleting owner before future has been retrieved");
-                }
-                task_->deleting_owner();
-            }
-        }
-
-        packaged_task(packaged_task && rhs)
-          : task_(std::move(rhs.task_)),
-            future_obtained_(rhs.future_obtained_)
-        {
-            rhs.task_.reset();
-            rhs.future_obtained_ = false;
-        }
-
-        packaged_task& operator=(packaged_task && rhs)
-        {
-            if (this != &rhs) {
-                if (task_)
-                {
-                    if (task_->is_ready() && !future_obtained_)
-                    {
-                        task_->set_error(broken_promise,
-                            "packaged_task<Result()>::operator=()",
-                            "deleting owner before future has been retrieved");
-                    }
-                    task_->deleting_owner();
-                }
-
-                task_ = std::move(rhs.task_);
-                future_obtained_ = rhs.future_obtained_;
-
-                rhs.task_.reset();
-                rhs.future_obtained_ = false;
-            }
-            return *this;
-        }
-
-        // synchronous execution
-        void operator()() const
-        {
-            if (!task_) {
-                HPX_THROW_EXCEPTION(task_moved,
-                    "packaged_task<Result()>::operator()",
-                    "packaged_task invalid (has it been moved?)");
-                return;
-            }
-            task_->run();
-        }
-
-        // asynchronous execution
-        void apply() const
-        {
-            if (!task_) {
-                HPX_THROW_EXCEPTION(task_moved,
-                    "packaged_task<Result()>::apply()",
-                    "packaged_task invalid (has it been moved?)");
-                return;
-            }
-            task_->apply();
-        }
-
-        // Result retrieval
-        lcos::unique_future<Result> get_future(error_code& ec = throws)
-        {
-            if (!task_) {
-                HPX_THROWS_IF(ec, task_moved,
-                    "packaged_task<Result()>::get_future",
-                    "packaged_task invalid (has it been moved?)");
-                return lcos::unique_future<Result>();
-            }
-            if (future_obtained_) {
-                HPX_THROWS_IF(ec, future_already_retrieved,
-                    "packaged_task<Result()>::get_future",
-                    "future already has been retrieved from this promise");
-                return lcos::unique_future<Result>();
-            }
-
-            using lcos::detail::future_access;
-            future_obtained_ = true;
-            return future_access::create<unique_future<Result> >(task_);
-        }
-
-        bool valid() const BOOST_NOEXCEPT
-        {
-            return task_.get();
-        }
-
-    protected:
-        boost::intrusive_ptr<task_impl_type> task_;
-        bool future_obtained_;
-    };
 
     ///////////////////////////////////////////////////////////////////////////
     // The futures_factory is very similar to a packaged_task except that it
@@ -790,6 +242,275 @@ namespace hpx { namespace lcos { namespace local
         boost::intrusive_ptr<task_impl_type> task_;
         bool future_obtained_;
     };
+
+    namespace detail
+    {
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Result, typename Signature>
+        class packaged_task_base
+        {
+        private:
+            HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task_base)
+
+        public:
+            // construction and destruction
+            packaged_task_base()
+              : function_()
+              , promise_()
+            {}
+
+            explicit packaged_task_base(util::function_nonser<Signature> const& f)
+              : function_(f)
+              , promise_()
+            {}
+
+            explicit packaged_task_base(util::function_nonser<Signature> && f)
+              : function_(std::move(f))
+              , promise_()
+            {}
+
+            packaged_task_base(packaged_task_base && other)
+              : function_(std::move(other.function_))
+              , promise_(std::move(other.promise_))
+            {}
+
+            packaged_task_base& operator=(packaged_task_base && other)
+            {
+                if (this != &other)
+                {
+                    function_ = std::move(other.function_);
+                    promise_ = std::move(other.promise_);
+                }
+                return *this;
+            }
+
+            void swap(packaged_task_base& other) BOOST_NOEXCEPT
+            {
+                function_.swap(other.function_);
+                promise_.swap(other.promise_);
+            }
+
+            // synchronous execution
+            template <typename F>
+            void invoke(F&& f, boost::mpl::false_, error_code& ec = throws)
+            {
+                if (function_.empty()) {
+                    HPX_THROWS_IF(ec, no_state,
+                        "packaged_task_base<Signature>::get_future",
+                        "this packaged_task has no valid shared state");
+                    return;
+                }
+
+                try {
+                    promise_.set_value(f());
+                }
+                catch(...) {
+                    promise_.set_exception(boost::current_exception());
+                }
+            }
+
+            template <typename F>
+            void invoke(F&& f, boost::mpl::true_, error_code& ec = throws)
+            {
+                if (function_.empty()) {
+                    HPX_THROWS_IF(ec, no_state,
+                        "packaged_task_base<Signature>::get_future",
+                        "this packaged_task has no valid shared state");
+                    return;
+                }
+
+                try {
+                    f();
+                    promise_.set_value();
+                }
+                catch(...) {
+                    promise_.set_exception(boost::current_exception());
+                }
+            }
+
+            // Result retrieval
+            lcos::unique_future<Result> get_future(error_code& ec = throws)
+            {
+                if (function_.empty()) {
+                    HPX_THROWS_IF(ec, no_state,
+                        "packaged_task_base<Signature>::get_future",
+                        "this packaged_task has no valid shared state");
+                    return lcos::unique_future<Result>();
+                }
+                return promise_.get_future();
+            }
+
+            bool valid() const BOOST_NOEXCEPT
+            {
+                return !function_.empty() && promise_.valid();
+            }
+
+            void reset(error_code& ec = throws)
+            {
+                if (function_.empty()) {
+                    HPX_THROWS_IF(ec, no_state,
+                        "packaged_task_base<Signature>::get_future",
+                        "this packaged_task has no valid shared state");
+                    return lcos::unique_future<Result>();
+                }
+                promise_ = local::promise<Result>();
+            }
+
+        protected:
+            util::function_nonser<Signature> function_;
+
+        private:
+            local::promise<Result> promise_;
+        };
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Func>
+    class packaged_task;
+
+    template <typename R>
+    class packaged_task<R()>
+      : private detail::packaged_task_base<R, R()>
+    {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task);
+
+        typedef detail::packaged_task_base<R, R()> base_type;
+
+    public:
+        // support for result_of
+        typedef R result_type;
+
+        // construction and destruction
+        packaged_task()
+          : base_type()
+        {}
+
+        template <typename F>
+        explicit packaged_task(F && f,
+            typename boost::enable_if_c<
+                !boost::is_same<typename util::decay<F>::type, packaged_task>::value
+             && traits::is_callable<typename util::decay<F>::type()>::value
+            >::type* = 0)
+          : base_type(std::forward<F>(f))
+        {}
+
+        packaged_task(packaged_task && other)
+          : base_type(std::move(other))
+        {}
+
+        packaged_task& operator=(packaged_task && rhs)
+        {
+            base_type::operator=(std::move(rhs));
+            return *this;
+        }
+
+        void operator()()
+        {
+            base_type::invoke(util::deferred_call(this->function_), boost::is_void<R>());
+        }
+
+        void swap(packaged_task& other) BOOST_NOEXCEPT
+        {
+            base_type::swap(other);
+        }
+
+        // Result retrieval
+        using base_type::get_future;
+        using base_type::valid;
+        using base_type::reset;
+    };
 }}}
+
+#   if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+#       include <hpx/lcos/local/preprocessed/packaged_task.hpp>
+#   else
+#       if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#           pragma wave option(preserve: 1, line: 0, output: "preprocessed/packaged_task_" HPX_LIMIT_STR ".hpp")
+#       endif
+
+        ///////////////////////////////////////////////////////////////////////
+#       define BOOST_PP_ITERATION_PARAMS_1                                    \
+        (                                                                     \
+            3                                                                 \
+          , (                                                                 \
+                1                                                             \
+              , HPX_FUNCTION_ARGUMENT_LIMIT                                   \
+              , <hpx/lcos/local/packaged_task.hpp>                           \
+            )                                                                 \
+        )                                                                     \
+        /**/
+#       include BOOST_PP_ITERATE()
+
+#       if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#           pragma wave option(output: null)
+#       endif
+#   endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+
+#endif
+
+#else // !BOOST_PP_IS_ITERATING
+
+#define N BOOST_PP_ITERATION()
+
+namespace hpx { namespace lcos { namespace local
+{
+    template <typename R, BOOST_PP_ENUM_PARAMS(N, typename T)>
+    class packaged_task<R(BOOST_PP_ENUM_PARAMS(N, T))>
+      : private detail::packaged_task_base<R, R(BOOST_PP_ENUM_PARAMS(N, T))>
+    {
+        HPX_MOVABLE_BUT_NOT_COPYABLE(packaged_task);
+
+        typedef detail::packaged_task_base<R, R(BOOST_PP_ENUM_PARAMS(N, T))> base_type;
+
+    public:
+        // support for result_of
+        typedef R result_type;
+
+        // construction and destruction
+        packaged_task()
+          : base_type()
+        {}
+
+        template <typename F>
+        explicit packaged_task(F && f,
+            typename boost::enable_if_c<
+                !boost::is_same<typename util::decay<F>::type, packaged_task>::value
+             && traits::is_callable<typename util::decay<F>::type(
+                    BOOST_PP_ENUM_PARAMS(N, T)
+                )>::value
+            >::type* = 0)
+          : base_type(std::forward<F>(f))
+        {}
+
+        packaged_task(packaged_task && other)
+          : base_type(std::move(other))
+        {}
+
+        packaged_task& operator=(packaged_task && rhs)
+        {
+            base_type::operator=(std::move(rhs));
+            return *this;
+        }
+
+        void swap(packaged_task& other) BOOST_NOEXCEPT
+        {
+            base_type::swap(other);
+        }
+
+        void operator()(BOOST_PP_ENUM_BINARY_PARAMS(N, T, t))
+        {
+            base_type::invoke(
+                util::deferred_call(this->function_, HPX_ENUM_FORWARD_ARGS(N, T, t)),
+                boost::is_void<R>());
+        }
+
+        // Result retrieval
+        using base_type::get_future;
+        using base_type::valid;
+        using base_type::reset;
+    };
+}}}
+
+#undef N
 
 #endif

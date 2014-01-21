@@ -19,6 +19,7 @@
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/lcos/local/packaged_continuation.hpp>
+#include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/local/and_gate.hpp>
 #include <hpx/lcos/local/trigger.hpp>
 
