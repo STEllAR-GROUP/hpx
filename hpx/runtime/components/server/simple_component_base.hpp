@@ -101,7 +101,7 @@ namespace hpx { namespace components
 
             // on first invocation take all credits to avoid a self reference
             naming::gid_type gid = gid_;
-            naming::detail::strip_credit_from_gid(const_cast<naming::gid_type&>(gid_));
+            naming::detail::strip_internal_bits_from_gid(const_cast<naming::gid_type&>(gid_));
 
             // We have to assume this credit was split as otherwise the gid
             // returned at this point will control the lifetime of the

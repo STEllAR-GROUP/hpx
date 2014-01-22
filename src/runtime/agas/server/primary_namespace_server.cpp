@@ -332,7 +332,7 @@ response primary_namespace::bind_gid(
     // parameters
     gva g = req.get_gva();
     naming::gid_type id = req.get_gid();
-    naming::detail::strip_credit_from_gid(id);
+    naming::detail::strip_internal_bits_from_gid(id);
 
     mutex_type::scoped_lock l(mutex_);
 
@@ -524,7 +524,7 @@ response primary_namespace::unbind_gid(
     // parameters
     boost::uint64_t count = req.get_count();
     naming::gid_type id = req.get_gid();
-    naming::detail::strip_credit_from_gid(id);
+    naming::detail::strip_internal_bits_from_gid(id);
 
     mutex_type::scoped_lock l(mutex_);
 
@@ -581,7 +581,7 @@ response primary_namespace::increment_credit(
     boost::int64_t credits = req.get_credit();
     naming::gid_type lower = req.get_gid();
 
-    naming::detail::strip_credit_from_gid(lower);
+    naming::detail::strip_internal_bits_from_gid(lower);
 
     // Increment.
     if (credits > 0)
@@ -610,8 +610,8 @@ response primary_namespace::change_credit(
     naming::gid_type lower = req.get_lower_bound();
     naming::gid_type upper = req.get_upper_bound();
 
-    naming::detail::strip_credit_from_gid(lower);
-    naming::detail::strip_credit_from_gid(upper);
+    naming::detail::strip_internal_bits_from_gid(lower);
+    naming::detail::strip_internal_bits_from_gid(upper);
 
     // Increment.
     if (credits > 0)
@@ -1216,7 +1216,7 @@ primary_namespace::resolve_gid_locked(
 { // {{{ resolve_gid implementation
     // parameters
     naming::gid_type id = gid;
-    naming::detail::strip_credit_from_gid(id);
+    naming::detail::strip_internal_bits_from_gid(id);
 
     gva_table_type::const_iterator it = gvas_.lower_bound(id)
                                  , begin = gvas_.begin()

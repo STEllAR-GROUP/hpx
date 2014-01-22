@@ -17,6 +17,9 @@
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_all.hpp>
+
 #include <boost/serialization/version.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/is_bitwise_serializable.hpp>
@@ -77,78 +80,18 @@
 // whenever the credit is valid. Bit 95 encodes whether the given id_type
 // has been split at any time. This information is needed to be able to decide
 // whether a garbage collection can be assumed to be a purely local operation.
-// Bit 93 is unused.
+// Bit 93 is used by the locking scheme for gid_types.
 //
 // Credit splitting is performed without any additional AGAS traffic as long as
 // sufficient credit is available. If the credit of the id_type to be split is
 // exhausted (reaches the value '2') it has to be replenished. This operation
-// is performed asynchronously. This is done for performance reasons and to
-// avoid that an outgoing parcel has to wait for the message acknowledging
-// that AGAS has accounted for the requested credit increase. While this seems
-// to be the sensible thing to do, it can easily lead to the situation where
-// global reference count decrement requests arrive at the AGAS server before
-// the increment request.
+// is performed synchronously. This is done  to ensure that AGAS has accounted
+// for the requested credit increase.
 //
 // Note that the id_type instance staying behind is replenished independently
 // from the id_type instance which is sent along to the destination. The former
 // is replenished at the sending locality, while the latter is replenished upon
 // receive at the destination locality.
-//
-// Replenishing the credit for an id_type instance is performed by:
-//
-//   1) adding the requested credit to the local instance
-//   2) asynchronously sending an increment request to AGAS
-//   3) asynchronously keeping the local instance alive until the request
-//      is acknowledged by AGAS
-//   4) making sure that none of the requested credits is given back to
-//      AGAS before the request was acknowledged (only at that point it is
-//      guaranteed that the decrement request is received after the increment
-//      request)
-//
-// It is the last item (4) which is the most difficult to implement. This is
-// because part of the requested credit may already have been split again and
-// sent to any of the other localities before the acknowledgment from AGAS
-// arrives.
-//
-// The current implementation of (4) keeps lists of (see incref_requests.hpp
-// and incref_requests.cpp):
-//
-//   a) incref requests which have been (asynchronously) sent to AGAS for all
-//      id_type instances (which are locally alive) but which have not been
-//      acknowledged yet.
-//   b) incref forwarding requests for the credits of all id_type instances
-//      which have been moved to a different locality (have been split) while
-//      there existed pending incref requests (from (a)) at the time the
-//      id_type instance was sent.
-//   c) decref requests for the credits of all (local) id_type instances which
-//      went out of scope while there existed pending incref requests (from
-//      (a) or (b)) at the time the id_type instance was deleted.
-//
-// The list (a) is controlling whether items are being held in the list (b).
-// The lists (a) and (b) are controlling whether items are being stored in the
-// list (c).
-//
-// Any incref request which results from credits running low after a credit
-// split operation is stored in list (a). Repeated incref requests for the same
-// id_type are accumulated in a single entry in list (a). The incref
-// acknowledgments which coming back from AGAS adjust the amount of credits
-// stored in list (a). If any of the entries in list (a) go to zero credits
-// they are deleted.
-//
-// Any operation splitting credits (id-splitting) causes an incref forwarding
-// request to be stored in list (b), if - at the point of the id-splitting -
-// there exists a (local) incref request entry in list (a). List (b) will store
-// the amount of credits sent to the other locality. At the same time the same
-// amount of credits is removed from list (a). Upon receive on the other
-// locality a corresponding entry in list (a) on that locality is created
-// (updated) which will prevent any decrement requests from being sent to AGAS.
-//
-// Any decref operation (any last id_type instance on a locality going out of
-// scope) causes a new entry in list (c) to be created if there exists at
-// least one entry for this id_type in list (a) and/or list (b). If a decref
-// entry has to be created (or an existing decref is augmented), the
-// corresponding decref operation in AGAS is not performed. It is held back
-// until all entries for an id_type in list (a) and list (b) are deleted.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -272,9 +215,11 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         // prepare the given id, note: this function modifies the passed id
         naming::gid_type id_type_impl::preprocess_gid(
-            boost::uint32_t dest_locality_id, bool& requires_incref_handling) const
+            boost::uint32_t dest_locality_id) const
         {
-            gid_type::mutex_type::scoped_lock l(this);
+            // Yes, this lock will be held even during the (possibly remote)
+            // incref AGAS operation.
+            gid_type::mutex_type::scoped_lock l(get_mutex());
 
             // If the initial credit is zero the gid is 'unmanaged' and no
             // additional action needs to be performed.
@@ -302,55 +247,30 @@ namespace hpx { namespace naming
             {
                 HPX_ASSERT(detail::get_credit_from_gid(*this) >= 1);
 
-                // note: the future returned by agas::incref_async()
-                //       keeps this instance alive as it is passed along
-                //       as the keep_alive parameter
                 naming::gid_type& gid = const_cast<id_type_impl&>(*this);
 
-                // We add the new credits to the gid's first to avoid
+                // We first add the new credits to the gid's to avoid
                 // duplicate splitting during concurrent serialization
                 // operations.
                 boost::uint64_t added_credit = detail::fill_credit_for_gid(gid);
-
-                // Inform our incref tracking that part of a credit is going to
-                // be sent over the wire.
-                requires_incref_handling = agas::add_remote_incref_request(
-                    dest_credit, newid, dest_locality_id);
-
-                id_type id(const_cast<id_type_impl*>(this));
-                agas::add_incref_request(added_credit, id);
-
-                // We unlock the lock as all operations on the local credit
-                // have been performed and we don't want the lock to be
-                // pending during the (possibly remote) AGAS operation.
-                l.unlock();
 
                 // If something goes wrong during the reference count
                 // increment below we will have already added credits to
                 // the split gid. In the worst case this will cause a
                 // memory leak. I'm not sure if it is possible to reliably
                 // handle this problem.
-                agas::incref_async(gid, added_credit, id);
-            }
-            else
-            {
-                // We unlock the lock as all operations on the local credit
-                // have been performed and we don't want the lock to be
-                // pending during the (possibly remote) AGAS operation.
-                l.unlock();
-
-                // Inform our incref tracking that part of a credit is going to
-                // be sent over the wire.
-                requires_incref_handling = agas::add_remote_incref_request(
-                    dest_credit, newid, dest_locality_id);
+                id_type id(const_cast<id_type_impl*>(this));
+                agas::incref(gid, added_credit, id);
             }
             return newid;
         }
 
         // prepare the given id, note: this function modifies the passed id
-        void id_type_impl::postprocess_gid(bool requires_incref_handling)
+        void id_type_impl::postprocess_gid()
         {
-            gid_type::mutex_type::scoped_lock l(this);
+            // Yes, this lock will be held even during the (possibly remote)
+            // incref AGAS operation.
+            gid_type::mutex_type::scoped_lock l(get_mutex());
 
             if (!detail::has_credits(*this))
                 return;
@@ -360,37 +280,17 @@ namespace hpx { namespace naming
             boost::int16_t credits = detail::get_log2credit_from_gid(*this);
             if (0 == credits)
             {
-                // Inform our incref tracking that part of a credit which was
-                // not acknowledged was received over the wire.
-                id_type id(this);
-
-                if (requires_incref_handling)
-                    agas::add_incref_request(1, id);
-
                 // We add the new credits to the gid first to avoid
                 // duplicate splitting during concurrent serialization
                 // operations.
                 boost::uint64_t added_credit = detail::fill_credit_for_gid(*this);
-
-                agas::add_incref_request(added_credit, id);
-
-                // We unlock the lock as all operations on the local credit
-                // have been performed and we don't want the lock to be
-                // pending during the (possibly remote) AGAS operation.
-                l.unlock();
 
                 // If something goes wrong during the reference count
                 // increment below we will have already added credits to
                 // the split gid. In the worst case this will cause a
                 // memory leak. I'm not sure if it is possible to reliably
                 // handle this problem.
-                agas::incref_async(*this, added_credit, id);
-            }
-            else if (requires_incref_handling)
-            {
-                // Inform our incref tracking that part of a credit which was
-                // not acknowledged was received over the wire.
-                agas::add_incref_request(naming::detail::power2(credits), id_type(this));
+                agas::incref(*this, added_credit, id_type(this));
             }
         }
 
@@ -398,7 +298,7 @@ namespace hpx { namespace naming
         boost::int64_t split_gid(gid_type& gid, gid_type& new_gid)
         {
             boost::int64_t new_credit = 0;
-            naming::gid_type::mutex_type::scoped_lock l(&gid);
+            naming::gid_type::mutex_type::scoped_lock l(gid.get_mutex());
 
             if (naming::detail::has_credits(gid))
             {
@@ -411,21 +311,17 @@ namespace hpx { namespace naming
 
                     boost::int64_t added_credit =
                         naming::detail::fill_credit_for_gid(gid);
+                    hpx::unique_future<boost::int64_t> f1 =
+                        agas::incref_async(gid, added_credit);
 
                     boost::int64_t added_new_credit =
                         naming::detail::fill_credit_for_gid(new_gid);
                     new_credit = naming::detail::get_credit_from_gid(new_gid);
 
-                    // inform incref handler before unlocking
-                    agas::add_incref_request(added_credit,
-                        naming::id_type(gid, id_type::unmanaged));
-                    agas::add_incref_request(added_new_credit,
-                        naming::id_type(new_gid, id_type::unmanaged));
+                    hpx::unique_future<boost::int64_t> f2 =
+                        agas::incref_async(new_gid, added_new_credit);
 
-                    l.unlock();
-
-                    agas::incref_async(gid, added_credit);
-                    agas::incref_async(new_gid, added_new_credit);
+                    hpx::wait_all(f1, f2);
                 }
             }
             else
@@ -436,22 +332,17 @@ namespace hpx { namespace naming
             return new_credit;
         }
 
-        hpx::unique_future<bool> replenish_credits(gid_type& id)
+        boost::int64_t replenish_credits(gid_type& gid)
         {
             boost::int64_t added_credit = 0;
 
-            {
-                gid_type::mutex_type::scoped_lock l(&id);
+            gid_type::mutex_type::scoped_lock l(gid);
 
-                HPX_ASSERT(0 == get_credit_from_gid(id));
-                added_credit = naming::detail::fill_credit_for_gid(id);
-                naming::detail::set_credit_split_mask_for_gid(id);
+            HPX_ASSERT(0 == get_credit_from_gid(gid));
+            added_credit = naming::detail::fill_credit_for_gid(gid);
+            naming::detail::set_credit_split_mask_for_gid(gid);
 
-                agas::add_incref_request(added_credit,
-                    naming::id_type(id, id_type::unmanaged));
-            }
-
-            return agas::incref_async(id, added_credit);
+            return agas::incref(gid, added_credit);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -459,7 +350,6 @@ namespace hpx { namespace naming
         {
             gid_type gid_;
             boost::uint16_t type_;
-            bool requires_incref_handling_;
         };
 
         // serialization
@@ -467,18 +357,15 @@ namespace hpx { namespace naming
         void id_type_impl::save(Archive& ar) const
         {
             boost::uint32_t dest_locality_id = ar.get_dest_locality_id();
-            bool requires_incref_handling = false;
 
             if(ar.flags() & util::disable_array_optimization) {
-                naming::gid_type split_id(
-                    preprocess_gid(dest_locality_id, requires_incref_handling));
-                ar << split_id << type_ << requires_incref_handling;
+                naming::gid_type split_id(preprocess_gid(dest_locality_id));
+                ar << split_id << type_;
             }
             else {
                 gid_serialization_data data;
-                data.gid_ = preprocess_gid(dest_locality_id, requires_incref_handling);
+                data.gid_ = preprocess_gid(dest_locality_id);
                 data.type_ = type_;
-                data.requires_incref_handling_ = requires_incref_handling;
 
                 ar.save(data);
             }
@@ -487,12 +374,10 @@ namespace hpx { namespace naming
         template <typename Archive>
         void id_type_impl::load(Archive& ar)
         {
-            bool requires_incref_handling = false;
-
             if(ar.flags() & util::disable_array_optimization) {
                 // serialize base class and management type
                 ar >> static_cast<gid_type&>(*this);
-                ar >> type_ >> requires_incref_handling;
+                ar >> type_;
             }
             else {
                 gid_serialization_data data;
@@ -500,7 +385,6 @@ namespace hpx { namespace naming
 
                 static_cast<gid_type&>(*this) = data.gid_;
                 type_ = static_cast<id_type_management>(data.type_);
-                requires_incref_handling = data.requires_incref_handling_;
             }
 
             if (detail::unmanaged != type_ && detail::managed != type_) {
@@ -509,7 +393,7 @@ namespace hpx { namespace naming
             }
 
             // make sure the credits get properly updated on receiving
-            postprocess_gid(requires_incref_handling);
+            postprocess_gid();
         }
 
         // explicit instantiation for the correct archive types

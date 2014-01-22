@@ -61,7 +61,8 @@ char const* const primary_namespace_service_name = "primary/";
 ///                  locality is assigned a prefix. This creates a 96-bit
 ///                  address space for each locality.
 ///     RC         - Bit 88 to bit 92 of the MSB. This is the log2 of the number
-///                  of reference counting credits on the GID. Bit 93 is unused.
+///                  of reference counting credits on the GID.
+///                  Bit 93 is used by the locking scheme for gid_types.
 ///                  Bit 94 is a flag which is set if the credit value is valid.
 ///                  Bit 95 is a flag that is set if a GID's credit count is
 ///                  ever split (e.g. if the GID is ever passed to another

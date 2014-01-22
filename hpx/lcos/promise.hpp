@@ -154,11 +154,11 @@ namespace hpx { namespace lcos { namespace detail
         // retrieve the gid of this promise
         naming::id_type get_gid() const
         {
-            naming::gid_type::mutex_type::scoped_lock l(&gid_);
+            naming::gid_type::mutex_type::scoped_lock l(gid_.get_mutex());
 
             // take all credits to avoid a self reference
             naming::gid_type gid = gid_;
-            naming::detail::strip_credit_from_gid(
+            naming::detail::strip_internal_bits_from_gid(
                 const_cast<naming::gid_type&>(gid_));
 
             // we request the id of a future only once

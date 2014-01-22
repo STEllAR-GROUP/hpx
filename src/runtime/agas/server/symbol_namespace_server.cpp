@@ -13,6 +13,8 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_all.hpp>
 
 namespace hpx { namespace agas
 {
@@ -265,8 +267,8 @@ response symbol_namespace::bind(
         boost::int64_t const credits = naming::detail::get_credit_from_gid(gid);
         naming::gid_type raw_gid = it->second;
 
-        naming::detail::strip_credit_from_gid(raw_gid);
-        naming::detail::strip_credit_from_gid(gid);
+        naming::detail::strip_internal_bits_from_gid(raw_gid);
+        naming::detail::strip_internal_bits_from_gid(gid);
 
         // increase reference count
         if (raw_gid == gid)
@@ -356,7 +358,7 @@ response symbol_namespace::resolve(
     naming::gid_type gid;
 
     // Is this entry reference counted?
-    naming::gid_type::mutex_type::scoped_lock gid_l(&(it->second));
+    naming::gid_type::mutex_type::scoped_lock gid_l(it->second.get_mutex());
     if (naming::detail::has_credits(it->second))
     {
         gid = naming::detail::split_credits_for_gid(it->second);
@@ -373,18 +375,17 @@ response symbol_namespace::resolve(
 
             boost::uint64_t added_credit =
                 naming::detail::fill_credit_for_gid(it->second);
-            agas::add_incref_request(added_credit,
-                naming::id_type(it->second, id_type::unmanaged));
+            hpx::unique_future<boost::int64_t> f1 =
+                agas::incref_async(it->second, added_credit);
 
             boost::uint64_t added_new_credit =
                 naming::detail::fill_credit_for_gid(gid);
-            agas::add_incref_request(added_new_credit,
-                naming::id_type(gid, id_type::unmanaged));
+            hpx::unique_future<boost::int64_t> f2 =
+                agas::incref_async(gid, added_new_credit);
+
+            hpx::wait_all(f1, f2);
 
             gid_l.unlock();
-
-            agas::incref_async(it->second, added_credit);
-            agas::incref_async(gid, added_new_credit);
 
             LAGAS_(debug) << (boost::format(
                 "symbol_namespace::resolve, incremented entry credits: "
