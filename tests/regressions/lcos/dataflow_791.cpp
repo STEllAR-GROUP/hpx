@@ -21,7 +21,7 @@
 
 using std::vector;
 using hpx::lcos::shared_future;
-using hpx::lcos::wait;
+using hpx::wait_all;
 using hpx::async;
 using hpx::lcos::local::dataflow;
 using hpx::util::unwrapped;
@@ -152,7 +152,7 @@ void LU( int numBlocks)
             }
         }
     }
-    wait(dfArray[numBlocks-1][numBlocks-1][numBlocks-1]);
+    wait_all(dfArray[numBlocks-1][numBlocks-1][numBlocks-1]);
 }
 
 void getBlockList(vector<vector<block>> &blockList, int numBlocks)
@@ -286,7 +286,7 @@ void InitMatrix3()
     for(int i = 0; i < size; i++) {
         futures.push_back( async( initLoop, i));
     }
-    wait(futures);
+    wait_all(futures);
 }
 
 void initLoop(int i) {

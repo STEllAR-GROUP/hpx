@@ -106,7 +106,7 @@ void function_pointers()
               , make_ready_future())
         );
 
-    hpx::wait(f1);
+    f1.wait();
     HPX_TEST_EQ(f2.get(), 126);
     HPX_TEST_EQ(f3.get(), 163);
     HPX_TEST_EQ(f4.get(), 10 * 84);
@@ -161,7 +161,7 @@ void future_function_pointers()
             &future_void_f1, async(&future_void_sf1, shared_future<void>(make_ready_future()))
         );
 
-    hpx::wait(f1);
+    f1.wait();
 
     HPX_TEST_EQ(future_void_f1_count, 2u);
     future_void_f1_count.store(0);
@@ -172,7 +172,7 @@ void future_function_pointers()
       , async(&future_void_sf1, shared_future<void>(make_ready_future()))
     );
 
-    hpx::wait(f2);
+    f2.wait();
     HPX_TEST_EQ(future_void_f1_count, 2u);
     HPX_TEST_EQ(future_void_f2_count, 1u);
     future_void_f1_count.store(0);

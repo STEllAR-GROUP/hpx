@@ -150,9 +150,9 @@ int main()
     }
 
     // The non-callback version of hpx::lcos::wait takes a single parameter,
-    // a future of vectors to wait on. hpx::lcos::wait only returns when
+    // a future of vectors to wait on. hpx::wait_all only returns when
     // all of the futures have finished.
-    hpx::lcos::wait(futures);
+    hpx::wait_all(futures);
     return 0;
 }
 //]

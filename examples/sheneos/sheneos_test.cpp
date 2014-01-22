@@ -99,7 +99,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
         }
     }
 
-    hpx::lcos::wait(tests);
+    hpx::wait_all(tests);
 }
 
 HPX_PLAIN_ACTION(test_sheneos, test_action);

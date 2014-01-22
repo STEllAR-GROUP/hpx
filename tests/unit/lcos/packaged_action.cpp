@@ -59,7 +59,7 @@ int hpx_main(variables_map&)
         // create an implicit future
         null_thread_executed = false;
         {
-            HPX_TEST(hpx::lcos::wait(async<null_action>(hpx::find_here())));
+            HPX_TEST(async<null_action>(hpx::find_here()).get());
         }
         HPX_TEST(null_thread_executed);
 
@@ -82,7 +82,7 @@ int hpx_main(variables_map&)
         // create an implicit future
         null_thread_executed = false;
         {
-            HPX_TEST(hpx::lcos::wait(async(do_null, hpx::find_here())));
+            HPX_TEST(async(do_null, hpx::find_here()).get());
         }
         HPX_TEST(null_thread_executed);
 

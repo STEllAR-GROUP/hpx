@@ -93,8 +93,8 @@ namespace jacobi
                             HPX_ASSERT(stencil_iterators[y-1].id);
                             HPX_ASSERT(stencil_iterators[y].id);
                             HPX_ASSERT(stencil_iterators[y+1].id);
-                            hpx::lcos::wait(init_futures[y-1]);
-                            hpx::lcos::wait(init_futures[y+1]);
+                            hpx::wait_all(init_futures[y-1]);
+                            hpx::wait_all(init_futures[y+1]);
                             boundary_futures.push_back(
                                 stencil_iterators[y].setup_boundary(
                                     stencil_iterators[y-1]
@@ -105,7 +105,7 @@ namespace jacobi
                     }
                 );
                 HPX_ASSERT(stencil_iterators[0].id);
-                hpx::lcos::wait(boundary_futures);
+                hpx::wait_all(boundary_futures);
                 HPX_ASSERT(stencil_iterators[0].id);
             }
 
@@ -122,7 +122,7 @@ namespace jacobi
                     run_futures.push_back(stencil_iterators[y].run(max_iterations));
                 }
                 HPX_ASSERT(stencil_iterators[0].id);
-                hpx::lcos::wait(run_futures);
+                hpx::wait_all(run_futures);
                 HPX_ASSERT(stencil_iterators[0].id);
                 */
 
@@ -136,7 +136,7 @@ namespace jacobi
                             stencil_iterators[y].step()
                         );
                     }
-                    hpx::lcos::wait(run_futures);
+                    hpx::wait_all(run_futures);
                 }
 
                 double time_elapsed = t.elapsed();
