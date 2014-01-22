@@ -231,81 +231,30 @@ namespace hpx { namespace naming
 
             // Request new credits from AGAS if needed (i.e. the remainder
             // of the credit splitting is equal to one).
-            naming::gid_type newid = detail::split_credits_for_gid(
-                const_cast<id_type_impl&>(*this));
-
-            boost::int64_t dest_credit = detail::get_credit_from_gid(newid);
-
-            // none of the ids should be left without credits
-            HPX_ASSERT(detail::has_credits(*this));
-            HPX_ASSERT(dest_credit != 0);
-
-            // We now add new credits to the id which is left behind only.
-            // The credit for the newid will be handled upon arrival
-            // on the destination node.
-            if (1 == dest_credit)
-            {
-                HPX_ASSERT(detail::get_credit_from_gid(*this) >= 1);
-
-                naming::gid_type& gid = const_cast<id_type_impl&>(*this);
-
-                // We first add the new credits to the gid's to avoid
-                // duplicate splitting during concurrent serialization
-                // operations.
-                boost::uint64_t added_credit = detail::fill_credit_for_gid(gid);
-
-                // If something goes wrong during the reference count
-                // increment below we will have already added credits to
-                // the split gid. In the worst case this will cause a
-                // memory leak. I'm not sure if it is possible to reliably
-                // handle this problem.
-                id_type id(const_cast<id_type_impl*>(this));
-                agas::incref(gid, added_credit, id);
-            }
-            return newid;
-        }
-
-        // prepare the given id, note: this function modifies the passed id
-        void id_type_impl::postprocess_gid()
-        {
-            // Yes, this lock will be held even during the (possibly remote)
-            // incref AGAS operation.
-            gid_type::mutex_type::scoped_lock l(get_mutex());
-
-            if (!detail::has_credits(*this))
-                return;
-
-            // If the initial credit after de-serialization is 1 we need to
-            // add more global credits.
-            boost::int16_t credits = detail::get_log2credit_from_gid(*this);
-            if (0 == credits)
-            {
-                // We add the new credits to the gid first to avoid
-                // duplicate splitting during concurrent serialization
-                // operations.
-                boost::uint64_t added_credit = detail::fill_credit_for_gid(*this);
-
-                // If something goes wrong during the reference count
-                // increment below we will have already added credits to
-                // the split gid. In the worst case this will cause a
-                // memory leak. I'm not sure if it is possible to reliably
-                // handle this problem.
-                agas::incref(*this, added_credit, id_type(this));
-            }
+            boost::int64_t new_credit = 0;
+            return split_gid(const_cast<id_type_impl&>(*this), new_credit);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        boost::int64_t split_gid(gid_type& gid, gid_type& new_gid)
+        gid_type split_gid(gid_type& gid, boost::int64_t& new_credit)
         {
-            boost::int64_t new_credit = 0;
-            naming::gid_type::mutex_type::scoped_lock l(gid.get_mutex());
+            naming::gid_type new_gid = gid;
+            new_credit = 0;
 
+            naming::gid_type::mutex_type::scoped_lock l(gid.get_mutex());
             if (naming::detail::has_credits(gid))
             {
                 new_gid = naming::detail::split_credits_for_gid(gid);
 
+                boost::int64_t src_credit =
+                    naming::detail::get_credit_from_gid(gid);
+
+                // none of the ids should be left without credits
+                HPX_ASSERT(src_credit != 0);
+                HPX_ASSERT(detail::has_credits(new_gid));
+
                 // Credit exhaustion - we need to get more.
-                if (1 == naming::detail::get_credit_from_gid(gid))
+                if (1 == src_credit)
                 {
                     HPX_ASSERT(1 == naming::detail::get_credit_from_gid(new_gid));
 
@@ -324,12 +273,7 @@ namespace hpx { namespace naming
                     hpx::wait_all(f1, f2);
                 }
             }
-            else
-            {
-                new_gid = gid;
-            }
-
-            return new_credit;
+            return new_gid;
         }
 
         boost::int64_t replenish_credits(gid_type& gid)
@@ -391,9 +335,6 @@ namespace hpx { namespace naming
                 HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
                     "trying to load id_type with unknown deleter");
             }
-
-            // make sure the credits get properly updated on receiving
-            postprocess_gid();
         }
 
         // explicit instantiation for the correct archive types

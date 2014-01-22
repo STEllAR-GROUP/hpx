@@ -1816,9 +1816,9 @@ lcos::unique_future<bool> addressing_service::register_name_async(
 { // {{{
     // We need to modify the reference count.
     naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
-    naming::gid_type new_gid;
-
-    boost::int64_t new_credit = naming::detail::split_gid(mutable_gid, new_gid);
+    boost::int64_t new_credit = 0;
+    naming::gid_type new_gid =
+        naming::detail::split_gid(mutable_gid, new_credit);
 
     request req(symbol_ns_bind, name, new_gid);
 

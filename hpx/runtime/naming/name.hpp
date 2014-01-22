@@ -533,7 +533,7 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT boost::int64_t split_gid(gid_type& id, gid_type& new_gid);
+        HPX_EXPORT gid_type split_gid(gid_type& id, boost::int64_t& new_credit);
         HPX_EXPORT boost::int64_t replenish_credits(gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////
@@ -639,7 +639,6 @@ namespace hpx { namespace naming
             // credit management (called during serialization), this function
             // has to be 'const' as save() above has to be 'const'.
             naming::gid_type preprocess_gid(boost::uint32_t dest_locality_id) const;
-            void postprocess_gid();
 
             // reference counting
             friend HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
