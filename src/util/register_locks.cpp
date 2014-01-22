@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
-//  Copyright (c) 2014 Thomas Haller
+//  Copyright (c) 2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,7 +8,7 @@
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/ptr_container/ptr_map.hpp>
@@ -29,14 +29,12 @@ namespace hpx { namespace util
         struct lock_data
         {
             lock_data()
-              : thread_num_(get_worker_thread_num())
-              , ignore_(false)
+              : ignore_(false)
               , user_data_(0)
             {}
 
             lock_data(register_lock_data* data)
-              : thread_num_(get_worker_thread_num())
-              , ignore_(false)
+              : ignore_(false)
               , user_data_(data)
             {}
 
@@ -45,7 +43,6 @@ namespace hpx { namespace util
                 delete user_data_;
             }
 
-            std::size_t thread_num_;
             bool ignore_;
             register_lock_data* user_data_;
         };
@@ -55,33 +52,26 @@ namespace hpx { namespace util
             typedef lcos::local::spinlock mutex_type;
             typedef boost::ptr_map<void const*, lock_data> held_locks_map;
 
-            struct registered_locks
-            {
-                mutable mutex_type mtx_;
-                held_locks_map stored_locks_;
-            };
-
             struct tls_tag {};
+            static hpx::util::thread_specific_ptr<held_locks_map, tls_tag> held_locks_;
 
             static bool lock_detection_enabled_;
 
-            static registered_locks& get_registered_locks()
-            {
-                util::static_<registered_locks, tls_tag> held_locks;
-                return held_locks.get();
-            }
-
-            static mutex_type& get_mtx()
-            {
-                return get_registered_locks().mtx_;
-            }
-
             static held_locks_map& get_lock_map()
             {
-                return get_registered_locks().stored_locks_;
+                if (NULL == held_locks_.get())
+                {
+                    held_locks_.reset(new held_locks_map());
+                }
+
+                HPX_ASSERT(NULL != held_locks_.get());
+                return *held_locks_.get();
             }
         };
 
+        hpx::util::thread_specific_ptr<
+            register_locks::held_locks_map, register_locks::tls_tag
+        > register_locks::held_locks_;
         bool register_locks::lock_detection_enabled_ = false;
     }
 
@@ -98,8 +88,6 @@ namespace hpx { namespace util
 
         if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
-            register_locks::mutex_type::scoped_lock l(register_locks::get_mtx());
-
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
 
@@ -126,8 +114,6 @@ namespace hpx { namespace util
 
         if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
-            register_locks::mutex_type::scoped_lock l(register_locks::get_mtx());
-
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
 
@@ -148,13 +134,11 @@ namespace hpx { namespace util
         {
             typedef register_locks::held_locks_map::const_iterator iterator;
 
-            std::size_t thread_num = get_worker_thread_num();
-
             iterator end = held_locks.end();
             for (iterator it = held_locks.begin(); it != end; ++it)
             {
                 lock_data const& data = *(*it).second;
-                if (data.thread_num_ == thread_num && !data.ignore_)
+                if (!(*it).second->ignore_)
                     return true;
             }
 
@@ -168,8 +152,6 @@ namespace hpx { namespace util
 
         if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
-            register_locks::mutex_type::scoped_lock l(register_locks::get_mtx());
-
             register_locks::held_locks_map& held_locks =
                 register_locks::get_lock_map();
 
@@ -224,8 +206,6 @@ namespace hpx { namespace util
         {
             if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
             {
-                register_locks::mutex_type::scoped_lock l(register_locks::get_mtx());
-
                 register_locks::held_locks_map& held_locks =
                     register_locks::get_lock_map();
 
