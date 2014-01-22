@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2013 Hartmut Kaiser
+//  Copyright (c) 2011-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1816,15 +1816,14 @@ lcos::unique_future<bool> addressing_service::register_name_async(
 { // {{{
     // We need to modify the reference count.
     naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
-    boost::int64_t new_credit = 0;
-    naming::gid_type new_gid =
-        naming::detail::split_gid(mutable_gid, new_credit);
+    naming::gid_type new_gid = naming::detail::split_gid_if_needed(mutable_gid);
 
     request req(symbol_ns_bind, name, new_gid);
 
     unique_future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
 
+    boost::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
     if (new_credit != 0)
     {
         using HPX_STD_PLACEHOLDERS::_1;

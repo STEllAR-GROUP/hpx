@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
@@ -533,7 +533,7 @@ namespace hpx { namespace naming
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT gid_type split_gid(gid_type& id, boost::int64_t& new_credit);
+        HPX_EXPORT gid_type split_gid_if_needed(gid_type& id);
         HPX_EXPORT boost::int64_t replenish_credits(gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////

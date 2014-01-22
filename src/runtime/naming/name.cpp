@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -88,10 +88,8 @@
 // is performed synchronously. This is done  to ensure that AGAS has accounted
 // for the requested credit increase.
 //
-// Note that the id_type instance staying behind is replenished independently
-// from the id_type instance which is sent along to the destination. The former
-// is replenished at the sending locality, while the latter is replenished upon
-// receive at the destination locality.
+// Note that both the id_type instance staying behind and the one sent along
+// are replenished before sending out the parcel at the sending locality.
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -231,15 +229,13 @@ namespace hpx { namespace naming
 
             // Request new credits from AGAS if needed (i.e. the remainder
             // of the credit splitting is equal to one).
-            boost::int64_t new_credit = 0;
-            return split_gid(const_cast<id_type_impl&>(*this), new_credit);
+            return split_gid_if_needed(const_cast<id_type_impl&>(*this));
         }
 
         ///////////////////////////////////////////////////////////////////////
-        gid_type split_gid(gid_type& gid, boost::int64_t& new_credit)
+        gid_type split_gid_if_needed(gid_type& gid)
         {
             naming::gid_type new_gid = gid;
-            new_credit = 0;
 
             naming::gid_type::mutex_type::scoped_lock l(gid.get_mutex());
             if (naming::detail::has_credits(gid))
@@ -265,8 +261,6 @@ namespace hpx { namespace naming
 
                     boost::int64_t added_new_credit =
                         naming::detail::fill_credit_for_gid(new_gid);
-                    new_credit = naming::detail::get_credit_from_gid(new_gid);
-
                     hpx::unique_future<boost::int64_t> f2 =
                         agas::incref_async(new_gid, added_new_credit);
 

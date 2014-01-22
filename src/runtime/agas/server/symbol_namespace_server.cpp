@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,8 +13,6 @@
 #include <hpx/runtime/agas/server/symbol_namespace.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_all.hpp>
 
 namespace hpx { namespace agas
 {
@@ -355,48 +353,7 @@ response symbol_namespace::resolve(
     if (&ec != &throws)
         ec = make_success_code();
 
-    naming::gid_type gid;
-
-    // Is this entry reference counted?
-    naming::gid_type::mutex_type::scoped_lock gid_l(it->second.get_mutex());
-    if (naming::detail::has_credits(it->second))
-    {
-        gid = naming::detail::split_credits_for_gid(it->second);
-
-        LAGAS_(debug) << (boost::format(
-            "symbol_namespace::resolve, split credits for entry: "
-            "key(%1%), entry(%2%), gid(%3%)")
-            % key % it->second % gid);
-
-        // Credit exhaustion - we need to get more.
-        if (1 == naming::detail::get_credit_from_gid(gid))
-        {
-            HPX_ASSERT(1 == naming::detail::get_credit_from_gid(it->second));
-
-            boost::uint64_t added_credit =
-                naming::detail::fill_credit_for_gid(it->second);
-            hpx::unique_future<boost::int64_t> f1 =
-                agas::incref_async(it->second, added_credit);
-
-            boost::uint64_t added_new_credit =
-                naming::detail::fill_credit_for_gid(gid);
-            hpx::unique_future<boost::int64_t> f2 =
-                agas::incref_async(gid, added_new_credit);
-
-            hpx::wait_all(f1, f2);
-
-            gid_l.unlock();
-
-            LAGAS_(debug) << (boost::format(
-                "symbol_namespace::resolve, incremented entry credits: "
-                "key(%1%), entry(%2%), gid(%3%)")
-                % key % it->second % gid);
-        }
-    }
-    else
-    {
-        gid = it->second;
-    }
+    naming::gid_type gid = naming::detail::split_gid_if_needed(it->second);
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::resolve, key(%1%), gid(%2%)")
