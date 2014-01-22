@@ -124,8 +124,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         if (PAPI_accum(evset_, &counts_[0]) != PAPI_OK) return false;
         timestamp_ = static_cast<boost::int64_t>(hpx::get_system_uptime());
         cnt->update_state(timestamp_, counts_[cnt->get_counter_index()]);
-	if (reset) counts_[cnt->get_counter_index()] = 0;
-        return true;
+        if (reset) counts_[cnt->get_counter_index()] = 0;
+            return true;
     }
 
     bool thread_counters::terminate(boost::uint32_t tix)
@@ -235,7 +235,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
         if (timestamp_ != -1) copy_value(value);
         else value.status_ = hpx::performance_counters::status_invalid_data;
 
-	// clear local copy
+        // clear local copy
         if (reset) value_ = 0;
 
         value.count_ = ++invocation_count_;
