@@ -201,8 +201,10 @@ namespace hpx { namespace naming
             switch (t) {
             case unmanaged:
                 return &detail::gid_unmanaged_deleter;
+
             case managed:
                 return &detail::gid_managed_deleter;
+
             default:
                 HPX_ASSERT(false);          // invalid management type
                 return &detail::gid_unmanaged_deleter;
@@ -215,21 +217,17 @@ namespace hpx { namespace naming
         naming::gid_type id_type_impl::preprocess_gid(
             boost::uint32_t dest_locality_id) const
         {
-            // Yes, this lock will be held even during the (possibly remote)
-            // incref AGAS operation.
-            gid_type::mutex_type::scoped_lock l(get_mutex());
-
-            // If the initial credit is zero the gid is 'unmanaged' and no
-            // additional action needs to be performed.
-            if (!has_credits(*this))
+            // unmanaged gids do not require any special handling
+            if (unmanaged == type_)
             {
-                HPX_ASSERT(unmanaged == type_);
                 return *this;
             }
 
+            HPX_ASSERT(has_credits(*this));
+
             // Request new credits from AGAS if needed (i.e. the remainder
             // of the credit splitting is equal to one).
-            return split_gid_if_needed_locked(const_cast<id_type_impl&>(*this));
+            return split_gid_if_needed(const_cast<id_type_impl&>(*this));
         }
 
         ///////////////////////////////////////////////////////////////////////
