@@ -229,18 +229,24 @@ namespace hpx { namespace naming
 
             // Request new credits from AGAS if needed (i.e. the remainder
             // of the credit splitting is equal to one).
-            return split_gid_if_needed(const_cast<id_type_impl&>(*this));
+            return split_gid_if_needed_locked(const_cast<id_type_impl&>(*this));
         }
 
         ///////////////////////////////////////////////////////////////////////
         gid_type split_gid_if_needed(gid_type& gid)
         {
+            gid_type::mutex_type::scoped_lock l(gid.get_mutex());
+            return split_gid_if_needed_locked(gid);
+        }
+
+        gid_type split_gid_if_needed_locked(gid_type& gid)
+        {
             naming::gid_type new_gid = gid;
 
-            naming::gid_type::mutex_type::scoped_lock l(gid.get_mutex());
             if (naming::detail::has_credits(gid))
             {
                 new_gid = naming::detail::split_credits_for_gid(gid);
+                naming::detail::strip_lock_from_gid(new_gid);
 
                 boost::int64_t src_credit =
                     naming::detail::get_credit_from_gid(gid);
