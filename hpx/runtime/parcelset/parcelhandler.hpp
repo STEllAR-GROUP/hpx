@@ -1,3 +1,4 @@
+//  Copyright (c)      2014 Thomas Heller
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -226,7 +227,7 @@ namespace hpx { namespace parcelset
         /// The function \a get_parcel returns the next available parcel
         ///
         /// \param p        [out] The parcel instance to be filled with the
-        ///                 received parcel. If the functioned returns \a true
+        ///                 received parcel. If the function returns \a true
         ///                 this will be the next received parcel.
         ///
         /// \returns        Returns \a true if the next parcel has been

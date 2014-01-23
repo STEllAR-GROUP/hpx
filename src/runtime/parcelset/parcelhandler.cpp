@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2013 Hartmut Kaiser
-//  Copyright (c)      2013 Thomas Heller
+//  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
 //

@@ -1,3 +1,4 @@
+//  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -108,7 +109,7 @@ namespace hpx { namespace parcelset
         ///                   std::size_t bytes_written);
         /// \endcode
         virtual void put_parcels(std::vector<parcel> const & parcels,
-            std::vector<write_handler_type> const& handlers);
+            std::vector<write_handler_type> const& handlers) = 0;
 
         /// Send an early parcel through the TCP parcelport
         ///
@@ -116,25 +117,16 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        virtual void send_early_parcel(parcel& p)
-        {
-            HPX_ASSERT(false);    // is implemented in tcp::parcelport only
-        }
+        virtual void send_early_parcel(parcel& p) = 0;
 
         /// Cache specific functionality
-        virtual void remove_from_connection_cache(naming::locality const& loc)
-        {
-            // by default, no connection cache is used
-        }
+        virtual void remove_from_connection_cache(naming::locality const& loc) = 0;
 
         /// Retrieve the type of the locality represented by this parcelport
         virtual connection_type get_type() const = 0;
 
         /// Return the thread pool if the name matches
-        virtual util::io_service_pool* get_thread_pool(char const* name)
-        {
-            return 0;     // by default no thread pool is used
-        }
+        virtual util::io_service_pool* get_thread_pool(char const* name) = 0;
 
         /// Return the given connection cache statistic
         enum connection_cache_statistics_type
@@ -147,29 +139,13 @@ namespace hpx { namespace parcelset
         };
 
         // invoke pending background work
-        virtual void do_background_work()
-        {
-            // by default no work has to be done
-        }
-
-        // by default this parcelport does not expose any conenction cache
-        // statistics
-        virtual bool supports_connection_cache_statistics() const
-        {
-            return false;
-        }
+        virtual void do_background_work() = 0;
 
         virtual boost::int64_t
-        get_connection_cache_statistics(connection_cache_statistics_type, bool reset)
-        {
-            return 0;
-        }
+        get_connection_cache_statistics(connection_cache_statistics_type, bool reset) = 0;
 
         /// Return the name of this locality
-        virtual std::string get_locality_name() const
-        {
-            return "<unknown>";
-        }
+        virtual std::string get_locality_name() const = 0;
 
         /// Register an event handler to be called whenever a parcel has been
         /// received.

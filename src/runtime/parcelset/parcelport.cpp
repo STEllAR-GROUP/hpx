@@ -11,6 +11,11 @@
 #endif
 
 #include <hpx/hpx_fwd.hpp>
+
+#if defined(HPX_HAVE_PARCELPORT_TCPIP)
+#include <hpx/runtime/parcelset/policies/tcp/connection_handler.hpp>
+#endif
+/*
 #if defined(HPX_HAVE_PARCELPORT_TCPIP)
 #include <hpx/runtime/parcelset/tcp/parcelport.hpp>
 #endif
@@ -23,6 +28,8 @@
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #  include <hpx/runtime/parcelset/mpi/parcelport.hpp>
 #endif
+*/
+#include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/exception.hpp>
@@ -60,7 +67,7 @@ namespace hpx { namespace parcelset
 
                 if (boost::lexical_cast<int>(enable_tcpip))
                 {
-                    return boost::make_shared<parcelset::tcp::parcelport>(
+                    return boost::make_shared<policies::tcp::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
                 }
 #endif
@@ -71,6 +78,7 @@ namespace hpx { namespace parcelset
 
         case connection_shmem:
             {
+/*
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
                 // Create shmem based parcelport only if allowed by the
                 // configuration info.
@@ -79,16 +87,18 @@ namespace hpx { namespace parcelset
 
                 if (boost::lexical_cast<int>(enable_shmem))
                 {
-                    return boost::make_shared<parcelset::shmem::parcelport>(
+                    return boost::make_shared<parcelport_impl<shmem::parcelport> >(
                         cfg, on_start_thread, on_stop_thread);
                 }
 #endif
+*/
                 HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                     "unsupported connection type 'connection_shmem'");
             }
             break;
 
         case connection_ibverbs:
+/*
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
             {
                 // Create ibverbs based parcelport only if allowed by the
@@ -98,11 +108,12 @@ namespace hpx { namespace parcelset
 
                 if (boost::lexical_cast<int>(enable_ibverbs))
                 {
-                    return boost::make_shared<parcelset::ibverbs::parcelport>(
+                    return boost::make_shared<parcelport_impl<ibverbs::parcelport> >(
                         cfg, on_start_thread, on_stop_thread);
                 }
             }
 #endif
+*/
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                 "unsupported connection type 'connection_ibverbs'");
             break;
@@ -122,7 +133,7 @@ namespace hpx { namespace parcelset
 
                 if (boost::lexical_cast<int>(enable_mpi))
                 {
-                    return boost::make_shared<parcelset::mpi::parcelport>(
+                    return boost::make_shared<parcelport_impl<mpi::parcelport> >(
                         cfg, on_start_thread, on_stop_thread);
                 }
             }
@@ -169,24 +180,6 @@ namespace hpx { namespace parcelset
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // default implementation, just forward to single parcel version
-    void parcelport::put_parcels(std::vector<parcel> const & parcels,
-            std::vector<write_handler_type> const& handlers)
-    {
-        if (parcels.size() != handlers.size())
-        {
-            HPX_THROW_EXCEPTION(bad_parameter, "parcelport::put_parcels",
-                "mismatched number of parcels and handlers");
-            return;
-        }
-
-        for (std::size_t i = 0; i != parcels.size(); ++i)
-        {
-            put_parcel(parcels[i], handlers[i]);
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     void parcelport::report_potential_connection_error(
         naming::locality const& locality_id, naming::gid_type const& parcel_id,
         error_code const& ec)
@@ -216,6 +209,12 @@ namespace hpx { namespace parcelset
                 }
             }
         }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    boost::uint64_t get_max_inbound_size(parcelport& pp)
+    {
+        return pp.get_max_message_size();
     }
 }}
 
