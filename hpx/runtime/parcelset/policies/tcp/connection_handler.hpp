@@ -17,6 +17,7 @@
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ip/host_name.hpp>
 
 namespace hpx { namespace parcelset {
     namespace policies { namespace tcp
@@ -30,8 +31,8 @@ namespace hpx { namespace parcelset {
     struct connection_handler_traits<policies::tcp::connection_handler>
     {
         typedef policies::tcp::sender connection_type;
-        typedef boost::mpl::true_ handles_early_parcels;
-        typedef boost::mpl::false_ needs_background_work;
+        typedef boost::mpl::true_  send_early_parcel;
+        typedef boost::mpl::false_ do_background_work;
 
         static const char * name()
         {
@@ -46,9 +47,6 @@ namespace hpx { namespace parcelset {
         {
             typedef parcelport_impl<connection_handler> base_type;
         public:
-
-            typedef sender connection_type;
-
             connection_handler(util::runtime_configuration const& ini,
                 HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
                 HPX_STD_FUNCTION<void()> const& on_stop_thread);
@@ -73,7 +71,7 @@ namespace hpx { namespace parcelset {
                 return boost::asio::ip::host_name();
             }
         
-            boost::shared_ptr<connection_type> create_connection(
+            boost::shared_ptr<sender> create_connection(
                 naming::locality const& l, error_code& ec);
 
         private:

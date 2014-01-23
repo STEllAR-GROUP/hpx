@@ -789,14 +789,6 @@ namespace hpx { namespace parcelset
         return pp ? pp->get_connection_cache_statistics(stat_type, reset) : 0;
     }
 
-    bool parcelhandler::supports_connection_cache_statistics(
-        connection_type pp_type) const
-    {
-        error_code ec(lightweight);
-        parcelport* pp = find_parcelport(pp_type, ec);
-        return pp ? pp->supports_connection_cache_statistics() : false;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     void parcelhandler::register_counter_types()
     {
@@ -1082,10 +1074,7 @@ namespace hpx { namespace parcelset
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
 
         // register connection specific performance counters related to connection
-        // caches, this is not supported by all parcelports
-        if (!supports_connection_cache_statistics(pp_type))
-            return;
-
+        // caches
         HPX_STD_FUNCTION<boost::int64_t(bool)> cache_insertions(
             boost::bind(&parcelhandler::get_connection_cache_statistics,
                 this, pp_type, parcelport::connection_cache_insertions, ::_1));

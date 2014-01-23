@@ -32,10 +32,6 @@ namespace hpx { namespace parcelset
         typedef
             typename connection_handler_traits<ConnectionHandler>::connection_type
             connection;
-
-        typedef
-            typename connection_handler_traits<ConnectionHandler>::handles_early_parcels
-            handles_early_parcels;
     
         static const char * connection_handler_name()
         {
@@ -178,16 +174,6 @@ namespace hpx { namespace parcelset
             send_early_parcel_impl<ConnectionHandler>(p);
         }
         
-        void remove_from_connection_cache(naming::locality const& loc)
-        {
-            //connection_handler_.remove_from_connection_cache(loc);
-        }
-        
-        virtual connection_type get_type() const
-        {
-            return connection_handler().get_type();
-        }
-        
         util::io_service_pool* get_thread_pool(char const* name)
         {
             if (0 == std::strcmp(name, io_service_pool_.get_name()))
@@ -197,7 +183,7 @@ namespace hpx { namespace parcelset
 
         void do_background_work()
         {
-            do_backround_work_impl<ConnectionHandler>(p);
+            do_background_work_impl<ConnectionHandler>();
         }
 
         /// support enable_shared_from_this
@@ -226,7 +212,7 @@ namespace hpx { namespace parcelset
     
         /////////////////////////////////////////////////////////////////////////
         // Return the given connection cache statistic
-        boost::int64_t parcelport::get_connection_cache_statistics(
+        boost::int64_t get_connection_cache_statistics(
             connection_cache_statistics_type t, bool reset)
         {
             switch (t) {
@@ -309,7 +295,7 @@ namespace hpx { namespace parcelset
         typename boost::enable_if<
             typename connection_handler_traits<
                 ConnectionHandler_
-            >::handles_early_parcels
+            >::send_early_parcel
         >::type
         send_early_parcel_impl(parcel& p)
         {
@@ -339,7 +325,7 @@ namespace hpx { namespace parcelset
         typename boost::disable_if<
             typename connection_handler_traits<
                 ConnectionHandler_
-            >::handles_early_parcels
+            >::send_early_parcel
         >::type
         send_early_parcel_impl(parcel& p)
         {
@@ -351,9 +337,9 @@ namespace hpx { namespace parcelset
         typename boost::enable_if<
             typename connection_handler_traits<
                 ConnectionHandler_
-            >::needs_background_work
+            >::do_background_work
         >::type
-        do_background_work_impl(parcel& p)
+        do_background_work_impl()
         {
             connection_handler().do_background_work();
         }
@@ -362,11 +348,10 @@ namespace hpx { namespace parcelset
         typename boost::disable_if<
             typename connection_handler_traits<
                 ConnectionHandler_
-            >::needs_background_work
+            >::do_background_work
         >::type
-        do_background_work_impl(parcel& p)
-        {
-        }
+        do_background_work_impl()
+        {}
 
         void get_connection_and_send_parcels(
             naming::locality const& locality_id, naming::gid_type const& parcel_id)
@@ -554,17 +539,15 @@ namespace hpx { namespace parcelset
             BOOST_FOREACH(parcel const& p, parcels)
             {
                 naming::locality const parcel_locality_id = p.get_destination_locality();
-                HPX_ASSERT(parcel_locality_id == client_connection->destination());
+                HPX_ASSERT(parcel_locality_id == sender_connection->destination());
                 sender_connection->verify(parcel_locality_id);
             }
 #endif
-            // store parcels in connection
-            // The parcel gets serialized inside set_parcel, no
-            // need to keep the original parcel alive after this call returned.
-            
+            // encode the parcels
             boost::shared_ptr<parcel_buffer<typename connection::buffer_type> >
                 buffer = encode_parcels(parcels, *sender_connection, archive_flags_);
             
+            // send them asynchronously
             sender_connection->async_write(
                 buffer,
                 hpx::parcelset::detail::call_for_each(handlers),

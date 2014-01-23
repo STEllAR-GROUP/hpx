@@ -439,7 +439,6 @@ namespace hpx { namespace parcelset
 
         boost::int64_t get_connection_cache_statistics(connection_type pp_type,
             parcelport::connection_cache_statistics_type stat_type, bool) const;
-        bool supports_connection_cache_statistics(connection_type pp_type) const;
 
     protected:
         std::size_t get_incoming_queue_length(bool /*reset*/) const
