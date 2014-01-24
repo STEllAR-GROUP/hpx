@@ -140,24 +140,6 @@ namespace hpx { namespace util
             "buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
             "array_optimization = ${HPX_PARCEL_IBVERBS_ARRAY_OPTIMIZATION:"
                 "$[hpx.parcel.array_optimization]}",
-
-            // MPI related settings
-            "[hpx.parcel.mpi]",
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-            "enable = ${HPX_HAVE_PARCELPORT_MPI:1}",
-            "max_requests = ${HPX_PARCEL_MPI_MAX_REQUESTS:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MPI_MAX_REQUESTS) "}",
-# if defined(HPX_PARCELPORT_MPI_ENV)
-            "env = ${HPX_PARCELPORT_MPI_ENV:" HPX_PARCELPORT_MPI_ENV "}",
-# else
-            "env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}",
-# endif
-            "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}",
-#else
-            "enable = ${HPX_HAVE_PARCELPORT_MPI:0}",
-#endif
-            "array_optimization = ${HPX_PARCEL_MPI_ARRAY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
 */
 
             // predefine command line aliases
