@@ -7,6 +7,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/policies/tcp/connection_handler.hpp>
@@ -129,7 +133,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
         boost::shared_ptr<sender> sender_connection(new sender(
-            io_service, l, this->parcels_sent_, this->get_max_message_size()));
+            io_service, l, this->parcels_sent_));
 
         // Connect to the target locality, retry if needed
         boost::system::error_code error = boost::asio::error::try_again;
@@ -273,3 +277,5 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
     }
 }}}}
+
+#endif

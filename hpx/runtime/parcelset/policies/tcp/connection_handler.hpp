@@ -14,7 +14,6 @@
 
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
-#include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>

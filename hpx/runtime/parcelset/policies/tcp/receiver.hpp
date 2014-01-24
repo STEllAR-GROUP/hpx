@@ -281,9 +281,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         /// buffer for incoming data
         boost::shared_ptr<buffer_type> in_buffer_;
 
-        boost::integer::ulittle64_t num_zero_copy_chunks_;
-        boost::integer::ulittle64_t num_non_zero_copy_chunks_;
-
         boost::uint64_t max_inbound_size_;
 
         bool ack_;
