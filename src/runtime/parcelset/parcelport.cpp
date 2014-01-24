@@ -80,7 +80,7 @@ namespace hpx { namespace parcelset
         case connection_mpi:
 #if defined(HPX_HAVE_PARCELPORT_MPI)
             return return_type(
-                policies::ibverbs::connection_handler::runtime_configuration()
+                policies::mpi::connection_handler::runtime_configuration()
               , true);
 #endif
 

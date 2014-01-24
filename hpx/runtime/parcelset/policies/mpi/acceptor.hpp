@@ -4,11 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_MPI_ACCEPTOR_HPP
-#define HPX_PARCELSET_MPI_ACCEPTOR_HPP
+#ifndef HPX_PARCELSET_POLICIES_MPI_ACCEPTOR_HPP
+#define HPX_PARCELSET_POLICIES_MPI_ACCEPTOR_HPP
+
+#include <mpi.h>
 
 #include <hpx/config.hpp>
-#include <hpx/runtime/parcelset/mpi/header.hpp>
+#include <hpx/runtime/parcelset/policies/mpi/header.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <boost/noncopyable.hpp>
@@ -16,7 +18,7 @@
 #include <vector>
 #include <utility>
 
-namespace hpx { namespace parcelset { namespace mpi {
+namespace hpx { namespace parcelset { namespace policies { namespace mpi {
     struct acceptor
       : boost::noncopyable
     {
@@ -70,6 +72,6 @@ namespace hpx { namespace parcelset { namespace mpi {
                 &request_);     // Request
         }
     };
-}}}
+}}}}
 
 #endif

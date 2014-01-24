@@ -203,6 +203,7 @@ namespace hpx { namespace parcelset
         void send_early_parcel(parcel& p)
         {
             send_early_parcel_impl<ConnectionHandler>(p);
+            do_background_work();
         }
         
         util::io_service_pool* get_thread_pool(char const* name)
@@ -349,6 +350,7 @@ namespace hpx { namespace parcelset
                 buffer
               , early_write_handler
               , early_pending_parcel_handler);
+            do_background_work();
         }
 
         template <typename ConnectionHandler_>
@@ -584,6 +586,8 @@ namespace hpx { namespace parcelset
                 boost::bind(&parcelport_impl::send_pending_parcels_trampoline,
                     this,
                     ::_1, ::_2, ::_3));
+            
+            do_background_work();
         }
 
     protected:
