@@ -196,7 +196,7 @@
 ///
 /// (or by setting the corresponding environment variable HPX_PARCEL_BOOTSTRAP).
 #if !defined(HPX_PARCEL_BOOTSTRAP)
-#  define HPX_PARCEL_BOOTSTRAP "tcpip"
+#  define HPX_PARCEL_BOOTSTRAP "tcp"
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

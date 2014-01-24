@@ -4,10 +4,17 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef HPX_PARCELSET_MPI_HEADER_HPP
-#define HPX_PARCELSET_MPI_HEADER_HPP
+#ifndef HPX_PARCELSET_POLICIES_MPI_HEADER_HPP
+#define HPX_PARCELSET_POLICIES_MPI_HEADER_HPP
 
-namespace hpx { namespace parcelset { namespace mpi {
+#include <mpi.h>
+
+#include <hpx/util/assert.hpp>
+#include <hpx/util/mpi_environment.hpp>
+
+#include <boost/array.hpp>
+
+namespace hpx { namespace parcelset { namespace policies { namespace mpi {
     struct header
     {
         typedef int value_type;
@@ -89,6 +96,6 @@ namespace hpx { namespace parcelset { namespace mpi {
         int rank_;
         boost::array<value_type, data_size_> data_;
     };
-}}}
+}}}}
 
 #endif

@@ -189,7 +189,7 @@ namespace hpx { namespace naming
             if(rank_ != -1)
                 return parcelset::connection_mpi;
 #endif
-            return parcelset::connection_tcpip;
+            return parcelset::connection_tcp;
         }
 
     private:

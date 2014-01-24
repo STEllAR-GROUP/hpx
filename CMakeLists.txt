@@ -317,12 +317,12 @@ endif()
 # Decide whether to use TCP/IP based parcelport (starting with Boost V1.52)
 ################################################################################
 if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
-  hpx_option(HPX_HAVE_PARCELPORT_TCPIP BOOL "Enable parcelport based on TCP/IP operations (default: OFF)." OFF ADVANCED)
+  hpx_option(HPX_HAVE_PARCELPORT_TCP BOOL "Enable parcelport based on TCP/IP operations (default: OFF)." OFF ADVANCED)
 else()
-  hpx_option(HPX_HAVE_PARCELPORT_TCPIP BOOL "Enable parcelport based on TCP/IP operations (default: ON)." ON ADVANCED)
+  hpx_option(HPX_HAVE_PARCELPORT_TCP BOOL "Enable parcelport based on TCP/IP operations (default: ON)." ON ADVANCED)
 endif()
-if(HPX_HAVE_PARCELPORT_TCPIP)
-  hpx_add_config_define(HPX_HAVE_PARCELPORT_TCPIP)
+if(HPX_HAVE_PARCELPORT_TCP)
+  hpx_add_config_define(HPX_HAVE_PARCELPORT_TCP)
 endif()
 
 ################################################################################
