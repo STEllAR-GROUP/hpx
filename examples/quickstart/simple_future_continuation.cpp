@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/iostreams.hpp>
+#include <hpx/include/threads.hpp>
 #include <hpx/include/thread_executors.hpp>
 
 int get_id(int i)

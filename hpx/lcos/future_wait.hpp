@@ -3,8 +3,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PP_IS_ITERATING
-
 #if !defined(HPX_LCOS_FUTURE_WAIT_OCT_23_2008_1140AM)
 #define HPX_LCOS_FUTURE_WAIT_OCT_23_2008_1140AM
 
@@ -219,7 +217,7 @@ namespace hpx { namespace lcos
         !boost::is_void<typename detail::future_traits<Future>::type>::value
       , std::size_t
     >::type
-    wait(Future && f1, F const& f)
+    wait(Future && f1, F && f)
     {
         f(0, f1.get());
         return 1;
@@ -230,7 +228,7 @@ namespace hpx { namespace lcos
         boost::is_void<typename detail::future_traits<Future>::type>::value
       , std::size_t
     >::type
-    wait(Future && f1, F const& f)
+    wait(Future && f1, F && f)
     {
         f1.get();
         f(0);
@@ -250,7 +248,7 @@ namespace hpx { namespace lcos
 
         if (lazy_values.empty())
             return 0;
-        
+
         return_type lazy_values_;
         lazy_values_.reserve(lazy_values.size());
         std::transform(lazy_values.begin(), lazy_values.end(),
@@ -260,7 +258,7 @@ namespace hpx { namespace lcos
         boost::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::when_each<Future, F>(std::move(lazy_values_), 
+                detail::when_each<Future, F>(std::move(lazy_values_),
                     std::forward<F>(f), &success_counter));
 
         p.apply();
@@ -286,7 +284,7 @@ namespace hpx { namespace lcos
 
         if (lazy_values.empty())
             return 0;
-        
+
         return_type lazy_values_;
         lazy_values_.reserve(lazy_values.size());
         std::transform(lazy_values.begin(), lazy_values.end(),
@@ -296,7 +294,7 @@ namespace hpx { namespace lcos
         boost::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::when_each<Future, F>(std::move(lazy_values_), 
+                detail::when_each<Future, F>(std::move(lazy_values_),
                     std::forward<F>(f), &success_counter));
 
         p.apply();
@@ -304,177 +302,6 @@ namespace hpx { namespace lcos
 
         return success_counter.load();
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Synchronous versions.
-
-    /// The one argument version is special in the sense that it returns the
-    /// expected value directly (without wrapping it into a tuple).
-    template <typename F1>
-    inline typename detail::future_traits<F1>::type
-    wait(F1 && f1)
-    {
-        return f1.get();
-    }
-
-    template <typename F1, typename F2>
-    inline typename boost::enable_if_c<
-        !boost::is_void<typename detail::future_traits<F1>::type>::value &&
-        !boost::is_void<typename detail::future_traits<F2>::type>::value
-      , HPX_STD_TUPLE<
-            typename detail::future_traits<F1>::type
-          , typename detail::future_traits<F2>::type>
-    >::type 
-    wait(F1 && f1, F2 && f2)
-    {
-        return HPX_STD_MAKE_TUPLE(f1.get(), f2.get());
-    }
-    
-    template <typename F1, typename F2>
-    inline typename boost::enable_if_c<
-        boost::is_void<typename detail::future_traits<F1>::type>::value &&
-        boost::is_void<typename detail::future_traits<F2>::type>::value
-      , void
-    >::type
-    wait(F1 && f1, F2 && f2)
-    {
-        f1.get();
-        f2.get();
-    }
 }}
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/future_wait.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/future_wait_" HPX_LIMIT_STR ".hpp")
 #endif
-
-#define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (3, HPX_WAIT_ARGUMENT_LIMIT,                                          \
-    "hpx/lcos/future_wait.hpp"))                                              \
-    /**/
-
-#include BOOST_PP_ITERATE()
-
-#if defined(__WAVE__) && defined (HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(output: null)
-#endif
-
-#endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-
-namespace hpx { namespace lcos
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Future>
-    inline void
-    wait(std::vector<Future>& v, 
-        std::vector<typename detail::future_traits<Future>::type>& r)
-    {
-        r.reserve(v.size());
-
-        BOOST_FOREACH(Future& f, v)
-            r.push_back(f.get());
-    }
-
-    template <typename Future>
-    inline void
-    wait(std::vector<Future> && v, 
-        std::vector<typename detail::future_traits<Future>::type>& r)
-    {
-        return wait(v);
-    }
-
-    template <typename Future>
-    inline void
-    wait(std::vector<Future> const& v, 
-        std::vector<typename detail::future_traits<Future>::type>& r)
-    {
-        r.reserve(v.size());
-
-        BOOST_FOREACH(Future const& f, v)
-            r.push_back(f.get());
-    }
-
-    template <typename Future>
-    inline void
-    wait(std::vector<Future>& v)
-    {
-        BOOST_FOREACH(Future& f, v)
-            f.get();
-    }
-    
-    template <typename Future>
-    inline void
-    wait(std::vector<Future> && v)
-    {
-        return wait(v);
-    }
-
-    template <typename Future>
-    inline void
-    wait(std::vector<Future> const& v)
-    {
-        BOOST_FOREACH(Future const& f, v)
-            f.get();
-    }
-}}
-
-namespace hpx
-{
-    using lcos::wait;
-}
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-//  Preprocessor vertical repetition code
-///////////////////////////////////////////////////////////////////////////////
-#else // defined(BOOST_PP_IS_ITERATING)
-
-#define N BOOST_PP_ITERATION()
-
-#define HPX_FUTURE_RESULT_TYPE(z, n, data)    BOOST_PP_COMMA_IF(n)            \
-        typename detail::future_traits<BOOST_PP_CAT(F, n)>::type              \
-    /**/
-#define HPX_FUTURE_RESULT_TYPE_IS_VOID(z, n, data)                            \
-         && boost::is_void<                                                   \
-            typename detail::future_traits<BOOST_PP_CAT(F, n)>::type>::value  \
-    /**/
-#define HPX_FUTURE_TUPLE_ARGUMENT(z, n, data) BOOST_PP_COMMA_IF(n)            \
-        BOOST_PP_CAT(f, n).get()                                              \
-    /**/
-#define HPX_FUTURE_VOID_STATEMENT(z, n, data) BOOST_PP_CAT(f, n).get();
-
-namespace hpx { namespace lcos
-{
-    template <BOOST_PP_ENUM_PARAMS(N, typename F)>
-    inline typename boost::enable_if_c<
-        !(true BOOST_PP_REPEAT(N, HPX_FUTURE_RESULT_TYPE_IS_VOID, _))
-      , HPX_STD_TUPLE<BOOST_PP_REPEAT(N, HPX_FUTURE_RESULT_TYPE, _)>
-    >::type
-    wait(HPX_ENUM_FWD_ARGS(N, F, f))
-    {
-        return HPX_STD_MAKE_TUPLE(BOOST_PP_REPEAT(N, HPX_FUTURE_TUPLE_ARGUMENT, _));
-    }
-    
-    template <BOOST_PP_ENUM_PARAMS(N, typename F)>
-    inline typename boost::enable_if_c<
-        (true BOOST_PP_REPEAT(N, HPX_FUTURE_RESULT_TYPE_IS_VOID, _))
-      , void
-    >::type
-    wait(HPX_ENUM_FWD_ARGS(N, F, f))
-    {
-        BOOST_PP_REPEAT(N, HPX_FUTURE_VOID_STATEMENT, _)
-    }
-}}
-
-#undef HPX_FUTURE_RESULT_TYPE
-#undef HPX_FUTURE_RESULT_TYPE_IS_VOID
-#undef HPX_FUTURE_TUPLE_ARGUMENT
-#undef HPX_FUTURE_VOID_STATEMENT
-#undef N
-
-#endif
-

@@ -23,7 +23,8 @@ set(function_argument_limit_preprocessing_files
   "hpx/util/bind_action.hpp"
   "hpx/util/deferred_call.hpp"
   "hpx/util/invoke.hpp"
-  "hpx/util/invoke_fused.hpp")
+  "hpx/util/invoke_fused.hpp"
+  "hpx/util/unwrapped.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
@@ -83,7 +84,6 @@ set(wait_argument_limit_preprocessing_files
   "hpx/lcos/wait_all.hpp"
   "hpx/lcos/wait_n.hpp"
   "hpx/lcos/wait_any.hpp"
-  "hpx/lcos/future_wait.hpp"
   "hpx/runtime/components/memory_block.hpp")
 foreach(file ${wait_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)

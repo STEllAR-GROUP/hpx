@@ -2182,6 +2182,8 @@ namespace hpx { namespace actions
 #endif
 }}
 
+#include <hpx/lcos/local/packaged_continuation.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 // hoist names into main namespace
 namespace hpx

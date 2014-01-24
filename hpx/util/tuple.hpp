@@ -876,10 +876,6 @@ namespace boost { namespace serialization
 #       endif
 #   endif // !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 
-#undef HPX_UTIL_TUPLE_NOEXCEPT_SFINAE
-
-#undef HPX_TUPLE_LIMIT
-
 #endif
 
 #else // !BOOST_PP_IS_ITERATING

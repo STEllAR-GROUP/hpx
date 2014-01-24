@@ -46,7 +46,7 @@ namespace hpx { namespace lcos { namespace local
         {
             base_type::swap(other);
         }
-        void operator()(T0 t0) const
+        void operator()(T0 t0)
         {
             base_type::invoke(
                 util::deferred_call(this->function_, std::forward<T0>( t0 )),
@@ -95,7 +95,7 @@ namespace hpx { namespace lcos { namespace local
         {
             base_type::swap(other);
         }
-        void operator()(T0 t0 , T1 t1) const
+        void operator()(T0 t0 , T1 t1)
         {
             base_type::invoke(
                 util::deferred_call(this->function_, std::forward<T0>( t0 ) , std::forward<T1>( t1 )),
@@ -144,7 +144,7 @@ namespace hpx { namespace lcos { namespace local
         {
             base_type::swap(other);
         }
-        void operator()(T0 t0 , T1 t1 , T2 t2) const
+        void operator()(T0 t0 , T1 t1 , T2 t2)
         {
             base_type::invoke(
                 util::deferred_call(this->function_, std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 )),
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos { namespace local
         {
             base_type::swap(other);
         }
-        void operator()(T0 t0 , T1 t1 , T2 t2 , T3 t3) const
+        void operator()(T0 t0 , T1 t1 , T2 t2 , T3 t3)
         {
             base_type::invoke(
                 util::deferred_call(this->function_, std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 )),
@@ -242,7 +242,7 @@ namespace hpx { namespace lcos { namespace local
         {
             base_type::swap(other);
         }
-        void operator()(T0 t0 , T1 t1 , T2 t2 , T3 t3 , T4 t4) const
+        void operator()(T0 t0 , T1 t1 , T2 t2 , T3 t3 , T4 t4)
         {
             base_type::invoke(
                 util::deferred_call(this->function_, std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 )),
@@ -291,7 +291,7 @@ namespace hpx { namespace lcos { namespace local
         {
             base_type::swap(other);
         }
-        void operator()(T0 t0 , T1 t1 , T2 t2 , T3 t3 , T4 t4 , T5 t5) const
+        void operator()(T0 t0 , T1 t1 , T2 t2 , T3 t3 , T4 t4 , T5 t5)
         {
             base_type::invoke(
                 util::deferred_call(this->function_, std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 )),
@@ -340,7 +340,7 @@ namespace hpx { namespace lcos { namespace local
         {
             base_type::swap(other);
         }
-        void operator()(T0 t0 , T1 t1 , T2 t2 , T3 t3 , T4 t4 , T5 t5 , T6 t6) const
+        void operator()(T0 t0 , T1 t1 , T2 t2 , T3 t3 , T4 t4 , T5 t5 , T6 t6)
         {
             base_type::invoke(
                 util::deferred_call(this->function_, std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 )),
@@ -389,7 +389,7 @@ namespace hpx { namespace lcos { namespace local
         {
             base_type::swap(other);
         }
-        void operator()(T0 t0 , T1 t1 , T2 t2 , T3 t3 , T4 t4 , T5 t5 , T6 t6 , T7 t7) const
+        void operator()(T0 t0 , T1 t1 , T2 t2 , T3 t3 , T4 t4 , T5 t5 , T6 t6 , T7 t7)
         {
             base_type::invoke(
                 util::deferred_call(this->function_, std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 )),
