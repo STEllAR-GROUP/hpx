@@ -91,6 +91,9 @@ namespace hpx { namespace parcelset
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
 
         ~parcelhandler() {}
+    
+        /// load runtime configuration settings ...
+        static std::vector<std::string> load_runtime_configuration();
 
         void initialize(boost::shared_ptr<parcelport> pp);
 
@@ -119,7 +122,7 @@ namespace hpx { namespace parcelset
         /// parcelhandler has been initialized with.
         parcelport& get_parcelport() const
         {
-            return *find_parcelport(connection_tcpip);
+            return *find_parcelport(connection_tcp);
         }
 
         /// Return the locality_id of this locality
@@ -339,7 +342,7 @@ namespace hpx { namespace parcelset
         /// this parcelhandler is associated with.
         naming::locality const& here() const
         {
-            return find_parcelport(connection_tcpip)->here();
+            return find_parcelport(connection_tcp)->here();
         }
 
         /// Return the name of this locality as retrieved from the 

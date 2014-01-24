@@ -38,6 +38,45 @@ namespace hpx { namespace parcelset
             return connection_handler_traits<ConnectionHandler>::name();
         }
 
+        static std::size_t thread_pool_size(util::runtime_configuration const& ini)
+        {
+            std::string key("hpx.parcel.");
+            key += connection_handler_name();
+
+            std::string thread_pool_size =
+                ini.get_entry(key + ".io_pool_size", "2");
+            return boost::lexical_cast<std::size_t>(thread_pool_size);
+        }
+
+        static const char *pool_name()
+        {
+            return connection_handler_traits<ConnectionHandler>::pool_name();
+        }
+
+        static const char *pool_name_postfix()
+        {
+            return connection_handler_traits<ConnectionHandler>::pool_name_postfix();
+        }
+
+        static std::size_t max_connections(util::runtime_configuration const& ini)
+        {
+            std::string key("hpx.parcel.");
+            key += connection_handler_name();
+
+            std::string max_connections =
+                ini.get_entry(key + ".max_connections", HPX_PARCEL_MAX_CONNECTIONS);
+            return boost::lexical_cast<std::size_t>(max_connections);
+        }
+
+        static std::size_t max_connections_per_loc(util::runtime_configuration const& ini)
+        {
+            std::string key("hpx.parcel.");
+            key += connection_handler_name();
+
+            std::string max_connections_per_locality =
+                ini.get_entry(key + ".max_connections_per_locality", HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY);
+            return boost::lexical_cast<std::size_t>(max_connections_per_locality);
+        }
 
     public:
         /// Construct the parcelport on the given locality.
@@ -45,14 +84,11 @@ namespace hpx { namespace parcelset
             HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
             HPX_STD_FUNCTION<void()> const& on_stop_thread)
           : parcelport(ini, connection_handler_name())
-
-            // FIXME: add connection handler specific configuration
-          , io_service_pool_(ini.get_thread_pool_size("parcel_pool"),
-                on_start_thread, on_stop_thread, "parcel_pool_tcp", "-tcp")
-          , connection_cache_(ini.get_max_connections(), ini.get_max_connections_per_loc())
+          , io_service_pool_(thread_pool_size(ini),
+                on_start_thread, on_stop_thread, pool_name(), pool_name_postfix())
+          , connection_cache_(max_connections(ini), max_connections_per_loc(ini))
           , archive_flags_(boost::archive::no_header)
         {
-            // FIXME: adapt for other parcelport types ...
 #ifdef BOOST_BIG_ENDIAN
             std::string endian_out = get_config_entry("hpx.parcel.endian_out", "big");
 #else
@@ -66,17 +102,12 @@ namespace hpx { namespace parcelset
                 HPX_ASSERT(endian_out =="little" || endian_out == "big");
             }
 
-            std::string array_optimization =
-                get_config_entry("hpx.parcel.tcpip.array_optimization", "1");
-
-            if (boost::lexical_cast<int>(array_optimization) == 0) {
+            if (!allow_array_optimizations_) {
                 archive_flags_ |= util::disable_array_optimization;
                 archive_flags_ |= util::disable_data_chunking;
             }
             else {
-                std::string zero_copy_optimization =
-                    get_config_entry("hpx.parcel.tcpip.zero_copy_optimization", "1");
-                if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
+                if (!allow_zero_copy_optimizations_)
                     archive_flags_ |= util::disable_data_chunking;
             }
         }
@@ -235,9 +266,8 @@ namespace hpx { namespace parcelset
                     break;
             }
             
-            // FIXME: add correct pp name
             HPX_THROW_EXCEPTION(bad_parameter,
-                "tcp::parcelport::get_connection_cache_statistics",
+                "parcelport_impl::get_connection_cache_statistics",
                 "invalid connection cache statistics type");
             return 0;
         }

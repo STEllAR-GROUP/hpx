@@ -12,23 +12,18 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_TCPIP)
+#if defined(HPX_HAVE_PARCELPORT_TCP)
 #include <hpx/runtime/parcelset/policies/tcp/connection_handler.hpp>
 #endif
-/*
-#if defined(HPX_HAVE_PARCELPORT_TCPIP)
-#include <hpx/runtime/parcelset/tcp/parcelport.hpp>
-#endif
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
-#  include <hpx/runtime/parcelset/shmem/parcelport.hpp>
+#include <hpx/runtime/parcelset/policies/shmem/connection_handler.hpp>
 #endif
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
-#  include <hpx/runtime/parcelset/ibverbs/parcelport.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/connection_handler.hpp>
 #endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-#  include <hpx/runtime/parcelset/mpi/parcelport.hpp>
+#include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
 #endif
-*/
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -44,13 +39,57 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
         HPX_STD_FUNCTION<void()> const& on_stop_thread)
     {
-        std::string pptype = cfg.get_entry("hpx.parcel.bootstrap", "tcpip");
+        std::string pptype = cfg.get_entry("hpx.parcel.bootstrap", "tcp");
 
         int type = get_connection_type_from_name(pptype);
         if (type == connection_unknown)
-            type = connection_tcpip;
+            type = connection_tcp;
 
         return create(type, cfg, on_start_thread, on_stop_thread);
+    }
+    
+    /// load the runtime configuration parameters
+    std::pair<std::vector<std::string>, bool> parcelport::runtime_configuration(int type)
+    {
+        typedef std::pair<std::vector<std::string>, bool> return_type;
+        switch(type) {
+        case connection_tcp:
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+            return return_type(
+                policies::tcp::connection_handler::runtime_configuration()
+              , true);
+#endif
+        case connection_shmem:
+#if defined(HPX_HAVE_PARCELPORT_SHMEM)
+            return return_type(
+                policies::shmem::connection_handler::runtime_configuration()
+              , true);
+#endif
+            break;
+        case connection_ibverbs:
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+            return return_type(
+                policies::ibverbs::connection_handler::runtime_configuration()
+              , true);
+#endif
+            break;
+
+        case connection_portals4:
+            break;
+
+        case connection_mpi:
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            return return_type(
+                policies::ibverbs::connection_handler::runtime_configuration()
+              , true);
+#endif
+
+            break;
+        default:
+            break;
+        }
+
+        return return_type(std::vector<std::string>(), false);
     }
 
     boost::shared_ptr<parcelport> parcelport::create(int type,
@@ -59,13 +98,13 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<void()> const& on_stop_thread)
     {
         switch(type) {
-        case connection_tcpip:
+        case connection_tcp:
             {
-#if defined(HPX_HAVE_PARCELPORT_TCPIP)
-                std::string enable_tcpip =
-                    cfg.get_entry("hpx.parcel.tcpip.enable", "1");
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+                std::string enable_tcp =
+                    cfg.get_entry("hpx.parcel.tcp.enable", "1");
 
-                if (boost::lexical_cast<int>(enable_tcpip))
+                if (boost::lexical_cast<int>(enable_tcp))
                 {
                     return boost::make_shared<policies::tcp::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
@@ -73,12 +112,11 @@ namespace hpx { namespace parcelset
 #endif
 
                 HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
-                    "unsupported connection type 'connection_tcpip'");
+                    "unsupported connection type 'connection_tcp'");
             }
 
         case connection_shmem:
             {
-/*
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
                 // Create shmem based parcelport only if allowed by the
                 // configuration info.
@@ -87,18 +125,16 @@ namespace hpx { namespace parcelset
 
                 if (boost::lexical_cast<int>(enable_shmem))
                 {
-                    return boost::make_shared<parcelport_impl<shmem::parcelport> >(
+                    return boost::make_shared<policies::shmem::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
                 }
 #endif
-*/
                 HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                     "unsupported connection type 'connection_shmem'");
             }
             break;
 
         case connection_ibverbs:
-/*
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
             {
                 // Create ibverbs based parcelport only if allowed by the
@@ -108,12 +144,11 @@ namespace hpx { namespace parcelset
 
                 if (boost::lexical_cast<int>(enable_ibverbs))
                 {
-                    return boost::make_shared<parcelport_impl<ibverbs::parcelport> >(
+                    return boost::make_shared<policies::ibverbs::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
                 }
             }
 #endif
-*/
             HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
                 "unsupported connection type 'connection_ibverbs'");
             break;
@@ -133,7 +168,7 @@ namespace hpx { namespace parcelset
 
                 if (boost::lexical_cast<int>(enable_mpi))
                 {
-                    return boost::make_shared<parcelport_impl<mpi::parcelport> >(
+                    return boost::make_shared<policies::mpi::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
                 }
             }
@@ -151,7 +186,7 @@ namespace hpx { namespace parcelset
 
         return boost::shared_ptr<parcelport>();
     }
-
+        
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini,
             std::string const& type)

@@ -27,7 +27,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
       , acceptor_(NULL)
     {
         /*
-        if (here_.get_type() != connection_tcpip) {
+        if (here_.get_type() != connection_tcp) {
             HPX_THROW_EXCEPTION(network_error, "tcp::parcelport::parcelport",
                 "this parcelport was instantiated to represent an unexpected "
                 "locality type: " + get_connection_type_name(here_.get_type()));

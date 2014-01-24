@@ -69,7 +69,7 @@ namespace hpx { namespace parcelset {
         if (!verify_parcel_suffix(parcel_data, parcel_id)) {
             // all hell breaks loose!
             HPX_THROW_EXCEPTION(security_error,
-                "decode_message(tcp)",
+                "decode_message",
                 "verify_message_suffix failed");
             return;
         }
@@ -126,7 +126,7 @@ namespace hpx { namespace parcelset {
                         if (!first_message && i == 0 && parcel_id != p.get_parcel_id()) {
                             // again, all hell breaks loose
                             HPX_THROW_EXCEPTION(security_error,
-                                "decode_message(tcp)",
+                                "decode_message",
                                 "parcel id mismatch");
                             return false;
                         }
@@ -156,22 +156,21 @@ namespace hpx { namespace parcelset {
 
                 pp.add_received_data(buffer->data_point_);
             }
-            // FIXME: add actual pp name ...
             catch (hpx::exception const& e) {
                 LPT_(error)
-                    << "decode_message(tcp): caught hpx::exception: "
+                    << "decode_message: caught hpx::exception: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
             }
             catch (boost::system::system_error const& e) {
                 LPT_(error)
-                    << "decode_message(tcp): caught boost::system::error: "
+                    << "decode_message: caught boost::system::error: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
             }
             catch (boost::exception const&) {
                 LPT_(error)
-                    << "decode_message(tcp): caught boost::exception.";
+                    << "decode_message: caught boost::exception.";
                 hpx::report_error(boost::current_exception());
             }
             catch (std::exception const& e) {
@@ -184,7 +183,7 @@ namespace hpx { namespace parcelset {
         }
         catch (...) {
             LPT_(error)
-                << "decode_message(tcp): caught unknown exception.";
+                << "decode_message: caught unknown exception.";
             hpx::report_error(boost::current_exception());
         }
 

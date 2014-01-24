@@ -306,6 +306,9 @@ namespace hpx { namespace parcelset
             parcels_sent_.add_data(data);
         }
 
+        /// load the runtime configuration parameters
+        static std::pair<std::vector<std::string>, bool> runtime_configuration(int type);
+
         /// Create a new instance of a parcelport
         static boost::shared_ptr<parcelport> create(int type,
             util::runtime_configuration const& cfg,

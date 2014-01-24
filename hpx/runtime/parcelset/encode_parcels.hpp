@@ -218,7 +218,7 @@ namespace hpx { namespace parcelset {
             }
             catch (hpx::exception const& e) {
                 LPT_(fatal)
-                    << "tcp::parcelport_connection::set_parcel: "
+                    << "encode_parcels: "
                        "caught hpx::exception: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
@@ -226,7 +226,7 @@ namespace hpx { namespace parcelset {
             }
             catch (boost::system::system_error const& e) {
                 LPT_(fatal)
-                    << "tcp::parcelport_connection::set_parcel: "
+                    << "encode_parcels: "
                        "caught boost::system::error: "
                     << e.what();
                 hpx::report_error(boost::current_exception());
@@ -234,7 +234,7 @@ namespace hpx { namespace parcelset {
             }
             catch (boost::exception const&) {
                 LPT_(fatal)
-                    << "tcp::parcelport_connection::set_parcel: "
+                    << "encode_parcels: "
                        "caught boost::exception";
                 hpx::report_error(boost::current_exception());
                 return buffer;
@@ -249,7 +249,7 @@ namespace hpx { namespace parcelset {
         }
         catch (...) {
             LPT_(fatal)
-                << "tcp::parcelport_connection::set_parcel: "
+                    << "encode_parcels: "
                    "caught unknown exception";
             hpx::report_error(boost::current_exception());
             return buffer;

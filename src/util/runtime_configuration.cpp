@@ -12,6 +12,8 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/register_locks.hpp>
+// TODO: move parcelports into plugins
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 
 #include <boost/config.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -124,38 +126,7 @@ namespace hpx { namespace util
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:"
                 BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
 
-            "[hpx.parcel]",
-            "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
-            "port = ${HPX_PARCEL_SERVER_PORT:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
-            "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}",
-            "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
-            "max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
-            "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
-#ifdef BOOST_BIG_ENDIAN
-            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
-#else
-            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
-#endif
-            "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
-            "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
-
-            // TCPIP related settings
-            "[hpx.parcel.tcpip]",
-#if defined(HPX_HAVE_PARCELPORT_TCPIP)
-            "enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}",
-#else
-            "enable = ${HPX_HAVE_PARCELPORT_TCPIP:0}",
-#endif
-            "array_optimization = ${HPX_PARCEL_TCPIP_ARRAY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
-            "zero_copy_optimization = ${HPX_PARCEL_TCPIP_ZERO_COPY_OPTIMIZATION:"
-                "$[hpx.parcel.zero_copy_optimization]}",
-
+/*
             // shmem related settings
             "[hpx.parcel.shmem]",
             "enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}",
@@ -187,6 +158,7 @@ namespace hpx { namespace util
 #endif
             "array_optimization = ${HPX_PARCEL_MPI_ARRAY_OPTIMIZATION:"
                 "$[hpx.parcel.array_optimization]}",
+*/
 
             // predefine command line aliases
             "[hpx.commandline]",
@@ -255,6 +227,11 @@ namespace hpx { namespace util
             "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
             "enabled = 1"
         ;
+
+        std::vector<std::string> lines_pp =
+            hpx::parcelset::parcelhandler::load_runtime_configuration();
+
+        lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
 
         // don't overload user overrides
         this->parse("static defaults", lines, false);
@@ -341,7 +318,7 @@ namespace hpx { namespace util
         // invoke last reconfigure
         reconfigure();
     }
-
+    
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration(char const* argv0_)
       : num_localities(0),
@@ -490,40 +467,6 @@ namespace hpx { namespace util
             }
         }
         return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
-    }
-
-    std::size_t runtime_configuration::get_max_connections_per_loc() const
-    {
-        if (has_section("hpx.parcel"))
-        {
-            util::section const * sec = get_section("hpx.parcel");
-            if(NULL != sec)
-            {
-                std::string cfg_max_connections_per_loc(
-                    sec->get_entry("max_connections_per_locality",
-                        HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY));
-
-                return boost::lexical_cast<std::size_t>(cfg_max_connections_per_loc);
-            }
-        }
-        return HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY;
-    }
-
-    std::size_t runtime_configuration::get_max_connections() const
-    {
-        if (has_section("hpx.parcel"))
-        {
-            util::section const * sec = get_section("hpx.parcel");
-            if(NULL != sec)
-            {
-                std::string cfg_max_connections(
-                    sec->get_entry("max_connections",
-                        HPX_PARCEL_MAX_CONNECTIONS));
-
-                return boost::lexical_cast<std::size_t>(cfg_max_connections);
-            }
-        }
-        return HPX_PARCEL_MAX_CONNECTIONS;
     }
 
     std::size_t runtime_configuration::get_shmem_data_buffer_cache_size() const

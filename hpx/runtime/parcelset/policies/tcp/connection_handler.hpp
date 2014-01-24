@@ -36,7 +36,17 @@ namespace hpx { namespace parcelset {
 
         static const char * name()
         {
-            return "tcpip";
+            return "tcp";
+        }
+        
+        static const char * pool_name()
+        {
+            return "parcel_pool_tcp";
+        }
+        
+        static const char * pool_name_postfix()
+        {
+            return "-tcp";
         }
     };
 
@@ -47,6 +57,14 @@ namespace hpx { namespace parcelset {
         {
             typedef parcelport_impl<connection_handler> base_type;
         public:
+
+            static std::vector<std::string> runtime_configuration()
+            {
+                std::vector<std::string> lines;
+
+                return lines;
+            }
+
             connection_handler(util::runtime_configuration const& ini,
                 HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
                 HPX_STD_FUNCTION<void()> const& on_stop_thread);
@@ -62,7 +80,7 @@ namespace hpx { namespace parcelset {
             /// Retrieve the type of the locality represented by this parcelport
             connection_type get_type() const
             {
-                return connection_tcpip;
+                return connection_tcp;
             }
             
             /// Return the name of this locality
