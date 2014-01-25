@@ -24,19 +24,19 @@ namespace hpx { namespace parcelset {
         
         parcel_buffer()
           : num_chunks_(count_chunks_type(0, 0))
-          , priority_(0), size_(0), data_size_(0)
+          , size_(0), data_size_(0)
         {}
 
         parcel_buffer(BufferType const & data)
           : data_(data)
           , num_chunks_(count_chunks_type(0, 0))
-          , priority_(0), size_(0), data_size_(0)
+          , size_(0), data_size_(0)
         {}
 
         parcel_buffer(BufferType && data)
           : data_(std::move(data))
           , num_chunks_(count_chunks_type(0, 0))
-          , priority_(0), size_(0), data_size_(0)
+          , size_(0), data_size_(0)
         {}
 
         BufferType data_;
@@ -49,7 +49,6 @@ namespace hpx { namespace parcelset {
         // pair of (zero-copy, non-zero-copy) chunks
         count_chunks_type num_chunks_;
 
-        boost::integer::ulittle8_t priority_;
         boost::integer::ulittle64_t size_;
         boost::integer::ulittle64_t data_size_;
         

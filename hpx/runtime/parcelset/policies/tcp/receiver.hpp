@@ -86,14 +86,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             in_buffer_->data_point_.bytes_ = 0;
             in_buffer_->data_point_.num_parcels_ = 0;
 
-            // Issue a read operation to read the parcel priority and size.
+            // Issue a read operation to read the message size.
             void (receiver::*f)(boost::system::error_code const&,
                     boost::tuple<Handler>)
                 = &receiver::handle_read_header<Handler>;
 
             using boost::asio::buffer;
             std::vector<boost::asio::mutable_buffer> buffers;
-            buffers.push_back(buffer(&in_buffer_->priority_, sizeof(in_buffer_->priority_)));
             buffers.push_back(buffer(&in_buffer_->size_, sizeof(in_buffer_->size_)));
             buffers.push_back(buffer(&in_buffer_->data_size_, sizeof(in_buffer_->data_size_)));
 
@@ -110,7 +109,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                     boost::make_tuple(handler)));
         }
     private:
-        /// Handle a completed read of the message priority and size from the
+        /// Handle a completed read of the message size from the
         /// message header.
         /// The handler is passed using a tuple since boost::bind seems to have
         /// trouble binding a function object created using boost::bind as a

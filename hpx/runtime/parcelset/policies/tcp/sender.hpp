@@ -94,7 +94,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;
-            buffers.push_back(boost::asio::buffer(&buffer->priority_, sizeof(buffer->priority_)));
             buffers.push_back(boost::asio::buffer(&buffer->size_, sizeof(buffer->size_)));
             buffers.push_back(boost::asio::buffer(&buffer->data_size_, sizeof(buffer->data_size_)));
 

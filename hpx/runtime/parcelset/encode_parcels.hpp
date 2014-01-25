@@ -149,10 +149,6 @@ namespace hpx { namespace parcelset {
             HPX_ASSERT(locality_id == connection.destination());
         }
 #endif
-
-        // we choose the highest priority of all parcels for this message
-        threads::thread_priority priority = threads::thread_priority_default;
-
         // collect argument sizes from parcels
         std::size_t arg_size = 0;
         boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
@@ -164,7 +160,6 @@ namespace hpx { namespace parcelset {
                 BOOST_FOREACH(parcel const & p, pv)
                 {
                     arg_size += traits::get_type_size(p);
-                    priority = (std::max)(p.get_thread_priority(), priority);
                 }
 
                 buffer->data_.reserve(arg_size*2);
@@ -255,7 +250,6 @@ namespace hpx { namespace parcelset {
             return buffer;
         }
         
-        buffer->priority_ = boost::integer::ulittle8_t(priority);
         buffer->size_ = buffer->data_.size();
         buffer->data_size_ = arg_size;
 
