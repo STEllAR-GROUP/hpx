@@ -10,9 +10,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_any.hpp>
-#include <hpx/lcos/wait_all.hpp>
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/lcos/when_all.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/detail/count_num_args.hpp>

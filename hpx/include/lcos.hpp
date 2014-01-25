@@ -21,6 +21,9 @@
 #include <hpx/lcos/wait_any.hpp>
 #include <hpx/lcos/wait_all.hpp>
 #include <hpx/lcos/wait_n.hpp>
+#include <hpx/lcos/when_any.hpp>
+#include <hpx/lcos/when_all.hpp>
+#include <hpx/lcos/when_n.hpp>
 
 #include <hpx/lcos/future_wait.hpp>
 

@@ -84,6 +84,9 @@ set(wait_argument_limit_preprocessing_files
   "hpx/lcos/wait_all.hpp"
   "hpx/lcos/wait_n.hpp"
   "hpx/lcos/wait_any.hpp"
+  "hpx/lcos/when_all.hpp"
+  "hpx/lcos/when_n.hpp"
+  "hpx/lcos/when_any.hpp"
   "hpx/runtime/components/memory_block.hpp")
 foreach(file ${wait_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)

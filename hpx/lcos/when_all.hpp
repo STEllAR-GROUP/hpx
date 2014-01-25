@@ -6,17 +6,13 @@
 
 #if !BOOST_PP_IS_ITERATING
 
-#if !defined(HPX_LCOS_WAIT_ANY_APR_17_2012_1143AM)
-#define HPX_LCOS_WAIT_ANY_APR_17_2012_1143AM
+#if !defined(HPX_LCOS_WHEN_ALL_APR_19_2012_1140AM)
+#define HPX_LCOS_WHEN_ALL_APR_19_2012_1140AM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
-#include <hpx/lcos/wait_n.hpp>
-#include <hpx/lcos/local/packaged_task.hpp>
-#include <hpx/lcos/local/packaged_continuation.hpp>
-#include <hpx/runtime/threads/thread.hpp>
+#include <hpx/lcos/when_n.hpp>
 #include <hpx/util/always_void.hpp>
-#include <hpx/util/bind.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/tuple.hpp>
@@ -25,7 +21,6 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/enum.hpp>
 #include <boost/preprocessor/iterate.hpp>
-#include <boost/utility/swap.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -34,18 +29,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos
 {
-    /// The function \a wait_any is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns the same list of
-    /// futures after one future of that list finishes execution.
+    /// The function \a when_all is a operator allowing to join on the result
+    /// of all given futures. It AND-composes all future objects given and
+    /// returns a new future object representing the same list of futures
+    /// after they finished executing.
     ///
-    /// \a wait_any returns after one future has been triggered.
-    ///
-    /// \note There are three variations of wait_any. The first takes a pair
+    /// \note There are three variations of when_all. The first takes a pair
     ///       of InputIterators. The second takes an std::vector of future<R>.
     ///       The third takes any arbitrary number of future<R>, where R need
     ///       not be the same type.
     ///
-    /// \return   The same list of futures as has been passed to wait_any.
+    /// \return   Returns a future holding the same list of futures as has
+    ///           been passed to when_all.
     ///           - future<vector<future<R>>>: If the input cardinality is
     ///             unknown at compile time and the futures are all of the
     ///             same type.
@@ -54,55 +49,62 @@ namespace hpx { namespace lcos
     ///             The inputs can be any arbitrary number of future objects.
 
     template <typename Future>
-    void
-    wait_any(std::vector<Future> const& lazy_values,
+    lcos::unique_future<std::vector<Future> >
+    when_all(std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
-        return wait_n(1, lazy_values, ec);
+        typedef std::vector<Future> result_type;
+
+        if (lazy_values.empty())
+            return lcos::make_ready_future(result_type());
+
+        return when_n(lazy_values.size(), lazy_values, ec);
     }
 
     template <typename Future>
-    void
-    wait_any(std::vector<Future>& lazy_values,
+    lcos::unique_future<std::vector<Future> > //-V659
+    when_all(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
-        return wait_any(const_cast<std::vector<Future> const&>(lazy_values), ec);
-    }
-
-    template <typename Future>
-    void
-    wait_any(std::vector<Future> && lazy_values,
-        error_code& ec = throws)
-    {
-        return wait_any(const_cast<std::vector<Future> const&>(lazy_values), ec);
+        return when_all(lazy_values, ec);
     }
 
     template <typename Iterator>
-    typename util::always_void<
+    lcos::unique_future<std::vector<
         typename lcos::detail::future_iterator_traits<Iterator>::type
-    >::type
-    wait_any(Iterator begin, Iterator end, error_code& ec = throws)
+    > >
+    when_all(Iterator begin, Iterator end, error_code& ec = throws)
     {
-        return wait_n(1, begin, end, ec);
+        typedef
+            typename lcos::detail::future_iterator_traits<Iterator>::type
+            future_type;
+        typedef std::vector<future_type> result_type;
+
+        result_type lazy_values_;
+        std::transform(begin, end, std::back_inserter(lazy_values_),
+            detail::when_acquire_future<future_type>());
+        return when_all(lazy_values_, ec);
     }
 
-    inline void
-    wait_any(error_code& ec = throws)
+    inline lcos::unique_future<HPX_STD_TUPLE<> > //-V524
+    when_all(error_code& ec = throws)
     {
-        return wait_n(1, ec);
+        typedef HPX_STD_TUPLE<> result_type;
+
+        return lcos::make_ready_future(result_type());
     }
 }}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/wait_any.hpp>
+#  include <hpx/lcos/preprocessed/when_all.hpp>
 #else
 
 #if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/wait_any_" HPX_LIMIT_STR ".hpp")
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/when_all_" HPX_LIMIT_STR ".hpp")
 #endif
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/wait_any.hpp>))                \
+    (3, (1, HPX_WAIT_ARGUMENT_LIMIT, <hpx/lcos/when_all.hpp>))                \
 /**/
 #include BOOST_PP_ITERATE()
 
@@ -114,7 +116,7 @@ namespace hpx { namespace lcos
 
 namespace hpx
 {
-    using lcos::wait_any;
+    using lcos::when_all;
 }
 
 #endif
@@ -124,16 +126,22 @@ namespace hpx
 
 #define N BOOST_PP_ITERATION()
 
+#define HPX_WHEN_N_DECAY_FUTURE(Z, N, D)                                      \
+    typename util::decay<BOOST_PP_CAT(T, N)>::type                            \
+    /**/
+
 namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    void wait_any(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
+    lcos::unique_future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> >
+    when_all(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
-        return wait_n(1, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
+        return when_n(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
     }
 }}
 
+#undef HPX_WHEN_N_DECAY_FUTURE
 #undef N
 
 #endif
