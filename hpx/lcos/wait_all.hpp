@@ -49,34 +49,34 @@ namespace hpx { namespace lcos
     ///             The inputs can be any arbitrary number of future objects.
 
     template <typename Future>
-    void
-    wait_all(std::vector<Future> const& lazy_values,
+    void wait_all(std::vector<Future> const& lazy_values,
         error_code& ec = throws)
     {
-        return wait_n(lazy_values.size(), lazy_values, ec);
+        return lcos::wait_n(
+            lazy_values.size(), lazy_values, ec);
     }
 
     template <typename Future>
-    void
-    wait_all(std::vector<Future>& lazy_values,
+    void wait_all(std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
-        return wait_all(const_cast<std::vector<Future> const&>(lazy_values), ec);
+        return lcos::wait_all(
+            const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
     template <typename Future>
-    void
-    wait_all(std::vector<Future> && lazy_values,
+    void wait_all(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
-        return wait_all(const_cast<std::vector<Future> const&>(lazy_values), ec);
+        return lcos::wait_all(
+            const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
     template <typename Iterator>
     typename util::always_void<
         typename lcos::detail::future_iterator_traits<Iterator>::type
-    >::type
-    wait_all(Iterator begin, Iterator end, error_code& ec = throws)
+    >::type wait_all(Iterator begin, Iterator end,
+        error_code& ec = throws)
     {
         typedef
             typename lcos::detail::future_iterator_traits<Iterator>::type
@@ -97,10 +97,9 @@ namespace hpx { namespace lcos
         return (*f.get())();
     }
 
-    inline void
-    wait_all(error_code& ec = throws)
+    inline void wait_all(error_code& ec = throws)
     {
-        return wait_n(0, ec);
+        return lcos::wait_n(0, ec);
     }
 }}
 
@@ -141,7 +140,7 @@ namespace hpx { namespace lcos
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
     void wait_all(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
-        return wait_n(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
+        return lcos::wait_n(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
     }
 }}
 

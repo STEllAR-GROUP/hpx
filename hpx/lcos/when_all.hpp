@@ -58,7 +58,7 @@ namespace hpx { namespace lcos
         if (lazy_values.empty())
             return lcos::make_ready_future(result_type());
 
-        return when_n(lazy_values.size(), lazy_values, ec);
+        return lcos::when_n(lazy_values.size(), lazy_values, ec);
     }
 
     template <typename Future>
@@ -66,7 +66,7 @@ namespace hpx { namespace lcos
     when_all(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
-        return when_all(lazy_values, ec);
+        return lcos::when_all(lazy_values, ec);
     }
 
     template <typename Iterator>
@@ -83,7 +83,7 @@ namespace hpx { namespace lcos
         result_type lazy_values_;
         std::transform(begin, end, std::back_inserter(lazy_values_),
             detail::when_acquire_future<future_type>());
-        return when_all(lazy_values_, ec);
+        return lcos::when_all(lazy_values_, ec);
     }
 
     inline lcos::unique_future<HPX_STD_TUPLE<> > //-V524
@@ -137,7 +137,7 @@ namespace hpx { namespace lcos
     lcos::unique_future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> >
     when_all(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
-        return when_n(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
+        return lcos::when_n(N, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);
     }
 }}
 

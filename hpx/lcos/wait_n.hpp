@@ -227,28 +227,27 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future>
-    void
-    wait_n(std::size_t n,
+    void wait_n(std::size_t n,
         std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
-        return wait_n(n, const_cast<std::vector<Future> const&>(lazy_values), ec);
+        return lcos::wait_n(
+            n, const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
     template <typename Future>
-    void
-    wait_n(std::size_t n,
+    void wait_n(std::size_t n,
         std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
-        return wait_n(n, const_cast<std::vector<Future> const&>(lazy_values), ec);
+        return lcos::wait_n(
+            n, const_cast<std::vector<Future> const&>(lazy_values), ec);
     }
 
     template <typename Iterator>
     typename util::always_void<
         typename lcos::detail::future_iterator_traits<Iterator>::type
-    >::type
-    wait_n(std::size_t n, Iterator begin, Iterator end,
+    >::type wait_n(std::size_t n, Iterator begin, Iterator end,
         error_code& ec = throws)
     {
         typedef
