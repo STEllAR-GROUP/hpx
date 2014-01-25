@@ -13,24 +13,6 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
-/*
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/placeholders.hpp>
-#include <boost/asio/read.hpp>
-#include <boost/asio/write.hpp>
-#include <boost/atomic.hpp>
-#include <boost/bind.hpp>
-#include <boost/bind/protect.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/integer/endian.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/tuple/tuple.hpp>
-*/
-
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
@@ -58,16 +40,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             >
             postprocess_function_type;
 
-        enum sender_state
-        {
-            invalid,
-            start_send,
-            sending_header,
-            sent_header,
-            sending_data,
-            sent_data,
-            sender_done,
-        };
+        typedef bool(sender::*next_function_type)();
 
         /// Construct a sending parcelport_connection with the given io_service.
         sender(MPI_Comm communicator,
@@ -81,7 +54,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , tag_(tag)
           , tag_mtx_(tag_mtx)
           , free_tags_(free_tags)
-          , sender_state_(invalid)
+          , sent_chunks_(0)
+          , next_(0)
           , parcelport_(handler)
           , there_(locality_id), parcels_sent_(parcels_sent)
         {}
@@ -111,12 +85,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         void async_write(boost::shared_ptr<parcel_buffer<buffer_type> > buffer,
             Handler handler, ParcelPostprocess parcel_postprocess)
         {
-            hpx::lcos::local::spinlock::scoped_lock l(mtx_);
             // Check for valid pre conditions
+            HPX_ASSERT(next_ == 0);
             HPX_ASSERT(!buffer_);
             HPX_ASSERT(!handler_);
             HPX_ASSERT(!postprocess_);
-            BOOST_ASSERT(buffer->chunks_.size() == 1);
 
             /// Increment sends and begin timer.
             buffer->data_point_.time_ = timer_.elapsed_nanoseconds();
@@ -127,135 +100,207 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
             // make header data structure
             header_ = header(
-                there_.get_rank()                       // destination rank ...
-              , tag_                                            // tag ...
-              , static_cast<std::size_t>(buffer_->size_)        // size ...
-              , static_cast<std::size_t>(buffer_->data_size_)   // data_size_ ...
+                there_.get_rank()  // destination rank ...
+              , tag_               // tag ...
+              , *buffer_           // fill it with the buffer data ...
             );
 
-            sender_state_ = start_send;
+            next(&sender::send_header);
             add_sender(parcelport_, shared_from_this());
         }
 
         bool done()
         {
-            hpx::lcos::local::spinlock::scoped_lock l(mtx_);
-            switch(sender_state_)
+            next_function_type f = 0;
             {
-            case start_send:
+                hpx::lcos::local::spinlock::scoped_lock l(mtx_);
+                f = next_;
+            }
+            if(f != 0)
+            {
+                if(((*this).*f)())
                 {
-                    HPX_ASSERT(buffer_);
-                    HPX_ASSERT(handler_);
-                    HPX_ASSERT(postprocess_);
-                    header_.assert_valid();
-                    HPX_ASSERT(header_.rank() != util::mpi_environment::rank());
-                    
-                    MPI_Isend(
-                        header_.data(),         // Data pointer
-                        header_.data_size_,     // Size
-                        header_.type(),         // MPI Datatype
-                        header_.rank(),         // Destination
-                        0,                      // Tag
-                        communicator_,          // Communicator
-                        &header_request_        // Request
-                    );
-
-                    MPI_Isend(
-                        buffer_->data_.data(), // Data pointer
-                        static_cast<int>(buffer_->size_), // Size
-                        MPI_CHAR,               // MPI Datatype
-                        header_.rank(),         // Destination
-                        header_.tag(),          // Tag
-                        communicator_,          // Communicator
-                        &data_request_          // Request
-                        );
-                    sender_state_ = sending_header;
-                    break;
-                }
-            case sending_header:
-                {
-                    HPX_ASSERT(buffer_);
-                    HPX_ASSERT(handler_);
-                    HPX_ASSERT(postprocess_);
-                    int completed = 0;
-                    MPI_Status status;
-                    int ret = MPI_Test(&header_request_, &completed, &status);
-                    HPX_ASSERT(ret == MPI_SUCCESS);
-                    if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
-                    {
-                        sender_state_ = sent_header;
-                    }
-                    break;
-                }
-            case sent_header:
-                {
-                    HPX_ASSERT(buffer_);
-                    HPX_ASSERT(handler_);
-                    HPX_ASSERT(postprocess_);
-                    HPX_ASSERT(static_cast<std::size_t>(header_.size()) ==
-                        buffer_->data_.size());
-                    sender_state_ = sending_data;
-                    break;
-                }
-            case sending_data:
-                {
-                    HPX_ASSERT(buffer_);
-                    HPX_ASSERT(handler_);
-                    HPX_ASSERT(postprocess_);
-                    int completed = 0;
-                    MPI_Status status;
-                    int ret = MPI_Test(&data_request_, &completed, &status);
-                    HPX_ASSERT(ret == MPI_SUCCESS);
-                    if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
-                    {
-                        sender_state_ = sent_data;
-                    }
-                    break;
-                }
-            case sent_data:
-                {
-                    HPX_ASSERT(buffer_);
-                    HPX_ASSERT(handler_);
-                    HPX_ASSERT(postprocess_);
+                    verify_valid();
                     error_code ec;
                     handler_(ec, header_.size());
-                    sender_state_ = sender_done;
-                    break;
-                }
-            case sender_done:
-                {
-                    HPX_ASSERT(buffer_);
-                    HPX_ASSERT(handler_);
-                    HPX_ASSERT(postprocess_);
-                    // complete data point and push back onto gatherer
-                    buffer_->data_point_.time_ = timer_.elapsed_nanoseconds() - buffer_->data_point_.time_;
+                    buffer_->data_point_.time_ = timer_.elapsed_nanoseconds()
+                        - buffer_->data_point_.time_;
                     parcels_sent_.add_data(buffer_->data_point_);
-                    error_code ec;
-                    postprocess_(ec, there_, shared_from_this());
                     // clear our state
                     buffer_.reset();
                     handler_.reset();
-                    postprocess_.reset();
-                    sender_state_ = invalid;
+                    sent_chunks_ = 0;
+                    postprocess_function_type pp;
+                    std::swap(pp, postprocess_);
+                    pp(ec, there_, shared_from_this());
                     return true;
+
                 }
-            case invalid:
-                {
-                    HPX_ASSERT(!buffer_);
-                    HPX_ASSERT(!handler_);
-                    HPX_ASSERT(!postprocess_);
-                }
-                break;
-            default:
-                {
-                    HPX_ASSERT(false);
-                }
-                break;
             }
             return false;
         }
 
     private:
+        void verify_valid()
+        {
+            HPX_ASSERT(buffer_);
+            HPX_ASSERT(handler_);
+            HPX_ASSERT(postprocess_);
+            header_.assert_valid();
+            HPX_ASSERT(header_.rank() != util::mpi_environment::rank());
+        }
+
+        bool send_header()
+        {
+            verify_valid();
+            MPI_Isend(
+                header_.data(),         // Data pointer
+                header_.data_size_,     // Size
+                header_.type(),         // MPI Datatype
+                header_.rank(),         // Destination
+                0,                      // Tag
+                communicator_,          // Communicator
+                &header_request_        // Request
+            );
+            return check_header_sent();
+        }
+
+        bool check_header_sent()
+        {
+            verify_valid();
+            int completed = 0;
+            MPI_Status status;
+            int ret = MPI_Test(&header_request_, &completed, &status);
+            HPX_ASSERT(ret == MPI_SUCCESS);
+            if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
+            {
+                return send_transmission_chunks();
+            }
+            return next(&sender::check_header_sent);
+            
+        }
+
+        bool send_transmission_chunks()
+        {
+            verify_valid();
+            if(buffer_->transmission_chunks_.empty())
+            {
+                return send_data();
+            }
+
+            MPI_Isend(
+                buffer_->transmission_chunks_.data(), // Data pointer
+                static_cast<int>(
+                    buffer_->transmission_chunks_.size()
+                        * sizeof(parcel_buffer<buffer_type>::transmission_chunk_type)
+                    ), // Size
+                MPI_CHAR,               // MPI Datatype
+                header_.rank(),         // Destination
+                header_.tag(),          // Tag
+                communicator_,          // Communicator
+                &data_request_          // Request
+                );
+            return check_transmission_chunks_sent();
+        }
+
+        bool check_transmission_chunks_sent()
+        {
+            verify_valid();
+            if(data_request_ready())
+            {
+                return send_data();
+            }
+            return next(&sender::check_transmission_chunks_sent);
+        }
+
+        bool send_data()
+        {
+            verify_valid();
+            MPI_Isend(
+                buffer_->data_.data(), // Data pointer
+                static_cast<int>(buffer_->data_.size()), // Size
+                MPI_CHAR,               // MPI Datatype
+                header_.rank(),         // Destination
+                header_.tag(),          // Tag
+                communicator_,          // Communicator
+                &data_request_          // Request
+                );
+            return check_data_sent();
+        }
+
+        bool check_data_sent()
+        {
+            verify_valid();
+            if(data_request_ready())
+            {
+                return send_chunks();
+            }
+            return next(&sender::check_data_sent);
+        }
+
+        bool send_chunks()
+        {
+            verify_valid();
+            if(buffer_->transmission_chunks_.empty())
+            {
+                next(0);
+                return true;
+            }
+            if(sent_chunks_ == buffer_->chunks_.size())
+            {
+                next(0);
+                return true;
+            }
+            
+            util::serialization_chunk & c = buffer_->chunks_[sent_chunks_];
+            ++sent_chunks_;
+            
+
+            if(c.type_ == util::chunk_type_pointer)
+            {
+                MPI_Isend(
+                    const_cast<void *>(c.data_.cpos_), // Data pointer
+                    static_cast<int>(c.size_), // Size
+                    MPI_CHAR,               // MPI Datatype
+                    header_.rank(),         // Destination
+                    header_.tag(),          // Tag
+                    communicator_,          // Communicator
+                    &data_request_          // Request
+                    );
+                return check_chunks_sent();
+            }
+            else
+            {
+                return send_chunks();
+            }
+        }
+
+        bool check_chunks_sent()
+        {
+            if(data_request_ready()) return send_chunks();
+            return next(&sender::check_chunks_sent);
+        }
+
+        bool data_request_ready()
+        {
+            int completed = 0;
+            MPI_Status status;
+            int ret = MPI_Test(&data_request_, &completed, &status);
+            HPX_ASSERT(ret == MPI_SUCCESS);
+            if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        bool next(next_function_type f)
+        {
+            hpx::lcos::local::spinlock::scoped_lock l(mtx_);
+            next_ = f;
+            return false;
+        }
+
         // This mutex protects the data members from possible races due to
         // concurrent access between async_write and done
         hpx::lcos::local::spinlock mtx_;
@@ -265,7 +310,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         int tag_;
         hpx::lcos::local::spinlock & tag_mtx_;
         std::deque<int> & free_tags_;
-        sender_state sender_state_;
+        std::size_t sent_chunks_;
+        next_function_type next_;
 
         MPI_Request header_request_;
         MPI_Request data_request_;

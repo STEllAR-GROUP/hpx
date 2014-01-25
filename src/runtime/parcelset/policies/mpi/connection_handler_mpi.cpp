@@ -39,7 +39,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             "env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}",
 #endif
             "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}",
-            "zero_copy_optimization = 0",
             "io_pool_size = 1"
             ;
 
@@ -59,9 +58,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 "this parcelport was instantiated to represent an unexpected "
                 "locality type: " + get_connection_type_name(here_.get_type()));
         }
-
-        // we never do zero copy optimization for this parcelport
-        allow_zero_copy_optimizations_ = false;
     }
 
     connection_handler::~connection_handler()
@@ -205,7 +201,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     ++it;
                 }
             }
-            if(!has_work) has_work = !receivers_.empty();
 
             // add new receive requests
             std::pair<bool, header> next(acceptor_.next_header());
@@ -214,6 +209,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 receivers_.push_back(boost::make_shared<receiver>(next.second, communicator_, *this));
             }
 
+            if(!has_work) has_work = !receivers_.empty();
 
             if (bootstrapping)
                 bootstrapping = hpx::is_starting();

@@ -9,6 +9,8 @@
 
 #include <mpi.h>
 
+#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+
 #include <hpx/util/assert.hpp>
 #include <hpx/util/mpi_environment.hpp>
 
@@ -20,9 +22,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     {
         typedef int value_type;
 
-        static int const data_size_ = 3;
+        static int const data_size_ = 5;
 
-        header(int rank, value_type tag_, std::size_t size_, std::size_t numbytes_)
+        template <typename BufferType, typename ChunkType>
+        header(int rank, value_type tag_,
+            parcel_buffer<BufferType, ChunkType> const & buffer)
           : rank_(rank)
         {
             HPX_ASSERT(rank_ != util::mpi_environment::rank());
@@ -30,9 +34,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             HPX_ASSERT(numbytes_ <= (std::numeric_limits<value_type>::max)());
 
             data_[0] = tag_;
-            data_[1] = static_cast<value_type>(size_);
-            data_[2] = static_cast<value_type>(numbytes_);
+            data_[1] = buffer.size_;
+            data_[2] = buffer.data_size_;
+            data_[3] = buffer.num_chunks_.first;
+            data_[4] = buffer.num_chunks_.second;
         }
+
 
         header()
           : rank_(-1)
@@ -40,6 +47,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             data_[0] = -1;
             data_[1] = -1;
             data_[2] = -1;
+            data_[3] = -1;
+            data_[4] = -1;
         }
 
         void assert_valid() const
@@ -49,6 +58,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             HPX_ASSERT(tag() != -1);
             HPX_ASSERT(size() != -1);
             HPX_ASSERT(numbytes() != -1);
+            HPX_ASSERT(num_chunks_first() != -1);
+            HPX_ASSERT(num_chunks_second() != -1);
         }
 
         value_type *data()
@@ -76,6 +87,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return data_[2];
         }
 
+        value_type const & num_chunks_first() const
+        {
+            return data_[3];
+        }
+
+        value_type const & num_chunks_second() const
+        {
+            return data_[4];
+        }
+
         value_type & rank()
         {
             return rank_;
@@ -89,6 +110,16 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         value_type & size()
         {
             return data_[1];
+        }
+
+        value_type & num_chunks_first()
+        {
+            return data_[3];
+        }
+
+        value_type & num_chunks_second()
+        {
+            return data_[4];
         }
 
         MPI_Datatype type()
