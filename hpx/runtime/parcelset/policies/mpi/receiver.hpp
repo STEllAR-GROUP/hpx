@@ -52,9 +52,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
       : public parcelport_connection<receiver>
     {
         typedef parcel_buffer<std::vector<char>, std::vector<char> > buffer_type;
+        typedef bool(receiver::*next_function_type)();
     public:
         receiver(header const & h, MPI_Comm communicator, connection_handler & parcelport)
           : header_(h)
+          , communicator_(communicator)
+          , next_(0)
+          , recvd_chunks_(0)
         {
             in_buffer_.reset(new buffer_type());
 
@@ -73,40 +77,40 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 return;
             }
 
-            in_buffer_->data_.resize(std::size_t(h.size()));
-
             header_.assert_valid();
             HPX_ASSERT(header_.rank() != util::mpi_environment::rank());
-            MPI_Irecv(
-                in_buffer_->data_.data(),    // data pointer
-                static_cast<int>(in_buffer_->data_.size()), // number of elements
-                MPI_CHAR,           // MPI Datatype
-                header_.rank(),     // Source
-                header_.tag(),      // Tag
-                communicator,       // Communicator
-                &request_);         // Request
+
+            in_buffer_->num_chunks_.first = header_.num_chunks_first();
+            in_buffer_->num_chunks_.second = header_.num_chunks_second();
+
+            // determine the size of the chunk buffer
+            std::size_t num_zero_copy_chunks =
+                static_cast<std::size_t>(
+                    static_cast<boost::uint32_t>(in_buffer_->num_chunks_.first));
+            std::size_t num_non_zero_copy_chunks =
+                static_cast<std::size_t>(
+                    static_cast<boost::uint32_t>(in_buffer_->num_chunks_.second));
+
+            if(num_zero_copy_chunks != 0)
+            {
+                in_buffer_->transmission_chunks_.resize(static_cast<std::size_t>(
+                    num_zero_copy_chunks + num_non_zero_copy_chunks));
+                in_buffer_->data_.resize(static_cast<std::size_t>(header_.size()));
+                in_buffer_->chunks_.resize(num_zero_copy_chunks);
+                next(&receiver::recv_transmission_chunks);
+            }
+            else
+            {
+                in_buffer_->data_.resize(std::size_t(header_.size()));
+                next(&receiver::recv_data);
+            }
         }
 
         bool done(connection_handler & pp)
         {
-            int completed = 0;
-            MPI_Status status;
-#ifdef HPX_DEBUG
-            HPX_ASSERT(MPI_Test(&request_, &completed, &status) == MPI_SUCCESS);
-#else
-            MPI_Test(&request_, &completed, &status);
-#endif
-            if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
+            HPX_ASSERT(next_ != 0);
+            if(((*this).*next_)())
             {
-                HPX_ASSERT(status.MPI_SOURCE == header_.rank());
-                HPX_ASSERT(status.MPI_SOURCE != util::mpi_environment::rank());
-                HPX_ASSERT(status.MPI_TAG == header_.tag());
-#ifdef HPX_DEBUG
-                int count = 0;
-                MPI_Get_count(&status, MPI_CHAR, &count);
-                HPX_ASSERT(count == header_.size());
-                HPX_ASSERT(static_cast<std::size_t>(count) == in_buffer_->data_.size());
-#endif
                 // take measurement of overall receive time
                 in_buffer_->data_point_.time_ = timer_.elapsed_nanoseconds() -
                     in_buffer_->data_point_.time_;
@@ -122,17 +126,128 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
         }
 
-        /// Asynchronously read a data structure from the socket.
-        template <typename Handler>
-        void async_read(Handler handler)
+    private:
+
+        bool recv_transmission_chunks()
         {
+            MPI_Irecv(
+                in_buffer_->transmission_chunks_.data(),    // data pointer
+                static_cast<int>(
+                    in_buffer_->transmission_chunks_.size()
+                        * sizeof(buffer_type::transmission_chunk_type)
+                ),                  // number of elements
+                MPI_CHAR,           // MPI Datatype
+                header_.rank(),     // Source
+                header_.tag(),      // Tag
+                communicator_,      // Communicator
+                &request_);         // Request
+            return check_transmission_chunks_recvd();
         }
 
-    private:
+        bool check_transmission_chunks_recvd()
+        {
+            if(request_ready())
+            {
+                return recv_data();
+            }
+
+            return next(&receiver::check_transmission_chunks_recvd);
+        }
+
+        bool recv_data()
+        {
+            MPI_Irecv(
+                in_buffer_->data_.data(),    // data pointer
+                static_cast<int>(in_buffer_->data_.size()), // number of elements
+                MPI_CHAR,           // MPI Datatype
+                header_.rank(),     // Source
+                header_.tag(),      // Tag
+                communicator_,       // Communicator
+                &request_);         // Request
+            return check_data_recvd();
+        }
+
+        bool check_data_recvd()
+        {
+            if(request_ready())
+            {
+                return recv_chunks();
+            }
+
+            return next(&receiver::check_data_recvd);
+        }
+
+        bool recv_chunks()
+        {
+            // add appropriately sized chunk buffers for the zero-copy data
+            std::size_t num_zero_copy_chunks =
+                static_cast<std::size_t>(
+                    static_cast<boost::uint32_t>(in_buffer_->num_chunks_.first));
+            if(recvd_chunks_ == num_zero_copy_chunks)
+            {
+                next(0);
+                return true;
+            }
+            
+            std::size_t chunk_size
+                = in_buffer_->transmission_chunks_[recvd_chunks_].second;
+
+            in_buffer_->chunks_[recvd_chunks_].resize(chunk_size);
+            MPI_Irecv(
+                in_buffer_->chunks_[recvd_chunks_].data(),  // data pointer
+                static_cast<int>(chunk_size), // number of elements
+                MPI_CHAR,           // MPI Datatype
+                header_.rank(),     // Source
+                header_.tag(),      // Tag
+                communicator_,       // Communicator
+                &request_);         // Request
+            ++recvd_chunks_;
+            return next(&receiver::check_chunks_recvd);
+        }
+
+        bool check_chunks_recvd()
+        {
+            if(request_ready())
+            {
+                return recv_chunks();
+            }
+
+            return next(&receiver::check_chunks_recvd);
+        }
+
+        bool request_ready()
+        {
+            int completed = 0;
+            MPI_Status status;
+#ifdef HPX_DEBUG
+            HPX_ASSERT(MPI_Test(&request_, &completed, &status) == MPI_SUCCESS);
+#else
+            MPI_Test(&request_, &completed, &status);
+#endif
+            if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
+            {
+                HPX_ASSERT(status.MPI_SOURCE == header_.rank());
+                HPX_ASSERT(status.MPI_SOURCE != util::mpi_environment::rank());
+                HPX_ASSERT(status.MPI_TAG == header_.tag());
+                return true;
+            }
+            return false;
+        }
+
+        bool next(next_function_type f)
+        {
+            next_ = f;
+            return false;
+        }
+
         /// buffer for incoming data
         boost::shared_ptr<buffer_type> in_buffer_;
         header header_;
+        MPI_Comm communicator_;
         MPI_Request request_;
+        
+        next_function_type next_;
+        std::size_t recvd_chunks_;
 
         boost::uint64_t max_inbound_size_;
 
