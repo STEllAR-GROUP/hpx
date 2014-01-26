@@ -355,6 +355,9 @@ namespace hpx { namespace parcelset
         typedef std::map<naming::locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;
 
+        typedef std::set<naming::locality> pending_parcels_destinations;
+        pending_parcels_destinations parcel_destinations_;
+
         /// The local locality
         naming::locality here_;
 
