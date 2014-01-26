@@ -43,6 +43,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             data_[4] = buffer.num_chunks_.second;
         }
 
+
         header()
           : rank_(-1)
         {
