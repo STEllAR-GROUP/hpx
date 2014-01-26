@@ -15,7 +15,9 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/lcos/promise.hpp>
+
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_all.hpp>
 
 #include <list>
 
@@ -1151,10 +1153,11 @@ void primary_namespace::free_components_sync(
 { // {{{ kill_sync implementation
     using boost::fusion::at_c;
 
-    std::list<lcos::promise<void> > futures;
+    std::vector<lcos::unique_future<void> > futures;
 
     ///////////////////////////////////////////////////////////////////////////
-    // Kill the dead objects.
+    // Delete the objects on the free list.
+    components::server::runtime_support::free_component_action act;
 
     BOOST_FOREACH(free_entry const& e, free_list)
     {
@@ -1179,30 +1182,17 @@ void primary_namespace::free_components_sync(
             % upper
             % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
 
-        typedef components::server::runtime_support::free_component_action
-            action_type;
-
         components::component_type const type_ =
             components::component_type(at_c<0>(e).type);
 
-        // FIXME: Resolve the locality instead of deducing it from the
-        // target GID, otherwise this will break once we start moving
-        // objects.
         naming::id_type const prefix_(
             naming::get_locality_from_gid(at_c<1>(e))
           , naming::id_type::unmanaged);
 
-        futures.push_back(lcos::promise<void>());
-
-        // FIXME: Priority?
-        hpx::apply_c<action_type>
-            (futures.back().get_gid(), prefix_, type_, at_c<1>(e), at_c<2>(e));
+        futures.push_back(hpx::async(act, prefix_, type_, at_c<1>(e), at_c<2>(e)));
     }
 
-    BOOST_FOREACH(lcos::promise<void>& f, futures)
-    {
-        f.get_future().get();
-    }
+    hpx::wait_all(futures);
 
     if (&ec != &throws)
         ec = make_success_code();
