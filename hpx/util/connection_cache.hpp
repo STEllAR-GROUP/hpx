@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2012 Thomas Heller
 //  Copyright (c)      2012 Bryce Adelstein-Lelbach
 //
@@ -137,10 +137,14 @@ namespace hpx { namespace util
         ///          true. If a connection could not be found and space could
         ///          not be returned, \a conn is unmodified and this function
         ///          returns false.
+        ///          If force_nsert is true, a new connection entry will be
+        ///          created even if that means the cache limits will be
+        ///          exceeded.
         ///
         /// \note    The connection must be returned to the cache by calling
         ///          \a reclaim().
-        bool get_or_reserve(key_type const& l, connection_type& conn)
+        bool get_or_reserve(key_type const& l, connection_type& conn,
+            bool force_insert = false)
         {
             mutex_type::scoped_lock lock(mtx_);
 
@@ -176,7 +180,8 @@ namespace hpx { namespace util
                 // Otherwise, if we have less connections for this locality
                 // than the maximum, try to reserve space in the cache for a new
                 // connection.
-                if (boost::get<1>(it->second) < max_connections_per_locality_)
+                if (boost::get<1>(it->second) < max_connections_per_locality_ ||
+                    force_insert)
                 {
                     // See if we have enough space or can make space available.
 
@@ -186,7 +191,7 @@ namespace hpx { namespace util
                     // reduced in size next time some connection is handed back
                     // to the cache).
 
-                    if (!free_space() && boost::get<1>(it->second) != 0)
+                    if (!free_space() && boost::get<1>(it->second) != 0 && !force_insert)
                     {
                         // If we can't find or make space, give up.
                         ++misses_;
@@ -260,18 +265,38 @@ namespace hpx { namespace util
                 // Update LRU meta data.
                 key_tracker_.splice(
                     key_tracker_.end()
-                  , key_tracker_
-                  , boost::get<2>(ct->second)
+                    , key_tracker_
+                    , boost::get<2>(ct->second)
                     );
 
-                // Add the connection to the entry.
-                boost::get<0>(ct->second).push_back(conn);
+                // Return the connection back to the cache only if the number
+                // of connections does not need to be shrunk.
+                if (boost::get<1>(ct->second) <= max_connections_per_locality_)
+                {
+                    // Add the connection to the entry.
+                    boost::get<0>(ct->second).push_back(conn);
 
-                ++reclaims_;
+                    ++reclaims_;
 
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
-                conn->set_state(Connection::state_reclaimed);
+                    conn->set_state(Connection::state_reclaimed);
 #endif
+                }
+                else
+                {
+                    // adjust the number of existing connections for this key
+                    --boost::get<1>(ct->second);
+
+                    // do the accounting
+                    --connections_;
+                    ++evictions_;
+
+                    // the connection itself will go out of scope on return
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+                    conn->set_state(Connection::state_deleting);
+#endif
+                }
+
                 // FIXME: Again, this should probably throw instead of asserting,
                 // as invariants could be invalidated here due to caller error.
                 check_invariants();
@@ -359,6 +384,36 @@ namespace hpx { namespace util
             check_invariants();
         }
 
+        /// Destroys all connections for the given locality in the cache, reset
+        /// all associated counts.
+        ///
+        /// \note Calling this function while connections are still checked out
+        ///       of the cache is a bad idea, and will violate this classes
+        ///       invariants.
+        void clear(key_type const& l, connection_type const& conn)
+        {
+            mutex_type::scoped_lock lock(mtx_);
+
+            // Check if this key already exists in the cache.
+            typename cache_type::iterator const it = cache_.find(l);
+            if (it != cache_.end())
+            {
+                // correct counter to avoid assertions later on
+                -- boost::get<1>(it->second);
+
+                // do the accounting
+                --connections_;
+                ++evictions_;
+
+                // the connection itself will go out of scope on return
+#if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
+                conn->set_state(Connection::state_deleting);
+#endif
+            }
+
+            check_invariants();
+        }
+
         // access statistics
         boost::int64_t get_cache_insertions(bool reset)
         {
@@ -404,12 +459,8 @@ namespace hpx { namespace util
                 cache_value_type const& val = ct->second;
 
                 // The separate item counter has to properly count all the
-                // existing the elements, not only those in the cache entry.
+                // existing elements, not only those in the cache entry.
                 HPX_ASSERT(boost::get<0>(val).size() <= boost::get<1>(val));
-
-                // The overall number of connections in each entry (for each
-                // locality) should not be larger than the allowed number.
-                HPX_ASSERT(boost::get<1>(val) <= max_connections_per_locality_);
 
                 // Count all connections (both those in the cache and those
                 // checked out of the cache).
@@ -467,7 +518,7 @@ namespace hpx { namespace util
                     }
 
                     // If we've gone through key_tracker_ and haven't found
-                    // anything evictable, then all the entries must be
+                    // anything evict-able, then all the entries must be
                     // currently checked out.
                     if (key_tracker_.end() == kt)
                         return false;

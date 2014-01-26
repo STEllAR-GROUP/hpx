@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -18,7 +18,8 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
 
-namespace hpx { namespace parcelset {
+namespace hpx { namespace parcelset
+{
     namespace policies { namespace tcp
     {
         class receiver;
@@ -37,12 +38,12 @@ namespace hpx { namespace parcelset {
         {
             return "tcp";
         }
-        
+
         static const char * pool_name()
         {
             return "parcel_pool_tcp";
         }
-        
+
         static const char * pool_name_postfix()
         {
             return "-tcp";
@@ -69,25 +70,25 @@ namespace hpx { namespace parcelset {
                 HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
             ~connection_handler();
-            
+
             /// Start the handling of connections.
             bool run();
 
             /// Stop the handling of connections.
             void stop();
-            
+
             /// Retrieve the type of the locality represented by this parcelport
             connection_type get_type() const
             {
                 return connection_tcp;
             }
-            
+
             /// Return the name of this locality
             std::string get_locality_name() const
             {
                 return boost::asio::ip::host_name();
             }
-        
+
             boost::shared_ptr<sender> create_connection(
                 naming::locality const& l, error_code& ec);
 
@@ -99,7 +100,7 @@ namespace hpx { namespace parcelset {
 
             /// Acceptor used to listen for incoming connections.
             boost::asio::ip::tcp::acceptor* acceptor_;
-        
+
             /// The list of accepted connections
             mutable lcos::local::spinlock connections_mtx_;
 

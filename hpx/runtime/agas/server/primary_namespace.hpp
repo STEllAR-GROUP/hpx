@@ -12,6 +12,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/traits/action_may_require_id_splitting.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
@@ -28,6 +29,7 @@
 
 #include <boost/format.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/include/at_c.hpp>
 
 namespace hpx { namespace agas
 {
@@ -458,11 +460,29 @@ namespace hpx { namespace traits
 
     // Parcel routing forwards the binary filter request to the routed action
     template <>
-    struct action_serialization_filter<agas::server::primary_namespace::service_action>
+    struct action_serialization_filter<
+        agas::server::primary_namespace::service_action>
     {
         static util::binary_filter* call(parcelset::parcel const& p)
         {
             return agas::server::primary_namespace::get_serialization_filter(p);
+        }
+    };
+
+    // id-splitting does not happen for incref operations
+    template <>
+    struct action_may_require_id_splitting<
+        agas::server::primary_namespace::service_action>
+    {
+        template <typename Arguments>
+        static bool call(Arguments const& args)
+        {
+            if (boost::fusion::at_c<0>(args).get_action_code() ==
+                agas::primary_ns_increment_credit)
+            {
+                return false;
+            }
+            return true;
         }
     };
 }}

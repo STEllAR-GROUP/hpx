@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -91,7 +91,7 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcel(parcel const& p, write_handler_type const& f) = 0;
+        virtual void put_parcel(parcel p, write_handler_type f) = 0;
 
         /// Queues a list of parcels for transmission to another locality
         ///
@@ -108,8 +108,8 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcels(std::vector<parcel> const & parcels,
-            std::vector<write_handler_type> const& handlers) = 0;
+        virtual void put_parcels(std::vector<parcel> parcels,
+            std::vector<write_handler_type> handlers) = 0;
 
         /// Send an early parcel through the TCP parcelport
         ///

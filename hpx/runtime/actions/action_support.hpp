@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -21,6 +21,7 @@
 #include <hpx/traits/action_stacksize.hpp>
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_message_handler.hpp>
+#include <hpx/traits/action_may_require_id_splitting.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/runtime/get_lva.hpp>
@@ -296,6 +297,9 @@ namespace hpx { namespace actions
 
         /// Return the size of action arguments in bytes
         virtual std::size_t get_type_size() const = 0;
+
+        /// Return whether the embedded action may require id-splitting
+        virtual bool may_require_id_splitting() const = 0;
 
         virtual void load(hpx::util::portable_binary_iarchive & ar) = 0;
         virtual void save(hpx::util::portable_binary_oarchive & ar) const = 0;
@@ -589,6 +593,12 @@ namespace hpx { namespace actions
             return traits::type_size<arguments_type>::call(arguments_);
         }
 
+        /// Return whether the embedded action may require id-splitting
+        bool may_require_id_splitting() const
+        {
+            return traits::action_may_require_id_splitting<Action>::call(arguments_);
+        }
+
         /// Return all data needed for thread initialization
         threads::thread_init_data&
         get_thread_init_data(naming::id_type const& target,
@@ -857,7 +867,7 @@ namespace hpx { namespace actions
         // serialization support
         friend class boost::serialization::access;
 
-        template <class Archive>
+        template <typename Archive>
         BOOST_FORCEINLINE void serialize(Archive& ar, const unsigned int) {}
     };
 

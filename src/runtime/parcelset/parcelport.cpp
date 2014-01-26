@@ -14,6 +14,8 @@
 
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 #include <hpx/runtime/parcelset/policies/tcp/connection_handler.hpp>
+#include <hpx/runtime/parcelset/policies/tcp/receiver.hpp>
+#include <hpx/runtime/parcelset/policies/tcp/sender.hpp>
 #endif
 #if defined(HPX_HAVE_PARCELPORT_SHMEM)
 #include <hpx/runtime/parcelset/policies/shmem/connection_handler.hpp>
@@ -23,7 +25,10 @@
 #endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
+#include <hpx/runtime/parcelset/policies/mpi/receiver.hpp>
+#include <hpx/runtime/parcelset/policies/mpi/sender.hpp>
 #endif
+
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -47,7 +52,7 @@ namespace hpx { namespace parcelset
 
         return create(type, cfg, on_start_thread, on_stop_thread);
     }
-    
+
     /// load the runtime configuration parameters
     std::pair<std::vector<std::string>, bool> parcelport::runtime_configuration(int type)
     {
@@ -186,7 +191,7 @@ namespace hpx { namespace parcelset
 
         return boost::shared_ptr<parcelport>();
     }
-        
+
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini,
             std::string const& type)

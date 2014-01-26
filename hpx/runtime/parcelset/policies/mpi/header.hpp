@@ -14,20 +14,24 @@
 
 #include <boost/array.hpp>
 
-namespace hpx { namespace parcelset { namespace policies { namespace mpi {
+namespace hpx { namespace parcelset { namespace policies { namespace mpi
+{
     struct header
     {
         typedef int value_type;
 
         static int const data_size_ = 3;
 
-        header(int rank, value_type tag_, value_type size_, value_type numbytes_)
+        header(int rank, value_type tag_, std::size_t size_, std::size_t numbytes_)
           : rank_(rank)
         {
             HPX_ASSERT(rank_ != util::mpi_environment::rank());
+            HPX_ASSERT(size_ <= (std::numeric_limits<value_type>::max)());
+            HPX_ASSERT(numbytes_ <= (std::numeric_limits<value_type>::max)());
+
             data_[0] = tag_;
-            data_[1] = size_;
-            data_[2] = numbytes_;
+            data_[1] = static_cast<value_type>(size_);
+            data_[2] = static_cast<value_type>(numbytes_);
         }
 
         header()

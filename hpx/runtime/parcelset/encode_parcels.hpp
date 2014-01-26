@@ -39,11 +39,12 @@ namespace hpx
 }
 #endif
 
-namespace hpx { namespace parcelset {
+namespace hpx { namespace parcelset
+{
     template <typename Connection>
     boost::shared_ptr<parcel_buffer<typename Connection::buffer_type> >
     encode_parcels(std::vector<parcel> const &, Connection & connection, int archive_flags_);
-    
+
     template <typename Connection>
     boost::shared_ptr<parcel_buffer<typename Connection::buffer_type> >
     encode_parcels(parcel const &p, Connection & connection, int archive_flags_)
@@ -99,9 +100,9 @@ namespace hpx { namespace parcelset {
             archive << has_certificate;
         }
     }
-    
-    template <typename Connection, typename ParcelBuffer>
-    void create_message_suffix(Connection & connection, ParcelBuffer & buffer,
+
+    template <typename ParcelBuffer>
+    void create_message_suffix(ParcelBuffer & buffer,
         naming::gid_type const& parcel_id)
     {
         // mark start of security work
@@ -129,7 +130,7 @@ namespace hpx { namespace parcelset {
         data_point_.security_time_ = timer_sec.elapsed_nanoseconds();
     }
 #endif
-    
+
     template <typename Connection>
     boost::shared_ptr<parcel_buffer<typename Connection::buffer_type> >
     encode_parcels(std::vector<parcel> const & pv, Connection & connection, int archive_flags_)
@@ -156,7 +157,7 @@ namespace hpx { namespace parcelset {
         // collect argument sizes from parcels
         std::size_t arg_size = 0;
         boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
-        
+
         // guard against serialization errors
         try {
             try {
@@ -211,7 +212,7 @@ namespace hpx { namespace parcelset {
                 // calculate and sign the hash, but only after everything has
                 // been initialized
                 if (!connection.first_message_)
-                    create_message_suffix(pv[0].get_parcel_id());
+                    create_message_suffix(*buffer, pv[0].get_parcel_id());
 #endif
                 // store the time required for serialization
                 buffer->data_point_.serialization_time_ = timer.elapsed_nanoseconds();
@@ -254,7 +255,7 @@ namespace hpx { namespace parcelset {
             hpx::report_error(boost::current_exception());
             return buffer;
         }
-        
+
         buffer->priority_ = boost::integer::ulittle8_t(priority);
         buffer->size_ = buffer->data_.size();
         buffer->data_size_ = arg_size;

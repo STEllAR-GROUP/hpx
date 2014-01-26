@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2011 Katelyn Kufahl
 //  Copyright (c) 2011 Bryce Lelbach
@@ -40,7 +40,7 @@ namespace hpx { namespace parcelset
 {
     template <typename ConnectionHandler>
     class parcelport_impl;
-    
+
     boost::uint64_t get_max_inbound_size(parcelport&);
 }}
 
@@ -52,11 +52,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
       : public parcelport_connection<receiver>
     {
         typedef parcel_buffer<std::vector<char>, std::vector<char> > buffer_type;
+
     public:
         receiver(boost::asio::io_service& io_service,
             parcelport_impl<connection_handler>& parcelport)
           : socket_(io_service)
-          , max_inbound_size_(get_max_inbound_size(parcelport))
+          , max_inbound_size_(hpx::parcelset::get_max_inbound_size(parcelport))
+          , ack_(0)
           , parcelport_(parcelport)
         {}
 
@@ -87,28 +89,35 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             in_buffer_->data_point_.num_parcels_ = 0;
 
             // Issue a read operation to read the parcel priority and size.
-            void (receiver::*f)(boost::system::error_code const&,
-                    boost::tuple<Handler>)
-                = &receiver::handle_read_header<Handler>;
-
             using boost::asio::buffer;
             std::vector<boost::asio::mutable_buffer> buffers;
-            buffers.push_back(buffer(&in_buffer_->priority_, sizeof(in_buffer_->priority_)));
-            buffers.push_back(buffer(&in_buffer_->size_, sizeof(in_buffer_->size_)));
-            buffers.push_back(buffer(&in_buffer_->data_size_, sizeof(in_buffer_->data_size_)));
+            buffers.push_back(buffer(&in_buffer_->priority_,
+                sizeof(in_buffer_->priority_)));
+            buffers.push_back(buffer(&in_buffer_->size_,
+                sizeof(in_buffer_->size_)));
+            buffers.push_back(buffer(&in_buffer_->data_size_,
+                sizeof(in_buffer_->data_size_)));
 
-            buffers.push_back(buffer(&in_buffer_->num_chunks_, sizeof(in_buffer_->num_chunks_)));
+            buffers.push_back(buffer(&in_buffer_->num_chunks_,
+                sizeof(in_buffer_->num_chunks_)));
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
             boost::asio::detail::socket_option::boolean<
                 IPPROTO_TCP, TCP_QUICKACK> quickack(true);
             socket_.set_option(quickack);
 #endif
+
+            void (receiver::*f)(boost::system::error_code const&,
+                    std::size_t, boost::tuple<Handler>)
+                = &receiver::handle_read_header<Handler>;
+
             boost::asio::async_read(socket_, buffers,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error,
+                    boost::asio::placeholders::bytes_transferred,
                     boost::make_tuple(handler)));
         }
+
     private:
         /// Handle a completed read of the message priority and size from the
         /// message header.
@@ -117,13 +126,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         /// parameter.
         template <typename Handler>
         void handle_read_header(boost::system::error_code const& e,
-            boost::tuple<Handler> handler)
+            std::size_t bytes_transferred, boost::tuple<Handler> handler)
         {
             if (e) {
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                async_read(boost::get<0>(handler));
+//                 async_read(boost::get<0>(handler));
             }
             else {
                 // Determine the length of the serialized data.
@@ -158,7 +167,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         num_zero_copy_chunks + num_non_zero_copy_chunks));
 
                     buffers.push_back(boost::asio::buffer(in_buffer_->transmission_chunks_.data(),
-                        in_buffer_->transmission_chunks_.size()*sizeof(buffer_type::transmission_chunk_type)));
+                        in_buffer_->transmission_chunks_.size() *
+                            sizeof(buffer_type::transmission_chunk_type)));
 
                     // add main buffer holding data which was serialized normally
                     in_buffer_->data_.resize(static_cast<std::size_t>(inbound_size));
@@ -196,7 +206,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                async_read(boost::get<0>(handler));
+//                 async_read(boost::get<0>(handler));
             }
             else {
                 // receive buffers
@@ -212,7 +222,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 {
                     std::size_t chunk_size = in_buffer_->transmission_chunks_[i].second;
                     in_buffer_->chunks_[i].resize(chunk_size);
-                    buffers.push_back(boost::asio::buffer(in_buffer_->chunks_[i].data(), chunk_size));
+                    buffers.push_back(
+                        boost::asio::buffer(in_buffer_->chunks_[i].data(), chunk_size));
                 }
 
                 // Start an asynchronous call to receive the data.
@@ -240,7 +251,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 boost::get<0>(handler)(e);
 
                 // Issue a read operation to read the next parcel.
-                async_read(boost::get<0>(handler));
+//                 async_read(boost::get<0>(handler));
             }
             else {
                 // complete data point and pass it along
@@ -271,7 +282,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             boost::get<0>(handler)(e);
 
             // Issue a read operation to read the next parcel.
-            async_read(boost::get<0>(handler));
+            if (!e)
+                async_read(boost::get<0>(handler));
         }
 
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -38,7 +38,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
         */
     }
-    
+
     connection_handler::~connection_handler()
     {
         if(acceptor_ != NULL)
@@ -124,7 +124,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             acceptor_ = NULL;
         }
     }
-    
+
     boost::shared_ptr<sender> connection_handler::create_connection(
         naming::locality const& l, error_code& ec)
     {
@@ -212,7 +212,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 
         if (&ec != &throws)
             ec = make_success_code();
-        
+
         return sender_connection;
     }
 
@@ -237,7 +237,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 lcos::local::spinlock::scoped_lock l(connections_mtx_);
                 accepted_connections_.insert(c);
             }
-            
+
             // disable Nagle algorithm, disable lingering on close
             boost::asio::ip::tcp::socket& s = c->socket();
             s.set_option(boost::asio::ip::tcp::no_delay(true));
@@ -259,7 +259,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     }
 
     // Handle completion of a read operation.
-    void connection_handler::handle_read_completion(boost::system::error_code const& e,
+    void connection_handler::handle_read_completion(
+        boost::system::error_code const& e,
         boost::shared_ptr<receiver> receiver_conn)
     {
         if (!e) return;
@@ -270,7 +271,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             LPT_(error)
                 << "handle read operation completion: error: "
                 << e.message();
+        }
 
+//         if (e != boost::asio::error::eof)
+        {
             // remove this connection from the list of known connections
             lcos::local::spinlock::scoped_lock l(connections_mtx_);
             accepted_connections_.erase(receiver_conn);

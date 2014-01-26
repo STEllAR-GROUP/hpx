@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -47,10 +47,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             naming::locality const& locality_id,
             performance_counters::parcels::gatherer& parcels_sent)
           : socket_(io_service)
+          , ack_(0)
           , there_(locality_id), parcels_sent_(parcels_sent)
         {
         }
-        
+
         ~sender()
         {
             // gracefully and portably shutdown the socket
@@ -83,7 +84,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
 
         template <typename Buffer, typename Handler, typename ParcelPostprocess>
-        void async_write(boost::shared_ptr<Buffer> buffer, Handler handler, ParcelPostprocess parcel_postprocess)
+        void async_write(boost::shared_ptr<Buffer> buffer, Handler handler,
+            ParcelPostprocess parcel_postprocess)
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_async_write;
@@ -94,16 +96,22 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;
-            buffers.push_back(boost::asio::buffer(&buffer->priority_, sizeof(buffer->priority_)));
-            buffers.push_back(boost::asio::buffer(&buffer->size_, sizeof(buffer->size_)));
-            buffers.push_back(boost::asio::buffer(&buffer->data_size_, sizeof(buffer->data_size_)));
+            buffers.push_back(boost::asio::buffer(&buffer->priority_,
+                sizeof(buffer->priority_)));
+            buffers.push_back(boost::asio::buffer(&buffer->size_,
+                sizeof(buffer->size_)));
+            buffers.push_back(boost::asio::buffer(&buffer->data_size_,
+                sizeof(buffer->data_size_)));
 
             // add chunk description
-            buffers.push_back(boost::asio::buffer(&buffer->num_chunks_, sizeof(buffer->num_chunks_)));
-            
+            buffers.push_back(boost::asio::buffer(&buffer->num_chunks_,
+                sizeof(buffer->num_chunks_)));
+
             if (!buffer->transmission_chunks_.empty()) {
-                buffers.push_back(boost::asio::buffer(buffer->transmission_chunks_.data(),
-                    buffer->transmission_chunks_.size()*sizeof(typename Buffer::transmission_chunk_type)));
+                buffers.push_back(boost::asio::buffer(
+                    buffer->transmission_chunks_.data(),
+                    buffer->transmission_chunks_.size() *
+                        sizeof(typename Buffer::transmission_chunk_type)));
 
                 // add main buffer holding data which was serialized normally
                 buffers.push_back(boost::asio::buffer(buffer->data_));
@@ -119,11 +127,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 // add main buffer holding data which was serialized normally
                 buffers.push_back(boost::asio::buffer(buffer->data_));
             }
-            
+
             // this additional wrapping of the handler into a bind object is
             // needed to keep  this parcelport_connection object alive for the whole
             // write operation
-            void (sender::*f)(boost::system::error_code const&, std::size_t, boost::shared_ptr<Buffer>,
+            void (sender::*f)(boost::system::error_code const&, std::size_t,
+                    boost::shared_ptr<Buffer>,
                     boost::tuple<Handler, ParcelPostprocess>)
                 = &sender::handle_write<Buffer, Handler, ParcelPostprocess>;
 
@@ -137,7 +146,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
     private:
         /// handle completed write operation
         template <typename Buffer, typename Handler, typename ParcelPostprocess>
-        void handle_write(boost::system::error_code const& e, std::size_t bytes, boost::shared_ptr<Buffer> buffer,
+        void handle_write(boost::system::error_code const& e, std::size_t bytes,
+            boost::shared_ptr<Buffer> buffer,
             boost::tuple<Handler, ParcelPostprocess> handler)
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
@@ -145,12 +155,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
 #endif
             // just call initial handler
             boost::get<0>(handler)(e, bytes);
+            if (e)
+            {
+                // inform post-processing handler of error as well
+                boost::get<1>(handler)(e, there_, shared_from_this());
+                return;
+            }
 
             // complete data point and push back onto gatherer
-            buffer->data_point_.time_ = timer_.elapsed_nanoseconds() - buffer->data_point_.time_;
+            buffer->data_point_.time_ =
+                timer_.elapsed_nanoseconds() - buffer->data_point_.time_;
             parcels_sent_.add_data(buffer->data_point_);
 
-            // now handle the acknowledgement byte which is sent by the receiver
+            // now handle the acknowledgment byte which is sent by the receiver
 #if defined(__linux) || defined(linux) || defined(__linux__)
             boost::asio::detail::socket_option::boolean<
                 IPPROTO_TCP, TCP_QUICKACK> quickack(true);

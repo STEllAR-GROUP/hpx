@@ -185,9 +185,10 @@ namespace hpx { namespace parcelset
                 "$[hpx.parcel.array_optimization]}"
             ;
 
-        for(std::size_t i = 0; i < connection_type::connection_last; ++i)
+        for(int i = 0; i < connection_type::connection_last; ++i)
         {
-            std::pair<std::vector<std::string>, bool> pp_ini_defs = parcelport::runtime_configuration(i);
+            std::pair<std::vector<std::string>, bool> pp_ini_defs = 
+                parcelport::runtime_configuration(i);
             std::string name = get_connection_type_name(connection_type(i));
             std::string name_uc = boost::to_upper_copy(name);
             std::string enable = pp_ini_defs.second ? "1" : "0";
@@ -199,13 +200,15 @@ namespace hpx { namespace parcelset
                     "$[hpx.threadpools.parcel_pool_size]}",
                 "max_connections =  ${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS:"
                     "$[hpx.parcel.max_connections]}",
-                "max_connections_per_locality =  ${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS_PER_LOCALITY:"
+                "max_connections_per_locality = "
+                    "${HPX_PARCEL_" + name_uc + "_MAX_CONNECTIONS_PER_LOCALITY:"
                     "$[hpx.parcel.max_connections_per_locality]}",
-                "max_message_size =  ${HPX_PARCEL_" + name_uc + "_MAX_MESSAGE_SIZE:"
-                    "$[hpx.parcel.max_message_size]}",
-                "array_optimization = ${HPX_PARCEL_" + name_uc + "_ARRAY_OPTIMIZATION:"
-                    "$[hpx.parcel.array_optimization]}",
-                "zero_copy_optimization = ${HPX_PARCEL_" + name_uc + "_ZERO_COPY_OPTIMIZATION:"
+                "max_message_size =  ${HPX_PARCEL_" + name_uc +
+                    "_MAX_MESSAGE_SIZE:$[hpx.parcel.max_message_size]}",
+                "array_optimization = ${HPX_PARCEL_" + name_uc +
+                    "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}",
+                "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
+                    "_ZERO_COPY_OPTIMIZATION:"
                     "$[hpx.parcel." + name + ".array_optimization]}"
                 ;
 
