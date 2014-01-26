@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2013-2014 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,8 @@
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
     class connection_handler;
-    void add_sender(connection_handler & handler, boost::shared_ptr<sender> sender_connection);
+    void add_sender(connection_handler & handler,
+        boost::shared_ptr<sender> sender_connection);
 
     class sender
       : public parcelset::parcelport_connection<sender>

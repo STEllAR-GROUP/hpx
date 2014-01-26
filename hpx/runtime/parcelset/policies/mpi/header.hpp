@@ -1,5 +1,5 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
-//  Copyright (c)      2013 Thomas Heller
+//  Copyright (c) 2013-2014 Hartmut Kaiser
+//  Copyright (c) 2013-2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,17 +29,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             parcel_buffer<BufferType, ChunkType> const & buffer)
           : rank_(rank)
         {
+            boost::uint64_t size = static_cast<boost::uint64_t>(buffer.size_);
+            boost::uint64_t numbytes = static_cast<boost::uint64_t>(buffer.data_size_);
+
             HPX_ASSERT(rank_ != util::mpi_environment::rank());
-            HPX_ASSERT(size_ <= (std::numeric_limits<value_type>::max)());
-            HPX_ASSERT(numbytes_ <= (std::numeric_limits<value_type>::max)());
+            HPX_ASSERT(size <= (std::numeric_limits<value_type>::max)());
+            HPX_ASSERT(numbytes <= (std::numeric_limits<value_type>::max)());
 
             data_[0] = tag_;
-            data_[1] = buffer.size_;
-            data_[2] = buffer.data_size_;
+            data_[2] = static_cast<value_type>(size);
+            data_[1] = static_cast<value_type>(numbytes);
             data_[3] = buffer.num_chunks_.first;
             data_[4] = buffer.num_chunks_.second;
         }
-
 
         header()
           : rank_(-1)
