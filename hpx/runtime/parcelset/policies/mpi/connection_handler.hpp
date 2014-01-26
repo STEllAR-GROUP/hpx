@@ -32,12 +32,12 @@ namespace hpx { namespace parcelset {
         {
             return "mpi";
         }
-        
+
         static const char * pool_name()
         {
             return "parcel_pool_mpi";
         }
-        
+
         static const char * pool_name_postfix()
         {
             return "-mpi";
@@ -50,8 +50,8 @@ namespace hpx { namespace parcelset {
           : public parcelport_impl<connection_handler>
         {
             typedef parcelport_impl<connection_handler> base_type;
-        public:
 
+        public:
             static std::vector<std::string> runtime_configuration();
 
             connection_handler(util::runtime_configuration const& ini,
@@ -59,7 +59,7 @@ namespace hpx { namespace parcelset {
                 HPX_STD_FUNCTION<void()> const& on_stop_thread);
 
             ~connection_handler();
-            
+
             /// Start the handling of connections.
             bool run();
 
@@ -67,16 +67,16 @@ namespace hpx { namespace parcelset {
             void stop();
 
             void do_background_work();
-            
+
             /// Retrieve the type of the locality represented by this parcelport
             connection_type get_type() const
             {
                 return connection_mpi;
             }
-            
+
             /// Return the name of this locality
             std::string get_locality_name() const;
-        
+
             boost::shared_ptr<sender> create_connection(
                 naming::locality const& l, error_code& ec);
 
@@ -95,7 +95,7 @@ namespace hpx { namespace parcelset {
             hpx::lcos::local::spinlock senders_mtx_;
             typedef std::list<boost::shared_ptr<sender> > senders_type;
             senders_type senders_;
-        
+
             boost::atomic<bool> stopped_;
             boost::atomic<bool> handling_messages_;
 

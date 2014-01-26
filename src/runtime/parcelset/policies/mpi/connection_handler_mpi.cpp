@@ -32,7 +32,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         std::vector<std::string> lines;
 
         using namespace boost::assign;
-        lines += 
+        lines +=
 #if defined(HPX_PARCELPORT_MPI_ENV)
             "env = ${HPX_PARCELPORT_MPI_ENV:" HPX_PARCELPORT_MPI_ENV "}",
 #else
@@ -63,7 +63,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         // we never do zero copy optimization for this parcelport
         allow_zero_copy_optimizations_ = false;
     }
-    
+
     connection_handler::~connection_handler()
     {
     }
@@ -97,19 +97,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         boost::asio::io_service& io_service = io_service_pool_.get_io_service();
         io_service.post(HPX_STD_BIND(&connection_handler::handle_messages, this));
     }
-            
+
     std::string connection_handler::get_locality_name() const
     {
         return util::mpi_environment::get_processor_name();
     }
-    
+
     boost::shared_ptr<sender> connection_handler::create_connection(
         naming::locality const& l, error_code& ec)
     {
         boost::shared_ptr<sender> sender_connection(new sender(
             communicator_, get_next_tag(), tag_mtx_, free_tags_, l,
             *this, this->parcels_sent_));
-        
+
         return sender_connection;
     }
 
@@ -118,12 +118,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         hpx::lcos::local::spinlock::scoped_lock l(senders_mtx_);
         senders_.push_back(sender_connection);
     }
-    
+
     void add_sender(connection_handler & handler, boost::shared_ptr<sender> sender_connection)
     {
         handler.add_sender(sender_connection);
     }
-            
+
     int connection_handler::get_next_tag()
     {
         int tag = 0;
@@ -145,7 +145,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         tag = static_cast<int>(next_tag_++);
         return tag;
     }
-    
+
     namespace detail
     {
         struct handling_messages
@@ -192,7 +192,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
                 has_work = !senders_.empty();
             }
-            
+
             // handle all receive requests
             for(receivers_type::iterator it = receivers_.begin(); it != receivers_.end(); /**/)
             {
