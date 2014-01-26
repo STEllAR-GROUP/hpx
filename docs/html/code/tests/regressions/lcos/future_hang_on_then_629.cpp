@@ -138,7 +138,7 @@ double null_tree(
 
     null_function(seed, delay_iterations);
 
-    hpx::wait(futures);
+    hpx::wait_all(futures);
 
     double d = 0.;
 

@@ -108,7 +108,7 @@ void hello_world_foreman()
         // return value of the future. hpx::lcos::wait doesn't return until
         // all the futures in the vector have returned.
         hpx::lcos::local::spinlock mtx;
-        hpx::wait(futures,
+        hpx::lcos::wait(futures,
             [&](std::size_t, std::size_t t) {
                 if (std::size_t(-1) != t)
                 {
@@ -150,9 +150,9 @@ int main()
     }
 
     // The non-callback version of hpx::lcos::wait takes a single parameter,
-    // a future of vectors to wait on. hpx::lcos::wait only returns when
+    // a future of vectors to wait on. hpx::wait_all only returns when
     // all of the futures have finished.
-    hpx::lcos::wait(futures);
+    hpx::wait_all(futures);
     return 0;
 }
 //]

@@ -6,15 +6,11 @@
 #if !defined(HPX_TRAITS_IS_FUTURE_RANGE_HPP)
 #define HPX_TRAITS_IS_FUTURE_RANGE_HPP
 
-#include <hpx/traits.hpp>
+#include <hpx/traits/is_future.hpp>
+
 #include <boost/mpl/bool.hpp>
 
 #include <vector>
-
-namespace hpx { namespace lcos
-{
-    template <typename Result> class future;
-}}
 
 namespace hpx { namespace traits
 {

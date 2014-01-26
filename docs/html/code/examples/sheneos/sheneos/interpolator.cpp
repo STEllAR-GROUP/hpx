@@ -260,7 +260,7 @@ namespace sheneos
         }
 
         // Wait for initialization to finish.
-        hpx::lcos::wait(lazy_sync);
+        hpx::wait_all(lazy_sync);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -397,7 +397,7 @@ namespace sheneos
             }
 
             // wait for all asynchronous operations to complete
-            lcos::wait(lazy_results);
+            wait_all(lazy_results);
 
             return overall_result;
         }
@@ -515,7 +515,7 @@ namespace sheneos
             }
 
             // wait for all asynchronous operations to complete
-            lcos::wait(lazy_results);
+            wait_all(lazy_results);
 
             return overall_results;
         }

@@ -26,6 +26,7 @@ set(tests
     packaged_action
     promise
     shared_future
+    unwrapped
    )
 
 # include some of the tests for non-gcc 4.4 only

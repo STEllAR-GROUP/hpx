@@ -6,7 +6,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/include/async.hpp>
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/util/unwrapped.hpp>
 
 #include "allgather.hpp"
 
@@ -40,8 +40,7 @@ namespace ag { namespace server
         lazy_results.push_back( hpx::async(get_item_, point_components[i]) );
       }
 
-      n_.clear();
-      hpx::lcos::wait(lazy_results,n_);
+      n_ = hpx::util::unwrapped(lazy_results);
     }
 
     double allgather::get_item() const

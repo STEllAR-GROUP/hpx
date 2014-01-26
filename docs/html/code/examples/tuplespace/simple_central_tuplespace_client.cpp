@@ -146,7 +146,7 @@ int hpx_main()
             futures.push_back(hpx::async<action_type>
                     (node, tuplespace_symbol_name, tuple2));
         }
-        hpx::lcos::wait(futures);
+        hpx::wait_all(futures);
     }
 
     // Initiate shutdown of the runtime systems on all localities.
