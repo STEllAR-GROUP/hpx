@@ -477,7 +477,8 @@ namespace hpx { namespace parcelset { namespace ibverbs
 
                 // wait for a really short amount of time
                 if (hpx::threads::get_self_ptr()) {
-                    this_thread::suspend();
+                    this_thread::suspend(hpx::threads::pending,
+                        "connection_handler(ibverbs)::create_connection");
                 }
                 else {
                     boost::this_thread::sleep(boost::get_system_time() +

@@ -454,7 +454,8 @@ namespace hpx { namespace parcelset { namespace shmem
                     break;
 
                 // wait for a really short amount of time
-                this_thread::suspend();
+                this_thread::suspend(hpx::threads::pending,
+                    "connection_handler(shmem)::create_connection");
             }
             catch (boost::system::system_error const& e) {
                 client_connection->window().close();

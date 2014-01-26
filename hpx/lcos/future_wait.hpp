@@ -193,7 +193,8 @@ namespace hpx { namespace lcos
                 if (ready_count_ < size)
                 {
                     // wait for all of the futures to return to become ready
-                    this_thread::suspend(threads::suspended);
+                    this_thread::suspend(threads::suspended,
+                        "hpx::lcos::detail::when_each::operator()");
                 }
 
                 // all futures should be ready
@@ -250,7 +251,7 @@ namespace hpx { namespace lcos
 
         if (lazy_values.empty())
             return 0;
-        
+
         return_type lazy_values_;
         lazy_values_.reserve(lazy_values.size());
         std::transform(lazy_values.begin(), lazy_values.end(),
@@ -260,7 +261,7 @@ namespace hpx { namespace lcos
         boost::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::when_each<Future, F>(std::move(lazy_values_), 
+                detail::when_each<Future, F>(std::move(lazy_values_),
                     std::forward<F>(f), &success_counter));
 
         p.apply();
@@ -286,7 +287,7 @@ namespace hpx { namespace lcos
 
         if (lazy_values.empty())
             return 0;
-        
+
         return_type lazy_values_;
         lazy_values_.reserve(lazy_values.size());
         std::transform(lazy_values.begin(), lazy_values.end(),
@@ -296,7 +297,7 @@ namespace hpx { namespace lcos
         boost::atomic<std::size_t> success_counter(0);
         lcos::local::futures_factory<return_type()> p =
             lcos::local::futures_factory<return_type()>(
-                detail::when_each<Future, F>(std::move(lazy_values_), 
+                detail::when_each<Future, F>(std::move(lazy_values_),
                     std::forward<F>(f), &success_counter));
 
         p.apply();
@@ -324,12 +325,12 @@ namespace hpx { namespace lcos
       , HPX_STD_TUPLE<
             typename detail::future_traits<F1>::type
           , typename detail::future_traits<F2>::type>
-    >::type 
+    >::type
     wait(F1 && f1, F2 && f2)
     {
         return HPX_STD_MAKE_TUPLE(f1.get(), f2.get());
     }
-    
+
     template <typename F1, typename F2>
     inline typename boost::enable_if_c<
         boost::is_void<typename detail::future_traits<F1>::type>::value &&
@@ -369,7 +370,7 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     inline void
-    wait(std::vector<Future>& v, 
+    wait(std::vector<Future>& v,
         std::vector<typename detail::future_traits<Future>::type>& r)
     {
         r.reserve(v.size());
@@ -380,7 +381,7 @@ namespace hpx { namespace lcos
 
     template <typename Future>
     inline void
-    wait(std::vector<Future> && v, 
+    wait(std::vector<Future> && v,
         std::vector<typename detail::future_traits<Future>::type>& r)
     {
         return wait(v);
@@ -388,7 +389,7 @@ namespace hpx { namespace lcos
 
     template <typename Future>
     inline void
-    wait(std::vector<Future> const& v, 
+    wait(std::vector<Future> const& v,
         std::vector<typename detail::future_traits<Future>::type>& r)
     {
         r.reserve(v.size());
@@ -404,7 +405,7 @@ namespace hpx { namespace lcos
         BOOST_FOREACH(Future& f, v)
             f.get();
     }
-    
+
     template <typename Future>
     inline void
     wait(std::vector<Future> && v)
@@ -458,7 +459,7 @@ namespace hpx { namespace lcos
     {
         return HPX_STD_MAKE_TUPLE(BOOST_PP_REPEAT(N, HPX_FUTURE_TUPLE_ARGUMENT, _));
     }
-    
+
     template <BOOST_PP_ENUM_PARAMS(N, typename F)>
     inline typename boost::enable_if_c<
         (true BOOST_PP_REPEAT(N, HPX_FUTURE_RESULT_TYPE_IS_VOID, _))

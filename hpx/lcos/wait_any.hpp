@@ -104,7 +104,8 @@ namespace hpx
                 if (index_.load() == static_cast<std::size_t>(index_error))
                 {
                     // wait for any of the futures to return to become ready
-                    this_thread::suspend(threads::suspended);
+                    this_thread::suspend(threads::suspended,
+                        "hpx::detail::when_any_swapped::operator()");
                 }
 
                 // that should not happen
