@@ -135,10 +135,10 @@ namespace hpx
 #else
         strm << "  HPX_HAVE_PARCEL_COALESCING=OFF\n";
 #endif
-#if defined(HPX_HAVE_PARCELPORT_SHMEM)
-        strm << "  HPX_HAVE_PARCELPORT_SHMEM=ON\n";
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+        strm << "  HPX_HAVE_PARCELPORT_IPC=ON\n";
 #else
-        strm << "  HPX_HAVE_PARCELPORT_SHMEM=OFF\n";
+        strm << "  HPX_HAVE_PARCELPORT_IPC=OFF\n";
 #endif
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
         strm << "  HPX_HAVE_PARCELPORT_IBVERBS=ON\n";
@@ -214,9 +214,9 @@ namespace hpx
         strm << "  HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD="
              << HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD << "\n";
 #endif
-#if defined(HPX_HAVE_PARCELPORT_SHMEM) && defined(HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE)
-        strm << "  HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE="
-             << HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE << "\n";
+#if defined(HPX_HAVE_PARCELPORT_IPC) && defined(HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE)
+        strm << "  HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE="
+             << HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE << "\n";
 #endif
 
         strm << "  HPX_PREFIX=" << HPX_PREFIX << "\n";

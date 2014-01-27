@@ -17,8 +17,8 @@
 #include <hpx/runtime/parcelset/policies/tcp/receiver.hpp>
 #include <hpx/runtime/parcelset/policies/tcp/sender.hpp>
 #endif
-#if defined(HPX_HAVE_PARCELPORT_SHMEM)
-#include <hpx/runtime/parcelset/policies/shmem/connection_handler.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+#include <hpx/runtime/parcelset/policies/ipc/connection_handler.hpp>
 #endif
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 #include <hpx/runtime/parcelset/policies/ibverbs/connection_handler.hpp>
@@ -64,10 +64,10 @@ namespace hpx { namespace parcelset
                 policies::tcp::connection_handler::runtime_configuration()
               , true);
 #endif
-        case connection_shmem:
-#if defined(HPX_HAVE_PARCELPORT_SHMEM)
+        case connection_ipc:
+#if defined(HPX_HAVE_PARCELPORT_IPC)
             return return_type(
-                policies::shmem::connection_handler::runtime_configuration()
+                policies::ipc::connection_handler::runtime_configuration()
               , true);
 #endif
             break;
@@ -120,22 +120,22 @@ namespace hpx { namespace parcelset
                     "unsupported connection type 'connection_tcp'");
             }
 
-        case connection_shmem:
+        case connection_ipc:
             {
-#if defined(HPX_HAVE_PARCELPORT_SHMEM)
-                // Create shmem based parcelport only if allowed by the
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+                // Create ipc based parcelport only if allowed by the
                 // configuration info.
-                std::string enable_shmem =
-                    cfg.get_entry("hpx.parcel.shmem.enable", "0");
+                std::string enable_ipc =
+                    cfg.get_entry("hpx.parcel.ipc.enable", "0");
 
-                if (boost::lexical_cast<int>(enable_shmem))
+                if (boost::lexical_cast<int>(enable_ipc))
                 {
-                    return boost::make_shared<policies::shmem::connection_handler>(
+                    return boost::make_shared<policies::ipc::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
                 }
 #endif
                 HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
-                    "unsupported connection type 'connection_shmem'");
+                    "unsupported connection type 'connection_ipc'");
             }
             break;
 

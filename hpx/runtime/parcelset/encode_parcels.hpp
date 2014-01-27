@@ -136,11 +136,6 @@ namespace hpx { namespace parcelset
     encode_parcels(std::vector<parcel> const & pv, Connection & connection, int archive_flags_)
     {
         typedef parcel_buffer<typename Connection::buffer_type> parcel_buffer_type;
-        boost::shared_ptr<parcel_buffer_type> buffer(
-            new parcel_buffer_type(
-                connection.get_buffer()
-            )
-        );
 
 #if defined(HPX_DEBUG)
         // make sure that all parcels go to the same locality
@@ -153,6 +148,8 @@ namespace hpx { namespace parcelset
         // collect argument sizes from parcels
         std::size_t arg_size = 0;
         boost::uint32_t dest_locality_id = pv[0].get_destination_locality_id();
+                
+        boost::shared_ptr<parcel_buffer_type> buffer;
 
         // guard against serialization errors
         try {
@@ -162,8 +159,9 @@ namespace hpx { namespace parcelset
                 {
                     arg_size += traits::get_type_size(p);
                 }
-
-                buffer->data_.reserve(arg_size*2);
+                
+                buffer = connection.get_buffer(pv[0], arg_size);
+                buffer->clear();
 
                 // mark start of serialization
                 util::high_resolution_timer timer;

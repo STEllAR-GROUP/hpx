@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_SHMEM_INTERPROCESS_ERRORS_NOV_25_2012_0703PM)
-#define HPX_PARCELSET_SHMEM_INTERPROCESS_ERRORS_NOV_25_2012_0703PM
+#if !defined(HPX_PARCELSET_IPC_INTERPROCESS_ERRORS_NOV_25_2012_0703PM)
+#define HPX_PARCELSET_IPC_INTERPROCESS_ERRORS_NOV_25_2012_0703PM
 
 #include <hpx/config.hpp>
 #include <boost/interprocess/errors.hpp>
@@ -18,7 +18,7 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset { namespace shmem
+namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail
@@ -101,7 +101,7 @@ namespace hpx { namespace parcelset { namespace shmem
         return boost::system::error_code(
             static_cast<int>(e), get_interprocess_category());
     }
-}}}
+}}}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace system
@@ -114,11 +114,11 @@ namespace boost { namespace system
 }}
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_SHMEM_THROWS_IF(ec, code)                                         \
+#define HPX_IPC_THROWS_IF(ec, code)                                           \
         if (&ec != &boost::system::throws) ec = code;                         \
         else boost::asio::detail::throw_error(code);                          \
     /**/
-#define HPX_SHMEM_RESET_EC(ec)                                                \
+#define HPX_IPC_RESET_EC(ec)                                                  \
         if (&ec != &boost::system::throws) ec = boost::system::error_code();  \
     /**/
 

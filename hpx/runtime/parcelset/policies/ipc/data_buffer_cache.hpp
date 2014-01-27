@@ -11,11 +11,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_SHMEM_DATA_BUFFER_CACHE_DEC_07_2012_0807AM)
-#define HPX_SHMEM_DATA_BUFFER_CACHE_DEC_07_2012_0807AM
+#if !defined(HPX_IPC_DATA_BUFFER_CACHE_DEC_07_2012_0807AM)
+#define HPX_IPC_DATA_BUFFER_CACHE_DEC_07_2012_0807AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/parcelset/shmem/data_buffer.hpp>
+#include <hpx/runtime/parcelset/policies/ipc/data_buffer.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <boost/tuple/tuple.hpp>
@@ -27,7 +27,7 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset { namespace shmem
+namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
     ///////////////////////////////////////////////////////////////////////////
     // This class implements an LRU cache to hold connections.
@@ -140,6 +140,6 @@ namespace hpx { namespace parcelset { namespace shmem
         key_tracker_type key_tracker_;
         cache_type cache_;
     };
-}}}
+}}}}
 
 #endif

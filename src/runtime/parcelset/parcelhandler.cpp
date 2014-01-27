@@ -49,8 +49,8 @@ namespace hpx { namespace parcelset
         case connection_tcp:
             return "tcp";
 
-        case connection_shmem:
-          return "shmem";
+        case connection_ipc:
+          return "ipc";
 
         case connection_ibverbs:
           return "ibverbs";
@@ -72,8 +72,8 @@ namespace hpx { namespace parcelset
         if (!std::strcmp(t.c_str(), "tcp"))
             return connection_tcp;
 
-        if (!std::strcmp(t.c_str(), "shmem"))
-            return connection_shmem;
+        if (!std::strcmp(t.c_str(), "ipc"))
+            return connection_ipc;
 
         if (!std::strcmp(t.c_str(), "ibverbs"))
             return connection_ibverbs;
@@ -251,13 +251,13 @@ namespace hpx { namespace parcelset
         HPX_ASSERT(0 != pool);
 
 
-#if defined(HPX_HAVE_PARCELPORT_SHMEM)
-        std::string enable_shmem =
-            get_config_entry("hpx.parcel.shmem.enable", "0");
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+        std::string enable_ipc =
+            get_config_entry("hpx.parcel.ipc.enable", "0");
 
-        if (boost::lexical_cast<int>(enable_shmem)) {
+        if (boost::lexical_cast<int>(enable_ipc)) {
             attach_parcelport(parcelport::create(
-                connection_shmem, hpx::get_config(),
+                connection_ipc, hpx::get_config(),
                 pool->get_on_start_thread(), pool->get_on_stop_thread()));
         }
 #endif
@@ -408,19 +408,19 @@ namespace hpx { namespace parcelset
     connection_type parcelhandler::find_appropriate_connection_type(
         naming::locality const& dest)
     {
-#if defined(HPX_HAVE_PARCELPORT_SHMEM)
+#if defined(HPX_HAVE_PARCELPORT_IPC)
         if (dest.get_type() == connection_tcp) {
-            std::string enable_shmem =
-                get_config_entry("hpx.parcel.use_shmem_parcelport", "0");
+            std::string enable_ipc =
+                get_config_entry("hpx.parcel.ipc.enable", "0");
 
             // if destination is on the same network node, use shared memory
             // otherwise fall back to tcp
             if (use_alternative_parcelports_ &&
                 dest.get_address() == here().get_address() &&
-                boost::lexical_cast<int>(enable_shmem))
+                boost::lexical_cast<int>(enable_ipc))
             {
-                if (pports_[connection_shmem])
-                    return connection_shmem;
+                if (pports_[connection_ipc])
+                    return connection_ipc;
             }
         }
 #endif
@@ -861,8 +861,8 @@ namespace hpx { namespace parcelset
     {
         // register connection specific counters
         register_counter_types(connection_tcp);
-#if defined(HPX_HAVE_PARCELPORT_SHMEM)
-        register_counter_types(connection_shmem);
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+        register_counter_types(connection_ipc);
 #endif
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
         register_counter_types(connection_ibverbs);

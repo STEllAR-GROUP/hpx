@@ -13,6 +13,7 @@
 #include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/sender.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/receiver.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
@@ -68,7 +69,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     {
         MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
         acceptor_.run(communicator_);
-        do_background_work();      // schedule message handler
+        background_work();      // schedule message handler
         return true;
     }
 
@@ -79,7 +80,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     }
 
     // Make sure all pending requests are handled
-    void connection_handler::do_background_work()
+    void connection_handler::background_work()
     {
         if (stopped_)
             return;
@@ -118,6 +119,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     void add_sender(connection_handler & handler, boost::shared_ptr<sender> sender_connection)
     {
         handler.add_sender(sender_connection);
+    }
+
+    void connection_handler::close_sender_connection(int tag, int rank)
+    {
+        {
+            hpx::lcos::local::spinlock::scoped_lock l(close_mtx_);
+            pending_close_requests_.push_back(std::make_pair(tag, rank));
+        }
+    }
+    
+    void close_sender_connection(connection_handler & handler, int tag, int rank)
+    {
+        handler.close_sender_connection(tag, rank);
     }
 
     int connection_handler::get_next_tag()
@@ -165,6 +179,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool bootstrapping = hpx::is_starting();
         bool has_work = true;
+        std::size_t k = 0;
 
         hpx::util::high_resolution_timer t;
 
@@ -188,25 +203,81 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
                 has_work = !senders_.empty();
             }
-
-            // handle all receive requests
-            for(receivers_type::iterator it = receivers_.begin(); it != receivers_.end(); /**/)
+            
+            // Send the pending close requests
             {
-                if((*it)->done(*this))
+                hpx::lcos::local::spinlock::scoped_lock l(close_mtx_);
+                typedef std::pair<int, int> pair_type;
+                BOOST_FOREACH(pair_type p, pending_close_requests_)
                 {
-                    it = receivers_.erase(it);
+                    header close_request = header::close(p.first, p.second);
+                    MPI_Send(
+                        close_request.data(),         // Data pointer
+                        close_request.data_size_,     // Size
+                        close_request.type(),         // MPI Datatype
+                        close_request.rank(),         // Destination
+                        0,                            // Tag
+                        communicator_                 // Communicator
+                    );
+                    hpx::lcos::local::spinlock::scoped_lock l(tag_mtx_);
+                    free_tags_.push_back(p.first);
                 }
-                else
-                {
-                    ++it;
-                }
+                pending_close_requests_.clear();
             }
 
             // add new receive requests
             std::pair<bool, header> next(acceptor_.next_header());
             if(next.first)
             {
-                receivers_.push_back(boost::make_shared<receiver>(next.second, communicator_, *this));
+                boost::shared_ptr<receiver> rcv;
+                receivers_rank_map_type::iterator jt = receivers_map_.find(next.second.rank());
+                if(jt != receivers_map_.end())
+                {
+                    receivers_tag_map_type::iterator kt = jt->second.find(next.second.tag());
+                    if(kt != jt->second.end())
+                    {
+                        if(next.second.close_request())
+                        {
+                            jt->second.erase(kt);
+                            if(jt->second.empty())
+                            {
+                                receivers_map_.erase(jt);
+                            }
+                        }
+                        else
+                        {
+                            rcv = kt->second;
+                        }
+                    }
+                }
+                if(!next.second.close_request())
+                {
+                    next.second.assert_valid();
+                    if(!rcv)
+                    {
+                        rcv = boost::make_shared<receiver>(communicator_);
+                    }
+                    rcv->async_read(next.second, *this);
+                    receivers_.push_back(rcv);
+                }
+            }
+
+            // handle all receive requests
+            for(receivers_type::iterator it = receivers_.begin(); it != receivers_.end(); /**/)
+            {
+                if((*it)->done(*this))
+                {
+                    HPX_ASSERT(
+                        !receivers_map_[(*it)->rank()][(*it)->tag()]
+                     || receivers_map_[(*it)->rank()][(*it)->tag()].get() == it->get()
+                    );
+                    receivers_map_[(*it)->rank()][(*it)->tag()] = *it;
+                    it = receivers_.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
             }
 
             if(!has_work) has_work = !receivers_.empty();
@@ -217,23 +288,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(has_work)
             {
                 t.restart();
+                k = 0;
             }
             else
             {
-#if defined( WIN32 ) || defined( _WIN32 ) || defined( __WIN32__ ) || defined( __CYGWIN__ )
-                Sleep( 1 );
-#elif defined( BOOST_HAS_PTHREADS )
-                // g++ -Wextra warns on {} or {0}
-                struct timespec rqtp = { 0, 0 };
-
-                // POSIX says that timespec has tv_sec and tv_nsec
-                // But it doesn't guarantee order or placement
-
-                rqtp.tv_sec = 0;
-                rqtp.tv_nsec = 1000;
-
-                nanosleep( &rqtp, 0 );
-#endif
+                hpx::lcos::local::spinlock::yield(k);
+                ++k;
             }
         }
 

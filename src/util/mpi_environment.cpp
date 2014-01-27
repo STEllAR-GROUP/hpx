@@ -219,7 +219,7 @@ namespace hpx { namespace util
         // prcelport other then MPI is enabled.
         if (detail::detect_mpi_environment(cfg.rtcfg_, "PMI_RANK,OMPI_COMM_WORLD_SIZE") &&
             detail::get_cfg_entry(cfg, "hpx.parcel.tcp.enable", 0) == 0 &&
-            detail::get_cfg_entry(cfg, "hpx.parcel.shmem.enable", 0) == 0 &&
+            detail::get_cfg_entry(cfg, "hpx.parcel.ipc.enable", 0) == 0 &&
             detail::get_cfg_entry(cfg, "hpx.parcel.ibverbs.enable", 0) == 0)
         {
             throw std::runtime_error("mpi_environment::init: "

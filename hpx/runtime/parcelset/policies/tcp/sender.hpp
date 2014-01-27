@@ -36,11 +36,9 @@
 namespace hpx { namespace parcelset { namespace policies { namespace tcp
 {
     class sender
-      : public parcelset::parcelport_connection<sender>
+      : public parcelset::parcelport_connection<sender, std::vector<char> >
     {
     public:
-
-        typedef std::vector<char> buffer_type;
 
         /// Construct a sending parcelport_connection with the given io_service.
         sender(boost::asio::io_service& io_service,
@@ -70,11 +68,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             return there_;
         }
 
-        buffer_type get_buffer() const
-        {
-            return std::vector<char>();
-        }
-
         void verify(naming::locality const & parcel_locality_id) const
         {
             HPX_ASSERT(parcel_locality_id.get_address() ==
@@ -83,39 +76,40 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                 socket_.remote_endpoint().port());
         }
 
-        template <typename Buffer, typename Handler, typename ParcelPostprocess>
-        void async_write(boost::shared_ptr<Buffer> buffer, Handler handler,
-            ParcelPostprocess parcel_postprocess)
+        template <typename Handler, typename ParcelPostprocess>
+        void async_write(Handler handler, ParcelPostprocess parcel_postprocess)
         {
+            HPX_ASSERT(buffer_);
+
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             state_ = state_async_write;
 #endif
             /// Increment sends and begin timer.
-            buffer->data_point_.time_ = timer_.elapsed_nanoseconds();
+            buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
 
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
             std::vector<boost::asio::const_buffer> buffers;
-            buffers.push_back(boost::asio::buffer(&buffer->size_,
-                sizeof(buffer->size_)));
-            buffers.push_back(boost::asio::buffer(&buffer->data_size_,
-                sizeof(buffer->data_size_)));
+            buffers.push_back(boost::asio::buffer(&buffer_->size_,
+                sizeof(buffer_->size_)));
+            buffers.push_back(boost::asio::buffer(&buffer_->data_size_,
+                sizeof(buffer_->data_size_)));
 
             // add chunk description
-            buffers.push_back(boost::asio::buffer(&buffer->num_chunks_,
-                sizeof(buffer->num_chunks_)));
+            buffers.push_back(boost::asio::buffer(&buffer_->num_chunks_,
+                sizeof(buffer_->num_chunks_)));
 
-            if (!buffer->transmission_chunks_.empty()) {
+            if (!buffer_->transmission_chunks_.empty()) {
                 buffers.push_back(boost::asio::buffer(
-                    buffer->transmission_chunks_.data(),
-                    buffer->transmission_chunks_.size() *
-                        sizeof(typename Buffer::transmission_chunk_type)));
+                    buffer_->transmission_chunks_.data(),
+                    buffer_->transmission_chunks_.size() *
+                        sizeof(parcel_buffer_type::transmission_chunk_type)));
 
                 // add main buffer holding data which was serialized normally
-                buffers.push_back(boost::asio::buffer(buffer->data_));
+                buffers.push_back(boost::asio::buffer(buffer_->data_));
 
                 // now add chunks themselves, those hold zero-copy serialized chunks
-                BOOST_FOREACH(util::serialization_chunk& c, buffer->chunks_)
+                BOOST_FOREACH(util::serialization_chunk& c, buffer_->chunks_)
                 {
                     if (c.type_ == util::chunk_type_pointer)
                         buffers.push_back(boost::asio::buffer(c.data_.cpos_, c.size_));
@@ -123,29 +117,26 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             }
             else {
                 // add main buffer holding data which was serialized normally
-                buffers.push_back(boost::asio::buffer(buffer->data_));
+                buffers.push_back(boost::asio::buffer(buffer_->data_));
             }
 
             // this additional wrapping of the handler into a bind object is
             // needed to keep  this parcelport_connection object alive for the whole
             // write operation
             void (sender::*f)(boost::system::error_code const&, std::size_t,
-                    boost::shared_ptr<Buffer>,
                     boost::tuple<Handler, ParcelPostprocess>)
-                = &sender::handle_write<Buffer, Handler, ParcelPostprocess>;
+                = &sender::handle_write<Handler, ParcelPostprocess>;
 
             boost::asio::async_write(socket_, buffers,
                 boost::bind(f, shared_from_this(),
                     boost::asio::placeholders::error, ::_2,
-                    buffer,
                     boost::make_tuple(handler, parcel_postprocess)));
         }
 
     private:
         /// handle completed write operation
-        template <typename Buffer, typename Handler, typename ParcelPostprocess>
+        template <typename Handler, typename ParcelPostprocess>
         void handle_write(boost::system::error_code const& e, std::size_t bytes,
-            boost::shared_ptr<Buffer> buffer,
             boost::tuple<Handler, ParcelPostprocess> handler)
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
@@ -161,9 +152,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             }
 
             // complete data point and push back onto gatherer
-            buffer->data_point_.time_ =
-                timer_.elapsed_nanoseconds() - buffer->data_point_.time_;
-            parcels_sent_.add_data(buffer->data_point_);
+            buffer_->data_point_.time_ =
+                timer_.elapsed_nanoseconds() - buffer_->data_point_.time_;
+            parcels_sent_.add_data(buffer_->data_point_);
 
             // now handle the acknowledgment byte which is sent by the receiver
 #if defined(__linux) || defined(linux) || defined(__linux__)

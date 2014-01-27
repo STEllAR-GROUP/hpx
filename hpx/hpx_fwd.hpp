@@ -105,7 +105,7 @@ namespace hpx
         {
             connection_unknown = -1,
             connection_tcp = 0,
-            connection_shmem = 1,
+            connection_ipc = 1,
             connection_portals4 = 2,
             connection_ibverbs = 3,
             connection_mpi = 4,
