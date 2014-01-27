@@ -19,14 +19,6 @@
 #include <sstream>
 #include <vector>
 
-namespace hpx { namespace parcelset
-{
-    template <typename ConnectionHandler>
-    class parcelport_impl;
-    
-    boost::uint64_t get_max_inbound_size(parcelport&);
-}}
-
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
     class connection_handler;

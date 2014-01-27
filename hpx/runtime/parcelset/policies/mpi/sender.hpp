@@ -63,10 +63,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         ~sender()
         {
             close_sender_connection(parcelport_, tag_, there_.get_rank());
-            /*
-            hpx::lcos::local::spinlock::scoped_lock l(tag_mtx_);
-            free_tags_.push_back(tag_);
-            */
         }
 
         naming::locality const& destination() const

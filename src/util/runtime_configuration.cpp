@@ -127,12 +127,6 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
 
 /*
-            // shmem related settings
-            "[hpx.parcel.shmem]",
-            "enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}",
-            "data_buffer_cache_size = ${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
-            "array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
 
             // ibverbs related settings
             "[hpx.parcel.ibverbs]",
@@ -451,38 +445,21 @@ namespace hpx { namespace util
         return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
     }
 
-    std::size_t runtime_configuration::get_shmem_data_buffer_cache_size() const
+    std::size_t runtime_configuration::get_ipc_data_buffer_cache_size() const
     {
         if (has_section("hpx.parcel"))
         {
-            util::section const * sec = get_section("hpx.parcel.shmem");
+            util::section const * sec = get_section("hpx.parcel.ipc");
             if(NULL != sec)
             {
-                std::string cfg_shmem_data_buffer_cache_size(
+                std::string cfg_ipc_data_buffer_cache_size(
                     sec->get_entry("data_buffer_cache_size",
-                        HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE));
+                        HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE));
 
-                return boost::lexical_cast<std::size_t>(cfg_shmem_data_buffer_cache_size);
+                return boost::lexical_cast<std::size_t>(cfg_ipc_data_buffer_cache_size);
             }
         }
-        return HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE;
-    }
-
-    std::size_t runtime_configuration::get_max_mpi_requests() const
-    {
-        if (has_section("hpx.parcel"))
-        {
-            util::section const * sec = get_section("hpx.parcel.mpi");
-            if(NULL != sec)
-            {
-                std::string cfg_max_mpi_requests(
-                    sec->get_entry("max_requests",
-                        HPX_PARCEL_MPI_MAX_REQUESTS));
-
-                return boost::lexical_cast<std::size_t>(cfg_max_mpi_requests);
-            }
-        }
-        return HPX_PARCEL_MPI_MAX_REQUESTS;
+        return HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE;
     }
 
     agas::service_mode runtime_configuration::get_agas_service_mode() const

@@ -60,11 +60,8 @@ namespace hpx { namespace util
         // Get the HPX network address to use
         naming::locality get_parcelport_address() const;
 
-        // Get the size of the shmem parcelport data buffer cache
-        std::size_t get_shmem_data_buffer_cache_size() const;
-
-        // Get the number of maximum requests in flight for the MPI parcelport
-        std::size_t get_max_mpi_requests() const;
+        // Get the size of the ipc parcelport data buffer cache
+        std::size_t get_ipc_data_buffer_cache_size() const;
 
         // Get AGAS client-side local cache size
         std::size_t get_agas_local_cache_size(

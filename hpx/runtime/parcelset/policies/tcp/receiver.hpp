@@ -35,14 +35,6 @@
 #include <sstream>
 #include <vector>
 
-namespace hpx { namespace parcelset
-{
-    template <typename ConnectionHandler>
-    class parcelport_impl;
-
-    boost::uint64_t get_max_inbound_size(parcelport&);
-}}
-
 namespace hpx { namespace parcelset { namespace policies { namespace tcp
 {
     class connection_handler;
@@ -51,8 +43,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
       : public parcelport_connection<receiver, std::vector<char>, std::vector<char> >
     {
     public:
-        receiver(boost::asio::io_service& io_service,
-            parcelport_impl<connection_handler>& parcelport)
+        receiver(boost::asio::io_service& io_service, connection_handler& parcelport)
           : socket_(io_service)
           , max_inbound_size_(hpx::parcelset::get_max_inbound_size(parcelport))
           , ack_(0)
@@ -291,7 +282,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         bool ack_;
 
         /// The handler used to process the incoming request.
-        parcelport_impl<connection_handler>& parcelport_;
+        connection_handler& parcelport_;
 
         /// Counters and timers for parcels received.
         util::high_resolution_timer timer_;

@@ -330,9 +330,9 @@ endif()
 # Boost V1.52)
 ################################################################################
 if(${BOOST_MINOR_VERSION} GREATER 51)
-  hpx_option(HPX_HAVE_PARCELPORT_SHMEM BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
-  if(HPX_HAVE_PARCELPORT_SHMEM)
-    hpx_add_config_define(HPX_HAVE_PARCELPORT_SHMEM)
+  hpx_option(HPX_HAVE_PARCELPORT_IPC BOOL "Enable parcelport based on shared memory (default: OFF)." OFF ADVANCED)
+  if(HPX_HAVE_PARCELPORT_IPC)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_IPC)
   endif()
 endif()
 
