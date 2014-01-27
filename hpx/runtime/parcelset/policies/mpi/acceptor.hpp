@@ -44,7 +44,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi {
                 HPX_ASSERT(header_.rank() == -1);
                 header h = header_;
                 h.rank() = status.MPI_SOURCE;
-                h.assert_valid();
                 irecv_header();
                 return std::make_pair(true, h);
             }

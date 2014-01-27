@@ -42,6 +42,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
           , recvd_chunks_(0)
         {}
 
+        int tag() const
+        {
+            header_.assert_valid();
+            return header_.tag();
+        }
+
+        int rank() const
+        {
+            header_.assert_valid();
+            return header_.rank();
+        }
+
         void async_read(header const & h, connection_handler & parcelport)
         {
             header_ = h;

@@ -356,7 +356,7 @@ namespace hpx { namespace parcelset
         >::type
         do_background_work_impl()
         {
-            connection_handler().do_background_work();
+            connection_handler().background_work();
         }
 
         template <typename ConnectionHandler_>

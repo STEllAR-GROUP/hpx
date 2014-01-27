@@ -66,7 +66,7 @@ namespace hpx { namespace parcelset {
             /// Stop the handling of connections.
             void stop();
 
-            void do_background_work();
+            void background_work();
 
             /// Retrieve the type of the locality represented by this parcelport
             connection_type get_type() const
@@ -81,6 +81,7 @@ namespace hpx { namespace parcelset {
                 naming::locality const& l, error_code& ec);
 
             void add_sender(boost::shared_ptr<sender> sender_connection);
+            void close_sender_connection(int tag, int rank);
         private:
             int get_next_tag();
             void handle_messages();
@@ -88,6 +89,13 @@ namespace hpx { namespace parcelset {
             MPI_Comm communicator_;
             // handle messages
             acceptor acceptor_;
+            
+            hpx::lcos::local::spinlock close_mtx_;
+            std::vector<std::pair<int, int> > pending_close_requests_;
+
+            typedef std::map<int, boost::shared_ptr<receiver> > receivers_tag_map_type;
+            typedef std::map<int, receivers_tag_map_type> receivers_rank_map_type;
+            receivers_rank_map_type receivers_map_;
 
             typedef std::list<boost::shared_ptr<receiver> > receivers_type;
             receivers_type receivers_;

@@ -54,6 +54,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             data_[4] = -1;
         }
 
+        static header close(int tag, int rank)
+        {
+            header h;
+            h.rank() = rank;
+            h.tag() = tag;
+            h.size() = -1;
+            h.numbytes() = -1;
+            return h;
+        }
+
+        bool close_request() const
+        {
+            return (size() == -1) && (numbytes() == -1);
+        }
+
         void assert_valid() const
         {
             HPX_ASSERT(rank_ != util::mpi_environment::rank());
@@ -113,6 +128,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         value_type & size()
         {
             return data_[1];
+        }
+
+        value_type & numbytes()
+        {
+            return data_[2];
         }
 
         value_type & num_chunks_first()
