@@ -47,6 +47,9 @@ namespace hpx { namespace naming
         // forward declaration
         inline boost::uint64_t strip_internal_bits_from_gid(boost::uint64_t msb)
             HPX_SUPER_PURE;
+
+        inline boost::uint64_t strip_lock_from_gid(boost::uint64_t msb)
+            HPX_SUPER_PURE;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -74,13 +77,29 @@ namespace hpx { namespace naming
         {}
 
         explicit gid_type (boost::uint64_t msb_id, boost::uint64_t lsb_id)
-          : id_msb_(msb_id), id_lsb_(lsb_id)
+          : id_msb_(naming::detail::strip_lock_from_gid(msb_id)),
+            id_lsb_(lsb_id)
+        {}
+
+        gid_type (gid_type const& rhs)
+          : id_msb_(naming::detail::strip_lock_from_gid(rhs.get_msb())),
+            id_lsb_(rhs.get_lsb())
         {}
 
         gid_type& operator=(boost::uint64_t lsb_id)
         {
             id_msb_ = 0;
             id_lsb_ = lsb_id;
+            return *this;
+        }
+
+        gid_type& operator=(gid_type const& rhs)
+        {
+            if (this != &rhs)
+            {
+                id_msb_ = naming::detail::strip_lock_from_gid(rhs.get_msb());
+                id_lsb_ = rhs.get_lsb();
+            }
             return *this;
         }
 
@@ -476,6 +495,11 @@ namespace hpx { namespace naming
             return gid;
         }
 
+        inline bool is_locked(gid_type const& gid)
+        {
+            return (gid.get_msb() & gid_type::is_locked_mask) ? true : false;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         inline gid_type get_stripped_gid(gid_type const& id) HPX_PURE;
 
@@ -575,7 +599,7 @@ namespace hpx { namespace naming
             boost::uint16_t log2credits = get_log2credit_from_gid(id);
             HPX_ASSERT(log2credits > 0);
 
-            gid_type newid = id;
+            gid_type newid = id;            // strips lock-bit
 
             set_log2credit_for_gid(id, log2credits-1);
             set_credit_split_mask_for_gid(id);

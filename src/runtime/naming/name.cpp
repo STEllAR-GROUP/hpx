@@ -239,12 +239,11 @@ namespace hpx { namespace naming
 
         gid_type split_gid_if_needed_locked(gid_type& gid)
         {
-            naming::gid_type new_gid = gid;
+            naming::gid_type new_gid;
 
             if (naming::detail::has_credits(gid))
             {
                 new_gid = naming::detail::split_credits_for_gid(gid);
-                naming::detail::strip_lock_from_gid(new_gid);
 
                 boost::int64_t src_credit =
                     naming::detail::get_credit_from_gid(gid);
@@ -260,8 +259,10 @@ namespace hpx { namespace naming
 
                     boost::int64_t added_credit =
                         naming::detail::fill_credit_for_gid(gid);
+
+                    naming::gid_type unlocked_gid = gid;
                     hpx::unique_future<boost::int64_t> f1 =
-                        agas::incref_async(gid, added_credit);
+                        agas::incref_async(unlocked_gid, added_credit);
 
                     boost::int64_t added_new_credit =
                         naming::detail::fill_credit_for_gid(new_gid);
@@ -270,6 +271,10 @@ namespace hpx { namespace naming
 
                     hpx::wait_all(f1, f2);
                 }
+            }
+            else
+            {
+                new_gid = gid;        // strips lock-bit
             }
             return new_gid;
         }
@@ -284,7 +289,8 @@ namespace hpx { namespace naming
             added_credit = naming::detail::fill_credit_for_gid(gid);
             naming::detail::set_credit_split_mask_for_gid(gid);
 
-            return agas::incref(gid, added_credit);
+            gid_type unlocked_gid = gid;        // strips lock-bit
+            return agas::incref(unlocked_gid, added_credit);
         }
 
         ///////////////////////////////////////////////////////////////////////

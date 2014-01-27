@@ -163,8 +163,6 @@ namespace hpx { namespace lcos { namespace detail
 
             // we request the id of a future only once
             HPX_ASSERT(naming::detail::has_credits(gid));
-
-            naming::detail::strip_lock_from_gid(gid);
             return naming::id_type(gid, naming::id_type::managed);
         }
 

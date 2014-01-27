@@ -98,12 +98,15 @@ namespace hpx { namespace components
             naming::gid_type::mutex_type::scoped_lock l(gid_.get_mutex());
 
             if (!naming::detail::has_credits(gid_))
-                return gid_;
+            {
+                naming::gid_type gid = gid_;
+                return gid;
+            }
 
             // on first invocation take all credits to avoid a self reference
             naming::gid_type gid = gid_;
 
-            naming::detail::strip_internal_bits_from_gid(
+            naming::detail::strip_credits_from_gid(
                 const_cast<naming::gid_type&>(gid_));
 
             HPX_ASSERT(naming::detail::has_credits(gid));
@@ -112,8 +115,6 @@ namespace hpx { namespace components
             // returned at this point will control the lifetime of the
             // component.
             naming::detail::set_credit_split_mask_for_gid(gid);
-            naming::detail::strip_lock_from_gid(gid);
-
             return gid;
         }
 
