@@ -179,10 +179,17 @@ namespace hpx { namespace threads
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+    HPX_API_EXPORT char const* get_thread_backtrace(
+        thread_id_type const& id, error_code& ec = throws);
+    HPX_API_EXPORT char const* set_thread_backtrace(
+        thread_id_type const& id, char const* bt = 0, error_code& ec = throws);
+#else
     HPX_API_EXPORT util::backtrace const* get_thread_backtrace(
         thread_id_type const& id, error_code& ec = throws);
     HPX_API_EXPORT util::backtrace const* set_thread_backtrace(
         thread_id_type const& id, util::backtrace const* bt = 0, error_code& ec = throws);
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_state is part of the thread related API. It

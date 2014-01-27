@@ -416,6 +416,17 @@ namespace hpx { namespace threads
 #endif
 
 #if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION == 0
+
+# if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION == 0
+        char const* get_backtrace() const
+        {
+            return 0;
+        }
+        char const* set_backtrace(char const*)
+        {
+            return 0;
+        }
+# else
         util::backtrace const* get_backtrace() const
         {
             return 0;
@@ -424,7 +435,25 @@ namespace hpx { namespace threads
         {
             return 0;
         }
-#else
+# endif
+
+#else  // HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION == 0
+
+# if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+        char const* get_backtrace() const
+        {
+            mutex_type::scoped_lock l(this);
+            return backtrace_;
+        }
+        char const* set_backtrace(char const* value)
+        {
+            mutex_type::scoped_lock l(this);
+
+            char const* bt = backtrace_;
+            backtrace_ = value;
+            return bt;
+        }
+# else
         util::backtrace const* get_backtrace() const
         {
             mutex_type::scoped_lock l(this);
@@ -438,6 +467,7 @@ namespace hpx { namespace threads
             backtrace_ = value;
             return bt;
         }
+# endif
 
         // Generate full backtrace for captured stack
         std::string backtrace()
@@ -445,7 +475,13 @@ namespace hpx { namespace threads
             mutex_type::scoped_lock l(this);
             std::string bt;
             if (0 != backtrace_)
+            {
+# if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+                bt = *backtrace_;
+#else
                 bt = backtrace_->trace();
+#endif
+            }
             return bt;
         }
 #endif
@@ -543,7 +579,11 @@ namespace hpx { namespace threads
 #endif
 
 #if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+# if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+        char const* backtrace_;
+# else
         util::backtrace const* backtrace_;
+# endif
 #endif
 
         ///////////////////////////////////////////////////////////////////////

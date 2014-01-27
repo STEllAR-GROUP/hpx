@@ -515,14 +515,22 @@ else()
   hpx_add_config_define(HPX_THREAD_MINIMAL_DEADLOCK_DETECTION 0)
 endif()
 
-hpx_option(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL "Enable thread stack back trace being captured on suspension (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION BOOL
+  "Enable thread stack back trace being captured on suspension (default: OFF)" OFF ADVANCED)
 
 if(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
-  hpx_option(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH STRING "Thread stack back trace depth being captured on suspension (default: 5)" "5" ADVANCED)
+  hpx_option(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH STRING
+    "Thread stack back trace depth being captured on suspension (default: 5)" "5" ADVANCED)
+  hpx_option(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION BOOL
+    "Enable thread stack back trace being captured on suspension (default: OFF)" OFF ADVANCED)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION 1)
   hpx_add_config_define(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH ${HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
+  if(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION)
+    hpx_add_config_define(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION 1)
+  endif()
 else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION 0)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION 0)
 endif()
 
 hpx_option(HPX_THREAD_MAINTAIN_TARGET_ADDRESS BOOL "Enable storing target address in thread for NUMA awareness (default: OFF)" OFF ADVANCED)

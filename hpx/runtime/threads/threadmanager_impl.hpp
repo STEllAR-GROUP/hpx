@@ -408,8 +408,13 @@ namespace hpx { namespace threads
         ///                   back trace of the thread referenced by the \a id
         ///                   parameter. If the thread is not known to the
         ///                   thread-manager the return value will be the zero.
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+        char const* get_backtrace(thread_id_type const& id) const;
+        char const* set_backtrace(thread_id_type const& id, char const* bt = 0);
+#else
         util::backtrace const* get_backtrace(thread_id_type const& id) const;
         util::backtrace const* set_backtrace(thread_id_type const& id, util::backtrace const* bt = 0);
+#endif
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
         /// The get_thread_data function is part of the thread related
