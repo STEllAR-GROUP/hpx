@@ -395,6 +395,8 @@ hpx::unique_future<boost::int64_t> incref_async(
   , naming::id_type const& keep_alive_
   )
 {
+    HPX_ASSERT(!naming::detail::is_locked(gid));
+
     naming::resolver_client& resolver = naming::get_agas_client();
 
     if (keep_alive_)
@@ -411,6 +413,8 @@ boost::int64_t incref(
   , error_code& ec
   )
 {
+    HPX_ASSERT(!naming::detail::is_locked(gid));
+
     naming::resolver_client& resolver = naming::get_agas_client();
 
     if (keep_alive_)
