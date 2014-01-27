@@ -14,13 +14,6 @@
 #include <boost/ptr_container/ptr_map.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail
-{
-    std::string backtrace();
-    std::string backtrace_direct();
-}}
-
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
 #if HPX_HAVE_VERIFY_LOCKS
@@ -31,12 +24,20 @@ namespace hpx { namespace util
             lock_data()
               : ignore_(false)
               , user_data_(0)
-            {}
+            {
+#if HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+                backtrace_ = hpx::detail::backtrace_direct();
+#endif
+            }
 
             lock_data(register_lock_data* data)
               : ignore_(false)
               , user_data_(data)
-            {}
+            {
+#if HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+                backtrace_ = hpx::detail::backtrace_direct();
+#endif
+            }
 
             ~lock_data()
             {
@@ -45,6 +46,9 @@ namespace hpx { namespace util
 
             bool ignore_;
             register_lock_data* user_data_;
+#if HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+            std::string backtrace_;
+#endif
         };
 
         struct register_locks
