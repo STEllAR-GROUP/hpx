@@ -329,7 +329,7 @@ namespace hpx { namespace util { namespace detail
               , boost::alignment_of<error_type>::value
             >::type
             max_alignment;
-        
+
         typedef
             typename boost::mpl::max<
                 boost::mpl::sizeof_<value_type>
@@ -371,7 +371,7 @@ namespace hpx { namespace util { namespace detail
         storage_type data_;         // protected data
         state state_;            // none, value, or error
     };
-    
+
     template <typename T>
     class value_or_error<T&>
     {
@@ -637,7 +637,7 @@ namespace hpx { namespace util { namespace detail
               , boost::alignment_of<error_type>::value
             >::type
             max_alignment;
-        
+
         typedef
             typename boost::mpl::max<
                 boost::mpl::sizeof_<T*>
