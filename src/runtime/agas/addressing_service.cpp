@@ -168,7 +168,7 @@ struct addressing_service::gva_cache_key
 
         // Is rhs in lhs?
         else if (1 != lhs.get_count() && 1 == rhs.get_count())
-            return boost::icl::contains(lhs.key_, lhs.key_);
+            return boost::icl::contains(lhs.key_, rhs.key_);
 
         // Direct hit
         return lhs.key_ == rhs.key_;
@@ -1218,7 +1218,10 @@ bool addressing_service::resolve_full(
 
         // Resolve the gva to the real resolved address (which is just a gva
         // with as fully resolved LVA and an offset of zero).
-        gva const g = rep.get_gva().resolve(id, rep.get_base_gid());
+        naming::gid_type base_gid = rep.get_base_gid();
+        gva const base_gva = rep.get_gva();
+
+        gva const g = base_gva.resolve(id, base_gid);
 
         addr.locality_ = g.endpoint;
         addr.type_ = g.type;
@@ -1228,7 +1231,7 @@ bool addressing_service::resolve_full(
         {
             if (range_caching_)
                 // Put the gva range into the cache.
-                update_cache_entry(rep.get_base_gid(), rep.get_gva(), ec);
+                update_cache_entry(base_gid, base_gva, ec);
             else
                 // Put the fully resolved gva into the cache.
                 update_cache_entry(id, g, ec);
@@ -1278,8 +1281,8 @@ bool addressing_service::resolve_cached(
     // Check if the entry is currently in the cache
     if (gva_cache_->get_entry(k, idbase, e))
     {
-        const boost::uint64_t id_msb
-            = naming::detail::strip_internal_bits_from_gid(id.get_msb());
+        const boost::uint64_t id_msb =
+            naming::detail::strip_internal_bits_from_gid(id.get_msb());
 
         if (HPX_UNLIKELY(id_msb != idbase.get_gid().get_msb()))
         {
@@ -1366,7 +1369,10 @@ naming::address addressing_service::resolve_full_postproc(
 
     // Resolve the gva to the real resolved address (which is just a gva
     // with as fully resolved LVA and an offset of zero).
-    gva const g = rep.get_gva().resolve(id, rep.get_base_gid());
+    naming::gid_type base_gid = rep.get_base_gid();
+    gva const base_gva = rep.get_gva();
+
+    gva const g = base_gva.resolve(id, base_gid);
 
     addr.locality_ = g.endpoint;
     addr.type_ = g.type;
@@ -1376,7 +1382,7 @@ naming::address addressing_service::resolve_full_postproc(
     {
         if (range_caching_)
             // Put the gva range into the cache.
-            update_cache_entry(rep.get_base_gid(), rep.get_gva());
+            update_cache_entry(base_gid, base_gva);
         else
             // Put the fully resolved gva into the cache.
             update_cache_entry(id, g);
@@ -1401,7 +1407,8 @@ hpx::unique_future<naming::address> addressing_service::resolve_full_async(
       , naming::id_type::unmanaged);
 
     using util::placeholders::_1;
-    unique_future<response> f = stubs::primary_namespace::service_async<response>(target, req);
+    unique_future<response> f =
+        stubs::primary_namespace::service_async<response>(target, req);
     return f.then(util::bind(&addressing_service::resolve_full_postproc, this, _1, gid));
 }
 
@@ -1467,7 +1474,10 @@ bool addressing_service::resolve_full(
 
             // Resolve the gva to the real resolved address (which is just a gva
             // with as fully resolved LVA and an offset of zero).
-            gva const g = reps[j].get_gva().resolve(gids[i], reps[j].get_base_gid());
+            naming::gid_type base_gid = reps[j].get_base_gid();
+            gva const base_gva = reps[j].get_gva();
+
+            gva const g = base_gva.resolve(gids[i], base_gid);
 
             naming::address& addr = addrs[i];
             addr.locality_ = g.endpoint;
@@ -1478,7 +1488,7 @@ bool addressing_service::resolve_full(
             {
                 if (range_caching_) {
                     // Put the gva range into the cache.
-                    update_cache_entry(reps[j].get_base_gid(), reps[j].get_gva(), ec);
+                    update_cache_entry(base_gid, base_gva, ec);
                 }
                 else {
                     // Put the fully resolved gva into the cache.
@@ -2013,10 +2023,13 @@ void addressing_service::insert_cache_entry(
             gva_cache_type::entry_type e;
 
             if (!gva_cache_->get_entry(key, idbase, e))
+            {
                 // This is impossible under sane conditions.
                 HPX_THROWS_IF(ec, invalid_data
                   , "addressing_service::insert_cache_entry"
                   , "data corruption or lock error occurred in cache");
+                return;
+            }
 
             LAGAS_(warning) <<
                 ( boost::format(
@@ -2066,6 +2079,15 @@ void addressing_service::update_cache_entry(
             ) % gid % count);
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
+
+        // update cache only if it's currently not locked
+//         cache_mutex_type::scoped_try_lock lock(gva_cache_mtx_);
+//         if (!lock)
+//         {
+//             if (&ec != &throws)
+//                 ec = make_success_code();
+//             return;
+//         }
 
         const gva_cache_key key(gid, count);
 
