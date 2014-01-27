@@ -443,7 +443,7 @@ namespace hpx { namespace this_thread
         {
             reset_backtrace(threads::thread_id_type const& id, error_code& ec)
               : id_(id),
-                backtrace_(new hpx::util::backtrace(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH)),
+                backtrace_(new hpx::util::backtrace()),
 #if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
                 full_backtrace_(backtrace_->trace()),
 #endif

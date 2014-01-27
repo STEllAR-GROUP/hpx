@@ -14,11 +14,17 @@
 
 namespace hpx { namespace util
 {
-    inline std::string trace()
+    struct backtrace {};
+
+    inline std::string trace(std::size_t frames_no = 0)
     {
         return "";
     }
-    struct backtrace {};
+
+    inline std::string trace_on_new_stack(std::size_t frames_no = 0)
+    {
+        return "";
+    }
 }}
 
 #endif
