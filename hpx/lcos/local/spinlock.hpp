@@ -81,7 +81,7 @@ namespace hpx { namespace lcos { namespace local
                 if (hpx::threads::get_self_ptr())
                 {
                     hpx::this_thread::suspend(hpx::threads::pending,
-                        "spinlock::yield");
+                        "local::spinlock::yield");
                 }
                 else
                 {
