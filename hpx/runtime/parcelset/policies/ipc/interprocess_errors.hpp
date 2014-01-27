@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -61,7 +61,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         public:
             const char* name() const BOOST_SYSTEM_NOEXCEPT
             {
-                return "Shmem";
+                return "IPC";
             }
 
             std::string message(int value) const
@@ -81,9 +81,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 #endif
 
                 if (value >= no_error && value <= timeout_when_waiting_error)
-                    return std::string("Shmem(") + error_names[value] + ")";
+                    return std::string("IPC(") + error_names[value] + ")";
 
-                return "Shmem(unknown_error)";
+                return "IPC(unknown_error)";
             }
         };
     }
