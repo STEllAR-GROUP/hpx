@@ -41,6 +41,16 @@ namespace hpx { namespace parcelset
           , size_(0), data_size_(0)
         {}
 
+        void clear()
+        {
+            data_.clear();
+            chunks_.clear();
+            transmission_chunks_.clear();
+            num_chunks_ = count_chunks_type(0, 0);
+            size_ = 0;
+            data_size_ = 0;
+        }
+
         BufferType data_;
         std::vector<ChunkType> chunks_;
 

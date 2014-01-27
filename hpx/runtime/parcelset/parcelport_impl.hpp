@@ -330,8 +330,7 @@ namespace hpx { namespace parcelset
                 buffer = encode_parcels(p, *sender_connection, archive_flags_);
 
             sender_connection->async_write(
-                buffer
-              , early_write_handler
+                early_write_handler
               , early_pending_parcel_handler);
 
             do_background_work();
@@ -648,7 +647,6 @@ namespace hpx { namespace parcelset
 
             // send them asynchronously
             sender_connection->async_write(
-                buffer,
                 hpx::parcelset::detail::call_for_each(std::move(handlers)),
                 boost::bind(&parcelport_impl::send_pending_parcels_trampoline,
                     this,

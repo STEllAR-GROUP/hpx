@@ -137,10 +137,9 @@ namespace hpx { namespace parcelset
     {
         typedef parcel_buffer<typename Connection::buffer_type> parcel_buffer_type;
         boost::shared_ptr<parcel_buffer_type> buffer(
-            new parcel_buffer_type(
-                connection.get_buffer()
-            )
+            connection.get_buffer()
         );
+        buffer->clear();
 
 #if defined(HPX_DEBUG)
         // make sure that all parcels go to the same locality

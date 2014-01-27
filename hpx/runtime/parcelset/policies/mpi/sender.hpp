@@ -22,12 +22,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         boost::shared_ptr<sender> sender_connection);
 
     class sender
-      : public parcelset::parcelport_connection<sender>
+      : public parcelset::parcelport_connection<sender, std::vector<char> >
     {
     public:
-
-        typedef std::vector<char> buffer_type;
-        typedef parcel_buffer<buffer_type> parcel_buffer_type;
         typedef
             HPX_STD_FUNCTION<void(boost::system::error_code const &, std::size_t)>
             handler_function_type;
@@ -72,30 +69,23 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             return there_;
         }
 
-        buffer_type get_buffer() const
-        {
-            return std::vector<char>();
-        }
-
         void verify(naming::locality const & parcel_locality_id) const
         {
             HPX_ASSERT(parcel_locality_id.get_rank() != util::mpi_environment::rank());
         }
 
         template <typename Handler, typename ParcelPostprocess>
-        void async_write(boost::shared_ptr<parcel_buffer<buffer_type> > buffer,
-            Handler handler, ParcelPostprocess parcel_postprocess)
+        void async_write(Handler handler, ParcelPostprocess parcel_postprocess)
         {
             // Check for valid pre conditions
             HPX_ASSERT(next_ == 0);
-            HPX_ASSERT(!buffer_);
+            HPX_ASSERT(buffer_);
             HPX_ASSERT(!handler_);
             HPX_ASSERT(!postprocess_);
 
             /// Increment sends and begin timer.
-            buffer->data_point_.time_ = timer_.elapsed_nanoseconds();
+            buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
 
-            buffer_ = buffer;
             handler_ = handler;
             postprocess_ = parcel_postprocess;
 
@@ -316,7 +306,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         MPI_Request header_request_;
         MPI_Request data_request_;
-        boost::shared_ptr<parcel_buffer_type> buffer_;
         handler_function_type handler_;
         postprocess_function_type postprocess_;
 

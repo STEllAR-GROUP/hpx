@@ -206,7 +206,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             std::pair<bool, header> next(acceptor_.next_header());
             if(next.first)
             {
-                receivers_.push_back(boost::make_shared<receiver>(next.second, communicator_, *this));
+                receivers_.push_back(boost::make_shared<receiver>(communicator_));
+                receivers_.back()->async_read(next.second, *this);
             }
 
             if(!has_work) has_work = !receivers_.empty();

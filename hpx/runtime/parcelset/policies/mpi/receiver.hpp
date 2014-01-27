@@ -12,26 +12,9 @@
 
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
-#include <hpx/runtime/parcelset/parcel_buffer.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
 #include <hpx/performance_counters/parcels/data_point.hpp>
 #include <hpx/performance_counters/parcels/gatherer.hpp>
-
-/*
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/placeholders.hpp>
-#include <boost/asio/read.hpp>
-#include <boost/asio/write.hpp>
-#include <boost/atomic.hpp>
-#include <boost/bind.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/integer/endian.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/tuple/tuple.hpp>
-*/
 
 #include <sstream>
 #include <vector>
@@ -49,24 +32,29 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     class connection_handler;
 
     class receiver
-      : public parcelport_connection<receiver>
+      : public parcelport_connection<receiver, std::vector<char>, std::vector<char> >
     {
-        typedef parcel_buffer<std::vector<char>, std::vector<char> > buffer_type;
         typedef bool(receiver::*next_function_type)();
     public:
-        receiver(header const & h, MPI_Comm communicator, connection_handler & parcelport)
-          : header_(h)
-          , communicator_(communicator)
+        receiver(MPI_Comm communicator)
+          : communicator_(communicator)
           , next_(0)
           , recvd_chunks_(0)
+        {}
+
+        void async_read(header const & h, connection_handler & parcelport)
         {
-            in_buffer_.reset(new buffer_type());
+            header_ = h;
+            buffer_ = get_buffer();
+            buffer_->clear();
+            next_ = 0;
+            recvd_chunks_ = 0;
 
             // Store the time of the begin of the read operation
-            in_buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
-            in_buffer_->data_point_.serialization_time_ = 0;
-            in_buffer_->data_point_.bytes_ = header_.size();
-            in_buffer_->data_point_.num_parcels_ = 0;
+            buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
+            buffer_->data_point_.serialization_time_ = 0;
+            buffer_->data_point_.bytes_ = header_.size();
+            buffer_->data_point_.num_parcels_ = 0;
 
             if (static_cast<std::size_t>(header_.size()) > get_max_inbound_size(parcelport))
             {
@@ -80,28 +68,28 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             header_.assert_valid();
             HPX_ASSERT(header_.rank() != util::mpi_environment::rank());
 
-            in_buffer_->num_chunks_.first = header_.num_chunks_first();
-            in_buffer_->num_chunks_.second = header_.num_chunks_second();
+            buffer_->num_chunks_.first = header_.num_chunks_first();
+            buffer_->num_chunks_.second = header_.num_chunks_second();
 
             // determine the size of the chunk buffer
             std::size_t num_zero_copy_chunks =
                 static_cast<std::size_t>(
-                    static_cast<boost::uint32_t>(in_buffer_->num_chunks_.first));
+                    static_cast<boost::uint32_t>(buffer_->num_chunks_.first));
             std::size_t num_non_zero_copy_chunks =
                 static_cast<std::size_t>(
-                    static_cast<boost::uint32_t>(in_buffer_->num_chunks_.second));
+                    static_cast<boost::uint32_t>(buffer_->num_chunks_.second));
 
             if(num_zero_copy_chunks != 0)
             {
-                in_buffer_->transmission_chunks_.resize(static_cast<std::size_t>(
+                buffer_->transmission_chunks_.resize(static_cast<std::size_t>(
                     num_zero_copy_chunks + num_non_zero_copy_chunks));
-                in_buffer_->data_.resize(static_cast<std::size_t>(header_.size()));
-                in_buffer_->chunks_.resize(num_zero_copy_chunks);
+                buffer_->data_.resize(static_cast<std::size_t>(header_.size()));
+                buffer_->chunks_.resize(num_zero_copy_chunks);
                 next(&receiver::recv_transmission_chunks);
             }
             else
             {
-                in_buffer_->data_.resize(std::size_t(header_.size()));
+                buffer_->data_.resize(std::size_t(header_.size()));
                 next(&receiver::recv_data);
             }
         }
@@ -112,11 +100,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             if(((*this).*next_)())
             {
                 // take measurement of overall receive time
-                in_buffer_->data_point_.time_ = timer_.elapsed_nanoseconds() -
-                    in_buffer_->data_point_.time_;
+                buffer_->data_point_.time_ = timer_.elapsed_nanoseconds() -
+                    buffer_->data_point_.time_;
 
                 // decode the received parcels.
-                decode_parcels(pp, shared_from_this(), in_buffer_);
+                decode_parcels(pp, shared_from_this(), buffer_);
                 return true;
             }
             return false;
@@ -131,10 +119,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool recv_transmission_chunks()
         {
             MPI_Irecv(
-                in_buffer_->transmission_chunks_.data(),    // data pointer
+                buffer_->transmission_chunks_.data(),    // data pointer
                 static_cast<int>(
-                    in_buffer_->transmission_chunks_.size()
-                        * sizeof(buffer_type::transmission_chunk_type)
+                    buffer_->transmission_chunks_.size()
+                        * sizeof(parcel_buffer_type::transmission_chunk_type)
                 ),                  // number of elements
                 MPI_CHAR,           // MPI Datatype
                 header_.rank(),     // Source
@@ -157,8 +145,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool recv_data()
         {
             MPI_Irecv(
-                in_buffer_->data_.data(),    // data pointer
-                static_cast<int>(in_buffer_->data_.size()), // number of elements
+                buffer_->data_.data(),    // data pointer
+                static_cast<int>(buffer_->data_.size()), // number of elements
                 MPI_CHAR,           // MPI Datatype
                 header_.rank(),     // Source
                 header_.tag(),      // Tag
@@ -182,7 +170,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             // add appropriately sized chunk buffers for the zero-copy data
             std::size_t num_zero_copy_chunks =
                 static_cast<std::size_t>(
-                    static_cast<boost::uint32_t>(in_buffer_->num_chunks_.first));
+                    static_cast<boost::uint32_t>(buffer_->num_chunks_.first));
             if(recvd_chunks_ == num_zero_copy_chunks)
             {
                 next(0);
@@ -190,11 +178,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
             
             std::size_t chunk_size
-                = in_buffer_->transmission_chunks_[recvd_chunks_].second;
+                = buffer_->transmission_chunks_[recvd_chunks_].second;
 
-            in_buffer_->chunks_[recvd_chunks_].resize(chunk_size);
+            buffer_->chunks_[recvd_chunks_].resize(chunk_size);
             MPI_Irecv(
-                in_buffer_->chunks_[recvd_chunks_].data(),  // data pointer
+                buffer_->chunks_[recvd_chunks_].data(),  // data pointer
                 static_cast<int>(chunk_size), // number of elements
                 MPI_CHAR,           // MPI Datatype
                 header_.rank(),     // Source
@@ -239,9 +227,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             next_ = f;
             return false;
         }
-
-        /// buffer for incoming data
-        boost::shared_ptr<buffer_type> in_buffer_;
+        
         header header_;
         MPI_Comm communicator_;
         MPI_Request request_;

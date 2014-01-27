@@ -7,11 +7,13 @@
 #ifndef HPX_PARCELSET_PARCELPORT_CONNECTION_HPP
 #define HPX_PARCELSET_PARCELPORT_CONNECTION_HPP
 
+#include <hpx/runtime/parcelset/parcel_buffer.hpp>
+
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/noncopyable.hpp>
 
 namespace hpx { namespace parcelset {
-    template <typename Connection>
+    template <typename Connection, typename BufferType, typename ChunkType = util::serialization_chunk>
     struct parcelport_connection
       : boost::enable_shared_from_this<Connection>
       , private boost::noncopyable
@@ -61,6 +63,21 @@ namespace hpx { namespace parcelset {
             state_ = newstate;
         }
 #endif
+
+        ////////////////////////////////////////////////////////////////////////
+        typedef std::vector<char> buffer_type;
+        typedef parcel_buffer<buffer_type, ChunkType> parcel_buffer_type;
+
+        boost::shared_ptr<parcel_buffer_type> get_buffer()
+        {
+            if(!buffer_)
+            {
+                buffer_ = boost::make_shared<parcel_buffer_type>(std::vector<char>());
+            }
+            return buffer_;
+        }
+        /// buffer for data
+        boost::shared_ptr<parcel_buffer_type> buffer_;
     };
 }}
 
