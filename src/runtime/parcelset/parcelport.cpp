@@ -19,6 +19,8 @@
 #endif
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 #include <hpx/runtime/parcelset/policies/ipc/connection_handler.hpp>
+#include <hpx/runtime/parcelset/policies/ipc/receiver.hpp>
+#include <hpx/runtime/parcelset/policies/ipc/sender.hpp>
 #endif
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 #include <hpx/runtime/parcelset/policies/ibverbs/connection_handler.hpp>
