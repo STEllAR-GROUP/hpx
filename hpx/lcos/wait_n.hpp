@@ -177,7 +177,13 @@ namespace hpx
               : lazy_values_(std::move(lazy_values))
               , count_(0)
               , needed_count_(n)
-            {}
+            {
+                ++instance_count_;
+            }
+            ~when_n()
+            {
+                --instance_count_;
+            }
 
             result_type operator()()
             {
@@ -192,6 +198,9 @@ namespace hpx
                 // we suspend ourselves
                 if (count_.load(boost::memory_order_acquire) < needed_count_)
                 {
+                    threads::set_thread_data(threads::get_self_id(),
+                        reinterpret_cast<std::size_t>(this));
+
                     // wait for any of the futures to return to become ready
                     this_thread::suspend(threads::suspended,
                         "hpx::detail::when_n::operator()");
@@ -205,8 +214,13 @@ namespace hpx
 
             result_type lazy_values_;
             boost::atomic<std::size_t> count_;
-            std::size_t needed_count_;
+            std::size_t const needed_count_;
+
+            static boost::atomic<std::size_t> instance_count_;
         };
+
+        template <typename Sequence>
+        boost::atomic<std::size_t> when_n<Sequence>::instance_count_(0);
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Sequence>
@@ -316,7 +330,7 @@ namespace hpx
 
             argument_type lazy_values_;
             boost::atomic<std::size_t> count_;
-            std::size_t needed_count_;
+            std::size_t const needed_count_;
         };
     }
 
