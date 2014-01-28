@@ -4,13 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_IBVERBS_ACCEPTOR_HPP)
-#define HPX_PARCELSET_IBVERBS_ACCEPTOR_HPP
+#if !defined(HPX_PARCELSET_POLICIES_IBVERBS_ACCEPTOR_HPP)
+#define HPX_PARCELSET_POLICIES_IBVERBS_ACCEPTOR_HPP
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/parcelset/ibverbs/ibverbs_errors.hpp>
-#include <hpx/runtime/parcelset/ibverbs/context.hpp>
-#include <hpx/runtime/parcelset/ibverbs/helper.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/ibverbs_errors.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/context.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/helper.hpp>
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/basic_io_object.hpp>
@@ -27,7 +27,7 @@
 #include <rdma/rdma_cma.h>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset { namespace ibverbs
+namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -511,7 +511,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
     typedef basic_acceptor<
         basic_acceptor_service<acceptor_impl>
     > acceptor;
-}}}
+}}}}
 
 #endif
 

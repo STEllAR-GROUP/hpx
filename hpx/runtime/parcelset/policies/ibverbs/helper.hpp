@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_IBVERBS_HELPER_HPP)
-#define HPX_PARCELSET_IBVERBS_HELPER_HPP
+#if !defined(HPX_PARCELSET_POLICIES_IBVERBS_HELPER_HPP)
+#define HPX_PARCELSET_POLICIES_IBVERBS_HELPER_HPP
 
 
 #include <netdb.h>
@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include <errno.h>
 
-namespace hpx { namespace parcelset { namespace ibverbs {
+namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
     template <typename Connection>
     inline bool get_next_event(
         rdma_event_channel *event_channel, rdma_cm_event & event_copy, Connection * c
@@ -96,6 +96,6 @@ namespace hpx { namespace parcelset { namespace ibverbs {
         }
     }
 
-}}}
+}}}}
 
 #endif

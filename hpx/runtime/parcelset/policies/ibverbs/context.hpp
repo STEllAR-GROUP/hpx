@@ -1,17 +1,17 @@
-//  Copyright (c)      2013 Thomas Heller
+//  Copyright (c) 2013-2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_IBVERBS_CONTEXT_HPP)
-#define HPX_PARCELSET_IBVERBS_CONTEXT_HPP
+#if !defined(HPX_PARCELSET_POLICIES_IBVERBS_CONTEXT_HPP)
+#define HPX_PARCELSET_POLICIES_IBVERBS_CONTEXT_HPP
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/runtime/parcelset/ibverbs/ibverbs_errors.hpp>
-#include <hpx/runtime/parcelset/ibverbs/helper.hpp>
-#include <hpx/runtime/parcelset/ibverbs/client.hpp>
-#include <hpx/runtime/parcelset/ibverbs/server.hpp>
-#include <hpx/runtime/parcelset/ibverbs/data_buffer.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/ibverbs_errors.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/helper.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/client.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/server.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/data_buffer.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/detail/yield_k.hpp>
 #include <hpx/apply.hpp>
@@ -35,7 +35,7 @@
 
 #include <poll.h>
 
-namespace hpx { namespace parcelset { namespace ibverbs
+namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
     struct basic_context_options
     {
@@ -1433,6 +1433,6 @@ namespace hpx { namespace parcelset { namespace ibverbs
     typedef basic_context<
         basic_context_service<context_impl<detail::server> >
     > server_context;
-}}}
+}}}}
 
 #endif

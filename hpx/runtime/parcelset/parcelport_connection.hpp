@@ -81,7 +81,7 @@ namespace hpx { namespace parcelset {
         {
             if(!buffer_)
             {
-                buffer_ = boost::make_shared<parcel_buffer_type>(buffer_type());
+                buffer_ = boost::make_shared<parcel_buffer_type>();
                 buffer_->data_.reserve(arg_size);
             }
             return buffer_;

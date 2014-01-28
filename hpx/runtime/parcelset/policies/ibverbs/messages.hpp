@@ -1,12 +1,12 @@
-//  Copyright (c)      2013 Thomas Heller
+//  Copyright (c) 2013-2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_IBVERBS_MESSAGES_HPP)
-#define HPX_PARCELSET_IBVERBS_MESSAGES_HPP
+#if !defined(HPX_PARCELSET_POLICIES_IBVERBS_MESSAGES_HPP)
+#define HPX_PARCELSET_POLICIES_IBVERBS_MESSAGES_HPP
 
-namespace hpx { namespace parcelset { namespace ibverbs {
+namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
         
     enum message_type
     {
@@ -24,6 +24,6 @@ namespace hpx { namespace parcelset { namespace ibverbs {
         boost::uint64_t addr;
         boost::uint32_t rkey;
     };
-}}}
+}}}}
 
 #endif

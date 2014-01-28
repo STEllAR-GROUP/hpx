@@ -1,12 +1,12 @@
-//  Copyright (c)      2013 Thomas Heller
+//  Copyright (c) 2013-2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_IBVERBS_DATA_BUFFER_HPP)
-#define HPX_PARCELSET_IBVERBS_DATA_BUFFER_HPP
+#if !defined(HPX_PARCELSET_POLICIES_IBVERBS_DATA_BUFFER_HPP)
+#define HPX_PARCELSET_POLICIES_IBVERBS_DATA_BUFFER_HPP
 
-namespace hpx { namespace parcelset { namespace ibverbs
+namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
     struct data_buffer
         : boost::noncopyable
@@ -278,7 +278,7 @@ namespace hpx { namespace parcelset { namespace ibverbs
         std::size_t mr_buffer_size_;
         std::size_t size_;
     };
-}}}
+}}}}
 
 #endif
 

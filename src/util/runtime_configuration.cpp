@@ -126,16 +126,6 @@ namespace hpx { namespace util
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:"
                 BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
 
-/*
-
-            // ibverbs related settings
-            "[hpx.parcel.ibverbs]",
-            "enable = ${HPX_HAVE_PARCELPORT_IBVERBS:0}",
-            "buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
-            "array_optimization = ${HPX_PARCEL_IBVERBS_ARRAY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
-*/
-
             // predefine command line aliases
             "[hpx.commandline]",
             "-a = --hpx:agas",

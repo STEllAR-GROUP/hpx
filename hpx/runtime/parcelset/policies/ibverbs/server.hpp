@@ -1,16 +1,17 @@
-//  Copyright (c)      2013 Thomas Heller
+//  Copyright (c) 2013-2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_PARCELSET_IBVERBS_SERVER_HPP)
-#define HPX_PARCELSET_IBVERBS_SERVER_HPP
+#if !defined(HPX_PARCELSET_POLICIES_IBVERBS_SERVER_HPP)
+#define HPX_PARCELSET_POLICIES_IBVERBS_SERVER_HPP
 
-#include <hpx/runtime/parcelset/ibverbs/messages.hpp>
-#include <hpx/runtime/parcelset/ibverbs/ibverbs_errors.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/messages.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/ibverbs_errors.hpp>
 #include <hpx/util/spinlock.hpp>
 
-namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
+namespace hpx { namespace parcelset { namespace policies { namespace ibverbs { namespace detail
+{
     struct server
     {
         server()
@@ -202,7 +203,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                 server_msg_mr_ = ibv_reg_mr(
                     pd
                   , server_msg_
-                  , sizeof(hpx::parcelset::ibverbs::message)
+                  , sizeof(hpx::parcelset::policies::ibverbs::message)
                   , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
                 );
                 if(!server_msg_mr_)
@@ -217,7 +218,7 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
                 client_msg_mr_ = ibv_reg_mr(
                     pd
                   , client_msg_
-                  , sizeof(hpx::parcelset::ibverbs::message)
+                  , sizeof(hpx::parcelset::policies::ibverbs::message)
                   , IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
                 );
                 if(!client_msg_mr_)
@@ -311,6 +312,6 @@ namespace hpx { namespace parcelset { namespace ibverbs { namespace detail {
 
         rdma_cm_id *id_;
     };
-}}}}
+}}}}}
 
 #endif
