@@ -102,10 +102,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         if(!hpx::is_starting() && !use_io_pool_)
         {
-            if (hpx::threads::get_self_ptr())
-            {
-                hpx::this_thread::yield();
-            }
             hpx::applier::register_thread_nullary(
                 HPX_STD_BIND(&connection_handler::handle_messages, this),
                 "mpi::connection_handler::handle_messages",
