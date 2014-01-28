@@ -90,7 +90,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_HAVE_PARCELPORT_MPI)
             return return_type(
                 policies::mpi::connection_handler::runtime_configuration()
-              , false);
+              , true);
 #endif
 
             break;
