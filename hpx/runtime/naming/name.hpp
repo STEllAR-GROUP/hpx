@@ -88,8 +88,14 @@ namespace hpx { namespace naming
         {
         }
 
+        ~gid_type()
+        {
+            HPX_ASSERT(!is_locked());
+        }
+
         gid_type& operator=(boost::uint64_t lsb_id)
         {
+            HPX_ASSERT(!is_locked());
             id_msb_ = 0;
             id_lsb_ = lsb_id;
             return *this;
@@ -99,6 +105,7 @@ namespace hpx { namespace naming
         {
             if (this != &rhs)
             {
+                HPX_ASSERT(!is_locked());
                 id_msb_ = naming::detail::strip_lock_from_gid(rhs.get_msb());
                 id_lsb_ = rhs.get_lsb();
             }
@@ -139,7 +146,9 @@ namespace hpx { namespace naming
         friend gid_type operator+ (gid_type const& lhs, gid_type const& rhs)
         {
             boost::uint64_t lsb = lhs.id_lsb_ + rhs.id_lsb_;
-            boost::uint64_t msb = lhs.id_msb_ + rhs.id_msb_;
+            boost::uint64_t msb =
+                detail::strip_internal_bits_from_gid(lhs.id_msb_) +
+                detail::strip_internal_bits_from_gid(rhs.id_msb_);
             if (lsb < lhs.id_lsb_ || lsb < rhs.id_lsb_)
                 ++msb;
             return gid_type(msb, lsb);
@@ -157,7 +166,9 @@ namespace hpx { namespace naming
         friend gid_type operator- (gid_type const& lhs, gid_type const& rhs)
         {
             boost::uint64_t lsb = lhs.id_lsb_ - rhs.id_lsb_;
-            boost::uint64_t msb = lhs.id_msb_ - rhs.id_msb_;
+            boost::uint64_t msb =
+                detail::strip_internal_bits_from_gid(lhs.id_msb_) -
+                detail::strip_internal_bits_from_gid(rhs.id_msb_);
             if (lsb > lhs.id_lsb_)
                 --msb;
             return gid_type(msb, lsb);
@@ -325,6 +336,8 @@ namespace hpx { namespace naming
                 ar >> id_msb_ >> id_lsb_;
             else
                 ar.load(*this);
+
+            id_msb_ = naming::detail::strip_lock_from_gid(id_msb_);
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -351,6 +364,11 @@ namespace hpx { namespace naming
             internal_mutex_type::scoped_lock l(this);
             id_msb_ &= ~is_locked_mask;
             util::unregister_lock_globally(this);
+        }
+
+        bool is_locked() const
+        {
+            return (id_msb_ & is_locked_mask) ? true : false;
         }
 
         // actual gid
