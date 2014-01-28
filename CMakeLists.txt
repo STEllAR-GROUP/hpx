@@ -493,14 +493,33 @@ else()
   hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_BACKTRACE 0)
 endif()
 
+###############################################################################
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-  hpx_option(HPX_THREAD_DEBUG_INFO BOOL "Enable thread debugging information (default: ON)" ON ADVANCED)
+  hpx_option(HPX_HAVE_VERIFY_LOCKS_GLOBALLY BOOL
+    "Enable global lock verification code (default: ON)" ON ADVANCED)
 else()
-  hpx_option(HPX_THREAD_DEBUG_INFO BOOL "Enable thread debugging information (default: OFF)" OFF ADVANCED)
+  hpx_option(HPX_HAVE_VERIFY_LOCKS_GLOBALLY BOOL
+    "Enable global lock verification code (default: OFF)" OFF ADVANCED)
+endif()
+
+if(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
+  hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_GLOBALLY 1)
+else()
+  hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_GLOBALLY 0)
+endif()
+
+###############################################################################
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  hpx_option(HPX_THREAD_DEBUG_INFO BOOL 
+    "Enable thread debugging information (default: ON)" ON ADVANCED)
+else()
+  hpx_option(HPX_THREAD_DEBUG_INFO BOOL 
+    "Enable thread debugging information (default: OFF)" OFF ADVANCED)
 endif()
 
 if(NOT MSVC)
-  hpx_option(HPX_THREAD_GUARD_PAGE BOOL "Enable thread guard page (default: ON)" ON ADVANCED)
+  hpx_option(HPX_THREAD_GUARD_PAGE BOOL 
+    "Enable thread guard page (default: ON)" ON ADVANCED)
   if(HPX_THREAD_GUARD_PAGE)
     hpx_add_config_define(HPX_THREAD_GUARD_PAGE 1)
   else()
@@ -536,7 +555,8 @@ if(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION)
     "Thread stack back trace depth being captured on suspension (default: 5)"
     "5" ADVANCED)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION 1)
-  hpx_add_config_define(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH ${HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
+  hpx_add_config_define(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH
+    ${HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH})
 
   hpx_option(HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION BOOL
     "Enable thread stack back trace being captured on suspension (default: OFF)"
@@ -569,6 +589,7 @@ else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME 0)
 endif()
 
+###############################################################################
 hpx_option(HPX_AGAS_DUMP_REFCNT_ENTRIES BOOL
   "Enable dumps of the AGAS refcnt tables to logs (default: OFF)" OFF ADVANCED)
 

@@ -12,7 +12,9 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/register_locks.hpp>
-// TODO: move parcelports into plugins
+#include <hpx/util/register_locks_globally.hpp>
+
+// TODO: move parcel ports into plugins
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 
 #include <boost/config.hpp>
@@ -88,6 +90,9 @@ namespace hpx { namespace util
             "shutdown_timeout = ${HPX_SHUTDOWN_TIMEOUT:-1.0}",
 #if HPX_HAVE_VERIFY_LOCKS
             "lock_detection = ${HPX_LOCK_DETECTION:0}",
+#endif
+#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+            "global_lock_detection = ${HPX_GLOBAL_LOCK_DETECTION:0}",
 #endif
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
 #if HPX_DEBUG
@@ -318,6 +323,10 @@ namespace hpx { namespace util
         if (enable_lock_detection())
             util::enable_lock_detection();
 #endif
+#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+        if (enable_global_lock_detection())
+            util::enable_global_lock_detection();
+#endif
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         threads::policies::minimal_deadlock_detection =
             enable_minimal_deadlock_detection();
@@ -367,6 +376,10 @@ namespace hpx { namespace util
 #if HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
             util::enable_lock_detection();
+#endif
+#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+        if (enable_global_lock_detection())
+            util::enable_global_lock_detection();
 #endif
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         threads::policies::minimal_deadlock_detection =
@@ -641,6 +654,21 @@ namespace hpx { namespace util
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
                     sec->get_entry("lock_detection", "0")) != 0;
+            }
+        }
+#endif
+        return false;
+    }
+
+    // Enable global lock tracking
+    bool runtime_configuration::enable_global_lock_detection() const
+    {
+#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                return boost::lexical_cast<int>(
+                    sec->get_entry("global_lock_detection", "0")) != 0;
             }
         }
 #endif

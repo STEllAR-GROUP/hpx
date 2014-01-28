@@ -91,6 +91,9 @@ namespace hpx { namespace util
         // Enable lock detection during suspension
         bool enable_lock_detection() const;
 
+        // Enable global lock tracking
+        bool enable_global_lock_detection() const;
+
         // Enable minimal deadlock detection for HPX threads
         bool enable_minimal_deadlock_detection() const;
 

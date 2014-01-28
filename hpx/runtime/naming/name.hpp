@@ -25,7 +25,7 @@
 #include <hpx/util/safe_bool.hpp>
 #include <hpx/util/serialize_intrusive_ptr.hpp>
 #include <hpx/util/stringstream.hpp>
-#include <hpx/util/register_locks.hpp>
+#include <hpx/util/register_locks_globally.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/promise_local_result.hpp>
@@ -79,12 +79,14 @@ namespace hpx { namespace naming
         explicit gid_type (boost::uint64_t msb_id, boost::uint64_t lsb_id)
           : id_msb_(naming::detail::strip_lock_from_gid(msb_id)),
             id_lsb_(lsb_id)
-        {}
+        {
+        }
 
         gid_type (gid_type const& rhs)
           : id_msb_(naming::detail::strip_lock_from_gid(rhs.get_msb())),
             id_lsb_(rhs.get_lsb())
-        {}
+        {
+        }
 
         gid_type& operator=(boost::uint64_t lsb_id)
         {
@@ -338,6 +340,7 @@ namespace hpx { namespace naming
             if (!was_locked)
             {
                 id_msb_ |= is_locked_mask;
+                util::register_lock_globally(this);
                 return true;
             }
             return false;
@@ -346,6 +349,7 @@ namespace hpx { namespace naming
         void reliquish_lock()
         {
             internal_mutex_type::scoped_lock l(this);
+            util::unregister_lock_globally(this);
             id_msb_ &= ~is_locked_mask;
         }
 
