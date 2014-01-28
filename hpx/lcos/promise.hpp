@@ -331,7 +331,7 @@ namespace hpx { namespace lcos { namespace detail
             return this->future_data_type::set_exception(e);
         }
 
-        util::unused_type const& get_value(error_code& ec = throws)
+        util::unused_type const& get_value(error_code& /*ec*/ = throws)
         {
             this->get_result();
             return util::unused;

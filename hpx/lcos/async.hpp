@@ -37,7 +37,7 @@ namespace hpx
         struct sync_local_invoke_0
         {
             BOOST_FORCEINLINE static lcos::unique_future<Result> call(
-                naming::id_type const& gid, naming::address const& addr)
+                naming::id_type const& gid, naming::address const& /*addr*/)
             {
                 lcos::packaged_action<Action, Result> p;
                 p.apply(launch::sync, gid);
@@ -49,7 +49,7 @@ namespace hpx
         struct sync_local_invoke_0<Action, lcos::unique_future<R> >
         {
             BOOST_FORCEINLINE static lcos::unique_future<R> call(
-                naming::id_type const& gid, naming::address const& addr)
+                naming::id_type const& /*gid*/, naming::address const& addr)
             {
                 HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<

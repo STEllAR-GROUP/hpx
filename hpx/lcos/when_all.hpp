@@ -87,7 +87,7 @@ namespace hpx { namespace lcos
     }
 
     inline lcos::unique_future<HPX_STD_TUPLE<> > //-V524
-    when_all(error_code& ec = throws)
+    when_all(error_code& /*ec*/ = throws)
     {
         typedef HPX_STD_TUPLE<> result_type;
 

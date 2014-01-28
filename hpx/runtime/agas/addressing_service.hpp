@@ -559,7 +559,7 @@ public:
         );
 
     bool get_id_range(
-        naming::locality const& l           // obsolete, ignored
+        naming::locality const& /*l*/           // obsolete, ignored
       , boost::uint64_t count
       , naming::gid_type& lower_bound
       , naming::gid_type& upper_bound

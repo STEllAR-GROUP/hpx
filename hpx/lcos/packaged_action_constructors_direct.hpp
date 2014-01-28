@@ -47,7 +47,7 @@
 #define N BOOST_PP_ITERATION()
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::id_type const& gid,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -75,7 +75,7 @@
     }
 
     template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::address& addr,
         naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);

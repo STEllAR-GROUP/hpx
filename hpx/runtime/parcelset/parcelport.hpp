@@ -116,13 +116,13 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        virtual void send_early_parcel(parcel& p)
+        virtual void send_early_parcel(parcel& /*p*/)
         {
             HPX_ASSERT(false);    // is implemented in tcp::parcelport only
         }
 
         /// Cache specific functionality
-        virtual void remove_from_connection_cache(naming::locality const& loc)
+        virtual void remove_from_connection_cache(naming::locality const& /*loc*/)
         {
             // by default, no connection cache is used
         }
@@ -131,7 +131,7 @@ namespace hpx { namespace parcelset
         virtual connection_type get_type() const = 0;
 
         /// Return the thread pool if the name matches
-        virtual util::io_service_pool* get_thread_pool(char const* name)
+        virtual util::io_service_pool* get_thread_pool(char const* /*name*/)
         {
             return 0;     // by default no thread pool is used
         }
@@ -160,7 +160,7 @@ namespace hpx { namespace parcelset
         }
 
         virtual boost::int64_t
-        get_connection_cache_statistics(connection_cache_statistics_type, bool reset)
+        get_connection_cache_statistics(connection_cache_statistics_type, bool /*reset*/)
         {
             return 0;
         }

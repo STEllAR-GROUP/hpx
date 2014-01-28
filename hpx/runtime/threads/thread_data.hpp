@@ -327,7 +327,7 @@ namespace hpx { namespace threads
         {
             return "<unknown>";
         }
-        char const* set_description(char const* value)
+        char const* set_description(char const* /*value*/)
         {
             return "<unknown>";
         }
@@ -336,7 +336,7 @@ namespace hpx { namespace threads
         {
             return "<unknown>";
         }
-        char const* set_lco_description(char const* value)
+        char const* set_lco_description(char const* /*value*/)
         {
             return "<unknown>";
         }

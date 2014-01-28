@@ -47,7 +47,7 @@ namespace hpx { namespace util
     inline void enable_lock_detection()
     {
     }
-    inline void ignore_while_checking(void const* lock)
+    inline void ignore_while_checking(void const* /*lock*/)
     {
     }
 #endif
