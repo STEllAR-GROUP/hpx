@@ -230,40 +230,40 @@ protected:
     // binary files don't include the optional information
     void save_override(const boost::archive::class_id_optional_type&, int) {}
 
-    HPX_ALWAYS_EXPORT void init(util::binary_filter* filter, unsigned int flags);
+    HPX_ALWAYS_EXPORT void init(util::binary_filter* filter, unsigned int flags_value);
 
 public:
     template <typename Container>
     portable_binary_oarchive(Container& buffer, binary_filter* filter = 0,
-            unsigned flags = 0)
-      : primitive_base_t(buffer, flags),
-        archive_base_t(flags),
+            unsigned flags_value = 0)
+      : primitive_base_t(buffer, flags_value),
+        archive_base_t(flags_value),
         dest_locality_id_(~0U)
     {
-        init(filter, flags);
+        init(filter, flags_value);
     }
 
     template <typename Container>
     portable_binary_oarchive(Container& buffer,
             boost::uint32_t dest_locality_id,
-            binary_filter* filter = 0, unsigned flags = 0)
-      : primitive_base_t(buffer, flags),
-        archive_base_t(flags),
+            binary_filter* filter = 0, unsigned flags_value = 0)
+      : primitive_base_t(buffer, flags_value),
+        archive_base_t(flags_value),
         dest_locality_id_(dest_locality_id)
     {
-        init(filter, flags);
+        init(filter, flags_value);
     }
 
     template <typename Container>
     portable_binary_oarchive(Container& buffer,
             std::vector<serialization_chunk>* chunks,
             boost::uint32_t dest_locality_id,
-            binary_filter* filter = 0, unsigned flags = 0)
-      : primitive_base_t(buffer, chunks, flags),
-        archive_base_t(flags),
+            binary_filter* filter = 0, unsigned flags_value = 0)
+      : primitive_base_t(buffer, chunks, flags_value),
+        archive_base_t(flags_value),
         dest_locality_id_(dest_locality_id)
     {
-        init(filter, flags);
+        init(filter, flags_value);
     }
 
     // the optimized save_array dispatches to the base class save_array
