@@ -310,7 +310,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION == 0
     template <typename SchedulingPolicy, typename NotificationPolicy>
     char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_backtrace(thread_id_type const& thrd) const
@@ -330,7 +330,7 @@ namespace hpx { namespace threads
         return thrd ? thrd->get_backtrace() : 0;
     }
 
-#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION == 0
     template <typename SchedulingPolicy, typename NotificationPolicy>
     char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_backtrace(thread_id_type const& thrd, char const* bt)

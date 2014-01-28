@@ -355,7 +355,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION == 0
     char const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
 #else
     util::backtrace const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
@@ -376,7 +376,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_backtrace(id);
     }
 
-#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION == 0
     char const* set_thread_backtrace(thread_id_type const& id,
         char const* bt, error_code& ec)
 #else
