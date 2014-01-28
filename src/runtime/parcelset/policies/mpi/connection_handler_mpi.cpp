@@ -100,18 +100,21 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         if (!handling_messages_.compare_exchange_strong(false_, true))
             return;
 
-        if(use_io_pool_)
+        if(!hpx::is_starting() && !use_io_pool_)
         {
-            boost::asio::io_service& io_service = io_service_pool_.get_io_service();
-            io_service.post(HPX_STD_BIND(&connection_handler::handle_messages, this));
-        }
-        else
-        {
-            hpx::this_thread::yield();
+            if (hpx::threads::get_self_ptr())
+            {
+                hpx::this_thread::yield();
+            }
             hpx::applier::register_thread_nullary(
                 HPX_STD_BIND(&connection_handler::handle_messages, this),
                 "mpi::connection_handler::handle_messages",
                 threads::pending, true, threads::thread_priority_critical);
+        }
+        else
+        {
+            boost::asio::io_service& io_service = io_service_pool_.get_io_service();
+            io_service.post(HPX_STD_BIND(&connection_handler::handle_messages, this));
         }
     }
 
