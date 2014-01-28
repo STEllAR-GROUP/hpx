@@ -104,7 +104,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         if (errors.get_error_count() == tried) {
             // all attempts failed
             HPX_THROW_EXCEPTION(network_error,
-                "shmem::parcelport::parcelport", errors.get_message());
+                "ipc::connection_handler::run", errors.get_message());
             return false;
         }
         return true;
@@ -115,8 +115,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         {
             // cancel all pending read operations, close those sockets
             lcos::local::spinlock::scoped_lock l(mtx_);
-            BOOST_FOREACH(boost::shared_ptr<receiver> c,
-                accepted_connections_)
+            BOOST_FOREACH(boost::shared_ptr<receiver> c, accepted_connections_)
             {
                 boost::system::error_code ec;
                 data_window& w = c->window();
