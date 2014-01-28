@@ -355,7 +355,7 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
-#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION == 0
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION != 0
     char const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
 #else
     util::backtrace const* get_thread_backtrace(thread_id_type const& id, error_code& ec)
@@ -376,7 +376,7 @@ namespace hpx { namespace threads
         return app->get_thread_manager().get_backtrace(id);
     }
 
-#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION == 0
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION != 0
     char const* set_thread_backtrace(thread_id_type const& id,
         char const* bt, error_code& ec)
 #else
@@ -444,12 +444,12 @@ namespace hpx { namespace this_thread
             reset_backtrace(threads::thread_id_type const& id, error_code& ec)
               : id_(id),
                 backtrace_(new hpx::util::backtrace()),
-#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION != 0
                 full_backtrace_(backtrace_->trace()),
 #endif
                 ec_(ec)
             {
-#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION != 0
                 threads::set_thread_backtrace(id_, full_backtrace_.c_str(), ec_);
 #else
                 threads::set_thread_backtrace(id_, backtrace_.get(), ec_);
@@ -462,7 +462,7 @@ namespace hpx { namespace this_thread
 
             threads::thread_id_type id_;
             boost::scoped_ptr<hpx::util::backtrace> backtrace_;
-#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION != 0
             std::string full_backtrace_;
 #endif
             error_code& ec_;
