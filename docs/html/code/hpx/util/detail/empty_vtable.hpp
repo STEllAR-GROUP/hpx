@@ -29,14 +29,14 @@ namespace hpx { namespace util { namespace detail
             return typeid(void);
         }
 
-        static void static_delete(void ** f) {}
-        static void destruct(void ** f) {}
-        static void clone(void *const* f, void ** dest) {}
-        static void copy(void *const* f, void ** dest) {}
+        static void static_delete(void ** /*f*/) {}
+        static void destruct(void ** /*f*/) {}
+        static void clone(void *const* /*f*/, void ** /*dest*/) {}
+        static void copy(void *const* /*f*/, void ** /*dest*/) {}
 
         // we can safely return an int here as those function will never
         // be called.
-        static int& construct(void ** f)
+        static int& construct(void ** /*f*/)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -45,7 +45,7 @@ namespace hpx { namespace util { namespace detail
             return t;
         }
 
-        static int& get(void **f)
+        static int& get(void ** /*f*/)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -54,7 +54,7 @@ namespace hpx { namespace util { namespace detail
             return t;
         }
 
-        static int& get(void *const*f)
+        static int& get(void *const* /*f*/)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -69,7 +69,7 @@ namespace hpx { namespace util { namespace detail
 }}}
 
 #define BOOST_UTIL_DETAIL_EMPTY_VTABLE_ADD_RVALUE_REF(Z, N, D)                  \
-    BOOST_PP_CAT(D, N) && BOOST_PP_CAT(a, N)                                    \
+    BOOST_PP_CAT(D, N) && /*BOOST_PP_CAT(a, N)*/                                \
     /**/
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -136,7 +136,7 @@ namespace hpx { namespace util { namespace detail
         }
 
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f
+        invoke(void ** /*f*/
             BOOST_PP_ENUM_TRAILING(N, BOOST_UTIL_DETAIL_EMPTY_VTABLE_ADD_RVALUE_REF, A))
         {
             hpx::throw_exception(bad_function_call,

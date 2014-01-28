@@ -188,8 +188,11 @@ namespace hpx { namespace util { namespace coroutines
         m_sp[backup_funp_idx] = m_sp[funp_idx] = nasty_cast<void*>(funp);
 
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-        m_sp[valgrind_id_idx] = reinterpret_cast<void*>(
-            VALGRIND_STACK_REGISTER(m_stack, m_stack + m_stack_size));
+        {
+            void * eos = static_cast<char*>(m_stack) + m_stack_size;
+            m_sp[valgrind_id_idx] = reinterpret_cast<void*>(
+                VALGRIND_STACK_REGISTER(m_stack, eos));
+        }
 #endif
       }
 

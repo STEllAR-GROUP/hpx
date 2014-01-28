@@ -130,26 +130,26 @@ namespace hpx { namespace util
         }
 #endif
 
-        HPX_ALWAYS_EXPORT void init(unsigned flags);
+        HPX_ALWAYS_EXPORT void init(unsigned flags_value);
 
         template <typename Container>
-        basic_binary_oprimitive(Container& buffer, unsigned flags = 0)
-          : flags_(flags & all_archive_flags),
+        basic_binary_oprimitive(Container& buffer, unsigned flags_value = 0)
+          : flags_(flags_value & all_archive_flags),
             size_(0),
             buffer_(boost::make_shared<detail::ocontainer_type<Container> >(boost::ref(buffer)))
         {
-            init(flags);
+            init(flags_value);
         }
 
         template <typename Container>
         basic_binary_oprimitive(Container& buffer, std::vector<serialization_chunk>* chunks,
-                unsigned flags = 0)
-          : flags_(flags & all_archive_flags),
+                unsigned flags_value = 0)
+          : flags_(flags_value & all_archive_flags),
             size_(0),
             buffer_(boost::make_shared<detail::ocontainer_type<Container> >(
                 boost::ref(buffer), chunks))
         {
-            init(flags);
+            init(flags_value);
         }
 
     public:

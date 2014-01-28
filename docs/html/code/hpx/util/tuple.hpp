@@ -223,27 +223,27 @@ namespace hpx { namespace util
         // tuple(const tuple& u) = default;
         // Initializes each element of *this with the corresponding element
         // of u.
-        BOOST_CONSTEXPR tuple(tuple const& other)
+        BOOST_CONSTEXPR tuple(tuple const& /*other*/)
         {}
 
         // tuple(tuple&& u) = default;
         // For all i, initializes the ith element of *this with
         // std::forward<Ti>(get<i>(u)).
-        BOOST_CONSTEXPR tuple(tuple && other)
+        BOOST_CONSTEXPR tuple(tuple && /*other*/)
         {}
 
         // 20.4.2.2, tuple assignment
 
         // tuple& operator=(const tuple& u);
         // Assigns each element of u to the corresponding element of *this.
-        tuple& operator=(tuple const& other) BOOST_NOEXCEPT
+        tuple& operator=(tuple const& /*other*/) BOOST_NOEXCEPT
         {
             return *this;
         }
 
         // tuple& operator=(tuple&& u) noexcept(see below );
         // For all i, assigns std::forward<Ti>(get<i>(u)) to get<i>(*this).
-        tuple& operator=(tuple && other) BOOST_NOEXCEPT
+        tuple& operator=(tuple && /*other*/) BOOST_NOEXCEPT
         {
             return *this;
         }
@@ -253,7 +253,7 @@ namespace hpx { namespace util
         // void swap(tuple& rhs) noexcept(see below);
         // Calls swap for each element in *this and its corresponding element
         // in rhs.
-        void swap(tuple& other) BOOST_NOEXCEPT
+        void swap(tuple& /*other*/) BOOST_NOEXCEPT
         {}
     };
 

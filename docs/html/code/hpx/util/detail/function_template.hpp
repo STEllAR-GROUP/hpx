@@ -423,7 +423,7 @@ namespace hpx { namespace util {
                     function_base
                   , typename util::decay<Functor>::type
                 >::type
-            >::type * dummy = 0
+            >::type * /*dummy*/ = 0
         )
             : vptr(get_empty_table_ptr())
             , object(0)

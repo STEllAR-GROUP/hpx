@@ -226,7 +226,7 @@ namespace hpx { namespace lcos
         ///
         /// \param gid    [in] The global id of the target component to use to
         ///               apply the action.
-        void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid)
+        void apply(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::id_type const& gid)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
 
@@ -251,7 +251,7 @@ namespace hpx { namespace lcos
             }
         }
 
-        void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+        void apply(BOOST_SCOPED_ENUM(launch) /*policy*/, naming::address& addr,
             naming::id_type const& gid)
         {
             util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
