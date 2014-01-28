@@ -112,18 +112,21 @@ namespace hpx { namespace parcelset {
                     for(std::size_t i = 0; i != parcel_count; ++i)
                     {
 #if defined(HPX_HAVE_SECURITY)
-                        // handle certificate and verify parcel suffix once
-                        naming::gid_type parcel_id;
-                        first_message = deserialize_certificate(archive, first_message);
-                        if (!first_message && i == 0)
-                            verify_message_suffix(buffer->data_, buffer->data_point_, parcel_id);
+                        if(pp.enable_security())
+                        {
+                            // handle certificate and verify parcel suffix once
+                            naming::gid_type parcel_id;
+                            first_message = deserialize_certificate(archive, first_message);
+                            if (!first_message && i == 0)
+                                verify_message_suffix(buffer->data_, buffer->data_point_, parcel_id);
+                        }
 
                         // de-serialize parcel and add it to incoming parcel queue
                         parcel p;
                         archive >> p;
 
                         // verify parcel id, but only once while handling the first parcel
-                        if (!first_message && i == 0 && parcel_id != p.get_parcel_id()) {
+                        if (pp.enable_security() && !first_message && i == 0 && parcel_id != p.get_parcel_id()) {
                             // again, all hell breaks loose
                             HPX_THROW_EXCEPTION(security_error,
                                 "decode_message",
@@ -191,6 +194,25 @@ namespace hpx { namespace parcelset {
     }
 
     template <typename Parcelport, typename Connection, typename Buffer>
+    void decode_parcels_impl(
+        Parcelport & parcelport
+      , Connection connection
+      , boost::shared_ptr<Buffer> buffer
+      , boost::shared_ptr<std::vector<util::serialization_chunk> > chunks)
+    {
+        std::vector<util::serialization_chunk> *chunks_ = 0;
+        if(chunks) chunks_ = chunks.get();
+
+#if defined(HPX_HAVE_SECURITY)
+        connection->first_message_ = decode_message(parcelport_, buffer, chunks_,
+            connection->first_message_);
+#else
+        decode_message(parcelport, buffer, chunks_);
+#endif
+    }
+
+
+    template <typename Parcelport, typename Connection, typename Buffer>
     void decode_parcels(Parcelport & parcelport, Connection connection, boost::shared_ptr<Buffer> buffer)
     {
         typedef typename Buffer::transmission_chunk_type transmission_chunk_type;
@@ -200,11 +222,11 @@ namespace hpx { namespace parcelset {
             static_cast<std::size_t>(
                 static_cast<boost::uint32_t>(buffer->num_chunks_.first));
         
+//        boost::shared_ptr<std::vector<std::vector<char> > > in_chunks(in_chunks_);
+        boost::shared_ptr<std::vector<util::serialization_chunk> > chunks;
         if (num_zero_copy_chunks != 0) {
             // decode chunk information
-//            boost::shared_ptr<std::vector<std::vector<char> > > in_chunks(in_chunks_);
-            boost::shared_ptr<std::vector<util::serialization_chunk> > chunks(
-                boost::make_shared<std::vector<util::serialization_chunk> >());
+            chunks = boost::make_shared<std::vector<util::serialization_chunk> >();
 
             std::size_t num_non_zero_copy_chunks =
                 static_cast<std::size_t>(
@@ -241,21 +263,19 @@ namespace hpx { namespace parcelset {
                 ++index;
             }
             HPX_ASSERT(index == num_zero_copy_chunks + num_non_zero_copy_chunks);
-            
-#if defined(HPX_HAVE_SECURITY)
-            connection->first_message_ = decode_message(parcelport_, buffer, chunks.get(),
-                connection->first_message_);
-#else
-            decode_message(parcelport, buffer, chunks.get());
-#endif
         }
-        else {
-#if defined(HPX_HAVE_SECURITY)
-            connection->first_message_ = decode_message(parcelport, buffer, 0,
-                connection->first_message_);
-#else
-            decode_message(parcelport, buffer, 0);
-#endif
+        if(parcelport.async_serialization())
+        {
+                hpx::applier::register_thread_nullary(
+                    HPX_STD_BIND(
+                        &decode_parcels_impl<Parcelport, Connection, Buffer>,
+                            boost::ref(parcelport), connection, buffer, chunks),
+                    "decode_parcels",
+                    threads::pending, true, threads::thread_priority_critical);
+        }
+        else
+        {
+            decode_parcels_impl(parcelport, connection, buffer, chunks);
         }
     }
 }}

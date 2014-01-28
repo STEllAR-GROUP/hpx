@@ -198,6 +198,25 @@ namespace hpx { namespace parcelset
         void do_background_work()
         {
             do_background_work_impl<ConnectionHandler>();
+            std::vector<naming::locality> destinations;
+            {
+                lcos::local::spinlock::scoped_lock l(mtx_);
+                if (parcel_destinations_.empty())
+                    return;
+
+                destinations.reserve(parcel_destinations_.size());
+                BOOST_FOREACH(naming::locality const& loc, parcel_destinations_)
+                {
+                    destinations.push_back(loc);
+                }
+            }
+
+            // Create new HPX threads which send the parcels that are still
+            // pending.
+            BOOST_FOREACH(naming::locality const& loc, destinations)
+            {
+                trigger_sending_parcels(loc, true);
+            }
         }
 
         /// support enable_shared_from_this
@@ -327,7 +346,7 @@ namespace hpx { namespace parcelset
 
             HPX_ASSERT(sender_connection.get() != 0);
             boost::shared_ptr<parcel_buffer<typename connection::buffer_type> >
-                buffer = encode_parcels(p, *sender_connection, archive_flags_);
+                buffer = encode_parcels(std::vector<parcel>(1, p), *sender_connection, archive_flags_, this->enable_security());
 
             sender_connection->async_write(
                 early_write_handler
@@ -367,25 +386,6 @@ namespace hpx { namespace parcelset
         >::type
         do_background_work_impl()
         {
-            std::vector<naming::locality> destinations;
-            {
-                lcos::local::spinlock::scoped_lock l(mtx_);
-                if (parcel_destinations_.empty())
-                    return;
-
-                destinations.reserve(parcel_destinations_.size());
-                BOOST_FOREACH(naming::locality const& loc, parcel_destinations_)
-                {
-                    destinations.push_back(loc);
-                }
-            }
-
-            // Create new HPX threads which send the parcels that are still
-            // pending.
-            BOOST_FOREACH(naming::locality const& loc, destinations)
-            {
-                trigger_sending_parcels(loc, true);
-            }
         }
 
         boost::shared_ptr<connection> get_connection(
@@ -584,9 +584,21 @@ namespace hpx { namespace parcelset
                 }
             }
 
-            // send parcels if they didn't get sent by another connection
-            send_pending_parcels(sender_connection, std::move(parcels),
-                std::move(handlers));
+            if(async_serialization())
+            {
+                hpx::applier::register_thread_nullary(
+                    HPX_STD_BIND(
+                        hpx::util::one_shot(&parcelport_impl::send_pending_parcels),
+                            this, sender_connection, std::move(parcels), std::move(handlers)),
+                    "send_pending_parcels",
+                    threads::pending, true, threads::thread_priority_critical);
+            }
+            else
+            {
+                // send parcels if they didn't get sent by another connection
+                send_pending_parcels(sender_connection, std::move(parcels),
+                    std::move(handlers));
+            }
         }
 
         void send_pending_parcels_trampoline(
@@ -643,7 +655,7 @@ namespace hpx { namespace parcelset
 #endif
             // encode the parcels
             boost::shared_ptr<parcel_buffer<typename connection::buffer_type> >
-                buffer = encode_parcels(parcels, *sender_connection, archive_flags_);
+                buffer = encode_parcels(parcels, *sender_connection, archive_flags_, this->enable_security());
 
             // send them asynchronously
             sender_connection->async_write(

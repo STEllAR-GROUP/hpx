@@ -110,6 +110,8 @@ namespace hpx { namespace parcelset {
             hpx::lcos::local::spinlock tag_mtx_;
             std::size_t next_tag_;
             std::deque<int> free_tags_;
+
+            bool use_io_pool_;
         };
     }}
 }}

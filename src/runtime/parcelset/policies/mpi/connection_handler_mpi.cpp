@@ -13,6 +13,7 @@
 #include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/sender.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/receiver.hpp>
+#include <hpx/runtime/threads/thread.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/mpi_environment.hpp>
 #include <hpx/util/runtime_configuration.hpp>
@@ -40,7 +41,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             "env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}",
 #endif
             "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}",
-            "io_pool_size = 1"
+            "io_pool_size = 1",
+            "use_io_pool = 1"
             ;
 
         return lines;
@@ -53,11 +55,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
       , stopped_(false)
       , handling_messages_(false)
       , next_tag_(1)
+      , use_io_pool_(true)
     {
         if (here_.get_type() != connection_mpi) {
             HPX_THROW_EXCEPTION(network_error, "mpi::parcelport::parcelport",
                 "this parcelport was instantiated to represent an unexpected "
                 "locality type: " + get_connection_type_name(here_.get_type()));
+        }
+        std::string use_io_pool =
+            ini.get_entry("hpx.parcel.mpi.use_io_pool", "1");
+        if(boost::lexical_cast<int>(use_io_pool) == 0)
+        {
+            use_io_pool_ = false;
         }
     }
 
@@ -91,8 +100,19 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         if (!handling_messages_.compare_exchange_strong(false_, true))
             return;
 
-        boost::asio::io_service& io_service = io_service_pool_.get_io_service();
-        io_service.post(HPX_STD_BIND(&connection_handler::handle_messages, this));
+        if(use_io_pool_)
+        {
+            boost::asio::io_service& io_service = io_service_pool_.get_io_service();
+            io_service.post(HPX_STD_BIND(&connection_handler::handle_messages, this));
+        }
+        else
+        {
+            hpx::this_thread::yield();
+            hpx::applier::register_thread_nullary(
+                HPX_STD_BIND(&connection_handler::handle_messages, this),
+                "mpi::connection_handler::handle_messages",
+                threads::pending, true, threads::thread_priority_critical);
+        }
     }
 
     std::string connection_handler::get_locality_name() const

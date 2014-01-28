@@ -133,7 +133,7 @@ namespace hpx { namespace parcelset
 
     template <typename Connection>
     boost::shared_ptr<parcel_buffer<typename Connection::buffer_type> >
-    encode_parcels(std::vector<parcel> const & pv, Connection & connection, int archive_flags_)
+    encode_parcels(std::vector<parcel> const & pv, Connection & connection, int archive_flags_, bool enable_security)
     {
         typedef parcel_buffer<typename Connection::buffer_type> parcel_buffer_type;
 
@@ -193,7 +193,8 @@ namespace hpx { namespace parcelset
                     BOOST_FOREACH(parcel const& p, pv)
                     {
 #if defined(HPX_HAVE_SECURITY)
-                        serialize_certificate(archive, localities, p);
+                        if(enable_security)
+                            serialize_certificate(archive, localities, p);
 #endif
                         archive << p;
                     }
@@ -204,7 +205,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_HAVE_SECURITY)
                 // calculate and sign the hash, but only after everything has
                 // been initialized
-                if (!connection.first_message_)
+                if (enable_security && !connection.first_message_)
                     create_message_suffix(*buffer, pv[0].get_parcel_id());
 #endif
                 // store the time required for serialization

@@ -203,7 +203,9 @@ namespace hpx { namespace parcelset
         here_(ini.get_parcelport_address()),
         max_message_size_(ini.get_max_message_size()),
         allow_array_optimizations_(true),
-        allow_zero_copy_optimizations_(true)
+        allow_zero_copy_optimizations_(true),
+        enable_security_(false),
+        async_serialization_(false)
     {
         std::string key("hpx.parcel.");
         key += type;
@@ -220,6 +222,20 @@ namespace hpx { namespace parcelset
                 ini.get_entry(key + ".zero_copy_optimization", "1");
             if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
                 allow_zero_copy_optimizations_ = false;
+        }
+
+        std::string enable_security =
+            ini.get_entry(key + ".enable_security", "0");
+        if(boost::lexical_cast<int>(enable_security) != 0)
+        {
+            enable_security_ = true;
+        }
+
+        std::string async_serialization =
+            ini.get_entry(key + ".async_serialization", "0");
+        if(boost::lexical_cast<int>(async_serialization) != 0)
+        {
+            async_serialization_ = true;
         }
     }
 

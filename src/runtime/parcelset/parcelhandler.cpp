@@ -182,7 +182,9 @@ namespace hpx { namespace parcelset
 #endif
             "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
             "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}"
+                "$[hpx.parcel.array_optimization]}",
+            "enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}",
+            "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}"
             ;
 
         for(int i = 0; i < connection_type::connection_last; ++i)
@@ -209,7 +211,13 @@ namespace hpx { namespace parcelset
                     "_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}",
                 "zero_copy_optimization = ${HPX_PARCEL_" + name_uc +
                     "_ZERO_COPY_OPTIMIZATION:"
-                    "$[hpx.parcel." + name + ".array_optimization]}"
+                    "$[hpx.parcel." + name + ".array_optimization]}",
+                "enable_security = ${HPX_PARCEL_" + name_uc +
+                    "_ENABLE_SECURITY:"
+                    "$[hpx.parcel.enable_security]}",
+                "async_serialiazation = ${HPX_PARCEL_" + name_uc +
+                    "_ASYNC_SERIALIZATION:"
+                    "$[hpx.parcel.async_serialization]}"
                 ;
 
             // add the pp specific configuration parameter
