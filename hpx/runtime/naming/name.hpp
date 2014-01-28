@@ -349,8 +349,8 @@ namespace hpx { namespace naming
         void reliquish_lock()
         {
             internal_mutex_type::scoped_lock l(this);
-            util::unregister_lock_globally(this);
             id_msb_ &= ~is_locked_mask;
+            util::unregister_lock_globally(this);
         }
 
         // actual gid
@@ -493,7 +493,7 @@ namespace hpx { namespace naming
             return msb & ~gid_type::is_locked_mask;
         }
 
-        inline gid_type strip_lock_from_gid(gid_type& gid)
+        inline gid_type& strip_lock_from_gid(gid_type& gid)
         {
             gid.set_msb(strip_lock_from_gid(gid.get_msb()));
             return gid;
