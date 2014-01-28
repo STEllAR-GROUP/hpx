@@ -24,6 +24,8 @@
 #endif
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 #include <hpx/runtime/parcelset/policies/ibverbs/connection_handler.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/receiver.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/sender.hpp>
 #endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
@@ -70,14 +72,14 @@ namespace hpx { namespace parcelset
 #if defined(HPX_HAVE_PARCELPORT_IPC)
             return return_type(
                 policies::ipc::connection_handler::runtime_configuration()
-              , true);
+              , false);
 #endif
             break;
         case connection_ibverbs:
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
             return return_type(
                 policies::ibverbs::connection_handler::runtime_configuration()
-              , true);
+              , false);
 #endif
             break;
 
@@ -88,7 +90,7 @@ namespace hpx { namespace parcelset
 #if defined(HPX_HAVE_PARCELPORT_MPI)
             return return_type(
                 policies::mpi::connection_handler::runtime_configuration()
-              , true);
+              , false);
 #endif
 
             break;
