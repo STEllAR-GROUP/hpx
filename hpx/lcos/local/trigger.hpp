@@ -176,7 +176,7 @@ namespace hpx { namespace lcos { namespace local
                 manage_condition cond(*this, c);
 
                 unique_future<void> f = cond.get_future(util::bind(
-                        &base_trigger::test_condition, this, generation));
+                        &base_trigger::test_condition, this, generation_value));
 
                 {
                     hpx::util::scoped_unlock<Lock> ul(l);

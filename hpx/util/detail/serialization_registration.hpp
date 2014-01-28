@@ -58,7 +58,7 @@ namespace hpx { namespace util { namespace detail
 #if defined(HPX_DISABLE_ASSERTS)
     inline void convert_byte(boost::uint8_t b, char*& buffer, char const* /*end*/)
 #else
-    inline void convert_byte(boost::uint8_t b, char*& buffer, char const* /*end*/)
+    inline void convert_byte(boost::uint8_t b, char*& buffer, char const* end)
 #endif
     {
         HPX_ASSERT(buffer < end-1);
