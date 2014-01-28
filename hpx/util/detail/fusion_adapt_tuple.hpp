@@ -154,8 +154,8 @@ namespace boost { namespace fusion
             typename add_const<Tuple>::type, Index>
             identity;
 
-        explicit hpx_tuple_iterator(Tuple& tuple)
-          : tuple(tuple) {}
+        explicit hpx_tuple_iterator(Tuple& tuple_)
+          : tuple(tuple_) {}
 
         Tuple& tuple;
 

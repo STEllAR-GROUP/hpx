@@ -70,7 +70,7 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         /// \brief get a future allowing to wait for the trigger to fire
-        unique_future<void> get_future(std::size_t* generation = 0,
+        unique_future<void> get_future(std::size_t* generation_value = 0,
             error_code& ec = hpx::throws)
         {
             typename mutex_type::scoped_lock l(mtx_);
@@ -80,8 +80,8 @@ namespace hpx { namespace lcos { namespace local
 
             trigger_conditions(ec);   // re-check/trigger condition, if needed
             if (!ec) {
-                if (generation)
-                    *generation = generation_;
+                if (generation_value)
+                    *generation_value = generation_;
                 return promise_.get_future(ec);
             }
             return hpx::unique_future<void>();
@@ -113,9 +113,9 @@ namespace hpx { namespace lcos { namespace local
         }
 
     private:
-        bool test_condition(std::size_t generation)
+        bool test_condition(std::size_t generation_value)
         {
-            return !(generation > generation_);
+            return !(generation_value > generation_);
         }
 
         struct manage_condition
@@ -146,23 +146,23 @@ namespace hpx { namespace lcos { namespace local
     public:
         /// \brief Wait for the generational counter to reach the requested
         ///        stage.
-        void synchronize(std::size_t generation,
+        void synchronize(std::size_t generation_value,
             char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
             typename mutex_type::scoped_lock l(mtx_);
-            synchronize(generation, l, function_name, ec);
+            synchronize(generation_value, l, function_name, ec);
         }
 
     protected:
         template <typename Lock>
-        void synchronize(std::size_t generation, Lock& l,
+        void synchronize(std::size_t generation_value, Lock& l,
             char const* function_name = "base_and_gate<>::synchronize",
             error_code& ec= throws)
         {
             HPX_ASSERT(l.owns_lock());
 
-            if (generation < generation_)
+            if (generation_value < generation_)
             {
                 HPX_THROWS_IF(ec, hpx::invalid_status, function_name,
                     "sequencing error, generational counter too small");
@@ -170,7 +170,7 @@ namespace hpx { namespace lcos { namespace local
             }
 
            // make sure this set operation has not arrived ahead of time
-            if (!test_condition(generation))
+            if (!test_condition(generation_value))
             {
                 conditional_trigger c;
                 manage_condition cond(*this, c);
@@ -241,11 +241,11 @@ namespace hpx { namespace lcos { namespace local
         }
 
         template <typename Lock>
-        void synchronize(std::size_t generation, Lock& l,
+        void synchronize(std::size_t generation_value, Lock& l,
             char const* function_name = "trigger::synchronize",
             error_code& ec= throws)
         {
-            this->base_type::synchronize(generation, l, function_name, ec);
+            this->base_type::synchronize(generation_value, l, function_name, ec);
         }
     };
 }}}

@@ -208,9 +208,9 @@ namespace hpx { namespace util
         {
             return flags_;
         }
-        void set_flags(boost::uint32_t flags)
+        void set_flags(boost::uint32_t flags_value)
         {
-            flags_ = flags;
+            flags_ = flags_value;
             init(flags_);
         }
 
