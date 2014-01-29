@@ -52,6 +52,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             performance_counters::parcels::gatherer& parcels_sent)
           : communicator_(communicator)
           , tag_(tag)
+          , receiver_tag_(-1)
           , tag_mtx_(tag_mtx)
           , free_tags_(free_tags)
           , sent_chunks_(0)
@@ -146,13 +147,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         {
             verify_valid();
             MPI_Isend(
-                header_.data(),         // Data pointer
-                header_.data_size_,     // Size
-                header_.type(),         // MPI Datatype
-                header_.rank(),         // Destination
-                0,                      // Tag
-                communicator_,          // Communicator
-                &header_request_        // Request
+                header_.data(),     // Data pointer
+                header_.data_size_, // Size
+                header_.type(),     // MPI Datatype
+                header_.rank(),     // Destination
+                0,                  // Tag
+                communicator_,      // Communicator
+                &request_           // Request
             );
             return check_header_sent();
         }
@@ -160,16 +161,34 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool check_header_sent()
         {
             verify_valid();
-            int completed = 0;
-            MPI_Status status;
-            int ret = MPI_Test(&header_request_, &completed, &status);
-            HPX_ASSERT(ret == MPI_SUCCESS);
-            if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
+            if(request_ready())
             {
-                return send_transmission_chunks();
+                return recv_tag();
             }
             return next(&sender::check_header_sent);
             
+        }
+
+        bool recv_tag()
+        {
+            MPI_Irecv(
+                &receiver_tag_, // data pointer
+                1,              // number of elements
+                MPI_INT,        // MPI Datatype
+                header_.rank(), // Source
+                tag_,           // Tag
+                communicator_,  // Communicator
+                &request_);     // Request
+            return check_tag_recvd();
+        }
+
+        bool check_tag_recvd()
+        {
+            if(request_ready())
+            {
+                return send_transmission_chunks();
+            }
+            return next(&sender::check_tag_recvd);
         }
 
         bool send_transmission_chunks()
@@ -188,9 +207,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     ), // Size
                 MPI_CHAR,               // MPI Datatype
                 header_.rank(),         // Destination
-                header_.tag(),          // Tag
+                receiver_tag_,          // Tag
                 communicator_,          // Communicator
-                &data_request_          // Request
+                &request_               // Request
                 );
             return check_transmission_chunks_sent();
         }
@@ -198,7 +217,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool check_transmission_chunks_sent()
         {
             verify_valid();
-            if(data_request_ready())
+            if(request_ready())
             {
                 return send_data();
             }
@@ -213,9 +232,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 static_cast<int>(buffer_->data_.size()), // Size
                 MPI_CHAR,               // MPI Datatype
                 header_.rank(),         // Destination
-                header_.tag(),          // Tag
+                receiver_tag_,          // Tag
                 communicator_,          // Communicator
-                &data_request_          // Request
+                &request_               // Request
                 );
             return check_data_sent();
         }
@@ -223,7 +242,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool check_data_sent()
         {
             verify_valid();
-            if(data_request_ready())
+            if(request_ready())
             {
                 return send_chunks();
             }
@@ -233,15 +252,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool send_chunks()
         {
             verify_valid();
-            if(buffer_->transmission_chunks_.empty())
-            {
-                next(0);
-                return true;
-            }
             if(sent_chunks_ == buffer_->chunks_.size())
             {
-                next(0);
-                return true;
+                return recv_ack();
             }
             
             util::serialization_chunk & c = buffer_->chunks_[sent_chunks_];
@@ -255,9 +268,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     static_cast<int>(c.size_), // Size
                     MPI_CHAR,               // MPI Datatype
                     header_.rank(),         // Destination
-                    header_.tag(),          // Tag
+                    receiver_tag_,          // Tag
                     communicator_,          // Communicator
-                    &data_request_          // Request
+                    &request_               // Request
                     );
                 return check_chunks_sent();
             }
@@ -269,15 +282,38 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         bool check_chunks_sent()
         {
-            if(data_request_ready()) return send_chunks();
+            if(request_ready()) return send_chunks();
             return next(&sender::check_chunks_sent);
         }
 
-        bool data_request_ready()
+        bool recv_ack()
+        {
+            MPI_Irecv(
+                &ack_,              // data pointer
+                1,                  // number of elements
+                MPI_CHAR,           // MPI Datatype
+                header_.rank(),     // Source
+                tag_,               // Tag
+                communicator_,      // Communicator
+                &request_);         // Request
+            return check_ack_recvd();
+        }
+
+        bool check_ack_recvd()
+        {
+            if(request_ready())
+            {
+                next(0);
+                return true;
+            }
+            return next(&sender::check_ack_recvd);
+        }
+
+        bool request_ready()
         {
             int completed = 0;
             MPI_Status status;
-            int ret = MPI_Test(&data_request_, &completed, &status);
+            int ret = MPI_Test(&request_, &completed, &status);
             HPX_ASSERT(ret == MPI_SUCCESS);
             if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
             {
@@ -300,13 +336,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         header header_;
         int tag_;
+        int receiver_tag_;
+        char ack_;
         hpx::lcos::local::spinlock & tag_mtx_;
         std::deque<int> & free_tags_;
         std::size_t sent_chunks_;
         next_function_type next_;
 
-        MPI_Request header_request_;
-        MPI_Request data_request_;
+        MPI_Request request_;
         handler_function_type handler_;
         postprocess_function_type postprocess_;
 

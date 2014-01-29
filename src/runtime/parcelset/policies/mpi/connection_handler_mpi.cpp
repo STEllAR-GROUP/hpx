@@ -257,6 +257,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     {
                         if(next.second.close_request())
                         {
+                            hpx::lcos::local::spinlock::scoped_lock l(tag_mtx_);
+                            free_tags_.push_back(kt->second->tag());
                             jt->second.erase(kt);
                             if(jt->second.empty())
                             {
@@ -274,7 +276,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                     next.second.assert_valid();
                     if(!rcv)
                     {
-                        rcv = boost::make_shared<receiver>(communicator_);
+                        rcv = boost::make_shared<receiver>(communicator_, get_next_tag());
                     }
                     rcv->async_read(next.second, *this);
                     receivers_.push_back(rcv);
@@ -287,10 +289,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 if((*it)->done(*this))
                 {
                     HPX_ASSERT(
-                        !receivers_map_[(*it)->rank()][(*it)->tag()]
-                     || receivers_map_[(*it)->rank()][(*it)->tag()].get() == it->get()
+                        !receivers_map_[(*it)->rank()][(*it)->sender_tag()]
+                     || receivers_map_[(*it)->rank()][(*it)->sender_tag()].get() == it->get()
                     );
-                    receivers_map_[(*it)->rank()][(*it)->tag()] = *it;
+                    receivers_map_[(*it)->rank()][(*it)->sender_tag()] = *it;
                     it = receivers_.erase(it);
                 }
                 else
