@@ -196,8 +196,9 @@ namespace hpx { namespace util
                 // remove the oldest one and return it.
                 if (!cached_connections(it->second).empty())
                 {
-                    connection_type result = cached_connections(it->second).front();
-                    cached_connections(it->second).pop_front();
+                    value_type& connections = cached_connections(it->second);
+                    connection_type result = connections.front();
+                    connections.pop_front();
 
                     ++hits_;
                     check_invariants();
