@@ -233,8 +233,17 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         gid_type split_gid_if_needed(gid_type& gid)
         {
-            gid_type::mutex_type::scoped_lock l(gid.get_mutex());
-            return split_gid_if_needed_locked(gid);
+            gid_type::mutex_type::scoped_try_lock l(gid.get_mutex());
+            if (l)
+            {
+                // split credit normally
+                return split_gid_if_needed_locked(gid);
+            }
+
+            // Just replenish the credit of the new gid and don't touch the
+            // local gid instance. This is less efficient than necessary but
+            // avoids deadlocks during serialization all together.
+            return replenish_new_gid_if_needed_locked(gid);
         }
 
         gid_type split_gid_if_needed_locked(gid_type& gid)
@@ -276,6 +285,23 @@ namespace hpx { namespace naming
             {
                 new_gid = gid;        // strips lock-bit
             }
+
+            return new_gid;
+        }
+
+        gid_type replenish_new_gid_if_needed_locked(gid_type const& gid)
+        {
+            naming::gid_type new_gid = gid;     // strips lock bit
+
+            if (naming::detail::has_credits(new_gid))
+            {
+                naming::detail::strip_credits_from_gid(new_gid);
+                boost::int64_t added_credit =
+                    naming::detail::fill_credit_for_gid(new_gid);
+                naming::detail::set_credit_split_mask_for_gid(new_gid);
+                agas::incref(new_gid, added_credit);
+            }
+
             return new_gid;
         }
 
