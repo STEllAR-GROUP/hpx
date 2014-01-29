@@ -78,6 +78,13 @@ namespace hpx { namespace naming
 
         static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
 
+        static boost::uint64_t const credit_bits_mask =
+            credit_mask | was_split_mask | has_credits_mask;
+        static boost::uint64_t const internal_bits_mask =
+            credit_bits_mask | is_locked_mask;
+        static boost::uint64_t const special_bits_mask =
+            locality_id_mask | internal_bits_mask;
+
         explicit gid_type (boost::uint64_t lsb_id = 0)
           : id_msb_(0), id_lsb_(lsb_id)
         {}
@@ -489,9 +496,7 @@ namespace hpx { namespace naming
         ///////////////////////////////////////////////////////////////////////
         inline boost::uint64_t strip_internal_bits_from_gid(boost::uint64_t msb)
         {
-            return msb & ~(
-                gid_type::credit_mask | gid_type::was_split_mask |
-                gid_type::has_credits_mask | gid_type::is_locked_mask);
+            return msb & ~gid_type::internal_bits_mask;
         }
 
         inline gid_type& strip_internal_bits_from_gid(gid_type& id)
@@ -502,18 +507,13 @@ namespace hpx { namespace naming
 
         inline boost::uint64_t get_internal_bits(boost::uint64_t msb)
         {
-            return msb & (
-                gid_type::credit_mask | gid_type::was_split_mask |
-                gid_type::has_credits_mask | gid_type::is_locked_mask);
+            return msb & gid_type::internal_bits_mask;
         }
 
         inline boost::uint64_t strip_internal_bits_and_locality_from_gid(
                 boost::uint64_t msb)
         {
-            return msb & ~(
-                gid_type::credit_mask | gid_type::was_split_mask |
-                gid_type::has_credits_mask | gid_type::is_locked_mask |
-                gid_type::locality_id_mask);
+            return msb & ~gid_type::special_bits_mask;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -545,9 +545,7 @@ namespace hpx { namespace naming
 
         inline boost::uint64_t strip_credits_from_gid(boost::uint64_t msb)
         {
-            return msb & ~(
-                gid_type::credit_mask | gid_type::was_split_mask |
-                gid_type::has_credits_mask);
+            return msb & ~gid_type::credit_bits_mask;
         }
 
         inline gid_type& strip_credits_from_gid(gid_type& id)
