@@ -5,9 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/apply.hpp>
 
 #include "widget.hpp"
-#include "hpx_qt.hpp"
 
 #include <QtGui/QLabel>
 #include <QtGui/QHBoxLayout>
@@ -71,6 +71,5 @@ void widget::run_clicked(bool)
         run_button->setEnabled(false);
         list->clear();
     }
-    
-    hpx::qt::runtime::apply(boost::bind(callback_, this, no_threads));
+    hpx::apply(callback_, this, no_threads);   
 }
