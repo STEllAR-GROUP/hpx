@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2013 Hartmut Kaiser
+//  Copyright (c) 2011-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -168,7 +168,7 @@ struct addressing_service::gva_cache_key
 
         // Is rhs in lhs?
         else if (1 != lhs.get_count() && 1 == rhs.get_count())
-            return boost::icl::contains(lhs.key_, lhs.key_);
+            return boost::icl::contains(lhs.key_, rhs.key_);
 
         // Direct hit
         return lhs.key_ == rhs.key_;
@@ -209,7 +209,6 @@ addressing_service::addressing_service(
   , refcnt_requests_count_(0)
   , enable_refcnt_caching_(true)
   , refcnt_requests_(new refcnt_requests_type)
-  , incref_requests_(new incref_requests_type)
   , service_type(ini_.get_agas_service_mode())
   , runtime_type(runtime_type_)
   , caching_(ini_.get_agas_caching_mode())
@@ -1143,7 +1142,7 @@ bool addressing_service::resolve_locally_known_addresses(
 {
     // LVA-encoded GIDs (located on this machine)
     boost::uint64_t lsb = id.get_lsb();
-    boost::uint64_t msb = naming::detail::strip_credit_from_gid(id.get_msb());
+    boost::uint64_t msb = naming::detail::strip_internal_bits_from_gid(id.get_msb());
 
     if (is_local_lva_encoded_address(msb))
     {
@@ -1219,7 +1218,10 @@ bool addressing_service::resolve_full(
 
         // Resolve the gva to the real resolved address (which is just a gva
         // with as fully resolved LVA and an offset of zero).
-        gva const g = rep.get_gva().resolve(id, rep.get_base_gid());
+        naming::gid_type base_gid = rep.get_base_gid();
+        gva const base_gva = rep.get_gva();
+
+        gva const g = base_gva.resolve(id, base_gid);
 
         addr.locality_ = g.endpoint;
         addr.type_ = g.type;
@@ -1229,7 +1231,7 @@ bool addressing_service::resolve_full(
         {
             if (range_caching_)
                 // Put the gva range into the cache.
-                update_cache_entry(rep.get_base_gid(), rep.get_gva(), ec);
+                update_cache_entry(base_gid, base_gva, ec);
             else
                 // Put the fully resolved gva into the cache.
                 update_cache_entry(id, g, ec);
@@ -1279,8 +1281,8 @@ bool addressing_service::resolve_cached(
     // Check if the entry is currently in the cache
     if (gva_cache_->get_entry(k, idbase, e))
     {
-        const boost::uint64_t id_msb
-            = naming::detail::strip_credit_from_gid(id.get_msb());
+        const boost::uint64_t id_msb =
+            naming::detail::strip_internal_bits_from_gid(id.get_msb());
 
         if (HPX_UNLIKELY(id_msb != idbase.get_gid().get_msb()))
         {
@@ -1367,7 +1369,10 @@ naming::address addressing_service::resolve_full_postproc(
 
     // Resolve the gva to the real resolved address (which is just a gva
     // with as fully resolved LVA and an offset of zero).
-    gva const g = rep.get_gva().resolve(id, rep.get_base_gid());
+    naming::gid_type base_gid = rep.get_base_gid();
+    gva const base_gva = rep.get_gva();
+
+    gva const g = base_gva.resolve(id, base_gid);
 
     addr.locality_ = g.endpoint;
     addr.type_ = g.type;
@@ -1377,7 +1382,7 @@ naming::address addressing_service::resolve_full_postproc(
     {
         if (range_caching_)
             // Put the gva range into the cache.
-            update_cache_entry(rep.get_base_gid(), rep.get_gva());
+            update_cache_entry(base_gid, base_gva);
         else
             // Put the fully resolved gva into the cache.
             update_cache_entry(id, g);
@@ -1402,7 +1407,8 @@ hpx::unique_future<naming::address> addressing_service::resolve_full_async(
       , naming::id_type::unmanaged);
 
     using util::placeholders::_1;
-    unique_future<response> f = stubs::primary_namespace::service_async<response>(target, req);
+    unique_future<response> f =
+        stubs::primary_namespace::service_async<response>(target, req);
     return f.then(util::bind(&addressing_service::resolve_full_postproc, this, _1, gid));
 }
 
@@ -1468,7 +1474,10 @@ bool addressing_service::resolve_full(
 
             // Resolve the gva to the real resolved address (which is just a gva
             // with as fully resolved LVA and an offset of zero).
-            gva const g = reps[j].get_gva().resolve(gids[i], reps[j].get_base_gid());
+            naming::gid_type base_gid = reps[j].get_base_gid();
+            gva const base_gva = reps[j].get_gva();
+
+            gva const g = base_gva.resolve(gids[i], base_gid);
 
             naming::address& addr = addrs[i];
             addr.locality_ = g.endpoint;
@@ -1479,7 +1488,7 @@ bool addressing_service::resolve_full(
             {
                 if (range_caching_) {
                     // Put the gva range into the cache.
-                    update_cache_entry(reps[j].get_base_gid(), reps[j].get_gva(), ec);
+                    update_cache_entry(base_gid, base_gva, ec);
                 }
                 else {
                     // Put the fully resolved gva into the cache.
@@ -1593,120 +1602,21 @@ void addressing_service::route(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool propagate_incref_acknowlegdement(
-    boost::int64_t credit
-  , naming::gid_type const& gid
-    )
-{
-    return naming::get_agas_client().
-        propagate_local_incref_acknowlegdement(credit, gid);
-}
-
-}}
-
-HPX_PLAIN_ACTION(hpx::agas::propagate_incref_acknowlegdement,
-    propagate_incref_acknowlegdement_action);
-
-namespace hpx { namespace agas
-{
-
-void addressing_service::add_incref_request(
-    boost::int64_t credit
-  , naming::id_type const& keep_alive
-    )
-{
-    incref_requests_->add_incref_request(credit, keep_alive);
-}
-
-bool addressing_service::add_remote_incref_request(
-    boost::int64_t credit
-  , naming::gid_type const& gid
-  , boost::uint32_t remote_locality
-    )
-{
-    return incref_requests_->add_remote_incref_request(credit, gid, remote_locality);
-}
-
-// This function is invoked in 2 cases
-//
-// a) remote incref requests which need to be acknowledged (loc != invalid_id)
-// b) local decref request which needs to be executed (loc == invalid_id)
-//
-hpx::unique_future<bool> addressing_service::propagate_acknowlegdements(
-    boost::int64_t credit
-  , naming::gid_type const& gid
-  , boost::uint32_t loc
-    )
-{
-    HPX_ASSERT(credit != 0);
-    if (credit > 0)
-    {
-        // local acknowledgment request have already been handled by the
-        // incref_requests functionality
-        HPX_ASSERT(loc != naming::invalid_locality_id);
-
-        propagate_incref_acknowlegdement_action act;
-        return async(act, naming::get_id_from_locality_id(loc), credit, gid);
-    }
-
-    // pending decref requests should not be remote
-    HPX_ASSERT(loc == naming::invalid_locality_id);
-    try {
-        mutex_type::scoped_lock l(refcnt_requests_mtx_);
-
-        refcnt_requests_->apply(gid,
-            util::decrementer<boost::int64_t>(-credit));
-        send_refcnt_requests(l);
-    }
-    catch (hpx::exception const& e) {
-        return hpx::make_error_future<bool>(hpx::get_exception_ptr(e));
-    }
-
-    return hpx::make_ready_future(true);
-}
-
-bool addressing_service::propagate_local_incref_acknowlegdement(
-    boost::int64_t credit
-  , naming::gid_type const& gid
-    )
-{
-    // update all outstanding incref requests for the given id
-    using util::placeholders::_1;
-    using util::placeholders::_2;
-    using util::placeholders::_3;
-
-    naming::id_type id(gid, naming::id_type::unmanaged);
-    return incref_requests_->acknowledge_request(credit, id,
-        util::bind(&addressing_service::propagate_acknowlegdements,
-            this, _1, _2, _3));
-}
-
 // The parameter 'compensated_credit' holds the amount of credits to be added
 // to the acknowledged number of credits. The compensated credits are non-zero
 // if there was a pending decref request at the point when the incref was sent.
 // The pending decref was subtracted from the amount of credits to incref.
-bool addressing_service::synchronize_with_async_incref(
+boost::int64_t addressing_service::synchronize_with_async_incref(
     hpx::unique_future<boost::int64_t> fut
   , naming::id_type const& id
   , boost::int64_t compensated_credit
     )
 {
     HPX_ASSERT(compensated_credit >= 0);
-
-    // check the result from the given incref request
-    boost::int64_t result = fut.get();
-
-    // update all outstanding incref requests for the given id
-    using util::placeholders::_1;
-    using util::placeholders::_2;
-    using util::placeholders::_3;
-
-    return incref_requests_->acknowledge_request(result + compensated_credit,
-        id, util::bind(&addressing_service::propagate_acknowlegdements,
-                this, _1, _2, _3));
+    return fut.get() + compensated_credit;
 }
 
-lcos::unique_future<bool> addressing_service::incref_async(
+lcos::unique_future<boost::int64_t> addressing_service::incref_async(
     naming::gid_type const& gid
   , boost::int64_t credit
   , naming::id_type const& keep_alive
@@ -1715,7 +1625,8 @@ lcos::unique_future<bool> addressing_service::incref_async(
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
-        lcos::unique_future<bool> (addressing_service::*incref_async_ptr)(
+        lcos::unique_future<boost::int64_t> (
+                addressing_service::*incref_async_ptr)(
             naming::gid_type const&
           , boost::int64_t
           , naming::id_type const&
@@ -1729,7 +1640,7 @@ lcos::unique_future<bool> addressing_service::incref_async(
         HPX_THROW_EXCEPTION(bad_parameter
           , "addressing_service::incref_async"
           , boost::str(boost::format("invalid credit count of %1%") % credit));
-        return lcos::unique_future<bool>();
+        return lcos::unique_future<boost::int64_t>();
     }
 
     HPX_ASSERT(keep_alive != naming::invalid_id);
@@ -1809,13 +1720,7 @@ lcos::unique_future<bool> addressing_service::incref_async(
     if (!has_pending_incref)
     {
         // no need to talk to AGAS, acknowledge the incref immediately
-        lcos::unique_future<boost::int64_t> f =
-            hpx::make_ready_future(static_cast<boost::int64_t>(0));
-
-        using util::placeholders::_1;
-        return f.then(
-            util::bind(&addressing_service::synchronize_with_async_incref,
-                this, _1, keep_alive, pending_decrefs));
+        return hpx::make_ready_future(pending_decrefs);
     }
 
     naming::gid_type const e_lower = boost::icl::lower(pending_incref.key());
@@ -1870,14 +1775,8 @@ void addressing_service::decref(
         mutex_type::scoped_lock l(refcnt_requests_mtx_);
 
         // Match the decref request with entries in the incref table
-        if (!incref_requests_->add_decref_request(credit, raw))
-        {
-            // file 'real' decref request only if there is no pending incref
-            // request for this gid
-            refcnt_requests_->apply(raw,
-                util::decrementer<boost::int64_t>(credit));
-            send_refcnt_requests(l, ec);
-        }
+        refcnt_requests_->apply(raw, util::decrementer<boost::int64_t>(credit));
+        send_refcnt_requests(l, ec);
     }
     catch (hpx::exception const& e) {
         HPX_RETHROWS_IF(ec, e, "addressing_service::decref");
@@ -1927,15 +1826,14 @@ lcos::unique_future<bool> addressing_service::register_name_async(
 { // {{{
     // We need to modify the reference count.
     naming::gid_type& mutable_gid = const_cast<naming::id_type&>(id).get_gid();
-    naming::gid_type new_gid;
-
-    boost::int64_t new_credit = naming::detail::split_gid(mutable_gid, new_gid);
+    naming::gid_type new_gid = naming::detail::split_gid_if_needed(mutable_gid);
 
     request req(symbol_ns_bind, name, new_gid);
 
     unique_future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
 
+    boost::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
     if (new_credit != 0)
     {
         using HPX_STD_PLACEHOLDERS::_1;
@@ -2125,10 +2023,13 @@ void addressing_service::insert_cache_entry(
             gva_cache_type::entry_type e;
 
             if (!gva_cache_->get_entry(key, idbase, e))
+            {
                 // This is impossible under sane conditions.
                 HPX_THROWS_IF(ec, invalid_data
                   , "addressing_service::insert_cache_entry"
                   , "data corruption or lock error occurred in cache");
+                return;
+            }
 
             LAGAS_(warning) <<
                 ( boost::format(
@@ -2178,6 +2079,15 @@ void addressing_service::update_cache_entry(
             ) % gid % count);
 
         cache_mutex_type::scoped_lock lock(gva_cache_mtx_);
+
+        // update cache only if it's currently not locked
+//         cache_mutex_type::scoped_try_lock lock(gva_cache_mtx_);
+//         if (!lock)
+//         {
+//             if (&ec != &throws)
+//                 ec = make_success_code();
+//             return;
+//         }
 
         const gva_cache_key key(gid, count);
 

@@ -191,7 +191,8 @@ namespace hpx { namespace lcos
                 if (ready_count_ < size)
                 {
                     // wait for all of the futures to return to become ready
-                    this_thread::suspend(threads::suspended);
+                    this_thread::suspend(threads::suspended,
+                        "hpx::lcos::detail::when_each::operator()");
                 }
 
                 // all futures should be ready

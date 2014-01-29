@@ -1,5 +1,5 @@
 //  Copyright (c) 2007-2014 Hartmut Kaiser
-//  Copyright (c) 2014 Thomas Haller
+//  Copyright (c) 2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -9,56 +9,87 @@
 #include <hpx/util/logging.hpp>
 #include <hpx/util/register_locks.hpp>
 #include <hpx/util/thread_specific_ptr.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/ptr_container/ptr_map.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail
-{
-    std::string backtrace();
-    std::string backtrace_direct();
-}}
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
 {
 #if HPX_HAVE_VERIFY_LOCKS
-    struct register_locks
+    namespace detail
     {
-        typedef boost::ptr_map<void const*, util::register_lock_data>
-            held_locks_map;
-
-        struct tls_tag {};
-        static hpx::util::thread_specific_ptr<held_locks_map, tls_tag> held_locks_;
-
-        static bool lock_detection_enabled_;
-
-        static held_locks_map& get_lock_map()
+        struct lock_data
         {
-            if (NULL == held_locks_.get())
+            lock_data()
+              : ignore_(false)
+              , user_data_(0)
             {
-                held_locks_.reset(new held_locks_map());
+#if HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+                backtrace_ = hpx::detail::backtrace_direct();
+#endif
             }
 
-            HPX_ASSERT(NULL != held_locks_.get());
-            return *held_locks_.get();
-        }
-    };
+            lock_data(register_lock_data* data)
+              : ignore_(false)
+              , user_data_(data)
+            {
+#if HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+                backtrace_ = hpx::detail::backtrace_direct();
+#endif
+            }
 
-    hpx::util::thread_specific_ptr<
-        register_locks::held_locks_map, register_locks::tls_tag
-    > register_locks::held_locks_;
-    bool register_locks::lock_detection_enabled_ = false;
+            ~lock_data()
+            {
+                delete user_data_;
+            }
+
+            bool ignore_;
+            register_lock_data* user_data_;
+#if HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+            std::string backtrace_;
+#endif
+        };
+
+        struct register_locks
+        {
+            typedef lcos::local::spinlock mutex_type;
+            typedef boost::ptr_map<void const*, lock_data> held_locks_map;
+
+            struct tls_tag {};
+            static hpx::util::thread_specific_ptr<held_locks_map, tls_tag> held_locks_;
+
+            static bool lock_detection_enabled_;
+
+            static held_locks_map& get_lock_map()
+            {
+                if (NULL == held_locks_.get())
+                {
+                    held_locks_.reset(new held_locks_map());
+                }
+
+                HPX_ASSERT(NULL != held_locks_.get());
+                return *held_locks_.get();
+            }
+        };
+
+        hpx::util::thread_specific_ptr<
+            register_locks::held_locks_map, register_locks::tls_tag
+        > register_locks::held_locks_;
+        bool register_locks::lock_detection_enabled_ = false;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     void enable_lock_detection()
     {
-        register_locks::lock_detection_enabled_ = true;
+        detail::register_locks::lock_detection_enabled_ = true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     bool register_lock(void const* lock, util::register_lock_data* data)
     {
+        using detail::register_locks;
+
         if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
@@ -70,10 +101,10 @@ namespace hpx { namespace util
 
             std::pair<register_locks::held_locks_map::iterator, bool> p;
             if (!data) {
-                p = held_locks.insert(lock, new util::register_lock_data);
+                p = held_locks.insert(lock, new detail::lock_data);
             }
             else {
-                p = held_locks.insert(lock, data);
+                p = held_locks.insert(lock, new detail::lock_data(data));
             }
             return p.second;
         }
@@ -83,6 +114,8 @@ namespace hpx { namespace util
     // unregister the given lock from this HPX-thread
     bool unregister_lock(void const* lock)
     {
+        using detail::register_locks;
+
         if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
@@ -97,34 +130,30 @@ namespace hpx { namespace util
         return true;
     }
 
-    inline bool some_locks_are_not_ignored(
-        register_locks::held_locks_map const& held_locks)
-    {
-        typedef register_locks::held_locks_map::const_iterator iterator;
-
-        iterator end = held_locks.end();
-        for (iterator it = held_locks.begin(); it != end; ++it)
-        {
-            if (!it->second->ignore_)
-                return true;
-        }
-
-        return false;
-    }
-
-    inline void reset_all_ignored(register_locks::held_locks_map& held_locks)
-    {
-        typedef register_locks::held_locks_map::iterator iterator;
-
-        iterator end = held_locks.end();
-        for (iterator it = held_locks.begin(); it != end; ++it)
-        {
-            it->second->ignore_ = false;
-        }
-    }
     // verify that no locks are held by this HPX-thread
+    namespace detail
+    {
+        inline bool some_locks_are_not_ignored(
+            register_locks::held_locks_map const& held_locks)
+        {
+            typedef register_locks::held_locks_map::const_iterator iterator;
+
+            iterator end = held_locks.end();
+            for (iterator it = held_locks.begin(); it != end; ++it)
+            {
+                lock_data const& data = *(*it).second;
+                if (!(*it).second->ignore_)
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
     void verify_no_locks()
     {
+        using detail::register_locks;
+
         if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
         {
             register_locks::held_locks_map& held_locks =
@@ -134,24 +163,22 @@ namespace hpx { namespace util
             // this OS-thread
             if (!held_locks.empty())
             {
-                if (some_locks_are_not_ignored(held_locks))
+                if (detail::some_locks_are_not_ignored(held_locks))
                 {
                     std::string back_trace(hpx::detail::backtrace_direct());
                     if (back_trace.empty()) {
                         LERR_(debug)
-                            << "suspending thread while at least one lock is being held "
-                               "(stack backtrace was disabled at compile time)";
+                            << "suspending thread while at least one lock is "
+                               "being held (stack backtrace was disabled at "
+                               "compile time)";
                     }
                     else {
                         LERR_(debug)
-                            << "suspending thread while at least one lock is being held, "
-                            << "stack backtrace: " << back_trace;
+                            << "suspending thread while at least one lock is "
+                            << "being held, stack backtrace: "
+                            << back_trace;
                     }
                 }
-
-                // now reset all ignored flags as we have no way of guaranteeing
-                // this reset otherwise
-                reset_all_ignored(held_locks);
             }
         }
     }
@@ -177,25 +204,40 @@ namespace hpx { namespace util
 //        }
     }
 
-    void ignore_while_checking(void const* lock)
+    namespace detail
     {
-        if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
+        void set_ignore_status(void const* lock, bool status)
         {
-            register_locks::held_locks_map& held_locks =
-                register_locks::get_lock_map();
-
-            register_locks::held_locks_map::iterator it = held_locks.find(lock);
-            if (it == held_locks.end())
+            if (register_locks::lock_detection_enabled_ && 0 != threads::get_self_ptr())
             {
-                HPX_THROW_EXCEPTION(invalid_status, "handle_while_checking",
-                    "The given lock has not been registered.");
-                return;
-            }
+                register_locks::held_locks_map& held_locks =
+                    register_locks::get_lock_map();
 
-            it->second->ignore_ = true;
+                register_locks::held_locks_map::iterator it = held_locks.find(lock);
+                if (it == held_locks.end())
+                {
+                    HPX_THROW_EXCEPTION(invalid_status, "set_ignore_status",
+                        "The given lock has not been registered.");
+                    return;
+                }
+
+                it->second->ignore_ = status;
+            }
         }
     }
+
+    void ignore_lock(void const* lock)
+    {
+        detail::set_ignore_status(lock, true);
+    }
+
+    void reset_ignored(void const* lock)
+    {
+        detail::set_ignore_status(lock, false);
+    }
+
 #else
+
     bool register_lock(void const*, util::register_lock_data*)
     {
         return true;
@@ -214,10 +256,14 @@ namespace hpx { namespace util
     {
     }
 
-    bool handle_while_checking(void const* lock, bool ignore)
+    void ignore_lock(void const* lock)
     {
-        return false;
     }
+
+    void reset_ignored(void const* lock)
+    {
+    }
+
 #endif
 }}
 

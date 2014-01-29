@@ -9,6 +9,10 @@
 #if !defined(HPX_UTIL_IO_SERVICE_POOL_MAR_26_2008_1218PM)
 #define HPX_UTIL_IO_SERVICE_POOL_MAR_26_2008_1218PM
 
+#include <hpx/config.hpp>
+#include <hpx/util/spinlock.hpp>
+#include <hpx/config/warnings_prefix.hpp>
+
 #include <vector>
 
 #include <boost/asio/io_service.hpp>
@@ -16,10 +20,6 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-
-#include <hpx/config.hpp>
-#include <hpx/util/spinlock.hpp>
-#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util

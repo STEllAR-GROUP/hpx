@@ -11,18 +11,29 @@
 #endif
 
 #include <hpx/hpx_fwd.hpp>
-#if defined(HPX_HAVE_PARCELPORT_TCPIP)
-#include <hpx/runtime/parcelset/tcp/parcelport.hpp>
+
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+#include <hpx/runtime/parcelset/policies/tcp/connection_handler.hpp>
+#include <hpx/runtime/parcelset/policies/tcp/receiver.hpp>
+#include <hpx/runtime/parcelset/policies/tcp/sender.hpp>
 #endif
-#if defined(HPX_HAVE_PARCELPORT_SHMEM)
-#  include <hpx/runtime/parcelset/shmem/parcelport.hpp>
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+#include <hpx/runtime/parcelset/policies/ipc/connection_handler.hpp>
+#include <hpx/runtime/parcelset/policies/ipc/receiver.hpp>
+#include <hpx/runtime/parcelset/policies/ipc/sender.hpp>
 #endif
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
-#  include <hpx/runtime/parcelset/ibverbs/parcelport.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/connection_handler.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/receiver.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/sender.hpp>
 #endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-#  include <hpx/runtime/parcelset/mpi/parcelport.hpp>
+#include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
+#include <hpx/runtime/parcelset/policies/mpi/receiver.hpp>
+#include <hpx/runtime/parcelset/policies/mpi/sender.hpp>
 #endif
+
+#include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/exception.hpp>
@@ -37,13 +48,57 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
         HPX_STD_FUNCTION<void()> const& on_stop_thread)
     {
-        std::string pptype = cfg.get_entry("hpx.parcel.bootstrap", "tcpip");
+        std::string pptype = cfg.get_entry("hpx.parcel.bootstrap", "tcp");
 
         int type = get_connection_type_from_name(pptype);
         if (type == connection_unknown)
-            type = connection_tcpip;
+            type = connection_tcp;
 
         return create(type, cfg, on_start_thread, on_stop_thread);
+    }
+
+    /// load the runtime configuration parameters
+    std::pair<std::vector<std::string>, bool> parcelport::runtime_configuration(int type)
+    {
+        typedef std::pair<std::vector<std::string>, bool> return_type;
+        switch(type) {
+        case connection_tcp:
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+            return return_type(
+                policies::tcp::connection_handler::runtime_configuration()
+              , true);
+#endif
+        case connection_ipc:
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+            return return_type(
+                policies::ipc::connection_handler::runtime_configuration()
+              , false);
+#endif
+            break;
+        case connection_ibverbs:
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+            return return_type(
+                policies::ibverbs::connection_handler::runtime_configuration()
+              , false);
+#endif
+            break;
+
+        case connection_portals4:
+            break;
+
+        case connection_mpi:
+#if defined(HPX_HAVE_PARCELPORT_MPI)
+            return return_type(
+                policies::mpi::connection_handler::runtime_configuration()
+              , true);
+#endif
+
+            break;
+        default:
+            break;
+        }
+
+        return return_type(std::vector<std::string>(), false);
     }
 
     boost::shared_ptr<parcelport> parcelport::create(int type,
@@ -52,39 +107,39 @@ namespace hpx { namespace parcelset
         HPX_STD_FUNCTION<void()> const& on_stop_thread)
     {
         switch(type) {
-        case connection_tcpip:
+        case connection_tcp:
             {
-#if defined(HPX_HAVE_PARCELPORT_TCPIP)
-                std::string enable_tcpip =
-                    cfg.get_entry("hpx.parcel.tcpip.enable", "1");
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+                std::string enable_tcp =
+                    cfg.get_entry("hpx.parcel.tcp.enable", "1");
 
-                if (boost::lexical_cast<int>(enable_tcpip))
+                if (boost::lexical_cast<int>(enable_tcp))
                 {
-                    return boost::make_shared<parcelset::tcp::parcelport>(
+                    return boost::make_shared<policies::tcp::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
                 }
 #endif
 
                 HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
-                    "unsupported connection type 'connection_tcpip'");
+                    "unsupported connection type 'connection_tcp'");
             }
 
-        case connection_shmem:
+        case connection_ipc:
             {
-#if defined(HPX_HAVE_PARCELPORT_SHMEM)
-                // Create shmem based parcelport only if allowed by the
+#if defined(HPX_HAVE_PARCELPORT_IPC)
+                // Create ipc based parcelport only if allowed by the
                 // configuration info.
-                std::string enable_shmem =
-                    cfg.get_entry("hpx.parcel.shmem.enable", "0");
+                std::string enable_ipc =
+                    cfg.get_entry("hpx.parcel.ipc.enable", "0");
 
-                if (boost::lexical_cast<int>(enable_shmem))
+                if (boost::lexical_cast<int>(enable_ipc))
                 {
-                    return boost::make_shared<parcelset::shmem::parcelport>(
+                    return boost::make_shared<policies::ipc::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
                 }
 #endif
                 HPX_THROW_EXCEPTION(bad_parameter, "parcelport::create",
-                    "unsupported connection type 'connection_shmem'");
+                    "unsupported connection type 'connection_ipc'");
             }
             break;
 
@@ -98,7 +153,7 @@ namespace hpx { namespace parcelset
 
                 if (boost::lexical_cast<int>(enable_ibverbs))
                 {
-                    return boost::make_shared<parcelset::ibverbs::parcelport>(
+                    return boost::make_shared<policies::ibverbs::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
                 }
             }
@@ -122,7 +177,7 @@ namespace hpx { namespace parcelset
 
                 if (boost::lexical_cast<int>(enable_mpi))
                 {
-                    return boost::make_shared<parcelset::mpi::parcelport>(
+                    return boost::make_shared<policies::mpi::connection_handler>(
                         cfg, on_start_thread, on_stop_thread);
                 }
             }
@@ -148,7 +203,9 @@ namespace hpx { namespace parcelset
         here_(ini.get_parcelport_address()),
         max_message_size_(ini.get_max_message_size()),
         allow_array_optimizations_(true),
-        allow_zero_copy_optimizations_(true)
+        allow_zero_copy_optimizations_(true),
+        enable_security_(false),
+        async_serialization_(false)
     {
         std::string key("hpx.parcel.");
         key += type;
@@ -166,56 +223,58 @@ namespace hpx { namespace parcelset
             if (boost::lexical_cast<int>(zero_copy_optimization) == 0)
                 allow_zero_copy_optimizations_ = false;
         }
-    }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // default implementation, just forward to single parcel version
-    void parcelport::put_parcels(std::vector<parcel> const & parcels,
-            std::vector<write_handler_type> const& handlers)
-    {
-        if (parcels.size() != handlers.size())
+        std::string enable_security =
+            ini.get_entry(key + ".enable_security", "0");
+        if(boost::lexical_cast<int>(enable_security) != 0)
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "parcelport::put_parcels",
-                "mismatched number of parcels and handlers");
-            return;
+            enable_security_ = true;
         }
 
-        for (std::size_t i = 0; i != parcels.size(); ++i)
+        std::string async_serialization =
+            ini.get_entry(key + ".async_serialization", "0");
+        if(boost::lexical_cast<int>(async_serialization) != 0)
         {
-            put_parcel(parcels[i], handlers[i]);
+            async_serialization_ = true;
         }
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void parcelport::report_potential_connection_error(
-        naming::locality const& locality_id, naming::gid_type const& parcel_id,
-        error_code const& ec)
+//     void parcelport::report_potential_connection_error(
+//         naming::locality const& locality_id, naming::gid_type const& parcel_id,
+//         error_code const& ec)
+//     {
+//         typedef pending_parcels_map::iterator iterator;
+// 
+//         // If there was an error, we might be safe if there are no parcels
+//         // to be sent anymore (some other thread already picked them up)
+//         // or if there are parcels, but the parcel we were about to sent
+//         // has been already processed.
+//         lcos::local::spinlock::scoped_lock l(mtx_);
+// 
+//         iterator it = pending_parcels_.find(locality_id);
+//         if (it != pending_parcels_.end())
+//         {
+//             map_second_type& data = it->second;
+// 
+//             std::vector<parcel>::iterator end = data.first.end();
+//             std::vector<write_handler_type>::iterator fit = data.second.begin();
+//             for (std::vector<parcel>::iterator pit = data.first.begin();
+//                     pit != end; ++pit, ++fit)
+//             {
+//                 if ((*pit).get_parcel_id() == parcel_id)
+//                 {
+//                     // our parcel is still here, bailing out
+//                     throw hpx::detail::access_exception(ec);
+//                 }
+//             }
+//         }
+//     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    boost::uint64_t get_max_inbound_size(parcelport& pp)
     {
-        typedef pending_parcels_map::iterator iterator;
-
-        // If there was an error, we might be safe if there are no parcels
-        // to be sent anymore (some other thread already picked them up)
-        // or if there are parcels, but the parcel we were about to sent
-        // has been already processed.
-        lcos::local::spinlock::scoped_lock l(mtx_);
-
-        iterator it = pending_parcels_.find(locality_id);
-        if (it != pending_parcels_.end())
-        {
-            map_second_type& data = it->second;
-
-            std::vector<parcel>::iterator end = data.first.end();
-            std::vector<write_handler_type>::iterator fit = data.second.begin();
-            for (std::vector<parcel>::iterator pit = data.first.begin();
-                    pit != end; ++pit, ++fit)
-            {
-                if ((*pit).get_parcel_id() == parcel_id)
-                {
-                    // our parcel is still here, bailing out
-                    throw hpx::detail::access_exception(ec);
-                }
-            }
-        }
+        return pp.get_max_message_size();
     }
 }}
 
