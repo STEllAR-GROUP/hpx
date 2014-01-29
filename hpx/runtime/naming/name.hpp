@@ -673,28 +673,28 @@ namespace hpx { namespace naming
         boost::uint64_t lsb = lhs.id_lsb_ - rhs.id_lsb_;
         boost::uint64_t msb = lhs.id_msb_ - rhs.id_msb_;
 
-#if defined(HPX_DEBUG)
-        // make sure we're using the operator- in proper contexts only
-        boost::uint64_t lhs_internal_bits = detail::get_internal_bits(lhs.id_msb_);
-
-        boost::uint64_t msb_test =
-            detail::strip_internal_bits_and_locality_from_gid(lhs.id_msb_) -
-            detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
-
-        boost::uint32_t lhs_locality_id = naming::get_locality_id_from_gid(lhs.id_msb_);
-        boost::uint32_t rhs_locality_id = naming::get_locality_id_from_gid(rhs.id_msb_);
-        if (rhs_locality_id != naming::invalid_locality_id)
-        {
-            HPX_ASSERT(lhs_locality_id == rhs_locality_id);
-            HPX_ASSERT(msb == naming::replace_locality_id(
-                msb_test | lhs_internal_bits, naming::invalid_locality_id));
-        }
-        else
-        {
-            HPX_ASSERT(msb == naming::replace_locality_id(
-                msb_test | lhs_internal_bits, lhs_locality_id));
-        }
-#endif
+// #if defined(HPX_DEBUG)
+//         // make sure we're using the operator- in proper contexts only
+//         boost::uint64_t lhs_internal_bits = detail::get_internal_bits(lhs.id_msb_);
+// 
+//         boost::uint64_t msb_test =
+//             detail::strip_internal_bits_and_locality_from_gid(lhs.id_msb_) -
+//             detail::strip_internal_bits_and_locality_from_gid(rhs.id_msb_);
+// 
+//         boost::uint32_t lhs_locality_id = naming::get_locality_id_from_gid(lhs.id_msb_);
+//         boost::uint32_t rhs_locality_id = naming::get_locality_id_from_gid(rhs.id_msb_);
+//         if (rhs_locality_id != naming::invalid_locality_id)
+//         {
+//             HPX_ASSERT(lhs_locality_id == rhs_locality_id);
+//             HPX_ASSERT(msb == naming::replace_locality_id(
+//                 msb_test | lhs_internal_bits, naming::invalid_locality_id));
+//         }
+//         else
+//         {
+//             HPX_ASSERT(msb == naming::replace_locality_id(
+//                 msb_test | lhs_internal_bits, lhs_locality_id));
+//         }
+// #endif
 
         if (lsb > lhs.id_lsb_)
             --msb;
