@@ -154,8 +154,8 @@
 $ c++ -o libhello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
 </pre>
 <p>
-          Now pick a directory in which to install your hpx component libraries.
-          For this example, we'll choose a directory named ''my_hpx_libs''.
+          Now pick a directory in which to install your <span class="emphasis"><em>HPX</em></span>
+          component libraries. For this example, we'll choose a directory named ''my_hpx_libs''.
         </p>
 <pre class="programlisting">$ mkdir ~/my_hpx_libs
 $ mv libhello_world.so ~/my_hpx_libs
@@ -166,11 +166,11 @@ $ mv libhello_world.so ~/my_hpx_libs
 <th align="left">Note</th>
 </tr>
 <tr><td align="left" valign="top"><p>
-            If HPX was build in debug mode (<code class="computeroutput">cmake -DCMAKE_BUILD_TYPE=Debug</code>)
+            If <span class="emphasis"><em>HPX</em></span> was build in debug mode (<code class="computeroutput">cmake -DCMAKE_BUILD_TYPE=Debug</code>)
             the pkg-config names have to be different. Instead of <code class="computeroutput">hpx_application</code>
             or <code class="computeroutput">hpx_component</code> you will have to use <code class="computeroutput">hpx_application_debug</code>
-            or <code class="computeroutput">hpx_component_debug</code>. Moreover, all referenced HPX components
-            need to have a appended 'd' suffix, e.g. instead of <code class="computeroutput">-liostreams</code>
+            or <code class="computeroutput">hpx_component_debug</code>. Moreover, all referenced <span class="emphasis"><em>HPX</em></span>
+            components need to have a appended 'd' suffix, e.g. instead of <code class="computeroutput">-liostreams</code>
             you will need to specify <code class="computeroutput">-liostreamsd</code>.
           </p></td></tr>
 </table></div>
@@ -231,7 +231,8 @@ $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs h
 $ ./hello_world_client
 </pre>
 <p>
-          which should print <code class="literal">Hello HPX World!</code> and exit.
+          which should print <code class="literal">Hello <span class="emphasis"><em>HPX</em></span> World!</code>
+          and exit.
         </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>

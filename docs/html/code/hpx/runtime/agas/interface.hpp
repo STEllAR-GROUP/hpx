@@ -266,15 +266,16 @@ HPX_API_EXPORT bool add_remote_incref_request(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT hpx::unique_future<bool> incref_async(
+HPX_API_EXPORT hpx::unique_future<boost::int64_t> incref_async(
     naming::gid_type const& gid
   , boost::int64_t credits
   , naming::id_type const& keep_alive = naming::invalid_id
   );
 
-HPX_API_EXPORT bool incref(
+HPX_API_EXPORT boost::int64_t incref(
     naming::gid_type const& gid
   , boost::int64_t credits = 1
+  , naming::id_type const& keep_alive = naming::invalid_id
   , error_code& ec = throws 
     );
 

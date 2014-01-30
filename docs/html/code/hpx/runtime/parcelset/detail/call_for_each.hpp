@@ -22,8 +22,8 @@ namespace hpx { namespace parcelset
             typedef std::vector<parcelport::write_handler_type> data_type;
             data_type fv_;
 
-            call_for_each(data_type const& fv)
-              : fv_(fv)
+            call_for_each(data_type&& fv)
+              : fv_(std::move(fv))
             {}
 
             result_type operator()(

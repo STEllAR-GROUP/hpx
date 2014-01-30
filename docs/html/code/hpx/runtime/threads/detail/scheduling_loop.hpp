@@ -321,6 +321,11 @@ namespace hpx { namespace threads { namespace detail
             {
                 busy_loop_count = 0;
                 scheduler.SchedulingPolicy::cleanup_terminated(true);
+
+                if (0 == num_thread) {
+                    // do background work in parcel layer
+                    hpx::parcelset::do_background_work();
+                }
             }
             else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX*10)
             {

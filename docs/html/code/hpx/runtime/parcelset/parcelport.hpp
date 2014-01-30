@@ -1,4 +1,5 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -90,7 +91,7 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcel(parcel const& p, write_handler_type const& f) = 0;
+        virtual void put_parcel(parcel p, write_handler_type f) = 0;
 
         /// Queues a list of parcels for transmission to another locality
         ///
@@ -107,8 +108,8 @@ namespace hpx { namespace parcelset
         ///      void handler(boost::system::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcels(std::vector<parcel> const & parcels,
-            std::vector<write_handler_type> const& handlers);
+        virtual void put_parcels(std::vector<parcel> parcels,
+            std::vector<write_handler_type> handlers) = 0;
 
         /// Send an early parcel through the TCP parcelport
         ///
@@ -116,25 +117,16 @@ namespace hpx { namespace parcelset
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
-        virtual void send_early_parcel(parcel& /*p*/)
-        {
-            HPX_ASSERT(false);    // is implemented in tcp::parcelport only
-        }
+        virtual void send_early_parcel(parcel& p) = 0;
 
         /// Cache specific functionality
-        virtual void remove_from_connection_cache(naming::locality const& /*loc*/)
-        {
-            // by default, no connection cache is used
-        }
+        virtual void remove_from_connection_cache(naming::locality const& loc) = 0;
 
         /// Retrieve the type of the locality represented by this parcelport
         virtual connection_type get_type() const = 0;
 
         /// Return the thread pool if the name matches
-        virtual util::io_service_pool* get_thread_pool(char const* /*name*/)
-        {
-            return 0;     // by default no thread pool is used
-        }
+        virtual util::io_service_pool* get_thread_pool(char const* name) = 0;
 
         /// Return the given connection cache statistic
         enum connection_cache_statistics_type
@@ -147,29 +139,13 @@ namespace hpx { namespace parcelset
         };
 
         // invoke pending background work
-        virtual void do_background_work()
-        {
-            // by default no work has to be done
-        }
-
-        // by default this parcelport does not expose any conenction cache
-        // statistics
-        virtual bool supports_connection_cache_statistics() const
-        {
-            return false;
-        }
+        virtual void do_background_work() = 0;
 
         virtual boost::int64_t
-        get_connection_cache_statistics(connection_cache_statistics_type, bool /*reset*/)
-        {
-            return 0;
-        }
+        get_connection_cache_statistics(connection_cache_statistics_type, bool reset) = 0;
 
         /// Return the name of this locality
-        virtual std::string get_locality_name() const
-        {
-            return "<unknown>";
-        }
+        virtual std::string get_locality_name() const = 0;
 
         /// Register an event handler to be called whenever a parcel has been
         /// received.
@@ -330,6 +306,9 @@ namespace hpx { namespace parcelset
             parcels_sent_.add_data(data);
         }
 
+        /// load the runtime configuration parameters
+        static std::pair<std::vector<std::string>, bool> runtime_configuration(int type);
+
         /// Create a new instance of a parcelport
         static boost::shared_ptr<parcelport> create(int type,
             util::runtime_configuration const& cfg,
@@ -359,6 +338,16 @@ namespace hpx { namespace parcelset
             return allow_zero_copy_optimizations_;
         }
 
+        bool enable_security() const
+        {
+            return enable_security_;
+        }
+
+        bool async_serialization() const
+        {
+            return async_serialization_;
+        }
+
     protected:
         void report_potential_connection_error(naming::locality const& locality_id,
             naming::gid_type const& parcel_id, error_code const& ec);
@@ -376,6 +365,9 @@ namespace hpx { namespace parcelset
         typedef std::map<naming::locality, map_second_type> pending_parcels_map;
         pending_parcels_map pending_parcels_;
 
+        typedef std::set<naming::locality> pending_parcels_destinations;
+        pending_parcels_destinations parcel_destinations_;
+
         /// The local locality
         naming::locality here_;
 
@@ -389,6 +381,12 @@ namespace hpx { namespace parcelset
         /// serialization is allowed to use array optimization
         bool allow_array_optimizations_;
         bool allow_zero_copy_optimizations_;
+
+        /// enable security
+        bool enable_security_;
+
+        /// async serialization of parcels
+        bool async_serialization_;
     };
 }}
 

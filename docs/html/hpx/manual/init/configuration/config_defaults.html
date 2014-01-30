@@ -590,6 +590,8 @@ max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:&lt;hpx
 max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:&lt;hpx_parcel_max_message_size&gt;}
 array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}
 zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}
+enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}
 </pre>
 <div class="informaltable">
 <a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel"></a><table class="table">
@@ -658,7 +660,7 @@ zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.array_
                       This property defines which parcelport type should be used
                       during application bootstrap. The default depends on the compile
                       time preprocessor constant <code class="computeroutput"><span class="identifier">HPX_PARCEL_BOOTSTRAP</span></code>
-                      (<code class="computeroutput"><span class="string">"tcpip"</span></code>).
+                      (<code class="computeroutput"><span class="string">"tcp"</span></code>).
                     </p>
                   </td>
 </tr>
@@ -736,16 +738,45 @@ zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.array_
                     </p>
                   </td>
 </tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">async_serialization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to spawn
+                      a new thread for serialization (this is both for encoding and
+                      decoding parcels). The default is <code class="computeroutput"><span class="number">1</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">enable_security</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is encrypting parcels.
+                      The default is <code class="computeroutput"><span class="number">0</span></code>.
+                    </p>
+                  </td>
+</tr>
 </tbody>
 </table>
 </div>
-<pre class="programlisting">[hpx.parcel.tcpip]
-enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}
-array_optimization = ${HPX_PARCEL_TCPIP_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
-zero_copy_optimization = ${HPX_PARCEL_TCPIP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
+<pre class="programlisting">[hpx.parcel.tcp]
+enable = ${HPX_HAVE_PARCELPORT_TCP:1}
+array_optimization = ${HPX_PARCEL_TCP_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+zero_copy_optimization = ${HPX_PARCEL_TCP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
+async_serialization = ${HPX_PARCEL_TCP_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
+enable_security = ${HPX_PARCEL_TCP_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
 </pre>
 <div class="informaltable">
-<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_tcpip"></a><table class="table">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_tcp"></a><table class="table">
 <colgroup>
 <col>
 <col>
@@ -766,23 +797,23 @@ zero_copy_optimization = ${HPX_PARCEL_TCPIP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.
 <tr>
 <td>
                     <p>
-                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcpip</span><span class="special">.</span><span class="identifier">enable</span></code>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcp</span><span class="special">.</span><span class="identifier">enable</span></code>
                     </p>
                   </td>
 <td>
                     <p>
-                      Enable the use of the default TCPIP parcelport. Note that the
+                      Enable the use of the default TCP parcelport. Note that the
                       initial bootstrap of the overall <span class="emphasis"><em>HPX</em></span> application
-                      will be performed using the default TCPIP connections. This
-                      parcelport is enabled by default. This will be disabled only
-                      if MPI is enabled (see below).
+                      will be performed using the default TCP connections. This parcelport
+                      is enabled by default. This will be disabled only if MPI is
+                      enabled (see below).
                     </p>
                   </td>
 </tr>
 <tr>
 <td>
                     <p>
-                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcpip</span><span class="special">.</span><span class="identifier">array_optimization</span></code>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcp</span><span class="special">.</span><span class="identifier">array_optimization</span></code>
                     </p>
                   </td>
 <td>
@@ -796,14 +827,43 @@ zero_copy_optimization = ${HPX_PARCEL_TCPIP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.
 <tr>
 <td>
                     <p>
-                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcpip</span><span class="special">.</span><span class="identifier">zero_copy_optimization</span></code>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcp</span><span class="special">.</span><span class="identifier">zero_copy_optimization</span></code>
                     </p>
                   </td>
 <td>
                     <p>
                       This property defines whether this locality is allowed to utilize
-                      zero copy optimizations in the TC{/IP parcelport during serialization
+                      zero copy optimizations in the TCP/IP parcelport during serialization
                       of parcel data. The default is the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">zero_copy_optimization</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcp</span><span class="special">.</span><span class="identifier">async_serialization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to spawn
+                      a new thread for serialization in the TCP/IP parcelport (this
+                      is both for encoding and decoding parcels). The default is
+                      the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">async_serialization</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">tcp</span><span class="special">.</span><span class="identifier">enable_security</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is encrypting parcels
+                      in the TCP/IP parcelport. The default is the same value as
+                      set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">enable_security</span></code>.
                     </p>
                   </td>
 </tr>
@@ -813,17 +873,19 @@ zero_copy_optimization = ${HPX_PARCEL_TCPIP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.
 <p>
             The following settings relate to the shared memory parcelport (which
             is usable for communication between two localities on the same node).
-            These settings take effect only if the compile time constant <code class="computeroutput"><span class="identifier">HPX_HAVE_PARCELPORT_SHMEM</span></code> is set (the
-            equivalent cmake variable is <code class="computeroutput"><span class="identifier">HPX_HAVE_PARCELPORT_SHMEM</span></code>,
+            These settings take effect only if the compile time constant <code class="computeroutput"><span class="identifier">HPX_HAVE_PARCELPORT_IPC</span></code> is set (the
+            equivalent cmake variable is <code class="computeroutput"><span class="identifier">HPX_HAVE_PARCELPORT_IPC</span></code>,
             and has to be set to <code class="computeroutput"><span class="identifier">ON</span></code>).
           </p>
-<pre class="programlisting">[hpx.parcel.shmem]
-enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}
-data_buffer_cache_size=${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}
-array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+<pre class="programlisting">[hpx.parcel.ipc]
+enable = ${HPX_HAVE_PARCELPORT_IPC:0}
+data_buffer_cache_size=${HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE:512}
+array_optimization = ${HPX_PARCEL_IPC_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+async_serialization = ${HPX_PARCEL_IPC_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
+enable_security = ${HPX_PARCEL_IPC_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
 </pre>
 <div class="informaltable">
-<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_shmem"></a><table class="table">
+<a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_ipc"></a><table class="table">
 <colgroup>
 <col>
 <col>
@@ -844,7 +906,7 @@ array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:$[hpx.parcel.array_op
 <tr>
 <td>
                     <p>
-                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">shmem</span><span class="special">.</span><span class="identifier">enable</span></code>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">ipc</span><span class="special">.</span><span class="identifier">enable</span></code>
                     </p>
                   </td>
 <td>
@@ -860,7 +922,7 @@ array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:$[hpx.parcel.array_op
 <tr>
 <td>
                     <p>
-                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">shmem</span><span class="special">.</span><span class="identifier">data_buffer_cache_size</span></code>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">ipc</span><span class="special">.</span><span class="identifier">data_buffer_cache_size</span></code>
                     </p>
                   </td>
 <td>
@@ -868,7 +930,7 @@ array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:$[hpx.parcel.array_op
                       This property specifies the number of cached data buffers used
                       for interprocess communication between localities on the same
                       node. The default depends on the compile time preprocessor
-                      constant <code class="computeroutput"><span class="identifier">HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE</span></code>
+                      constant <code class="computeroutput"><span class="identifier">HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE</span></code>
                       (<code class="computeroutput"><span class="number">512</span></code>).
                     </p>
                   </td>
@@ -876,7 +938,7 @@ array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:$[hpx.parcel.array_op
 <tr>
 <td>
                     <p>
-                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">shmem</span><span class="special">.</span><span class="identifier">array_optimization</span></code>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">ipc</span><span class="special">.</span><span class="identifier">array_optimization</span></code>
                     </p>
                   </td>
 <td>
@@ -885,6 +947,35 @@ array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:$[hpx.parcel.array_op
                       array optimizations in the shared memory parcelport during
                       serialization of parcel data. The default is the same value
                       as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">array_optimization</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">ipc</span><span class="special">.</span><span class="identifier">async_serialization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to spawn
+                      a new thread for serialization in the shared memory parcelport
+                      (this is both for encoding and decoding parcels). The default
+                      is the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">async_serialization</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">ipc</span><span class="special">.</span><span class="identifier">enable_security</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is encrypting parcels
+                      in the shared memory parcelport. The default is the same value
+                      as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">enable_security</span></code>.
                     </p>
                   </td>
 </tr>
@@ -901,6 +992,8 @@ array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:$[hpx.parcel.array_op
 enable = ${HPX_HAVE_PARCELPORT_IBVERBS:0}
 buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}
 array_optimization = ${HPX_PARCEL_IBVERBS_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+async_serialization = ${HPX_PARCEL_IBVERBS_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
+enable_security = ${HPX_PARCEL_IBVERBS_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
 </pre>
 <div class="informaltable">
 <a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_ibverbs"></a><table class="table">
@@ -967,6 +1060,35 @@ array_optimization = ${HPX_PARCEL_IBVERBS_ARRAY_OPTIMIZATION:$[hpx.parcel.array_
                     </p>
                   </td>
 </tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">ibverbs</span><span class="special">.</span><span class="identifier">async_serialization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to spawn
+                      a new thread for serialization in the ibverbs parcelport (this
+                      is both for encoding and decoding parcels). The default is
+                      the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">async_serialization</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">ibverbs</span><span class="special">.</span><span class="identifier">enable_security</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is encrypting parcels
+                      in the ibverbs parcelport. The default is the same value as
+                      set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">enable_security</span></code>.
+                    </p>
+                  </td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -983,6 +1105,10 @@ multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}
 rank = &lt;MPI_rank&gt;
 processor_name = &lt;MPI_processor_name&gt;
 array_optimization = ${HPX_PARCEL_MPI_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+zero_copy_optimization = ${HPX_PARCEL_MPI_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
+use_io_pool = ${HPX_PARCEL_MPI_USE_IO_POOL:$1}
+async_serialization = ${HPX_PARCEL_MPI_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
+enable_security = ${HPX_PARCEL_MPI_ENABLE_SECURITY:$[hpx.parcel.enable_security]}
 </pre>
 <div class="informaltable">
 <a name="hpx.manual.init.configuration.config_defaults.ini_hpx_parcel_mpi"></a><table class="table">
@@ -1086,6 +1212,63 @@ array_optimization = ${HPX_PARCEL_MPI_ARRAY_OPTIMIZATION:$[hpx.parcel.array_opti
                       This property defines whether this locality is allowed to utilize
                       array optimizations in the MPI parcelport during serialization
                       of parcel data. The default is the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">array_optimization</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">mpi</span><span class="special">.</span><span class="identifier">zero_copy_optimization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to utilize
+                      zero copy optimizations in the MPI parcelport during serialization
+                      of parcel data. The default is the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">zero_copy_optimization</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">mpi</span><span class="special">.</span><span class="identifier">use_io_pool</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property can be set to run the progress thread inside
+                      of HPX threads instead of a separate thread pool. The default
+                      is <code class="computeroutput"><span class="number">1</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">mpi</span><span class="special">.</span><span class="identifier">async_serialization</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is allowed to spawn
+                      a new thread for serialization in the MPI parcelport (this
+                      is both for encoding and decoding parcels). The default is
+                      the same value as set for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">async_serialization</span></code>.
+                    </p>
+                  </td>
+</tr>
+<tr>
+<td>
+                    <p>
+                      <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">mpi</span><span class="special">.</span><span class="identifier">enable_security</span></code>
+                    </p>
+                  </td>
+<td>
+                    <p>
+                      This property defines whether this locality is encrypting parcels
+                      in the MPI parcelport. The default is the same value as set
+                      for <code class="computeroutput"><span class="identifier">hpx</span><span class="special">.</span><span class="identifier">parcel</span><span class="special">.</span><span class="identifier">enable_security</span></code>.
                     </p>
                   </td>
 </tr>

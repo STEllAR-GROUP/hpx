@@ -193,7 +193,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         template <typename Lock>
-        void wait(Lock& lock, 
+        void wait(Lock& lock,
             char const* description, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
@@ -213,7 +213,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                 if (ec) return;
             }
         }
-        
+
         template <typename Lock>
         void wait(Lock& lock, error_code& ec = throws)
         {
@@ -251,7 +251,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         wait_for(Lock& lock, boost::posix_time::time_duration const& rel_time,
             error_code& ec = throws)
         {
-            return wait_for(lock, rel_time, 
+            return wait_for(lock, rel_time,
                 "condition_variable::wait_for", ec);
         }
 
@@ -286,7 +286,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         wait_until(Lock& lock, boost::posix_time::ptime const& abs_time,
             error_code& ec = throws)
         {
-            return wait_until(lock, abs_time, 
+            return wait_until(lock, abs_time,
                 "condition_variable::wait_until", ec);
         }
 

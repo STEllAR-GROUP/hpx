@@ -52,26 +52,27 @@ cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
 # This project is C++ based.
 project(your_app CXX)
 
-# This adds the HPX cmake configuration directory to the search path.
+# This adds the <span class="emphasis"><em>HPX</em></span> cmake configuration directory to the search path.
 set(CMAKE_MODULE_PATH
     ${HPX_ROOT}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules)
 
-# Instruct cmake to find the HPX settings
+# Instruct cmake to find the <span class="emphasis"><em>HPX</em></span> settings
 find_package(HPX)
 
 include_directories(${HPX_INCLUDE_DIR})
 link_directories(${HPX_LIBRARY_DIR})
 </pre>
 <p>
-          This cmake script assumes that the location of the HPX installation is
-          set as the value of HPX_ROOT which is best done by passing it on the command
-          line while invoking cmake:
+          This cmake script assumes that the location of the <span class="emphasis"><em>HPX</em></span>
+          installation is set as the value of HPX_ROOT which is best done by passing
+          it on the command line while invoking cmake:
         </p>
 <pre class="programlisting">cmake -DHPX_ROOT=&lt;HPX installations directory&gt; ...
 </pre>
 <p>
-          Alternatively, if you wish to require HPX for your project, replace the
-          <code class="computeroutput">find_package(HPX)</code> line with <code class="computeroutput">find_package(HPX REQUIRED)</code>.
+          Alternatively, if you wish to require <span class="emphasis"><em>HPX</em></span> for your
+          project, replace the <code class="computeroutput">find_package(HPX)</code> line with <code class="computeroutput">find_package(HPX
+          REQUIRED)</code>.
         </p>
 <p>
           The last two lines in the snippet above sets the appropriate include and

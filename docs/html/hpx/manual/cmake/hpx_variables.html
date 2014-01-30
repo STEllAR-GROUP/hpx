@@ -17,12 +17,12 @@
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h4 class="title">
-<a name="hpx.manual.cmake.hpx_variables"></a><a class="link" href="hpx_variables.html" title="HPX specific CMake Variables">HPX specific CMake
-        Variables</a>
+<a name="hpx.manual.cmake.hpx_variables"></a><a class="link" href="hpx_variables.html" title="HPX specific CMake Variables"><span class="emphasis"><em>HPX</em></span>
+        specific CMake Variables</a>
 </h4></div></div></div>
 <div class="toc"><dl class="toc">
 <dt><span class="section"><a href="hpx_variables/cmake_frequently_used.html">Frequently
-          used HPX specific CMake Variables</a></span></dt>
+          used <span class="emphasis"><em>HPX</em></span> specific CMake Variables</a></span></dt>
 <dt><span class="section"><a href="hpx_variables/cmake_hpx_malloc.html">Setting
           the memory Allocator</a></span></dt>
 <dt><span class="section"><a href="hpx_variables/cmake_threading.html">Variables
@@ -38,13 +38,36 @@
           purposes.
         </p>
 <div class="variablelist">
-<p class="title"><b>Other HPX specific CMake Variables</b></p>
+<p class="title"><b>Other __hpx__ specific CMake Variables</b></p>
 <dl class="variablelist">
 <dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
 <dd><p>
                 Sets whether <span class="emphasis"><em>HPX</em></span> threads should capture the
-                stack back-trace whenever they are about to be suspended (default:
-                <code class="computeroutput"><span class="identifier">OFF</span></code>).
+                stack back-trace (list of stack frames) whenever they are about to
+                be suspended (default: <code class="computeroutput"><span class="identifier">OFF</span></code>).
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether <span class="emphasis"><em>HPX</em></span> threads should capture the
+                stack back-trace as a string whenever they are about to be suspended
+                (default: <code class="computeroutput"><span class="identifier">OFF</span></code>). If
+                this option is enabled <span class="emphasis"><em>HPX</em></span> will not store the
+                stack back-trace (list of stack frames) as enabled by <code class="computeroutput"><span class="identifier">HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION</span></code>.
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_HAVE_VERIFY_LOCKS</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether <span class="emphasis"><em>HPX</em></span> should be configured to enable
+                code which verifies that no locks are being held during thread suspension
+                (default: <code class="computeroutput"><span class="identifier">OFF</span></code>). This
+                option is mostly useful for debugging purposes as locks which are
+                being held during thread suspension can easily cause deadlocks.
+              </p></dd>
+<dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_HAVE_VERIFY_LOCKS_BACKTRACE</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
+<dd><p>
+                Sets whether <span class="emphasis"><em>HPX</em></span> should be configured to store
+                the stack back-trace as a string for are locks which are registered
+                with the lock tracking (default <code class="computeroutput"><span class="identifier">OFF</span></code>).
+                This allows to track at what place a lock was acquired.
               </p></dd>
 <dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH</span><span class="special">:</span><span class="identifier">STRING</span></code></span></dt>
 <dd><p>
@@ -95,16 +118,16 @@
               </p></dd>
 <dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_USE_MORE_THAN_64_THREADS</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
 <dd><p>
-                Sets whether HPX should be configured to run more than 64 threads
-                (for system having more than 64 processing units, like the XeonPhi
-                device). The variable is set to <code class="computeroutput"><span class="identifier">OFF</span></code>
+                Sets whether <span class="emphasis"><em>HPX</em></span> should be configured to run
+                more than 64 threads (for system having more than 64 processing units,
+                like the XeonPhi device). The variable is set to <code class="computeroutput"><span class="identifier">OFF</span></code>
                 by default.
               </p></dd>
 <dt><span class="term"><code class="computeroutput"><span class="identifier">HPX_HAVE_SECURITY</span><span class="special">:</span><span class="identifier">BOOL</span></code></span></dt>
 <dd><p>
-                Sets whether HPX should be configured to include security related
-                code which currently secures inter-locality related traffic and inter-locality
-                action invocations.
+                Sets whether <span class="emphasis"><em>HPX</em></span> should be configured to include
+                security related code which currently secures inter-locality related
+                traffic and inter-locality action invocations.
               </p></dd>
 </dl>
 </div>

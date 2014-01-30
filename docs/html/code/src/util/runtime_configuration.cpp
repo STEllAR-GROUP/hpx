@@ -12,6 +12,10 @@
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/find_prefix.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/util/register_locks_globally.hpp>
+
+// TODO: move parcel ports into plugins
+#include <hpx/runtime/parcelset/parcelhandler.hpp>
 
 #include <boost/config.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -87,6 +91,9 @@ namespace hpx { namespace util
 #if HPX_HAVE_VERIFY_LOCKS
             "lock_detection = ${HPX_LOCK_DETECTION:0}",
 #endif
+#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+            "global_lock_detection = ${HPX_GLOBAL_LOCK_DETECTION:0}",
+#endif
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
 #if HPX_DEBUG
             "minimal_deadlock_detection = ${MINIMAL_DEADLOCK_DETECTION:1}",
@@ -123,70 +130,6 @@ namespace hpx { namespace util
                 BOOST_PP_STRINGIZE(HPX_NUM_PARCEL_POOL_THREADS) "}",
             "timer_pool_size = ${HPX_NUM_TIMER_POOL_THREADS:"
                 BOOST_PP_STRINGIZE(HPX_NUM_TIMER_POOL_THREADS) "}",
-
-            "[hpx.parcel]",
-            "address = ${HPX_PARCEL_SERVER_ADDRESS:" HPX_INITIAL_IP_ADDRESS "}",
-            "port = ${HPX_PARCEL_SERVER_PORT:"
-                BOOST_PP_STRINGIZE(HPX_INITIAL_IP_PORT) "}",
-            "bootstrap = ${HPX_PARCEL_BOOTSTRAP:" HPX_PARCEL_BOOTSTRAP "}",
-            "max_connections = ${HPX_PARCEL_MAX_CONNECTIONS:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS) "}",
-            "max_connections_per_locality = ${HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY) "}",
-            "max_message_size = ${HPX_PARCEL_MAX_MESSAGE_SIZE:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MAX_MESSAGE_SIZE) "}",
-#ifdef BOOST_BIG_ENDIAN
-            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:big}",
-#else
-            "endian_out = ${HPX_PARCEL_ENDIAN_OUT:little}",
-#endif
-            "array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}",
-            "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
-
-            // TCPIP related settings
-            "[hpx.parcel.tcpip]",
-#if defined(HPX_HAVE_PARCELPORT_TCPIP)
-            "enable = ${HPX_HAVE_PARCELPORT_TCPIP:1}",
-#else
-            "enable = ${HPX_HAVE_PARCELPORT_TCPIP:0}",
-#endif
-            "array_optimization = ${HPX_PARCEL_TCPIP_ARRAY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
-            "zero_copy_optimization = ${HPX_PARCEL_TCPIP_ZERO_COPY_OPTIMIZATION:"
-                "$[hpx.parcel.zero_copy_optimization]}",
-
-            // shmem related settings
-            "[hpx.parcel.shmem]",
-            "enable = ${HPX_HAVE_PARCELPORT_SHMEM:0}",
-            "data_buffer_cache_size = ${HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE:512}",
-            "array_optimization = ${HPX_PARCEL_SHMEM_ARRAY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
-
-            // ibverbs related settings
-            "[hpx.parcel.ibverbs]",
-            "enable = ${HPX_HAVE_PARCELPORT_IBVERBS:0}",
-            "buffer_size = ${HPX_PARCEL_IBVERBS_BUFFER_SIZE:65536}",
-            "array_optimization = ${HPX_PARCEL_IBVERBS_ARRAY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
-
-            // MPI related settings
-            "[hpx.parcel.mpi]",
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-            "enable = ${HPX_HAVE_PARCELPORT_MPI:1}",
-            "max_requests = ${HPX_PARCEL_MPI_MAX_REQUESTS:"
-                BOOST_PP_STRINGIZE(HPX_PARCEL_MPI_MAX_REQUESTS) "}",
-# if defined(HPX_PARCELPORT_MPI_ENV)
-            "env = ${HPX_PARCELPORT_MPI_ENV:" HPX_PARCELPORT_MPI_ENV "}",
-# else
-            "env = ${HPX_PARCELPORT_MPI_ENV:PMI_RANK,OMPI_COMM_WORLD_SIZE}",
-# endif
-            "multithreaded = ${HPX_PARCELPORT_MPI_MULTITHREADED:0}",
-#else
-            "enable = ${HPX_HAVE_PARCELPORT_MPI:0}",
-#endif
-            "array_optimization = ${HPX_PARCEL_MPI_ARRAY_OPTIMIZATION:"
-                "$[hpx.parcel.array_optimization]}",
 
             // predefine command line aliases
             "[hpx.commandline]",
@@ -255,6 +198,11 @@ namespace hpx { namespace util
             "path = $[hpx.location]/lib/hpx/" HPX_DLL_STRING,
             "enabled = 1"
         ;
+
+        std::vector<std::string> lines_pp =
+            hpx::parcelset::parcelhandler::load_runtime_configuration();
+
+        lines.insert(lines.end(), lines_pp.begin(), lines_pp.end());
 
         // don't overload user overrides
         this->parse("static defaults", lines, false);
@@ -341,7 +289,7 @@ namespace hpx { namespace util
         // invoke last reconfigure
         reconfigure();
     }
-
+    
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration(char const* argv0_)
       : num_localities(0),
@@ -374,6 +322,10 @@ namespace hpx { namespace util
 #if HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
             util::enable_lock_detection();
+#endif
+#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+        if (enable_global_lock_detection())
+            util::enable_global_lock_detection();
 #endif
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         threads::policies::minimal_deadlock_detection =
@@ -424,6 +376,10 @@ namespace hpx { namespace util
 #if HPX_HAVE_VERIFY_LOCKS
         if (enable_lock_detection())
             util::enable_lock_detection();
+#endif
+#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+        if (enable_global_lock_detection())
+            util::enable_global_lock_detection();
 #endif
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
         threads::policies::minimal_deadlock_detection =
@@ -492,72 +448,21 @@ namespace hpx { namespace util
         return naming::locality(HPX_INITIAL_IP_ADDRESS, HPX_INITIAL_IP_PORT);
     }
 
-    std::size_t runtime_configuration::get_max_connections_per_loc() const
+    std::size_t runtime_configuration::get_ipc_data_buffer_cache_size() const
     {
         if (has_section("hpx.parcel"))
         {
-            util::section const * sec = get_section("hpx.parcel");
+            util::section const * sec = get_section("hpx.parcel.ipc");
             if(NULL != sec)
             {
-                std::string cfg_max_connections_per_loc(
-                    sec->get_entry("max_connections_per_locality",
-                        HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY));
-
-                return boost::lexical_cast<std::size_t>(cfg_max_connections_per_loc);
-            }
-        }
-        return HPX_PARCEL_MAX_CONNECTIONS_PER_LOCALITY;
-    }
-
-    std::size_t runtime_configuration::get_max_connections() const
-    {
-        if (has_section("hpx.parcel"))
-        {
-            util::section const * sec = get_section("hpx.parcel");
-            if(NULL != sec)
-            {
-                std::string cfg_max_connections(
-                    sec->get_entry("max_connections",
-                        HPX_PARCEL_MAX_CONNECTIONS));
-
-                return boost::lexical_cast<std::size_t>(cfg_max_connections);
-            }
-        }
-        return HPX_PARCEL_MAX_CONNECTIONS;
-    }
-
-    std::size_t runtime_configuration::get_shmem_data_buffer_cache_size() const
-    {
-        if (has_section("hpx.parcel"))
-        {
-            util::section const * sec = get_section("hpx.parcel.shmem");
-            if(NULL != sec)
-            {
-                std::string cfg_shmem_data_buffer_cache_size(
+                std::string cfg_ipc_data_buffer_cache_size(
                     sec->get_entry("data_buffer_cache_size",
-                        HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE));
+                        HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE));
 
-                return boost::lexical_cast<std::size_t>(cfg_shmem_data_buffer_cache_size);
+                return boost::lexical_cast<std::size_t>(cfg_ipc_data_buffer_cache_size);
             }
         }
-        return HPX_PARCEL_SHMEM_DATA_BUFFER_CACHE_SIZE;
-    }
-
-    std::size_t runtime_configuration::get_max_mpi_requests() const
-    {
-        if (has_section("hpx.parcel"))
-        {
-            util::section const * sec = get_section("hpx.parcel.mpi");
-            if(NULL != sec)
-            {
-                std::string cfg_max_mpi_requests(
-                    sec->get_entry("max_requests",
-                        HPX_PARCEL_MPI_MAX_REQUESTS));
-
-                return boost::lexical_cast<std::size_t>(cfg_max_mpi_requests);
-            }
-        }
-        return HPX_PARCEL_MPI_MAX_REQUESTS;
+        return HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE;
     }
 
     agas::service_mode runtime_configuration::get_agas_service_mode() const
@@ -749,6 +654,21 @@ namespace hpx { namespace util
             if (NULL != sec) {
                 return boost::lexical_cast<int>(
                     sec->get_entry("lock_detection", "0")) != 0;
+            }
+        }
+#endif
+        return false;
+    }
+
+    // Enable global lock tracking
+    bool runtime_configuration::enable_global_lock_detection() const
+    {
+#if HPX_HAVE_VERIFY_LOCKS_GLOBALLY
+        if (has_section("hpx")) {
+            util::section const* sec = get_section("hpx");
+            if (NULL != sec) {
+                return boost::lexical_cast<int>(
+                    sec->get_entry("global_lock_detection", "0")) != 0;
             }
         }
 #endif

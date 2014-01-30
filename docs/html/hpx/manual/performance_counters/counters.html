@@ -309,8 +309,8 @@
                   <p>
                     where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
                     <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
-                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
-                    <code class="computeroutput">ibverbs</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">ipc</code>,
+                    <code class="computeroutput">ibverbs</code>, <code class="computeroutput">mpi</code>
                   </p>
                 </td>
 <td>
@@ -335,14 +335,20 @@
                     or <code class="computeroutput">received</code>) for the specified <code class="computeroutput">&lt;connection_type&gt;</code>.
                   </p>
                   <p>
-                    The performance counters for the connection type <code class="computeroutput">shmem</code>
-                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    The performance counters for the connection type <code class="computeroutput">ipc</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IPC</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
                   <p>
                     The performance counters for the connection type <code class="computeroutput">ibverbs</code>
                     are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">mpi</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_MPI</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
@@ -360,8 +366,8 @@
                   <p>
                     where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
                     <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
-                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
-                    <code class="computeroutput">ibverbs</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">ipc</code>,
+                    <code class="computeroutput">ibverbs</code>, <code class="computeroutput">mpi</code>
                   </p>
                 </td>
 <td>
@@ -388,14 +394,20 @@
                     <code class="computeroutput">sent</code> or <code class="computeroutput">received</code>).
                   </p>
                   <p>
-                    The performance counters for the connection type <code class="computeroutput">shmem</code>
-                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    The performance counters for the connection type <code class="computeroutput">ipc</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IPC</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
                   <p>
                     The performance counters for the connection type <code class="computeroutput">ibverbs</code>
                     are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">mpi</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_MPI</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
@@ -413,8 +425,8 @@
                   <p>
                     where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
                     <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
-                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
-                    <code class="computeroutput">ibverbs</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">ipc</code>,
+                    <code class="computeroutput">ibverbs</code>, <code class="computeroutput">mpi</code>
                   </p>
                 </td>
 <td>
@@ -440,14 +452,20 @@
                     given locality.
                   </p>
                   <p>
-                    The performance counters for the connection type <code class="computeroutput">shmem</code>
-                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    The performance counters for the connection type <code class="computeroutput">ipc</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IPC</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
                   <p>
                     The performance counters for the connection type <code class="computeroutput">ibverbs</code>
                     are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">mpi</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_MPI</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
@@ -465,8 +483,8 @@
                   <p>
                     where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
                     <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
-                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
-                    <code class="computeroutput">ibverbs</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">ipc</code>,
+                    <code class="computeroutput">ibverbs</code>, <code class="computeroutput">mpi</code>
                   </p>
                 </td>
 <td>
@@ -492,14 +510,20 @@
                     or <code class="computeroutput">received</code>).
                   </p>
                   <p>
-                    The performance counters for the connection type <code class="computeroutput">shmem</code>
-                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    The performance counters for the connection type <code class="computeroutput">ipc</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IPC</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
                   <p>
                     The performance counters for the connection type <code class="computeroutput">ibverbs</code>
                     are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">mpi</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_MPI</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
@@ -517,8 +541,8 @@
                   <p>
                     where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
                     <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
-                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
-                    <code class="computeroutput">ibverbs</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">ipc</code>,
+                    <code class="computeroutput">ibverbs</code>, <code class="computeroutput">mpi</code>
                   </p>
                 </td>
 <td>
@@ -545,14 +569,20 @@
                     or <code class="computeroutput">received</code>).
                   </p>
                   <p>
-                    The performance counters for the connection type <code class="computeroutput">shmem</code>
-                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    The performance counters for the connection type <code class="computeroutput">ipc</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IPC</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
                   <p>
                     The performance counters for the connection type <code class="computeroutput">ibverbs</code>
                     are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">mpi</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_MPI</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
@@ -613,8 +643,8 @@
                   <p>
                     where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
                     <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
-                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
-                    <code class="computeroutput">ibverbs</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">ipc</code>,
+                    <code class="computeroutput">ibverbs</code>, <code class="computeroutput">mpi</code>
                   </p>
                 </td>
 <td>
@@ -639,14 +669,20 @@
                     <code class="computeroutput">&lt;operation&gt;</code>, e.g. <code class="computeroutput">sent</code> or <code class="computeroutput">received</code>).
                   </p>
                   <p>
-                    The performance counters for the connection type <code class="computeroutput">shmem</code>
-                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    The performance counters for the connection type <code class="computeroutput">ipc</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IPC</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
                   <p>
                     The performance counters for the connection type <code class="computeroutput">ibverbs</code>
                     are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">mpi</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_MPI</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
@@ -664,8 +700,8 @@
                   <p>
                     where:<br> <code class="computeroutput">&lt;operation&gt;</code> is one of the following:
                     <code class="computeroutput">sent</code>, <code class="computeroutput">received</code><br> <code class="computeroutput">&lt;connection_type&gt;</code>
-                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>,
-                    <code class="computeroutput">ibverbs</code>
+                    is one of the following: <code class="computeroutput">tcp</code>, <code class="computeroutput">ipc</code>,
+                    <code class="computeroutput">ibverbs</code>, <code class="computeroutput">mpi</code>
                   </p>
                 </td>
 <td>
@@ -690,14 +726,20 @@
                     <code class="computeroutput">sent</code> or <code class="computeroutput">received</code>).
                   </p>
                   <p>
-                    The performance counters for the connection type <code class="computeroutput">shmem</code>
-                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    The performance counters for the connection type <code class="computeroutput">ipc</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IPC</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
                   <p>
                     The performance counters for the connection type <code class="computeroutput">ibverbs</code>
                     are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">mpi</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_MPI</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
@@ -717,7 +759,7 @@
                     the following: <code class="computeroutput">cache-insertions</code>, <code class="computeroutput">cache-evictions</code>,
                     <code class="computeroutput">cache-hits</code>, <code class="computeroutput">cache-misses</code>, <code class="computeroutput">cache-misses</code><br>
                     <code class="computeroutput">&lt;connection_type&gt;</code> is one of the following:
-                    <code class="computeroutput">tcp</code>, <code class="computeroutput">shmem</code>, <code class="computeroutput">ibverbs</code>
+                    <code class="computeroutput">tcp</code>, <code class="computeroutput">ipc</code>, <code class="computeroutput">ibverbs</code>, <code class="computeroutput">mpi</code>
                   </p>
                 </td>
 <td>
@@ -744,14 +786,20 @@
                     <code class="computeroutput">cache-hits</code>, <code class="computeroutput">cache-misses</code>, or <code class="computeroutput">cache-reclaims</code>).
                   </p>
                   <p>
-                    The performance counters for the connection type <code class="computeroutput">shmem</code>
-                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_SHMEM</code>
+                    The performance counters for the connection type <code class="computeroutput">ipc</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IPC</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>
                   <p>
                     The performance counters for the connection type <code class="computeroutput">ibverbs</code>
                     are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_IBVERBS</code>
+                    was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
+                    library (which is not defined by default).
+                  </p>
+                  <p>
+                    The performance counters for the connection type <code class="computeroutput">mpi</code>
+                    are available only if the compile time constant <code class="computeroutput">HPX_HAVE_PARCELPORT_MPI</code>
                     was defined while compiling the <span class="emphasis"><em>HPX</em></span> core
                     library (which is not defined by default).
                   </p>

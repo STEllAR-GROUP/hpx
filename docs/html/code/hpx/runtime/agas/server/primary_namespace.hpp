@@ -12,6 +12,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/traits/action_may_require_id_splitting.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
@@ -28,6 +29,7 @@
 
 #include <boost/format.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/include/at_c.hpp>
 
 namespace hpx { namespace agas
 {
@@ -61,7 +63,8 @@ char const* const primary_namespace_service_name = "primary/";
 ///                  locality is assigned a prefix. This creates a 96-bit
 ///                  address space for each locality.
 ///     RC         - Bit 88 to bit 92 of the MSB. This is the log2 of the number
-///                  of reference counting credits on the GID. Bit 93 is unused.
+///                  of reference counting credits on the GID.
+///                  Bit 93 is used by the locking scheme for gid_types.
 ///                  Bit 94 is a flag which is set if the credit value is valid.
 ///                  Bit 95 is a flag that is set if a GID's credit count is
 ///                  ever split (e.g. if the GID is ever passed to another
@@ -457,11 +460,29 @@ namespace hpx { namespace traits
 
     // Parcel routing forwards the binary filter request to the routed action
     template <>
-    struct action_serialization_filter<agas::server::primary_namespace::service_action>
+    struct action_serialization_filter<
+        agas::server::primary_namespace::service_action>
     {
         static util::binary_filter* call(parcelset::parcel const& p)
         {
             return agas::server::primary_namespace::get_serialization_filter(p);
+        }
+    };
+
+    // id-splitting does not happen for incref operations
+    template <>
+    struct action_may_require_id_splitting<
+        agas::server::primary_namespace::service_action>
+    {
+        template <typename Arguments>
+        static bool call(Arguments const& args)
+        {
+            if (boost::fusion::at_c<0>(args).get_action_code() ==
+                agas::primary_ns_increment_credit)
+            {
+                return false;
+            }
+            return true;
         }
     };
 }}

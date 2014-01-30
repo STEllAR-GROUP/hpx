@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2013 Hartmut Kaiser
+//  Copyright (c) 2011-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,7 +27,6 @@
 #include <hpx/lcos/local/mutex.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/runtime/agas/gva.hpp>
-#include <hpx/runtime/agas/incref_requests.hpp>
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/locality.hpp>
@@ -82,7 +81,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_requests_type;
-    typedef detail::incref_requests incref_requests_type;
 
     struct bootstrap_data_type;
     struct hosted_data_type;
@@ -100,7 +98,6 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     bool enable_refcnt_caching_;
 
     boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
-    boost::shared_ptr<incref_requests_type> incref_requests_;
 
     service_mode const service_type;
     runtime_mode const runtime_type;
@@ -211,19 +208,10 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     void* get_bootstrap_component_ns_ptr() const;
     void* get_bootstrap_symbol_ns_ptr() const;
 
-    bool synchronize_with_async_incref(
+    boost::int64_t synchronize_with_async_incref(
         hpx::unique_future<boost::int64_t> fut
       , naming::id_type const& id
       , boost::int64_t compensated_credit
-        );
-    hpx::unique_future<bool> propagate_acknowlegdements(
-        boost::int64_t credit
-      , naming::gid_type const& gid
-      , boost::uint32_t locality
-        );
-    bool propagate_local_incref_acknowlegdement(
-        boost::int64_t credit
-      , naming::gid_type const& gid
         );
 
 protected:
@@ -1103,13 +1091,13 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    lcos::unique_future<bool> incref_async(
+    lcos::unique_future<boost::int64_t> incref_async(
         naming::gid_type const& gid
       , boost::int64_t credits = 1
       , naming::id_type const& keep_alive = naming::invalid_id
         );
 
-    bool incref(
+    boost::int64_t incref(
         naming::gid_type const& gid
       , boost::int64_t credits = 1
       , error_code& ec = throws
@@ -1117,16 +1105,6 @@ public:
     {
         return incref_async(gid, credits).get(ec);
     }
-
-    void add_incref_request(
-        boost::int64_t credit
-      , naming::id_type const& keep_alive
-        );
-    bool add_remote_incref_request(
-        boost::int64_t credit
-      , naming::gid_type const& gid
-      , boost::uint32_t remote_locality
-        );
 
     /// \brief Decrement the global reference count for the given id
     ///

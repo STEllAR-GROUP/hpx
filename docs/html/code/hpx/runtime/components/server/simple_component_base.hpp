@@ -10,7 +10,6 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>
@@ -96,18 +95,26 @@ namespace hpx { namespace components
                 }
             }
 
-            if (!naming::detail::has_credits(gid_)) 
-                return gid_;
+            naming::gid_type::mutex_type::scoped_lock l(gid_.get_mutex());
+
+            if (!naming::detail::has_credits(gid_))
+            {
+                naming::gid_type gid = gid_;
+                return gid;
+            }
 
             // on first invocation take all credits to avoid a self reference
             naming::gid_type gid = gid_;
-            naming::detail::strip_credit_from_gid(const_cast<naming::gid_type&>(gid_));
+
+            naming::detail::strip_credits_from_gid(
+                const_cast<naming::gid_type&>(gid_));
+
+            HPX_ASSERT(naming::detail::has_credits(gid));
 
             // We have to assume this credit was split as otherwise the gid
             // returned at this point will control the lifetime of the
             // component.
             naming::detail::set_credit_split_mask_for_gid(gid);
-
             return gid;
         }
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
 //  Copyright (c) 2011 Bryce Lelbach
@@ -99,6 +99,8 @@ namespace hpx { namespace parcelset
             virtual void set_parcel_id(naming::gid_type const& id) = 0;
 
             virtual std::size_t get_type_size() const = 0;
+
+            virtual bool may_require_id_splitting() const = 0;
 
             // default copy constructor is ok
             // default assignment operator is ok
@@ -322,6 +324,11 @@ namespace hpx { namespace parcelset
             std::size_t get_type_size() const
             {
                 return sizeof(parcel_buffer) + this->get_action()->get_type_size();
+            }
+
+            bool may_require_id_splitting() const
+            {
+                return this->get_action()->may_require_id_splitting();
             }
 
             template <typename Archive>
@@ -711,6 +718,11 @@ namespace hpx { namespace parcelset
         std::size_t get_type_size() const
         {
             return data_->get_type_size();
+        }
+
+        bool may_require_id_splitting() const
+        {
+            return data_->may_require_id_splitting();
         }
 
         // generate unique parcel id

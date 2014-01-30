@@ -15,7 +15,9 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#include <hpx/lcos/promise.hpp>
+
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/wait_all.hpp>
 
 #include <list>
 
@@ -332,7 +334,7 @@ response primary_namespace::bind_gid(
     // parameters
     gva g = req.get_gva();
     naming::gid_type id = req.get_gid();
-    naming::detail::strip_credit_from_gid(id);
+    naming::detail::strip_internal_bits_from_gid(id);
 
     mutex_type::scoped_lock l(mutex_);
 
@@ -524,7 +526,7 @@ response primary_namespace::unbind_gid(
     // parameters
     boost::uint64_t count = req.get_count();
     naming::gid_type id = req.get_gid();
-    naming::detail::strip_credit_from_gid(id);
+    naming::detail::strip_internal_bits_from_gid(id);
 
     mutex_type::scoped_lock l(mutex_);
 
@@ -581,7 +583,7 @@ response primary_namespace::increment_credit(
     boost::int64_t credits = req.get_credit();
     naming::gid_type lower = req.get_gid();
 
-    naming::detail::strip_credit_from_gid(lower);
+    naming::detail::strip_internal_bits_from_gid(lower);
 
     // Increment.
     if (credits > 0)
@@ -610,8 +612,8 @@ response primary_namespace::change_credit(
     naming::gid_type lower = req.get_lower_bound();
     naming::gid_type upper = req.get_upper_bound();
 
-    naming::detail::strip_credit_from_gid(lower);
-    naming::detail::strip_credit_from_gid(upper);
+    naming::detail::strip_internal_bits_from_gid(lower);
+    naming::detail::strip_internal_bits_from_gid(upper);
 
     // Increment.
     if (credits > 0)
@@ -1151,10 +1153,11 @@ void primary_namespace::free_components_sync(
 { // {{{ kill_sync implementation
     using boost::fusion::at_c;
 
-    std::list<lcos::promise<void> > futures;
+    std::vector<lcos::unique_future<void> > futures;
 
     ///////////////////////////////////////////////////////////////////////////
-    // Kill the dead objects.
+    // Delete the objects on the free list.
+    components::server::runtime_support::free_component_action act;
 
     BOOST_FOREACH(free_entry const& e, free_list)
     {
@@ -1179,30 +1182,17 @@ void primary_namespace::free_components_sync(
             % upper
             % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
 
-        typedef components::server::runtime_support::free_component_action
-            action_type;
-
         components::component_type const type_ =
             components::component_type(at_c<0>(e).type);
 
-        // FIXME: Resolve the locality instead of deducing it from the
-        // target GID, otherwise this will break once we start moving
-        // objects.
         naming::id_type const prefix_(
             naming::get_locality_from_gid(at_c<1>(e))
           , naming::id_type::unmanaged);
 
-        futures.push_back(lcos::promise<void>());
-
-        // FIXME: Priority?
-        hpx::apply_c<action_type>
-            (futures.back().get_gid(), prefix_, type_, at_c<1>(e), at_c<2>(e));
+        futures.push_back(hpx::async(act, prefix_, type_, at_c<1>(e), at_c<2>(e)));
     }
 
-    BOOST_FOREACH(lcos::promise<void>& f, futures)
-    {
-        f.get_future().get();
-    }
+    hpx::wait_all(futures);
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -1216,7 +1206,7 @@ primary_namespace::resolve_gid_locked(
 { // {{{ resolve_gid implementation
     // parameters
     naming::gid_type id = gid;
-    naming::detail::strip_credit_from_gid(id);
+    naming::detail::strip_internal_bits_from_gid(id);
 
     gva_table_type::const_iterator it = gvas_.lower_bound(id)
                                  , begin = gvas_.begin()
