@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2012 Bryce Adelstein-Lelbach 
+//  Copyright (c) 2012 Bryce Adelstein-Lelbach
 //  Copyright (c) 2014 Agustin Berge
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -29,6 +29,7 @@ using hpx::actions::plain_action0;
 using hpx::actions::plain_result_action0;
 
 using hpx::util::unwrapped;
+using hpx::util::unwrapped2;
 using hpx::async;
 using hpx::lcos::unique_future;
 
@@ -38,7 +39,7 @@ using hpx::naming::id_type;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> void_counter; 
+boost::atomic<std::size_t> void_counter;
 
 void null_thread()
 {
@@ -50,7 +51,7 @@ typedef plain_action0<null_thread> null_action;
 HPX_REGISTER_PLAIN_ACTION(null_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-boost::atomic<std::size_t> result_counter; 
+boost::atomic<std::size_t> result_counter;
 
 bool null_result_thread()
 {
@@ -61,6 +62,22 @@ bool null_result_thread()
 typedef plain_result_action0<bool, null_result_thread> null_result_action;
 
 HPX_REGISTER_PLAIN_ACTION(null_result_action);
+
+///////////////////////////////////////////////////////////////////////////////
+int increment(int c)
+{
+    return c + 1;
+}
+
+int accumulate(std::vector<int> cs)
+{
+    return std::accumulate(cs.begin(), cs.end(), 0);
+}
+
+int add(int c1, int c2)
+{
+    return c1 + c2;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
@@ -107,7 +124,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Sync wait, multiple futures, non-void return.
         {
-            HPX_STD_TUPLE<bool, bool, bool> r 
+            HPX_STD_TUPLE<bool, bool, bool> r
                 = unwrapped(async<null_result_action>(here_)
                      , async<null_result_action>(here_)
                      , async<null_result_action>(here_));
@@ -155,7 +172,7 @@ int hpx_main(
             for (std::size_t i = 0; i < 64; ++i)
                 HPX_TEST_EQ(true, values[i]);
 
-            result_counter.store(0); 
+            result_counter.store(0);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -172,6 +189,48 @@ int hpx_main(
             HPX_TEST_EQ(64U, result_counter.load());
 
             result_counter.store(0);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Functional wrapper, single future
+        {
+            unique_future<int> future = hpx::make_ready_future(42);
+
+            HPX_TEST_EQ(unwrapped(&increment)(future), 42 + 1);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Functional wrapper, vector of future
+        {
+            std::vector<unique_future<int> > futures;
+            futures.reserve(64);
+
+            for (std::size_t i = 0; i < 64; ++i)
+                futures.push_back(hpx::make_ready_future(42));
+
+            HPX_TEST_EQ(unwrapped(&accumulate)(futures), 42 * 64);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Functional wrapper, tuple of future
+        {
+            hpx::util::tuple<unique_future<int>, unique_future<int> > tuple =
+                hpx::util::forward_as_tuple(
+                    hpx::make_ready_future(42), hpx::make_ready_future(42));
+
+            HPX_TEST_EQ(unwrapped(&add)(tuple), 42 + 42);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Functional wrapper, future of tuple of future
+        {
+            hpx::unique_future<
+                hpx::util::tuple<unique_future<int>, unique_future<int> >
+            > tuple_future =
+                hpx::make_ready_future(hpx::util::make_tuple(
+                    hpx::make_ready_future(42), hpx::make_ready_future(42)));
+
+            HPX_TEST_EQ(unwrapped2(&add)(tuple_future), 42 + 42);
         }
     }
 
