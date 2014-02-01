@@ -115,8 +115,7 @@ struct HPX_EXPORT primary_namespace
 
     typedef boost::int32_t component_type;
 
-    typedef std::map<naming::gid_type, gva>
-        gva_table_type;
+    typedef std::map<naming::gid_type, gva> gva_table_type;
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_table_type;
@@ -371,13 +370,6 @@ struct HPX_EXPORT primary_namespace
       , naming::gid_type const& lower
       , naming::gid_type const& upper
       , boost::int64_t credits
-      , error_code& ec
-        );
-
-    void free_components_non_blocking(
-        std::list<free_entry>& free_list
-      , naming::gid_type const& lower
-      , naming::gid_type const& upper
       , error_code& ec
         );
 

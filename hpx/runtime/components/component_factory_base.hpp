@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -81,11 +81,28 @@ namespace hpx { namespace components
         virtual naming::gid_type create_with_args(
             HPX_STD_FUNCTION<void(void*)> const&) = 0;
 
+        /// \brief Create one new component instance and initialize it using
+        ///        the using the given constructor function. Assign the give
+        ///        GID to the new object.
+        ///
+        /// \param assign_gid [in] The GID to assign to the newly created object.
+        /// \param f  [in] The constructor function to call in order to
+        ///           initialize the newly allocated object.
+        ///
+        /// \return   Returns the GID of the first newly created component
+        ///           instance (this is the same as assign_gid, if successful).
+        virtual naming::gid_type create_with_args(
+            naming::gid_type const& assign_gid,
+            HPX_STD_FUNCTION<void(void*)> const& f) = 0;
+
         /// \brief Destroy one or more component instances
         ///
         /// \param gid    [in] The gid of the first component instance to
         ///               destroy.
-        virtual void destroy(naming::gid_type const&) = 0;
+        /// \param addr   [in] The resolved address of the first component
+        ///               instance to destroy.
+        virtual void destroy(naming::gid_type const&,
+            naming::address const& addr) = 0;
 
         /// \brief Ask whether this factory can be unloaded
         ///
@@ -106,10 +123,10 @@ namespace hpx { namespace components
         virtual long instance_count() const = 0;
 
 #if defined(HPX_HAVE_SECURITY)
-        /// \brief Return the required capabilities necessary to create an 
+        /// \brief Return the required capabilities necessary to create an
         ///        instance of a component using this factory instance.
         ///
-        /// \return Returns required capabilities necessary to create a new 
+        /// \return Returns required capabilities necessary to create a new
         ///         instance of a component using this factory instance.
         virtual components::security::capability
             get_required_capabilities() const = 0;

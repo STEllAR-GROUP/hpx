@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -50,7 +50,7 @@ namespace hpx { namespace components
         /// \brief Destruct a simple_component
         ~simple_component_base()
         {
-            if (gid_) applier::unbind_gid(gid_);
+            if (gid_) applier::unbind_gid_local(gid_);
         }
 
         /// \brief finalize() will be called just before the instance gets
@@ -73,7 +73,8 @@ namespace hpx { namespace components
         ///
         /// \returns      The global id (GID) assigned to this instance of a
         ///               component
-        naming::gid_type get_base_gid() const
+        naming::gid_type get_base_gid(
+            naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
             if (!gid_)
             {
@@ -81,17 +82,38 @@ namespace hpx { namespace components
                 naming::address addr(appl.here(),
                     components::get_component_type<wrapped_type>(),
                     boost::uint64_t(static_cast<this_component_type const*>(this)));
-                gid_ = hpx::detail::get_next_id();
-                if (!applier::bind_gid(gid_, addr))
+
+                if (!assign_gid)
                 {
-                    hpx::util::osstream strm;
-                    strm << gid_;
+                    gid_ = hpx::detail::get_next_id();
+                    if (!applier::bind_gid_local(gid_, addr))
+                    {
+                        hpx::util::osstream strm;
+                        strm << gid_;
 
-                    gid_ = naming::invalid_gid;   // invalidate GID
+                        gid_ = naming::invalid_gid;   // invalidate GID
 
-                    HPX_THROW_EXCEPTION(duplicate_component_address,
-                        "simple_component_base<Component>::get_base_gid",
-                        hpx::util::osstream_get_string(strm));
+                        HPX_THROW_EXCEPTION(duplicate_component_address,
+                            "simple_component_base<Component>::get_base_gid",
+                            hpx::util::osstream_get_string(strm));
+                    }
+                }
+                else
+                {
+                    gid_ = assign_gid;
+                    naming::detail::strip_credits_from_gid(gid_);
+
+                    if (!agas::bind_sync(gid_, addr))
+                    {
+                        hpx::util::osstream strm;
+                        strm << gid_;
+
+                        gid_ = naming::invalid_gid;   // invalidate GID
+
+                        HPX_THROW_EXCEPTION(duplicate_component_address,
+                            "simple_component_base<Component>::get_base_gid",
+                            hpx::util::osstream_get_string(strm));
+                    }
                 }
             }
 

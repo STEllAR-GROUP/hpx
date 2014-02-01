@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -122,14 +122,37 @@ namespace hpx { namespace components
             return naming::invalid_gid;
         }
 
+        /// \brief Create one new component instance and initialize it using
+        ///        the using the given constructor function. Assign the give
+        ///        GID to the new object.
+        ///
+        /// \param assign_gid [in] The GID to assign to the newly created object.
+        /// \param f  [in] The constructor function to call in order to
+        ///           initialize the newly allocated object.
+        ///
+        /// \return   Returns the GID of the first newly created component
+        ///           instance (this is the same as assign_gid, if successful).
+        naming::gid_type create_with_args(
+            naming::gid_type const& assign_gid,
+            HPX_STD_FUNCTION<void(void*)> const& f)
+        {
+            HPX_THROW_EXCEPTION(bad_request,
+                "base_lco_factory::create_with_args",
+                "this function should be never called");
+            return naming::invalid_gid;
+        }
+
     public:
         /// \brief Destroy one or more component instances
         ///
         /// \param gid    [in] The gid of the first component instance to
         ///               destroy.
-        void destroy(naming::gid_type const& gid)
+        /// \param addr   [in] The resolved address of the first component
+        ///               instance to destroy.
+        void destroy(naming::gid_type const& gid,
+            naming::address const& addr)    
         {
-            server::destroy_base_lco(gid, heap_.get(), type_);
+            server::destroy_base_lco(gid, addr, heap_.get(), type_);
         }
 
         /// \brief Ask how many instances are alive of the type this factory is

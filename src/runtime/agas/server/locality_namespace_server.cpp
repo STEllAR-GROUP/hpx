@@ -466,7 +466,8 @@ response locality_namespace::resolve_locality(
     if (&ec != &throws)
         ec = make_success_code();
 
-    return response(locality_ns_resolve_locality, 0, no_success);
+    return response(locality_ns_resolve_locality, naming::invalid_locality_id,
+        no_success);
 } // }}}
 
 response locality_namespace::free(

@@ -226,6 +226,11 @@ protected:
         unique_future<response> f
       , naming::gid_type const& id
         );
+    bool bind_postproc(
+        unique_future<response> f
+      , naming::gid_type const& id
+      , gva const& g
+    );
 
 private:
     /// Assumes that \a refcnt_requests_mtx_ is locked.
@@ -584,13 +589,21 @@ public:
     ///
     /// \note             Binding a gid to a local address sets its global
     ///                   reference count to one.
-    bool bind(
+    bool bind_local(
         naming::gid_type const& id
       , naming::address const& addr
       , error_code& ec = throws
         )
     {
-        return bind_range(id, 1, addr, 0, ec);
+        return bind_range_local(id, 1, addr, 0, ec);
+    }
+
+    hpx::unique_future<bool> bind_async(
+        naming::gid_type const& id
+      , naming::address const& addr
+        )
+    {
+        return bind_range_async(id, 1, addr, 0);
     }
 
     /// \brief Bind unique range of global ids to given base address
@@ -626,12 +639,19 @@ public:
     ///
     /// \note             Binding a gid to a local address sets its global
     ///                   reference count to one.
-    bool bind_range(
+    bool bind_range_local(
         naming::gid_type const& lower_id
       , boost::uint64_t count
       , naming::address const& baseaddr
       , boost::uint64_t offset
       , error_code& ec = throws
+        );
+
+    hpx::unique_future<bool> bind_range_async(
+        naming::gid_type const& lower_id
+      , boost::uint64_t count
+      , naming::address const& baseaddr
+      , boost::uint64_t offset
         );
 
     /// \brief Unbind a global address
@@ -665,12 +685,12 @@ public:
     /// \note             This function will raise an error if the global
     ///                   reference count of the given gid is not zero!
     ///                   TODO: confirm that this happens.
-    bool unbind(
+    bool unbind_local(
         naming::gid_type const& id
       , error_code& ec = throws
         )
     {
-        return unbind_range(id, 1, ec);
+        return unbind_range_local(id, 1, ec);
     }
 
     /// \brief Unbind a global address
@@ -708,13 +728,13 @@ public:
     /// \note             This function will raise an error if the global
     ///                   reference count of the given gid is not zero!
     ///                   TODO: confirm that this happens.
-    bool unbind(
+    bool unbind_local(
         naming::gid_type const& id
       , naming::address& addr
       , error_code& ec = throws
         )
     {
-        return unbind_range(id, 1, addr, ec);
+        return unbind_range_local(id, 1, addr, ec);
     }
 
     /// \brief Unbind the given range of global ids
@@ -752,14 +772,14 @@ public:
     /// \note             This function will raise an error if the global
     ///                   reference count of the given gid is not zero!
     ///                   TODO: confirm that this happens.
-    bool unbind_range(
+    bool unbind_range_local(
         naming::gid_type const& lower_id
       , boost::uint64_t count
       , error_code& ec = throws
         )
     {
         naming::address addr;
-        return unbind_range(lower_id, count, addr, ec);
+        return unbind_range_local(lower_id, count, addr, ec);
     }
 
     /// \brief Unbind the given range of global ids
@@ -799,7 +819,7 @@ public:
     ///
     /// \note             This function will raise an error if the global
     ///                   reference count of the given gid is not zero!
-    bool unbind_range(
+    bool unbind_range_local(
         naming::gid_type const& lower_id
       , boost::uint64_t count
       , naming::address& addr
@@ -824,20 +844,20 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool is_local_address(
-        naming::gid_type const& id
-      , error_code& ec = throws
-        )
-    {
-        naming::address addr;
-        return is_local_address(id, addr, ec);
-    }
-
-    bool is_local_address(
-        naming::gid_type const& id
-      , naming::address& addr
-      , error_code& ec = throws
-        );
+//     bool is_local_address(
+//         naming::gid_type const& id
+//       , error_code& ec = throws
+//         )
+//     {
+//         naming::address addr;
+//         return is_local_address(id, addr, ec);
+//     }
+// 
+//     bool is_local_address(
+//         naming::gid_type const& id
+//       , naming::address& addr
+//       , error_code& ec = throws
+//         );
 
     bool is_local_address_cached(
         naming::gid_type const& id
@@ -859,13 +879,13 @@ public:
         );
 
     // same, but bulk operation
-    bool is_local_address(
-        naming::gid_type const* gids
-      , naming::address* addrs
-      , std::size_t size
-      , boost::dynamic_bitset<>& locals
-      , error_code& ec = throws
-        );
+//     bool is_local_address(
+//         naming::gid_type const* gids
+//       , naming::address* addrs
+//       , std::size_t size
+//       , boost::dynamic_bitset<>& locals
+//       , error_code& ec = throws
+//         );
 
     /// \brief Resolve a given global address (\a id) to its associated local
     ///        address.
@@ -896,7 +916,7 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    bool resolve(
+    bool resolve_local(
         naming::gid_type const& id
       , naming::address& addr
       , error_code& ec = throws
@@ -912,35 +932,35 @@ public:
                 return false;
         }
 
-        return resolve_full(id, addr, ec);
+        return resolve_full_local(id, addr, ec);
     }
 
-    bool resolve(
+    bool resolve_local(
         naming::id_type const& id
       , naming::address& addr
       , error_code& ec = throws
         )
     {
-        return resolve(id.get_gid(), addr, ec);
+        return resolve_local(id.get_gid(), addr, ec);
     }
 
-    naming::address resolve(
+    naming::address resolve_local(
         naming::gid_type const& id
       , error_code& ec = throws
         )
     {
         naming::address addr;
-        resolve(id, addr, ec);
+        resolve_local(id, addr, ec);
         return addr;
     }
 
-    naming::address resolve(
+    naming::address resolve_local(
         naming::id_type const& id
       , error_code& ec = throws
         )
     {
         naming::address addr;
-        resolve(id.get_gid(), addr, ec);
+        resolve_local(id.get_gid(), addr, ec);
         return addr;
     }
 
@@ -955,38 +975,38 @@ public:
         return resolve_async(id.get_gid());
     }
 
-    bool resolve_full(
+    bool resolve_full_local(
         naming::gid_type const& id
       , naming::address& addr
       , error_code& ec = throws
         );
 
-    bool resolve_full(
+    bool resolve_full_local(
         naming::id_type const& id
       , naming::address& addr
       , error_code& ec = throws
         )
     {
-        return resolve_full(id.get_gid(), addr, ec);
+        return resolve_full_local(id.get_gid(), addr, ec);
     }
 
-    naming::address resolve_full(
+    naming::address resolve_full_local(
         naming::gid_type const& id
       , error_code& ec = throws
         )
     {
         naming::address addr;
-        resolve_full(id, addr, ec);
+        resolve_full_local(id, addr, ec);
         return addr;
     }
 
-    naming::address resolve_full(
+    naming::address resolve_full_local(
         naming::id_type const& id
       , error_code& ec = throws
         )
     {
         naming::address addr;
-        resolve_full(id.get_gid(), addr, ec);
+        resolve_full_local(id.get_gid(), addr, ec);
         return addr;
     }
 
@@ -1019,7 +1039,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     // Bulk version.
     // TODO: Add versions that take std::vector<id_type> for convenience.
-    bool resolve(
+    bool resolve_local(
         naming::gid_type const* gids
       , naming::address* addrs
       , std::size_t size
@@ -1037,10 +1057,10 @@ public:
                 return true; // Nothing more to do.
         }
 
-        return resolve_full(gids, addrs, size, locals, ec);
+        return resolve_full_local(gids, addrs, size, locals, ec);
     }
 
-    bool resolve_full(
+    bool resolve_full_local(
         naming::gid_type const* gids
       , naming::address* addrs
       , std::size_t size

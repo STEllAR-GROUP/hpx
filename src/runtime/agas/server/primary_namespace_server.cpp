@@ -1066,84 +1066,6 @@ void primary_namespace::decrement_sweep(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void primary_namespace::free_components_non_blocking(
-    std::list<free_entry>& free_list
-  , naming::gid_type const& lower
-  , naming::gid_type const& upper
-  , error_code& ec
-    )
-{ // {{{ kill_non_blocking implementation
-    using boost::fusion::at_c;
-
-//    naming::gid_type const agas_prefix_
-//        = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Kill the dead objects.
-
-    BOOST_FOREACH(free_entry const& e, free_list)
-    {
-        // Bail if we're in late shutdown.
-        if (HPX_UNLIKELY(!threads::threadmanager_is(running)))
-        {
-            LAGAS_(info) << (boost::format(
-                "primary_namespace::kill_non_blocking, cancelling free "
-                "operation because the thread-manager is down, lower(%1%), "
-                "upper(%2%), base(%3%), gva(%4%), count(%5%)")
-                % lower
-                % upper
-                % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
-            continue;
-        }
-
-        LAGAS_(info) << (boost::format(
-            "primary_namespace::kill_non_blocking, freeing component%1%, "
-            "lower(%2%), upper(%3%), base(%4%), gva(%5%), count(%6%)")
-            % ((at_c<2>(e) == naming::gid_type(0, 1)) ? "" : "s")
-            % lower
-            % upper
-            % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
-
-        typedef components::server::runtime_support::free_component_action
-            action_type;
-
-        components::component_type const type_ =
-            components::component_type(at_c<0>(e).type);
-
-        HPX_ASSERT(naming::invalid_locality_id != locality_id_);
-        if (locality_id_ == naming::get_locality_id_from_gid(at_c<1>(e)))
-        {
-            naming::address rts_addr(at_c<0>(e).endpoint,
-                components::component_runtime_support,
-                get_runtime_support_ptr());
-
-            // FIXME: Priority?
-            hpx::applier::detail::apply_l<action_type>(
-                naming::get_id_from_locality_id(locality_id_), rts_addr, type_,
-                at_c<1>(e), at_c<2>(e));
-        }
-
-        else
-        {
-            // get_lva<> will resolve the LVA to the runtime support pointer
-            // on the target locality.
-            naming::address rts_addr(at_c<0>(e).endpoint,
-                components::component_runtime_support);
-
-            naming::id_type const prefix_(
-                naming::get_locality_from_gid(at_c<1>(e)),
-                naming::id_type::unmanaged);
-
-            // FIXME: Priority?
-            hpx::applier::detail::apply_r<action_type>(
-                rts_addr, prefix_, type_, at_c<1>(e), at_c<2>(e));
-        }
-    }
-
-    if (&ec != &throws)
-        ec = make_success_code();
-} // }}}
-
 void primary_namespace::free_components_sync(
     std::list<free_entry>& free_list
   , naming::gid_type const& lower
@@ -1182,14 +1104,13 @@ void primary_namespace::free_components_sync(
             % upper
             % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
 
-        components::component_type const type_ =
-            components::component_type(at_c<0>(e).type);
-
-        naming::id_type const prefix_(
+        naming::id_type const target_locality(
             naming::get_locality_from_gid(at_c<1>(e))
           , naming::id_type::unmanaged);
 
-        futures.push_back(hpx::async(act, prefix_, type_, at_c<1>(e), at_c<2>(e)));
+        futures.push_back(
+            hpx::async(act, target_locality, at_c<0>(e), at_c<1>(e), at_c<2>(e).get_lsb())
+        );
     }
 
     hpx::wait_all(futures);

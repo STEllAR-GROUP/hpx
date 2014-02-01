@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,32 +18,23 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
+    HPX_EXPORT void destroy_component(naming::gid_type const& gid,
+        naming::address const& addr, error_code& ec = throws);
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    void destroy(naming::gid_type const& gid, error_code& ec = throws)
+    void destroy(naming::gid_type const& gid, naming::address const& addr,
+        error_code& ec = throws)
     {
         // retrieve the local address bound to the given global id
         applier::applier& appl = hpx::applier::get_applier();
-        naming::address addr;
-        if (!appl.get_agas_client().resolve(gid, addr))
-        {
-            hpx::util::osstream strm;
-            strm << "global id " << gid << " is not bound to any "
-                    "component instance";
-            HPX_THROWS_IF(ec, hpx::unknown_component_address,
-                "destroy<Component>", hpx::util::osstream_get_string(strm));
-            return;
-        }
 
         // make sure this component is located here
         if (appl.here() != addr.locality_)
         {
-            // FIXME: should the component be re-bound ?
-            hpx::util::osstream strm;
-            strm << "global id " << gid << " is not bound to any local "
-                    "component instance";
-            HPX_THROWS_IF(ec, hpx::unknown_component_address,
-                "destroy<Component>", hpx::util::osstream_get_string(strm));
+            // This component might have been migrated, find out where it is
+            // and instruct that locality to delete it.
+            destroy_component(gid, addr, ec);
             return;
         }
 
@@ -69,10 +60,34 @@ namespace hpx { namespace components { namespace server
             ec = make_success_code();
     }
 
+    template <typename Component>
+    void destroy(naming::gid_type const& gid, error_code& ec = throws)
+    {
+        // retrieve the local address bound to the given global id
+        applier::applier& appl = hpx::applier::get_applier();
+
+        naming::address addr;
+        if (!appl.get_agas_client().resolve_local(gid, addr))
+        {
+            hpx::util::osstream strm;
+            strm << "global id " << gid << " is not bound to any "
+                    "component instance";
+            HPX_THROWS_IF(ec, hpx::unknown_component_address,
+                "destroy<Component>", hpx::util::osstream_get_string(strm));
+            return;
+        }
+
+        destroy<Component>(gid, addr, ec);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void destroy_base_lco(naming::gid_type const& gid,
         util::one_size_heap_list_base* heap, components::component_type type,
         error_code& ec = throws);
+
+    HPX_EXPORT void destroy_base_lco(naming::gid_type const& gid,
+        naming::address const& addr, util::one_size_heap_list_base* heap,
+        components::component_type type, error_code& ec = throws);
 }}}
 
 #endif

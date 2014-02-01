@@ -143,26 +143,19 @@ namespace hpx { namespace components { namespace stubs
         call_shutdown_functions_async(gid, pre_shutdown).get();
     }
 
-    void runtime_support::free_component_sync(components::component_type type,
+    void runtime_support::free_component_sync(agas::gva const& g,
         naming::gid_type const& gid, boost::uint64_t count)
-    {
-        free_component_sync(type, gid, naming::gid_type(0, count));
-    }
-
-    void runtime_support::free_component_sync(components::component_type type,
-        naming::gid_type const& gid, naming::gid_type const& count)
     {
         typedef server::runtime_support::free_component_action action_type;
 
         // Determine whether the gid of the component to delete is local or
         // remote
-        //naming::resolver_client& agas = appl.get_agas_client();
-        if (/*agas.is_bootstrap() || */agas::is_local_address(gid)) {
+        if (agas::is_local_address_cached(gid)) {
             // apply locally
             applier::detail::apply_helper<action_type>::call(naming::invalid_id,
                 applier::get_applier().get_runtime_support_raw_gid().get_lsb(),
                 threads::thread_priority_default,
-                util::forward_as_tuple(type, gid, count));
+                util::forward_as_tuple(g, gid, count));
         }
         else {
             // apply remotely
@@ -170,7 +163,7 @@ namespace hpx { namespace components { namespace stubs
                 naming::id_type(gid, naming::id_type::unmanaged));
 
             lcos::packaged_action<action_type, void> p;
-            p.apply(launch::async, id, type, gid, count);
+            p.apply(launch::async, id, g, gid, count);
             p.get_future().get();
         }
     }

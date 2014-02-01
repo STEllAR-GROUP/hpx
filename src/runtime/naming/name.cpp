@@ -156,7 +156,8 @@ namespace hpx { namespace naming
                 // directly to free_component_sync.
                 try {
                     using components::stubs::runtime_support;
-                    runtime_support::free_component_sync(t, *p, 1);
+                    agas::gva g (addr.locality_, addr.type_, 1, addr.address_);
+                    runtime_support::free_component_sync(g, *p, 1);
                 }
                 catch (hpx::exception const& e) {
                     // This request might come in too late and the thread manager
