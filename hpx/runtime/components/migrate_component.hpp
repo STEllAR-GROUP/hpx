@@ -33,10 +33,8 @@ namespace hpx { namespace components
             naming::id_type source_locality = f.get();
             if (source_locality == target_locality)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
-                    "hpx::components::detail::migrate_component",
-                    "can't migrate component to same locality.");
-                return make_ready_future(naming::invalid_id);
+                // 'migration' to same locality as before is a no-op
+                return make_ready_future(to_migrate);
             }
 
             typename server::migrate_component_action<Component> act;
