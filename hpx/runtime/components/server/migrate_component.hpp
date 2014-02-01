@@ -39,10 +39,8 @@ namespace hpx { namespace components { namespace server
     {
         if (target_locality == hpx::find_here())
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
-                "hpx::components::server::migrate_component<Component>",
-                "can't migrate component to same locality.");
-            return make_ready_future(naming::invalid_id);
+            // 'migration' to same locality as before is a no-op
+            return make_ready_future(to_migrate);
         }
 
         unique_future<boost::shared_ptr<Component> > f =
