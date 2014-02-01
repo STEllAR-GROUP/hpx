@@ -12,31 +12,38 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/decay.hpp>
+#include <hpx/util/result_of.hpp>
+#include <hpx/lcos/future.hpp>
 
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
-#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
-#  include <hpx/lcos/preprocessed/async_continue_fwd.hpp>
-#else
-
-#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
-#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/async_continue_fwd_" HPX_LIMIT_STR ".hpp")
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    namespace util
+    {
+        template <typename Action, typename F>
+        struct result_of_continuation
+          : util::result_of<typename util::decay<F>::type(
+                naming::id_type,
+                typename traits::promise_local_result<
+                    typename hpx::actions::extract_action<Action>::remote_result_type
+                >::type
+            )>
+        {};
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
       , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+            typename util::result_of_continuation<Action, F>::type
+        >
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         F && f);
@@ -45,9 +52,8 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
       , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+            typename util::result_of_continuation<Action, F>::type
+        >
     >::type
     async_continue(naming::id_type const& gid, F && f);
 
@@ -57,9 +63,8 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 0
       , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+            typename util::result_of_continuation<Derived, F>::type
+        >
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -71,15 +76,22 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 0
       , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+            typename util::result_of_continuation<Derived, F>::type
+        >
     >::type
     async_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
         > /*act*/, naming::id_type const& gid, F && f);
 }
+
+#if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
+#  include <hpx/lcos/preprocessed/async_continue_fwd.hpp>
+#else
+
+#if defined(__WAVE__) && defined(HPX_CREATE_PREPROCESSED_FILES)
+#  pragma wave option(preserve: 1, line: 0, output: "preprocessed/async_continue_fwd_" HPX_LIMIT_STR ".hpp")
+#endif
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
     (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
@@ -111,9 +123,8 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
       , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+            typename util::result_of_continuation<Action, F>::type
+        >
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         HPX_ENUM_FWD_ARGS(N, Arg, arg), F && f);
@@ -122,9 +133,8 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
       , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+            typename util::result_of_continuation<Action, F>::type
+        >
     >::type
     async_continue(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         F && f);
@@ -135,9 +145,8 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N
       , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+            typename util::result_of_continuation<Derived, F>::type
+        >
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy,
         hpx::actions::action<
@@ -150,9 +159,8 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N
       , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+            typename util::result_of_continuation<Derived, F>::type
+        >
     >::type
     async_continue(
         hpx::actions::action<

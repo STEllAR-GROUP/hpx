@@ -211,13 +211,20 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     struct set_lco_value_continuation
     {
-        typedef void result_type;
+        template <typename T1, typename T2>
+        struct result
+        {
+            typedef T2 type;
+        };
 
         template <typename T>
-        BOOST_FORCEINLINE void operator()(id_type const& lco,
-            T && t) const
+        BOOST_FORCEINLINE T operator()(id_type const& lco, T && t) const
         {
             hpx::set_lco_value(lco, std::forward<T>(t));
+
+            // Yep, 't' is a zombie, however we don't use the returned value
+            // anyways. We need it for result type calculation, though.
+            return std::move(t);
         }
     };
 
@@ -225,7 +232,11 @@ namespace hpx { namespace actions
     template <typename Cont>
     struct continuation_impl
     {
-        typedef void result_type;
+        template <typename T1, typename T2>
+        struct result
+        {
+            typedef T2 type;
+        };
 
         continuation_impl() {}
 
@@ -235,9 +246,13 @@ namespace hpx { namespace actions
         {}
 
         template <typename T>
-        void operator()(hpx::id_type const& lco, T && t) const
+        T operator()(hpx::id_type const& lco, T && t) const
         {
             hpx::apply_c(cont_, lco, target_, std::forward<T>(t));
+
+            // Yep, 't' is a zombie, however we don't use the returned value
+            // anyways. We need it for result type calculation, though.
+            return std::move(t);
         }
 
     private:
@@ -259,7 +274,11 @@ namespace hpx { namespace actions
     template <typename Cont, typename F>
     struct continuation2_impl
     {
-        typedef void result_type;
+        template <typename T1, typename T2>
+        struct result
+        {
+            typedef T2 type;
+        };
 
         continuation2_impl() {}
 
@@ -272,10 +291,15 @@ namespace hpx { namespace actions
         {}
 
         template <typename T>
-        void operator()(hpx::id_type const& lco, T && t) const
+        T operator()(hpx::id_type const& lco, T && t) const
         {
             using hpx::util::placeholders::_2;
-            hpx::apply_continue(cont_, target_, std::forward<T>(t), hpx::util::bind(f_, lco, _2));
+            hpx::apply_continue(cont_, target_, std::forward<T>(t),
+                hpx::util::bind(f_, lco, _2));
+
+            // Yep, 't' is a zombie, however we don't use the returned value
+            // anyways. We need it for result type calculation, though.
+            return std::move(t);
         }
 
     private:
