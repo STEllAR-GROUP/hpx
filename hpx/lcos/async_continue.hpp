@@ -93,7 +93,7 @@ namespace hpx
             Component, Result, Arguments, Derived
         > /*act*/, naming::id_type const& gid, F && f)
     {
-        return async_continue<Derived>(/*launch::all, */gid, std::forward<F>(f));
+        return async_continue<Derived>(launch::all, gid, std::forward<F>(f));
     }
 }
 
@@ -156,38 +156,38 @@ namespace hpx
         return p.get_future();
     }
 
-//     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
-//     typename boost::enable_if_c<
-//         util::tuple_size<typename Action::arguments_type>::value == N
-//       , lcos::unique_future<
-//             typename util::result_of_continuation<Action, F>::type
-//         >
-//     >::type
-//     async_continue(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
-//         F && f)
-//     {
-//         return async_continue<Action>(launch::all, gid,
-//             HPX_ENUM_FORWARD_ARGS(N, Arg, arg), std::forward<F>(f));
-//     }
+    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == N
+      , lcos::unique_future<
+            typename util::result_of_continuation<Action, F>::type
+        >
+    >::type
+    async_continue(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
+        F && f)
+    {
+        return async_continue<Action>(launch::all, gid,
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg), std::forward<F>(f));
+    }
 
     ///////////////////////////////////////////////////////////////////////////
-//     template <typename Component, typename Result, typename Arguments,
-//         typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
-//     typename boost::enable_if_c<
-//         util::tuple_size<Arguments>::value == N
-//       , lcos::unique_future<
-//             typename util::result_of_continuation<Derived, F>::type
-//         >
-//     >::type
-//     async_continue(BOOST_SCOPED_ENUM(launch) policy,
-//         hpx::actions::action<
-//             Component, Result, Arguments, Derived
-//         > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
-//         F && f)
-//     {
-//         return async_continue<Derived>(policy, gid,
-//             HPX_ENUM_FORWARD_ARGS(N, Arg, arg), std::forward<F>(f));
-//     }
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == N
+      , lcos::unique_future<
+            typename util::result_of_continuation<Derived, F>::type
+        >
+    >::type
+    async_continue(BOOST_SCOPED_ENUM(launch) policy,
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
+        F && f)
+    {
+        return async_continue<Derived>(policy, gid,
+            HPX_ENUM_FORWARD_ARGS(N, Arg, arg), std::forward<F>(f));
+    }
 
     template <typename Component, typename Result, typename Arguments,
         typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
@@ -203,7 +203,7 @@ namespace hpx
         > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
         F && f)
     {
-        return async_continue<Derived>(/*launch::all, */gid,
+        return async_continue<Derived>(launch::all, gid,
             HPX_ENUM_FORWARD_ARGS(N, Arg, arg), std::forward<F>(f));
     }
 }
