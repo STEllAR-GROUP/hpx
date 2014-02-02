@@ -49,12 +49,14 @@ struct HPX_EXPORT response
         namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
+      , boost::uint32_t locality_id_
       , error status_ = success
         );
 
     response(
         namespace_action_code type_
       , gva const& gva_
+      , boost::uint32_t locality_id_
       , error status_ = success
         );
 

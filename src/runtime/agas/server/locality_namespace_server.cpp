@@ -412,7 +412,7 @@ response locality_namespace::allocate(
             const gva g(ep, components::component_runtime_support, count);
 
             naming::gid_type id(naming::get_gid_from_locality_id(prefix));
-            request req(primary_ns_bind_gid, id, g);
+            request req(primary_ns_bind_gid, id, g, prefix);
             response resp = primary_->service(req, ec);
             if (ec) return resp;
         }

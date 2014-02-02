@@ -601,9 +601,10 @@ public:
     hpx::unique_future<bool> bind_async(
         naming::gid_type const& id
       , naming::address const& addr
+      , boost::uint32_t locality_id
         )
     {
-        return bind_range_async(id, 1, addr, 0);
+        return bind_range_async(id, 1, addr, 0, locality_id);
     }
 
     /// \brief Bind unique range of global ids to given base address
@@ -652,6 +653,7 @@ public:
       , boost::uint64_t count
       , naming::address const& baseaddr
       , boost::uint64_t offset
+      , boost::uint32_t locality_id
         );
 
     /// \brief Unbind a global address

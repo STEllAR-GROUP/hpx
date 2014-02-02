@@ -216,11 +216,13 @@ HPX_API_EXPORT naming::address resolve_sync(
 HPX_API_EXPORT hpx::unique_future<bool> bind(
     naming::gid_type const& id
   , naming::address const& addr
+  , boost::uint32_t locality_id
     );
 
 HPX_API_EXPORT bool bind_sync(
     naming::gid_type const& id
   , naming::address const& addr
+  , boost::uint32_t locality_id
   , error_code& ec = throws
     );
 

@@ -374,12 +374,14 @@ void addressing_service::launch_bootstrap(
 
     request reqs[] =
     {
-        request(primary_ns_bind_gid, locality_gid, locality_gva)
-      , request(primary_ns_bind_gid, primary_gid, primary_gva)
-      , request(primary_ns_bind_gid, component_gid, component_gva)
-      , request(primary_ns_bind_gid, symbol_gid, symbol_gva)
-//      , request(primary_ns_bind_gid, runtime_support_gid1, runtime_support_address)
-//      , request(primary_ns_bind_gid, runtime_support_gid2, runtime_support_address)
+        request(primary_ns_bind_gid, locality_gid, locality_gva
+          , naming::get_locality_id_from_gid(locality_gid))
+      , request(primary_ns_bind_gid, primary_gid, primary_gva
+          , naming::get_locality_id_from_gid(primary_gid))
+      , request(primary_ns_bind_gid, component_gid, component_gva
+          , naming::get_locality_id_from_gid(component_gid))
+      , request(primary_ns_bind_gid, symbol_gid, symbol_gva
+          , naming::get_locality_id_from_gid(symbol_gid))
     };
 
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
@@ -989,7 +991,8 @@ bool addressing_service::bind_range_local(
         // parameters.
         gva const g(ep, baseaddr.type_, count, baseaddr.address_, offset);
 
-        request req(primary_ns_bind_gid, lower_id, g);
+        request req(primary_ns_bind_gid, lower_id, g,
+            naming::get_locality_id_from_gid(lower_id));
         response rep;
 
         if (is_bootstrap())
@@ -1005,9 +1008,10 @@ bool addressing_service::bind_range_local(
         if (caching_)
         {
             if (range_caching_)
+            {
                 // Put the range into the cache.
                 update_cache_entry(lower_id, g, ec);
-
+            }
             else
             {
                 // Only put the first GID in the range into the cache.
@@ -1058,6 +1062,7 @@ hpx::unique_future<bool> addressing_service::bind_range_async(
   , boost::uint64_t count
   , naming::address const& baseaddr
   , boost::uint64_t offset
+  , boost::uint32_t locality_id
     )
 {
     // ask server
@@ -1071,7 +1076,7 @@ hpx::unique_future<bool> addressing_service::bind_range_async(
         stubs::primary_namespace::get_service_instance(lower_id)
       , naming::id_type::unmanaged);
 
-    request req(primary_ns_bind_gid, lower_id, g);
+    request req(primary_ns_bind_gid, lower_id, g, locality_id);
     response rep;
 
     using util::placeholders::_1;

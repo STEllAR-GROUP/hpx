@@ -290,20 +290,22 @@ naming::address resolve_sync(
 hpx::unique_future<bool> bind(
     naming::gid_type const& id
   , naming::address const& addr
+  , boost::uint32_t locality_id
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.bind_async(id, addr);
+    return agas_.bind_async(id, addr, locality_id);
 }
 
 bool bind_sync(
     naming::gid_type const& id
   , naming::address const& addr
+  , boost::uint32_t locality_id
   , error_code& ec
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.bind_async(id, addr).get(ec);
+    return agas_.bind_async(id, addr, locality_id).get(ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

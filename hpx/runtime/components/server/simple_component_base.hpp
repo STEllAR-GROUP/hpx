@@ -103,7 +103,7 @@ namespace hpx { namespace components
                     gid_ = assign_gid;
                     naming::detail::strip_credits_from_gid(gid_);
 
-                    if (!agas::bind_sync(gid_, addr))
+                    if (!agas::bind_sync(gid_, addr, appl.get_locality_id()))
                     {
                         hpx::util::osstream strm;
                         strm << gid_;
