@@ -20,7 +20,6 @@
               , util::forward_as_tuple(std::forward<U0>( u0 ))
             );
     }
-    
     template <typename U0>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
@@ -54,7 +53,6 @@
               , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ))
             );
     }
-    
     template <typename U0 , typename U1>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
@@ -88,7 +86,6 @@
               , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ))
             );
     }
-    
     template <typename U0 , typename U1 , typename U2>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
@@ -122,7 +119,6 @@
               , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ))
             );
     }
-    
     template <typename U0 , typename U1 , typename U2 , typename U3>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
@@ -156,7 +152,6 @@
               , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ))
             );
     }
-    
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
@@ -190,7 +185,6 @@
               , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ))
             );
     }
-    
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
@@ -224,7 +218,6 @@
               , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ))
             );
     }
-    
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
@@ -258,7 +251,6 @@
               , util::forward_as_tuple(std::forward<U0>( u0 ) , std::forward<U1>( u1 ) , std::forward<U2>( u2 ) , std::forward<U3>( u3 ) , std::forward<U4>( u4 ) , std::forward<U5>( u5 ) , std::forward<U6>( u6 ) , std::forward<U7>( u7 ))
             );
     }
-    
     template <typename U0 , typename U1 , typename U2 , typename U3 , typename U4 , typename U5 , typename U6 , typename U7>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>

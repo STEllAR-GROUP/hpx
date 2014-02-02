@@ -34,7 +34,6 @@ namespace hpx { namespace util
                     );
             }
         };
-        
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
@@ -46,7 +45,7 @@ namespace hpx { namespace util
             typedef
                 lcos::unique_future<
                     typename traits::promise_local_result<
-                        typename hpx::actions::extract_action<Action>::result_type
+                        typename hpx::actions::extract_action<Action>::remote_result_type
                     >::type
                 >
                 type;
@@ -85,7 +84,6 @@ namespace hpx { namespace util
               , util::forward_as_tuple(std::forward<T0>( t0 ))
             );
     }
-     
     template <
         typename Component, typename Result, typename Arguments
       , typename Derived
@@ -137,7 +135,6 @@ namespace hpx { namespace util
                     );
             }
         };
-        
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
@@ -149,7 +146,7 @@ namespace hpx { namespace util
             typedef
                 lcos::unique_future<
                     typename traits::promise_local_result<
-                        typename hpx::actions::extract_action<Action>::result_type
+                        typename hpx::actions::extract_action<Action>::remote_result_type
                     >::type
                 >
                 type;
@@ -188,7 +185,6 @@ namespace hpx { namespace util
               , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ))
             );
     }
-     
     template <
         typename Component, typename Result, typename Arguments
       , typename Derived
@@ -240,7 +236,6 @@ namespace hpx { namespace util
                     );
             }
         };
-        
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
@@ -252,7 +247,7 @@ namespace hpx { namespace util
             typedef
                 lcos::unique_future<
                     typename traits::promise_local_result<
-                        typename hpx::actions::extract_action<Action>::result_type
+                        typename hpx::actions::extract_action<Action>::remote_result_type
                     >::type
                 >
                 type;
@@ -291,7 +286,6 @@ namespace hpx { namespace util
               , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ))
             );
     }
-     
     template <
         typename Component, typename Result, typename Arguments
       , typename Derived
@@ -343,7 +337,6 @@ namespace hpx { namespace util
                     );
             }
         };
-        
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
@@ -355,7 +348,7 @@ namespace hpx { namespace util
             typedef
                 lcos::unique_future<
                     typename traits::promise_local_result<
-                        typename hpx::actions::extract_action<Action>::result_type
+                        typename hpx::actions::extract_action<Action>::remote_result_type
                     >::type
                 >
                 type;
@@ -394,7 +387,6 @@ namespace hpx { namespace util
               , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ))
             );
     }
-     
     template <
         typename Component, typename Result, typename Arguments
       , typename Derived
@@ -446,7 +438,6 @@ namespace hpx { namespace util
                     );
             }
         };
-        
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
@@ -458,7 +449,7 @@ namespace hpx { namespace util
             typedef
                 lcos::unique_future<
                     typename traits::promise_local_result<
-                        typename hpx::actions::extract_action<Action>::result_type
+                        typename hpx::actions::extract_action<Action>::remote_result_type
                     >::type
                 >
                 type;
@@ -497,7 +488,6 @@ namespace hpx { namespace util
               , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ))
             );
     }
-     
     template <
         typename Component, typename Result, typename Arguments
       , typename Derived
@@ -549,7 +539,6 @@ namespace hpx { namespace util
                     );
             }
         };
-        
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
@@ -561,7 +550,7 @@ namespace hpx { namespace util
             typedef
                 lcos::unique_future<
                     typename traits::promise_local_result<
-                        typename hpx::actions::extract_action<Action>::result_type
+                        typename hpx::actions::extract_action<Action>::remote_result_type
                     >::type
                 >
                 type;
@@ -600,7 +589,6 @@ namespace hpx { namespace util
               , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ))
             );
     }
-     
     template <
         typename Component, typename Result, typename Arguments
       , typename Derived
@@ -652,7 +640,6 @@ namespace hpx { namespace util
                     );
             }
         };
-        
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
@@ -664,7 +651,7 @@ namespace hpx { namespace util
             typedef
                 lcos::unique_future<
                     typename traits::promise_local_result<
-                        typename hpx::actions::extract_action<Action>::result_type
+                        typename hpx::actions::extract_action<Action>::remote_result_type
                     >::type
                 >
                 type;
@@ -703,7 +690,6 @@ namespace hpx { namespace util
               , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ))
             );
     }
-     
     template <
         typename Component, typename Result, typename Arguments
       , typename Derived
@@ -755,7 +741,6 @@ namespace hpx { namespace util
                     );
             }
         };
-        
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
@@ -767,7 +752,7 @@ namespace hpx { namespace util
             typedef
                 lcos::unique_future<
                     typename traits::promise_local_result<
-                        typename hpx::actions::extract_action<Action>::result_type
+                        typename hpx::actions::extract_action<Action>::remote_result_type
                     >::type
                 >
                 type;
@@ -806,7 +791,6 @@ namespace hpx { namespace util
               , util::forward_as_tuple(std::forward<T0>( t0 ) , std::forward<T1>( t1 ) , std::forward<T2>( t2 ) , std::forward<T3>( t3 ) , std::forward<T4>( t4 ) , std::forward<T5>( t5 ) , std::forward<T6>( t6 ) , std::forward<T7>( t7 ))
             );
     }
-     
     template <
         typename Component, typename Result, typename Arguments
       , typename Derived

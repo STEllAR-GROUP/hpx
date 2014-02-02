@@ -91,7 +91,7 @@
               , util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, U, u))
             );
     }
-    
+
     template <BOOST_PP_ENUM_PARAMS(N, typename U)>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>

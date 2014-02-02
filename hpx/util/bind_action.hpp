@@ -71,7 +71,7 @@ namespace hpx { namespace util
         BOOST_FORCEINLINE
         lcos::unique_future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type
         >
         bind_action_async(
@@ -90,7 +90,7 @@ namespace hpx { namespace util
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         BOOST_FORCEINLINE
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
         bind_action_invoke(
             BoundArgs& bound_args
@@ -111,7 +111,7 @@ namespace hpx { namespace util
         public:
             typedef
                 typename traits::promise_local_result<
-                    typename hpx::actions::extract_action<Action>::result_type
+                    typename hpx::actions::extract_action<Action>::remote_result_type
                 >::type
                 result_type;
 
@@ -140,49 +140,6 @@ namespace hpx { namespace util
         public: // exposition-only
             BoundArgs _bound_args;
         };
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action>
-    typename boost::enable_if_c<
-        traits::is_action<typename boost::remove_reference<Action>::type>::value
-      , detail::bound_action<
-            typename util::decay<Action>::type
-          , util::tuple<>
-        >
-    >::type
-    bind()
-    {
-        typedef
-            detail::bound_action<
-                typename util::decay<Action>::type
-              , util::tuple<>
-            >
-            result_type;
-
-        return result_type(Action(), util::forward_as_tuple());
-    }
-    
-    template <
-        typename Component, typename Result, typename Arguments
-      , typename Derived
-    >
-    detail::bound_action<Derived, util::tuple<> >
-    bind(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > action
-    )
-    {
-        typedef
-            detail::bound_action<Derived, util::tuple<> >
-            result_type;
-
-        return
-            result_type(
-                static_cast<Derived const&>(action)
-              , util::forward_as_tuple()
-            );
     }
 }}
 
@@ -268,7 +225,7 @@ namespace hpx { namespace util
 #       define HPX_UTIL_BIND_EVAL(Z, N, D)                                    \
         detail::bind_eval<Action>(                                            \
             util::get<N>(bound_args)                                          \
-          , std::forward<UnboundArgs>(unbound_args)                         \
+          , std::forward<UnboundArgs>(unbound_args)                           \
         )                                                                     \
         /**/
         template <typename Action, typename BoundArgs, typename UnboundArgs>
@@ -293,7 +250,7 @@ namespace hpx { namespace util
                     );
             }
         };
-        
+
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
@@ -305,7 +262,7 @@ namespace hpx { namespace util
             typedef
                 lcos::unique_future<
                     typename traits::promise_local_result<
-                        typename hpx::actions::extract_action<Action>::result_type
+                        typename hpx::actions::extract_action<Action>::remote_result_type
                     >::type
                 >
                 type;
@@ -352,7 +309,7 @@ namespace hpx { namespace util
               , util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, T, t))
             );
     }
-     
+
     template <
         typename Component, typename Result, typename Arguments
       , typename Derived
