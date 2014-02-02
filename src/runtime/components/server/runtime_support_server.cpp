@@ -314,10 +314,7 @@ namespace hpx { namespace components { namespace server
         {
             naming::gid_type target(gid + i);
 
-            naming::address addr;
-            addr.locality_ = g.endpoint;
-            addr.type_ = g.type;
-            addr.address_ = g.lva(target, gid);
+            naming::address addr(g.endpoint, g.type, g.lva(target, gid));
 
             // FIXME: If this throws then we leak the rest of count.
             // What should we do instead?

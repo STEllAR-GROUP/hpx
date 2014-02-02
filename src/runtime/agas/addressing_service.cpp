@@ -1167,6 +1167,8 @@ bool addressing_service::is_local_address_cached(
     // GID to not be found in the cache.
     if (!resolve_cached(id, addr, ec) || ec)
     {
+        if (ec) return false;
+
         // try also the local part of AGAS before giving up
         if (!resolve_full_local(id, addr, ec) || ec)
             return false;

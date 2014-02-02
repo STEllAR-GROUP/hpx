@@ -13,36 +13,13 @@
 #include <hpx/runtime/components/server/migrate_component.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/async_colocated.hpp>
 #include <hpx/traits/is_component.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace components
 {
-    /// \cond NOINTERNAL
-    namespace detail
-    {
-        // This triggers the migration of the component to the given locality.
-        // This will be called when f is ready().
-        template <typename Component>
-        unique_future<naming::id_type>
-        migrate(naming::id_type const& to_migrate,
-            naming::id_type const& target_locality,
-            unique_future<naming::id_type> f)
-        {
-            naming::id_type source_locality = f.get();
-            if (source_locality == target_locality)
-            {
-                // 'migration' to same locality as before is a no-op
-                return make_ready_future(to_migrate);
-            }
-
-            typename server::migrate_component_action<Component> act;
-            return async(act, source_locality, to_migrate, target_locality);
-        }
-    }
-    /// \endcond
-
     /// \brief Migrate the given component to the specified target locality
     ///
     /// The function \a migrate<Component> will migrate the component
@@ -75,9 +52,8 @@ namespace hpx { namespace components
     migrate(naming::id_type const& to_migrate,
         naming::id_type const& target_locality)
     {
-        unique_future<naming::id_type> f = get_colocation_id(to_migrate);
-        return f.then(util::bind(&detail::migrate<Component>,
-            to_migrate, target_locality, util::placeholders::_1));
+        server::migrate_component_action<Component> act;
+        return async_colocated(to_migrate, act, to_migrate, target_locality);
     }
 }}
 
