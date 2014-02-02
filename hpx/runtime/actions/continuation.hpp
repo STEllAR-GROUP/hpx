@@ -211,8 +211,11 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     struct set_lco_value_continuation
     {
-        template <typename T1, typename T2>
-        struct result
+        template <typename T>
+        struct result;
+
+        template <typename F, typename T1, typename T2>
+        struct result<F(T1, T2)>
         {
             typedef T2 type;
         };
@@ -232,8 +235,11 @@ namespace hpx { namespace actions
     template <typename Cont>
     struct continuation_impl
     {
-        template <typename T1, typename T2>
-        struct result
+        template <typename T>
+        struct result;
+
+        template <typename F, typename T1, typename T2>
+        struct result<F(T1, T2)>
         {
             typedef T2 type;
         };
@@ -274,8 +280,11 @@ namespace hpx { namespace actions
     template <typename Cont, typename F>
     struct continuation2_impl
     {
-        template <typename T1, typename T2>
-        struct result
+        template <typename T>
+        struct result;
+
+        template <typename F, typename T1, typename T2>
+        struct result<F(T1, T2)>
         {
             typedef T2 type;
         };

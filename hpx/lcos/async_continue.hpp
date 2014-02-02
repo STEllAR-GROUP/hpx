@@ -30,18 +30,21 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
       , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
-        >
+            typename actions::detail::remote_action_result<
+                typename util::result_of_continuation<Action, F>::type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         F && f)
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::remote_result_type remote_result_type;
-        typedef typename traits::promise_local_result<
-            remote_result_type>::type result_type;
+        typedef
+            typename util::result_of_continuation<Action, F>::type
+        result_type;
+        typedef
+            typename actions::detail::remote_action_result<result_type>::type
+        remote_result_type;
 
-        lcos::packaged_action<action_type, result_type> p;
+        lcos::packaged_action<Action, remote_result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
                 new hpx::actions::typed_continuation<result_type>(
@@ -135,18 +138,21 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
       , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
-        >
+            typename actions::detail::remote_action_result<
+                typename util::result_of_continuation<Action, F>::type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         HPX_ENUM_FWD_ARGS(N, Arg, arg), F && f)
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::remote_result_type remote_result_type;
-        typedef typename traits::promise_local_result<
-            remote_result_type>::type result_type;
+        typedef
+            typename util::result_of_continuation<Action, F>::type
+        result_type;
+        typedef
+            typename actions::detail::remote_action_result<result_type>::type
+        remote_result_type;
 
-        lcos::packaged_action<action_type, result_type> p;
+        lcos::packaged_action<Action, remote_result_type> p;
         if (policy == launch::sync || detail::has_async_policy(policy)) {
             apply<Action>(
                 new hpx::actions::typed_continuation<result_type>(

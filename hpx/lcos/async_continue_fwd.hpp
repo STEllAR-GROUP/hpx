@@ -24,6 +24,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
+    ///////////////////////////////////////////////////////////////////////////
     namespace util
     {
         template <typename Action, typename F>
@@ -31,7 +32,9 @@ namespace hpx
           : util::result_of<typename util::decay<F>::type(
                 naming::id_type,
                 typename traits::promise_local_result<
-                    typename hpx::actions::extract_action<Action>::remote_result_type
+                    typename hpx::actions::extract_action<
+                        Action
+                    >::remote_result_type
                 >::type
             )>
         {};
@@ -42,8 +45,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
       , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
-        >
+            typename actions::detail::remote_action_result<
+                typename util::result_of_continuation<Action, F>::type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         F && f);
@@ -123,8 +127,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
       , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
-        >
+            typename actions::detail::remote_action_result<
+                typename util::result_of_continuation<Action, F>::type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         HPX_ENUM_FWD_ARGS(N, Arg, arg), F && f);

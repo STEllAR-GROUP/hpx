@@ -16,8 +16,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 1
       , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
-        >
+            typename actions::detail::remote_action_result<
+                typename util::result_of_continuation<Action, F>::type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         Arg0 && arg0, F && f);
@@ -66,8 +67,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 2
       , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
-        >
+            typename actions::detail::remote_action_result<
+                typename util::result_of_continuation<Action, F>::type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1, F && f);
@@ -116,8 +118,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 3
       , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
-        >
+            typename actions::detail::remote_action_result<
+                typename util::result_of_continuation<Action, F>::type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2, F && f);
@@ -166,8 +169,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 4
       , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
-        >
+            typename actions::detail::remote_action_result<
+                typename util::result_of_continuation<Action, F>::type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3, F && f);
@@ -216,8 +220,9 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 5
       , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
-        >
+            typename actions::detail::remote_action_result<
+                typename util::result_of_continuation<Action, F>::type
+            >::type>
     >::type
     async_continue(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4, F && f);
