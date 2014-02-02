@@ -30,7 +30,7 @@ namespace hpx { namespace agas
 
 // TODO: Ensure that multiple invocations of get_data get optimized into the
 // same jump table.
-struct response
+struct HPX_EXPORT response
 {
   private:
     struct response_data;
