@@ -509,9 +509,10 @@ namespace hpx { namespace components { namespace server
             );
         }
 
+        // sanity checks
         if (!id)
         {
-            // we should not get here if the id is invalid
+            // we should not get here (id should not be invalid)
             HPX_THROW_EXCEPTION(hpx::invalid_status,
                 "runtime_support::migrate_component_to_here",
                 "could not create copy of given component");
@@ -519,7 +520,7 @@ namespace hpx { namespace components { namespace server
         }
         if (id != to_migrate)
         {
-            // we should not get here if the id is invalid
+            // we should not get here either (the ids should be the same)
             HPX_THROW_EXCEPTION(hpx::invalid_status,
                 "runtime_support::migrate_component_to_here",
                 "could not create copy of given component (the new id is "
