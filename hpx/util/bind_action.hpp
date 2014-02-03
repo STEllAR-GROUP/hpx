@@ -65,6 +65,30 @@ namespace hpx { namespace util
             typename Action, typename BoundArgs, typename UnboundArgs
           , typename Enable = void
         >
+        struct bind_action_apply_cont_impl;
+
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        BOOST_FORCEINLINE
+        bool
+        bind_action_apply_cont(
+            naming::id_type const& contgid
+          , BoundArgs& bound_args
+          , UnboundArgs && unbound_args
+        )
+        {
+            return
+                bind_action_apply_cont_impl<Action, BoundArgs, UnboundArgs>::call(
+                    contgid
+                  , bound_args
+                  , std::forward<UnboundArgs>(unbound_args)
+                );
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action, typename BoundArgs, typename UnboundArgs
+          , typename Enable = void
+        >
         struct bind_action_async_impl;
 
         template <typename Action, typename BoundArgs, typename UnboundArgs>
@@ -228,6 +252,7 @@ namespace hpx { namespace util
           , std::forward<UnboundArgs>(unbound_args)                           \
         )                                                                     \
         /**/
+
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_apply_impl<
             Action, BoundArgs, UnboundArgs
@@ -247,6 +272,30 @@ namespace hpx { namespace util
                 return
                     hpx::apply<Action>(
                         BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _)
+                    );
+            }
+        };
+
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == N
+            >::type
+        >
+        {
+            typedef bool type;
+
+            static BOOST_FORCEINLINE
+            type call(
+                naming::id_type const& contgid
+              , BoundArgs& bound_args
+              , UnboundArgs && unbound_args
+            )
+            {
+                return
+                    hpx::apply_c<Action>(
+                        contgid, BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _)
                     );
             }
         };

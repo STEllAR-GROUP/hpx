@@ -35,6 +35,28 @@ namespace hpx { namespace util
             }
         };
         template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 1
+            >::type
+        >
+        {
+            typedef bool type;
+            static BOOST_FORCEINLINE
+            type call(
+                naming::id_type const& contgid
+              , BoundArgs& bound_args
+              , UnboundArgs && unbound_args
+            )
+            {
+                return
+                    hpx::apply_c<Action>(
+                        contgid, detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
+                    );
+            }
+        };
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
           , typename boost::enable_if_c<
@@ -132,6 +154,28 @@ namespace hpx { namespace util
                 return
                     hpx::apply<Action>(
                         detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
+                    );
+            }
+        };
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 2
+            >::type
+        >
+        {
+            typedef bool type;
+            static BOOST_FORCEINLINE
+            type call(
+                naming::id_type const& contgid
+              , BoundArgs& bound_args
+              , UnboundArgs && unbound_args
+            )
+            {
+                return
+                    hpx::apply_c<Action>(
+                        contgid, detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
                     );
             }
         };
@@ -237,6 +281,28 @@ namespace hpx { namespace util
             }
         };
         template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 3
+            >::type
+        >
+        {
+            typedef bool type;
+            static BOOST_FORCEINLINE
+            type call(
+                naming::id_type const& contgid
+              , BoundArgs& bound_args
+              , UnboundArgs && unbound_args
+            )
+            {
+                return
+                    hpx::apply_c<Action>(
+                        contgid, detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
+                    );
+            }
+        };
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
           , typename boost::enable_if_c<
@@ -334,6 +400,28 @@ namespace hpx { namespace util
                 return
                     hpx::apply<Action>(
                         detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
+                    );
+            }
+        };
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 4
+            >::type
+        >
+        {
+            typedef bool type;
+            static BOOST_FORCEINLINE
+            type call(
+                naming::id_type const& contgid
+              , BoundArgs& bound_args
+              , UnboundArgs && unbound_args
+            )
+            {
+                return
+                    hpx::apply_c<Action>(
+                        contgid, detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
                     );
             }
         };
@@ -439,6 +527,28 @@ namespace hpx { namespace util
             }
         };
         template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 5
+            >::type
+        >
+        {
+            typedef bool type;
+            static BOOST_FORCEINLINE
+            type call(
+                naming::id_type const& contgid
+              , BoundArgs& bound_args
+              , UnboundArgs && unbound_args
+            )
+            {
+                return
+                    hpx::apply_c<Action>(
+                        contgid, detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
+                    );
+            }
+        };
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
           , typename boost::enable_if_c<
@@ -536,6 +646,28 @@ namespace hpx { namespace util
                 return
                     hpx::apply<Action>(
                         detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
+                    );
+            }
+        };
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 6
+            >::type
+        >
+        {
+            typedef bool type;
+            static BOOST_FORCEINLINE
+            type call(
+                naming::id_type const& contgid
+              , BoundArgs& bound_args
+              , UnboundArgs && unbound_args
+            )
+            {
+                return
+                    hpx::apply_c<Action>(
+                        contgid, detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
                     );
             }
         };
@@ -641,6 +773,28 @@ namespace hpx { namespace util
             }
         };
         template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 7
+            >::type
+        >
+        {
+            typedef bool type;
+            static BOOST_FORCEINLINE
+            type call(
+                naming::id_type const& contgid
+              , BoundArgs& bound_args
+              , UnboundArgs && unbound_args
+            )
+            {
+                return
+                    hpx::apply_c<Action>(
+                        contgid, detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
+                    );
+            }
+        };
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
           , typename boost::enable_if_c<
@@ -738,6 +892,28 @@ namespace hpx { namespace util
                 return
                     hpx::apply<Action>(
                         detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
+                    );
+            }
+        };
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == 8
+            >::type
+        >
+        {
+            typedef bool type;
+            static BOOST_FORCEINLINE
+            type call(
+                naming::id_type const& contgid
+              , BoundArgs& bound_args
+              , UnboundArgs && unbound_args
+            )
+            {
+                return
+                    hpx::apply_c<Action>(
+                        contgid, detail::bind_eval<Action>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<Action>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) )
                     );
             }
         };
