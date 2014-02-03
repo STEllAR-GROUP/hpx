@@ -62,17 +62,16 @@ namespace hpx
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
       , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
+            typename util::result_of_async_continue<Action, F>::type
         >
     >::type
     async_continue(
-        BOOST_SCOPED_ENUM(launch) policy
-      , naming::id_type const& gid
+        naming::id_type const& gid
       BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
       , F && f)
     {
         typedef
-            typename util::result_of_continuation<Action, F>::type
+            typename util::result_of_async_continue<Action, F>::type
         result_type;
         typedef
             typename traits::promise_local_result<
@@ -82,78 +81,24 @@ namespace hpx
             >::type
         continuation_result_type;
 
-        lcos::packaged_action<Action, result_type> p;
-        if (policy == launch::sync || detail::has_async_policy(policy)) {
-            apply<Action>(
-                new hpx::actions::typed_continuation<continuation_result_type>(
-                    p.get_gid(), std::forward<F>(f))
-              , gid
-              BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-        }
-        return p.get_future();
-    }
-
-    template <
-        typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-      , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == N
-      , lcos::unique_future<
-            typename util::result_of_continuation<Action, F>::type
-        >
-    >::type
-    async_continue(
-        naming::id_type const& gid
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
-      , F && f)
-    {
-        return async_continue<Action>(
-            launch::all
+        lcos::promise<result_type> p;
+        apply<Action>(
+            new hpx::actions::typed_continuation<continuation_result_type>(
+                p.get_gid(), std::forward<F>(f))
           , gid
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
-          , std::forward<F>(f));
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        return p.get_future();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
+        typename Component, typename Result, typename Arguments, typename Derived
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N
       , lcos::unique_future<
-            typename util::result_of_continuation<Derived, F>::type
-        >
-    >::type
-    async_continue(
-        BOOST_SCOPED_ENUM(launch) policy
-      , hpx::actions::action<Component, Result, Arguments, Derived> /*act*/
-      , naming::id_type const& gid
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
-      , F && f)
-    {
-        return async_continue<Derived>(
-            policy
-          , gid
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
-          , std::forward<F>(f));
-    }
-
-    template <
-        typename Component
-      , typename Result
-      , typename Arguments
-      , typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-      , typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == N
-      , lcos::unique_future<
-            typename util::result_of_continuation<Derived, F>::type
+            typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
     async_continue(
@@ -163,8 +108,7 @@ namespace hpx
       , F && f)
     {
         return async_continue<Derived>(
-            launch::all
-          , gid
+            gid
           BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
           , std::forward<F>(f));
     }
