@@ -51,7 +51,8 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action
+    template <
+        typename Action
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
@@ -60,41 +61,13 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
-    async_colocated(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg));
-
-    template <typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == N
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
-    >::type
-    async_colocated(naming::id_type const& gid
+    async_colocated(
+        naming::id_type const& gid
       BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg));
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == N
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
-    >::type
-    async_colocated(BOOST_SCOPED_ENUM(launch) policy,
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg));
-
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived
+    template <
+        typename Component, typename Result, typename Arguments, typename Derived
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N

@@ -39,6 +39,54 @@ namespace hpx { namespace detail
             return naming::get_id_from_locality_id(rep.get_locality_id());
         }
     };
+
+    template <typename Bound>
+    struct apply_continuation_impl
+    {
+        typedef typename util::decay<Bound>::type bound_type;
+
+        template <typename T>
+        struct result;
+
+        template <typename F, typename T1, typename T2>
+        struct result<F(T1, T2)>
+          : util::result_of<F(T1, T2)>
+        {};
+
+        apply_continuation_impl() {}
+
+        explicit apply_continuation_impl(Bound && bound)
+          : bound_(std::move(bound))
+        {}
+
+        template <typename T>
+        typename util::result_of<bound_type(naming::id_type, T)>::type
+        operator()(naming::id_type lco, T && t) const
+        {
+            bound_.apply_c(lco, lco, std::forward<T>(t));
+            return util::result_of<bound_type(naming::id_type, T)>::type();
+        }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        template <typename Archive>
+        BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
+        {
+            ar & bound_;
+        }
+
+        bound_type bound_;
+    };
+
+    template <typename Bound>
+    apply_continuation_impl<typename util::decay<Bound>::type>
+    apply_continuation(Bound && bound)
+    {
+        return apply_continuation_impl<typename util::decay<Bound>::type>(
+            std::forward<Bound>(bound));
+    }
 }}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
@@ -74,7 +122,8 @@ namespace hpx { namespace detail
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action
+    template <
+        typename Action
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
@@ -83,7 +132,8 @@ namespace hpx
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
     >::type
-    async_colocated(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid
+    async_colocated(
+        naming::id_type const& gid
       BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         // Attach the requested action as a continuation to a resolve_async
@@ -96,51 +146,18 @@ namespace hpx
         typedef agas::server::primary_namespace::service_action action_type;
 
         using util::placeholders::_2;
-        return async_continue<action_type>(policy, service_target, req,
-            util::bind<Action>(util::bind(detail::extract_locality(), _2)
-              BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
-    }
-
-    template <typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == N
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
-    >::type
-    async_colocated(naming::id_type const& gid
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg))
-    {
-        return async_colocated<Action>(launch::all, gid
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+        return async_continue<action_type>(
+            service_target, req
+          , detail::apply_continuation(
+                util::bind<Action>(
+                    util::bind(detail::extract_locality(), _2)
+                  BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
+                ));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == N
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
-    >::type
-    async_colocated(BOOST_SCOPED_ENUM(launch) policy,
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg))
-    {
-        return async_colocated<Derived>(policy, gid
-          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
-    }
-
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived
+    template <
+        typename Component, typename Result, typename Arguments, typename Derived
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N
@@ -151,12 +168,11 @@ namespace hpx
     >::type
     async_colocated(
         naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/
+      , hpx::actions::action<Component, Result, Arguments, Derived> /*act*/
       BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        return async_colocated<Derived>(launch::all, gid
+        return async_colocated<Derived>(
+            gid
           BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 }
