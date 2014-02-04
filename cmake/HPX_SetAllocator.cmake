@@ -79,3 +79,16 @@ if("${HPX_MALLOC_UPPER}" MATCHES "SYSTEM")
   hpx_warn("malloc"
     "HPX will perform poorly without tcmalloc or jemalloc. See docs for more info.")
 endif()
+
+if(JEMALLOC_FOUND OR TCMALLOC_FOUND)
+  hpx_use_flag_if_available(-fno-builtin-cfree LANGUAGES CXX C)
+  hpx_use_flag_if_available(-fno-builtin-pvalloc LANGUAGES CXX C)
+  hpx_use_flag_if_available(-fno-builtin-malloc LANGUAGES CXX C)
+  hpx_use_flag_if_available(-fno-builtin-free LANGUAGES CXX C)
+  hpx_use_flag_if_available(-fno-builtin-calloc LANGUAGES CXX C)
+  hpx_use_flag_if_available(-fno-builtin-realloc LANGUAGES CXX C)
+  hpx_use_flag_if_available(-fno-builtin-valloc LANGUAGES CXX C)
+  hpx_use_flag_if_available(-fno-builtin-memalign LANGUAGES CXX C)
+  hpx_use_flag_if_available(-fno-builtin-posix_memalign LANGUAGES CXX C)
+endif()
+
