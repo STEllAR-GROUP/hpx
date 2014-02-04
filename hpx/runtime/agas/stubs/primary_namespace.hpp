@@ -9,7 +9,8 @@
 #define HPX_5D993B14_5B65_4231_A84E_90AD1807EB8F
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/include/async.hpp>
+#include <hpx/lcos/future.hpp>
+#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/runtime/agas/server/primary_namespace.hpp>
 
 namespace hpx { namespace agas { namespace stubs

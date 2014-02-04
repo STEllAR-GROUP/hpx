@@ -283,8 +283,8 @@ namespace hpx { namespace actions
         template <typename T>
         struct result;
 
-        template <typename F, typename T1, typename T2>
-        struct result<F(T1, T2)>
+        template <typename This, typename T1, typename T2>
+        struct result<This(T1, T2)>
         {
             typedef T2 type;
         };
