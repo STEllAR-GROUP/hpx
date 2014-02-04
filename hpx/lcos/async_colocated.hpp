@@ -64,8 +64,12 @@ namespace hpx { namespace detail
         typename util::result_of<bound_type(naming::id_type, T)>::type
         operator()(naming::id_type lco, T && t) const
         {
+            typedef typename util::result_of<
+                bound_type(naming::id_type, T)
+            >::type result_type;
+
             bound_.apply_c(lco, lco, std::forward<T>(t));
-            return util::result_of<bound_type(naming::id_type, T)>::type();
+            return result_type();
         }
 
     private:
