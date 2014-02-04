@@ -9,9 +9,9 @@
 #include <hpx/include/threads.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/util.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/lightweight_test.hpp>
-
 
 #include <boost/lexical_cast.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -45,13 +45,12 @@ int hpx_main(variables_map & vm)
 
         high_resolution_timer t;
         twice_action act;
-        hpx::lcos::wait(
-            hpx::for_each(
-                v
-              , HPX_STD_BIND(act, hpx::find_here(), HPX_STD_PLACEHOLDERS::_1)
-            )
-          , w
-        );
+        w = hpx::util::unwrapped(
+                hpx::for_each(
+                    v
+                  , HPX_STD_BIND(act, hpx::find_here(), HPX_STD_PLACEHOLDERS::_1)
+                )
+            );
 
         std::cout << t.elapsed() << "\n";
 
@@ -81,7 +80,7 @@ int main(int argc, char* argv[])
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
         , "number of iterations in the delay loop")
-        ("n", value<std::size_t>()->default_value(10), 
+        ("n", value<std::size_t>()->default_value(10),
             "the number of vector elements to iterate over") ;
 
     // We force this test to use several threads by default.

@@ -12,6 +12,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/traits/action_may_require_id_splitting.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>
 #include <hpx/runtime/agas/namespace_action_code.hpp>
@@ -28,6 +29,7 @@
 
 #include <boost/format.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/include/at_c.hpp>
 
 namespace hpx { namespace agas
 {
@@ -61,7 +63,8 @@ char const* const primary_namespace_service_name = "primary/";
 ///                  locality is assigned a prefix. This creates a 96-bit
 ///                  address space for each locality.
 ///     RC         - Bit 88 to bit 92 of the MSB. This is the log2 of the number
-///                  of reference counting credits on the GID. Bit 93 is unused.
+///                  of reference counting credits on the GID.
+///                  Bit 93 is used by the locking scheme for gid_types.
 ///                  Bit 94 is a flag which is set if the credit value is valid.
 ///                  Bit 95 is a flag that is set if a GID's credit count is
 ///                  ever split (e.g. if the GID is ever passed to another
@@ -190,7 +193,7 @@ struct HPX_EXPORT primary_namespace
         api_counter_data resolve_gid_;          // primary_ns_resolve_gid
         api_counter_data unbind_gid_;           // primary_ns_unbind_gid
         api_counter_data change_credit_;        // primary_ns_change_credit_non_blocking
-                                                // primary_ns_change_credit_sync
+                                                // primary_ns_change_credit
         api_counter_data allocate_;             // primary_ns_allocate
     };
     counter_data counter_data_;
@@ -301,12 +304,12 @@ struct HPX_EXPORT primary_namespace
       , error_code& ec = throws
         );
 
-    response change_credit_non_blocking(
+    response increment_credit(
         request const& req
       , error_code& ec = throws
         );
 
-    response change_credit_sync(
+    response change_credit(
         request const& req
       , error_code& ec = throws
         );
@@ -330,7 +333,7 @@ struct HPX_EXPORT primary_namespace
     void increment(
         naming::gid_type const& lower
       , naming::gid_type const& upper
-      , boost::int64_t credits
+      , boost::int64_t& credits
       , error_code& ec
         );
 
@@ -354,6 +357,15 @@ struct HPX_EXPORT primary_namespace
       , naming::gid_type    // count
     > free_entry;
 
+    void resolve_free_list(
+        mutex_type::scoped_lock& l
+      , std::list<refcnt_table_type::iterator> const& free_list
+      , std::list<free_entry>& free_entry_list
+      , naming::gid_type const& lower
+      , naming::gid_type const& upper
+      , error_code& ec
+        );
+
     void decrement_sweep(
         std::list<free_entry>& free_list
       , naming::gid_type const& lower
@@ -362,14 +374,14 @@ struct HPX_EXPORT primary_namespace
       , error_code& ec
         );
 
-    void kill_non_blocking(
+    void free_components_non_blocking(
         std::list<free_entry>& free_list
       , naming::gid_type const& lower
       , naming::gid_type const& upper
       , error_code& ec
         );
 
-    void kill_sync(
+    void free_components_sync(
         std::list<free_entry>& free_list
       , naming::gid_type const& lower
       , naming::gid_type const& upper
@@ -388,8 +400,8 @@ struct HPX_EXPORT primary_namespace
       , namespace_bind_gid                      = primary_ns_bind_gid
       , namespace_resolve_gid                   = primary_ns_resolve_gid
       , namespace_unbind_gid                    = primary_ns_unbind_gid
-      , namespace_change_credit_non_blocking    = primary_ns_change_credit_non_blocking
-      , namespace_change_credit_sync            = primary_ns_change_credit_sync
+      , namespace_change_credit_non_blocking    = primary_ns_increment_credit
+      , namespace_change_credit_sync            = primary_ns_change_credit
       , namespace_allocate                      = primary_ns_allocate
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}
@@ -448,11 +460,29 @@ namespace hpx { namespace traits
 
     // Parcel routing forwards the binary filter request to the routed action
     template <>
-    struct action_serialization_filter<agas::server::primary_namespace::service_action>
+    struct action_serialization_filter<
+        agas::server::primary_namespace::service_action>
     {
         static util::binary_filter* call(parcelset::parcel const& p)
         {
             return agas::server::primary_namespace::get_serialization_filter(p);
+        }
+    };
+
+    // id-splitting does not happen for incref operations
+    template <>
+    struct action_may_require_id_splitting<
+        agas::server::primary_namespace::service_action>
+    {
+        template <typename Arguments>
+        static bool call(Arguments const& args)
+        {
+            if (boost::fusion::at_c<0>(args).get_action_code() ==
+                agas::primary_ns_increment_credit)
+            {
+                return false;
+            }
+            return true;
         }
     };
 }}

@@ -36,7 +36,7 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f
+        invoke(void ** 
             )
         {
             hpx::throw_exception(bad_function_call,
@@ -73,8 +73,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f
-            , A0 && a0)
+        invoke(void ** 
+            , A0 &&)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -110,8 +110,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f
-            , A0 && a0 , A1 && a1)
+        invoke(void ** 
+            , A0 && , A1 &&)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -147,8 +147,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f
-            , A0 && a0 , A1 && a1 , A2 && a2)
+        invoke(void ** 
+            , A0 && , A1 && , A2 &&)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -184,8 +184,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f
-            , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
+        invoke(void ** 
+            , A0 && , A1 && , A2 && , A3 &&)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -221,8 +221,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f
-            , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
+        invoke(void ** 
+            , A0 && , A1 && , A2 && , A3 && , A4 &&)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -258,8 +258,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f
-            , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5)
+        invoke(void ** 
+            , A0 && , A1 && , A2 && , A3 && , A4 && , A5 &&)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -295,8 +295,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f
-            , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6)
+        invoke(void ** 
+            , A0 && , A1 && , A2 && , A3 && , A4 && , A5 && , A6 &&)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",
@@ -332,8 +332,8 @@ namespace hpx { namespace util { namespace detail
                 >::template get<IArchive, OArchive>();
         }
         BOOST_ATTRIBUTE_NORETURN static R
-        invoke(void ** f
-            , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7)
+        invoke(void ** 
+            , A0 && , A1 && , A2 && , A3 && , A4 && , A5 && , A6 && , A7 &&)
         {
             hpx::throw_exception(bad_function_call,
                 "empty function object should not be used",

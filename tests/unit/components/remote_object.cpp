@@ -103,7 +103,7 @@ int hpx_main(variables_map &)
 
         BOOST_FOREACH(object_type & o, objects)
         {
-            hpx::lcos::wait(o <= output());
+            hpx::wait_all(o <= output());
             cctor_counter = 0;
             hpx::util::function<int(foo &)> f = plus(9);
             hpx::cout << (o <= f).get() << "\n" << hpx::flush;

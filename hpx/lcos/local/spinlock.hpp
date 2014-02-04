@@ -48,7 +48,7 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         ///////////////////////////////////////////////////////////////////////
-        static void yield(std::size_t k, bool suspend)
+        static void yield(std::size_t k)
         {
             if (k < 4) //-V112
             {
@@ -59,15 +59,12 @@ namespace hpx { namespace lcos { namespace local
                 BOOST_SMT_PAUSE
             }
 #endif
-            else if (k < 32 || (k & 1)) //-V112
+            else if(k < 32 || k & 1) //-V112
             {
                 if (hpx::threads::get_self_ptr())
                 {
-                    if (suspend)
-                    {
-                        hpx::this_thread::suspend(hpx::threads::pending,
-                            "spinlock::yield");
-                    }
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "spinlock::yield");
                 }
                 else
                 {
@@ -83,11 +80,8 @@ namespace hpx { namespace lcos { namespace local
             {
                 if (hpx::threads::get_self_ptr())
                 {
-                    if (suspend)
-                    {
-                        hpx::this_thread::suspend(hpx::threads::pending,
-                            "spinlock::yield");
-                    }
+                    hpx::this_thread::suspend(hpx::threads::pending,
+                        "local::spinlock::yield");
                 }
                 else
                 {
@@ -110,6 +104,7 @@ namespace hpx { namespace lcos { namespace local
             }
         }
 
+    public:
         spinlock() : v_(0)
         {
             HPX_ITT_SYNC_CREATE(this, "hpx::lcos::local::spinlock", "");
@@ -145,12 +140,9 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            // only suspend in yield if there aren't any locks
-            // previously registered for this running HPX thread
-            bool suspend = (util::registered_lock_count() == 0);
-            for (std::size_t k = 0; !try_lock(); ++k)
+            for (std::size_t k = 0; !acquire_lock(); ++k)
             {
-                spinlock::yield(k, suspend);
+                spinlock::yield(k);
             }
 
             HPX_ITT_SYNC_ACQUIRED(this);
@@ -161,14 +153,9 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-#if defined(BOOST_WINDOWS)
-            boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
-            BOOST_COMPILER_FENCE
-#else
-            boost::uint64_t r = __sync_lock_test_and_set(&v_, 1);
-#endif
+            bool r = acquire_lock();
 
-            if (r == 0) {
+            if (r) {
                 HPX_ITT_SYNC_ACQUIRED(this);
                 util::register_lock(this);
                 return true;
@@ -182,17 +169,36 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_RELEASING(this);
 
+            relinquish_lock();
+
+            HPX_ITT_SYNC_RELEASED(this);
+            util::unregister_lock(this);
+        }
+
+    private:
+        // returns whether the mutex has been acquired
+        bool acquire_lock()
+        {
+#if defined(BOOST_WINDOWS)
+            boost::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
+            BOOST_COMPILER_FENCE
+#else
+            boost::uint64_t r = __sync_lock_test_and_set(&v_, 1);
+#endif
+            return r == 0;
+        }
+
+        void relinquish_lock()
+        {
 #if defined(BOOST_WINDOWS)
             BOOST_COMPILER_FENCE
             *const_cast<boost::uint64_t volatile*>(&v_) = 0;
 #else
             __sync_lock_release(&v_);
 #endif
-
-            HPX_ITT_SYNC_RELEASED(this);
-            util::unregister_lock(this);
         }
 
+    public:
         typedef boost::unique_lock<spinlock> scoped_lock;
         typedef boost::detail::try_lock_wrapper<spinlock> scoped_try_lock;
     };

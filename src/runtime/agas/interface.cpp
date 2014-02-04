@@ -388,32 +388,15 @@ void decref(
     resolver.decref(gid, credits, ec);
 }
 
-void add_incref_request(
-    boost::int64_t credit
-  , naming::id_type const& keep_alive
-    )
-{
-    naming::resolver_client& resolver = naming::get_agas_client();
-    resolver.add_incref_request(credit, keep_alive);
-}
-
-bool add_remote_incref_request(
-    boost::int64_t credit
-  , naming::gid_type const& gid
-  , boost::uint32_t remote_locality
-    )
-{
-    naming::resolver_client& resolver = naming::get_agas_client();
-    return resolver.add_remote_incref_request(credit, gid, remote_locality);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
-hpx::unique_future<bool> incref_async(
+hpx::unique_future<boost::int64_t> incref_async(
     naming::gid_type const& gid
   , boost::int64_t credits
   , naming::id_type const& keep_alive_
   )
 {
+    HPX_ASSERT(!naming::detail::is_locked(gid));
+
     naming::resolver_client& resolver = naming::get_agas_client();
 
     if (keep_alive_)
@@ -423,14 +406,22 @@ hpx::unique_future<bool> incref_async(
     return resolver.incref_async(gid, credits, keep_alive);
 }
 
-bool incref(
+boost::int64_t incref(
     naming::gid_type const& gid
   , boost::int64_t credits
+  , naming::id_type const& keep_alive_
   , error_code& ec
   )
 {
+    HPX_ASSERT(!naming::detail::is_locked(gid));
+
     naming::resolver_client& resolver = naming::get_agas_client();
-    return resolver.incref(gid, credits, ec);
+
+    if (keep_alive_)
+        return resolver.incref_async(gid, credits, keep_alive_).get();
+
+    naming::id_type keep_alive = naming::id_type(gid, id_type::unmanaged);
+    return resolver.incref_async(gid, credits, keep_alive).get();
 }
 
 }}

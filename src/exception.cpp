@@ -37,14 +37,14 @@ extern char **environ;
 namespace hpx { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
-    std::string backtrace()
+    std::string backtrace(std::size_t frames)
     {
-        return util::trace_on_new_stack();
+        return util::trace_on_new_stack(frames);
     }
 
-    std::string backtrace_direct()
+    std::string backtrace_direct(std::size_t frames)
     {
-        return util::trace();
+        return util::trace(frames);
     }
 
     ///////////////////////////////////////////////////////////////////////////

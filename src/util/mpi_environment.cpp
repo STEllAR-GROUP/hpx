@@ -88,7 +88,7 @@ namespace hpx { namespace util
         // The bottomline is that we use the MPI parcelport either when the application
         // was executed using mpirun or if the tcp/ip parcelport was disabled.
         if (!detail::detect_mpi_environment(cfg.rtcfg_, HPX_PARCELPORT_MPI_ENV) &&
-            detail::get_cfg_entry(cfg, "hpx.parcel.tcpip.enable", 1))
+            detail::get_cfg_entry(cfg, "hpx.parcel.tcp.enable", 1))
         {
             // explicitly disable mpi if not run by mpirun
             cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
@@ -208,7 +208,7 @@ namespace hpx { namespace util
     {
         // if somebody tries to enforce using MPI, bail out
         if (detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) != 0 ||
-            cfg.rtcfg_.get_entry("hpx.parcel.bootstrap", "tcpip") == "mpi")
+            cfg.rtcfg_.get_entry("hpx.parcel.bootstrap", "tcp") == "mpi")
         {
             throw std::runtime_error("mpi_environment::init: "
                 "HPX is not compiled for MPI, but 'hpx.parcel.mpi.enable=1'. "
@@ -218,8 +218,8 @@ namespace hpx { namespace util
         // Report error, if the application was run using mpirun or similar but no
         // prcelport other then MPI is enabled.
         if (detail::detect_mpi_environment(cfg.rtcfg_, "PMI_RANK,OMPI_COMM_WORLD_SIZE") &&
-            detail::get_cfg_entry(cfg, "hpx.parcel.tcpip.enable", 0) == 0 &&
-            detail::get_cfg_entry(cfg, "hpx.parcel.shmem.enable", 0) == 0 &&
+            detail::get_cfg_entry(cfg, "hpx.parcel.tcp.enable", 0) == 0 &&
+            detail::get_cfg_entry(cfg, "hpx.parcel.ipc.enable", 0) == 0 &&
             detail::get_cfg_entry(cfg, "hpx.parcel.ibverbs.enable", 0) == 0)
         {
             throw std::runtime_error("mpi_environment::init: "

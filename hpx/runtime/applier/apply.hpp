@@ -33,10 +33,10 @@ namespace hpx { namespace actions
     template <typename Action>
     threads::thread_priority action_priority()
     {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename hpx::actions::extract_action<Action>::type action_type_;
         threads::thread_priority priority =
             static_cast<threads::thread_priority>(
-                traits::action_priority<action_type>::value);
+                traits::action_priority<action_type_>::value);
         if (priority == threads::thread_priority_default)
             priority = threads::thread_priority_normal;
         return priority;
@@ -67,12 +67,12 @@ namespace hpx
         apply_r_p(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            typedef typename hpx::actions::extract_action<Action>::type action_type_;
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(priority,
+            parcelset::parcel p(id, complement_addr<action_type_>(addr),
+                new hpx::actions::transfer_action<action_type_>(priority,
                     util::forward_as_tuple()));
 
             // Send the parcel through the parcel handler
@@ -114,14 +114,14 @@ namespace hpx
             std::vector<naming::gid_type> const& gids,
             threads::thread_priority priority)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            typedef typename hpx::actions::extract_action<Action>::type action_type_;
 
             // sort destinations
             std::map<naming::locality, destinations> dests;
 
             std::size_t count = gids.size();
             for (std::size_t i = 0; i < count; ++i) {
-                complement_addr<action_type>(addrs[i]);
+                complement_addr<action_type_>(addrs[i]);
 
                 destinations& dest = dests[addrs[i].locality_];
                 dest.gids_.push_back(gids[i]);
@@ -132,7 +132,7 @@ namespace hpx
             parcelset::parcelhandler& ph =
                 hpx::applier::get_applier().get_parcel_handler();
             actions::action_type act(
-                new hpx::actions::transfer_action<action_type>(priority,
+                new hpx::actions::transfer_action<action_type_>(priority,
                     util::forward_as_tuple()));
 
             std::for_each(dests.begin(), dests.end(), send_parcel(ph, act));
@@ -154,14 +154,14 @@ namespace hpx
         apply_l_p(naming::id_type const& target, naming::address const& addr,
             threads::thread_priority priority)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            typedef typename hpx::actions::extract_action<Action>::type action_type_;
 
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
-                    typename action_type::component_type>()));
+                    typename action_type_::component_type>()));
 
             util::tuple<> env;
-            apply_helper<action_type>::call(target, addr.address_, priority, env);
+            apply_helper<action_type_>::call(target, addr.address_, priority, env);
             return true;     // no parcel has been sent (dest is local)
         }
 
@@ -279,14 +279,14 @@ namespace hpx
         apply_r_p(naming::address& addr, actions::continuation* c,
             naming::id_type const& id, threads::thread_priority priority)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            typedef typename hpx::actions::extract_action<Action>::type action_type_;
 
             actions::continuation_type cont(c);
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(priority,
+            parcelset::parcel p(id, complement_addr<action_type_>(addr),
+                new hpx::actions::transfer_action<action_type_>(priority,
                     util::forward_as_tuple()), cont);
 
             // Send the parcel through the parcel handler
@@ -308,12 +308,12 @@ namespace hpx
         apply_r_sync_p(naming::address& addr, naming::id_type const& id,
             threads::thread_priority priority)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            typedef typename hpx::actions::extract_action<Action>::type action_type_;
 
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            parcelset::parcel p(id, complement_addr<action_type>(addr),
-                new hpx::actions::transfer_action<action_type>(priority,
+            parcelset::parcel p(id, complement_addr<action_type_>(addr),
+                new hpx::actions::transfer_action<action_type_>(priority,
                     util::forward_as_tuple()));
 
             // Send the parcel through the parcel handler
@@ -334,15 +334,15 @@ namespace hpx
         inline bool apply_l_p(actions::continuation* c, naming::id_type const& target,
             naming::address const& addr, threads::thread_priority priority)
         {
-            typedef typename hpx::actions::extract_action<Action>::type action_type;
+            typedef typename hpx::actions::extract_action<Action>::type action_type_;
 
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<
-                    typename action_type::component_type>()));
+                    typename action_type_::component_type>()));
 
             actions::continuation_type cont(c);
             util::tuple<> env;
-            apply_helper<action_type>::call(cont, target, addr.address_, priority, env);
+            apply_helper<action_type_>::call(cont, target, addr.address_, priority, env);
             return true;     // no parcel has been sent (dest is local)
         }
 

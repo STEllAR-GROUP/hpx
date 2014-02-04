@@ -1,34 +1,22 @@
-
-//  Copyright (c) 2012 Thomas Heller
+//  Copyright (c) 2012-2014 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-
-#include <hpx/include/iostreams.hpp>
-
-using boost::program_options::variables_map;
-using boost::program_options::options_description;
-using boost::program_options::value;
+#include <hpx/include/thread_executors.hpp>
+#include <hpx/lcos/future_wait.hpp>
 
 using hpx::util::high_resolution_timer;
 
-using hpx::init;
-using hpx::finalize;
-
-using hpx::cout;
-using hpx::flush;
-
 #include <QtGui/QApplication>
 #include "widget.hpp"
-#include "hpx_qt.hpp"
 
 double runner(double now)
 {
     high_resolution_timer t(now);
-    // TODO: do something cool here
+    // do something cool here
     return t.elapsed();
 }
 
@@ -44,23 +32,37 @@ void run(widget * w, std::size_t num_threads)
         futures[i] = hpx::async(a, hpx::find_here(), high_resolution_timer::now());
     }
 
-    hpx::wait(futures, [w](std::size_t i, double t){ w->add_label(i, t); });
+    hpx::lcos::wait(futures, [w](std::size_t i, double t){ w->add_label(i, t); });
     w->run_finished();
 }
 
-int hpx_main(int argc, char ** argv)
-{
-    return finalize();
-}
-
-int main(int argc, char **argv)
+void qt_main(int argc, char ** argv)
 {
     QApplication app(argc, argv);
 
     widget main(boost::bind(run, _1, _2));
-
-    hpx::qt::runtime r(argc, argv);
-    QObject::connect(&r, SIGNAL(hpx_started()), &main, SLOT(show()));
+    main.show();
 
     app.exec();
+}
+
+int hpx_main(int argc, char ** argv)
+{
+    {
+        // Get a reference to one of the main thread
+        hpx::threads::executors::main_pool_executor scheduler;
+        // run an async function on the main thread to start the Qt application
+        hpx::unique_future<void> qt_application
+            = hpx::async(scheduler, qt_main, argc, argv);
+
+        // do something else while qt is executing in the background ...
+
+        qt_application.wait();
+    }
+    return hpx::finalize();
+}
+
+int main(int argc, char **argv)
+{
+    return hpx::init(argc, argv);
 }

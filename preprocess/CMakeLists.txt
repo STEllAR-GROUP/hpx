@@ -23,7 +23,8 @@ set(function_argument_limit_preprocessing_files
   "hpx/util/bind_action.hpp"
   "hpx/util/deferred_call.hpp"
   "hpx/util/invoke.hpp"
-  "hpx/util/invoke_fused.hpp")
+  "hpx/util/invoke_fused.hpp"
+  "hpx/util/unwrapped.hpp")
 foreach(file ${function_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)
 endforeach()
@@ -54,6 +55,7 @@ set(action_argument_limit_preprocessing_files
   "hpx/lcos/deferred_packaged_task_constructors.hpp"
   "hpx/lcos/deferred_packaged_task_constructors_direct.hpp"
   "hpx/lcos/local/dataflow.hpp"
+  "hpx/lcos/local/packaged_task.hpp"
   "hpx/runtime/actions/component_action_implementations.hpp"
   "hpx/runtime/actions/gcc44/component_action_implementations.hpp"
   "hpx/runtime/actions/component_const_action_implementations.hpp"
@@ -82,7 +84,9 @@ set(wait_argument_limit_preprocessing_files
   "hpx/lcos/wait_all.hpp"
   "hpx/lcos/wait_n.hpp"
   "hpx/lcos/wait_any.hpp"
-  "hpx/lcos/future_wait.hpp"
+  "hpx/lcos/when_all.hpp"
+  "hpx/lcos/when_n.hpp"
+  "hpx/lcos/when_any.hpp"
   "hpx/runtime/components/memory_block.hpp")
 foreach(file ${wait_argument_limit_preprocessing_files})
   hpx_partial_preprocess_header(${file} LIMIT HPX_LIMIT)

@@ -25,9 +25,6 @@
 
 #include <numeric>
 
-// The number of types that response's variant can represent.
-#define HPX_AGAS_RESPONSE_SUBTYPES 10
-
 namespace hpx { namespace agas
 {
 
@@ -102,6 +99,12 @@ struct response
       , error status_ = success
         );
 
+    response(
+        namespace_action_code type_
+      , boost::int64_t added_credits_
+      , error status_ = success
+        );
+
     ///////////////////////////////////////////////////////////////////////////
     // copy constructor
     response(
@@ -142,6 +145,11 @@ struct response
         ) const;
 
     boost::uint32_t get_locality_id(
+        error_code& ec = throws
+        ) const;
+
+    // primary_ns_change_credit_one
+    boost::int64_t get_added_credits(
         error_code& ec = throws
         ) const;
 
@@ -197,6 +205,7 @@ struct response
 
     namespace_action_code mc;
     error status;
+
     // FIXME: std::unique_ptr doesn't seem to work with incomplete types
     boost::shared_ptr<response_data> data;
 };
@@ -255,6 +264,28 @@ struct get_remote_result<boost::uint32_t, agas::response>
         }
         HPX_THROW_EXCEPTION(bad_parameter,
             "get_remote_result<boost::uint32_t, agas::response>::call",
+            "unexpected action code in result conversion");
+        return 0;
+    }
+};
+
+template <>
+struct get_remote_result<boost::int64_t, agas::response>
+{
+    static boost::int64_t call(
+        agas::response const& rep
+        )
+    {
+        switch(rep.get_action_code()) {
+        case agas::primary_ns_increment_credit:
+            return rep.get_added_credits();
+
+        default:
+            break;
+        }
+
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "get_remote_result<boost::int64_t, agas::response>::call",
             "unexpected action code in result conversion");
         return 0;
     }

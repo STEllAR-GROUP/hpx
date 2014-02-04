@@ -1070,6 +1070,7 @@ namespace hpx
             util::apex_wrapper_init apex(argc, argv);
 
             result = cfg.call(desc_cmdline, argc, argv);
+
             if (result != 0) {
                 if (result > 0)
                     result = 0;     // --hpx:help

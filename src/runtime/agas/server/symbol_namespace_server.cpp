@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -97,8 +97,8 @@ response symbol_namespace::service(
         case primary_ns_bind_gid:
         case primary_ns_resolve_gid:
         case primary_ns_unbind_gid:
-        case primary_ns_change_credit_non_blocking:
-        case primary_ns_change_credit_sync:
+        case primary_ns_increment_credit:
+        case primary_ns_change_credit:
         case primary_ns_allocate:
         {
             LAGAS_(warning) <<
@@ -265,8 +265,8 @@ response symbol_namespace::bind(
         boost::int64_t const credits = naming::detail::get_credit_from_gid(gid);
         naming::gid_type raw_gid = it->second;
 
-        naming::detail::strip_credit_from_gid(raw_gid);
-        naming::detail::strip_credit_from_gid(gid);
+        naming::detail::strip_internal_bits_from_gid(raw_gid);
+        naming::detail::strip_internal_bits_from_gid(gid);
 
         // increase reference count
         if (raw_gid == gid)
@@ -353,49 +353,7 @@ response symbol_namespace::resolve(
     if (&ec != &throws)
         ec = make_success_code();
 
-    naming::gid_type gid;
-
-    // Is this entry reference counted?
-    naming::gid_type::mutex_type::scoped_lock gid_l(&(it->second));
-    if (naming::detail::has_credits(it->second))
-    {
-        gid = naming::detail::split_credits_for_gid(it->second);
-
-        LAGAS_(debug) << (boost::format(
-            "symbol_namespace::resolve, split credits for entry: "
-            "key(%1%), entry(%2%), gid(%3%)")
-            % key % it->second % gid);
-
-        // Credit exhaustion - we need to get more.
-        if (1 == naming::detail::get_credit_from_gid(gid))
-        {
-            HPX_ASSERT(1 == naming::detail::get_credit_from_gid(it->second));
-
-            boost::uint64_t added_credit =
-                naming::detail::fill_credit_for_gid(it->second);
-            agas::add_incref_request(added_credit,
-                naming::id_type(it->second, id_type::unmanaged));
-
-            boost::uint64_t added_new_credit =
-                naming::detail::fill_credit_for_gid(gid);
-            agas::add_incref_request(added_new_credit,
-                naming::id_type(gid, id_type::unmanaged));
-
-            gid_l.unlock();
-
-            agas::incref_async(it->second, added_credit);
-            agas::incref_async(gid, added_new_credit);
-
-            LAGAS_(debug) << (boost::format(
-                "symbol_namespace::resolve, incremented entry credits: "
-                "key(%1%), entry(%2%), gid(%3%)")
-                % key % it->second % gid);
-        }
-    }
-    else
-    {
-        gid = it->second;
-    }
+    naming::gid_type gid = naming::detail::split_gid_if_needed(it->second);
 
     LAGAS_(info) << (boost::format(
         "symbol_namespace::resolve, key(%1%), gid(%2%)")

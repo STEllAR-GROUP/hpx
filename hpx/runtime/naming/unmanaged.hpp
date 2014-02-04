@@ -32,7 +32,7 @@ namespace hpx { namespace naming
     ///
     inline id_type unmanaged(id_type const& id)
     {
-        return id_type(detail::strip_credit_from_gid(id.get_msb()),
+        return id_type(detail::strip_internal_bits_from_gid(id.get_msb()),
             id.get_lsb(), id_type::unmanaged);
     }
 }}

@@ -498,7 +498,7 @@ namespace hpx
         ///               \a hpx_category (if mode is \a plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        error_code get_error_code(throwmode mode = plain) const throw()
+        error_code get_error_code(throwmode /*mode*/ = plain) const throw()
         {
             return error_code(this->boost::system::system_error::code().value(),
                 *this);
@@ -785,7 +785,10 @@ namespace hpx
 
         // If backtrace support is enabled, this function returns the current
         // stack backtrace, otherwise it will return an empty string.
-        HPX_EXPORT std::string backtrace();
+        HPX_EXPORT std::string backtrace(
+            std::size_t frames = HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH);
+        HPX_EXPORT std::string backtrace_direct(
+            std::size_t frames = HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH);
 
         // Portably extract the current execution environment
         HPX_EXPORT std::string get_execution_environment();

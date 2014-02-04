@@ -310,9 +310,15 @@ namespace hpx { namespace threads
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION != 0
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        get_backtrace(thread_id_type const& thrd) const
+#else
     template <typename SchedulingPolicy, typename NotificationPolicy>
     util::backtrace const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_backtrace(thread_id_type const& thrd) const
+#endif
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,
@@ -324,9 +330,15 @@ namespace hpx { namespace threads
         return thrd ? thrd->get_backtrace() : 0;
     }
 
+#if HPX_THREAD_MAINTAIN_FULLBACKTRACE_ON_SUSPENSION != 0
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    char const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        set_backtrace(thread_id_type const& thrd, char const* bt)
+#else
     template <typename SchedulingPolicy, typename NotificationPolicy>
     util::backtrace const* threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         set_backtrace(thread_id_type const& thrd, util::backtrace const* bt)
+#endif
     {
         if (HPX_UNLIKELY(!thrd)) {
             HPX_THROW_EXCEPTION(null_thread_id,

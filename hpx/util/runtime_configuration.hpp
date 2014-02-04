@@ -60,15 +60,8 @@ namespace hpx { namespace util
         // Get the HPX network address to use
         naming::locality get_parcelport_address() const;
 
-        // Get the number of maximum concurrent connections per locality
-        std::size_t get_max_connections_per_loc() const;
-        std::size_t get_max_connections() const;
-
-        // Get the size of the shmem parcelport data buffer cache
-        std::size_t get_shmem_data_buffer_cache_size() const;
-
-        // Get the number of maximum requests in flight for the MPI parcelport
-        std::size_t get_max_mpi_requests() const;
+        // Get the size of the ipc parcelport data buffer cache
+        std::size_t get_ipc_data_buffer_cache_size() const;
 
         // Get AGAS client-side local cache size
         std::size_t get_agas_local_cache_size(
@@ -97,6 +90,9 @@ namespace hpx { namespace util
 
         // Enable lock detection during suspension
         bool enable_lock_detection() const;
+
+        // Enable global lock tracking
+        bool enable_global_lock_detection() const;
 
         // Enable minimal deadlock detection for HPX threads
         bool enable_minimal_deadlock_detection() const;

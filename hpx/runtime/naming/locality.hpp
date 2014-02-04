@@ -180,7 +180,7 @@ namespace hpx { namespace naming
         void set_rank(boost::int16_t rank) { rank_ = rank; }
 #else
         boost::int16_t get_rank() const { return -1; }
-        void set_rank(boost::int16_t rank) {}
+        void set_rank(boost::int16_t /*rank*/) {}
 #endif
 
         parcelset::connection_type get_type() const
@@ -189,7 +189,7 @@ namespace hpx { namespace naming
             if(rank_ != -1)
                 return parcelset::connection_mpi;
 #endif
-            return parcelset::connection_tcpip;
+            return parcelset::connection_tcp;
         }
 
     private:

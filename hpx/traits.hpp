@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -73,6 +73,9 @@ namespace hpx { namespace traits
     struct action_capability_provider;
 #endif
 
+    template <typename Action, typename Enable = void>
+    struct action_may_require_id_splitting;
+
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for type_size
     template <typename T, typename Enable = void>
@@ -85,6 +88,10 @@ namespace hpx { namespace traits
     ///////////////////////////////////////////////////////////////////////////
     template <typename Range, typename Enable = void>
     struct is_future_range;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Tuple, typename Enable = void>
+    struct is_future_tuple;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>

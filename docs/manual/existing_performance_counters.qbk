@@ -127,7 +127,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `shmem`, `ibverbs`
+          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
         ]
         [`locality#*/total`
 
@@ -140,13 +140,18 @@ system and application performance.
          (see `<operation>`, e.g. `sent` or `received`) for the specified
          `<connection_type>`.
 
-         The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
+         The performance counters for the connection type `ipc` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
          The performance counters for the connection type `ibverbs` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default).
+
+         The performance counters for the connection type `mpi` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -156,7 +161,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `shmem`, `ibverbs`
+          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
         ]
         [`locality#*/total`
 
@@ -170,13 +175,18 @@ system and application performance.
          operation for the specified `<connection_type>` the given locality
          (see `<operation>`, e.g. `sent` or `received`).
 
-         The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
+         The performance counters for the connection type `ipc` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
          The performance counters for the connection type `ibverbs` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default).
+
+         The performance counters for the connection type `mpi` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -186,7 +196,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `shmem`, `ibverbs`
+          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
         ]
         [`locality#*/total`
 
@@ -199,13 +209,18 @@ system and application performance.
          e.g. `sent` or `received`, possibly compressed) for the specified
          `<connection_type>` by the given locality.
 
-         The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
+         The performance counters for the connection type `ipc` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
          The performance counters for the connection type `ibverbs` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default).
+
+         The performance counters for the connection type `mpi` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -215,7 +230,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `shmem`, `ibverbs`
+          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
         ]
         [`locality#*/total`
 
@@ -228,13 +243,18 @@ system and application performance.
          for the specified `<connection_type>`on the given locality (see
          `<operation>`, e.g. `sent` or `received`).
 
-         The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
+         The performance counters for the connection type `ipc` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
          The performance counters for the connection type `ibverbs` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default).
+
+         The performance counters for the connection type `mpi` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -244,7 +264,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `shmem`, `ibverbs`
+          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
         ]
         [`locality#*/total`
 
@@ -257,13 +277,18 @@ system and application performance.
          for the specified `<connection_type>`on the given locality (see
          `<operation>`, e.g. `sent` or `received`).
 
-         The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
+         The performance counters for the connection type `ipc` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
          The performance counters for the connection type `ibverbs` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default).
+
+         The performance counters for the connection type `mpi` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -296,7 +321,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `shmem`, `ibverbs`
+          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
         ]
         [`locality#*/total`
 
@@ -309,13 +334,18 @@ system and application performance.
          `<connection_type>` by the given locality (see `<operation>`, e.g.
          `sent` or `received`).
 
-         The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
+         The performance counters for the connection type `ipc` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
          The performance counters for the connection type `ibverbs` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default).
+
+         The performance counters for the connection type `mpi` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -325,7 +355,7 @@ system and application performance.
 
           where:[br] `<operation>` is one of the following:
           `sent`, `received`[br]
-          `<connection_type>` is one of the following: `tcp`, `shmem`, `ibverbs`
+          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
         ]
         [`locality#*/total`
 
@@ -339,13 +369,18 @@ system and application performance.
          the specified `<connection_type>` by the given locality (see
          `<operation>`, e.g. `sent` or `received`).
 
-         The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
+         The performance counters for the connection type `ipc` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
          The performance counters for the connection type `ibverbs` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default).
+
+         The performance counters for the connection type `mpi` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
@@ -356,7 +391,7 @@ system and application performance.
           where:[br] `<cache_statistics>` is one of the following:
           `cache-insertions`, `cache-evictions`, `cache-hits`, `cache-misses`,
           `cache-misses`[br]
-          `<connection_type>` is one of the following: `tcp`, `shmem`, `ibverbs`
+          `<connection_type>` is one of the following: `tcp`, `ipc`, `ibverbs`, `mpi`
         ]
         [`locality#*/total`
 
@@ -370,13 +405,18 @@ system and application performance.
          type on the given locality (see `<cache_statistics>`, e.g. `cache-insertions`,
          `cache-evictions`, `cache-hits`, `cache-misses`, or `cache-reclaims`).
 
-         The performance counters for the connection type `shmem` are available
-         only if the compile time constant `HPX_HAVE_PARCELPORT_SHMEM` was
+         The performance counters for the connection type `ipc` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_IPC` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 
          The performance counters for the connection type `ibverbs` are available
          only if the compile time constant `HPX_HAVE_PARCELPORT_IBVERBS` was
+         defined while compiling the __hpx__ core library (which is not defined
+         by default).
+
+         The performance counters for the connection type `mpi` are available
+         only if the compile time constant `HPX_HAVE_PARCELPORT_MPI` was
          defined while compiling the __hpx__ core library (which is not defined
          by default).
 

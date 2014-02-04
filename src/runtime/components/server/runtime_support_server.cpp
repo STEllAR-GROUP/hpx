@@ -27,7 +27,7 @@
 #include <hpx/runtime/components/component_commandline_base.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/lcos/future_wait.hpp>
+#include <hpx/lcos/wait_all.hpp>
 
 #include <hpx/util/assert.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -392,7 +392,7 @@ namespace hpx { namespace components { namespace server
 
         // wait for all localities to finish executing their registered
         // shutdown functions
-        lcos::wait(lazy_actions);
+        wait_all(lazy_actions);
     }
 
     void runtime_support::shutdown_all(double timeout)
@@ -426,7 +426,7 @@ namespace hpx { namespace components { namespace server
             }
 
             // wait for all localities to be stopped
-            lcos::wait(lazy_actions);
+            wait_all(lazy_actions);
         }
 
         // now make sure this local locality gets shut down as well.
@@ -458,7 +458,7 @@ namespace hpx { namespace components { namespace server
             }
 
             // wait for all localities to be stopped
-            lcos::wait(lazy_actions);
+            wait_all(lazy_actions);
         }
 
         // now make sure this local locality gets terminated as well.

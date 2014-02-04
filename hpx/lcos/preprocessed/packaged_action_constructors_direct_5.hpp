@@ -9,7 +9,7 @@
 
 
     template <typename Arg0>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::id_type const& gid,
         Arg0 && arg0)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -34,7 +34,7 @@
         }
     }
     template <typename Arg0>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::address& addr,
         naming::id_type const& gid, Arg0 && arg0)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -70,7 +70,7 @@
         apply(launch::all, gid, std::forward<Arg0>( arg0 ));
     }
     template <typename Arg0 , typename Arg1>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -95,7 +95,7 @@
         }
     }
     template <typename Arg0 , typename Arg1>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::address& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -131,7 +131,7 @@
         apply(launch::all, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -156,7 +156,7 @@
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::address& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -192,7 +192,7 @@
         apply(launch::all, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -217,7 +217,7 @@
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::address& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -253,7 +253,7 @@
         apply(launch::all, gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::id_type const& gid,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::id_type const& gid,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
@@ -278,7 +278,7 @@
         }
     }
     template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    void apply(BOOST_SCOPED_ENUM(launch) policy, naming::address& addr,
+    void apply(BOOST_SCOPED_ENUM(launch) , naming::address& addr,
         naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);

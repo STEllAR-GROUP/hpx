@@ -112,6 +112,9 @@ void test_waiting_future()
     HPX_TEST(!fi.has_value());
     HPX_TEST(!fi.has_exception());
     HPX_TEST(fi.get_status() == hpx::lcos::future_status::deferred);
+    
+    // fulfill the promise so the destructor of promise is happy.
+    pi.set_value(0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -222,7 +225,7 @@ void test_invoking_a_packaged_task_twice_throws()
         HPX_TEST(false);
     }
     catch (hpx::exception const& e) {
-        HPX_TEST(e.get_error() == hpx::task_already_started);
+        HPX_TEST(e.get_error() == hpx::promise_already_satisfied);
     }
     catch (...) {
         HPX_TEST(false);
@@ -589,7 +592,7 @@ void test_packaged_task_can_be_moved()
         HPX_TEST(!"Can invoke moved task!");
     }
     catch (hpx::exception const& e) {
-      HPX_TEST(e.get_error() == hpx::task_moved);
+      HPX_TEST(e.get_error() == hpx::no_state);
     }
     catch (...) {
         HPX_TEST(false);
@@ -641,7 +644,7 @@ void test_destroying_a_packaged_task_stores_broken_task()
         HPX_TEST(false);    // shouldn't get here
     }
     catch (hpx::exception const& e) {
-      HPX_TEST(e.get_error() == hpx::broken_task);
+      HPX_TEST(e.get_error() == hpx::broken_promise);
     }
     catch (...) {
         HPX_TEST(false);
@@ -677,7 +680,7 @@ void test_wait_for_either_of_two_futures_1()
     HPX_TEST_EQ(f1.get(), 42);
 
     HPX_TEST(HPX_STD_GET(0, t).is_ready());
-    HPX_TEST_EQ(HPX_STD_GET(1, t).get(), 42);
+    HPX_TEST_EQ(HPX_STD_GET(0, t).get(), 42);
 }
 
 void test_wait_for_either_of_two_futures_2()

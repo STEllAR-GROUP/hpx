@@ -1732,7 +1732,7 @@ namespace hpx { namespace actions
             init_registration<typed_continuation>::g.register_continuation();
         }
 
-        void deferred_trigger(lcos::unique_future<R> result, boost::mpl::false_) const
+        void deferred_trigger(lcos::unique_future<R> result) const
         {
             if (f_.empty()) {
                 if (!this->get_gid()) {
@@ -1748,48 +1748,25 @@ namespace hpx { namespace actions
             }
         }
 
-        void deferred_trigger(lcos::unique_future<R> result, boost::mpl::true_) const
-        {
-            if (f_.empty()) {
-                if (!this->get_gid()) {
-                    HPX_THROW_EXCEPTION(invalid_status,
-                        "typed_continuation<lcos::unique_future<R> >::trigger_value",
-                        "attempt to trigger invalid LCO (the id is invalid)");
-                    return;
-                }
-                result.get();
-                hpx::set_lco_value(this->get_gid());
-            }
-            else {
-                result.get();
-                f_(this->get_gid());
-            }
-        }
-
         void trigger_value(lcos::unique_future<R> && result) const
         {
             LLCO_(info)
                 << "typed_continuation<lcos::unique_future<R> >::trigger("
                 << this->get_gid() << ")";
 
-            typedef boost::mpl::bool_<boost::is_void<R>::value> predicate;
-
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {
-                deferred_trigger(std::move(result), predicate());
+                deferred_trigger(std::move(result));
                 return;
             }
 
             // attach continuation to this future which will send the result back
             // once its ready
-            void(typed_continuation::*f)(lcos::unique_future<R>, predicate) const
-                = &typed_continuation::deferred_trigger;
-
-            deferred_result_ = result.then(
-                util::bind(f,
+            result.then(
+                util::bind(&typed_continuation::deferred_trigger,
                     boost::static_pointer_cast<typed_continuation const>(
                         shared_from_this()),
-                    util::placeholders::_1, predicate()));
+                    util::placeholders::_1));
         }
 
     private:
@@ -1825,7 +1802,114 @@ namespace hpx { namespace actions
         }
 
         util::function<void(naming::id_type, R)> f_;
-        mutable lcos::unique_future<void> deferred_result_;
+    };
+
+    template <>
+    struct typed_continuation<lcos::unique_future<void> > : continuation
+    {
+        typed_continuation()
+        {}
+
+        explicit typed_continuation(naming::id_type const& gid)
+          : continuation(gid)
+        {}
+        explicit typed_continuation(naming::id_type && gid)
+          : continuation(std::move(gid))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type const& gid,
+                F && f)
+          : continuation(gid), f_(std::forward<F>(f))
+        {}
+        template <typename F>
+        explicit typed_continuation(naming::id_type && gid,
+                F && f)
+          : continuation(std::move(gid)), f_(std::forward<F>(f))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(F && f)
+          : f_(std::forward<F>(f))
+        {}
+
+        ~typed_continuation()
+        {
+            init_registration<typed_continuation>::g.register_continuation();
+        }
+
+        void deferred_trigger(lcos::unique_future<void> result) const
+        {
+            if (f_.empty()) {
+                if (!this->get_gid()) {
+                    HPX_THROW_EXCEPTION(invalid_status,
+                        "typed_continuation<lcos::unique_future<void> >::trigger_value",
+                        "attempt to trigger invalid LCO (the id is invalid)");
+                    return;
+                }
+                result.get();
+                hpx::trigger_lco_event(this->get_gid());
+            }
+            else {
+                result.get();
+                f_(this->get_gid());
+            }
+        }
+
+        void trigger_value(lcos::unique_future<void> && result) const
+        {
+            LLCO_(info)
+                << "typed_continuation<lcos::unique_future<void> >::trigger("
+                << this->get_gid() << ")";
+
+            // if the future is ready, send the result back immediately
+            if (result.is_ready()) {
+                deferred_trigger(std::move(result));
+                return;
+            }
+
+            // attach continuation to this future which will send the result back
+            // once its ready
+            result.then(
+                util::bind(&typed_continuation::deferred_trigger,
+                    boost::static_pointer_cast<typed_continuation const>(
+                        shared_from_this()),
+                    util::placeholders::_1));
+        }
+
+    private:
+        char const* get_continuation_name() const
+        {
+            return detail::get_continuation_name<typed_continuation>();
+        }
+
+        /// serialization support
+        void load(hpx::util::portable_binary_iarchive& ar)
+        {
+            // serialize base class
+            typedef continuation base_type;
+            this->base_type::load(ar);
+
+            // serialize function
+            bool have_function = false;
+            ar.load(have_function);
+            if (have_function)
+                ar >> f_;
+        }
+        void save(hpx::util::portable_binary_oarchive& ar) const
+        {
+            // serialize base class
+            typedef continuation base_type;
+            this->base_type::save(ar);
+
+            // serialize function
+            bool have_function = !f_.empty();
+            ar.save(have_function);
+            if (have_function)
+                ar << f_;
+        }
+
+        util::function<void(naming::id_type)> f_;
     };
 
     template <typename R>
@@ -1862,7 +1946,7 @@ namespace hpx { namespace actions
             init_registration<typed_continuation>::g.register_continuation();
         }
 
-        void deferred_trigger(lcos::shared_future<R> result, boost::mpl::false_) const
+        void deferred_trigger(lcos::shared_future<R> result) const
         {
             if (f_.empty()) {
                 if (!this->get_gid()) {
@@ -1878,48 +1962,25 @@ namespace hpx { namespace actions
             }
         }
 
-        void deferred_trigger(lcos::shared_future<R> result, boost::mpl::true_) const
-        {
-            if (f_.empty()) {
-                if (!this->get_gid()) {
-                    HPX_THROW_EXCEPTION(invalid_status,
-                        "typed_continuation<lcos::shared_future<R> >::trigger_value",
-                        "attempt to trigger invalid LCO (the id is invalid)");
-                    return;
-                }
-                result.get();
-                hpx::set_lco_value(this->get_gid());
-            }
-            else {
-                result.get();
-                f_(this->get_gid());
-            }
-        }
-
         void trigger_value(lcos::shared_future<R> && result) const
         {
             LLCO_(info)
                 << "typed_continuation<lcos::shared_future<R> >::trigger("
                 << this->get_gid() << ")";
 
-            typedef boost::mpl::bool_<boost::is_void<R>::value> predicate;
-
             // if the future is ready, send the result back immediately
             if (result.is_ready()) {
-                deferred_trigger(std::move(result), predicate());
+                deferred_trigger(std::move(result));
                 return;
             }
 
             // attach continuation to this future which will send the result back
             // once its ready
-            void(typed_continuation::*f)(lcos::shared_future<R>, predicate) const
-                = &typed_continuation::deferred_trigger;
-
-            deferred_result_ = result.then(
-                util::bind(f,
+            result.then(
+                util::bind(&typed_continuation::deferred_trigger,
                     boost::static_pointer_cast<typed_continuation const>(
                         shared_from_this()),
-                    util::placeholders::_1, predicate()));
+                    util::placeholders::_1));
         }
 
     private:
@@ -1955,7 +2016,114 @@ namespace hpx { namespace actions
         }
 
         util::function<void(naming::id_type, R)> f_;
-        mutable lcos::shared_future<void> deferred_result_;
+    };
+
+    template <>
+    struct typed_continuation<lcos::shared_future<void> > : continuation
+    {
+        typed_continuation()
+        {}
+
+        explicit typed_continuation(naming::id_type const& gid)
+          : continuation(gid)
+        {}
+        explicit typed_continuation(naming::id_type && gid)
+          : continuation(std::move(gid))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(naming::id_type const& gid,
+                F && f)
+          : continuation(gid), f_(std::forward<F>(f))
+        {}
+        template <typename F>
+        explicit typed_continuation(naming::id_type && gid,
+                F && f)
+          : continuation(std::move(gid)), f_(std::forward<F>(f))
+        {}
+
+        template <typename F>
+        explicit typed_continuation(F && f)
+          : f_(std::forward<F>(f))
+        {}
+
+        ~typed_continuation()
+        {
+            init_registration<typed_continuation>::g.register_continuation();
+        }
+
+        void deferred_trigger(lcos::shared_future<void> result) const
+        {
+            if (f_.empty()) {
+                if (!this->get_gid()) {
+                    HPX_THROW_EXCEPTION(invalid_status,
+                        "typed_continuation<lcos::shared_future<void> >::trigger_value",
+                        "attempt to trigger invalid LCO (the id is invalid)");
+                    return;
+                }
+                result.get();
+                hpx::trigger_lco_event(this->get_gid());
+            }
+            else {
+                result.get();
+                f_(this->get_gid());
+            }
+        }
+
+        void trigger_value(lcos::shared_future<void> && result) const
+        {
+            LLCO_(info)
+                << "typed_continuation<lcos::shared_future<R> >::trigger("
+                << this->get_gid() << ")";
+
+            // if the future is ready, send the result back immediately
+            if (result.is_ready()) {
+                deferred_trigger(std::move(result));
+                return;
+            }
+
+            // attach continuation to this future which will send the result back
+            // once its ready
+            result.then(
+                util::bind(&typed_continuation::deferred_trigger,
+                    boost::static_pointer_cast<typed_continuation const>(
+                        shared_from_this()),
+                    util::placeholders::_1));
+        }
+
+    private:
+        char const* get_continuation_name() const
+        {
+            return detail::get_continuation_name<typed_continuation>();
+        }
+
+        /// serialization support
+        void load(hpx::util::portable_binary_iarchive& ar)
+        {
+            // serialize base class
+            typedef continuation base_type;
+            this->base_type::load(ar);
+
+            // serialize function
+            bool have_function = false;
+            ar.load(have_function);
+            if (have_function)
+                ar >> f_;
+        }
+        void save(hpx::util::portable_binary_oarchive& ar) const
+        {
+            // serialize base class
+            typedef continuation base_type;
+            this->base_type::save(ar);
+
+            // serialize function
+            bool have_function = !f_.empty();
+            ar.save(have_function);
+            if (have_function)
+                ar << f_;
+        }
+
+        util::function<void(naming::id_type)> f_;
     };
 
 #if defined(HPX_ENABLE_DEPRECATED_FUTURE)
@@ -2025,7 +2193,7 @@ namespace hpx { namespace actions
 
             // attach continuation to this future which will send the result back
             // once its ready
-            deferred_result_ = result.then(
+            result.then(
                 util::bind(&typed_continuation::deferred_trigger,
                     boost::static_pointer_cast<typed_continuation const>(
                         shared_from_this()),
@@ -2065,7 +2233,6 @@ namespace hpx { namespace actions
         }
 
         util::function<void(naming::id_type, Result)> f_;
-        mutable lcos::future<void> deferred_result_;
     };
 
     // special handling of actions returning a future
@@ -2137,7 +2304,7 @@ namespace hpx { namespace actions
 
             // attach continuation to this future which will send the result back
             // once its ready
-            deferred_result_ = result.then(
+            result.then(
                 util::bind(&typed_continuation::deferred_trigger,
                     boost::static_pointer_cast<typed_continuation const>(
                         shared_from_this()),
@@ -2177,10 +2344,11 @@ namespace hpx { namespace actions
         }
 
         util::function<void(naming::id_type)> f_;
-        mutable lcos::future<void> deferred_result_;
     };
 #endif
 }}
+
+#include <hpx/lcos/local/packaged_continuation.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // hoist names into main namespace
