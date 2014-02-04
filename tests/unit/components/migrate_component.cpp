@@ -10,7 +10,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
-  : hpx::components::simple_component_base<test_server>
+  : hpx::components::migratable<
+        hpx::components::simple_component_base<test_server>
+    >
 {
     test_server() {}
     ~test_server() {}

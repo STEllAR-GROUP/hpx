@@ -14,7 +14,6 @@
 #include <hpx/runtime/agas/stubs/primary_namespace.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
-#include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/async_fwd.hpp>
 #include <hpx/lcos/async_continue_fwd.hpp>

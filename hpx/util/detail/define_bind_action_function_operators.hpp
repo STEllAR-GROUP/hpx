@@ -32,7 +32,7 @@
     apply_c(naming::id_type const& contgid) const
     {
         return
-            detail::bind_action_async_cont<Action>(
+            detail::bind_action_apply_cont<Action>(
                 contgid
               , _bound_args
               , util::forward_as_tuple()

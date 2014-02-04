@@ -29,12 +29,13 @@ namespace hpx
             get_ptr_deleter(naming::id_type const& id) : id_(id) {}
 
             template <typename Component>
-            void operator()(Component*)
+            void operator()(Component* p)
             {
                 id_ = naming::invalid_id;       // release component
+                p->unpin();
             }
 
-            naming::id_type id_;                // hold component alive
+            naming::id_type id_;                // holds component alive
         };
 
         template <typename Component>
@@ -59,7 +60,9 @@ namespace hpx
             }
 
             Component* p = get_lva<Component>::call(addr.address_);
-            return boost::shared_ptr<Component>(p, detail::get_ptr_deleter(id));
+            boost::shared_ptr<Component> ptr(p, detail::get_ptr_deleter(id));
+            ptr->pin();     // the shared_ptr pins the component
+            return ptr;
         }
     }
     /// \endcond

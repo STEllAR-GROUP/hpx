@@ -144,6 +144,21 @@ public:
     }
 #endif
 
+    // Mark this component type as not migratable
+    static BOOST_CONSTEXPR bool supports_migration() { return false; }
+
+    // Pinning functionality
+    void pin() {}
+    void unpin() {}
+    boost::uint32_t pin_count() const { return 0; }
+    void mark_as_migrated()
+    {
+        // If this assertion is triggered then this component instance is being
+        // migrated even if the component type has not been enabled to support
+        // migration.
+        HPX_ASSERT(false);
+    }
+
 private:
     mutable naming::gid_type gid_;
     boost::uint64_t msb_;

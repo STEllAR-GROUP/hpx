@@ -20,14 +20,58 @@ namespace hpx { namespace components { namespace server
     /// \brief Migrate given component to the specified target locality
     namespace detail
     {
+        // clean up (source) memory of migrated object
+        template <typename Component>
+        naming::id_type migrate_component_cleanup(
+            unique_future<naming::id_type> f,
+            boost::shared_ptr<Component> ptr,
+            naming::id_type const& to_migrate)
+        {
+            ptr->mark_as_migrated();
+
+            agas::gva g (hpx::get_locality(),
+                components::get_component_type<Component>(), 1, ptr.get());
+
+            using components::stubs::runtime_support;
+            runtime_support::free_component_sync(g, to_migrate.get_gid());
+
+            return to_migrate;
+        }
+
+        // trigger the actual migration
         template <typename Component>
         unique_future<naming::id_type> migrate_component_postproc(
             unique_future<boost::shared_ptr<Component> > f,
             naming::id_type const& to_migrate,
             naming::id_type const& target_locality)
         {
-            return stubs::runtime_support::migrate_component_async<Component>(
-                target_locality, f.get(), to_migrate);
+            using components::stubs::runtime_support;
+
+            boost::shared_ptr<Component> ptr = f.get();
+            boost::uint32_t pin_count = ptr->pin_count();
+
+            if (pin_count == ~0x0)
+            {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "hpx::components::server::migrate_component",
+                    "attempting to migrate an instance of a component which was "
+                    "already migrated");
+                return make_ready_future(naming::invalid_id);
+            }
+            if (pin_count > 1)
+            {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "hpx::components::server::migrate_component",
+                    "attempting to migrate an instance of a component which is "
+                    "currently pinned");
+                return make_ready_future(naming::invalid_id);
+            }
+
+            return runtime_support::migrate_component_async<Component>(
+                        target_locality, ptr, to_migrate)
+                .then(util::bind(
+                    &detail::migrate_component_cleanup<Component>,
+                    util::placeholders::_1, ptr, to_migrate));
         }
     }
 
@@ -37,17 +81,22 @@ namespace hpx { namespace components { namespace server
         naming::id_type const& to_migrate,
         naming::id_type const& target_locality)
     {
+        // 'migration' to same locality as before is a no-op
         if (target_locality == hpx::find_here())
         {
-            // 'migration' to same locality as before is a no-op
             return make_ready_future(to_migrate);
         }
+        if (!Component::supports_migration())
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::components::server::migrate_component"
+                "attempting to migrate an instance of a component which is "
+                "not marked as being 'migratable'");
+            return make_ready_future(naming::invalid_id);
+        }
 
-        unique_future<boost::shared_ptr<Component> > f =
-            get_ptr<Component>(to_migrate);
-
-        return f.then(
-            util::bind(&detail::migrate_component_postproc<Component>, 
+        return get_ptr<Component>(to_migrate)
+            .then(util::bind(&detail::migrate_component_postproc<Component>,
                 util::placeholders::_1, to_migrate, target_locality));
     }
 

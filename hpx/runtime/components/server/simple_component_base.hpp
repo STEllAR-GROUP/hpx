@@ -180,7 +180,22 @@ namespace hpx { namespace components
         }
 #endif
 
-    private:
+        // Mark this component type as not migratable
+        static BOOST_CONSTEXPR bool supports_migration() { return false; }
+
+        // Pinning functionality
+        void pin() {}
+        void unpin() {}
+        unsigned int pin_count() const { return 0; }
+        void mark_as_migrated()
+        {
+            // If this assertion is triggered then this component instance is
+            // being migrated even if the component type has not been enabled
+            // to support migration.
+            HPX_ASSERT(false);
+        }
+
+    protected:
         mutable naming::gid_type gid_;
     };
 
