@@ -7,7 +7,7 @@
 #include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-
+#include <mpi.h>
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
