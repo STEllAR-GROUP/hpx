@@ -28,13 +28,6 @@ namespace hpx { namespace components { namespace server
             naming::id_type const& to_migrate)
         {
             ptr->mark_as_migrated();
-
-            agas::gva g (hpx::get_locality(),
-                components::get_component_type<Component>(), 1, ptr.get());
-
-            using components::stubs::runtime_support;
-            runtime_support::free_component_sync(g, to_migrate.get_gid());
-
             return to_migrate;
         }
 
@@ -89,13 +82,13 @@ namespace hpx { namespace components { namespace server
         if (!Component::supports_migration())
         {
             HPX_THROW_EXCEPTION(invalid_status,
-                "hpx::components::server::migrate_component"
+                "hpx::components::server::migrate_component",
                 "attempting to migrate an instance of a component which is "
                 "not marked as being 'migratable'");
             return make_ready_future(naming::invalid_id);
         }
 
-        return get_ptr<Component>(to_migrate)
+        return hpx::detail::get_ptr_for_migration<Component>(to_migrate)
             .then(util::bind(&detail::migrate_component_postproc<Component>,
                 util::placeholders::_1, to_migrate, target_locality));
     }

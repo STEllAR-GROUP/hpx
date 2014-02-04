@@ -140,7 +140,7 @@ namespace hpx { namespace components { namespace server
 
         template <typename Component>
         naming::gid_type migrate_component_to_here(
-            boost::shared_ptr<Component> const& p, naming::gid_type const&);
+            boost::shared_ptr<Component> const& p, naming::id_type);
 
         /// \brief Action to create new memory block
         naming::gid_type create_memory_block(std::size_t count,
@@ -462,8 +462,7 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     naming::gid_type runtime_support::migrate_component_to_here(
-        boost::shared_ptr<Component> const& p,
-        naming::gid_type const& to_migrate)
+        boost::shared_ptr<Component> const& p, naming::id_type to_migrate)
     {
         components::component_type const type =
             components::get_component_type<
@@ -497,13 +496,15 @@ namespace hpx { namespace components { namespace server
 
         // create a local instance by copying the bits and remapping the id in
         // AGAS
+        naming::gid_type migrated_id = to_migrate.get_gid();
+
         naming::gid_type id;
         boost::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
 
             typedef typename Component::wrapping_type wrapping_type;
-            id = factory->create_with_args(to_migrate,
+            id = factory->create_with_args(migrated_id,
                 component_constructor_functor1<wrapping_type, Component>(
                     std::move(*p))
             );
@@ -518,7 +519,7 @@ namespace hpx { namespace components { namespace server
                 "could not create copy of given component");
             return naming::invalid_gid;
         }
-        if (id != to_migrate)
+        if (id != migrated_id)
         {
             // we should not get here either (the ids should be the same)
             HPX_THROW_EXCEPTION(hpx::invalid_status,
@@ -532,6 +533,7 @@ namespace hpx { namespace components { namespace server
             << " of type: " << components::get_component_type_name(type)
             << " to locality: " << find_here();
 
+        to_migrate.make_unmanaged();
         return id;
     }
 }}}
@@ -613,7 +615,7 @@ namespace hpx { namespace components { namespace server
     struct migrate_component_here_action
       : ::hpx::actions::result_action2<
             runtime_support, naming::id_type
-          , boost::shared_ptr<Component> const&, naming::gid_type const&,
+          , boost::shared_ptr<Component> const&, naming::id_type,
           , &runtime_support::migrate_component_to_here<Component>
           , migrate_component_here_action<Component> >
     {};
@@ -630,7 +632,7 @@ namespace hpx { namespace components { namespace server
     struct migrate_component_here_action
       : ::hpx::actions::result_action2<
             naming::gid_type (runtime_support::*)(
-                boost::shared_ptr<Component> const&, naming::gid_type const&)
+                boost::shared_ptr<Component> const&, naming::id_type)
           , &runtime_support::migrate_component_to_here<Component>
           , migrate_component_here_action<Component> >
     {};

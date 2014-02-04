@@ -172,7 +172,7 @@ namespace hpx { namespace components { namespace stubs
 
             typedef typename server::migrate_component_here_action<Component>
                 action_type;
-            return hpx::async<action_type>(target_locality, p, to_migrate.get_gid());
+            return hpx::async<action_type>(target_locality, p, to_migrate);
         }
 
         template <typename Component>
@@ -240,6 +240,8 @@ namespace hpx { namespace components { namespace stubs
             bool pre_shutdown);
         static void free_component_sync(agas::gva const& g,
             naming::gid_type const& gid, boost::uint64_t count = 1);
+        static void free_component_locally(agas::gva const& g,
+            naming::gid_type const& gid);
 
         /// \brief Shutdown the given runtime system
         static lcos::unique_future<void>

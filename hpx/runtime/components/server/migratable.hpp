@@ -52,8 +52,9 @@ namespace hpx { namespace components
         void unpin()
         {
             typename mutex_type::scoped_lock l(mtx_);
-            HPX_ASSERT(pin_count_ != 0 && pin_count_ != ~0x0);
-            --pin_count_;
+            HPX_ASSERT(pin_count_ != 0);
+            if (pin_count_ != ~0x0)
+                --pin_count_;
         }
         boost::uint32_t pin_count() const
         {
