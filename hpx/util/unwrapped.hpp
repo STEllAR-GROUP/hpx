@@ -288,7 +288,10 @@ namespace hpx { namespace util
             typename result<unwrapped_impl()>::type
             operator()()
             {
-                return util::invoke_fused(f_, util::make_tuple());
+                typedef typename result<unwrapped_impl()>::type result_type;
+
+                return util::invoke_fused_r<result_type>(f_,
+                    util::make_tuple());
             }
 
             template <typename This, typename T0>
@@ -304,12 +307,13 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
+                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<util::tuple<typename decay<T0>::type> >
                     unwrap_impl_t;
 
-                return util::invoke_fused(f_, unwrap_impl_t::call(
-                    util::forward_as_tuple(t0)));
+                return util::invoke_fused_r<result_type>(f_,
+                    unwrap_impl_t::call(util::forward_as_tuple(t0)));
             }
 
             // future-range
@@ -321,12 +325,13 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
+                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
 
-                return util::invoke_fused(f_, util::forward_as_tuple(
-                    unwrap_impl_t::call(t0)));
+                return util::invoke_fused_r<result_type>(f_,
+                    util::forward_as_tuple(unwrap_impl_t::call(t0)));
             }
 
             template <typename T0>
@@ -337,12 +342,14 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
+                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
 
                 unwrap_impl_t::call(t0);
-                return util::invoke_fused(f_, util::forward_as_tuple());
+                return util::invoke_fused_r<result_type>(f_,
+                    util::forward_as_tuple());
             }
 
             // future-tuple
@@ -353,12 +360,13 @@ namespace hpx { namespace util
               , result<unwrapped_impl(T0)>
             >::type operator()(T0&& t0)
             {
+                typedef typename result<unwrapped_impl(T0)>::type result_type;
                 typedef
                     unwrap_impl<typename decay<T0>::type>
                     unwrap_impl_t;
 
-                return util::invoke_fused(f_, unwrap_impl_t::call(
-                    util::forward_as_tuple(t0)));
+                return util::invoke_fused_r<result_type>(f_,
+                    unwrap_impl_t::call(t0));
             }
 
             // futures
@@ -378,12 +386,16 @@ namespace hpx { namespace util
             operator()(HPX_ENUM_FWD_ARGS(N, T, t))                            \
             {                                                                 \
                 typedef                                                       \
+                    typename result<unwrapped_impl(BOOST_PP_ENUM_PARAMS(N, T))>::type\
+                    result_type;                                              \
+                typedef                                                       \
                     unwrap_impl<util::tuple<                                  \
                         BOOST_PP_ENUM(N, HPX_UTIL_UNWRAPPED_DECAY, _)> >      \
                     unwrap_impl_t;                                            \
                                                                               \
-                return util::invoke_fused(f_, unwrap_impl_t::call(            \
-                    util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, T, t)))); \
+                return util::invoke_fused_r<result_type>(f_,                  \
+                    unwrap_impl_t::call(util::forward_as_tuple(               \
+                        HPX_ENUM_FORWARD_ARGS(N, T, t))));                    \
             }                                                                 \
             /**/
 
@@ -399,6 +411,7 @@ namespace hpx { namespace util
         };
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     typename boost::lazy_enable_if_c<
         traits::is_future<typename decay<Future>::type>::value
@@ -411,7 +424,7 @@ namespace hpx { namespace util
             detail::unwrap_impl<typename decay<Future>::type>
             unwrap_impl_t;
 
-        return unwrap_impl_t::call(f);
+        return unwrap_impl_t::call(std::forward<Future>(f));
     }
 
     template <typename F>
@@ -426,6 +439,40 @@ namespace hpx { namespace util
             res(std::forward<F>(f));
 
         return std::move(res);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Future>
+    typename boost::lazy_enable_if_c<
+        traits::is_future<typename decay<Future>::type>::value
+     || traits::is_future_range<typename decay<Future>::type>::value
+     || traits::is_future_tuple<typename decay<Future>::type>::value
+      , detail::unwrap_impl<typename detail::unwrap_impl<
+            typename decay<Future>::type
+        > >
+    >::type unwrapped2(Future&& f)
+    {
+        return unwrapped(unwrapped(std::forward<Future>(f)));
+    }
+
+    template <typename F>
+    typename boost::disable_if_c<
+        traits::is_future<typename decay<F>::type>::value
+     || traits::is_future_range<typename decay<F>::type>::value
+     || traits::is_future_tuple<typename decay<F>::type>::value
+      , detail::unwrapped_impl<detail::unwrapped_impl<
+            typename util::decay<F>::type
+        > >
+    >::type unwrapped2(F && f)
+    {
+        typedef detail::unwrapped_impl<detail::unwrapped_impl<
+            typename util::decay<F>::type
+        > > result_type;
+
+        detail::unwrapped_impl<typename util::decay<F>::type >
+            res(std::forward<F>(f));
+
+        return result_type(std::move(res));
     }
 }}
 
