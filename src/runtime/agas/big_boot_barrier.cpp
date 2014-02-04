@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach & Katelyn Kufahl
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -364,14 +364,14 @@ void register_worker(registration_header const& header)
     naming::address primary_ns_address(header.locality
       , components::get_component_type<agas::server::primary_namespace>()
       , header.primary_ns_ptr);
-    agas_client.bind(primary_ns_gid, primary_ns_address);
+    agas_client.bind_local(primary_ns_gid, primary_ns_address);
 
     naming::gid_type symbol_ns_gid(
         stubs::symbol_namespace::get_service_instance(prefix));
     naming::address symbol_ns_address(header.locality
       , components::get_component_type<agas::server::symbol_namespace>()
       , header.symbol_ns_ptr);
-    agas_client.bind(symbol_ns_gid, symbol_ns_address);
+    agas_client.bind_local(symbol_ns_gid, symbol_ns_address);
 
     naming::address locality_addr(rt.here(),
         server::locality_namespace::get_component_type(),
@@ -499,17 +499,17 @@ void notify_worker(notification_header const& header)
     naming::address const runtime_support_address(here
       , components::get_component_type<components::server::runtime_support>()
       , rt.get_runtime_support_lva());
-    agas_client.bind(runtime_support_gid, runtime_support_address);
+    agas_client.bind_local(runtime_support_gid, runtime_support_address);
 
     runtime_support_gid.set_lsb(boost::uint64_t(0));
-    agas_client.bind(runtime_support_gid, runtime_support_address);
+    agas_client.bind_local(runtime_support_gid, runtime_support_address);
 
     naming::gid_type const memory_gid(header.prefix.get_msb()
       , rt.get_memory_lva());
     naming::address const memory_address(here
       , components::get_component_type<components::server::memory>()
       , rt.get_memory_lva());
-    agas_client.bind(memory_gid, memory_address);
+    agas_client.bind_local(memory_gid, memory_address);
 
     // register local primary namespace component
     naming::gid_type const primary_gid =
@@ -518,7 +518,7 @@ void notify_worker(notification_header const& header)
     naming::address const primary_addr(here
       , server::primary_namespace::get_component_type(),
         agas_client.get_hosted_primary_ns_ptr());
-    agas_client.bind(primary_gid, primary_addr);
+    agas_client.bind_local(primary_gid, primary_addr);
 
     // register local symbol namespace component
     naming::gid_type const symbol_gid =
@@ -527,7 +527,7 @@ void notify_worker(notification_header const& header)
     naming::address const symbol_addr(here
       , server::symbol_namespace::get_component_type(),
         agas_client.get_hosted_symbol_ns_ptr());
-    agas_client.bind(symbol_gid, symbol_addr);
+    agas_client.bind_local(symbol_gid, symbol_addr);
 
     // Assign the initial parcel gid range to the parcelport. Note that we can't
     // get the parcelport through the parcelhandler because it isn't up yet.

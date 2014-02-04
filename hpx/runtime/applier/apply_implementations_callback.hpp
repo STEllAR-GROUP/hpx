@@ -101,7 +101,7 @@ namespace hpx
 
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             // apply locally
             bool result = applier::detail::apply_l_p<Action>(gid, addr, priority,
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
@@ -223,7 +223,7 @@ namespace hpx
 
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             // apply locally
             bool result = applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 HPX_ENUM_FORWARD_ARGS(N, Arg, arg));

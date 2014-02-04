@@ -30,7 +30,7 @@ namespace hpx { namespace agas
 
 // TODO: Ensure that multiple invocations of get_data get optimized into the
 // same jump table.
-struct response
+struct HPX_EXPORT response
 {
   private:
     struct response_data;
@@ -49,12 +49,14 @@ struct response
         namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
+      , boost::uint32_t locality_id_
       , error status_ = success
         );
 
     response(
         namespace_action_code type_
       , gva const& gva_
+      , boost::uint32_t locality_id_
       , error status_ = success
         );
 

@@ -14,6 +14,7 @@
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 
 #include <boost/shared_ptr.hpp>
@@ -24,28 +25,58 @@ namespace hpx
     /// \cond NOINTERNAL
     namespace detail
     {
+        ///////////////////////////////////////////////////////////////////////
         struct get_ptr_deleter
         {
             get_ptr_deleter(naming::id_type const& id) : id_(id) {}
 
             template <typename Component>
-            void operator()(Component*)
+            void operator()(Component* p)
             {
                 id_ = naming::invalid_id;       // release component
+                p->unpin();
             }
 
-            naming::id_type id_;                // hold component alive
+            naming::id_type id_;                // holds component alive
         };
 
-        template <typename Component>
+        struct get_ptr_for_migration_deleter
+        {
+            get_ptr_for_migration_deleter(naming::id_type const& id)
+              : id_(id)
+            {}
+
+            template <typename Component>
+            void operator()(Component* p)
+            {
+                bool was_migrated = p->pin_count() == ~0x0;
+                p->unpin();
+
+                if (was_migrated)
+                {
+                    using components::stubs::runtime_support;
+                    agas::gva g (hpx::get_locality(),
+                        components::get_component_type<Component>(), 1, p);
+                    runtime_support::free_component_locally(g, id_.get_gid());
+                }
+                id_ = naming::invalid_id;       // release credits
+            }
+
+            naming::id_type id_;                // holds component alive
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component, typename Deleter>
         boost::shared_ptr<Component>
-        get_ptr_postproc(hpx::unique_future<naming::address> f, naming::id_type const& id)
+        get_ptr_postproc(hpx::unique_future<naming::address> f,
+            naming::id_type const& id)
         {
             naming::address addr = f.get();
 
             if (get_locality() != addr.locality_)
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "hpx::get_ptr",
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "hpx::get_ptr_postproc<Component, Deleter>",
                     "the given component id does not belong to a local object");
                 return boost::shared_ptr<Component>();
             }
@@ -53,13 +84,31 @@ namespace hpx
             if (!components::types_are_compatible(addr.type_,
                     components::get_component_type<Component>()))
             {
-                HPX_THROW_EXCEPTION(bad_component_type, "hpx::get_ptr",
+                HPX_THROW_EXCEPTION(bad_component_type,
+                    "hpx::get_ptr_postproc<Component, Deleter>",
                     "requested component type does not match the given component id");
                 return boost::shared_ptr<Component>();
             }
 
             Component* p = get_lva<Component>::call(addr.address_);
-            return boost::shared_ptr<Component>(p, detail::get_ptr_deleter(id));
+            boost::shared_ptr<Component> ptr(p, Deleter(id));
+
+            ptr->pin();     // the shared_ptr pins the component
+            return ptr;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // This is similar to get_ptr<> below, except that the shared_ptr will
+        // delete the local instance when it goes out of scope.
+        template <typename Component>
+        hpx::unique_future<boost::shared_ptr<Component> >
+        get_ptr_for_migration(naming::id_type const& id)
+        {
+            using util::placeholders::_1;
+            hpx::unique_future<naming::address> f = agas::resolve(id);
+            return f.then(util::bind(
+                &get_ptr_postproc<Component, get_ptr_for_migration_deleter>,
+                _1, id));
         }
     }
     /// \endcond
@@ -90,9 +139,11 @@ namespace hpx
     {
         using util::placeholders::_1;
         hpx::unique_future<naming::address> f = agas::resolve(id);
-        return f.then(util::bind(&detail::get_ptr_postproc<Component>, _1, id));
+        return f.then(util::bind(
+            &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>,
+            _1, id));
     }
-    
+
     /// \brief Returns the pointer to the underlying memory of a component
     ///
     /// The function hpx::get_ptr_sync can be used to extract the pointer to

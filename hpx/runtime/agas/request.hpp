@@ -29,7 +29,7 @@ namespace hpx { namespace agas
 
 // TODO: Ensure that multiple invocations of get_data get optimized into the
 // same jump table.
-struct request
+struct HPX_EXPORT request
 {
   private:
     struct request_data;
@@ -63,6 +63,7 @@ struct request
         namespace_action_code type_
       , naming::gid_type const& gid_
       , gva const& gva_
+      , boost::uint32_t locality_
         );
 
     request(

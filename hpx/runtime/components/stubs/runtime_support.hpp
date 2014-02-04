@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -124,7 +124,7 @@ namespace hpx { namespace components { namespace stubs
 #undef HPX_RUNTIME_SUPPORT_STUB_REMOVE_REFERENCE
 
         ///////////////////////////////////////////////////////////////////////
-        // copy construct a component 
+        // copy construct a component
         template <typename Component>
         static lcos::unique_future<naming::id_type>
         copy_create_component_async(naming::id_type const& gid,
@@ -151,6 +151,40 @@ namespace hpx { namespace components { namespace stubs
             // The following get yields control while the action above
             // is executed and the result is returned to the future
             return copy_create_component_async<Component>(gid, p, local_op).get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // copy construct a component
+        template <typename Component>
+        static lcos::unique_future<naming::id_type>
+        migrate_component_async(naming::id_type const& target_locality,
+            boost::shared_ptr<Component> const& p,
+            naming::id_type const& to_migrate)
+        {
+            if (!naming::is_locality(target_locality))
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "stubs::runtime_support::migrate_component_async",
+                    "The id passed as the first argument is not representing"
+                        " a locality");
+                return lcos::make_ready_future(naming::invalid_id);
+            }
+
+            typedef typename server::migrate_component_here_action<Component>
+                action_type;
+            return hpx::async<action_type>(target_locality, p, to_migrate);
+        }
+
+        template <typename Component>
+        static naming::id_type migrate_component(
+            naming::id_type const& target_locality,
+            naming::id_type const& to_migrate,
+            boost::shared_ptr<Component> const& p)
+        {
+            // The following get yields control while the action above
+            // is executed and the result is returned to the future
+            return migrate_component_async<Component>(
+                target_locality, p, to_migrate).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -204,11 +238,10 @@ namespace hpx { namespace components { namespace stubs
 
         static void call_shutdown_functions(naming::id_type const& gid,
             bool pre_shutdown);
-        static void free_component_sync(components::component_type type,
-            naming::gid_type const& gid, boost::uint64_t count);
-
-        static void free_component_sync(components::component_type type,
-            naming::gid_type const& gid, naming::gid_type const& count);
+        static void free_component_sync(agas::gva const& g,
+            naming::gid_type const& gid, boost::uint64_t count = 1);
+        static void free_component_locally(agas::gva const& g,
+            naming::gid_type const& gid);
 
         /// \brief Shutdown the given runtime system
         static lcos::unique_future<void>

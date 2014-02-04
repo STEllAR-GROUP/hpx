@@ -211,13 +211,23 @@ namespace hpx { namespace actions
     ///////////////////////////////////////////////////////////////////////////
     struct set_lco_value_continuation
     {
-        typedef void result_type;
+        template <typename T>
+        struct result;
+
+        template <typename F, typename T1, typename T2>
+        struct result<F(T1, T2)>
+        {
+            typedef T2 type;
+        };
 
         template <typename T>
-        BOOST_FORCEINLINE void operator()(id_type const& lco,
-            T && t) const
+        BOOST_FORCEINLINE T operator()(id_type const& lco, T && t) const
         {
             hpx::set_lco_value(lco, std::forward<T>(t));
+
+            // Yep, 't' is a zombie, however we don't use the returned value
+            // anyways. We need it for result type calculation, though.
+            return std::move(t);
         }
     };
 
@@ -225,7 +235,14 @@ namespace hpx { namespace actions
     template <typename Cont>
     struct continuation_impl
     {
-        typedef void result_type;
+        template <typename T>
+        struct result;
+
+        template <typename F, typename T1, typename T2>
+        struct result<F(T1, T2)>
+        {
+            typedef T2 type;
+        };
 
         continuation_impl() {}
 
@@ -235,9 +252,13 @@ namespace hpx { namespace actions
         {}
 
         template <typename T>
-        void operator()(hpx::id_type const& lco, T && t) const
+        T operator()(hpx::id_type const& lco, T && t) const
         {
             hpx::apply_c(cont_, lco, target_, std::forward<T>(t));
+
+            // Yep, 't' is a zombie, however we don't use the returned value
+            // anyways. We need it for result type calculation, though.
+            return std::move(t);
         }
 
     private:
@@ -250,7 +271,7 @@ namespace hpx { namespace actions
             ar & cont_ & target_;
         }
 
-        typedef typename boost::remove_reference<Cont>::type cont_type;
+        typedef typename util::decay<Cont>::type cont_type;
         cont_type cont_;
         hpx::id_type target_;
     };
@@ -259,7 +280,14 @@ namespace hpx { namespace actions
     template <typename Cont, typename F>
     struct continuation2_impl
     {
-        typedef void result_type;
+        template <typename T>
+        struct result;
+
+        template <typename This, typename T1, typename T2>
+        struct result<This(T1, T2)>
+        {
+            typedef T2 type;
+        };
 
         continuation2_impl() {}
 
@@ -272,10 +300,15 @@ namespace hpx { namespace actions
         {}
 
         template <typename T>
-        void operator()(hpx::id_type const& lco, T && t) const
+        T operator()(hpx::id_type const& lco, T && t) const
         {
             using hpx::util::placeholders::_2;
-            hpx::apply_continue(cont_, target_, std::forward<T>(t), hpx::util::bind(f_, lco, _2));
+            hpx::apply_continue(cont_, target_, std::forward<T>(t),
+                hpx::util::bind(f_, lco, _2));
+
+            // Yep, 't' is a zombie, however we don't use the returned value
+            // anyways. We need it for result type calculation, though.
+            return std::move(t);
         }
 
     private:
@@ -535,22 +568,22 @@ namespace hpx
 
     template <typename Cont>
     inline hpx::actions::continuation_impl<
-        typename boost::remove_reference<Cont>::type
+        typename util::decay<Cont>::type
     >
     make_continuation(Cont && cont)
     {
-        typedef typename boost::remove_reference<Cont>::type cont_type;
+        typedef typename util::decay<Cont>::type cont_type;
         return hpx::actions::continuation_impl<cont_type>(
             std::forward<Cont>(cont), hpx::find_here());
     }
 
     template <typename Cont>
     inline hpx::actions::continuation_impl<
-        typename boost::remove_reference<Cont>::type
+        typename util::decay<Cont>::type
     >
     make_continuation(Cont && f, hpx::id_type const& target)
     {
-        typedef typename boost::remove_reference<Cont>::type cont_type;
+        typedef typename util::decay<Cont>::type cont_type;
         return hpx::actions::continuation_impl<cont_type>(
             std::forward<Cont>(f), target);
     }
@@ -558,18 +591,18 @@ namespace hpx
     template <typename Cont, typename F>
     inline typename boost::disable_if<
         boost::is_same<
-            typename boost::remove_reference<F>::type,
+            typename util::decay<F>::type,
             hpx::naming::id_type
         >,
         hpx::actions::continuation2_impl<
-            typename boost::remove_reference<Cont>::type,
-            typename boost::remove_reference<F>::type
+            typename util::decay<Cont>::type,
+            typename util::decay<F>::type
         >
     >::type
     make_continuation(Cont && cont, F && f)
     {
-        typedef typename boost::remove_reference<Cont>::type cont_type;
-        typedef typename boost::remove_reference<F>::type function_type;
+        typedef typename util::decay<Cont>::type cont_type;
+        typedef typename util::decay<F>::type function_type;
 
         return hpx::actions::continuation2_impl<cont_type, function_type>(
             std::forward<Cont>(cont), hpx::find_here(), std::forward<F>(f));
@@ -577,14 +610,14 @@ namespace hpx
 
     template <typename Cont, typename F>
     inline hpx::actions::continuation2_impl<
-        typename boost::remove_reference<Cont>::type,
-        typename boost::remove_reference<F>::type
+        typename util::decay<Cont>::type,
+        typename util::decay<F>::type
     >
     make_continuation(Cont && cont, hpx::id_type const& target,
         F && f)
     {
-        typedef typename boost::remove_reference<Cont>::type cont_type;
-        typedef typename boost::remove_reference<F>::type function_type;
+        typedef typename util::decay<Cont>::type cont_type;
+        typedef typename util::decay<F>::type function_type;
 
         return hpx::actions::continuation2_impl<cont_type, function_type>(
             std::forward<Cont>(cont), target, std::forward<F>(f));

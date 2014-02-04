@@ -334,6 +334,8 @@ response primary_namespace::bind_gid(
     // parameters
     gva g = req.get_gva();
     naming::gid_type id = req.get_gid();
+    boost::uint32_t locality_id = req.get_locality_id();
+
     naming::detail::strip_internal_bits_from_gid(id);
 
     mutex_type::scoped_lock l(mutex_);
@@ -348,7 +350,8 @@ response primary_namespace::bind_gid(
         // binding (e.g. move semantics).
         if (it->first == id)
         {
-            gva& gaddr = it->second;
+            gva& gaddr = it->second.first;
+            boost::uint32_t& loc_id = it->second.second;
 
             // Check for count mismatch (we can't change block sizes of
             // existing bindings).
@@ -371,8 +374,21 @@ response primary_namespace::bind_gid(
                   , "primary_namespace::bind_gid"
                   , boost::str(boost::format(
                         "attempt to update a GVA with an invalid type, "
-                        "gid(%1%), gva(%2%)")
-                        % id % g));
+                        "gid(%1%), gva(%2%), locality_id(%3%)")
+                        % id % g % locality_id));
+                return response();
+            }
+
+            if (HPX_UNLIKELY(locality_id == naming::invalid_locality_id))
+            {
+                l.unlock();
+
+                HPX_THROWS_IF(ec, bad_parameter
+                  , "primary_namespace::bind_gid"
+                  , boost::str(boost::format(
+                        "attempt to update a GVA with an invalid locality id, "
+                        "gid(%1%), gva(%2%), locality_id(%3%)")
+                        % id % g % locality_id));
                 return response();
             }
 
@@ -381,11 +397,12 @@ response primary_namespace::bind_gid(
             gaddr.type = g.type;
             gaddr.lva(g.lva());
             gaddr.offset = g.offset;
+            loc_id = locality_id;
 
             LAGAS_(info) << (boost::format(
                 "primary_namespace::bind_gid, gid(%1%), gva(%2%), "
-                "response(repeated_request)")
-                % id % g);
+                "locality_id(%3%), response(repeated_request)")
+                % id % g % locality_id);
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -400,7 +417,7 @@ response primary_namespace::bind_gid(
             --it;
 
             // Check that a previous range doesn't cover the new id.
-            if (HPX_UNLIKELY((it->first + it->second.count) > id))
+            if (HPX_UNLIKELY((it->first + it->second.first.count) > id))
             {
                 // REVIEW: Is this the right error code to use?
                 l.unlock();
@@ -418,7 +435,7 @@ response primary_namespace::bind_gid(
         --it;
 
         // Check that a previous range doesn't cover the new id.
-        if ((it->first + it->second.count) > id)
+        if ((it->first + it->second.first.count) > id)
         {
             // REVIEW: Is this the right error code to use?
             l.unlock();
@@ -450,14 +467,14 @@ response primary_namespace::bind_gid(
           , "primary_namespace::bind_gid"
           , boost::str(boost::format(
                 "attempt to insert a GVA with an invalid type, "
-                "gid(%1%), gva(%2%)")
-                % id % g));
+                "gid(%1%), gva(%2%), locality_id(%3%)")
+                % id % g % locality_id));
         return response();
     }
 
     // Insert a GID -> GVA entry into the GVA table.
     if (HPX_UNLIKELY(!util::insert_checked(gvas_.insert(
-            std::make_pair(id, g)))))
+            std::make_pair(id, std::make_pair(g, locality_id))))))
     {
         l.unlock();
 
@@ -466,13 +483,13 @@ response primary_namespace::bind_gid(
           , boost::str(boost::format(
                 "GVA table insertion failed due to a locking error or "
                 "memory corruption, gid(%1%), gva(%2%)")
-                % id % g));
+                % id % g % locality_id));
         return response();
     }
 
     LAGAS_(info) << (boost::format(
-        "primary_namespace::bind_gid, gid(%1%), gva(%2%)")
-        % id % g);
+        "primary_namespace::bind_gid, gid(%1%), gva(%2%), locality_id(%3%)")
+        % id % g % locality_id);
 
     if (&ec != &throws)
         ec = make_success_code();
@@ -490,7 +507,7 @@ response primary_namespace::resolve_gid(
     // parameters
     naming::gid_type id = req.get_gid();
 
-    boost::fusion::vector2<naming::gid_type, gva> r;
+    boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t> r;
 
     {
         mutex_type::scoped_lock l(mutex_);
@@ -506,16 +523,18 @@ response primary_namespace::resolve_gid(
         return response(primary_ns_resolve_gid
                       , naming::invalid_gid
                       , gva()
+                      , naming::invalid_locality_id
                       , no_success);
     }
 
     LAGAS_(info) << (boost::format(
-        "primary_namespace::resolve_gid, gid(%1%), base(%2%), gva(%3%)")
-        % id % at_c<0>(r) % at_c<1>(r));
+        "primary_namespace::resolve_gid, gid(%1%), base(%2%), gva(%3%), locality_id(%4%)")
+        % id % at_c<0>(r) % at_c<1>(r) % at_c<2>(r));
 
     return response(primary_ns_resolve_gid
                     , at_c<0>(r)
-                    , at_c<1>(r));
+                    , at_c<1>(r)
+                    , at_c<2>(r));
 } // }}}
 
 response primary_namespace::unbind_gid(
@@ -535,7 +554,7 @@ response primary_namespace::unbind_gid(
 
     if (it != end)
     {
-        if (HPX_UNLIKELY(it->second.count != count))
+        if (HPX_UNLIKELY(it->second.first.count != count))
         {
             l.unlock();
 
@@ -545,10 +564,11 @@ response primary_namespace::unbind_gid(
             return response();
         }
 
-        response r(primary_ns_unbind_gid, it->second);
+        response r(primary_ns_unbind_gid, it->second.first, it->second.second);
         LAGAS_(info) << (boost::format(
-            "primary_namespace::unbind_gid, gid(%1%), count(%2%), gva(%3%)")
-            % id % count % it->second);
+            "primary_namespace::unbind_gid, gid(%1%), count(%2%), gva(%3%), "
+            "locality_id(%4%)")
+            % id % count % it->second.first % it->second.second);
 
         gvas_.erase(it);
 
@@ -570,6 +590,7 @@ response primary_namespace::unbind_gid(
 
         return response(primary_ns_unbind_gid
                       , gva()
+                      , naming::invalid_locality_id
                       , no_success);
     }
 } // }}}
@@ -868,7 +889,7 @@ void primary_namespace::resolve_free_list(
             naming::gid_type query = boost::icl::lower(super);
 
             // Resolve the query GID.
-            boost::fusion::vector2<naming::gid_type, gva>
+            boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
                 r = resolve_gid_locked(query, ec);
 
             if (ec)
@@ -948,7 +969,7 @@ void primary_namespace::resolve_free_list(
 
             // Add the information needed to destroy these components to the
             // free list.
-            free_entry_list.push_back(free_entry(g, query, length));
+            free_entry_list.push_back(free_entry(g, query, length, at_c<2>(r)));
         }
 
         // If this is just a partial match, we need to split it up with a
@@ -1066,84 +1087,6 @@ void primary_namespace::decrement_sweep(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void primary_namespace::free_components_non_blocking(
-    std::list<free_entry>& free_list
-  , naming::gid_type const& lower
-  , naming::gid_type const& upper
-  , error_code& ec
-    )
-{ // {{{ kill_non_blocking implementation
-    using boost::fusion::at_c;
-
-//    naming::gid_type const agas_prefix_
-//        = naming::get_gid_from_locality_id(HPX_AGAS_BOOTSTRAP_PREFIX);
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Kill the dead objects.
-
-    BOOST_FOREACH(free_entry const& e, free_list)
-    {
-        // Bail if we're in late shutdown.
-        if (HPX_UNLIKELY(!threads::threadmanager_is(running)))
-        {
-            LAGAS_(info) << (boost::format(
-                "primary_namespace::kill_non_blocking, cancelling free "
-                "operation because the thread-manager is down, lower(%1%), "
-                "upper(%2%), base(%3%), gva(%4%), count(%5%)")
-                % lower
-                % upper
-                % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
-            continue;
-        }
-
-        LAGAS_(info) << (boost::format(
-            "primary_namespace::kill_non_blocking, freeing component%1%, "
-            "lower(%2%), upper(%3%), base(%4%), gva(%5%), count(%6%)")
-            % ((at_c<2>(e) == naming::gid_type(0, 1)) ? "" : "s")
-            % lower
-            % upper
-            % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
-
-        typedef components::server::runtime_support::free_component_action
-            action_type;
-
-        components::component_type const type_ =
-            components::component_type(at_c<0>(e).type);
-
-        HPX_ASSERT(naming::invalid_locality_id != locality_id_);
-        if (locality_id_ == naming::get_locality_id_from_gid(at_c<1>(e)))
-        {
-            naming::address rts_addr(at_c<0>(e).endpoint,
-                components::component_runtime_support,
-                get_runtime_support_ptr());
-
-            // FIXME: Priority?
-            hpx::applier::detail::apply_l<action_type>(
-                naming::get_id_from_locality_id(locality_id_), rts_addr, type_,
-                at_c<1>(e), at_c<2>(e));
-        }
-
-        else
-        {
-            // get_lva<> will resolve the LVA to the runtime support pointer
-            // on the target locality.
-            naming::address rts_addr(at_c<0>(e).endpoint,
-                components::component_runtime_support);
-
-            naming::id_type const prefix_(
-                naming::get_locality_from_gid(at_c<1>(e)),
-                naming::id_type::unmanaged);
-
-            // FIXME: Priority?
-            hpx::applier::detail::apply_r<action_type>(
-                rts_addr, prefix_, type_, at_c<1>(e), at_c<2>(e));
-        }
-    }
-
-    if (&ec != &throws)
-        ec = make_success_code();
-} // }}}
-
 void primary_namespace::free_components_sync(
     std::list<free_entry>& free_list
   , naming::gid_type const& lower
@@ -1167,29 +1110,28 @@ void primary_namespace::free_components_sync(
             LAGAS_(info) << (boost::format(
                 "primary_namespace::kill_sync, cancelling free "
                 "operation because the threadmanager is down, lower(%1%), "
-                "upper(%2%), base(%3%), gva(%4%), count(%5%)")
+                "upper(%2%), base(%3%), gva(%4%), count(%5%), locality_id(%6%)")
                 % lower
                 % upper
-                % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
+                % at_c<1>(e) % at_c<0>(e) % at_c<2>(e) % at_c<3>(e));
             continue;
         }
 
         LAGAS_(info) << (boost::format(
             "primary_namespace::kill_sync, freeing component%1%, "
-            "lower(%2%), upper(%3%), base(%4%), gva(%5%), count(%6%)")
+            "lower(%2%), upper(%3%), base(%4%), gva(%5%), count(%6%), locality_id(%7%)")
             % ((at_c<2>(e) == naming::gid_type(0, 1)) ? "" : "s")
             % lower
             % upper
-            % at_c<1>(e) % at_c<0>(e) % at_c<2>(e));
+            % at_c<1>(e) % at_c<0>(e) % at_c<2>(e) % at_c<3>(e));
 
-        components::component_type const type_ =
-            components::component_type(at_c<0>(e).type);
-
-        naming::id_type const prefix_(
-            naming::get_locality_from_gid(at_c<1>(e))
+        naming::id_type const target_locality(
+            naming::get_gid_from_locality_id(at_c<3>(e))
           , naming::id_type::unmanaged);
 
-        futures.push_back(hpx::async(act, prefix_, type_, at_c<1>(e), at_c<2>(e)));
+        futures.push_back(
+            hpx::async(act, target_locality, at_c<0>(e), at_c<1>(e), at_c<2>(e).get_lsb())
+        );
     }
 
     hpx::wait_all(futures);
@@ -1198,7 +1140,7 @@ void primary_namespace::free_components_sync(
         ec = make_success_code();
 } // }}}
 
-boost::fusion::vector2<naming::gid_type, gva>
+boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
 primary_namespace::resolve_gid_locked(
     naming::gid_type const& gid
   , error_code& ec
@@ -1220,8 +1162,8 @@ primary_namespace::resolve_gid_locked(
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return boost::fusion::vector2<naming::gid_type, gva>
-                (it->first, it->second);
+            return boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
+                (it->first, it->second.first, it->second.second);
         }
 
         // We need to decrement the iterator, first we check that it's safe
@@ -1231,22 +1173,22 @@ primary_namespace::resolve_gid_locked(
             --it;
 
             // Found the GID in a range
-            if ((it->first + it->second.count) > id)
+            if ((it->first + it->second.first.count) > id)
             {
                 if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
                 {
                     HPX_THROWS_IF(ec, internal_server_error
                       , "primary_namespace::resolve_gid_locked"
                       , "MSBs of lower and upper range bound do not match");
-                    return boost::fusion::vector2<naming::gid_type, gva>
-                        (naming::invalid_gid, gva());
+                    return boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
+                        (naming::invalid_gid, gva(), naming::invalid_locality_id);
                 }
 
                 if (&ec != &throws)
                     ec = make_success_code();
 
-                return boost::fusion::vector2<naming::gid_type, gva>
-                    (it->first, it->second);
+                return boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
+                    (it->first, it->second.first, it->second.second);
             }
         }
     }
@@ -1256,30 +1198,30 @@ primary_namespace::resolve_gid_locked(
         --it;
 
         // Found the GID in a range
-        if ((it->first + it->second.count) > id)
+        if ((it->first + it->second.first.count) > id)
         {
             if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
             {
                 HPX_THROWS_IF(ec, internal_server_error
                   , "primary_namespace::resolve_gid_locked"
                   , "MSBs of lower and upper range bound do not match");
-                return boost::fusion::vector2<naming::gid_type, gva>
-                    (naming::invalid_gid, gva());
+                return boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
+                    (naming::invalid_gid, gva(), naming::invalid_locality_id);
             }
 
             if (&ec != &throws)
                 ec = make_success_code();
 
-            return boost::fusion::vector2<naming::gid_type, gva>
-                (it->first, it->second);
+            return boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
+                (it->first, it->second.first, it->second.second);
         }
     }
 
     if (&ec != &throws)
         ec = make_success_code();
 
-    return boost::fusion::vector2<naming::gid_type, gva>
-        (naming::invalid_gid, gva());
+    return boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
+        (naming::invalid_gid, gva(), naming::invalid_locality_id);
 } // }}}
 
 response primary_namespace::statistics_counter(

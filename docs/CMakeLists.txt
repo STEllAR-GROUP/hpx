@@ -47,6 +47,7 @@ set(doxygen_dependencies
     ${hpx_SOURCE_DIR}/hpx/runtime/actions/component_non_const_action.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/new.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/components/copy_component.hpp
+    ${hpx_SOURCE_DIR}/hpx/runtime/components/migrate_component.hpp
     ${hpx_SOURCE_DIR}/hpx/runtime/naming/unmanaged.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/fold.hpp
     ${hpx_SOURCE_DIR}/hpx/lcos/reduce.hpp

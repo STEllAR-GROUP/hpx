@@ -28,6 +28,18 @@
     }
 
     BOOST_FORCEINLINE
+    bool
+    apply_c(naming::id_type const& contgid) const
+    {
+        return
+            detail::bind_action_apply_cont<Action>(
+                contgid
+              , _bound_args
+              , util::forward_as_tuple()
+            );
+    }
+
+    BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>
     async() const
     {
@@ -91,7 +103,20 @@
               , util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, U, u))
             );
     }
-    
+
+    template <BOOST_PP_ENUM_PARAMS(N, typename U)>
+    BOOST_FORCEINLINE
+    bool
+    apply_c(naming::id_type const& contgid, HPX_ENUM_FWD_ARGS(N, U, u)) const
+    {
+        return
+            detail::bind_action_apply_cont<Action>(
+                contgid
+              , _bound_args
+              , util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, U, u))
+            );
+    }
+
     template <BOOST_PP_ENUM_PARAMS(N, typename U)>
     BOOST_FORCEINLINE
     hpx::lcos::unique_future<result_type>

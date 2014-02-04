@@ -115,8 +115,8 @@ struct HPX_EXPORT primary_namespace
 
     typedef boost::int32_t component_type;
 
-    typedef std::map<naming::gid_type, gva>
-        gva_table_type;
+    typedef std::pair<gva, boost::uint32_t> gva_table_data_type;
+    typedef std::map<naming::gid_type, gva_table_data_type> gva_table_type;
 
     typedef util::merging_map<naming::gid_type, boost::int64_t>
         refcnt_table_type;
@@ -325,7 +325,8 @@ struct HPX_EXPORT primary_namespace
         );
 
   private:
-    boost::fusion::vector2<naming::gid_type, gva> resolve_gid_locked(
+    boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
+    resolve_gid_locked(
         naming::gid_type const& gid
       , error_code& ec
         );
@@ -351,10 +352,11 @@ struct HPX_EXPORT primary_namespace
     ///        matches) and remove them from the reference counting table.
     ///    3.) Kill the dead objects (fire-and-forget semantics).
 
-    typedef boost::fusion::vector3<
+    typedef boost::fusion::vector4<
         gva                 // gva
       , naming::gid_type    // gid
       , naming::gid_type    // count
+      , boost::uint32_t     // locality_id
     > free_entry;
 
     void resolve_free_list(
@@ -371,13 +373,6 @@ struct HPX_EXPORT primary_namespace
       , naming::gid_type const& lower
       , naming::gid_type const& upper
       , boost::int64_t credits
-      , error_code& ec
-        );
-
-    void free_components_non_blocking(
-        std::list<free_entry>& free_list
-      , naming::gid_type const& lower
-      , naming::gid_type const& upper
       , error_code& ec
         );
 

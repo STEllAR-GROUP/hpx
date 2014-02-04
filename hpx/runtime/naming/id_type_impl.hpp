@@ -131,6 +131,11 @@ namespace hpx { namespace naming
     {
         gid_->set_lsb(lsb);
     }
+
+    inline void id_type::make_unmanaged()
+    {
+        gid_->set_management_type(detail::unmanaged);
+    }
 }}
 
 #endif

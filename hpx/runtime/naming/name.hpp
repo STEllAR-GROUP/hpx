@@ -771,6 +771,10 @@ namespace hpx { namespace naming
             {
                 return type_;
             }
+            void set_management_type(id_type_management type)
+            {
+                type_ = type;
+            }
 
             // serialization
             template <typename Archive>

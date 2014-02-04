@@ -54,7 +54,7 @@
         util::block_profiler_wrapper<deferred_packaged_task_direct_tag> bp(apply_logger_);
 
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             // local, direct execution
             HPX_ASSERT(components::types_are_compatible(addr.type_,
                 components::get_component_type<typename Action::component_type>()));
