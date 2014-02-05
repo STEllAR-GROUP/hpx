@@ -46,7 +46,11 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    template <typename Mutex, typename Queuing>
+    template <typename Mutex
+            , typename PendingQueuing
+            , typename StagedQueuing
+            , typename TerminatedQueuing
+             >
     class local_priority_queue_scheduler : public scheduler_base
     {
     protected:
@@ -55,12 +59,15 @@ namespace hpx { namespace threads { namespace policies
         // items queue is not empty. Otherwise the number of active threads
         // will be incremented in steps equal to the \a min_add_new_count
         // specified above.
+        // FIXME: this is specified both here, and in thread_queue.
         enum { max_thread_count = 1000 };
 
     public:
         typedef boost::mpl::false_ has_periodic_maintenance;
 
-        typedef thread_queue<Mutex, Queuing> thread_queue_type;
+        typedef thread_queue<
+            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
+        > thread_queue_type;
 
         // the scheduler type takes two initialization parameters:
         //    the number of queues

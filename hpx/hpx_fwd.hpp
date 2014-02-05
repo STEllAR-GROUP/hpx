@@ -153,43 +153,47 @@ namespace hpx
         {
             struct scheduler_base;
 
-            struct software_fifo;
+            struct lockfree_fifo;
+            struct lockfree_lifo;
+            struct lockfree_abp_fifo;
+            struct lockfree_abp_fifo;
 
-            template <typename Mutex = boost::mutex,
-                      typename Queuing = software_fifo>
+            template <typename Mutex = boost::mutex
+                    , typename PendingQueuing = lockfree_lifo
+                    , typename StagedQueuing = lockfree_lifo
+                    , typename TerminatedQueuing = lockfree_fifo
+                     >
             class HPX_EXPORT local_priority_queue_scheduler;
-
-#if defined(HPX_GLOBAL_SCHEDULER)
-            class HPX_EXPORT global_queue_scheduler;
-#endif
-#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
-            template <typename Mutex = boost::mutex,
-                      typename Queuing = software_fifo>
-            class HPX_API_EXPORT static_priority_queue_scheduler;
-#endif
-#if defined(HPX_ABP_SCHEDULER)
-            struct HPX_EXPORT abp_queue_scheduler;
-#endif
-#if defined(HPX_ABP_PRIORITY_SCHEDULER)
-            class HPX_EXPORT abp_priority_queue_scheduler;
-#endif
 
             template <typename Mutex = boost::mutex>
             class HPX_EXPORT local_queue_scheduler;
 
+#if defined(HPX_STATIC_PRIORITY_SCHEDULER)
+            template <typename Mutex = boost::mutex
+                    , typename PendingQueuing = lockfree_lifo
+                    , typename StagedQueuing = lockfree_lifo
+                    , typename TerminatedQueuing = lockfree_fifo
+                     >
+            class HPX_API_EXPORT static_priority_queue_scheduler;
+#endif
+
 #if defined(HPX_HIERARCHY_SCHEDULER)
             class HPX_EXPORT hierarchy_scheduler;
 #endif
+
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
-            template <typename Mutex = boost::mutex,
-                      typename Queuing = software_fifo>
+            template <typename Mutex = boost::mutex
+                    , typename PendingQueuing = lockfree_lifo
+                    , typename StagedQueuing = lockfree_lifo
+                    , typename TerminatedQueuing = lockfree_fifo
+                     >
             class HPX_EXPORT periodic_priority_queue_scheduler;
 #endif
 
-            class HPX_EXPORT callback_notifier;
-
             // define the default scheduler to use
             typedef local_priority_queue_scheduler<> queue_scheduler;
+
+            class HPX_EXPORT callback_notifier;
         }
 
         struct HPX_EXPORT threadmanager_base;
