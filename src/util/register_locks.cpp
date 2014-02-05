@@ -141,7 +141,7 @@ namespace hpx { namespace util
             iterator end = held_locks.end();
             for (iterator it = held_locks.begin(); it != end; ++it)
             {
-                lock_data const& data = *(*it).second;
+                //lock_data const& data = *(*it).second;
                 if (!(*it).second->ignore_)
                     return true;
             }
