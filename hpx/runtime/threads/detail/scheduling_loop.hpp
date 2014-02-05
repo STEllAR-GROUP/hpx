@@ -215,15 +215,23 @@ namespace hpx { namespace threads { namespace detail
                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
 #endif
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
                                 boost::uint64_t timestamp = util::hardware::timestamp();
+#endif
                                 thrd_stat = (*thrd)();
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
                                 exec_time += util::hardware::timestamp() - timestamp;
+#endif
                             }
 
+#if HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
                             ++executed_thread_phases;
+#endif
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
                             tfunc_time = util::hardware::timestamp() - overall_timestamp;
+#endif
                         }
                         else {
                             // some other worker-thread got in between and started
@@ -250,8 +258,8 @@ namespace hpx { namespace threads { namespace detail
                         // state at this point
                     }
 
-                    detail::write_new_state_log_debug(num_thread, thrd,
-                        state_val, "normal");
+                    //detail::write_new_state_log_debug(num_thread, thrd,
+                    //    state_val, "normal");
 
                     // Re-add this work item to our list of work items if the PX
                     // thread should be re-scheduled. If the HPX thread is suspended
@@ -263,9 +271,6 @@ namespace hpx { namespace threads { namespace detail
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
-                        //
-                        // REVIEW: Passing a specific target thread may set off
-                        // the round robin queuing.
                         scheduler.SchedulingPolicy::schedule_thread_last(thrd, num_thread);
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
@@ -292,11 +297,15 @@ namespace hpx { namespace threads { namespace detail
                 // REVIEW: what has to be done with depleted HPX threads?
                 if (state_val == depleted || state_val == terminated)
                 {
+#if HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
                     ++executed_threads;
+#endif
                     scheduler.SchedulingPolicy::destroy_thread(thrd, busy_loop_count);
                 }
 
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
                 tfunc_time = util::hardware::timestamp() - overall_timestamp;
+#endif
             }
 
             // if nothing else has to be done either wait or terminate
@@ -315,12 +324,9 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
 
-            // Clean up all terminated threads for all thread queues once in a
-            // while.
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX*10)
             {
                 busy_loop_count = 0;
-                scheduler.SchedulingPolicy::cleanup_terminated(true);
 
                 if (0 == num_thread) {
                     // do background work in parcel layer
@@ -335,12 +341,14 @@ namespace hpx { namespace threads { namespace detail
 
                 // clean up terminated threads
                 idle_loop_count = 0;
-                scheduler.SchedulingPolicy::cleanup_terminated();
+                scheduler.SchedulingPolicy::cleanup_terminated(true);
             }
         }
 
         // record total time elapsed after the main scheduling loop exited
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
         tfunc_time = util::hardware::timestamp() - overall_timestamp;
+#endif
     }
 }}}
 
