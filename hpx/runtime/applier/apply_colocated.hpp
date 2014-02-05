@@ -13,7 +13,7 @@
 #include <hpx/traits.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
-#include <hpx/util/detail/colocated_helpers.hpp>
+#include <hpx/util/functional/colocated_helpers.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
 
@@ -56,8 +56,7 @@ namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-      , typename F>
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
       , bool
@@ -78,9 +77,9 @@ namespace hpx
         using util::placeholders::_2;
         return apply_continue<action_type>(
             service_target, req
-          , util::detail::apply_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
-                    util::bind(util::detail::extract_locality(), _2)
+                    util::bind(util::functional::extract_locality(), _2)
                   BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
                 ));
     }
@@ -88,8 +87,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <
         typename Component, typename Result, typename Arguments, typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
-      , typename F>
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N
       , bool
@@ -97,8 +95,7 @@ namespace hpx
     apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> /*act*/
       , naming::id_type const& gid
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
-      , F && f)
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         return apply_colocated<Derived>(
             gid

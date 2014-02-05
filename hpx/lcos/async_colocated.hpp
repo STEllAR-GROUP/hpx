@@ -21,7 +21,7 @@
 #include <hpx/lcos/async_colocated_fwd.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
-#include <hpx/util/detail/colocated_helpers.hpp>
+#include <hpx/util/functional/colocated_helpers.hpp>
 
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
@@ -87,9 +87,9 @@ namespace hpx
         using util::placeholders::_2;
         return async_continue<action_type>(
             service_target, req
-          , util::detail::apply_continuation(
+          , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(util::detail::extract_locality(), _2)
+                    util::bind(util::functional::extract_locality(), _2)
                   BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
                 ));
     }
