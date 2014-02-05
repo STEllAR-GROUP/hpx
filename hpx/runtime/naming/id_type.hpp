@@ -113,11 +113,8 @@ namespace hpx { namespace naming
 
         friend class boost::serialization::access;
 
-        template <typename Archive>
-        void save(Archive & ar, const unsigned int version) const;
-
-        template <typename Archive>
-        void load(Archive & ar, const unsigned int version);
+        void save(util::portable_binary_oarchive& ar, const unsigned int version) const;
+        void load(util::portable_binary_iarchive& ar, const unsigned int version);
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 

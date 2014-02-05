@@ -148,11 +148,9 @@ namespace hpx { namespace parcelset
             }
 
         protected:
-            template <typename Archive>
-            void save(Archive& ar, bool has_source_id, bool has_continuation) const;
+            void save(util::portable_binary_oarchive& ar, bool has_source_id, bool has_continuation) const;
 
-            template <typename Archive>
-            void load(Archive& ar, bool has_source_id, bool has_continuation);
+            void load(util::portable_binary_iarchive& ar, bool has_source_id, bool has_continuation);
 
         private:
             friend void intrusive_ptr_add_ref(parcel_data* p);
@@ -331,26 +329,20 @@ namespace hpx { namespace parcelset
                 return this->get_action()->may_require_id_splitting();
             }
 
-            template <typename Archive>
-            void save(Archive& ar) const;
+            void save(util::portable_binary_oarchive& ar) const;
 
-            template <typename Archive>
-            void load(Archive& ar);
+            void load(util::portable_binary_iarchive& ar);
 
         private:
             friend std::ostream& operator<< (std::ostream& os,
                 single_destination_parcel_data const& req);
 
             // serialization support
-            template <typename Archive>
-            void save_optimized(Archive& ar) const;
-            template <typename Archive>
-            void save_normal(Archive& ar) const;
+            void save_optimized(util::portable_binary_oarchive& ar) const;
+            void save_normal(util::portable_binary_oarchive& ar) const;
 
-            template <typename Archive>
-            void load_optimized(Archive& ar);
-            template <typename Archive>
-            void load_normal(Archive& ar);
+            void load_optimized(util::portable_binary_iarchive& ar);
+            void load_normal(util::portable_binary_iarchive& ar);
 
         private:
             // the parcel data is wrapped into a separate struct to simplify
@@ -512,26 +504,20 @@ namespace hpx { namespace parcelset
                     this->get_action()->get_type_size();      // action
             }
 
-            template <typename Archive>
-            void save(Archive& ar) const;
+            void save(util::portable_binary_oarchive& ar) const;
 
-            template <typename Archive>
-            void load(Archive& ar);
+            void load(util::portable_binary_iarchive& ar);
 
         private:
             friend std::ostream& operator<< (std::ostream& os,
                 multi_destination_parcel_data const& req);
 
             // serialization support
-            template <typename Archive>
-            void save_optimized(Archive& ar) const;
-            template <typename Archive>
-            void save_normal(Archive& ar) const;
+            void save_optimized(util::portable_binary_oarchive& ar) const;
+            void save_normal(util::portable_binary_oarchive& ar) const;
 
-            template <typename Archive>
-            void load_optimized(Archive& ar);
-            template <typename Archive>
-            void load_normal(Archive& ar);
+            void load_optimized(util::portable_binary_iarchive& ar);
+            void load_normal(util::portable_binary_iarchive& ar);
 
         private:
             // the parcel data is wrapped into a separate struct to simplify
@@ -735,11 +721,9 @@ namespace hpx { namespace parcelset
         // serialization support
         friend class boost::serialization::access;
 
-        template <typename Archive>
-        void save(Archive& ar, const unsigned int version) const;
+        void save(util::portable_binary_oarchive& ar, const unsigned int version) const;
 
-        template <typename Archive>
-        void load(Archive& ar, const unsigned int version);
+        void load(util::portable_binary_iarchive& ar, const unsigned int version);
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
