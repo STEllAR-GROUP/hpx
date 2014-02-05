@@ -15,6 +15,7 @@
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/lockfree/fifo.hpp>
+#include <boost/lockfree/stack.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/queue_helpers.hpp>
@@ -164,8 +165,7 @@ namespace hpx { namespace threads { namespace policies
         typedef typename Queuing::template apply<task_description*>::type
             task_items_type;
 
-        typedef typename Queuing::template apply<thread_data_base*>::type
-            thread_id_queue_type;
+        typedef boost::lockfree::stack<thread_data_base*> terminated_items_type;
 
     protected:
         template <typename Lock>
@@ -220,7 +220,7 @@ namespace hpx { namespace threads { namespace policies
         // add new threads if there is some amount of work available
         std::size_t add_new(boost::int64_t add_count, thread_queue* addfrom,
             std::size_t num_thread, typename mutex_type::scoped_try_lock &lk,
-            bool steal= false)
+            bool steal = false)
         {
             if (HPX_UNLIKELY(0 == add_count))
                 return 0;
@@ -414,7 +414,7 @@ namespace hpx { namespace threads { namespace policies
             if (delete_all) {
                 // delete all threads
                 thread_data_base* todelete;
-                while (Queuing::dequeue(terminated_items_, todelete))
+                while (terminated_items_.pop(todelete))
                 {
                     // this thread has to be in this map
                     HPX_ASSERT(thread_map_.find(todelete) != thread_map_.end());
@@ -435,7 +435,7 @@ namespace hpx { namespace threads { namespace policies
                         static_cast<boost::int64_t>(max_delete_count));
 
                 thread_data_base* todelete;
-                while (delete_count && Queuing::dequeue(terminated_items_, todelete))
+                while (delete_count && terminated_items_.pop(todelete))
                 {
                     thread_map_type::iterator it = thread_map_.find(todelete);
 
@@ -817,7 +817,7 @@ namespace hpx { namespace threads { namespace policies
         {
             if (thrd->is_created_from(&memory_pool_))
             {
-                Queuing::enqueue(terminated_items_, thrd);
+                terminated_items_.push(thrd);
 
                 boost::int64_t count = ++terminated_items_count_;
                 if (count > HPX_MAX_TERMINATED_THREADS)
@@ -914,6 +914,7 @@ namespace hpx { namespace threads { namespace policies
                     }
                     return false;
                 }
+
                 cleanup_terminated_locked();
             }
             return false;
@@ -961,7 +962,7 @@ namespace hpx { namespace threads { namespace policies
         boost::atomic<boost::int64_t> work_items_wait_;        ///< overall wait time of work items
         boost::atomic<boost::int64_t> work_items_wait_count_;  ///< overall number of work items in queue
 #endif
-        thread_id_queue_type terminated_items_;     ///< list of terminated threads
+        terminated_items_type terminated_items_;     ///< list of terminated threads
         boost::atomic<boost::int64_t> terminated_items_count_; ///< count of terminated items
 
         std::size_t max_count_;                     ///< maximum number of existing PX-threads
