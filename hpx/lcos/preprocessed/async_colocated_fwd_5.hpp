@@ -36,10 +36,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
        );
 }
 namespace hpx
@@ -70,10 +68,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0);
 }
 namespace hpx
@@ -104,10 +100,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1);
 }
 namespace hpx
@@ -138,10 +132,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2);
 }
 namespace hpx
@@ -172,10 +164,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3);
 }
 namespace hpx
@@ -206,9 +196,7 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4);
 }

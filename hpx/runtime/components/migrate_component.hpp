@@ -52,8 +52,8 @@ namespace hpx { namespace components
     migrate(naming::id_type const& to_migrate,
         naming::id_type const& target_locality)
     {
-        server::migrate_component_action<Component> act;
-        return async_colocated(to_migrate, act, to_migrate, target_locality);
+        typedef server::migrate_component_action<Component> action_type;
+        return async_colocated<action_type>(to_migrate, to_migrate, target_locality);
     }
 }}
 

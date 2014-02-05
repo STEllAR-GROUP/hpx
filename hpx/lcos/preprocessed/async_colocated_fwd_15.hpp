@@ -36,10 +36,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
        );
 }
 namespace hpx
@@ -70,10 +68,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0);
 }
 namespace hpx
@@ -104,10 +100,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1);
 }
 namespace hpx
@@ -138,10 +132,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2);
 }
 namespace hpx
@@ -172,10 +164,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3);
 }
 namespace hpx
@@ -206,10 +196,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4);
 }
 namespace hpx
@@ -240,10 +228,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5);
 }
 namespace hpx
@@ -274,10 +260,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6);
 }
 namespace hpx
@@ -308,10 +292,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7);
 }
 namespace hpx
@@ -342,10 +324,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8);
 }
 namespace hpx
@@ -376,10 +356,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9);
 }
 namespace hpx
@@ -410,10 +388,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10);
 }
 namespace hpx
@@ -444,10 +420,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11);
 }
 namespace hpx
@@ -478,10 +452,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12);
 }
 namespace hpx
@@ -512,10 +484,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13);
 }
 namespace hpx
@@ -546,9 +516,7 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > 
+        hpx::actions::action<Component, Result, Arguments, Derived> 
+      , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14);
 }

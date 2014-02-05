@@ -77,10 +77,8 @@ namespace hpx
             >::type>
     >::type
     async_colocated(
-        naming::id_type const& gid
-      , hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/
+        hpx::actions::action<Component, Result, Arguments, Derived> /*act*/
+      , naming::id_type const& gid
       BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg));
 }
 
