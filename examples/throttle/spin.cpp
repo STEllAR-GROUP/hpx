@@ -50,8 +50,7 @@ int hpx_main(variables_map& vm)
 
                 BOOST_FOREACH(id_type const& locality_, localities)
                 {
-                    address addr;
-                    agas_client.resolve(locality_.get_gid(), addr);
+                    address addr = hpx::agas::resolve(locality_).get();
 
                     std::cout << ( boost::format("  [%1%] %2%\n")
                                  % get_locality_id_from_gid(locality_.get_gid())

@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace server
             boost::shared_ptr<Component> ptr = f.get();
             boost::uint32_t pin_count = ptr->pin_count();
 
-            if (pin_count == ~0x0)
+            if (pin_count == ~0x0u)
             {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "hpx::components::server::migrate_component",
