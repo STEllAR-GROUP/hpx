@@ -64,44 +64,30 @@ int hpx_main()
 
     {
         increment_action inc;
-
-        using hpx::util::placeholders::_1;
-
         hpx::apply_colocated(inc, there, here, 1);
-//         hpx::apply_colocated(hpx::util::bind(inc, there, here, 1));
-//         hpx::apply_colocated(hpx::util::bind(inc, there, here, _1), 1);
     }
 
-//     {
-//         hpx::unique_future<hpx::id_type> inc_f =
-//             hpx::components::new_<increment_server>(there);
-//         hpx::id_type inc = inc_f.get();
-// 
-//         using hpx::util::placeholders::_1;
-//         using hpx::util::placeholders::_2;
-//         using hpx::util::placeholders::_3;
-// 
-//         call_action call;
-//         hpx::apply_colocated(call, inc, here, 1);
-//         hpx::apply_colocated(hpx::util::bind(call, inc, here, 1));
-//         hpx::apply_colocated(hpx::util::bind(call, inc, here, _1), 1);
-//         hpx::apply_colocated(hpx::util::bind(call, _1, here, 1), inc);
-//         hpx::apply_colocated(hpx::util::bind(call, _1, _2, 1), inc, here);
-//         hpx::apply_colocated(hpx::util::bind(call, _1, _2, _3), inc, here, 1);
-//     }
+    {
+        hpx::unique_future<hpx::id_type> inc_f =
+            hpx::components::new_<increment_server>(there);
+        hpx::id_type where = inc_f.get();
 
-//     {
-//         hpx::unique_future<hpx::id_type> inc_f =
-//             hpx::components::new_<increment_server>(there);
-//         hpx::id_type inc = inc_f.get();
-// 
-//         hpx::apply_colocated<call_action>(inc, here, 1);
-//     }
+        increment_action inc;
+        hpx::apply_colocated(inc, where, here, 1);
+    }
 
+    {
+        hpx::unique_future<hpx::id_type> inc_f =
+            hpx::components::new_<increment_server>(there);
+        hpx::id_type where = inc_f.get();
+
+        hpx::apply_colocated<increment_action>(where, here, 1);
+    }
+
+    // finalize will synchronize will all pending operations
     int result = hpx::finalize();
 
-    HPX_TEST_EQ(final_result, 10);
-
+    HPX_TEST_EQ(final_result, 3);
     return result;
 }
 
