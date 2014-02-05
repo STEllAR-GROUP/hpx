@@ -118,7 +118,7 @@ public:
         }
     }
 
-    /** Pushes object t to the fifo. May fail, if the freelist is not able to allocate a new fifo node.
+    /** Pushes object t to the queue. May fail, if the freelist is not able to allocate a new queue node.
      *
      * \returns true, if the push operation is successful.
      *
@@ -143,7 +143,7 @@ public:
         }
     }
 
-    /** Pushes object t to the fifo. May fail, if the freelist is not able to allocate a new fifo node.
+    /** Pushes object t to the queue. May fail, if the freelist is not able to allocate a new queue node.
      *
      * \returns true, if the push operation is successful.
      *
