@@ -72,10 +72,10 @@ namespace hpx { namespace parcelset
             ~connection_handler();
 
             /// Start the handling of connections.
-            bool run();
+            bool do_run();
 
             /// Stop the handling of connections.
-            void stop();
+            void do_stop();
 
             /// Retrieve the type of the locality represented by this parcelport
             connection_type get_type() const

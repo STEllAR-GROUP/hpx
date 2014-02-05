@@ -124,7 +124,7 @@ namespace hpx { namespace parcelset
         {
             io_service_pool_.run(false);    // start pool
 
-            bool success = connection_handler().run();
+            bool success = connection_handler().do_run();
 
             if (blocking)
                 io_service_pool_.join();
@@ -140,7 +140,7 @@ namespace hpx { namespace parcelset
                 connection_cache_.shutdown();
 
                 io_service_pool_.join();
-                connection_handler().stop();
+                connection_handler().do_stop();
                 connection_cache_.clear();
                 io_service_pool_.clear();
             }
