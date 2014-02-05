@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,42 +19,6 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<typename Action::arguments_type>::value == 0,
-        bool
-    >::type
-    apply_continue(naming::id_type const& gid, F && f)
-    {
-        typedef typename hpx::actions::extract_action<Action>::type action_type;
-        typedef typename action_type::result_type result_type;
-
-        return apply<Action>(
-            new hpx::actions::typed_continuation<result_type>(
-                std::forward<F>(f))
-          , gid);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename F>
-    typename boost::enable_if_c<
-        util::tuple_size<Arguments>::value == 0,
-        bool
-    >::type
-    apply_continue(
-        hpx::actions::action<
-            Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid, F && f)
-    {
-        return apply_continue<Derived>(gid, std::forward<F>(f));
-    }
-}
-
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/runtime/applier/preprocessed/apply_continue.hpp>
 #else
@@ -64,7 +28,7 @@ namespace hpx
 #endif
 
 #define BOOST_PP_ITERATION_PARAMS_1                                           \
-    (3, (1, HPX_ACTION_ARGUMENT_LIMIT,                                        \
+    (3, (0, HPX_ACTION_ARGUMENT_LIMIT,                                        \
     "hpx/runtime/applier/apply_continue.hpp"))                                \
     /**/
 
@@ -88,14 +52,15 @@ namespace hpx
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg),
-        typename F>
+    template <typename Action
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N,
         bool
     >::type
-    apply_continue(naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
-        F && f)
+    apply_continue(naming::id_type const& gid
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg), F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
@@ -104,12 +69,13 @@ namespace hpx
             new hpx::actions::typed_continuation<result_type>(
                 std::forward<F>(f))
           , gid
-          , HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result, typename Arguments,
-        typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
+        typename Derived
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N,
         bool
@@ -117,11 +83,14 @@ namespace hpx
     apply_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid, HPX_ENUM_FWD_ARGS(N, Arg, arg),
-        F && f)
+        > /*act*/, naming::id_type const& gid
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+      , F && f)
     {
-        return apply_continue<Derived>(gid, HPX_ENUM_FORWARD_ARGS(N, Arg, arg),
-            std::forward<F>(f));
+        return apply_continue<Derived>(
+            gid
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
+          , std::forward<F>(f));
     }
 }
 

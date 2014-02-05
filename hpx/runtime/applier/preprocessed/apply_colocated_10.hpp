@@ -11,17 +11,13 @@
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
        >
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
        )
     {
@@ -33,9 +29,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                    )
@@ -47,17 +43,14 @@ namespace hpx
        >
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 0
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
        )
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
            );
     }
@@ -65,17 +58,13 @@ namespace hpx
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
       , typename Arg0>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 1
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
       , Arg0 && arg0)
     {
@@ -87,9 +76,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                   , std::forward<Arg0>( arg0 ))
@@ -101,17 +90,14 @@ namespace hpx
       , typename Arg0>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 1
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0)
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
           , std::forward<Arg0>( arg0 ));
     }
@@ -119,17 +105,13 @@ namespace hpx
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
       , typename Arg0 , typename Arg1>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 2
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1)
     {
@@ -141,9 +123,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))
@@ -155,17 +137,14 @@ namespace hpx
       , typename Arg0 , typename Arg1>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 2
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1)
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
     }
@@ -173,17 +152,13 @@ namespace hpx
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
       , typename Arg0 , typename Arg1 , typename Arg2>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 3
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
@@ -195,9 +170,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))
@@ -209,17 +184,14 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 3
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
     }
@@ -227,17 +199,13 @@ namespace hpx
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 4
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
@@ -249,9 +217,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))
@@ -263,17 +231,14 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 4
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
     }
@@ -281,17 +246,13 @@ namespace hpx
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 5
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
@@ -303,9 +264,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))
@@ -317,17 +278,14 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 5
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
     }
@@ -335,17 +293,13 @@ namespace hpx
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 6
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
@@ -357,9 +311,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ))
@@ -371,17 +325,14 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 6
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
     }
@@ -389,17 +340,13 @@ namespace hpx
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 7
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
@@ -411,9 +358,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ))
@@ -425,17 +372,14 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 7
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
     }
@@ -443,17 +387,13 @@ namespace hpx
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 8
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
@@ -465,9 +405,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ))
@@ -479,17 +419,14 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 8
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
     }
@@ -497,17 +434,13 @@ namespace hpx
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 9
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
@@ -519,9 +452,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ))
@@ -533,17 +466,14 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 9
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
     }
@@ -551,17 +481,13 @@ namespace hpx
 namespace hpx
 {
     
-    template <
-        typename Action
+    template <typename Action
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 10
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
@@ -573,9 +499,9 @@ namespace hpx
           , naming::id_type::unmanaged);
         typedef agas::server::primary_namespace::service_action action_type;
         using util::placeholders::_2;
-        return async_continue<action_type>(
+        return apply_continue<action_type>(
             service_target, req
-          , util::functional::async_continuation(
+          , util::functional::apply_continuation(
                 util::bind<Action>(
                     util::bind(util::functional::extract_locality(), _2)
                   , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ))
@@ -587,17 +513,14 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 10
-      , lcos::unique_future<
-            typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Derived>::remote_result_type
-            >::type>
+      , bool
     >::type
-    async_colocated(
+    apply_colocated(
         hpx::actions::action<Component, Result, Arguments, Derived> 
       , naming::id_type const& gid
       , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
     {
-        return async_colocated<Derived>(
+        return apply_colocated<Derived>(
             gid
           , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
     }
