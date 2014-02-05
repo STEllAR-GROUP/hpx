@@ -42,7 +42,7 @@ namespace hpx { namespace agas { namespace server
                 if (!addrs[i])
                 {
                     cache_addresses.push_back(resolve_gid_locked(ids[i].get_gid(), ec));
-                    boost::fusion::vector2<naming::gid_type, gva> const& r =
+                    boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t> const& r =
                         cache_addresses.back();
 
                     if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)
@@ -92,7 +92,7 @@ namespace hpx { namespace agas { namespace server
         naming::id_type source = get_colocation_id_sync(p.get_source());
         for (std::size_t i = 0; i != size; ++i)
         {
-            boost::fusion::vector2<naming::gid_type, gva> const& r =
+            boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t> const& r =
                 cache_addresses[i];
 
             if (boost::fusion::at_c<0>(r))
