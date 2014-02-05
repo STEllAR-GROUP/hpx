@@ -374,12 +374,14 @@ void addressing_service::launch_bootstrap(
 
     request reqs[] =
     {
-        request(primary_ns_bind_gid, locality_gid, locality_gva)
-      , request(primary_ns_bind_gid, primary_gid, primary_gva)
-      , request(primary_ns_bind_gid, component_gid, component_gva)
-      , request(primary_ns_bind_gid, symbol_gid, symbol_gva)
-//      , request(primary_ns_bind_gid, runtime_support_gid1, runtime_support_address)
-//      , request(primary_ns_bind_gid, runtime_support_gid2, runtime_support_address)
+        request(primary_ns_bind_gid, locality_gid, locality_gva
+          , naming::get_locality_id_from_gid(locality_gid))
+      , request(primary_ns_bind_gid, primary_gid, primary_gva
+          , naming::get_locality_id_from_gid(primary_gid))
+      , request(primary_ns_bind_gid, component_gid, component_gva
+          , naming::get_locality_id_from_gid(component_gid))
+      , request(primary_ns_bind_gid, symbol_gid, symbol_gva
+          , naming::get_locality_id_from_gid(symbol_gid))
     };
 
     for (std::size_t i = 0; i < (sizeof(reqs) / sizeof(request)); ++i)
@@ -974,7 +976,7 @@ bool addressing_service::get_id_range(
     }
 } // }}}
 
-bool addressing_service::bind_range(
+bool addressing_service::bind_range_local(
     naming::gid_type const& lower_id
   , boost::uint64_t count
   , naming::address const& baseaddr
@@ -989,7 +991,8 @@ bool addressing_service::bind_range(
         // parameters.
         gva const g(ep, baseaddr.type_, count, baseaddr.address_, offset);
 
-        request req(primary_ns_bind_gid, lower_id, g);
+        request req(primary_ns_bind_gid, lower_id, g,
+            naming::get_locality_id_from_gid(lower_id));
         response rep;
 
         if (is_bootstrap())
@@ -1005,9 +1008,10 @@ bool addressing_service::bind_range(
         if (caching_)
         {
             if (range_caching_)
+            {
                 // Put the range into the cache.
                 update_cache_entry(lower_id, g, ec);
-
+            }
             else
             {
                 // Only put the first GID in the range into the cache.
@@ -1022,12 +1026,68 @@ bool addressing_service::bind_range(
         return true;
     }
     catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::bind_range");
+        HPX_RETHROWS_IF(ec, e, "addressing_service::bind_range_local");
         return false;
     }
 } // }}}
 
-bool addressing_service::unbind_range(
+bool addressing_service::bind_postproc(
+    unique_future<response> f, naming::gid_type const& lower_id, gva const& g
+    )
+{
+    response rep = f.get();
+    error const s = rep.get_status();
+    if (success != s && repeated_request != s)
+        return false;
+
+    if (caching_)
+    {
+        if (range_caching_)
+            // Put the range into the cache.
+            update_cache_entry(lower_id, g);
+
+        else
+        {
+            // Only put the first GID in the range into the cache.
+            gva const first_g = g.resolve(lower_id, lower_id);
+            update_cache_entry(lower_id, first_g);
+        }
+    }
+
+    return true;
+}
+
+hpx::unique_future<bool> addressing_service::bind_range_async(
+    naming::gid_type const& lower_id
+  , boost::uint64_t count
+  , naming::address const& baseaddr
+  , boost::uint64_t offset
+  , boost::uint32_t locality_id
+    )
+{
+    // ask server
+    naming::locality const& ep = baseaddr.locality_;
+
+    // Create a global virtual address from the legacy calling convention
+    // parameters.
+    gva const g(ep, baseaddr.type_, count, baseaddr.address_, offset);
+
+    naming::id_type target(
+        stubs::primary_namespace::get_service_instance(lower_id)
+      , naming::id_type::unmanaged);
+
+    request req(primary_ns_bind_gid, lower_id, g, locality_id);
+    response rep;
+
+    using util::placeholders::_1;
+    unique_future<response> f =
+        stubs::primary_namespace::service_async<response>(target, req);
+    return f.then(
+        util::bind(&addressing_service::bind_postproc, this, _1, lower_id, g)
+    );
+}
+
+bool addressing_service::unbind_range_local(
     naming::gid_type const& lower_id
   , boost::uint64_t count
   , naming::address& addr
@@ -1037,6 +1097,19 @@ bool addressing_service::unbind_range(
     try {
         request req(primary_ns_unbind_gid, lower_id, count);
         response rep;
+
+//         if (get_status() == running &&
+//             naming::get_locality_id_from_gid(lower_id) !=
+//                 naming::get_locality_id_from_gid(locality_))
+//         {
+//             naming::id_type target(
+//                 stubs::primary_namespace::get_service_instance(lower_id)
+//               , naming::id_type::unmanaged);
+// 
+//             rep = stubs::primary_namespace::service(
+//                 target, req, threads::thread_priority_default, ec);
+//         }
+//         else
 
         if (is_bootstrap())
             rep = bootstrap->primary_ns_server_.service(req, ec);
@@ -1060,7 +1133,7 @@ bool addressing_service::unbind_range(
         return true;
     }
     catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::unbind_range");
+        HPX_RETHROWS_IF(ec, e, "addressing_service::unbind_range_local");
         return false;
     }
 } // }}}
@@ -1070,21 +1143,21 @@ bool addressing_service::unbind_range(
 /// cache and local AGAS instance, assuming that everything which is not in
 /// the cache is not local.
 
-bool addressing_service::is_local_address(
-    naming::gid_type const& id
-  , naming::address& addr
-  , error_code& ec
-    )
-{
-    // Resolve the address of the GID.
-
-    // NOTE: We do not throw here for a reason; it is perfectly valid for the
-    // GID to not be found in the local AGAS instance.
-    if (!resolve(id, addr, ec) || ec)
-        return false;
-
-    return addr.locality_ == get_here();
-}
+// bool addressing_service::is_local_address(
+//     naming::gid_type const& id
+//   , naming::address& addr
+//   , error_code& ec
+//     )
+// {
+//     // Resolve the address of the GID.
+// 
+//     // NOTE: We do not throw here for a reason; it is perfectly valid for the
+//     // GID to not be found in the local AGAS instance.
+//     if (!resolve(id, addr, ec) || ec)
+//         return false;
+// 
+//     return addr.locality_ == get_here();
+// }
 
 bool addressing_service::is_local_address_cached(
     naming::gid_type const& id
@@ -1092,40 +1165,47 @@ bool addressing_service::is_local_address_cached(
   , error_code& ec
     )
 {
-    // Try to resolve the address of the GID.
+    // Try to resolve the address of the GID from the locally available
+    // information.
 
     // NOTE: We do not throw here for a reason; it is perfectly valid for the
     // GID to not be found in the cache.
     if (!resolve_cached(id, addr, ec) || ec)
-        return false;
+    {
+        if (ec) return false;
+
+        // try also the local part of AGAS before giving up
+        if (!resolve_full_local(id, addr, ec) || ec)
+            return false;
+    }
 
     return addr.locality_ == get_here();
 }
 
 // Return true if at least one address is local.
-bool addressing_service::is_local_address(
-    naming::gid_type const* gids
-  , naming::address* addrs
-  , std::size_t size
-  , boost::dynamic_bitset<>& locals
-  , error_code& ec
-    )
-{
-    // Try the cache
-    if (caching_)
-    {
-        bool all_resolved = resolve_cached(gids, addrs, size, locals, ec);
-        if (ec)
-            return false;
-        if (all_resolved)
-            return locals.any();      // all destinations resolved
-    }
-
-    if (!resolve_full(gids, addrs, size, locals, ec) || ec)
-        return false;
-
-    return locals.any();
-}
+// bool addressing_service::is_local_address(
+//     naming::gid_type const* gids
+//   , naming::address* addrs
+//   , std::size_t size
+//   , boost::dynamic_bitset<>& locals
+//   , error_code& ec
+//     )
+// {
+//     // Try the cache
+//     if (caching_)
+//     {
+//         bool all_resolved = resolve_cached(gids, addrs, size, locals, ec);
+//         if (ec)
+//             return false;
+//         if (all_resolved)
+//             return locals.any();      // all destinations resolved
+//     }
+// 
+//     if (!resolve_full(gids, addrs, size, locals, ec) || ec)
+//         return false;
+// 
+//     return locals.any();
+// }
 
 bool addressing_service::is_local_lva_encoded_address(
     boost::uint64_t msb
@@ -1194,7 +1274,7 @@ bool addressing_service::resolve_locally_known_addresses(
     return false;
 } // }}}
 
-bool addressing_service::resolve_full(
+bool addressing_service::resolve_full_local(
     naming::gid_type const& id
   , naming::address& addr
   , error_code& ec
@@ -1246,7 +1326,7 @@ bool addressing_service::resolve_full(
         return true;
     }
     catch (hpx::exception const& e) {
-        HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_full");
+        HPX_RETHROWS_IF(ec, e, "addressing_service::resolve_full_local");
         return false;
     }
 } // }}}
@@ -1409,11 +1489,13 @@ hpx::unique_future<naming::address> addressing_service::resolve_full_async(
     using util::placeholders::_1;
     unique_future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
-    return f.then(util::bind(&addressing_service::resolve_full_postproc, this, _1, gid));
+    return f.then(
+        util::bind(&addressing_service::resolve_full_postproc, this, _1, gid)
+    );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool addressing_service::resolve_full(
+bool addressing_service::resolve_full_local(
     naming::gid_type const* gids
   , naming::address* addrs
   , std::size_t count
@@ -1566,7 +1648,7 @@ void addressing_service::route(
 
     // Determine whether the gid is local or remote
     naming::address addr;
-    if (is_local_address(target.get_gid(), addr))
+    if (is_local_address_cached(target.get_gid(), addr))
     {
         // route through the local AGAS service instance
         applier::detail::apply_l_p<action_type>(
@@ -2065,6 +2147,13 @@ void addressing_service::update_cache_entry(
     if (!caching_)
     {
         // If caching is disabled, we silently pretend success.
+        return;
+    }
+
+    if (naming::get_locality_id_from_gid(gid) ==
+        naming::get_locality_id_from_gid(locality_))
+    {
+        // we prefer not to store any local items in the AGAS cache
         return;
     }
 

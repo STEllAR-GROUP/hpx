@@ -44,14 +44,16 @@ namespace hpx { namespace components { namespace server
     template <typename Component>
     struct copy_component_action
       : ::hpx::actions::plain_result_action2<
-            unique_future<naming::id_type>, naming::id_type const&, naming::id_type const&
+            unique_future<naming::id_type>,
+            naming::id_type const&, naming::id_type const&
           , &copy_component<Component>
           , copy_component_action<Component> >
     {};
 }}}
 
 HPX_REGISTER_PLAIN_ACTION_TEMPLATE(
-    (template <typename Component>), (hpx::components::server::copy_component_action<Component>)
+    (template <typename Component>),
+    (hpx::components::server::copy_component_action<Component>)
 )
 
 #endif

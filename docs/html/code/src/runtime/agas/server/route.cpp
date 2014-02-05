@@ -25,7 +25,8 @@ namespace hpx { namespace agas { namespace server
         std::size_t size = p.size();
         naming::id_type const* ids = p.get_destinations();
         naming::address* addrs = p.get_destination_addrs();
-        std::vector<boost::fusion::vector2<naming::gid_type, gva> > cache_addresses;
+        std::vector<boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t> >
+            cache_addresses;
 
         // resolve destination addresses, we should be able to resolve all of
         // them, otherwise it's an error
@@ -69,7 +70,8 @@ namespace hpx { namespace agas { namespace server
                 else
                 {
                     cache_addresses.push_back(
-                        boost::fusion::make_vector(naming::gid_type(), gva()));
+                        boost::fusion::make_vector(
+                            naming::gid_type(), gva(), naming::invalid_locality_id));
                 }
             }
         }

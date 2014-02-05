@@ -192,7 +192,7 @@ namespace hpx
 
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (agas::is_local_address(gid, addr))
+        if (agas::is_local_address_cached(gid, addr))
             return applier::detail::apply_l_p<Action>(gid, addr, priority);   // apply locally
 
         // apply remotely
@@ -229,7 +229,7 @@ namespace hpx
 
         std::size_t count = ids.size();
         gids.reserve(count);
-        if (agas::is_local_address(ids, addrs, locals)) {
+        if (agas::is_local_address_cached(ids, addrs, locals)) {
             // at least one destination is local
             for (std::size_t i = 0; i < count; ++i) {
                 if (locals.test(i))
@@ -369,7 +369,7 @@ namespace hpx
 
         // Determine whether the gid is local or remote
         naming::address addr;
-        if (agas::is_local_address(gid, addr))
+        if (agas::is_local_address_cached(gid, addr))
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority);
 
         // apply remotely

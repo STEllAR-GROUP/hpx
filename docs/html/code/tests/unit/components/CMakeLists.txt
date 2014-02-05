@@ -12,6 +12,7 @@ set(tests
     copy_component
     get_gid
     get_ptr
+    migrate_component
     remote_object
    )
 
@@ -20,6 +21,10 @@ set(copy_component_PARAMETERS
     THREADS_PER_LOCALITY 2)
 
 set(get_ptr_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 2)
+
+set(migrate_component_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
 

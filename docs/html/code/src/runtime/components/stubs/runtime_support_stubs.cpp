@@ -14,6 +14,7 @@
 #include <hpx/include/async.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/runtime.hpp>
 
 #include <boost/serialization/vector.hpp>
 
@@ -143,36 +144,39 @@ namespace hpx { namespace components { namespace stubs
         call_shutdown_functions_async(gid, pre_shutdown).get();
     }
 
-    void runtime_support::free_component_sync(components::component_type type,
+    void runtime_support::free_component_sync(agas::gva const& g,
         naming::gid_type const& gid, boost::uint64_t count)
     {
-        free_component_sync(type, gid, naming::gid_type(0, count));
-    }
-
-    void runtime_support::free_component_sync(components::component_type type,
-        naming::gid_type const& gid, naming::gid_type const& count)
-    {
-        typedef server::runtime_support::free_component_action action_type;
-
         // Determine whether the gid of the component to delete is local or
         // remote
-        //naming::resolver_client& agas = appl.get_agas_client();
-        if (/*agas.is_bootstrap() || */agas::is_local_address(gid)) {
+        if (g.endpoint == hpx::get_locality() ||
+            agas::is_local_address_cached(gid))
+        {
             // apply locally
-            applier::detail::apply_helper<action_type>::call(naming::invalid_id,
-                applier::get_applier().get_runtime_support_raw_gid().get_lsb(),
-                threads::thread_priority_default,
-                util::forward_as_tuple(type, gid, count));
+            components::server::runtime_support* p =
+                reinterpret_cast<components::server::runtime_support*>(
+                      hpx::get_runtime().get_runtime_support_lva());
+            p->free_component(g, gid, count);
         }
         else {
             // apply remotely
+            typedef server::runtime_support::free_component_action action_type;
             naming::id_type id = get_colocation_id_sync(
                 naming::id_type(gid, naming::id_type::unmanaged));
 
             lcos::packaged_action<action_type, void> p;
-            p.apply(launch::async, id, type, gid, count);
+            p.apply(launch::async, id, g, gid, count);
             p.get_future().get();
         }
+    }
+
+    void runtime_support::free_component_locally(agas::gva const& g,
+        naming::gid_type const& gid)
+    {
+        components::server::runtime_support* p =
+            reinterpret_cast<components::server::runtime_support*>(
+                  get_runtime().get_runtime_support_lva());
+        p->free_component(g, gid, 1);
     }
 
     /// \brief Shutdown the given runtime system

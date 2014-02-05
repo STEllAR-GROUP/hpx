@@ -60,7 +60,7 @@ namespace hpx { namespace agas
         enum subtype
         {
             subtype_gid_gid_prefix      = 0x0
-          , subtype_gid_gva             = 0x1
+          , subtype_gid_gva_prefix      = 0x1
           , subtype_gva                 = 0x2
           , subtype_ctype               = 0x3
           , subtype_prefixes            = 0x4
@@ -89,11 +89,13 @@ namespace hpx { namespace agas
           , util::tuple<
                 naming::gid_type // idbase
               , gva              // gva
+              , boost::uint32_t  // prefix
             >
             // 0x2
             // primary_ns_unbind_gid
           , util::tuple<
-                gva // gva
+                gva              // gva
+              , boost::uint32_t  // locality_id
             >
             // 0x3
             // component_ns_bind_prefix
@@ -228,25 +230,27 @@ namespace hpx { namespace agas
         namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
+      , boost::uint32_t locality_id_
       , error status_
         )
       : mc(type_)
       , status(status_)
-      , data(new response_data(util::make_tuple(gidbase_, gva_)))
+      , data(new response_data(util::make_tuple(gidbase_, gva_, locality_id_)))
     {
-        // TODO: verification of namespace_action_code
+        HPX_ASSERT(type_ == primary_ns_resolve_gid);
     }
 
     response::response(
         namespace_action_code type_
       , gva const& gva_
+      , boost::uint32_t locality_id_
       , error status_
         )
       : mc(type_)
       , status(status_)
-      , data(new response_data(util::make_tuple(gva_)))
+      , data(new response_data(util::make_tuple(gva_, locality_id_)))
     {
-        // TODO: verification of namespace_action_code
+        HPX_ASSERT(type_ == primary_ns_unbind_gid);
     }
 
     response::response(
@@ -373,8 +377,8 @@ namespace hpx { namespace agas
     {
         switch (data->which())
         {
-            case response_data::subtype_gid_gva:
-                return data->get_data<response_data::subtype_gid_gva, 1>(ec);
+            case response_data::subtype_gid_gva_prefix:
+                return data->get_data<response_data::subtype_gid_gva_prefix, 1>(ec);
 
             case response_data::subtype_gva:
                 return data->get_data<response_data::subtype_gva, 0>(ec);
@@ -446,6 +450,9 @@ namespace hpx { namespace agas
     {
         switch (data->which())
         {
+            case response_data::subtype_gid_gva_prefix:
+                return data->get_data<response_data::subtype_gid_gva_prefix, 2>(ec);
+
             case response_data::subtype_gid_gid_prefix:
                 return data->get_data<response_data::subtype_gid_gid_prefix, 2>(ec);
 
@@ -465,7 +472,7 @@ namespace hpx { namespace agas
         error_code& ec
         ) const
     {
-        return data->get_data<response_data::subtype_gid_gva, 0>(ec);
+        return data->get_data<response_data::subtype_gid_gva_prefix, 0>(ec);
     }
 
     naming::gid_type response::get_gid(

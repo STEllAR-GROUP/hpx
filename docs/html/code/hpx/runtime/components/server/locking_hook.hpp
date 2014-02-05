@@ -40,11 +40,10 @@ namespace hpx { namespace components
         wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
             naming::address::address_type lva)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-
             return HPX_STD_BIND(&locking_hook::thread_function,
-                get_lva<this_component_type>::call(lva), _1,
-                std::move(base_type::wrap_action(std::move(f), lva)));
+                get_lva<this_component_type>::call(lva),
+                HPX_STD_PLACEHOLDERS::_1,
+                base_type::wrap_action(std::move(f), lva));
         }
 
     protected:
@@ -66,8 +65,6 @@ namespace hpx { namespace components
             threads::thread_state_ex_enum state,
             HPX_STD_FUNCTION<threads::thread_function_type> f)
         {
-            using HPX_STD_PLACEHOLDERS::_1;
-
             threads::thread_state_enum result = threads::unknown;
 
             // now lock the mutex and execute the action
@@ -75,11 +72,13 @@ namespace hpx { namespace components
 
             {
                 // register our yield decorator
+                using HPX_STD_PLACEHOLDERS::_1;
                 threads::get_self().decorate_yield(
                     HPX_STD_BIND(&locking_hook::yield_function, this, _1));
 
                 undecorate_wrapper yield_undecorator;
                 (void)yield_undecorator;       // silence gcc warnings
+
                 result = f(state);
             }
 
@@ -89,7 +88,7 @@ namespace hpx { namespace components
         struct decorate_wrapper
         {
             decorate_wrapper()
-              : yield_decorator_(std::move(threads::get_self().undecorate_yield()))
+              : yield_decorator_(threads::get_self().undecorate_yield())
             {}
 
             ~decorate_wrapper()

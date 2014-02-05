@@ -534,7 +534,7 @@ namespace hpx { namespace parcelset
 
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         if (!addrs[0])
-            resolved_locally = resolver_.resolve(ids[0], addrs[0]);
+            resolved_locally = resolver_.resolve_local(ids[0], addrs[0]);
 #else
         std::size_t size = p.size();
 
@@ -546,11 +546,11 @@ namespace hpx { namespace parcelset
 
         if (1 == size) {
             if (!addrs[0])
-                resolved_locally = resolver_.resolve(ids[0], addrs[0]);
+                resolved_locally = resolver_.resolve_local(ids[0], addrs[0]);
         }
         else {
             boost::dynamic_bitset<> locals;
-            resolved_locally = resolver_.resolve(ids, addrs, size, locals);
+            resolved_locally = resolver_.resolve_local(ids, addrs, size, locals);
         }
 #endif
 
@@ -560,7 +560,7 @@ namespace hpx { namespace parcelset
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.
         if (resolved_locally) {
-            // rewrap the given parcel-sent handler
+            // re-wrap the given parcel-sent handler
             using util::placeholders::_1;
             using util::placeholders::_2;
             write_handler_type wrapped_f =
