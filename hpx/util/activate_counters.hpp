@@ -38,10 +38,16 @@ namespace hpx { namespace util
         void reset_counters(error_code& ec = throws);
 
         typedef std::vector<unique_future<performance_counters::counter_value> >
-            counter_values_type;
+            async_counter_values_type;
 
-        counter_values_type
-        evaluate_counters(bool reset = false, error_code& ec = throws); 
+        typedef std::vector<performance_counters::counter_value>
+            sync_counter_values_type;
+
+        async_counter_values_type
+        evaluate_counters_async(bool reset = false, error_code& ec = throws); 
+
+        sync_counter_values_type
+        evaluate_counters_sync(bool reset = false, error_code& ec = throws); 
 
         std::string name(boost::uint64_t i) const
         {
