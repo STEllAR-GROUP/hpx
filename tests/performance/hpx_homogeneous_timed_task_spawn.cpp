@@ -6,8 +6,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// FIXME: Calling the tasks "workers" overloads the term worker-thread (which 
+// refers to OS-threads).
+
 #include <hpx/config.hpp>
 #include <hpx/hpx_init.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/runtime/agas/interface.hpp>
@@ -18,12 +23,15 @@
 
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/math/common_factor.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
 #include "worker_timed.hpp"
+
+char const* benchmark_name = "Homogeneous Timed Task Spawn - HPX";
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -50,8 +58,14 @@ using std::flush;
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables.
 boost::uint64_t tasks = 500000;
+boost::uint64_t suspended_tasks = 0;
 boost::uint64_t delay = 0;
 bool header = true;
+std::string scaling("weak");
+std::string distribution("static-balanced");
+  
+boost::uint64_t suspend_step = 0;
+boost::uint64_t no_suspend_step = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
 std::string format_build_date(std::string timestamp)
@@ -64,6 +78,9 @@ std::string format_build_date(std::string timestamp)
                      % d.month().as_number() % d.day() % d.year());
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
 void print_results(
     boost::uint64_t cores
   , double walltime
@@ -71,10 +88,19 @@ void print_results(
   , boost::shared_ptr<hpx::util::activate_counters> ac 
     )
 {
+    std::vector<hpx::performance_counters::counter_value> counter_values;
+
+    if (ac)
+        counter_values = ac->evaluate_counters_sync();
+
     if (header)
     {
+        cout << "# BENCHMARK: " << benchmark_name
+                 << " (" << scaling << " scaling, "
+                 << distribution << " distribution)\n";
+
         cout << "# VERSION: " << HPX_GIT_COMMIT << " "
-             << format_build_date(__DATE__) << "\n"
+                 << format_build_date(__DATE__) << "\n"
              << "#\n";
 
         // Note that if we change the number of fields above, we have to
@@ -82,12 +108,13 @@ void print_results(
         // performance counters below (e.g. the last_index part).
         cout <<
                 "## 0:DELAY:Delay [micro-seconds] - Independent Variable\n"
-                "## 1:TASKS:Tasks - Independent Variable\n"
-                "## 2:OSTHRDS:OS-threads - Independent Variable\n"
-                "## 3:WTIME:Total Walltime [seconds]\n"
+                "## 1:TASKS:# of Tasks - Independent Variable\n"
+                "## 2:STASKS:# of Tasks to Suspend - Independent Variable\n"
+                "## 3:OSTHRDS:OS-threads - Independent Variable\n"
+                "## 4:WTIME:Total Walltime [seconds]\n"
                 ;
 
-        boost::uint64_t const last_index = 3;
+        boost::uint64_t const last_index = 4;
 
         for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
         {
@@ -103,72 +130,183 @@ void print_results(
         }
     }
 
-    std::string const cores_str = boost::str(boost::format("%lu") % cores);
-    std::string const tasks_str = boost::str(boost::format("%lu") % tasks);
-    std::string const delay_str = boost::str(boost::format("%lu") % delay);
-
-    cout << ( boost::format("%lu %lu %lu %.14g")
+    cout << ( boost::format("%lu %lu %lu %lu %.14g")
             % delay 
             % tasks 
+            % suspended_tasks
             % cores
-            % walltime);
+            % walltime
+            );
 
     if (ac)
     {   
-        hpx::util::activate_counters::counter_values_type values
-            = ac->evaluate_counters();
-
         for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
             cout << ( boost::format(" %.14g")
-                    % values[i].get().get_value<double>());
+                    % counter_values[i].get_value<double>());
     }
 
     cout << "\n";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int invoke_worker_timed(double delay_sec)
-{
-    volatile int i = 0;
-    worker_timed(delay_sec, &i);
-    return i;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-void blocker(
-    boost::barrier& entered
-  , boost::barrier& started
+void wait_for_tasks(
+    hpx::lcos::local::barrier& finished
+  , boost::uint64_t suspended_tasks
     )
 {
-    entered.wait();
-    started.wait();
+    boost::uint64_t const pending_count =
+        get_thread_count(hpx::threads::thread_priority_normal
+                       , hpx::threads::pending);
+
+    if (pending_count == 0)
+    {
+        boost::uint64_t const all_count =
+            get_thread_count(hpx::threads::thread_priority_normal);
+
+        if (all_count != suspended_tasks + 1)
+        {
+            register_work(boost::bind(&wait_for_tasks
+                                    , boost::ref(finished)
+                                    , suspended_tasks)
+                , "wait_for_tasks", hpx::threads::pending
+                , hpx::threads::thread_priority_low);
+            return;
+        }
+    }
+
+    finished.wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void wait_for_tasks(hpx::lcos::local::barrier& finished)
+hpx::threads::thread_state_enum invoke_worker_timed_no_suspension(
+    hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
+    )
 {
-    if (get_thread_count(hpx::threads::thread_priority_normal) != 1)
-    {
-        register_work(boost::bind(&wait_for_tasks, boost::ref(finished)),
-            "wait_for_tasks", hpx::threads::pending,
-            hpx::threads::thread_priority_low);
-    }
-    else
-        finished.wait();
+    worker_timed(delay);
+    return hpx::threads::terminated;
 }
 
-void spawn_workers(boost::uint64_t local_tasks)
+hpx::threads::thread_state_enum invoke_worker_timed_suspension(
+    hpx::threads::thread_state_ex_enum ex = hpx::threads::wait_signaled
+    )
 {
-//    boost::uint64_t num_thread = hpx::get_worker_thread_num();
+    worker_timed(delay);
 
-    for (boost::uint64_t i = 0; i < local_tasks; ++i)
-        register_work(boost::bind(&invoke_worker_timed
-                                , double(delay) * 1e-6)
-          , "invoke_worker_timed"
-//          , hpx::threads::pending
-//          , hpx::threads::thread_priority_normal
-//          , num_thread
+    hpx::error_code ec(hpx::lightweight);
+    hpx::this_thread::suspend(hpx::threads::suspended, "suspend", ec);
+
+    return hpx::threads::terminated;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+typedef void (*stage_worker_function)(boost::uint64_t, bool);
+
+void stage_worker_static_balanced(
+    boost::uint64_t target_thread
+  , bool suspend
+    )
+{
+    if (suspend)
+        hpx::threads::register_thread_plain(
+            invoke_worker_timed_suspension
+          , "invoke_worker_timed_suspension"
+          , hpx::threads::pending
+          , false
+          , hpx::threads::thread_priority_normal
+          , target_thread
             );
+    else
+        hpx::threads::register_thread_plain(
+            invoke_worker_timed_no_suspension
+          , "invoke_worker_timed_no_suspension"
+          , hpx::threads::pending
+          , false
+          , hpx::threads::thread_priority_normal
+          , target_thread
+            );
+}
+
+void stage_worker_static_imbalanced(
+    boost::uint64_t target_thread
+  , bool suspend
+    )
+{
+    if (suspend)
+        hpx::threads::register_thread_plain(
+            invoke_worker_timed_suspension
+          , "invoke_worker_timed_suspension"
+          , hpx::threads::pending
+          , false
+          , hpx::threads::thread_priority_normal
+          , 0
+            );
+    else
+        hpx::threads::register_thread_plain(
+            invoke_worker_timed_no_suspension
+          , "invoke_worker_timed_no_suspension"
+          , hpx::threads::pending
+          , false
+          , hpx::threads::thread_priority_normal
+          , 0
+            );
+}
+
+void stage_worker_round_robin(
+    boost::uint64_t target_thread
+  , bool suspend
+    )
+{
+    if (suspend)
+        hpx::threads::register_thread_plain(
+            invoke_worker_timed_suspension
+          , "invoke_worker_timed_suspension"
+          , hpx::threads::pending
+          , false
+            );
+    else
+        hpx::threads::register_thread_plain(
+            invoke_worker_timed_no_suspension
+          , "invoke_worker_timed_no_suspension"
+          , hpx::threads::pending
+          , false
+            );
+}
+
+void stage_workers(
+    boost::uint64_t target_thread
+  , boost::uint64_t local_tasks
+  , stage_worker_function stage_worker
+    )
+{
+    boost::uint64_t num_thread = hpx::get_worker_thread_num();
+
+    if (num_thread != target_thread)
+    {
+        register_work(boost::bind(&stage_workers
+                                , target_thread
+                                , local_tasks
+                                , stage_worker)
+            , "stage_workers"
+            , hpx::threads::pending
+            , hpx::threads::thread_priority_normal
+            , target_thread
+              );
+        return;
+    }
+
+    for (boost::uint64_t i = 0; i < local_tasks;)
+    {
+        for (boost::uint64_t j = 0; j < suspend_step; ++j)
+        {
+            stage_worker(target_thread, true);
+            ++i;
+        }
+        for (boost::uint64_t j = 0; j < no_suspend_step; ++j)
+        {
+            stage_worker(target_thread, false);
+            ++i;
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -177,30 +315,83 @@ int hpx_main(
     )
 {
     {
-        boost::uint64_t const os_thread_count = get_os_thread_count();
-
         if (vm.count("no-header"))
             header = false;
 
+        if (0 == tasks)
+            throw std::invalid_argument("count of 0 tasks specified\n");
+
+        if (suspended_tasks > tasks)
+            throw std::invalid_argument(
+                "suspended tasks must be smaller than tasks\n");
+
+        boost::uint64_t const os_thread_count = get_os_thread_count();
+
+        ///////////////////////////////////////////////////////////////////////
+        stage_worker_function stage_worker;
+
+        if ("static-balanced" == distribution)
+            stage_worker = &stage_worker_static_balanced; 
+        else if ("static-imbalanced" == distribution)
+            stage_worker = &stage_worker_static_imbalanced; 
+        else if ("round-robin" == distribution)
+            stage_worker = &stage_worker_round_robin; 
+        else
+            throw std::invalid_argument(
+                "invalid distribution type specified (valid options are "
+                "\"static-balanced\", \"static-imbalanced\" or \"round-robin\")"
+                );
+
+        ///////////////////////////////////////////////////////////////////////
         boost::uint64_t tasks_per_feeder = 0;
         boost::uint64_t total_tasks = 0;
-        std::string const scaling = vm["scaling"].as<std::string>();
+        boost::uint64_t suspended_tasks_per_feeder = 0;
+        boost::uint64_t total_suspended_tasks = 0;
 
         if ("strong" == scaling)
         {
+            if (tasks % os_thread_count)
+                throw std::invalid_argument(
+                    "tasks must be cleanly divisable by OS-thread count\n");
+
+            if (suspended_tasks % os_thread_count)
+                throw std::invalid_argument(
+                    "suspended tasks must be cleanly divisable by OS-thread "
+                    "count\n");
+
             tasks_per_feeder = tasks / os_thread_count;
             total_tasks      = tasks;
+            suspended_tasks_per_feeder = suspended_tasks / os_thread_count;
+            total_suspended_tasks      = suspended_tasks;
         }
         else if ("weak" == scaling)
         {
             tasks_per_feeder = tasks; 
             total_tasks      = tasks * os_thread_count;
+            suspended_tasks_per_feeder = suspended_tasks; 
+            total_suspended_tasks      = suspended_tasks * os_thread_count;
         }
         else
             throw std::invalid_argument(
                 "invalid scaling type specified (valid options are \"strong\" "
                 "or \"weak\")");
 
+        ///////////////////////////////////////////////////////////////////////
+        if (suspended_tasks != 0)
+        {
+            boost::uint64_t gcd = boost::math::gcd(tasks_per_feeder
+                                                 , suspended_tasks_per_feeder);
+
+            suspend_step = suspended_tasks_per_feeder / gcd;
+            // We check earlier to make sure that there are never more
+            // suspended tasks than tasks requested.
+            no_suspend_step = (tasks_per_feeder / gcd) - suspend_step;
+
+            std::cout << "ns_step: " << no_suspend_step << "\n"
+                      << "s_step: " << suspend_step << "\n";
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         std::vector<std::string> counter_shortnames;
         std::vector<std::string> counters;
         if (vm.count("counter"))
@@ -222,27 +413,9 @@ int hpx_main(
             }
         }
 
-        if (0 == tasks)
-            throw std::invalid_argument("count of 0 tasks specified\n");
-
         boost::shared_ptr<hpx::util::activate_counters> ac;
         if (!counters.empty())
             ac.reset(new hpx::util::activate_counters(counters));
-
-        ///////////////////////////////////////////////////////////////////////
-        // Block all other OS threads.
-/*
-        boost::barrier entered(os_thread_count);
-        boost::barrier started(os_thread_count);
-
-        for (boost::uint64_t i = 0; i < (os_thread_count - 1); ++i)
-        {
-            register_work(boost::bind(
-                &blocker, boost::ref(entered), boost::ref(started)));
-        }
-
-        entered.wait();
-*/
 
         ///////////////////////////////////////////////////////////////////////
         // Start the clock.
@@ -252,34 +425,39 @@ int hpx_main(
             ac->reset_counters();
 
         // This needs to stay here; we may have suspended as recently as the
-        // performance counter reset above.
+        // performance counter reset (which is called just before the staging
+        // function).
         boost::uint64_t const num_thread = hpx::get_worker_thread_num();
-
+    
         for (boost::uint64_t i = 0; i < os_thread_count; ++i)
         {
             if (num_thread == i) continue;
-
-            register_work(boost::bind(&spawn_workers
-                                    , tasks_per_feeder)
-                , "spawn_workers"
+    
+            register_work(boost::bind(stage_workers
+                                    , i
+                                    , tasks_per_feeder
+                                    , stage_worker
+                                      )
+                , "stage_workers"
                 , hpx::threads::pending
                 , hpx::threads::thread_priority_normal
                 , i
                   );
         }
 
-        spawn_workers(tasks_per_feeder);
-
-//        started.wait();
+        stage_workers(num_thread, tasks_per_feeder, stage_worker);
 
         // Schedule a low-priority thread; when it is executed, it checks to
         // make sure all the tasks (which are normal priority) have been 
         // executed, and then it
         hpx::lcos::local::barrier finished(2);
 
-        register_work(boost::bind(&wait_for_tasks, boost::ref(finished)),
-            "wait_for_tasks", hpx::threads::pending,
-            hpx::threads::thread_priority_low);
+        register_work(boost::bind(&wait_for_tasks
+                                , boost::ref(finished)
+                                , total_suspended_tasks
+                                 )
+            , "wait_for_tasks", hpx::threads::pending
+            , hpx::threads::thread_priority_low);
 
         finished.wait();
 
@@ -288,6 +466,10 @@ int hpx_main(
 
         print_results(os_thread_count, time_elapsed, counter_shortnames, ac);
     }
+
+    if (suspended_tasks != 0)
+        // Force termination of all suspended tasks.
+        hpx::get_runtime().get_thread_manager().abort_all_suspended_threads();
 
     return finalize();
 }
@@ -303,9 +485,14 @@ int main(
 
     cmdline.add_options()
         ( "scaling"
-        , value<std::string>()->default_value("weak")
+        , value<std::string>(&scaling)->default_value("weak")
         , "type of scaling to benchmark (valid options are \"strong\" or "
           "\"weak\")")
+
+        ( "distribution"
+        , value<std::string>(&distribution)->default_value("static-balanced")
+        , "type of distribution to perform (valid options are "
+          "\"static-balanced\", \"static-imbalanced\" or \"round-robin\")")
 
         ( "tasks"
         , value<boost::uint64_t>(&tasks)->default_value(500000)
@@ -313,16 +500,22 @@ int main(
           "number of tasks invoked; when weak-scaling, it is the number of "
           "tasks per core)")
 
+        ( "suspended-tasks"
+        , value<boost::uint64_t>(&suspended_tasks)->default_value(0)
+        , "number of tasks to suspend (when strong-scaling, this is the total "
+          "number of tasks suspended; when weak-scaling, it is the number of "
+          "suspended per core)")
+
         ( "delay"
-        , value<boost::uint64_t>(&delay)->default_value(0)
-        , "time in micro-seconds for the delay loop")
+        , value<boost::uint64_t>(&delay)->default_value(5)
+        , "duration of delay in microseconds")
 
         ( "counter"
         , value<std::vector<std::string> >()->composing()
         , "activate and report the specified performance counter")
 
         ( "no-header"
-        , "do not print out the csv header row")
+        , "do not print out the header")
         ;
 
     // Initialize and run HPX.
