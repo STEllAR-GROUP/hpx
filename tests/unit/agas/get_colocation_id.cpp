@@ -58,6 +58,7 @@ void test(hpx::id_type there)
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), there);
 
+    // verify for remote component
     HPX_TEST_EQ(hpx::get_colocation_id_sync(t1.get_gid()), there);
 
     HPX_TEST_EQ(hpx::async_colocated<test_colocation_action>(
@@ -65,6 +66,14 @@ void test(hpx::id_type there)
 
     test_colocation_action act;
     HPX_TEST_EQ(hpx::async_colocated(act, t1.get_gid()).get(), there);
+
+    // verify for remote locality
+    HPX_TEST_EQ(hpx::get_colocation_id_sync(there), there);
+
+    HPX_TEST_EQ(hpx::async_colocated<test_colocation_action>(
+        there).get(), there);
+
+    HPX_TEST_EQ(hpx::async_colocated(act, there).get(), there);
 }
 
 int hpx_main()
@@ -73,6 +82,17 @@ int hpx_main()
     {
         test(id);
     }
+
+    bool caught_exception = false;
+    try {
+        hpx::get_colocation_id_sync(hpx::invalid_id);
+        HPX_TEST(false);
+    }
+    catch (hpx::exception const&) {
+        caught_exception = true;
+    }
+    HPX_TEST(caught_exception);
+
     return hpx::finalize();
 }
 
