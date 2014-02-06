@@ -170,6 +170,7 @@ namespace hpx { namespace lcos
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_all.hpp>
+#include <hpx/lcos/async_colocated.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/util/assert.hpp>
@@ -252,7 +253,7 @@ namespace hpx { namespace lcos
                 // in the middle of the folding chain we simply apply the folding
                 // operation to the two values we received.
                 HPX_ASSERT(fres.size() == 2);
-                return fold_op_(fres[1].get(), fres[2].get());
+                return fold_op_(fres[0].get(), fres[1].get());
             }
 
             FoldOp const& fold_op_;
@@ -487,10 +488,9 @@ namespace hpx { namespace lcos
 
                 if(!ids.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_next.front());
                     fold_futures.push_back(
-                        hpx::async<fold_impl_action>(
-                            id
+                        hpx::async_colocated<fold_impl_action>(
+                            ids_next.front()
                           , act
                           , std::move(ids_next)
                           , fold_op
@@ -609,16 +609,14 @@ namespace hpx { namespace lcos
                     "empty list of targets for fold operation"));
         }
 
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
-
         typedef
             typename detail::make_fold_action<Action>::
                 template fold_invoker<FoldOp>::type
             fold_impl_action;
 
         return
-            hpx::async<fold_impl_action>(
-                dest
+            hpx::async_colocated<fold_impl_action>(
+                ids[0]
               , Action()
               , ids
               , std::forward<FoldOp>(fold_op)
@@ -740,16 +738,14 @@ namespace hpx { namespace lcos
         std::vector<id_type> inverted_ids;
         std::reverse_copy(ids.begin(), ids.end(), std::back_inserter(inverted_ids));
 
-        hpx::id_type dest = hpx::get_colocation_id_sync(inverted_ids[0]);
-
         typedef
             typename detail::make_fold_action<Action>::
                 template fold_invoker<FoldOp>::type
             fold_impl_action;
 
         return
-            hpx::async<fold_impl_action>(
-                dest
+            hpx::async_colocated<fold_impl_action>(
+                inverted_ids[0]
               , Action()
               , inverted_ids
               , std::forward<FoldOp>(fold_op)
