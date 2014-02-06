@@ -10,9 +10,25 @@
 #define HPX_TESTS_PERFORMANCE_WORKER_HPP
 
 #include <hpx/config.hpp>
-#include <hpx/util/high_resolution_timer.hpp>
+#include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/util/high_resolution_clock.hpp>
 #include <boost/cstdint.hpp>
 
-HPX_SYMBOL_EXPORT void worker_timed(double delay_sec, volatile int * i);
+inline void worker_timed(
+    boost::uint64_t delay_ms
+    )
+{
+    using namespace hpx::util;
+
+    boost::uint64_t const local_delay = delay_ms * 1000;
+    boost::uint64_t start = high_resolution_clock::now(); 
+
+    while (true)
+    {
+        // Check if we've reached the specified delay.
+        if ((high_resolution_clock::now() - start) >= local_delay)
+            break;
+    }
+}
 
 #endif
