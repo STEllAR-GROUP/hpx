@@ -1432,6 +1432,20 @@ hpx::unique_future<naming::address> addressing_service::resolve_async(
     return resolve_full_async(gid);
 }
 
+hpx::unique_future<naming::id_type> addressing_service::get_colocation_id_async(
+    naming::id_type const& id
+    )
+{
+    agas::request req(agas::primary_ns_resolve_gid, id.get_gid());
+    naming::id_type service_target(
+        agas::stubs::primary_namespace::get_service_instance(id.get_gid())
+        , naming::id_type::unmanaged);
+
+    return stubs::primary_namespace::service_async<naming::id_type>(
+        service_target, req);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 naming::address addressing_service::resolve_full_postproc(
     unique_future<response> f, naming::gid_type const& id
     )

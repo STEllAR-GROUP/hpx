@@ -6,21 +6,25 @@
 add_subdirectory(components)
 
 set(tests
+    credit_exhaustion
+    get_colocation_id
+    gid_type
     local_address_rebind
-    scoped_ref_to_local_object
-    scoped_ref_to_remote_object
     local_embedded_ref_to_local_object
     local_embedded_ref_to_remote_object
     remote_embedded_ref_to_local_object
     remote_embedded_ref_to_remote_object
     refcnted_symbol_to_local_object
     refcnted_symbol_to_remote_object
+    scoped_ref_to_local_object
+    scoped_ref_to_remote_object
+    split_credit
     uncounted_symbol_to_local_object
     uncounted_symbol_to_remote_object
-    gid_type
-    credit_exhaustion
-    split_credit
    )
+
+set(get_colocation_id_PARAMETERS
+    LOCALITIES 2)
 
 set(local_address_rebind_FLAGS
     DEPENDENCIES simple_mobile_object_component)
