@@ -124,7 +124,7 @@ namespace hpx { namespace parcelset
         {
             io_service_pool_.run(false);    // start pool
 
-            bool success = connection_handler().run();
+            bool success = connection_handler().do_run();
 
             if (blocking)
                 io_service_pool_.join();
@@ -140,7 +140,7 @@ namespace hpx { namespace parcelset
                 connection_cache_.shutdown();
 
                 io_service_pool_.join();
-                connection_handler().stop();
+                connection_handler().do_stop();
                 connection_cache_.clear();
                 io_service_pool_.clear();
             }
@@ -232,7 +232,8 @@ namespace hpx { namespace parcelset
             // pending.
             BOOST_FOREACH(naming::locality const& loc, destinations)
             {
-                trigger_sending_parcels(loc, true);
+                if (!trigger_sending_parcels(loc, true))
+                    return;
             }
         }
 
@@ -558,15 +559,18 @@ namespace hpx { namespace parcelset
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void trigger_sending_parcels(naming::locality const& loc,
+        bool trigger_sending_parcels(naming::locality const& loc,
             bool background = false)
         {
+            error_code ec(lightweight);
             hpx::applier::register_thread_nullary(
                 HPX_STD_BIND(
                     &parcelport_impl::get_connection_and_send_parcels,
                     this, loc, background),
                 "get_connection_and_send_parcels",
-                threads::pending, true, threads::thread_priority_critical);
+                threads::pending, true, threads::thread_priority_critical,
+                std::size_t(-1), threads::thread_stacksize_default, ec);
+            return ec ? false : true;
         }
 
         void get_connection_and_send_parcels(

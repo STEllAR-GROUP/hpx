@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +14,7 @@
 #include <hpx/runtime/threads/thread_executor.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
+#include <hpx/runtime/applier/apply_colocated.hpp>
 #include <hpx/util/bind_action.hpp>
 #include <hpx/util/deferred_call.hpp>
 #include <hpx/util/move.hpp>

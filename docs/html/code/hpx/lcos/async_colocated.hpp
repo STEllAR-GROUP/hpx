@@ -21,77 +21,12 @@
 #include <hpx/lcos/async_colocated_fwd.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/bind_action.hpp>
+#include <hpx/util/functional/colocated_helpers.hpp>
 
 #include <boost/preprocessor/repeat.hpp>
 #include <boost/preprocessor/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
-
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail
-{
-    struct extract_locality
-    {
-        typedef naming::id_type result_type;
-
-        naming::id_type operator()(agas::response const& rep) const
-        {
-            return naming::get_id_from_locality_id(rep.get_locality_id());
-        }
-    };
-
-    template <typename Bound>
-    struct apply_continuation_impl
-    {
-        typedef typename util::decay<Bound>::type bound_type;
-
-        template <typename T>
-        struct result;
-
-        template <typename F, typename T1, typename T2>
-        struct result<F(T1, T2)>
-          : util::result_of<F(T1, T2)>
-        {};
-
-        apply_continuation_impl() {}
-
-        explicit apply_continuation_impl(Bound && bound)
-          : bound_(std::move(bound))
-        {}
-
-        template <typename T>
-        typename util::result_of<bound_type(naming::id_type, T)>::type
-        operator()(naming::id_type lco, T && t) const
-        {
-            typedef typename util::result_of<
-                bound_type(naming::id_type, T)
-            >::type result_type;
-
-            bound_.apply_c(lco, lco, std::forward<T>(t));
-            return result_type();
-        }
-
-    private:
-        // serialization support
-        friend class boost::serialization::access;
-
-        template <typename Archive>
-        BOOST_FORCEINLINE void serialize(Archive& ar, unsigned int const)
-        {
-            ar & bound_;
-        }
-
-        bound_type bound_;
-    };
-
-    template <typename Bound>
-    apply_continuation_impl<typename util::decay<Bound>::type>
-    apply_continuation(Bound && bound)
-    {
-        return apply_continuation_impl<typename util::decay<Bound>::type>(
-            std::forward<Bound>(bound));
-    }
-}}
 
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/lcos/preprocessed/async_colocated.hpp>
@@ -152,9 +87,9 @@ namespace hpx
         using util::placeholders::_2;
         return async_continue<action_type>(
             service_target, req
-          , detail::apply_continuation(
+          , util::functional::async_continuation(
                 util::bind<Action>(
-                    util::bind(detail::extract_locality(), _2)
+                    util::bind(util::functional::extract_locality(), _2)
                   BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg))
                 ));
     }

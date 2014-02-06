@@ -11,14 +11,57 @@
 namespace hpx
 {
     
-    template <typename Action, typename Arg0,
-        typename F>
+    template <typename Action
+       
+      , typename F>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == 0,
+        bool
+    >::type
+    apply_continue(naming::id_type const& gid
+       , F && f)
+    {
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename action_type::result_type result_type;
+        return apply<Action>(
+            new hpx::actions::typed_continuation<result_type>(
+                std::forward<F>(f))
+          , gid
+           );
+    }
+    
+    template <typename Component, typename Result, typename Arguments,
+        typename Derived
+       , typename F>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == 0,
+        bool
+    >::type
+    apply_continue(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > , naming::id_type const& gid
+       
+      , F && f)
+    {
+        return apply_continue<Derived>(
+            gid
+           
+          , std::forward<F>(f));
+    }
+}
+namespace hpx
+{
+    
+    template <typename Action
+      , typename Arg0
+      , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 1,
         bool
     >::type
-    apply_continue(naming::id_type const& gid, Arg0 && arg0,
-        F && f)
+    apply_continue(naming::id_type const& gid
+      , Arg0 && arg0, F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
@@ -30,7 +73,8 @@ namespace hpx
     }
     
     template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0, typename F>
+        typename Derived
+      , typename Arg0, typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 1,
         bool
@@ -38,24 +82,28 @@ namespace hpx
     apply_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, Arg0 && arg0,
-        F && f)
+        > , naming::id_type const& gid
+      , Arg0 && arg0
+      , F && f)
     {
-        return apply_continue<Derived>(gid, std::forward<Arg0>( arg0 ),
-            std::forward<F>(f));
+        return apply_continue<Derived>(
+            gid
+          , std::forward<Arg0>( arg0 )
+          , std::forward<F>(f));
     }
 }
 namespace hpx
 {
     
-    template <typename Action, typename Arg0 , typename Arg1,
-        typename F>
+    template <typename Action
+      , typename Arg0 , typename Arg1
+      , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 2,
         bool
     >::type
-    apply_continue(naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1,
-        F && f)
+    apply_continue(naming::id_type const& gid
+      , Arg0 && arg0 , Arg1 && arg1, F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
@@ -67,7 +115,8 @@ namespace hpx
     }
     
     template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1, typename F>
+        typename Derived
+      , typename Arg0 , typename Arg1, typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 2,
         bool
@@ -75,24 +124,28 @@ namespace hpx
     apply_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1,
-        F && f)
+        > , naming::id_type const& gid
+      , Arg0 && arg0 , Arg1 && arg1
+      , F && f)
     {
-        return apply_continue<Derived>(gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ),
-            std::forward<F>(f));
+        return apply_continue<Derived>(
+            gid
+          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 )
+          , std::forward<F>(f));
     }
 }
 namespace hpx
 {
     
-    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2,
-        typename F>
+    template <typename Action
+      , typename Arg0 , typename Arg1 , typename Arg2
+      , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 3,
         bool
     >::type
-    apply_continue(naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2,
-        F && f)
+    apply_continue(naming::id_type const& gid
+      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2, F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
@@ -104,7 +157,8 @@ namespace hpx
     }
     
     template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2, typename F>
+        typename Derived
+      , typename Arg0 , typename Arg1 , typename Arg2, typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 3,
         bool
@@ -112,24 +166,28 @@ namespace hpx
     apply_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2,
-        F && f)
+        > , naming::id_type const& gid
+      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2
+      , F && f)
     {
-        return apply_continue<Derived>(gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ),
-            std::forward<F>(f));
+        return apply_continue<Derived>(
+            gid
+          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 )
+          , std::forward<F>(f));
     }
 }
 namespace hpx
 {
     
-    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3,
-        typename F>
+    template <typename Action
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3
+      , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 4,
         bool
     >::type
-    apply_continue(naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3,
-        F && f)
+    apply_continue(naming::id_type const& gid
+      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3, F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
@@ -141,7 +199,8 @@ namespace hpx
     }
     
     template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3, typename F>
+        typename Derived
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3, typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 4,
         bool
@@ -149,24 +208,28 @@ namespace hpx
     apply_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3,
-        F && f)
+        > , naming::id_type const& gid
+      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3
+      , F && f)
     {
-        return apply_continue<Derived>(gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ),
-            std::forward<F>(f));
+        return apply_continue<Derived>(
+            gid
+          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 )
+          , std::forward<F>(f));
     }
 }
 namespace hpx
 {
     
-    template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4,
-        typename F>
+    template <typename Action
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4
+      , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 5,
         bool
     >::type
-    apply_continue(naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4,
-        F && f)
+    apply_continue(naming::id_type const& gid
+      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4, F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
@@ -178,7 +241,8 @@ namespace hpx
     }
     
     template <typename Component, typename Result, typename Arguments,
-        typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4, typename F>
+        typename Derived
+      , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4, typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 5,
         bool
@@ -186,10 +250,13 @@ namespace hpx
     apply_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > , naming::id_type const& gid, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4,
-        F && f)
+        > , naming::id_type const& gid
+      , Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4
+      , F && f)
     {
-        return apply_continue<Derived>(gid, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ),
-            std::forward<F>(f));
+        return apply_continue<Derived>(
+            gid
+          , std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 )
+          , std::forward<F>(f));
     }
 }

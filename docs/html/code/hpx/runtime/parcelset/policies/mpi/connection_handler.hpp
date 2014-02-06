@@ -61,10 +61,10 @@ namespace hpx { namespace parcelset {
             ~connection_handler();
 
             /// Start the handling of connections.
-            bool run();
+            bool do_run();
 
             /// Stop the handling of connections.
-            void stop();
+            void do_stop();
 
             void background_work();
 

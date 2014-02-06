@@ -50,7 +50,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         }
     }
 
-    bool connection_handler::run()
+    bool connection_handler::do_run()
     {
         using boost::asio::ip::tcp;
         boost::asio::io_service& io_service = io_service_pool_.get_io_service();
@@ -93,7 +93,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         return true;
     }
 
-    void connection_handler::stop()
+    void connection_handler::do_stop()
     {
         {
             // cancel all pending read operations, close those sockets

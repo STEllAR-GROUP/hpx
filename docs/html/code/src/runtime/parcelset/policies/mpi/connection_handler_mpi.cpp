@@ -74,7 +74,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     {
     }
 
-    bool connection_handler::run()
+    bool connection_handler::do_run()
     {
         MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
         acceptor_.run(communicator_);
@@ -82,7 +82,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         return true;
     }
 
-    void connection_handler::stop()
+    void connection_handler::do_stop()
     {
         // Mark stopped state
         stopped_ = true;
