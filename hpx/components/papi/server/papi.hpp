@@ -121,7 +121,10 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
     ///////////////////////////////////////////////////////////////////////////
     class papi_counter_base: boost::noncopyable
     {
+    public:
         typedef hpx::lcos::local::spinlock mutex_type;
+
+    private:
         typedef std::map<boost::uint32_t, thread_counters *> ttable_type;
 
         //// shared state
@@ -135,6 +138,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace serv
 
         // lookup or create thread_counters instance for thread tix
         thread_counters *get_thread_counters(boost::uint32_t tix);
+
+        mutex_type& get_global_mtx()
+        {
+            return base_mtx_; 
+        }
     };
 
 
