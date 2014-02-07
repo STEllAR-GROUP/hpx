@@ -16,14 +16,15 @@ from numpy import std, mean
 
 DELAY = 0
 TASKS = 1
-OS_THREADS = 2
+STASKS = 2
+OS_THREADS = 3
 
 LAST_IVAR = OS_THREADS
 
 # Returns the index of the independent variable that we use to differentiate
 # datasets (dataset == line on the graph).
 def dataset_key(row):
-    return (int(row[DELAY]), int(row[TASKS]))
+    return (int(row[DELAY]), int(row[TASKS]), int(row[STASKS]))
 
 # Returns a list of all the independent variables. 
 def ivars(row):
@@ -119,7 +120,7 @@ for (key, dataset) in sorted(master.iteritems()):
     else:
         is_first = False
 
-    print >> output_data, "\"%i μs, %i tasks\"" % key
+    print >> output_data, "\"%i μs, %i tasks\"" % (key[DELAY], key[TASKS])
 
     # iv is a list, dvs is a list of lists.
     for (iv, dvs) in sorted(dataset.iteritems()):
