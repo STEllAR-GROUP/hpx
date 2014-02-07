@@ -28,7 +28,7 @@ struct timer
 private:
     inline double gettimestamp()
     {
-        return double(hpx::util::high_resolution_clock::now()) * 1e-9;
+        return double(hpx::util::high_resolution_clock::now());//* 1e-9;
     }
     double counter;
 };
@@ -37,7 +37,7 @@ private:
 typedef boost::function<thread_function_type> function_test_type;
 typedef hpx::threads::coroutine_type coroutine_test_type;
 
-int global_int = 0;
+volatile int global_int = 0;
 
 thread_state_enum foo(thread_state_ex_enum)
 {
@@ -62,18 +62,6 @@ thread_state_enum foo_coro(thread_state_ex_enum s)
     }
     return terminated;
 }
-
-// thread_state_enum ol_foo_coro(thread_state_ex_enum s)
-// {
-//     while(true)
-//     {
-//         ol_foo(s);
-//         s = get_self().yield(pending);
-//         if (s == wait_terminate)
-//             break;
-//     }
-//     return terminated;
-// }
 
 struct foo_struct
 {
@@ -114,43 +102,18 @@ double test(F && f, int n)
     return t.stop();
 }
 
-int main()
+int main(int argc, char** argv)
 {
-    int const iterations = 1000*10*10*10*10;
-/*
-    function_test_type function_foo(foo);
-    function_test_type function_foo_struct = foo_struct();
-    function_test_type function_ol_foo(ol_foo);
-    coroutine_test_type coro_foo(foo_coro, hpx::find_here());
-    foo_struct_coro t;
-    coroutine_test_type coro_foo_struct  (t, hpx::find_here());
-    coroutine_test_type coro_ol_foo(ol_foo_coro, hpx::find_here());
-    cout.setf(ios_base::floatfield);
-    cout.unsetf(ios_base::scientific);
-    cout << setw(50) << "Call to function: "
-         << setw(16) << right << test(foo, iterations) << endl;
-    cout << setw(50) << "Call to out-of-line function: "
-         << setw(16) << right << test(ol_foo, iterations) << endl;
-    cout << setw(50) << "Call to function object: "
-         << setw(16) << right << test(foo_struct(), iterations) << endl;
-    cout << setw(50) << "Call to boost::function of function: "
-         << setw(16) << right << test(function_foo, iterations) << endl;
-    cout << setw(50) << "Call to boost::function of function object: "
-         << setw(16) << right << test(function_foo_struct, iterations) << endl;
-    cout << setw(50) << "Call to boost::function of out-of-line function: "
-         << setw(16) << right << test(function_ol_foo, iterations) << endl;
-    cout << setw(50) << "Call to coroutine of function: "
-         << setw(16) << right << noshowpoint << test(coro_foo, iterations) << endl;
-    cout << setw(50) << "Call to coroutine of function object: "
-         << setw(16) << right  << noshowpoint << test(coro_foo_struct, iterations) << endl;
-    cout << setw(50) << "Call to coroutine of out-of-line function: "
-         << setw(16) << right << noshowpoint << test(coro_ol_foo, iterations) << endl;
-*/
+    int const iterations = boost::lexical_cast<int>(argv[1]);
+
     foo_struct_coro t;
     coroutine_test_type coro_foo_struct(t, hpx::find_here());
-    cout << setw(50) << "Call to coroutine of function object: "
-         << setw(16) << right  << noshowpoint
-         << test(coro_foo_struct, iterations)/iterations << endl;
+
+    double foo_time = test(foo, iterations);
+    double coro_time = test(coro_foo_struct, iterations);
+
+    cout << "foo() time: " << foo_time/iterations << endl;
+    cout << "coroutine() time: " << coro_time/iterations << endl;
 
    return 0;
 }
