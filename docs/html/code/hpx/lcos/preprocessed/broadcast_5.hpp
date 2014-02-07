@@ -128,10 +128,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                            
@@ -142,10 +141,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                            
@@ -204,10 +202,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                            
@@ -218,10 +215,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                            
@@ -490,10 +486,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , a0
@@ -504,10 +499,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , a0
@@ -566,10 +560,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , a0
@@ -580,10 +573,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , a0
@@ -852,10 +844,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , a0 , a1
@@ -866,10 +857,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , a0 , a1
@@ -928,10 +918,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , a0 , a1
@@ -942,10 +931,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , a0 , a1
@@ -1214,10 +1202,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , a0 , a1 , a2
@@ -1228,10 +1215,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , a0 , a1 , a2
@@ -1290,10 +1276,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , a0 , a1 , a2
@@ -1304,10 +1289,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , a0 , a1 , a2
@@ -1576,10 +1560,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , a0 , a1 , a2 , a3
@@ -1590,10 +1573,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , a0 , a1 , a2 , a3
@@ -1652,10 +1634,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , a0 , a1 , a2 , a3
@@ -1666,10 +1647,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , a0 , a1 , a2 , a3
@@ -1938,10 +1918,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4
@@ -1952,10 +1931,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4
@@ -2014,10 +1992,9 @@ namespace hpx { namespace lcos {
                     broadcast_impl_action;
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , a0 , a1 , a2 , a3 , a4
@@ -2028,10 +2005,9 @@ namespace hpx { namespace lcos {
                 }
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     broadcast_futures.push_back(
-                        hpx::async<broadcast_impl_action>(
-                            id
+                        hpx::async_colocated<broadcast_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , a0 , a1 , a2 , a3 , a4

@@ -25,8 +25,19 @@ namespace hpx { namespace components { namespace server
             unique_future<boost::shared_ptr<Component> > f,
             naming::id_type const& target_locality)
         {
+            using stubs::runtime_support;
+
             boost::shared_ptr<Component> ptr = f.get();
-            return stubs::runtime_support::copy_create_component<Component>(
+            if (!target_locality)
+            {
+                // This is executed on the locality where the component lives,
+                // if no target_locality is given we have to create the copy on
+                // the locality of the component.
+                return runtime_support::copy_create_component<Component>(
+                    hpx::find_here(), ptr, true);
+            }
+
+            return runtime_support::copy_create_component<Component>(
                 target_locality, ptr, target_locality == find_here());
         }
     }
@@ -36,8 +47,9 @@ namespace hpx { namespace components { namespace server
     unique_future<naming::id_type> copy_component(naming::id_type const& to_copy,
         naming::id_type const& target_locality)
     {
-        unique_future<boost::shared_ptr<Component> > f = get_ptr<Component>(to_copy);
-        return f.then(util::bind(&detail::copy_component_postproc<Component>, 
+        unique_future<boost::shared_ptr<Component> > f =
+            get_ptr<Component>(to_copy);
+        return f.then(util::bind(&detail::copy_component_postproc<Component>,
             util::placeholders::_1, target_locality));
     }
 

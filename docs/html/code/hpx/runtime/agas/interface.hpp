@@ -80,12 +80,12 @@ HPX_API_EXPORT lcos::unique_future<naming::id_type> resolve_name(
 // HPX_API_EXPORT lcos::unique_future<std::vector<naming::id_type> > get_localities(
 //     components::component_type type = components::component_invalid
 //     );
-// 
+//
 // HPX_API_EXPORT std::vector<naming::id_type> get_localities_sync(
 //     components::component_type type
 //   , error_code& ec = throws
 //     );
-// 
+//
 // inline std::vector<naming::id_type> get_localities_sync(
 //     error_code& ec = throws
 //     )
@@ -126,13 +126,13 @@ HPX_API_EXPORT boost::uint32_t get_num_overall_threads_sync(
 //     naming::gid_type const& gid
 //   , error_code& ec = throws
 //     );
-// 
+//
 // HPX_API_EXPORT bool is_local_address(
 //     naming::gid_type const& gid
 //   , naming::address& addr
 //   , error_code& ec = throws
 //     );
-// 
+//
 // inline bool is_local_address(
 //     naming::id_type const& gid
 //   , error_code& ec = throws
@@ -140,7 +140,7 @@ HPX_API_EXPORT boost::uint32_t get_num_overall_threads_sync(
 // {
 //     return is_local_address(gid.get_gid(), ec);
 // }
-// 
+//
 // inline bool is_local_address(
 //     naming::id_type const& gid
 //   , naming::address& addr
@@ -149,7 +149,7 @@ HPX_API_EXPORT boost::uint32_t get_num_overall_threads_sync(
 // {
 //     return is_local_address(gid.get_gid(), addr, ec);
 // }
-// 
+//
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Returns true if at least one referenced id_type is local
 // HPX_API_EXPORT bool is_local_address(
@@ -290,8 +290,16 @@ HPX_API_EXPORT boost::int64_t incref(
     naming::gid_type const& gid
   , boost::int64_t credits = 1
   , naming::id_type const& keep_alive = naming::invalid_id
-  , error_code& ec = throws 
+  , error_code& ec = throws
     );
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT hpx::unique_future<naming::id_type> get_colocation_id(
+    naming::id_type const& id);
+
+HPX_API_EXPORT naming::id_type get_colocation_id_sync(
+    naming::id_type const& id
+  , error_code& ec = throws);
 
 }}
 

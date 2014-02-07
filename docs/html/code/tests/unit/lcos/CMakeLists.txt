@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2007-2014 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying

@@ -966,6 +966,7 @@ public:
         return addr;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     hpx::unique_future<naming::address> resolve_async(
         naming::gid_type const& id
         );
@@ -977,6 +978,12 @@ public:
         return resolve_async(id.get_gid());
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    hpx::unique_future<naming::id_type> get_colocation_id_async(
+        naming::id_type const& id
+        );
+
+    ///////////////////////////////////////////////////////////////////////////
     bool resolve_full_local(
         naming::gid_type const& id
       , naming::address& addr

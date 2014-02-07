@@ -112,9 +112,9 @@ namespace hpx { namespace agas
             // 0x5
             // symbol_ns_unbind
             // symbol_ns_resolve
-            // primary_ns_statistics
-            // component_ns_statistics
-            // symbol_ns_statistics
+            // primary_ns_statistics_counter
+            // component_ns_statistics_counter
+            // symbol_ns_statistics_counter
           , util::tuple<
                 naming::gid_type // gid
             >

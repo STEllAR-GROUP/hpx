@@ -27,6 +27,7 @@ namespace hpx { namespace parcelset {
         typedef policies::mpi::sender connection_type;
         typedef boost::mpl::true_  send_early_parcel;
         typedef boost::mpl::true_ do_background_work;
+        typedef boost::mpl::false_ do_enable_parcel_handling;
 
         static const char * name()
         {

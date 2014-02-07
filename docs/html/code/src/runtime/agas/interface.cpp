@@ -446,5 +446,20 @@ boost::int64_t incref(
     return resolver.incref_async(gid, credits, keep_alive).get();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+hpx::unique_future<naming::id_type> get_colocation_id(
+    naming::id_type const& id)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.get_colocation_id_async(id);
+}
+
+naming::id_type get_colocation_id_sync(
+    naming::id_type const& id
+  , error_code& ec)
+{
+    return get_colocation_id(id).get(ec);
+}
+
 }}
 
