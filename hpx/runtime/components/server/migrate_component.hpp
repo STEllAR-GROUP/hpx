@@ -84,7 +84,7 @@ namespace hpx { namespace components { namespace server
             HPX_THROW_EXCEPTION(invalid_status,
                 "hpx::components::server::migrate_component",
                 "attempting to migrate an instance of a component which is "
-                "not marked as being 'migratable'");
+                "does not support migration");
             return make_ready_future(naming::invalid_id);
         }
 

@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_COMPONENTS_SERVER_MIGRATABLE_FEB_03_2014_0230PM)
-#define HPX_COMPONENTS_SERVER_MIGRATABLE_FEB_03_2014_0230PM
+#if !defined(HPX_COMPONENTS_SERVER_MIGRATION_SUPPORT_FEB_03_2014_0230PM)
+#define HPX_COMPONENTS_SERVER_MIGRATION_SUPPORT_FEB_03_2014_0230PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -14,7 +14,7 @@ namespace hpx { namespace components
     /// This hook has to be inserted into the derivation chain of any component
     /// for it to support migration.
     template <typename BaseComponent, typename Mutex = lcos::local::spinlock>
-    struct migratable : BaseComponent
+    struct migration_support : BaseComponent
     {
     private:
         typedef Mutex mutex_type;
@@ -22,17 +22,17 @@ namespace hpx { namespace components
         typedef typename base_type::this_component_type this_component_type;
 
     public:
-        migratable()
+        migration_support()
           : pin_count_(0)
         {}
 
         template <typename Arg>
-        migratable(Arg && arg)
+        migration_support(Arg && arg)
           : base_type(std::forward<Arg>(arg))
           , pin_count_(0)
         {}
 
-        ~migratable()
+        ~migration_support()
         {
             // prevent base destructor from unregistering the gid if this
             // instance has been migrated
@@ -40,7 +40,7 @@ namespace hpx { namespace components
                 this->gid_ = naming::invalid_gid;
         }
 
-        // Mark this component type as not migratable
+        // This component type supports migration.
         static BOOST_CONSTEXPR bool supports_migration() { return true; }
 
         // Pinning functionality

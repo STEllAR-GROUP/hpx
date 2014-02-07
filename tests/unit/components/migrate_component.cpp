@@ -10,7 +10,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
-  : hpx::components::migratable<
+  : hpx::components::migration_support<
         hpx::components::simple_component_base<test_server>
     >
 {

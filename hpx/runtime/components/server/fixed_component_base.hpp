@@ -144,7 +144,7 @@ public:
     }
 #endif
 
-    // Mark this component type as not migratable
+    // This component type does not support migration.
     static BOOST_CONSTEXPR bool supports_migration() { return false; }
 
     // Pinning functionality
