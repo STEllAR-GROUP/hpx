@@ -271,8 +271,7 @@ namespace hpx { namespace threads
             for (;;) {
                 thread_state tmp = prev_state;
 
-                using boost::lockfree::likely;
-                if (likely(current_state_.compare_exchange_strong(
+                if (HPX_LIKELY(current_state_.compare_exchange_strong(
                         tmp, thread_state(newstate, tmp.get_tag() + 1))))
                 {
                     return prev_state;
@@ -354,8 +353,7 @@ namespace hpx { namespace threads
             for (;;) {
                 thread_state_ex tmp = prev_state;
 
-                using boost::lockfree::likely;
-                if (likely(current_state_ex_.compare_exchange_strong(
+                if (HPX_LIKELY(current_state_ex_.compare_exchange_strong(
                         tmp, thread_state_ex(new_state, tmp.get_tag() + 1))))
                 {
                     return prev_state;
