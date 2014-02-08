@@ -874,12 +874,6 @@ endif()
 ################################################################################
 hpx_option(HPX_ALL_SCHEDULERS BOOL "Enables all schedulers, overrides individual configuration options (default: OFF)" OFF ADVANCED)
 
-hpx_option(HPX_GLOBAL_SCHEDULER BOOL "Enable the use of --queueing=global (default: OFF)" OFF ADVANCED)
-
-if(HPX_GLOBAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
-  hpx_add_config_define(HPX_GLOBAL_SCHEDULER)
-endif()
-
 hpx_option(HPX_LOCAL_SCHEDULER BOOL "Enable the use of --queueing=local (default: OFF)" OFF ADVANCED)
 
 if(HPX_LOCAL_SCHEDULER OR HPX_ALL_SCHEDULERS)
