@@ -22,7 +22,6 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/util/coroutine/stackless_coroutine.hpp>
-#include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/util/spinlock_pool.hpp>
 
 #include <boost/atomic.hpp>
