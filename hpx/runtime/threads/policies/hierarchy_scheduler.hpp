@@ -13,7 +13,6 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/logging.hpp>
-#include <hpx/util/block_profiler.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/policies/thread_queue.hpp>
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
@@ -28,6 +27,11 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     /// The hierarchy_scheduler maintains a tree of queues of work items
     /// (threads). Every OS threads walks that tree to obtain new work
+    template <typename Mutex
+            , typename PendingQueuing
+            , typename StagedQueuing
+            , typename TerminatedQueuing
+             >
     class hierarchy_scheduler : public scheduler_base
     {
     private:
@@ -36,10 +40,16 @@ namespace hpx { namespace threads { namespace policies
         // items queue is not empty. Otherwise the number of active threads
         // will be incremented in steps equal to the \a min_add_new_count
         // specified above.
+        // FIXME: this is specified both here, and in thread_queue.
         enum { max_thread_count = 1000 };
 
     public:
         typedef boost::mpl::false_ has_periodic_maintenance;
+
+        typedef thread_queue<
+            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
+        > thread_queue_type;
+
         // the scheduler type takes two initialization parameters:
         //    the number of queues
         //    the maxcount per queue
@@ -60,13 +70,6 @@ namespace hpx { namespace threads { namespace policies
                 numa_sensitive_(numa_sensitive)
             {}
 
-            init_parameter(std::pair<std::size_t, std::size_t> const& init,
-                    bool numa_sensitive = false)
-              : num_queues_(init.first),
-                max_queue_thread_count_(init.second),
-                numa_sensitive_(numa_sensitive)
-            {}
-
             std::size_t num_queues_;
             std::size_t arity_;
             std::size_t max_queue_thread_count_;
@@ -74,7 +77,7 @@ namespace hpx { namespace threads { namespace policies
         };
         typedef init_parameter init_parameter_type;
 
-        typedef std::vector<thread_queue<>*> level_type;
+        typedef std::vector<thread_queue_type*> level_type;
         typedef std::vector<level_type> tree_type;
         tree_type tree;
 
@@ -94,8 +97,8 @@ namespace hpx { namespace threads { namespace policies
         flag_tree_type work_flag_tree;
         flag_tree_type task_flag_tree;
 
-        typedef tree_type::size_type size_type;
-        typedef tree_type::difference_type difference_type;
+        typedef typename tree_type::size_type size_type;
+        typedef typename tree_type::difference_type difference_type;
         size_type d;
 
         void init_tree(size_type n, std::size_t max_queue_thread_count)
@@ -108,7 +111,7 @@ namespace hpx { namespace threads { namespace policies
                 tree.push_back(
                     level_type(
                         1
-                      , new thread_queue<>(max_queue_thread_count)
+                      , new thread_queue_type(max_queue_thread_count)
                     )
                 );
                 work_flag_tree.push_back(
@@ -131,7 +134,7 @@ namespace hpx { namespace threads { namespace policies
             task_flag_tree.push_back(level_flag_type(n));
             for(size_type i = 0; i < n; ++i)
             {
-                level.at(i) = new thread_queue<>(max_queue_thread_count);
+                level.at(i) = new thread_queue_type(max_queue_thread_count);
                 work_flag_tree.back()[i] = false;
                 task_flag_tree.back()[i] = false;
             }
@@ -153,7 +156,8 @@ namespace hpx { namespace threads { namespace policies
         }
 
         hierarchy_scheduler(init_parameter_type const& init)
-            : d(init.arity_),
+            : scheduler_base(init.num_queues_),
+            d(init.arity_),
             numa_sensitive_(init.numa_sensitive_)
         {
             HPX_ASSERT(init.num_queues_ != 0);
@@ -172,28 +176,7 @@ namespace hpx { namespace threads { namespace policies
             }
         }
 
-        std::size_t init(init_affinity_data const&, topology const&)
-        {
-            return 0;
-        }
-
         bool numa_sensitive() const { return numa_sensitive_; }
-
-        threads::mask_cref_type get_pu_mask(topology const& topology,
-            std::size_t num_thread) const
-        {
-            return topology.get_thread_affinity_mask(num_thread, numa_sensitive_);
-        }
-
-        std::size_t get_pu_num(std::size_t num_thread) const
-        {
-            return num_thread;
-        }
-
-        std::size_t get_num_stolen_threads(std::size_t num_thread, bool reset)
-        {
-            return 0;
-        }
 
         ///////////////////////////////////////////////////////////////////////
         // Queries the current length of the queues (work items and new items).
@@ -300,6 +283,135 @@ namespace hpx { namespace threads { namespace policies
         }
 #endif
 
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+        boost::uint64_t get_creation_time(bool reset)
+        {
+            boost::uint64_t time = 0;
+
+            for (size_type i = 0; i < tree.size(); ++i)
+                for (size_type j = 0; j < tree[i].size(); ++j)
+                    time += tree[i][j]->get_creation_time(reset);
+
+            return time;
+        }
+
+        boost::uint64_t get_cleanup_time(bool reset)
+        {
+            boost::uint64_t time = 0;
+
+            for (size_type i = 0; i < tree.size(); ++i)
+                for (size_type j = 0; j < tree[i].size(); ++j)
+                    time += tree[i]->get_cleanup_time(reset);
+
+            return time;
+        }
+#endif
+
+        std::size_t get_num_pending_misses(std::size_t num_thread, bool reset)
+        {
+            std::size_t num_pending_misses = 0;
+            if (num_thread == std::size_t(-1))
+            {
+                for (size_type i = 0; i < tree.size(); ++i)
+                    for (size_type j = 0; j < tree[i].size(); ++j)
+                        num_pending_misses += tree[i][j]->
+                            get_num_pending_misses(reset);
+
+                return num_pending_misses;
+            }
+
+            num_pending_misses += tree[0][num_thread]->
+                get_num_pending_misses(reset);
+            return num_pending_misses;
+        }
+
+        std::size_t get_num_pending_accesses(std::size_t num_thread, bool reset)
+        {
+            std::size_t num_pending_accesses = 0;
+            if (num_thread == std::size_t(-1))
+            {
+                for (size_type i = 0; i < tree.size(); ++i)
+                    for (size_type j = 0; j < tree[i].size(); ++j)
+                        num_pending_accesses += tree[i][j]->
+                            get_num_pending_accesses(reset);
+
+                return num_pending_accesses;
+            }
+
+            num_pending_accesses += tree[0][num_thread]->
+                get_num_pending_accesses(reset);
+            return num_pending_accesses;
+        }
+
+        std::size_t get_num_stolen_from_pending(std::size_t num_thread, bool reset)
+        {
+            std::size_t num_stolen_threads = 0;
+            if (num_thread == std::size_t(-1))
+            {
+                for (size_type i = 0; i < tree.size(); ++i)
+                    for (size_type j = 0; j < tree[i].size(); ++j)
+                        num_stolen_threads +=
+                            tree[i][j]->get_num_stolen_from_pending(reset);
+                return num_stolen_threads;
+            }
+
+            num_stolen_threads += tree[0][num_thread]->
+                get_num_stolen_from_pending(reset);
+            return num_stolen_threads;
+        }
+
+        std::size_t get_num_stolen_to_pending(std::size_t num_thread, bool reset)
+        {
+            std::size_t num_stolen_threads = 0;
+            if (num_thread == std::size_t(-1))
+            {
+                for (size_type i = 0; i < tree.size(); ++i)
+                    for (size_type j = 0; j < tree[i].size(); ++j)
+                        num_stolen_threads +=
+                            tree[i][j]->get_num_stolen_to_pending(reset);
+                return num_stolen_threads;
+            }
+
+            num_stolen_threads += tree[0][num_thread]->
+                get_num_stolen_to_pending(reset);
+            return num_stolen_threads;
+        }
+
+        std::size_t get_num_stolen_from_staged(std::size_t num_thread, bool reset)
+        {
+            std::size_t num_stolen_threads = 0;
+            if (num_thread == std::size_t(-1))
+            {
+                for (size_type i = 0; i < tree.size(); ++i)
+                    for (size_type j = 0; j < tree[i].size(); ++j)
+                        num_stolen_threads +=
+                            tree[i][j]->get_num_stolen_from_staged(reset);
+                return num_stolen_threads;
+            }
+
+            num_stolen_threads += tree[0][num_thread]->
+                get_num_stolen_from_staged(reset);
+            return num_stolen_threads;
+        }
+
+        std::size_t get_num_stolen_to_staged(std::size_t num_thread, bool reset)
+        {
+            std::size_t num_stolen_threads = 0;
+            if (num_thread == std::size_t(-1))
+            {
+                for (size_type i = 0; i < tree.size(); ++i)
+                    for (size_type j = 0; j < tree[i].size(); ++j)
+                        num_stolen_threads +=
+                            tree[i][j]->get_num_stolen_to_staged(reset);
+                return num_stolen_threads;
+            }
+
+            num_stolen_threads += tree[0][num_thread]->
+                get_num_stolen_to_staged(reset);
+            return num_stolen_threads;
+        }
+
+
         ///////////////////////////////////////////////////////////////////////
         void abort_all_suspended_threads()
         {
@@ -331,6 +443,7 @@ namespace hpx { namespace threads { namespace policies
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
         // pending
+        // TODO: add recycling
         thread_id_type create_thread(thread_init_data& data,
             thread_state_enum initial_state, bool run_now, error_code& ec,
             std::size_t num_thread)
@@ -356,9 +469,9 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(idx < tree.at(level).size());
             HPX_ASSERT(parent < tree.at(level-1).size());
 
-            thread_queue<> * tq = tree[level][idx];
+            thread_queue_type * tq = tree[level][idx];
             boost::int64_t num = tq->get_pending_queue_length();
-            thread_queue<> * dest = tree[level-1][parent];
+            thread_queue_type * dest = tree[level-1][parent];
             if(num == 0)
             {
                 if(work_flag_tree[level][idx] == false)
@@ -371,7 +484,7 @@ namespace hpx { namespace threads { namespace policies
                 {
                     while(work_flag_tree[level][idx])
                     {
-                        #if defined(BOOST_WINDOWS)
+#if defined(BOOST_WINDOWS)
                     Sleep(1);
 #elif defined(BOOST_HAS_PTHREADS)
                     sched_yield();
@@ -388,7 +501,7 @@ namespace hpx { namespace threads { namespace policies
             );
         }
 
-        /// Return the next thread to be executed, return false if non is
+        /// Return the next thread to be executed, return false if none is
         /// available
         bool get_next_thread(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count, threads::thread_data_base*& thrd)
@@ -397,7 +510,7 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(num_thread < tree[0].size());
 
             //std::cout << "get next thread " << num_thread << "\n";
-            thread_queue<> * tq = tree[0][num_thread];
+            thread_queue_type * tq = tree[0][num_thread];
 
             // check if we need to collect new work from parents
             if(tq->get_pending_queue_length() == 0)
@@ -454,7 +567,7 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(idx < tree.at(level).size());
             HPX_ASSERT(parent < tree.at(level-1).size());
 
-            thread_queue<> * tq = tree[level][idx];
+            thread_queue_type * tq = tree[level][idx];
 
             boost::int64_t num = tq->get_staged_queue_length();
             if(num == 0)
@@ -469,7 +582,7 @@ namespace hpx { namespace threads { namespace policies
                 {
                     while(task_flag_tree[level][idx])
                     {
-                        #if defined(BOOST_WINDOWS)
+#if defined(BOOST_WINDOWS)
                     Sleep(1);
 #elif defined(BOOST_HAS_PTHREADS)
                     sched_yield();
@@ -479,7 +592,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            thread_queue<> * dest = tree[level-1][parent];
+            thread_queue_type * dest = tree[level-1][parent];
             dest->move_task_items_from(
                 tq
               , tq->get_staged_queue_length()/d + 1
@@ -497,7 +610,7 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(num_thread < tree.at(0).size());
             std::size_t added = 0;
 
-            thread_queue<> * tq = tree[0][num_thread];
+            thread_queue_type * tq = tree[0][num_thread];
             if(tq->get_staged_queue_length() == 0)
             {
                 transfer_tasks(num_thread/d, num_thread, 1);
@@ -516,9 +629,6 @@ namespace hpx { namespace threads { namespace policies
         {
             HPX_ASSERT(tree.size());
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        void add_punit(std::size_t virt_core, std::size_t thread_num) {}
 
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)

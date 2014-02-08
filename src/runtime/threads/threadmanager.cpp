@@ -1755,7 +1755,7 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
 #include <hpx/runtime/threads/policies/hierarchy_scheduler.hpp>
 
 template class HPX_EXPORT hpx::threads::threadmanager_impl<
-    hpx::threads::policies::hierarchy_scheduler,
+    hpx::threads::policies::hierarchy_scheduler<>,
     hpx::threads::policies::callback_notifier>;
 #endif
 

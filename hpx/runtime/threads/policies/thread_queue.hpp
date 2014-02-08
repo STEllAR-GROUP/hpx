@@ -544,6 +544,9 @@ namespace hpx { namespace threads { namespace policies
             return work_items_wait_ / count;
         }
 #endif
+
+        // TODO: #ifdef these
+
         std::size_t get_num_pending_misses(bool reset)
         {
             return util::get_and_reset_value(pending_misses_, reset);

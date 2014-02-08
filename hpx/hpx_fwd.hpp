@@ -191,6 +191,11 @@ namespace hpx
 #endif
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
+            template <typename Mutex = boost::mutex
+                    , typename PendingQueuing = lockfree_lifo
+                    , typename StagedQueuing = lockfree_lifo
+                    , typename TerminatedQueuing = lockfree_fifo
+                     >
             class HPX_EXPORT hierarchy_scheduler;
 #endif
 

@@ -975,7 +975,7 @@ namespace hpx
             ensure_hwloc_compatibility(cfg.vm_);
 
             // scheduling policy
-            typedef hpx::threads::policies::hierarchy_scheduler queue_policy;
+            typedef hpx::threads::policies::hierarchy_scheduler<> queue_policy;
             std::size_t arity = 2;
             if (cfg.vm_.count("hpx:hierarchy-arity"))
                 arity = cfg.vm_["hpx:hierarchy-arity"].as<std::size_t>();
