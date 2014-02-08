@@ -23,12 +23,20 @@ namespace hpx { namespace threads { namespace policies
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
     /// This scheduler does not do any work stealing.
-    template <typename Mutex, typename Queuing>
+    template <typename Mutex
+            , typename PendingQueuing
+            , typename StagedQueuing
+            , typename TerminatedQueuing
+             >
     class static_priority_queue_scheduler
-        : public local_priority_queue_scheduler<Mutex, Queuing>
+        : public local_priority_queue_scheduler<    
+            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
+          >
     {
     public:
-        typedef local_priority_queue_scheduler<Mutex, Queuing> base_type;
+        typedef local_priority_queue_scheduler<
+            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
+        > base_type;
 
         typedef typename base_type::init_parameter_type 
             init_parameter_type;
