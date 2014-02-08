@@ -5,6 +5,43 @@
 
 #include "pci.hh"
 #include "accel_defs.h"
+    
+///////////////////////////////////////////////////////////////////////////
+#ifdef HPX_ACCEL_QUEUING
+    // hardware accelerated queuing
+    struct hardware_fifo
+    {
+        template <typename T>
+        struct apply
+        {
+            typedef accel::fifo<T> type;
+        };
+
+        template <typename T, typename ThreadData>
+        static bool
+        enqueue(accel::fifo<T>& work_items, ThreadData* thrd,
+            std::size_t num_thread = std::size_t(-1))
+        {
+            return work_items.enqueue(thrd, num_thread);
+        }
+    
+        template <typename T, typename ThreadData>
+        static bool
+        dequeue(accel::fifo<T>& work_items, ThreadData*& thrd,
+            std::size_t num_thread = std::size_t(-1), bool steal = false)
+        {
+            return work_items.dequeue(thrd, num_thread);
+        }
+   
+        template <typename T> 
+        static bool
+        empty(accel::fifo<T>& work_items,
+            std::size_t num_thread = std::size_t(-1))
+        {
+            return work_items.empty(num_thread);
+        }
+    };
+#endif
 
 
 namespace accel
@@ -101,3 +138,4 @@ namespace accel
     }
   };
 }
+
