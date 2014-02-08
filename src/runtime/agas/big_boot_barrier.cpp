@@ -827,7 +827,7 @@ void big_boot_barrier::trigger()
     {
         HPX_STD_FUNCTION<void()>* p;
 
-        while (thunks.dequeue(p))
+        while (thunks.pop(p))
             (*p)();
     }
 }

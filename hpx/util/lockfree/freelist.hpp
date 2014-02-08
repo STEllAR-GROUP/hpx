@@ -60,74 +60,10 @@ namespace boost { namespace lockfree
             this->base_type::template deallocate<true>(n);
         }
     };
-
-    struct caching_freelist_t {};
-    struct static_freelist_t {};
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T, 
-        typename Freelist = caching_freelist_t, typename Alloc = std::allocator<T> >
-    class fifo;
-
-    template <typename T, typename Alloc>
-    class fifo<T, caching_freelist_t, Alloc>
-      : public queue<T, lockfree::fixed_sized<false>, lockfree::allocator<Alloc> >
-    {
-        typedef queue<
-            T, lockfree::fixed_sized<false>, lockfree::allocator<Alloc> 
-        > base_type;
-
-    public:
-        fifo() {}
-
-        explicit fifo(std::size_t n)
-          : base_type(n)
-        {}
-
-        bool enqueue(T const& t)
-        {
-            return this->base_type::push(t);
-        }
-
-        bool dequeue(T& t)
-        {
-            return this->base_type::pop(t);
-        }
-    };
-
-    template <typename T, typename Alloc>
-    class fifo<T, static_freelist_t, Alloc>
-      : public queue<T, lockfree::fixed_sized<true>, lockfree::capacity<1000>, 
-            lockfree::allocator<Alloc> >
-    {
-        typedef queue<T, lockfree::fixed_sized<true>, lockfree::capacity<1000>, 
-            lockfree::allocator<Alloc> > base_type;
-
-    public:
-        fifo() {}
-
-        explicit fifo(std::size_t n)
-          : base_type(n)
-        {}
-
-        bool enqueue(T const& t)
-        {
-            return this->base_type::bounded_push(t);
-        }
-
-        bool dequeue(T& t)
-        {
-            return this->base_type::pop(t);
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    using detail::likely;
-    using detail::unlikely;
 }}
 
 #else
-#include <boost/lockfree/fifo.hpp>
+#include <boost/lockfree/detail/freelist.hpp>
 #endif
 
 #endif
