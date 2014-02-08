@@ -176,7 +176,9 @@ namespace hpx { namespace threads { namespace detail
         boost::int64_t idle_loop_count = 0;
         boost::int64_t busy_loop_count = 0;
 
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
         boost::uint64_t overall_timestamp = util::hardware::timestamp();
+#endif
 
         typedef typename SchedulingPolicy::has_periodic_maintenance pred;
         detail::start_periodic_maintenance(scheduler, global_state, pred());
