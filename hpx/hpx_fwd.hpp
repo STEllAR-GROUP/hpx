@@ -199,8 +199,36 @@ namespace hpx
             class HPX_EXPORT hierarchy_scheduler;
 #endif
 
+            typedef local_priority_queue_scheduler<
+                boost::mutex,
+                lockfree_fifo, // FIFO pending queuing
+                lockfree_fifo, // FIFO staged queuing
+                lockfree_lifo  // LIFO terminated queuing
+            > fifo_priority_queue_scheduler;
+
+            typedef local_priority_queue_scheduler<
+                boost::mutex,
+                lockfree_lifo, // LIFO pending queuing
+                lockfree_lifo, // LIFO staged queuing
+                lockfree_lifo  // LIFO terminated queuing
+            > lifo_priority_queue_scheduler;
+
+            typedef local_priority_queue_scheduler<
+                boost::mutex,
+                lockfree_abp_fifo, // FIFO + ABP pending queuing
+                lockfree_abp_fifo, // FIFO + ABP staged queuing
+                lockfree_lifo  // LIFO terminated queuing
+            > abp_fifo_priority_queue_scheduler;
+
+            typedef local_priority_queue_scheduler<
+                boost::mutex,
+                lockfree_abp_lifo, // LIFO + ABP pending queuing
+                lockfree_abp_lifo, // LIFO + ABP staged queuing
+                lockfree_lifo  // LIFO terminated queuing
+            > abp_lifo_priority_queue_scheduler;
+
             // define the default scheduler to use
-            typedef local_priority_queue_scheduler<> queue_scheduler;
+            typedef fifo_priority_queue_scheduler queue_scheduler;
 
             class HPX_EXPORT callback_notifier;
         }
