@@ -39,6 +39,8 @@ namespace hpx { namespace threads { namespace policies
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
         > base_type;
 
+        typedef typename base_type::thread_queue_type thread_queue_type;
+
         typedef typename base_type::init_parameter_type 
             init_parameter_type;
 
@@ -70,7 +72,7 @@ namespace hpx { namespace threads { namespace policies
                 // Remove items from queues that have more than the average
                 // FIXME: We should be able to avoid using a thread_queue as 
                 // a temporary.
-                thread_queue<Mutex> tmp_queue;
+                thread_queue_type tmp_queue;
                 for(std::size_t i = 0; i < this->high_priority_queues_.size(); ++i)
                 {
                     boost::int64_t task_items = this->high_priority_queues_[i]->
@@ -148,7 +150,7 @@ namespace hpx { namespace threads { namespace policies
                 average_work_count = average_work_count / this->queues_.size();
 
                 // Remove items from queues that have more than the average
-                thread_queue<> tmp_queue;
+                thread_queue_type tmp_queue;
                 for(std::size_t i = 0; i < this->queues_.size(); ++i)
                 {
                     boost::int64_t task_items =
