@@ -596,6 +596,13 @@ else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES 0)
 endif()
 
+hpx_option(HPX_THREAD_MAINTAIN_IDLE_RATE BOOL "Enable measuring the percentage of time spent in the scheduler (default: OFF)" OFF ADVANCED)
+if(HPX_THREAD_MAINTAIN_IDLE_RATE)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATE 1)
+else()
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATE 0)
+endif()
+
 ##############################################################################
 hpx_option(HPX_AGAS_DUMP_REFCNT_ENTRIES BOOL
   "Enable dumps of the AGAS refcnt tables to logs (default: OFF)" OFF ADVANCED)
@@ -884,18 +891,6 @@ hpx_option(HPX_STATIC_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=stat
 
 if(HPX_STATIC_PRIORITY_SCHEDULER OR HPX_ALL_SCHEDULERS)
   hpx_add_config_define(HPX_STATIC_PRIORITY_SCHEDULER)
-endif()
-
-hpx_option(HPX_ABP_SCHEDULER BOOL "Enable the use of --queueing=abp (default: OFF)" OFF ADVANCED)
-
-if(HPX_ABP_SCHEDULER OR HPX_ALL_SCHEDULERS)
-  hpx_add_config_define(HPX_ABP_SCHEDULER)
-endif()
-
-hpx_option(HPX_ABP_PRIORITY_SCHEDULER BOOL "Enable the use of --queueing=priority_abp (default: OFF)" OFF ADVANCED)
-
-if(HPX_ABP_PRIORITY_SCHEDULER OR HPX_ALL_SCHEDULERS)
-  hpx_add_config_define(HPX_ABP_PRIORITY_SCHEDULER)
 endif()
 
 hpx_option(HPX_HIERARCHY_SCHEDULER BOOL "Enable the use of --queueing=hierarchy (default: OFF)" OFF ADVANCED)
