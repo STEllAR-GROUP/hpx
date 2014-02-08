@@ -159,42 +159,42 @@ namespace hpx
             struct lockfree_abp_fifo;
 
             template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_lifo
-                    , typename StagedQueuing = lockfree_lifo
-                    , typename TerminatedQueuing = lockfree_fifo
+                    , typename PendingQueuing = lockfree_fifo
+                    , typename StagedQueuing = lockfree_fifo
+                    , typename TerminatedQueuing = lockfree_lifo
                      >
             class HPX_EXPORT local_priority_queue_scheduler;
 
             template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_lifo
-                    , typename StagedQueuing = lockfree_lifo
-                    , typename TerminatedQueuing = lockfree_fifo
+                    , typename PendingQueuing = lockfree_fifo
+                    , typename StagedQueuing = lockfree_fifo
+                    , typename TerminatedQueuing = lockfree_lifo
                      >
             class HPX_EXPORT local_queue_scheduler;
 
 #if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
             template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_lifo
-                    , typename StagedQueuing = lockfree_lifo
-                    , typename TerminatedQueuing = lockfree_fifo
+                    , typename PendingQueuing = lockfree_fifo
+                    , typename StagedQueuing = lockfree_fifo
+                    , typename TerminatedQueuing = lockfree_lifo
                      >
             class HPX_EXPORT periodic_priority_queue_scheduler;
 #endif
 
 #if defined(HPX_STATIC_PRIORITY_SCHEDULER)
             template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_lifo
-                    , typename StagedQueuing = lockfree_lifo
-                    , typename TerminatedQueuing = lockfree_fifo
+                    , typename PendingQueuing = lockfree_fifo
+                    , typename StagedQueuing = lockfree_fifo
+                    , typename TerminatedQueuing = lockfree_lifo
                      >
             class HPX_API_EXPORT static_priority_queue_scheduler;
 #endif
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
             template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_lifo
-                    , typename StagedQueuing = lockfree_lifo
-                    , typename TerminatedQueuing = lockfree_fifo
+                    , typename PendingQueuing = lockfree_fifo
+                    , typename StagedQueuing = lockfree_fifo
+                    , typename TerminatedQueuing = lockfree_lifo
                      >
             class HPX_EXPORT hierarchy_scheduler;
 #endif
