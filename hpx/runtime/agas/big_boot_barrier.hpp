@@ -17,7 +17,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
-#include <hpx/util/lockfree/queue.hpp>
+#include <boost/lockfree/queue.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 
