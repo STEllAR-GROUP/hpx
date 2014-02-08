@@ -165,8 +165,21 @@ namespace hpx
                      >
             class HPX_EXPORT local_priority_queue_scheduler;
 
-            template <typename Mutex = boost::mutex>
+            template <typename Mutex = boost::mutex
+                    , typename PendingQueuing = lockfree_lifo
+                    , typename StagedQueuing = lockfree_lifo
+                    , typename TerminatedQueuing = lockfree_fifo
+                     >
             class HPX_EXPORT local_queue_scheduler;
+
+#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
+            template <typename Mutex = boost::mutex
+                    , typename PendingQueuing = lockfree_lifo
+                    , typename StagedQueuing = lockfree_lifo
+                    , typename TerminatedQueuing = lockfree_fifo
+                     >
+            class HPX_EXPORT periodic_priority_queue_scheduler;
+#endif
 
 #if defined(HPX_STATIC_PRIORITY_SCHEDULER)
             template <typename Mutex = boost::mutex
@@ -179,15 +192,6 @@ namespace hpx
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
             class HPX_EXPORT hierarchy_scheduler;
-#endif
-
-#if defined(HPX_PERIODIC_PRIORITY_SCHEDULER)
-            template <typename Mutex = boost::mutex
-                    , typename PendingQueuing = lockfree_lifo
-                    , typename StagedQueuing = lockfree_lifo
-                    , typename TerminatedQueuing = lockfree_fifo
-                     >
-            class HPX_EXPORT periodic_priority_queue_scheduler;
 #endif
 
             // define the default scheduler to use
