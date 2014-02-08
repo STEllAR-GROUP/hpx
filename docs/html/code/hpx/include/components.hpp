@@ -35,7 +35,7 @@
 #include <hpx/runtime/components/server/abstract_component_base.hpp>
 
 #include <hpx/runtime/components/server/locking_hook.hpp>
-#include <hpx/runtime/components/server/migratable.hpp>
+#include <hpx/runtime/components/server/migration_support.hpp>
 
 #include <hpx/runtime/components/new.hpp>
 #include <hpx/runtime/components/copy_component.hpp>
