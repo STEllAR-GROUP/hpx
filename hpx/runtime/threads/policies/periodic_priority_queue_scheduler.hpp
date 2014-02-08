@@ -22,14 +22,22 @@ namespace hpx { namespace threads { namespace policies
     /// High priority threads are executed by the first N OS threads before any
     /// other work is executed. Low priority threads are executed by the last
     /// OS thread whenever no other work is available.
-    template <typename Mutex, typename Queuing>
+    template <typename Mutex
+            , typename PendingQueuing
+            , typename StagedQueuing
+            , typename TerminatedQueuing
+             >
     class periodic_priority_queue_scheduler
-        : public local_priority_queue_scheduler<Mutex, Queuing>
+        : public local_priority_queue_scheduler<    
+            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
+          >
     {
     public:
         typedef boost::mpl::true_ has_periodic_maintenance;
 
-        typedef local_priority_queue_scheduler<Mutex, Queuing> base_type;
+        typedef local_priority_queue_scheduler<
+            Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
+        > base_type;
 
         typedef typename base_type::init_parameter_type 
             init_parameter_type;
