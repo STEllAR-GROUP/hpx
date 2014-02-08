@@ -156,7 +156,7 @@ namespace hpx
             struct lockfree_fifo;
             struct lockfree_lifo;
             struct lockfree_abp_fifo;
-            struct lockfree_abp_fifo;
+            struct lockfree_abp_lifo;
 
             template <typename Mutex = boost::mutex
                     , typename PendingQueuing = lockfree_fifo
