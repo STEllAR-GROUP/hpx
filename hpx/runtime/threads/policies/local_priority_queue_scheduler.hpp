@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIOTITY_QUEUE_MAR_15_2011_0926AM)
-#define HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIOTITY_QUEUE_MAR_15_2011_0926AM
+#if !defined(HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIORITY_QUEUE_MAR_15_2011_0926AM)
+#define HPX_THREADMANAGER_SCHEDULING_LOCAL_PRIORITY_QUEUE_MAR_15_2011_0926AM
 
 #include <vector>
 #include <memory>
@@ -177,6 +177,10 @@ namespace hpx { namespace threads { namespace policies
                 for (std::size_t i = 0; i < queues_.size(); ++i)
                     num_pending_misses += queues_[i]->
                         get_num_pending_misses(reset);
+
+                num_pending_misses += low_priority_queue_.
+                    get_num_pending_misses(reset);
+
                 return num_pending_misses;
             }
 
@@ -197,6 +201,10 @@ namespace hpx { namespace threads { namespace policies
                 for (std::size_t i = 0; i < queues_.size(); ++i)
                     num_pending_accesses += queues_[i]->
                         get_num_pending_accesses(reset);
+
+                num_pending_accesses += low_priority_queue_.
+                    get_num_pending_accesses(reset);
+
                 return num_pending_accesses;
             }
 
