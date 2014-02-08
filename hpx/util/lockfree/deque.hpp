@@ -25,9 +25,9 @@
 #include <boost/atomic.hpp>
 #include <boost/noncopyable.hpp>
 
-#include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/tagged_ptr.hpp>
 
+#include <hpx/util/lockfree/freelist.hpp>
 #include <hpx/util/lockfree/detail/tagged_ptr_pair.hpp>
 
 namespace boost { namespace lockfree

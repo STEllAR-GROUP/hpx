@@ -60,6 +60,9 @@ namespace boost { namespace lockfree
             this->base_type::template deallocate<true>(n);
         }
     };
+
+    struct caching_freelist_t {};
+    struct static_freelist_t {};
 }}
 
 #else
