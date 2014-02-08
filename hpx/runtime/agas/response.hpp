@@ -30,7 +30,7 @@ namespace hpx { namespace agas
 
 // TODO: Ensure that multiple invocations of get_data get optimized into the
 // same jump table.
-struct response
+struct HPX_EXPORT response
 {
   private:
     struct response_data;
@@ -49,12 +49,14 @@ struct response
         namespace_action_code type_
       , naming::gid_type const& gidbase_
       , gva const& gva_
+      , boost::uint32_t locality_id_
       , error status_ = success
         );
 
     response(
         namespace_action_code type_
       , gva const& gva_
+      , boost::uint32_t locality_id_
       , error status_ = success
         );
 
@@ -223,12 +225,36 @@ struct get_remote_result<naming::id_type, agas::response>
         agas::response const& rep
         )
     {
-        naming::gid_type raw_gid = rep.get_gid();
+        switch(rep.get_action_code()) {
+        case agas::symbol_ns_unbind:
+        case agas::symbol_ns_resolve:
+        case agas::primary_ns_statistics_counter:
+        case agas::component_ns_statistics_counter:
+        case agas::symbol_ns_statistics_counter:
+            {
+                naming::gid_type raw_gid = rep.get_gid();
 
-        if (naming::detail::has_credits(raw_gid))
-            return naming::id_type(raw_gid, naming::id_type::managed);
+                if (naming::detail::has_credits(raw_gid))
+                    return naming::id_type(raw_gid, naming::id_type::managed);
 
-        return naming::id_type(raw_gid, naming::id_type::unmanaged);
+                return naming::id_type(raw_gid, naming::id_type::unmanaged);
+            }
+
+        case agas::primary_ns_resolve_gid:
+            {
+                // return the wrapped locality_id
+                return naming::get_id_from_locality_id(rep.get_locality_id());
+            }
+            break;
+
+        default:
+            break;
+        }
+
+        HPX_THROW_EXCEPTION(bad_parameter,
+            "get_remote_result<naming::id_type, agas::response>::call",
+            "unexpected action code in result conversion");
+        return naming::invalid_id;
     }
 };
 

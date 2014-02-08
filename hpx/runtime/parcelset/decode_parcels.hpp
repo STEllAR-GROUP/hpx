@@ -118,7 +118,10 @@ namespace hpx { namespace parcelset {
                             naming::gid_type parcel_id;
                             first_message = deserialize_certificate(archive, first_message);
                             if (!first_message && i == 0)
-                                verify_message_suffix(buffer->data_, buffer->data_point_, parcel_id);
+                            {
+                                verify_message_suffix(buffer->data_,
+                                    buffer->data_point_, parcel_id);
+                            }
                         }
 
                         // de-serialize parcel and add it to incoming parcel queue
@@ -126,7 +129,9 @@ namespace hpx { namespace parcelset {
                         archive >> p;
 
                         // verify parcel id, but only once while handling the first parcel
-                        if (pp.enable_security() && !first_message && i == 0 && parcel_id != p.get_parcel_id()) {
+                        if (pp.enable_security() && !first_message && i == 0 &&
+                            parcel_id != p.get_parcel_id())
+                        {
                             // again, all hell breaks loose
                             HPX_THROW_EXCEPTION(security_error,
                                 "decode_message",
@@ -213,7 +218,8 @@ namespace hpx { namespace parcelset {
 
 
     template <typename Parcelport, typename Connection, typename Buffer>
-    void decode_parcels(Parcelport & parcelport, Connection connection, boost::shared_ptr<Buffer> buffer)
+    void decode_parcels(Parcelport & parcelport, Connection connection,
+        boost::shared_ptr<Buffer> buffer)
     {
         typedef typename Buffer::transmission_chunk_type transmission_chunk_type;
 
@@ -221,7 +227,7 @@ namespace hpx { namespace parcelset {
         std::size_t num_zero_copy_chunks =
             static_cast<std::size_t>(
                 static_cast<boost::uint32_t>(buffer->num_chunks_.first));
-        
+
 //        boost::shared_ptr<std::vector<std::vector<char> > > in_chunks(in_chunks_);
         boost::shared_ptr<std::vector<util::serialization_chunk> > chunks;
         if (num_zero_copy_chunks != 0) {
@@ -231,21 +237,21 @@ namespace hpx { namespace parcelset {
             std::size_t num_non_zero_copy_chunks =
                 static_cast<std::size_t>(
                     static_cast<boost::uint32_t>(buffer->num_chunks_.second));
-            
+
             chunks->resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
-            
+
             // place the zero-copy chunks at their spots first
             for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
             {
                 transmission_chunk_type& c = buffer->transmission_chunks_[i];
                 boost::uint64_t first = c.first, second = c.second;
-                
+
                 HPX_ASSERT(buffer->chunks_[i].size() == second);
-                
+
                 (*chunks)[first] = util::create_pointer_chunk(
                         buffer->chunks_[i].data(), second);
             }
-            
+
             std::size_t index = 0;
             for (std::size_t i = num_zero_copy_chunks;
                  i != num_zero_copy_chunks + num_non_zero_copy_chunks;
@@ -253,11 +259,11 @@ namespace hpx { namespace parcelset {
             {
                 transmission_chunk_type& c = buffer->transmission_chunks_[i];
                 boost::uint64_t first = c.first, second = c.second;
-                
+
                 // find next free entry
                 while ((*chunks)[index].size_ != 0)
                     ++index;
-                
+
                 // place the index based chunk at the right spot
                 (*chunks)[index] = util::create_index_chunk(first, second);
                 ++index;

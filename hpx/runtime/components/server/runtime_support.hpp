@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Thomas Heller
 //
@@ -138,6 +138,10 @@ namespace hpx { namespace components { namespace server
         naming::gid_type copy_create_component(
             boost::shared_ptr<Component> const& p, bool);
 
+        template <typename Component>
+        naming::gid_type migrate_component_to_here(
+            boost::shared_ptr<Component> const& p, naming::id_type);
+
         /// \brief Action to create new memory block
         naming::gid_type create_memory_block(std::size_t count,
             hpx::actions::manage_object_action_base const& act);
@@ -146,8 +150,8 @@ namespace hpx { namespace components { namespace server
         ///
         /// \param count [in] This GID is a count of the number of components
         ///                   to destroy. It does not represent a global address.
-        void free_component(components::component_type type,
-            naming::gid_type const& gid, naming::gid_type const& count);
+        void free_component(agas::gva const&, naming::gid_type const& gid,
+            boost::uint64_t count);
 
         /// \brief Gracefully shutdown this runtime system instance
         void shutdown(double timeout, naming::id_type const& respond_to);
@@ -454,6 +458,84 @@ namespace hpx { namespace components { namespace server
 
         return id;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component>
+    naming::gid_type runtime_support::migrate_component_to_here(
+        boost::shared_ptr<Component> const& p, naming::id_type to_migrate)
+    {
+        components::component_type const type =
+            components::get_component_type<
+                typename Component::wrapped_type>();
+
+        component_map_mutex_type::scoped_lock l(cm_mtx_);
+        component_map_type::const_iterator it = components_.find(type);
+        if (it == components_.end()) {
+            hpx::util::osstream strm;
+            strm << "attempt to migrate component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (component type not found in map)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::migrate_component_to_here",
+                hpx::util::osstream_get_string(strm));
+            return naming::invalid_gid;
+        }
+
+        if (!(*it).second.first) {
+            hpx::util::osstream strm;
+            strm << "attempt to migrate component instance of "
+                << "invalid/unknown type: "
+                << components::get_component_type_name(type)
+                << " (map entry is NULL)";
+            HPX_THROW_EXCEPTION(hpx::bad_component_type,
+                "runtime_support::migrate_component_to_here",
+                hpx::util::osstream_get_string(strm));
+            return naming::invalid_gid;
+        }
+
+        // create a local instance by copying the bits and remapping the id in
+        // AGAS
+        naming::gid_type migrated_id = to_migrate.get_gid();
+
+        naming::gid_type id;
+        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        {
+            util::scoped_unlock<component_map_mutex_type::scoped_lock> ul(l);
+
+            typedef typename Component::wrapping_type wrapping_type;
+            id = factory->create_with_args(migrated_id,
+                component_constructor_functor1<wrapping_type, Component>(
+                    std::move(*p))
+            );
+        }
+
+        // sanity checks
+        if (!id)
+        {
+            // we should not get here (id should not be invalid)
+            HPX_THROW_EXCEPTION(hpx::invalid_status,
+                "runtime_support::migrate_component_to_here",
+                "could not create copy of given component");
+            return naming::invalid_gid;
+        }
+        if (id != migrated_id)
+        {
+            // we should not get here either (the ids should be the same)
+            HPX_THROW_EXCEPTION(hpx::invalid_status,
+                "runtime_support::migrate_component_to_here",
+                "could not create copy of given component (the new id is "
+                    "different from the original id)");
+            return naming::invalid_gid;
+        }
+
+        LRT_(info) << "successfully migrated component " << id
+            << " of type: " << components::get_component_type_name(type)
+            << " to locality: " << find_here();
+
+        to_migrate.make_unmanaged();
+        return id;
+    }
 }}}
 
 #include <hpx/config/warnings_suffix.hpp>
@@ -529,13 +611,30 @@ namespace hpx { namespace components { namespace server
           , &runtime_support::copy_create_component<Component>
           , copy_create_component_action<Component> >
     {};
+    template <typename Component>
+    struct migrate_component_here_action
+      : ::hpx::actions::result_action2<
+            runtime_support, naming::id_type
+          , boost::shared_ptr<Component> const&, naming::id_type,
+          , &runtime_support::migrate_component_to_here<Component>
+          , migrate_component_here_action<Component> >
+    {};
 #else
     template <typename Component>
     struct copy_create_component_action
       : ::hpx::actions::result_action2<
-            naming::gid_type (runtime_support::*)(boost::shared_ptr<Component> const&, bool)
+            naming::gid_type (runtime_support::*)(
+                boost::shared_ptr<Component> const&, bool)
           , &runtime_support::copy_create_component<Component>
           , copy_create_component_action<Component> >
+    {};
+    template <typename Component>
+    struct migrate_component_here_action
+      : ::hpx::actions::result_action2<
+            naming::gid_type (runtime_support::*)(
+                boost::shared_ptr<Component> const&, naming::id_type)
+          , &runtime_support::migrate_component_to_here<Component>
+          , migrate_component_here_action<Component> >
     {};
 #endif
 }}}

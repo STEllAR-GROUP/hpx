@@ -232,7 +232,7 @@ namespace hpx { namespace lcos
 
             // Determine whether the gid is local or remote
             naming::address addr;
-            if (agas::is_local_address(gid, addr)) {
+            if (agas::is_local_address_cached(gid, addr)) {
                 // local, direct execution
                 HPX_ASSERT(components::types_are_compatible(addr.type_,
                     components::get_component_type<

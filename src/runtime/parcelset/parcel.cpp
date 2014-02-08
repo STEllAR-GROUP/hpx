@@ -40,8 +40,7 @@ namespace hpx { namespace parcelset
     namespace detail
     {
         ///////////////////////////////////////////////////////////////////////////
-        template <typename Archive>
-        void parcel_data::save(Archive& ar, bool has_source_id, bool has_continuation) const
+        void parcel_data::save(util::portable_binary_oarchive& ar, bool has_source_id, bool has_continuation) const
         {
             // If we have a source id, serialize it.
             if (has_source_id)
@@ -61,8 +60,7 @@ namespace hpx { namespace parcelset
             }
         }
 
-        template <typename Archive>
-        void parcel_data::load(Archive& ar, bool has_source_id, bool has_continuation)
+        void parcel_data::load(util::portable_binary_iarchive& ar, bool has_source_id, bool has_continuation)
         {
             // Check for a source id.
             if (has_source_id)
@@ -87,8 +85,7 @@ namespace hpx { namespace parcelset
         }
 
         ///////////////////////////////////////////////////////////////////////////
-        template <typename Archive>
-        void single_destination_parcel_data::save_optimized(Archive& ar) const
+        void single_destination_parcel_data::save_optimized(util::portable_binary_oarchive& ar) const
         {
             data_.has_source_id_ = source_id_ != naming::invalid_id;
 
@@ -99,8 +96,7 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ != 0);
         }
 
-        template <typename Archive>
-        void single_destination_parcel_data::save_normal(Archive& ar) const
+        void single_destination_parcel_data::save_normal(util::portable_binary_oarchive& ar) const
         {
             data_.has_source_id_ = source_id_ != naming::invalid_id;
 
@@ -115,8 +111,7 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ != 0);
         }
 
-        template <typename Archive>
-        void single_destination_parcel_data::save(Archive& ar) const
+        void single_destination_parcel_data::save(util::portable_binary_oarchive& ar) const
         {
             if (ar.flags() & util::disable_array_optimization)
                 save_normal(ar);
@@ -125,8 +120,7 @@ namespace hpx { namespace parcelset
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Archive>
-        void single_destination_parcel_data::load_optimized(Archive & ar)
+        void single_destination_parcel_data::load_optimized(util::portable_binary_iarchive & ar)
         {
             ar.load(data_);
             ar >> dest_ >> addr_;
@@ -135,8 +129,7 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ != 0);
         }
 
-        template <typename Archive>
-        void single_destination_parcel_data::load_normal(Archive & ar)
+        void single_destination_parcel_data::load_normal(util::portable_binary_iarchive & ar)
         {
             ar >> data_.parcel_id_;
             ar >> data_.start_time_ >> data_.creation_time_;
@@ -149,8 +142,7 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ != 0);
         }
 
-        template <typename Archive>
-        void single_destination_parcel_data::load(Archive& ar)
+        void single_destination_parcel_data::load(util::portable_binary_iarchive& ar)
         {
             if (ar.flags() & util::disable_array_optimization)
                 load_normal(ar);
@@ -160,8 +152,7 @@ namespace hpx { namespace parcelset
 
         ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        template <typename Archive>
-        void multi_destination_parcel_data::save_optimized(Archive& ar) const
+        void multi_destination_parcel_data::save_optimized(util::portable_binary_oarchive& ar) const
         {
             data_.has_source_id_ = source_id_ != naming::invalid_id;
 
@@ -172,8 +163,7 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ != 0);
         }
 
-        template <typename Archive>
-        void multi_destination_parcel_data::save_normal(Archive& ar) const
+        void multi_destination_parcel_data::save_normal(util::portable_binary_oarchive& ar) const
         {
             data_.has_source_id_ = source_id_ != naming::invalid_id;
 
@@ -187,8 +177,7 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ != 0);
         }
 
-        template <typename Archive>
-        void multi_destination_parcel_data::save(Archive& ar) const
+        void multi_destination_parcel_data::save(util::portable_binary_oarchive& ar) const
         {
             if (ar.flags() & util::disable_array_optimization)
                 save_normal(ar);
@@ -197,8 +186,7 @@ namespace hpx { namespace parcelset
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Archive>
-        void multi_destination_parcel_data::load_optimized(Archive& ar)
+        void multi_destination_parcel_data::load_optimized(util::portable_binary_iarchive& ar)
         {
             ar.load(data_);
             ar >> dests_ >> addrs_;
@@ -207,8 +195,7 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ != 0);
         }
 
-        template <typename Archive>
-        void multi_destination_parcel_data::load_normal(Archive& ar)
+        void multi_destination_parcel_data::load_normal(util::portable_binary_iarchive& ar)
         {
             ar >> data_.parcel_id_;
             ar >> data_.start_time_ >> data_.creation_time_;
@@ -220,30 +207,13 @@ namespace hpx { namespace parcelset
                 data_.has_continuation_ != 0);
         }
 
-        template <typename Archive>
-        void multi_destination_parcel_data::load(Archive& ar)
+        void multi_destination_parcel_data::load(util::portable_binary_iarchive& ar)
         {
             if (ar.flags() & util::disable_array_optimization)
                 load_normal(ar);
             else
                 load_optimized(ar);
         }
-#endif
-
-        ///////////////////////////////////////////////////////////////////////
-        // explicit instantiation for the correct archive types
-        template HPX_EXPORT void
-        single_destination_parcel_data::save(util::portable_binary_oarchive&) const;
-
-        template HPX_EXPORT void
-        single_destination_parcel_data::load(util::portable_binary_iarchive&);
-
-#if defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
-        template HPX_EXPORT void
-        multi_destination_parcel_data::save(util::portable_binary_oarchive&) const;
-
-        template HPX_EXPORT void
-        multi_destination_parcel_data::load(util::portable_binary_iarchive&);
 #endif
 
         ///////////////////////////////////////////////////////////////////////////
@@ -267,8 +237,7 @@ namespace hpx { namespace parcelset
 #endif
     }
 
-    template <typename Archive>
-    void parcel::save(Archive& ar, const unsigned int version) const
+    void parcel::save(util::portable_binary_oarchive& ar, const unsigned int version) const
     {
         HPX_ASSERT(data_.get() != 0);
 
@@ -290,8 +259,7 @@ namespace hpx { namespace parcelset
         }
     }
 
-    template <typename Archive>
-    void parcel::load(Archive& ar, const unsigned int version)
+    void parcel::load(util::portable_binary_iarchive& ar, const unsigned int version)
     {
         if (version > HPX_PARCEL_VERSION)
         {
@@ -325,14 +293,6 @@ namespace hpx { namespace parcelset
             std::swap(data_, data);
         }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // explicit instantiation for the correct archive types
-    template HPX_EXPORT void
-    parcel::save(util::portable_binary_oarchive&, const unsigned int) const;
-
-    template HPX_EXPORT void
-    parcel::load(util::portable_binary_iarchive&, const unsigned int);
 
     ///////////////////////////////////////////////////////////////////////////
     std::ostream& operator<< (std::ostream& os, parcel const& p)

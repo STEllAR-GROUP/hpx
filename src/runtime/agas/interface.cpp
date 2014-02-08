@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -204,45 +205,45 @@ boost::uint32_t get_num_overall_threads_sync(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool is_local_address(
-    naming::gid_type const& gid
-  , error_code& ec
-    )
-{
-    return naming::get_agas_client().is_local_address(gid, ec);
-}
-
-bool is_local_address(
-    naming::gid_type const& gid
-  , naming::address& addr
-  , error_code& ec
-    )
-{
-    return naming::get_agas_client().is_local_address(gid, addr, ec);
-}
-
-inline naming::gid_type const& convert_to_gid(naming::id_type const& id)
-{
-    return id.get_gid();
-}
-
-bool is_local_address(
-    std::vector<naming::id_type> const& ids
-  , std::vector<naming::address>& addrs
-  , boost::dynamic_bitset<>& locals
-  , error_code& ec
-    )
-{
-    std::size_t count = ids.size();
-
-    std::vector<naming::gid_type> gids;
-    gids.reserve(count);
-
-    std::transform(ids.begin(), ids.end(), std::back_inserter(gids), convert_to_gid);
-
-    addrs.resize(count);
-    return naming::get_agas_client().is_local_address(gids.data(), addrs.data(), count, locals, ec);
-}
+// bool is_local_address(
+//     naming::gid_type const& gid
+//   , error_code& ec
+//     )
+// {
+//     return naming::get_agas_client().is_local_address(gid, ec);
+// }
+// 
+// bool is_local_address(
+//     naming::gid_type const& gid
+//   , naming::address& addr
+//   , error_code& ec
+//     )
+// {
+//     return naming::get_agas_client().is_local_address(gid, addr, ec);
+// }
+// 
+// inline naming::gid_type const& convert_to_gid(naming::id_type const& id)
+// {
+//     return id.get_gid();
+// }
+// 
+// bool is_local_address(
+//     std::vector<naming::id_type> const& ids
+//   , std::vector<naming::address>& addrs
+//   , boost::dynamic_bitset<>& locals
+//   , error_code& ec
+//     )
+// {
+//     std::size_t count = ids.size();
+// 
+//     std::vector<naming::gid_type> gids;
+//     gids.reserve(count);
+// 
+//     std::transform(ids.begin(), ids.end(), std::back_inserter(gids), convert_to_gid);
+// 
+//     addrs.resize(count);
+//     return naming::get_agas_client().is_local_address(gids.data(), addrs.data(), count, locals, ec);
+// }
 
 bool is_local_address_cached(
     naming::gid_type const& gid
@@ -283,7 +284,28 @@ naming::address resolve_sync(
     )
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
-    return agas_.resolve(id, ec);
+    return agas_.resolve_async(id).get(ec);
+}
+
+hpx::unique_future<bool> bind(
+    naming::gid_type const& id
+  , naming::address const& addr
+  , boost::uint32_t locality_id
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.bind_async(id, addr, locality_id);
+}
+
+bool bind_sync(
+    naming::gid_type const& id
+  , naming::address const& addr
+  , boost::uint32_t locality_id
+  , error_code& ec
+    )
+{
+    naming::resolver_client& agas_ = naming::get_agas_client();
+    return agas_.bind_async(id, addr, locality_id).get(ec);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -422,6 +444,21 @@ boost::int64_t incref(
 
     naming::id_type keep_alive = naming::id_type(gid, id_type::unmanaged);
     return resolver.incref_async(gid, credits, keep_alive).get();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+hpx::unique_future<naming::id_type> get_colocation_id(
+    naming::id_type const& id)
+{
+    naming::resolver_client& resolver = naming::get_agas_client();
+    return resolver.get_colocation_id_async(id);
+}
+
+naming::id_type get_colocation_id_sync(
+    naming::id_type const& id
+  , error_code& ec)
+{
+    return get_colocation_id(id).get(ec);
 }
 
 }}

@@ -55,7 +55,7 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address(gid, addr))
+        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
         {
             return detail::sync_local_invoke_1<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ));
@@ -157,7 +157,7 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address(gid, addr))
+        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
         {
             return detail::sync_local_invoke_2<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
@@ -259,7 +259,7 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address(gid, addr))
+        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
         {
             return detail::sync_local_invoke_3<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
@@ -361,7 +361,7 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address(gid, addr))
+        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
         {
             return detail::sync_local_invoke_4<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
@@ -463,7 +463,7 @@ namespace hpx
             typename action_type::remote_result_type
         >::type result_type;
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address(gid, addr))
+        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
         {
             return detail::sync_local_invoke_5<action_type, result_type>::
                 call(gid, addr, std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));

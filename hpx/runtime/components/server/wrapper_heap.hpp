@@ -266,7 +266,7 @@ namespace hpx { namespace components { namespace detail
 
                     // register the global ids and the base address of this heap
                     // with the AGAS
-                    if (!applier::bind_range(base_gid, step_,
+                    if (!applier::bind_range_local(base_gid, step_,
                             naming::address(hpx::get_locality(), type, addr),
                             sizeof(value_type)))
                     {
@@ -285,7 +285,7 @@ namespace hpx { namespace components { namespace detail
                 {
                     // unbind the range which is not needed anymore
                     util::scoped_unlock<scoped_lock> ul(l);
-                    applier::unbind_range(base_gid, step_);
+                    applier::unbind_range_local(base_gid, step_);
                 }
             }
 
@@ -323,7 +323,7 @@ namespace hpx { namespace components { namespace detail
                 naming::gid_type base_gid = base_gid_;
                 base_gid_ = naming::invalid_gid;
 
-                applier::unbind_range(base_gid, step_);
+                applier::unbind_range_local(base_gid, step_);
             }
 
             tidy();

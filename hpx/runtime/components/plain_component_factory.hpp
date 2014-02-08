@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -162,11 +162,35 @@ namespace hpx { namespace components
             return naming::invalid_gid;
         }
 
+        /// \brief Create one new component instance and initialize it using
+        ///        the using the given constructor function. Assign the give
+        ///        GID to the new object.
+        ///
+        /// \param assign_gid [in] The GID to assign to the newly created object.
+        /// \param f  [in] The constructor function to call in order to
+        ///           initialize the newly allocated object.
+        ///
+        /// \return   Returns the GID of the first newly created component
+        ///           instance (this is the same as assign_gid, if successful).
+        naming::gid_type create_with_args(
+            naming::gid_type const& assign_gid,
+            HPX_STD_FUNCTION<void(void*)> const& f)
+        {
+            HPX_THROW_EXCEPTION(bad_request,
+                "plain_component_factory::create_with_args",
+                "create_with_args is not supported by this factory instance (" +
+                get_component_name() + ")");
+            return naming::invalid_gid;
+        }
+
         /// \brief Destroy one or more component instances
         ///
         /// \param gid    [in] The gid of the first component instance to
         ///               destroy.
-        void destroy(naming::gid_type const& /*gid*/)
+        /// \param addr   [in] The resolved address of the first component
+        ///               instance to destroy.
+        void destroy(naming::gid_type const& gid,
+            naming::address const& addr)
         {
         }
 

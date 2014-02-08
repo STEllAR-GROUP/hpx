@@ -25,7 +25,8 @@ namespace hpx { namespace agas { namespace server
         std::size_t size = p.size();
         naming::id_type const* ids = p.get_destinations();
         naming::address* addrs = p.get_destination_addrs();
-        std::vector<boost::fusion::vector2<naming::gid_type, gva> > cache_addresses;
+        std::vector<boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t> >
+            cache_addresses;
 
         // resolve destination addresses, we should be able to resolve all of
         // them, otherwise it's an error
@@ -41,7 +42,7 @@ namespace hpx { namespace agas { namespace server
                 if (!addrs[i])
                 {
                     cache_addresses.push_back(resolve_gid_locked(ids[i].get_gid(), ec));
-                    boost::fusion::vector2<naming::gid_type, gva> const& r =
+                    boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t> const& r =
                         cache_addresses.back();
 
                     if (ec || boost::fusion::at_c<0>(r) == naming::invalid_gid)
@@ -69,7 +70,8 @@ namespace hpx { namespace agas { namespace server
                 else
                 {
                     cache_addresses.push_back(
-                        boost::fusion::make_vector(naming::gid_type(), gva()));
+                        boost::fusion::make_vector(
+                            naming::gid_type(), gva(), naming::invalid_locality_id));
                 }
             }
         }
@@ -87,10 +89,9 @@ namespace hpx { namespace agas { namespace server
         }
 
         // asynchronously update cache on source locality
-        naming::id_type source = get_colocation_id_sync(p.get_source());
         for (std::size_t i = 0; i != size; ++i)
         {
-            boost::fusion::vector2<naming::gid_type, gva> const& r =
+            boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t> const& r =
                 cache_addresses[i];
 
             if (boost::fusion::at_c<0>(r))
@@ -98,6 +99,8 @@ namespace hpx { namespace agas { namespace server
                 gva const& g = boost::fusion::at_c<1>(r);
                 naming::address addr(g.endpoint, g.type, g.lva());
 
+                naming::id_type source = naming::get_id_from_locality_id(
+                    boost::fusion::at_c<2>(r));
                 components::stubs::runtime_support::update_agas_cache_entry(
                     source, boost::fusion::at_c<0>(r), addr, g.count, g.offset);
             }

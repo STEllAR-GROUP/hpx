@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -79,12 +80,12 @@ HPX_API_EXPORT lcos::unique_future<naming::id_type> resolve_name(
 // HPX_API_EXPORT lcos::unique_future<std::vector<naming::id_type> > get_localities(
 //     components::component_type type = components::component_invalid
 //     );
-// 
+//
 // HPX_API_EXPORT std::vector<naming::id_type> get_localities_sync(
 //     components::component_type type
 //   , error_code& ec = throws
 //     );
-// 
+//
 // inline std::vector<naming::id_type> get_localities_sync(
 //     error_code& ec = throws
 //     )
@@ -121,42 +122,42 @@ HPX_API_EXPORT boost::uint32_t get_num_overall_threads_sync(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT bool is_local_address(
-    naming::gid_type const& gid
-  , error_code& ec = throws
-    );
-
-HPX_API_EXPORT bool is_local_address(
-    naming::gid_type const& gid
-  , naming::address& addr
-  , error_code& ec = throws
-    );
-
-inline bool is_local_address(
-    naming::id_type const& gid
-  , error_code& ec = throws
-    )
-{
-    return is_local_address(gid.get_gid(), ec);
-}
-
-inline bool is_local_address(
-    naming::id_type const& gid
-  , naming::address& addr
-  , error_code& ec = throws
-    )
-{
-    return is_local_address(gid.get_gid(), addr, ec);
-}
-
+// HPX_API_EXPORT bool is_local_address(
+//     naming::gid_type const& gid
+//   , error_code& ec = throws
+//     );
+//
+// HPX_API_EXPORT bool is_local_address(
+//     naming::gid_type const& gid
+//   , naming::address& addr
+//   , error_code& ec = throws
+//     );
+//
+// inline bool is_local_address(
+//     naming::id_type const& gid
+//   , error_code& ec = throws
+//     )
+// {
+//     return is_local_address(gid.get_gid(), ec);
+// }
+//
+// inline bool is_local_address(
+//     naming::id_type const& gid
+//   , naming::address& addr
+//   , error_code& ec = throws
+//     )
+// {
+//     return is_local_address(gid.get_gid(), addr, ec);
+// }
+//
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Returns true if at least one referenced id_type is local
-HPX_API_EXPORT bool is_local_address(
-    std::vector<naming::id_type> const& ids
-  , std::vector<naming::address>& addrs
-  , boost::dynamic_bitset<>& locals
-  , error_code& ec = throws
-    );
+// HPX_API_EXPORT bool is_local_address(
+//     std::vector<naming::id_type> const& ids
+//   , std::vector<naming::address>& addrs
+//   , boost::dynamic_bitset<>& locals
+//   , error_code& ec = throws
+//     );
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_API_EXPORT boost::uint32_t get_locality_id(error_code& ec = throws);
@@ -209,6 +210,19 @@ HPX_API_EXPORT hpx::unique_future<naming::address> resolve(
 
 HPX_API_EXPORT naming::address resolve_sync(
     naming::id_type const& id
+  , error_code& ec = throws
+    );
+
+HPX_API_EXPORT hpx::unique_future<bool> bind(
+    naming::gid_type const& id
+  , naming::address const& addr
+  , boost::uint32_t locality_id
+    );
+
+HPX_API_EXPORT bool bind_sync(
+    naming::gid_type const& id
+  , naming::address const& addr
+  , boost::uint32_t locality_id
   , error_code& ec = throws
     );
 
@@ -276,8 +290,16 @@ HPX_API_EXPORT boost::int64_t incref(
     naming::gid_type const& gid
   , boost::int64_t credits = 1
   , naming::id_type const& keep_alive = naming::invalid_id
-  , error_code& ec = throws 
+  , error_code& ec = throws
     );
+
+///////////////////////////////////////////////////////////////////////////////
+HPX_API_EXPORT hpx::unique_future<naming::id_type> get_colocation_id(
+    naming::id_type const& id);
+
+HPX_API_EXPORT naming::id_type get_colocation_id_sync(
+    naming::id_type const& id
+  , error_code& ec = throws);
 
 }}
 

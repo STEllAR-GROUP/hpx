@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Thomas Heller
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -278,6 +278,21 @@ namespace hpx { namespace components
             naming::address::address_type)
         {
             return std::move(f);
+        }
+
+        // This component type does not support migration.
+        static BOOST_CONSTEXPR bool supports_migration() { return false; }
+
+        // Pinning functionality
+        void pin() {}
+        void unpin() {}
+        boost::uint32_t pin_count() const { return 0; }
+        void mark_as_migrated()
+        {
+            // If this assertion is triggered then this component instance is
+            // being migrated even if the component type has not been enabled
+            // to support migration.
+            HPX_ASSERT(false);
         }
 
     protected:
@@ -645,8 +660,16 @@ namespace hpx { namespace components
         {
             return naming::id_type(get_base_gid(), naming::id_type::unmanaged);
         }
-        naming::gid_type get_base_gid() const
+        naming::gid_type get_base_gid(
+            naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
+            if (assign_gid)
+            {
+                HPX_THROW_EXCEPTION(bad_parameter,
+                    "managed_component::get_base_gid",
+                    "managed_components must be assigned new gids on creation");
+                return naming::invalid_gid;
+            }
             return heap_type::get_gid(const_cast<managed_component*>(this));
         }
 

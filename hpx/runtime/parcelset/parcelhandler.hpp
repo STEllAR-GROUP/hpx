@@ -91,7 +91,7 @@ namespace hpx { namespace parcelset
             threads::threadmanager_base* tm, parcelhandler_queue_base* policy);
 
         ~parcelhandler() {}
-    
+
         /// load runtime configuration settings ...
         static std::vector<std::string> load_runtime_configuration();
 
@@ -345,9 +345,20 @@ namespace hpx { namespace parcelset
             return find_parcelport(connection_tcp)->here();
         }
 
-        /// Return the name of this locality as retrieved from the 
+        /// Return the name of this locality as retrieved from the
         /// active parcel port.
         std::string get_locality_name() const;
+
+        /// Temporarily enable/disable all parcel handling activities in the
+        /// parcel subsystem
+        ///
+        /// \param new_state    [in] The desired new state of the parcel
+        ///                     handling (true: enable parcel handling, false:
+        ///                     disable parcel handling)
+        ///
+        /// \returns            The previous state of the parcel handling
+        ///                     subsystem.
+        bool enable(bool new_state);
 
         ///////////////////////////////////////////////////////////////////////
         /// The function register_counter_types() is called during startup to
@@ -479,6 +490,7 @@ namespace hpx { namespace parcelset
         /// the runtime systems of all localities are guaranteed to have
         /// reached a certain state).
         boost::atomic<bool> use_alternative_parcelports_;
+        bool enable_parcel_handling_;
 
         /// Store message handlers for actions
         mutex_type handlers_mtx_;

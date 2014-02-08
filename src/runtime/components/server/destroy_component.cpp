@@ -6,28 +6,28 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/components/server/destroy_component.hpp>
+#include <hpx/runtime/components/stubs/runtime_support.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
-    void destroy_base_lco(naming::gid_type const& gid,
-        util::one_size_heap_list_base* heap, components::component_type type,
-        error_code& ec)
+    ///////////////////////////////////////////////////////////////////////////
+    void destroy_component(naming::gid_type const& gid,
+        naming::address const& addr, error_code& ec)
     {
-        // retrieve the local address bound to the given global id
-        applier::applier& appl = hpx::applier::get_applier();
-        naming::address addr;
-        if (!appl.get_agas_client().resolve(gid, addr))
-        {
-            hpx::util::osstream strm;
-            strm << "global id " << gid << " is not bound to any "
-                    "component instance";
-            HPX_THROWS_IF(ec, hpx::unknown_component_address,
-                "destroy_base_lco", hpx::util::osstream_get_string(strm));
-            return;
-        }
+        using components::stubs::runtime_support;
+        agas::gva g (addr.locality_, addr.type_, 1, addr.address_);
+        runtime_support::free_component_sync(g, gid, 1);
+    }
 
-        // make sure this component is located here
+    ///////////////////////////////////////////////////////////////////////////
+    void destroy_base_lco(naming::gid_type const& gid,
+        naming::address const& addr, util::one_size_heap_list_base* heap,
+        components::component_type type, error_code& ec)
+    {
+        applier::applier& appl = hpx::applier::get_applier();
+
+        // make sure this component is located here (lcos don't migrate)
         if (appl.here() != addr.locality_)
         {
             hpx::util::osstream strm;
@@ -60,6 +60,27 @@ namespace hpx { namespace components { namespace server
 
         if (&ec != &throws)
             ec = make_success_code();
+    }
+
+    void destroy_base_lco(naming::gid_type const& gid,
+        util::one_size_heap_list_base* heap, components::component_type type,
+        error_code& ec)
+    {
+        // retrieve the local address bound to the given global id
+        applier::applier& appl = hpx::applier::get_applier();
+
+        naming::address addr;
+        if (!appl.get_agas_client().resolve_local(gid, addr))
+        {
+            hpx::util::osstream strm;
+            strm << "global id " << gid << " is not bound to any "
+                    "component instance";
+            HPX_THROWS_IF(ec, hpx::unknown_component_address,
+                "destroy_base_lco", hpx::util::osstream_get_string(strm));
+            return;
+        }
+
+        destroy_base_lco(gid, addr, heap, type, ec);
     }
 }}}
 

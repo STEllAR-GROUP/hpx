@@ -16,28 +16,28 @@ namespace hpx { namespace applier
 {
     // helper functions allowing to bind and unbind a GID to a given address
     // without having to directly refer to the resolver_client
-    bool bind_gid(naming::gid_type const& gid_, naming::address const& addr,
+    bool bind_gid_local(naming::gid_type const& gid_, naming::address const& addr,
         error_code& ec)
     {
         applier* appl = get_applier_ptr();
         if (0 == appl) {
-            HPX_THROWS_IF(ec, invalid_status, "applier::bind_gid",
+            HPX_THROWS_IF(ec, invalid_status, "applier::bind_gid_local",
                 "applier is not valid");
             return false;
         }
-        return appl->get_agas_client().bind(gid_, addr, ec);
+        return appl->get_agas_client().bind_local(gid_, addr, ec);
     }
 
-    void unbind_gid(naming::gid_type const& gid_, error_code& ec)
+    void unbind_gid_local(naming::gid_type const& gid_, error_code& ec)
     {
         if (gid_) {
             applier* appl = get_applier_ptr();
             if (0 == appl) {
-                HPX_THROWS_IF(ec, invalid_status, "applier::unbind_gid",
+                HPX_THROWS_IF(ec, invalid_status, "applier::unbind_gid_local",
                     "applier is not valid");
             }
             else {
-                appl->get_agas_client().unbind(gid_, ec);
+                appl->get_agas_client().unbind_local(gid_, ec);
             }
         }
         else {
@@ -46,28 +46,28 @@ namespace hpx { namespace applier
         }
     }
 
-    bool bind_range(naming::gid_type const& gid, std::size_t count,
+    bool bind_range_local(naming::gid_type const& gid, std::size_t count,
         naming::address const& addr, std::size_t offset, error_code& ec)
     {
         applier* appl = get_applier_ptr();
         if (0 == appl) {
-            HPX_THROWS_IF(ec, invalid_status, "applier::bind_range",
+            HPX_THROWS_IF(ec, invalid_status, "applier::bind_range_local",
                 "applier is not valid");
             return false;
         }
-        return appl->get_agas_client().bind_range(gid, count, addr, offset, ec);
+        return appl->get_agas_client().bind_range_local(gid, count, addr, offset, ec);
     }
 
-    void unbind_range(naming::gid_type const& gid, std::size_t count,
+    void unbind_range_local(naming::gid_type const& gid, std::size_t count,
         error_code& ec)
     {
         applier* appl = get_applier_ptr();
         if (0 == appl) {
-            HPX_THROWS_IF(ec, invalid_status, "applier::unbind_range",
+            HPX_THROWS_IF(ec, invalid_status, "applier::unbind_range_local",
                 "applier is not valid");
         }
         else {
-            appl->get_agas_client().unbind_range(gid, count, ec);
+            appl->get_agas_client().unbind_range_local(gid, count, ec);
         }
     }
 }}

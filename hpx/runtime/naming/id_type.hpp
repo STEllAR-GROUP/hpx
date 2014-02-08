@@ -102,6 +102,10 @@ namespace hpx { namespace naming
         void set_lsb(boost::uint64_t lsb);
         void set_lsb(void* lsb);
 
+        // Convert this id into an unmanaged one (in-place) - Use with maximum
+        // care, or better, don't use this at all.
+        void make_unmanaged();
+
     private:
         friend HPX_API_EXPORT gid_type get_parcel_dest_gid(id_type const& id);
 
@@ -109,11 +113,8 @@ namespace hpx { namespace naming
 
         friend class boost::serialization::access;
 
-        template <typename Archive>
-        void save(Archive & ar, const unsigned int version) const;
-
-        template <typename Archive>
-        void load(Archive & ar, const unsigned int version);
+        void save(util::portable_binary_oarchive& ar, const unsigned int version) const;
+        void load(util::portable_binary_iarchive& ar, const unsigned int version);
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 

@@ -48,6 +48,13 @@ template lcos::unique_future<boost::int64_t>
       , threads::thread_priority priority
         );
 
+template lcos::unique_future<naming::id_type>
+    primary_namespace::service_async<naming::id_type>(
+        naming::id_type const& gid
+      , request const& req
+      , threads::thread_priority priority
+        );
+
 void primary_namespace::service_non_blocking(
     naming::id_type const& gid
   , request const& req

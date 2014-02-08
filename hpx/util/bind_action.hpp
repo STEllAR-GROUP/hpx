@@ -65,13 +65,37 @@ namespace hpx { namespace util
             typename Action, typename BoundArgs, typename UnboundArgs
           , typename Enable = void
         >
+        struct bind_action_apply_cont_impl;
+
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        BOOST_FORCEINLINE
+        bool
+        bind_action_apply_cont(
+            naming::id_type const& contgid
+          , BoundArgs& bound_args
+          , UnboundArgs && unbound_args
+        )
+        {
+            return
+                bind_action_apply_cont_impl<Action, BoundArgs, UnboundArgs>::call(
+                    contgid
+                  , bound_args
+                  , std::forward<UnboundArgs>(unbound_args)
+                );
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <
+            typename Action, typename BoundArgs, typename UnboundArgs
+          , typename Enable = void
+        >
         struct bind_action_async_impl;
 
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         BOOST_FORCEINLINE
         lcos::unique_future<
             typename traits::promise_local_result<
-                typename hpx::actions::extract_action<Action>::result_type
+                typename hpx::actions::extract_action<Action>::remote_result_type
             >::type
         >
         bind_action_async(
@@ -90,7 +114,7 @@ namespace hpx { namespace util
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         BOOST_FORCEINLINE
         typename traits::promise_local_result<
-            typename hpx::actions::extract_action<Action>::result_type
+            typename hpx::actions::extract_action<Action>::remote_result_type
         >::type
         bind_action_invoke(
             BoundArgs& bound_args
@@ -111,7 +135,7 @@ namespace hpx { namespace util
         public:
             typedef
                 typename traits::promise_local_result<
-                    typename hpx::actions::extract_action<Action>::result_type
+                    typename hpx::actions::extract_action<Action>::remote_result_type
                 >::type
                 result_type;
 
@@ -225,9 +249,10 @@ namespace hpx { namespace util
 #       define HPX_UTIL_BIND_EVAL(Z, N, D)                                    \
         detail::bind_eval<Action>(                                            \
             util::get<N>(bound_args)                                          \
-          , std::forward<UnboundArgs>(unbound_args)                         \
+          , std::forward<UnboundArgs>(unbound_args)                           \
         )                                                                     \
         /**/
+
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_apply_impl<
             Action, BoundArgs, UnboundArgs
@@ -250,7 +275,31 @@ namespace hpx { namespace util
                     );
             }
         };
-        
+
+        template <typename Action, typename BoundArgs, typename UnboundArgs>
+        struct bind_action_apply_cont_impl<
+            Action, BoundArgs, UnboundArgs
+          , typename boost::enable_if_c<
+                util::tuple_size<BoundArgs>::value == N
+            >::type
+        >
+        {
+            typedef bool type;
+
+            static BOOST_FORCEINLINE
+            type call(
+                naming::id_type const& contgid
+              , BoundArgs& bound_args
+              , UnboundArgs && unbound_args
+            )
+            {
+                return
+                    hpx::apply_c<Action>(
+                        contgid, BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _)
+                    );
+            }
+        };
+
         template <typename Action, typename BoundArgs, typename UnboundArgs>
         struct bind_action_async_impl<
             Action, BoundArgs, UnboundArgs
@@ -262,7 +311,7 @@ namespace hpx { namespace util
             typedef
                 lcos::unique_future<
                     typename traits::promise_local_result<
-                        typename hpx::actions::extract_action<Action>::result_type
+                        typename hpx::actions::extract_action<Action>::remote_result_type
                     >::type
                 >
                 type;
@@ -309,7 +358,7 @@ namespace hpx { namespace util
               , util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, T, t))
             );
     }
-     
+
     template <
         typename Component, typename Result, typename Arguments
       , typename Derived

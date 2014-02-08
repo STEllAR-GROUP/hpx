@@ -60,7 +60,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         }
     }
 
-    bool connection_handler::run()
+    bool connection_handler::do_run()
     {
         if (NULL == acceptor_)
             acceptor_ = new acceptor(io_service_pool_.get_io_service(0));
@@ -103,7 +103,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         return true;
     }
 
-    void connection_handler::stop()
+    void connection_handler::do_stop()
     {
         {
             // cancel all pending read operations, close those sockets

@@ -75,7 +75,7 @@ namespace hpx
         >::type result_type;
 
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address(gid, addr))
+        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
         {
             return detail::sync_local_invoke_0<action_type, result_type>::
                 call(gid, addr);
@@ -214,7 +214,7 @@ namespace hpx
         >::type result_type;
 
         naming::address addr;
-        if (policy == launch::sync && agas::is_local_address(gid, addr))
+        if (policy == launch::sync && agas::is_local_address_cached(gid, addr))
         {
             return detail::BOOST_PP_CAT(sync_local_invoke_, N)<action_type, result_type>::
                 call(gid, addr, HPX_ENUM_FORWARD_ARGS(N, Arg, arg));

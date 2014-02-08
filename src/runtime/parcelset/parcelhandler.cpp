@@ -154,9 +154,10 @@ namespace hpx { namespace parcelset
         tm_(tm),
         parcels_(policy),
         use_alternative_parcelports_(false),
+        enable_parcel_handling_(true),
         count_routed_(0)
     {}
-    
+
     std::vector<std::string> parcelhandler::load_runtime_configuration()
     {
         /// TODO: properly hide this in plugins ...
@@ -189,7 +190,7 @@ namespace hpx { namespace parcelset
 
         for(int i = 0; i < connection_type::connection_last; ++i)
         {
-            std::pair<std::vector<std::string>, bool> pp_ini_defs = 
+            std::pair<std::vector<std::string>, bool> pp_ini_defs =
                 parcelport::runtime_configuration(i);
             std::string name = get_connection_type_name(connection_type(i));
             std::string name_uc = boost::to_upper_copy(name);
@@ -223,7 +224,7 @@ namespace hpx { namespace parcelset
             // add the pp specific configuration parameter
             ini_defs.insert(ini_defs.end(),
                 pp_ini_defs.first.begin(), pp_ini_defs.first.end());
-            
+
         }
 
         return ini_defs;
@@ -245,7 +246,7 @@ namespace hpx { namespace parcelset
         util::io_service_pool *pool = 0;
 #if defined(HPX_HAVE_PARCELPORT_MPI)
         bool tcp_bootstrap = (get_config_entry("hpx.parcel.bootstrap", "tcp") == "tcp");
-        if(tcp_bootstrap)
+        if (tcp_bootstrap)
         {
             pool = pports_[connection_tcp]->get_thread_pool("parcel_pool_tcp");
         }
@@ -263,7 +264,8 @@ namespace hpx { namespace parcelset
         std::string enable_ipc =
             get_config_entry("hpx.parcel.ipc.enable", "0");
 
-        if (boost::lexical_cast<int>(enable_ipc)) {
+        if (boost::lexical_cast<int>(enable_ipc))
+        {
             attach_parcelport(parcelport::create(
                 connection_ipc, hpx::get_config(),
                 pool->get_on_start_thread(), pool->get_on_stop_thread()));
@@ -273,14 +275,15 @@ namespace hpx { namespace parcelset
         std::string enable_ibverbs =
             get_config_entry("hpx.parcel.ibverbs.enable", "0");
 
-        if (boost::lexical_cast<int>(enable_ibverbs)) {
+        if (boost::lexical_cast<int>(enable_ibverbs))
+        {
             attach_parcelport(parcelport::create(
                 connection_ibverbs, hpx::get_config(),
                 pool->get_on_start_thread(), pool->get_on_stop_thread()));
         }
 #endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-        if(tcp_bootstrap)
+        if (tcp_bootstrap)
         {
             if (util::mpi_environment::enabled()) {
                 attach_parcelport(parcelport::create(
@@ -501,7 +504,7 @@ namespace hpx { namespace parcelset
         }
 
         if (exception) {
-            // report any pending exception
+            // report any pending exceptions
             boost::rethrow_exception(exception);
         }
     }
@@ -534,7 +537,7 @@ namespace hpx { namespace parcelset
 
 #if !defined(HPX_SUPPORT_MULTIPLE_PARCEL_DESTINATIONS)
         if (!addrs[0])
-            resolved_locally = resolver_.resolve(ids[0], addrs[0]);
+            resolved_locally = resolver_.resolve_local(ids[0], addrs[0]);
 #else
         std::size_t size = p.size();
 
@@ -546,11 +549,11 @@ namespace hpx { namespace parcelset
 
         if (1 == size) {
             if (!addrs[0])
-                resolved_locally = resolver_.resolve(ids[0], addrs[0]);
+                resolved_locally = resolver_.resolve_local(ids[0], addrs[0]);
         }
         else {
             boost::dynamic_bitset<> locals;
-            resolved_locally = resolver_.resolve(ids, addrs, size, locals);
+            resolved_locally = resolver_.resolve_local(ids, addrs, size, locals);
         }
 #endif
 
@@ -560,7 +563,7 @@ namespace hpx { namespace parcelset
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.
         if (resolved_locally) {
-            // rewrap the given parcel-sent handler
+            // re-wrap the given parcel-sent handler
             using util::placeholders::_1;
             using util::placeholders::_2;
             write_handler_type wrapped_f =
@@ -694,6 +697,20 @@ namespace hpx { namespace parcelset
             if (pp) return pp->get_locality_name();
         }
         return "<unknown>";
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool parcelhandler::enable(bool new_state)
+    {
+        mutex_type::scoped_lock l(mtx_);
+        std::swap(enable_parcel_handling_, new_state);
+
+        BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
+        {
+            if (pp) pp->enable(enable_parcel_handling_);
+        }
+
+        return new_state;
     }
 
     ///////////////////////////////////////////////////////////////////////////

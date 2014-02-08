@@ -156,7 +156,8 @@ namespace hpx { namespace naming
                 // directly to free_component_sync.
                 try {
                     using components::stubs::runtime_support;
-                    runtime_support::free_component_sync(t, *p, 1);
+                    agas::gva g (addr.locality_, addr.type_, 1, addr.address_);
+                    runtime_support::free_component_sync(g, *p);
                 }
                 catch (hpx::exception const& e) {
                     // This request might come in too late and the thread manager
@@ -327,8 +328,7 @@ namespace hpx { namespace naming
         };
 
         // serialization
-        template <typename Archive>
-        void id_type_impl::save(Archive& ar) const
+        void id_type_impl::save(util::portable_binary_oarchive& ar) const
         {
             boost::uint32_t dest_locality_id = ar.get_dest_locality_id();
 
@@ -345,8 +345,7 @@ namespace hpx { namespace naming
             }
         }
 
-        template <typename Archive>
-        void id_type_impl::load(Archive& ar)
+        void id_type_impl::load(util::portable_binary_iarchive& ar)
         {
             if(ar.flags() & util::disable_array_optimization) {
                 // serialize base class and management type
@@ -367,13 +366,6 @@ namespace hpx { namespace naming
             }
         }
 
-        // explicit instantiation for the correct archive types
-        template HPX_EXPORT void id_type_impl::save(
-            util::portable_binary_oarchive&) const;
-
-        template HPX_EXPORT void id_type_impl::load(
-            util::portable_binary_iarchive&);
-
         /// support functions for boost::intrusive_ptr
         void intrusive_ptr_add_ref(id_type_impl* p)
         {
@@ -388,8 +380,30 @@ namespace hpx { namespace naming
     }   // detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <class Archive>
-    void id_type::save(Archive& ar, const unsigned int version) const
+    void gid_type::save(
+        util::portable_binary_oarchive& ar
+      , const unsigned int version) const
+    {
+        if(ar.flags() & util::disable_array_optimization)
+            ar << id_msb_ << id_lsb_;
+        else
+            ar.save(*this);
+    }
+
+    void gid_type::load(
+        util::portable_binary_iarchive& ar
+      , const unsigned int /*version*/)
+    {
+        if(ar.flags() & util::disable_array_optimization)
+            ar >> id_msb_ >> id_lsb_;
+        else
+            ar.load(*this);
+
+        id_msb_ &= ~is_locked_mask;     // strip lock-bit upon receive
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    void id_type::save(util::portable_binary_oarchive& ar, const unsigned int version) const
     {
         bool isvalid = gid_ != 0;
         ar.save(isvalid);
@@ -397,8 +411,7 @@ namespace hpx { namespace naming
             gid_->save(ar);
     }
 
-    template <class Archive>
-    void id_type::load(Archive& ar, const unsigned int version)
+    void id_type::load(util::portable_binary_iarchive& ar, const unsigned int version)
     {
         if (version > HPX_IDTYPE_VERSION) {
             HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
@@ -415,13 +428,6 @@ namespace hpx { namespace naming
         }
     }
 
-    // explicit instantiation for the correct archive types
-    template HPX_EXPORT void id_type::save(
-        util::portable_binary_oarchive&, const unsigned int version) const;
-
-    template HPX_EXPORT void id_type::load(
-        util::portable_binary_iarchive&, const unsigned int version);
-
     ///////////////////////////////////////////////////////////////////////////
     char const* const management_type_names[] =
     {
@@ -436,32 +442,18 @@ namespace hpx { namespace naming
             return "invalid";
         return management_type_names[m + 1];
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    inline naming::id_type get_colocation_id_sync(naming::id_type const& id, error_code& ec)
-    {
-        // FIXME: Resolve the locality instead of deducing it from the target
-        //        GID, otherwise this will break once we start moving objects.
-        boost::uint32_t locality_id = get_locality_id_from_gid(id.get_gid());
-        return get_id_from_locality_id(locality_id);
-    }
-
-    inline lcos::unique_future<naming::id_type> get_colocation_id(naming::id_type const& id)
-    {
-        return lcos::make_ready_future(naming::get_colocation_id_sync(id, throws));
-    }
 }}
 
 namespace hpx
 {
     naming::id_type get_colocation_id_sync(naming::id_type const& id, error_code& ec)
     {
-        return naming::get_colocation_id(id).get(ec);
+        return agas::get_colocation_id_sync(id, ec);
     }
 
     lcos::unique_future<naming::id_type> get_colocation_id(naming::id_type const& id)
     {
-        return naming::get_colocation_id(id);
+        return agas::get_colocation_id(id);
     }
 }
 

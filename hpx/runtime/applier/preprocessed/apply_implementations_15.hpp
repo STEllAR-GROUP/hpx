@@ -89,7 +89,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ));
         }
@@ -185,7 +185,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ));
         }
@@ -369,7 +369,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
@@ -465,7 +465,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ));
         }
@@ -649,7 +649,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
@@ -745,7 +745,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ));
         }
@@ -929,7 +929,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
@@ -1025,7 +1025,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ));
         }
@@ -1209,7 +1209,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
@@ -1305,7 +1305,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ));
         }
@@ -1489,7 +1489,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
         }
@@ -1585,7 +1585,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ));
         }
@@ -1769,7 +1769,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
         }
@@ -1865,7 +1865,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ));
         }
@@ -2049,7 +2049,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
         }
@@ -2145,7 +2145,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ));
         }
@@ -2329,7 +2329,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
         }
@@ -2425,7 +2425,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ));
         }
@@ -2609,7 +2609,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
         }
@@ -2705,7 +2705,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ));
         }
@@ -2889,7 +2889,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
         }
@@ -2985,7 +2985,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ));
         }
@@ -3169,7 +3169,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
         }
@@ -3265,7 +3265,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ));
         }
@@ -3449,7 +3449,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
         }
@@ -3545,7 +3545,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ));
         }
@@ -3729,7 +3729,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
         }
@@ -3825,7 +3825,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ));
         }
@@ -4009,7 +4009,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
         }
@@ -4105,7 +4105,7 @@ namespace hpx
         }
         
         naming::address addr;
-        if (agas::is_local_address(gid, addr)) {
+        if (agas::is_local_address_cached(gid, addr)) {
             return applier::detail::apply_l_p<Action>(c, gid, addr, priority,
                 std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ));
         }

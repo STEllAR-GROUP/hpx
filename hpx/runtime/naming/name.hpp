@@ -314,26 +314,9 @@ namespace hpx { namespace naming
         friend std::ostream& operator<< (std::ostream& os, gid_type const& id);
 
         friend class boost::serialization::access;
-
-        template <typename Archive>
-        void save(Archive& ar, const unsigned int /*version*/) const
-        {
-            if(ar.flags() & util::disable_array_optimization)
-                ar << id_msb_ << id_lsb_;
-            else
-                ar.save(*this);
-        }
-
-        template <typename Archive>
-        void load(Archive& ar, const unsigned int /*version*/)
-        {
-            if(ar.flags() & util::disable_array_optimization)
-                ar >> id_msb_ >> id_lsb_;
-            else
-                ar.load(*this);
-
-            id_msb_ &= ~is_locked_mask;     // strip lock-bit upon receive
-        }
+        
+        void save(util::portable_binary_oarchive& ar, const unsigned int version) const;
+        void load(util::portable_binary_iarchive& ar, const unsigned int version);
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -771,13 +754,15 @@ namespace hpx { namespace naming
             {
                 return type_;
             }
+            void set_management_type(id_type_management type)
+            {
+                type_ = type;
+            }
 
             // serialization
-            template <typename Archive>
-            void save(Archive& ar) const;
+            void save(util::portable_binary_oarchive& ar) const;
 
-            template <typename Archive>
-            void load(Archive& ar);
+            void load(util::portable_binary_iarchive& ar);
 
         private:
             // credit management (called during serialization), this function

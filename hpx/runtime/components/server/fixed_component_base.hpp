@@ -55,7 +55,7 @@ public:
         if (naming::invalid_gid != gid_)
         {
             error_code ec(lightweight);     // ignore errors
-            applier::unbind_gid(gid_, ec);
+            applier::unbind_gid_local(gid_, ec);
             gid_ = naming::gid_type();      // invalidate GID
         }
     }
@@ -73,8 +73,17 @@ public:
     /// \brief Return the component's fixed GID.
     ///
     /// \returns The fixed global id (GID) for this component
-    naming::gid_type get_base_gid() const
+    naming::gid_type get_base_gid(
+        naming::gid_type const& assign_gid = naming::invalid_gid) const
     {
+        if (assign_gid)
+        {
+            HPX_THROW_EXCEPTION(bad_parameter,
+                "fixed_component_base::get_base_gid",
+                "fixed_components must be assigned new gids on creation");
+            return naming::invalid_gid;
+        }
+
         if (!gid_)
         {
             naming::address addr(applier::get_applier().here(),
@@ -84,10 +93,10 @@ public:
             gid_ = naming::gid_type(msb_, lsb_);
 
             // Try to bind the preset GID first
-            if (!applier::bind_gid(gid_, addr))
+            if (!applier::bind_gid_local(gid_, addr))
             {
                 hpx::util::osstream strm;
-                strm << "could not bind_gid: " << gid_;
+                strm << "could not bind_gid(local): " << gid_;
                 gid_ = naming::gid_type();   // invalidate GID
                 HPX_THROW_EXCEPTION(duplicate_component_address,
                     "fixed_component_base<Component>::get_base_gid",
@@ -134,6 +143,21 @@ public:
         return components::default_component_creation_capabilities(caps);
     }
 #endif
+
+    // This component type does not support migration.
+    static BOOST_CONSTEXPR bool supports_migration() { return false; }
+
+    // Pinning functionality
+    void pin() {}
+    void unpin() {}
+    boost::uint32_t pin_count() const { return 0; }
+    void mark_as_migrated()
+    {
+        // If this assertion is triggered then this component instance is being
+        // migrated even if the component type has not been enabled to support
+        // migration.
+        HPX_ASSERT(false);
+    }
 
 private:
     mutable naming::gid_type gid_;

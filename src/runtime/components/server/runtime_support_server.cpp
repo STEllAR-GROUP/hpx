@@ -246,34 +246,18 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     // delete an existing instance of a component
     void runtime_support::free_component(
-        components::component_type type, naming::gid_type const& gid,
-        naming::gid_type const& count)
+        agas::gva const& g, naming::gid_type const& gid, boost::uint64_t count)
     {
         // Special case: component_memory_block.
-        if (type == components::component_memory_block) {
+        if (g.type == components::component_memory_block) {
             applier::applier& appl = hpx::applier::get_applier();
 
-            for (naming::gid_type i(0, 0); i < count; ++i)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 naming::gid_type target = gid + i;
 
-                // retrieve the local address bound to the given global id
-                naming::address addr;
-                if (!appl.get_agas_client().resolve(target, addr))
-                {
-                    hpx::util::osstream strm;
-                    strm << "global id " << target << " is not bound to any "
-                            "component instance";
-                    // FIXME: If this throws then we leak the rest of count.
-                    // What should we do instead?
-                    HPX_THROW_EXCEPTION(hpx::unknown_component_address,
-                        "runtime_support::free_component",
-                        hpx::util::osstream_get_string(strm));
-                    return;
-                }
-
                 // make sure this component is located here
-                if (appl.here() != addr.locality_)
+                if (appl.here() != g.endpoint)
                 {
                     // FIXME: should the component be re-bound ?
                     hpx::util::osstream strm;
@@ -289,7 +273,8 @@ namespace hpx { namespace components { namespace server
 
                 // free the memory block
                 components::server::memory_block::destroy(
-                    reinterpret_cast<components::server::memory_block*>(addr.address_));
+                    reinterpret_cast<components::server::memory_block*>(
+                        g.lva(target, gid)));
 
                 LRT_(info) << "successfully destroyed memory block " << target;
             }
@@ -298,7 +283,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // locate the factory for the requested component type
-        component_map_type::const_iterator it = components_.find(type);
+        component_map_type::const_iterator it = components_.find(g.type);
         if (it == components_.end()) {
             // we don't know anything about this component
             hpx::util::osstream strm;
@@ -306,8 +291,8 @@ namespace hpx { namespace components { namespace server
             error_code ec(lightweight);
             strm << "attempt to destroy component " << gid
                  << " of invalid/unknown type: "
-                 << components::get_component_type_name(type) << " ("
-                 << naming::get_agas_client().get_component_type_name(type, ec)
+                 << components::get_component_type_name(g.type) << " ("
+                 << naming::get_agas_client().get_component_type_name(g.type, ec)
                  << ")" << std::endl;
 
             strm << "list of registered components: \n";
@@ -325,18 +310,20 @@ namespace hpx { namespace components { namespace server
             return;
         }
 
-
-        for (naming::gid_type i(0, 0); i < count; ++i)
+        for (std::size_t i = 0; i != count; ++i)
         {
-            naming::gid_type target = gid + i;
+            naming::gid_type target(gid + i);
+
+            naming::address addr(g.endpoint, g.type, g.lva(target, gid));
 
             // FIXME: If this throws then we leak the rest of count.
             // What should we do instead?
-            // destroy the component instance
-            (*it).second.first->destroy(target);
 
-            LRT_(info) << "successfully destroyed component " << target
-                << " of type: " << components::get_component_type_name(type);
+            // destroy the component instance
+            (*it).second.first->destroy(target, addr);
+
+            LRT_(info) << "successfully destroyed component " << (gid + i)
+                << " of type: " << components::get_component_type_name(g.type);
         }
     }
 
@@ -361,7 +348,7 @@ namespace hpx { namespace components { namespace server
             typedef void_lco_type::set_event_action action_type;
 
             naming::address addr;
-            if (agas::is_local_address(respond_to, addr)) {
+            if (agas::is_local_address_cached(respond_to, addr)) {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
                 hpx::applier::detail::apply_l<action_type>(respond_to, addr);
@@ -647,8 +634,8 @@ namespace hpx { namespace components { namespace server
             agas_client.unregister_locality(appl.here(), ec);
 
             // unregister fixed components
-            agas_client.unbind(appl.get_runtime_support_raw_gid(), ec);
-            agas_client.unbind(appl.get_memory_raw_gid(), ec);
+            agas_client.unbind_local(appl.get_runtime_support_raw_gid(), ec);
+            agas_client.unbind_local(appl.get_memory_raw_gid(), ec);
 
             if (remove_from_remote_caches)
                 remove_here_from_connection_cache();
@@ -659,7 +646,7 @@ namespace hpx { namespace components { namespace server
                 typedef void_lco_type::set_event_action action_type;
 
                 naming::address addr;
-                if (agas::is_local_address(respond_to, addr)) {
+                if (agas::is_local_address_cached(respond_to, addr)) {
                     // execute locally, action is executed immediately as it is
                     // a direct_action
                     hpx::applier::detail::apply_l<action_type>(respond_to, addr);

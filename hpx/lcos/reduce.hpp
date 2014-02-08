@@ -400,10 +400,9 @@ namespace hpx { namespace lcos
 
                 if(!ids_first.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_first[0]);
                     reduce_futures.push_back(
-                        hpx::async<reduce_impl_action>(
-                            id
+                        hpx::async_colocated<reduce_impl_action>(
+                            ids_first[0]
                           , act
                           , std::move(ids_first)
                           , reduce_op
@@ -415,10 +414,9 @@ namespace hpx { namespace lcos
 
                 if(!ids_second.empty())
                 {
-                    hpx::id_type id = hpx::get_colocation_id_sync(ids_second[0]);
                     reduce_futures.push_back(
-                        hpx::async<reduce_impl_action>(
-                            id
+                        hpx::async_colocated<reduce_impl_action>(
+                            ids_second[0]
                           , act
                           , std::move(ids_second)
                           , reduce_op
@@ -517,8 +515,6 @@ namespace hpx { namespace lcos
       , ReduceOp && reduce_op
       BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(N, A, const & a))
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
-
         typedef
             typename detail::make_reduce_action<Action>::
                 template reduce_invoker<ReduceOp>::type
@@ -529,8 +525,8 @@ namespace hpx { namespace lcos
             action_result;
 
         return
-            hpx::async<reduce_impl_action>(
-                dest
+            hpx::async_colocated<reduce_impl_action>(
+                ids[0]
               , Action()
               , ids
               , std::forward<ReduceOp>(reduce_op)

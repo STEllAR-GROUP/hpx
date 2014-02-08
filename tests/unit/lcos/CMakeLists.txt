@@ -1,10 +1,11 @@
-# Copyright (c) 2007-2013 Hartmut Kaiser
+# Copyright (c) 2007-2014 Hartmut Kaiser
 # Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    apply_colocated
     apply_local
     apply_remote
     async_continue
@@ -45,7 +46,11 @@ if((040500 EQUAL ${gcc_version}) OR (040500 LESS ${gcc_version}) OR ("${CMAKE_CX
      )
 endif()
 
+set(apply_colocated_PARAMETERS LOCALITIES 2)
+set(apply_remote_PARAMETERS LOCALITIES 2)
+
 set(async_continue_PARAMETERS LOCALITIES 2)
+set(async_remote_PARAMETERS LOCALITIES 2)
 
 set(broadcast_PARAMETERS LOCALITIES 2)
 

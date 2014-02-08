@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,45 +13,13 @@
 #include <hpx/runtime/components/server/copy_component.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/lcos/future.hpp>
+#include <hpx/lcos/async_colocated.hpp>
 #include <hpx/traits/is_component.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
 namespace hpx { namespace components
 {
-    /// \cond NOINTERNAL
-    namespace detail
-    {
-        // This creates the new copy of the component on the same locality 
-        // as the source.
-        // This will be called when f is ready().
-        template <typename Component>
-        naming::id_type copy_same_locality(naming::id_type const& to_copy,
-            unique_future<naming::id_type> f)
-        {
-            typedef typename server::copy_component_action<Component>
-                action_type;
-
-            naming::id_type component_locality(f.get());
-            return async<action_type>(component_locality, to_copy,
-                component_locality).get();
-        }
-
-        // This creates the new copy of the component on the same locality 
-        // as the source.
-        // This will be called when f is ready().
-        template <typename Component>
-        naming::id_type copy_any_locality(naming::id_type const& to_copy,
-            naming::id_type const& target_locality,
-            unique_future<naming::id_type> f)
-        {
-            typedef typename server::copy_component_action<Component>
-                action_type;
-            return async<action_type>(f.get(), to_copy, target_locality).get();
-        }
-    }
-    /// \endcond
-
     /// \brief Copy given component to the specified target locality
     ///
     /// The function \a copy<Component> will create a copy of the component
@@ -85,21 +53,8 @@ namespace hpx { namespace components
     copy(naming::id_type const& to_copy,
         naming::id_type const& target_locality = naming::invalid_id)
     {
-        unique_future<naming::id_type> f = get_colocation_id(to_copy);
-
-        // if the new component should be created on the same locality as 
-        // the source component, we simply invoke the copy operation there.
-        if (!target_locality) {
-            return f.then(util::bind(
-                &detail::copy_same_locality<Component>,
-                to_copy, util::placeholders::_1));
-        }
-
-        // at this point it is not clear what locality the new component
-        // should be created on
-        return f.then(util::bind(
-            &detail::copy_any_locality<Component>,
-            to_copy, target_locality, util::placeholders::_1));
+        typedef server::copy_component_action<Component> action_type;
+        return async_colocated<action_type>(to_copy, to_copy, target_locality);
     }
 }}
 
