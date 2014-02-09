@@ -130,7 +130,7 @@ namespace hpx
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_EXPORTS)
+#if !defined(HPX_EXPORTS) && !defined(HPX_NO_VERSION_CHECK)
     // This is instantiated for each translation unit outside of the HPX core
     // library, forcing to resolve the variable HPX_CHECK_VERSION.
     namespace
