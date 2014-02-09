@@ -1,10 +1,10 @@
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //  Copyright (c) 2007-2013 Hartmut Kaiser
-//  Copyright (c)      2013 Thomas Heller
-//  Copyright (c)      2013 Patricia Grubel
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include "worker_timed.hpp"
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
@@ -16,8 +16,6 @@
 #include <boost/format.hpp>
 #include <boost/cstdint.hpp>
 
-#include "worker_timed.hpp"
-
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
 using boost::program_options::value;
@@ -27,14 +25,12 @@ using hpx::finalize;
 using hpx::get_os_thread_count;
 
 using hpx::applier::register_work;
+using hpx::applier::register_non_suspendable_work;
 
 using hpx::this_thread::suspend;
 using hpx::threads::get_thread_count;
 
 using hpx::util::high_resolution_timer;
-
-using hpx::reset_active_counters;
-using hpx::stop_active_counters;
 
 using hpx::cout;
 using hpx::flush;
@@ -45,9 +41,6 @@ boost::uint64_t tasks = 500000;
 boost::uint64_t delay = 0;
 bool header = true;
 
-// delay in seconds
-double delay_sec = 0;
-
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
     boost::uint64_t cores
@@ -55,7 +48,7 @@ void print_results(
     )
 {
     if (header)
-        cout << "OS-threads,Tasks,Delay (micro-seconds),"
+        cout << "OS-threads,Tasks,Delay (iterations),"
                 "Total Walltime (seconds),Walltime per Task (seconds)\n"
              << flush;
 
@@ -69,15 +62,6 @@ void print_results(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// avoid having one single volatile variable to become a contention point
-int invoke_worker_timed(double delay_sec)
-{
-    volatile int i = 0;
-    worker_timed(delay_sec, &i);
-    return i;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int hpx_main(
     variables_map& vm
     )
@@ -85,16 +69,13 @@ int hpx_main(
     if (vm.count("no-header"))
         header = false;
 
-    // delay in seconds
-    delay_sec = delay * 1.0E-6;
-
     std::size_t num_os_threads = hpx::get_os_thread_count();
 
     int num_executors = vm["executors"].as<int>();
     if (num_executors <= 0)
         throw std::invalid_argument("number of executors to use must be larger than 0");
 
-    if (num_executors > std::size_t(num_os_threads))
+    if (std::size_t(num_executors) > num_os_threads)
         throw std::invalid_argument("number of executors to use must be smaller than number of OS threads");
 
     std::size_t num_cores_per_executor = vm["cores"].as<int>();
@@ -104,9 +85,6 @@ int hpx_main(
 
     if (0 == tasks)
         throw std::invalid_argument("count of 0 tasks specified\n");
-
-    // Reset performance counters (if specified on command line)
-    reset_active_counters();
 
     // Start the clock.
     high_resolution_timer t;
@@ -130,19 +108,22 @@ int hpx_main(
 
         t.restart();
 
-        for (boost::uint64_t i = 0; i < tasks; ++i)
-            executors[i % num_executors].add(HPX_STD_BIND(&invoke_worker_timed, delay_sec));
+        if (0 == vm.count("no-stack")) {
+            // schedule normal threads
+            for (boost::uint64_t i = 0; i < tasks; ++i)
+                executors[i % num_executors].add(HPX_STD_BIND(&worker_timed, delay));
+        }
+        else {
+            // schedule stackless threads
+            for (boost::uint64_t i = 0; i < tasks; ++i)
+                executors[i % num_executors].add(HPX_STD_BIND(&worker_timed, delay),
+                    "", hpx::threads::pending, true, hpx::threads::thread_stacksize_nostack);
+        }
 
     // destructors of executors will wait for all tasks to finish executing
     }
 
-    // Stop the clock
-    double time_elapsed = t.elapsed();
-
-    // Stop Performance Counters
-    stop_active_counters();
-
-    print_results(get_os_thread_count(), time_elapsed);
+    print_results(num_os_threads, t.elapsed());
 
     return finalize();
 }
@@ -163,11 +144,14 @@ int main(
 
         ( "delay"
         , value<boost::uint64_t>(&delay)->default_value(0)
-        , "time in micro-seconds for the delay loop")
+        , "number of iterations in the delay loop")
 
         ( "executors,e"
         , value<int>()->default_value(1)
         , "number of executor instances to use")
+
+        ( "no-stack"
+        , "use stackless threads")
 
         ( "cores"
         , value<int>()->default_value(1)

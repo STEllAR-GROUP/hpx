@@ -6,7 +6,7 @@
 #if !defined(HPX_HIGH_RESOLUTION_CLOCK_FEB_24_2012_1125AM)
 #define HPX_HIGH_RESOLUTION_CLOCK_FEB_24_2012_1125AM
 
-#include <hpx/util/assert.hpp>
+#include <boost/cstdint.hpp>
 
 #if defined(__bgq__)
 #include <hwi/include/bqc/A2_inlines.h>
@@ -27,7 +27,6 @@ namespace hpx { namespace util
 #else
             boost::chrono::nanoseconds ns =
                 boost::chrono::steady_clock::now().time_since_epoch();
-            HPX_ASSERT(ns.count() >= 0);
             return static_cast<boost::uint64_t>(ns.count());
 #endif
         }

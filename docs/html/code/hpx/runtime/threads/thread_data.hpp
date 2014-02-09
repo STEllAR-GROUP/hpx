@@ -22,14 +22,13 @@
 #include <hpx/util/backtrace.hpp>
 #include <hpx/util/coroutine/coroutine.hpp>
 #include <hpx/util/coroutine/stackless_coroutine.hpp>
-#include <hpx/util/lockfree/fifo.hpp>
 #include <hpx/util/spinlock_pool.hpp>
+#include <hpx/util/lockfree/freelist.hpp>
 
 #include <boost/atomic.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/lockfree/detail/freelist.hpp>
 #include <boost/lockfree/detail/branch_hints.hpp>
 
 #include <stack>
@@ -159,10 +158,63 @@ namespace hpx { namespace threads
             ran_exit_funcs_(false),
             exit_funcs_(0),
             scheduler_base_(init_data.scheduler_base),
-            count_(0)
+            count_(0),
+            stacksize_(init_data.stacksize)
         {
             LTM_(debug) << "thread::thread(" << this << "), description("
                         << get_description() << ")";
+
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+            // store the thread id of the parent thread, mainly for debugging
+            // purposes
+            if (0 == parent_thread_id_) {
+                thread_self* self = get_self_ptr();
+                if (self)
+                {
+                    parent_thread_id_ = threads::get_self_id().get();
+                    parent_thread_phase_ = self->get_thread_phase();
+                }
+            }
+            if (0 == parent_locality_id_)
+                parent_locality_id_ = get_locality_id();
+#endif
+        }
+
+        void rebind_base(thread_init_data& init_data, thread_state_enum newstate)
+        {
+            free_thread_exit_callbacks();
+
+            current_state_.store(thread_state(newstate));
+            current_state_ex_.store(thread_state_ex(wait_signaled));
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+            component_id_ = init_data.lva;
+#endif
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
+            description_ = (init_data.description ? init_data.description : "");
+            lco_description_ = "";
+#endif
+#if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
+            parent_locality_id_ = init_data.parent_locality_id;
+            parent_thread_id_ = init_data.parent_id;
+            parent_thread_phase_ = init_data.parent_phase;
+#endif
+#if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
+            set_marked_state(thread_state(unknown));
+#endif
+#if HPX_THREAD_MAINTAIN_BACKTRACE_ON_SUSPENSION
+            backtrace_ = 0;
+#endif
+            priority_ = init_data.priority;
+            requested_interrupt_ = false;
+            enabled_interrupt_ = true;
+            ran_exit_funcs_ = false;
+            exit_funcs_ = 0;
+            scheduler_base_ = init_data.scheduler_base;
+
+            HPX_ASSERT(init_data.stacksize == get_stack_size());
+
+            LTM_(debug) << "thread::thread(" << this << "), description("
+                        << get_description() << "), rebind";
 
 #if HPX_THREAD_MAINTAIN_PARENT_REFERENCE
             // store the thread id of the parent thread, mainly for debugging
@@ -219,8 +271,7 @@ namespace hpx { namespace threads
             for (;;) {
                 thread_state tmp = prev_state;
 
-                using boost::lockfree::likely;
-                if (likely(current_state_.compare_exchange_strong(
+                if (HPX_LIKELY(current_state_.compare_exchange_strong(
                         tmp, thread_state(newstate, tmp.get_tag() + 1))))
                 {
                     return prev_state;
@@ -302,8 +353,7 @@ namespace hpx { namespace threads
             for (;;) {
                 thread_state_ex tmp = prev_state;
 
-                using boost::lockfree::likely;
-                if (likely(current_state_ex_.compare_exchange_strong(
+                if (HPX_LIKELY(current_state_ex_.compare_exchange_strong(
                         tmp, thread_state_ex(new_state, tmp.get_tag() + 1))))
                 {
                     return prev_state;
@@ -538,6 +588,11 @@ namespace hpx { namespace threads
             return scheduler_base_;
         }
 
+        std::ptrdiff_t get_stack_size() const
+        {
+            return stacksize_;
+        }
+
         virtual bool is_created_from(void* pool) const = 0;
         virtual thread_state_enum operator()() = 0;
         virtual thread_id_type get_thread_id() const = 0;
@@ -546,6 +601,9 @@ namespace hpx { namespace threads
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 #endif
+        
+        virtual void rebind(thread_init_data& init_data,
+            thread_state_enum newstate) = 0;
 
         /// This function will be called when the thread is about to be deleted
         //virtual void reset() {}
@@ -601,6 +659,8 @@ namespace hpx { namespace threads
 
         //reference count
         boost::detail::atomic_count count_;
+
+        std::ptrdiff_t stacksize_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -628,6 +688,21 @@ namespace hpx { namespace threads
             LTM_(debug) << "~thread(" << this << "), description(" //-V128
                         << get_description() << "), phase("
                         << get_thread_phase() << ")";
+        }
+
+        void rebind(thread_init_data& init_data, thread_state_enum newstate)
+        {
+            LTM_(debug) << "~thread(" << this << "), description(" //-V128
+                        << get_description() << "), phase("
+                        << get_thread_phase() << "), rebind";
+
+            this->thread_data_base::rebind_base(init_data, newstate);
+
+            coroutine_.rebind(boost::move(init_data.func),
+                boost::move(init_data.target), this_());
+
+            HPX_ASSERT(init_data.stacksize != 0);
+            HPX_ASSERT(coroutine_.is_ready());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -659,8 +734,9 @@ namespace hpx { namespace threads
             thread_state_ex current_state_ex = get_state_ex();
             current_state_ex_.store(thread_state_ex(wait_signaled,
                 current_state_ex.get_tag() + 1), boost::memory_order_release);
-
+    
             HPX_ASSERT(this_() == coroutine_.get_thread_id());
+    
             return coroutine_(current_state_ex);
         }
 
@@ -728,6 +804,20 @@ namespace hpx { namespace threads
                         << get_thread_phase() << ")";
         }
 
+        void rebind(thread_init_data& init_data, thread_state_enum newstate)
+        {
+            LTM_(debug) << "~stackless_thread(" << this << "), description(" //-V128
+                        << get_description() << "), phase("
+                        << get_thread_phase() << "), rebind";
+
+            this->thread_data_base::rebind_base(init_data, newstate);
+
+            coroutine_.rebind(boost::move(init_data.func),
+                boost::move(init_data.target), this_());
+
+            HPX_ASSERT(init_data.stacksize == 0);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Memory management
         bool is_created_from(void* pool) const
@@ -746,7 +836,7 @@ namespace hpx { namespace threads
             thread_state_ex current_state_ex = get_state_ex();
             current_state_ex_.store(thread_state_ex(wait_signaled,
                 current_state_ex.get_tag() + 1), boost::memory_order_release);
-
+    
             return coroutine_(current_state_ex);
         }
 

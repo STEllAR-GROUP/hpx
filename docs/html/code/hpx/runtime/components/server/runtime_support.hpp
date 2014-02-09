@@ -614,8 +614,8 @@ namespace hpx { namespace components { namespace server
     template <typename Component>
     struct migrate_component_here_action
       : ::hpx::actions::result_action2<
-            runtime_support, naming::id_type
-          , boost::shared_ptr<Component> const&, naming::id_type,
+            runtime_support, naming::gid_type
+          , boost::shared_ptr<Component> const&, naming::id_type
           , &runtime_support::migrate_component_to_here<Component>
           , migrate_component_here_action<Component> >
     {};

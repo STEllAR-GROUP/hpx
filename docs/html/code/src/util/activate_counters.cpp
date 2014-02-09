@@ -12,6 +12,7 @@
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/util/stringstream.hpp>
 #include <hpx/util/apex.hpp>
+#include <hpx/util/unwrapped.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/stubs/performance_counter.hpp>
@@ -90,6 +91,8 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     void activate_counters::start_counters(error_code& ec)
     {
+        using performance_counters::stubs::performance_counter;
+
         // add counter prefix, if necessary
         BOOST_FOREACH(std::string& name, names_)
             performance_counters::ensure_counter_prefix(name);
@@ -97,7 +100,6 @@ namespace hpx { namespace util
         find_counters();
 
         // Query the performance counters.
-        using performance_counters::stubs::performance_counter;
         std::vector<unique_future<bool> > started;
 
         started.reserve(ids_.size());
@@ -156,12 +158,13 @@ namespace hpx { namespace util
     }
 
     std::vector<unique_future<performance_counters::counter_value> >
-    activate_counters::evaluate_counters(bool reset, error_code& ec)
+    activate_counters::evaluate_counters_async(bool reset, error_code& ec)
     {
         if (ids_.empty())
         {
             // start has not been called yet
-            HPX_THROWS_IF(ec, invalid_status, "activate_counters::evaluate_counters",
+            HPX_THROWS_IF(ec, invalid_status,
+                "activate_counters::evaluate_counters_async",
                 "The counters to be evaluated have not been initialized yet");
             std::vector<unique_future<performance_counters::counter_value> > tmp;
             return tmp;
@@ -176,5 +179,16 @@ namespace hpx { namespace util
 
         return values;
     } 
+
+    std::vector<performance_counters::counter_value>
+    activate_counters::evaluate_counters_sync(bool reset, error_code& ec)
+    {
+        std::vector<unique_future<performance_counters::counter_value> >
+            futures = evaluate_counters_async(reset, ec);
+
+        return util::unwrapped(futures);
+        
+    } 
+
 }}
 

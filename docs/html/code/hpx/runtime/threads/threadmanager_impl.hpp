@@ -24,7 +24,6 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/block_profiler.hpp>
 #include <hpx/util/spinlock.hpp>
-#include <hpx/util/lockfree/fifo.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -443,6 +442,11 @@ namespace hpx { namespace threads
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_idle_rate(bool reset);
         boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
+
+#if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
+        boost::int64_t avg_creation_idle_rate(bool reset);
+        boost::int64_t avg_cleanup_idle_rate(bool reset);
+#endif
 
     protected:
         // this is the thread function executing the work items in the queue

@@ -17,7 +17,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
-#include <hpx/util/lockfree/fifo.hpp>
+#include <boost/lockfree/queue.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
 
@@ -38,7 +38,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     boost::mutex mtx;
     std::size_t connected;
 
-    boost::lockfree::fifo<HPX_STD_FUNCTION<void()>* > thunks;
+    boost::lockfree::queue<HPX_STD_FUNCTION<void()>* > thunks;
 
     void spin();
 
@@ -73,7 +73,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
     ~big_boot_barrier()
     {
         HPX_STD_FUNCTION<void()>* f;
-        while (thunks.dequeue(f))
+        while (thunks.pop(f))
             delete f;
     }
 
@@ -102,7 +102,7 @@ struct HPX_EXPORT big_boot_barrier : boost::noncopyable
         HPX_STD_FUNCTION<void()>* f
         )
     {
-        thunks.enqueue(f);
+        thunks.push(f);
     }
 };
 

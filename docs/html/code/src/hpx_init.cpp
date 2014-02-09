@@ -541,40 +541,6 @@ namespace hpx
             return rt.start();
         }
 
-#if defined(HPX_GLOBAL_SCHEDULER)
-        ///////////////////////////////////////////////////////////////////////
-        // global scheduler (one queue for all OS threads)
-        int run_global(startup_function_type const& startup,
-            shutdown_function_type const& shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-            ensure_queuing_option_compatibility(cfg.vm_);
-            ensure_hwloc_compatibility(cfg.vm_);
-
-            // scheduling policy
-            typedef hpx::threads::policies::global_queue_scheduler
-                global_queue_policy;
-
-            global_queue_policy::init_parameter_type init(0);
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<global_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
-
-            if (blocking) {
-                return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown);
-            }
-
-            // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
-
-            rt.release();          // pointer to runtime is stored in TLS
-            return 0;
-        }
-#endif
-
 #if defined(HPX_LOCAL_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // local scheduler (one queue for each OS threads)
@@ -882,41 +848,6 @@ namespace hpx
             return 0;
         }
 
-#if defined(HPX_ABP_SCHEDULER)
-        ///////////////////////////////////////////////////////////////////////
-        // abp scheduler: local deques for each OS thread, with work
-        // stealing from the "bottom" of each.
-        int run_abp(startup_function_type const& startup,
-            shutdown_function_type const& shutdown,
-            util::command_line_handling& cfg, bool blocking)
-        {
-            ensure_queuing_option_compatibility(cfg.vm_);
-            ensure_hwloc_compatibility(cfg.vm_);
-
-            // scheduling policy
-            typedef hpx::threads::policies::abp_queue_scheduler
-                abp_queue_policy;
-            abp_queue_policy::init_parameter_type init(cfg.num_threads_, 1000);
-
-            // Build and configure this runtime instance.
-            typedef hpx::runtime_impl<abp_queue_policy> runtime_type;
-            HPX_STD_UNIQUE_PTR<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init));
-
-            if (blocking) {
-                return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup,
-                    shutdown);
-            }
-
-            // non-blocking version
-            start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.mode_, startup, shutdown);
-
-            rt.release();          // pointer to runtime is stored in TLS
-            return 0;
-        }
-#endif
-
-#if defined(HPX_ABP_PRIORITY_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // priority abp scheduler: local priority deques for each OS thread,
         // with work stealing from the "bottom" of each.
@@ -938,7 +869,7 @@ namespace hpx
                 numa_sensitive = true;
 
             // scheduling policy
-            typedef hpx::threads::policies::abp_priority_queue_scheduler
+            typedef hpx::threads::policies::abp_fifo_priority_queue_scheduler
                 abp_priority_queue_policy;
             abp_priority_queue_policy::init_parameter_type init(
                 cfg.num_threads_, num_high_priority_queues, 1000,
@@ -960,7 +891,6 @@ namespace hpx
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
         }
-#endif
 
 #if defined(HPX_HIERARCHY_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
@@ -975,7 +905,7 @@ namespace hpx
             ensure_hwloc_compatibility(cfg.vm_);
 
             // scheduling policy
-            typedef hpx::threads::policies::hierarchy_scheduler queue_policy;
+            typedef hpx::threads::policies::hierarchy_scheduler<> queue_policy;
             std::size_t arity = 2;
             if (cfg.vm_.count("hpx:hierarchy-arity"))
                 arity = cfg.vm_["hpx:hierarchy-arity"].as<std::size_t>();
@@ -1022,7 +952,7 @@ namespace hpx
                 numa_sensitive = true;
 
             // scheduling policy
-            typedef hpx::threads::policies::local_periodic_priority_scheduler
+            typedef hpx::threads::policies::periodic_priority_queue_scheduler<>
                 local_queue_policy;
             local_queue_policy::init_parameter_type init(cfg.num_threads_,
                 num_high_priority_queues, 1000, numa_sensitive);
@@ -1078,16 +1008,7 @@ namespace hpx
             }
 
             // Initialize and start the HPX runtime.
-            if (0 == std::string("global").find(cfg.queuing_)) {
-#if defined(HPX_GLOBAL_SCHEDULER)
-                result = detail::run_global(startup, shutdown, cfg, blocking);
-#else
-                throw std::logic_error("Command line option --hpx:queuing=global "
-                    "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_GLOBAL_SCHEDULER=ON'.");
-#endif
-            }
-            else if (0 == std::string("local").find(cfg.queuing_)) {
+            if (0 == std::string("local").find(cfg.queuing_)) {
 #if defined(HPX_LOCAL_SCHEDULER)
                 result = detail::run_local(startup, shutdown, cfg, blocking);
 #else
@@ -1107,30 +1028,14 @@ namespace hpx
             }
             else if (0 == std::string("priority_local").find(cfg.queuing_)) {
                 // local scheduler with priority queue (one queue for each OS threads
-                // plus one separate queue for high priority PX-threads)
+                // plus separate deques for low/high priority PX-threads)
                 result = detail::run_priority_local(startup, shutdown, cfg, blocking);
             }
-            else if (0 == std::string("abp").find(cfg.queuing_)) {
-                // abp scheduler: local dequeues for each OS thread, with work
-                // stealing from the "bottom" of each.
-#if defined(HPX_ABP_SCHEDULER)
-                result = detail::run_abp(startup, shutdown, cfg, blocking);
-#else
-                throw std::logic_error("Command line option --hpx:queuing=abp "
-                    "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_ABP_SCHEDULER=ON'.");
-#endif
-            }
             else if (0 == std::string("priority_abp").find(cfg.queuing_)) {
-                // priority abp scheduler: local priority dequeues for each
-                // OS thread, with work stealing from the "bottom" of each.
-#if defined(HPX_ABP_PRIORITY_SCHEDULER)
+                // local scheduler with priority deque (one deque for each OS threads
+                // plus separate deques for high priority PX-threads), uses
+                // abp-style stealing
                 result = detail::run_priority_abp(startup, shutdown, cfg, blocking);
-#else
-                throw std::logic_error("Command line option --hpx:queuing=priority_abp "
-                    "is not configured in this build. Please rebuild with "
-                    "'cmake -DHPX_ABP_PRIORITY_SCHEDULER=ON'.");
-#endif
             }
             else if (0 == std::string("hierarchy").find(cfg.queuing_)) {
 #if defined(HPX_HIERARCHY_SCHEDULER)

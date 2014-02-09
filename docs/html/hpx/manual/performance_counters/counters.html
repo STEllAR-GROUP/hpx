@@ -969,6 +969,49 @@
 <tr>
 <td>
                   <p>
+                    <code class="computeroutput">/threads/count/cumulative_phases</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the overall number of executed <span class="emphasis"><em>HPX</em></span>-thread
+                    phases (invocations) should be queried for. The locality id (given
+                    by <code class="computeroutput">*</code>) is a (zero based) number identifying the locality.
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the overall number of executed <span class="emphasis"><em>HPX</em></span>-thread
+                    phases (invocations) should be queried for. The worker thread
+                    number (given by the <code class="computeroutput">*</code>) is a (zero based) number
+                    identifying the worker thread. The number of available worker
+                    threads is usually specified on the command line for the application
+                    using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the overall number of executed (retired) <span class="emphasis"><em>HPX</em></span>-threads
+                    on the given locality since application start. If the instance
+                    name is <code class="computeroutput">total</code> the counter returns the accumulated
+                    number of retired <span class="emphasis"><em>HPX</em></span>-threads for all worker
+                    threads (cores) on that locality. If the instance name is <code class="computeroutput">worker-thread#*</code>
+                    the counter will return the overall number of retired <span class="emphasis"><em>HPX</em></span>-threads
+                    for the specified worker thread.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
                     <code class="computeroutput">/threads/count/instantaneous/&lt;thread-state&gt;</code>
                   </p>
                   <p>
