@@ -16,6 +16,8 @@
 
 #include <boost/cstdint.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace util
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -62,5 +64,7 @@ namespace hpx { namespace util
         interval_timer timer_;
     };
 }}
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
