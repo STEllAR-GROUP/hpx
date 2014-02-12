@@ -38,7 +38,10 @@ namespace jacobi_smp {
 
     inline void report_timing(std::size_t n, std::size_t iterations, double elapsed)
     {
-        std::cout << n << "x" << n << " " << ((double((n-2)*(n-2) * iterations)/1e6)/elapsed) << " MLUPS/s\n";
+        std::cout
+            << n << "x" << n << " "
+            << elapsed << " s "
+            << ((double((n-2)*(n-2) * iterations)/1e6)/elapsed) << " MLUPS/s\n";
     }
 
     inline void output_grid(std::string filename, std::vector<double> const & grid, std::size_t n)
