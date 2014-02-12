@@ -301,7 +301,7 @@ namespace hpx { namespace threads { namespace policies
 
             for (size_type i = 0; i < tree.size(); ++i)
                 for (size_type j = 0; j < tree[i].size(); ++j)
-                    time += tree[i]->get_cleanup_time(reset);
+                    time += tree[i][j]->get_cleanup_time(reset);
 
             return time;
         }
