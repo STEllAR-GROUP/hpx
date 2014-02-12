@@ -160,6 +160,75 @@ namespace hpx { namespace threads { namespace detail
         bool need_restore_state_;
     };
 
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
+    struct idle_collect_rate
+    {
+        idle_collect_rate(boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)
+          : start_timestamp_(util::hardware::timestamp())
+          , tfunc_time_(tfunc_time)
+          , exec_time_(exec_time)
+        {}
+
+        void collect_exec_time(boost::uint64_t timestamp)
+        {
+            exec_time_ += util::hardware::timestamp() - timestamp;
+        }
+        void take_snapshot()
+        {
+            tfunc_time_ = util::hardware::timestamp() - start_timestamp_;
+        }
+
+        boost::uint64_t start_timestamp_;
+
+        boost::uint64_t& tfunc_time_;
+        boost::uint64_t& exec_time_;
+    };
+
+    struct exec_time_wrapper
+    {
+        exec_time_wrapper(idle_collect_rate& idle_rate)
+          : timestamp_(util::hardware::timestamp())
+          , idle_rate_(idle_rate)
+        {}
+        ~exec_time_wrapper()
+        {
+            idle_rate_.collect_exec_time(timestamp_);
+        }
+
+        boost::uint64_t timestamp_;
+        idle_collect_rate& idle_rate_;
+    };
+
+    struct tfunc_time_wrapper
+    {
+        tfunc_time_wrapper(idle_collect_rate& idle_rate)
+          : idle_rate_(idle_rate)
+        {
+        }
+        ~tfunc_time_wrapper()
+        {
+            idle_rate_.take_snapshot();
+        }
+
+        idle_collect_rate& idle_rate_;
+    };
+#else
+    struct idle_collect_rate
+    {
+        idle_collect_rate(boost::uint64_t&, boost::uint64_t&) {}
+    };
+
+    struct exec_time_wrapper
+    {
+        exec_time_wrapper(idle_collect_rate&) {}
+    };
+
+    struct tfunc_time_wrapper
+    {
+        tfunc_time_wrapper(idle_collect_rate&) {}
+    };
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
@@ -176,9 +245,8 @@ namespace hpx { namespace threads { namespace detail
         boost::int64_t idle_loop_count = 0;
         boost::int64_t busy_loop_count = 0;
 
-#if HPX_THREAD_MAINTAIN_IDLE_RATE
-        boost::uint64_t overall_timestamp = util::hardware::timestamp();
-#endif
+        idle_collect_rate idle_rate(tfunc_time, exec_time);
+        tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
         typedef typename SchedulingPolicy::has_periodic_maintenance pred;
         detail::start_periodic_maintenance(scheduler, global_state, pred());
@@ -189,6 +257,8 @@ namespace hpx { namespace threads { namespace detail
             if (scheduler.SchedulingPolicy::get_next_thread(num_thread,
                     global_state == running, idle_loop_count, thrd))
             {
+                tfunc_time_wrapper tfunc_time_collector(idle_rate);
+
                 idle_loop_count = 0;
                 ++busy_loop_count;
 
@@ -208,7 +278,10 @@ namespace hpx { namespace threads { namespace detail
                         // tries to set state to active (only if state is still
                         // the same as 'state')
                         detail::switch_status thrd_stat (thrd, state);
-                        if (thrd_stat.is_valid() && thrd_stat.get_previous() == pending) {
+                        if (thrd_stat.is_valid() && thrd_stat.get_previous() == pending)
+                        {
+                            tfunc_time_wrapper tfunc_time_collector(idle_rate);
+
                             // thread returns new required state
                             // store the returned state in the thread
                             {
@@ -217,22 +290,14 @@ namespace hpx { namespace threads { namespace detail
                                 util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task(domain, thrd->get_description());
 #endif
-#if HPX_THREAD_MAINTAIN_IDLE_RATE
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
-                                boost::uint64_t timestamp = util::hardware::timestamp();
-#endif
+                                exec_time_wrapper exec_time_collector(idle_rate);
                                 thrd_stat = (*thrd)();
-#if HPX_THREAD_MAINTAIN_IDLE_RATE
-                                exec_time += util::hardware::timestamp() - timestamp;
-#endif
                             }
 
 #if HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
                             ++executed_thread_phases;
-#endif
-#if HPX_THREAD_MAINTAIN_IDLE_RATE
-                            tfunc_time = util::hardware::timestamp() - overall_timestamp;
 #endif
                         }
                         else {
@@ -304,10 +369,6 @@ namespace hpx { namespace threads { namespace detail
 #endif
                     scheduler.SchedulingPolicy::destroy_thread(thrd, busy_loop_count);
                 }
-
-#if HPX_THREAD_MAINTAIN_IDLE_RATE
-                tfunc_time = util::hardware::timestamp() - overall_timestamp;
-#endif
             }
 
             // if nothing else has to be done either wait or terminate
@@ -346,11 +407,6 @@ namespace hpx { namespace threads { namespace detail
                 scheduler.SchedulingPolicy::cleanup_terminated(true);
             }
         }
-
-        // record total time elapsed after the main scheduling loop exited
-#if HPX_THREAD_MAINTAIN_IDLE_RATE
-        tfunc_time = util::hardware::timestamp() - overall_timestamp;
-#endif
     }
 }}}
 
