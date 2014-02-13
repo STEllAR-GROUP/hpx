@@ -29,7 +29,7 @@
 #endif
 #endif
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(__bgq__)
 #define BOOST_HAVE_ABI_CXA_DEMANGLE
 #endif
 
