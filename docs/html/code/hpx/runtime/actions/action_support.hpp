@@ -223,7 +223,7 @@ namespace hpx { namespace actions
     struct base_action
     {
         /// The type of an action defines whether this action will be executed
-        /// directly or by a PX-threads
+        /// directly or by a HPX-threads
         enum action_type
         {
             plain_action = 0,   ///< The action will be executed by a newly created thread

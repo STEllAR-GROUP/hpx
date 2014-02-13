@@ -55,7 +55,7 @@ namespace hpx { namespace threads
         /// \brief Return whether the thread manager is still running
         virtual state status() const = 0;
 
-        /// \brief return the number of PX-threads with the given state
+        /// \brief return the number of HPX-threads with the given state
         virtual boost::int64_t get_thread_count(
             thread_state_enum state = unknown,
             thread_priority priority = thread_priority_default) const = 0;

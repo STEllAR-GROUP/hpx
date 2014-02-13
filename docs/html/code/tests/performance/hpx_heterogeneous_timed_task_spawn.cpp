@@ -208,8 +208,8 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Wait for the work to finish.
         do {
-            // Reschedule hpx_main until all other px-threads have finished. We
-            // should be resumed after most of the null px-threads have been
+            // Reschedule hpx_main until all other HPX-threads have finished. We
+            // should be resumed after most of the null HPX-threads have been
             // executed. If we haven't, we just reschedule ourselves again.
             suspend();
         } while (get_thread_count(hpx::threads::thread_priority_normal) > 1);

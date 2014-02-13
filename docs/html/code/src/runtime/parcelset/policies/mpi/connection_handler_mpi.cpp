@@ -7,7 +7,7 @@
 #include <hpx/config/defines.hpp>
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
-
+#include <mpi.h>
 #include <hpx/exception_list.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/policies/mpi/connection_handler.hpp>
@@ -86,6 +86,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     {
         // Mark stopped state
         stopped_ = true;
+        // Wait until message handler returns
+        std::size_t k = 0;
+        while(handling_messages_)
+        {
+            hpx::lcos::local::spinlock::yield(k);
+            ++k;
+        }
     }
 
     // Make sure all pending requests are handled
@@ -201,6 +208,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         std::size_t k = 0;
 
         hpx::util::high_resolution_timer t;
+        std::list<std::pair<int, MPI_Request> > close_requests;
 
         // We let the message handling loop spin for another 2 seconds to avoid the
         // costs involved with posting it to asio
@@ -227,19 +235,20 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 hpx::lcos::local::spinlock::scoped_lock l(close_mtx_);
                 typedef std::pair<int, int> pair_type;
+
                 BOOST_FOREACH(pair_type p, pending_close_requests_)
                 {
                     header close_request = header::close(p.first, p.second);
-                    MPI_Send(
+                    close_requests.push_back(std::make_pair(p.first, MPI_Request()));
+                    MPI_Isend(
                         close_request.data(),         // Data pointer
                         close_request.data_size_,     // Size
                         close_request.type(),         // MPI Datatype
                         close_request.rank(),         // Destination
                         0,                            // Tag
-                        communicator_                 // Communicator
+                        communicator_,                // Communicator
+                        &close_requests.back().second
                     );
-                    hpx::lcos::local::spinlock::scoped_lock l(tag_mtx_);
-                    free_tags_.push_back(p.first);
                 }
                 pending_close_requests_.clear();
             }
@@ -302,6 +311,31 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
 
             if(!has_work) has_work = !receivers_.empty();
+            
+            // handle completed close requests
+            for(
+                std::list<std::pair<int, MPI_Request> >::iterator it = close_requests.begin();
+                it != close_requests.end();
+            )
+            {
+                int completed = 0;
+                MPI_Status status;
+                int ret = 0;
+                ret = MPI_Test(&it->second, &completed, &status);
+                HPX_ASSERT(ret == MPI_SUCCESS);
+                if(completed && status.MPI_ERROR != MPI_ERR_PENDING)
+                {
+                    hpx::lcos::local::spinlock::scoped_lock l(tag_mtx_);
+                    free_tags_.push_back(it->first);
+                    it = close_requests.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+            if(!has_work)
+                has_work = !close_requests.empty();
 
             if (bootstrapping)
                 bootstrapping = hpx::is_starting();

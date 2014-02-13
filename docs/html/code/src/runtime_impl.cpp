@@ -408,7 +408,7 @@ namespace hpx {
 
         // schedule task in timer_pool to execute stopped() below
         // this is necessary as this function (stop()) might have been called
-        // from a PX thread, so it would deadlock by waiting for the thread
+        // from a HPX thread, so it would deadlock by waiting for the thread
         // manager
         boost::mutex mtx;
         boost::condition cond;
@@ -429,13 +429,13 @@ namespace hpx {
 
     // Second step in termination: shut down all services.
     // This gets executed as a task in the timer_pool io_service and not as
-    // a PX thread!
+    // a HPX thread!
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::stopped(
         bool blocking, boost::condition& cond, boost::mutex& mtx)
     {
         // wait for thread manager to exit
-        runtime_support_->stopped();         // re-activate shutdown PX-thread
+        runtime_support_->stopped();         // re-activate shutdown HPX-thread
         thread_manager_->stop(blocking);     // wait for thread manager
 
         // this disables all logging from the main thread
@@ -452,7 +452,7 @@ namespace hpx {
     void runtime_impl<SchedulingPolicy, NotificationPolicy>::report_error(
         std::size_t num_thread, boost::exception_ptr const& e)
     {
-        // Early and late exceptions, errors outside of px-threads
+        // Early and late exceptions, errors outside of HPX-threads
         if (!threads::get_self_ptr() || !threads::threadmanager_is(running))
         {
             detail::report_exception_and_terminate(e);

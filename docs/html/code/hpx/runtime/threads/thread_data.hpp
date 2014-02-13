@@ -618,7 +618,7 @@ namespace hpx { namespace threads
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
-        naming::address::address_type const component_id_;
+        naming::address::address_type component_id_;
 #endif
 
 #if HPX_THREAD_MAINTAIN_DESCRIPTION

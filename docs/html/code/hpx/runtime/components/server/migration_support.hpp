@@ -68,6 +68,45 @@ namespace hpx { namespace components
             pin_count_ = ~0x0;
         }
 
+        /// This is the hook implementation for decorate_action which makes
+        /// sure that the object becomes pinned during the execution of an
+        /// action.
+        static HPX_STD_FUNCTION<threads::thread_function_type>
+        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
+            naming::address::address_type lva)
+        {
+            using util::placeholders::_1;
+            return util::bind(&migration_support::thread_function,
+                get_lva<this_component_type>::call(lva),
+                _1, base_type::wrap_action(std::move(f), lva));
+        }
+
+    protected:
+        struct scoped_pinner
+        {
+            scoped_pinner(migration_support& outer)
+              : outer_(outer)
+            {
+                outer.pin();
+            }
+            ~scoped_pinner()
+            {
+                outer_.unpin();
+            }
+
+            migration_support& outer_;
+        };
+
+        // Execute the wrapped action. This pins the object making sure that
+        // no migration will happen while an operation is in flight.
+        threads::thread_state_enum thread_function(
+            threads::thread_state_ex_enum state,
+            HPX_STD_FUNCTION<threads::thread_function_type> const& f)
+        {
+            scoped_pinner sp(*this);
+            return f(state);
+        }
+
     private:
         mutable mutex_type mtx_;
         boost::uint32_t pin_count_;

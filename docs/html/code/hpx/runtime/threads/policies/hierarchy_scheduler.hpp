@@ -288,10 +288,12 @@ namespace hpx { namespace threads { namespace policies
         {
             boost::uint64_t time = 0;
 
-            for (size_type i = 0; i < tree.size(); ++i)
-                for (size_type j = 0; j < tree[i].size(); ++j)
-                    time += tree[i][j]->get_creation_time(reset);
-
+            for (size_type i = 0; i != tree.size(); ++i)
+            {
+                level_type& t = tree[i];
+                for (size_type j = 0; j != t.size(); ++j)
+                    time += t[j]->get_creation_time(reset);
+            }
             return time;
         }
 
@@ -299,10 +301,12 @@ namespace hpx { namespace threads { namespace policies
         {
             boost::uint64_t time = 0;
 
-            for (size_type i = 0; i < tree.size(); ++i)
-                for (size_type j = 0; j < tree[i].size(); ++j)
-                    time += tree[i]->get_cleanup_time(reset);
-
+            for (size_type i = 0; i != tree.size(); ++i)
+            {
+                level_type& t = tree[i];
+                for (size_type j = 0; j != t.size(); ++j)
+                    time += t[j]->get_cleanup_time(reset);
+            }
             return time;
         }
 #endif
@@ -312,11 +316,13 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_pending_misses = 0;
             if (num_thread == std::size_t(-1))
             {
-                for (size_type i = 0; i < tree.size(); ++i)
-                    for (size_type j = 0; j < tree[i].size(); ++j)
-                        num_pending_misses += tree[i][j]->
+                for (size_type i = 0; i != tree.size(); ++i)
+                {
+                    level_type& t = tree[i];
+                    for (size_type j = 0; j != t.size(); ++j)
+                        num_pending_misses += t[j]->
                             get_num_pending_misses(reset);
-
+                }
                 return num_pending_misses;
             }
 
@@ -330,11 +336,13 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_pending_accesses = 0;
             if (num_thread == std::size_t(-1))
             {
-                for (size_type i = 0; i < tree.size(); ++i)
-                    for (size_type j = 0; j < tree[i].size(); ++j)
-                        num_pending_accesses += tree[i][j]->
-                            get_num_pending_accesses(reset);
-
+                for (size_type i = 0; i != tree.size(); ++i)
+                {
+                    level_type& t = tree[i];
+                    for (size_type j = 0; j != t.size(); ++j)
+                        num_pending_accesses +=
+                            t[j]->get_num_pending_accesses(reset);
+                }
                 return num_pending_accesses;
             }
 
@@ -348,10 +356,13 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
-                for (size_type i = 0; i < tree.size(); ++i)
-                    for (size_type j = 0; j < tree[i].size(); ++j)
+                for (size_type i = 0; i != tree.size(); ++i)
+                {
+                    level_type& t = tree[i];
+                    for (size_type j = 0; j != t.size(); ++j)
                         num_stolen_threads +=
-                            tree[i][j]->get_num_stolen_from_pending(reset);
+                            t[j]->get_num_stolen_from_pending(reset);
+                }
                 return num_stolen_threads;
             }
 
@@ -365,10 +376,13 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
-                for (size_type i = 0; i < tree.size(); ++i)
-                    for (size_type j = 0; j < tree[i].size(); ++j)
+                for (size_type i = 0; i != tree.size(); ++i)
+                {
+                    level_type& t = tree[i];
+                    for (size_type j = 0; j != t.size(); ++j)
                         num_stolen_threads +=
-                            tree[i][j]->get_num_stolen_to_pending(reset);
+                            t[j]->get_num_stolen_to_pending(reset);
+                }
                 return num_stolen_threads;
             }
 
@@ -382,10 +396,13 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
-                for (size_type i = 0; i < tree.size(); ++i)
-                    for (size_type j = 0; j < tree[i].size(); ++j)
+                for (size_type i = 0; i != tree.size(); ++i)
+                {
+                    level_type& t = tree[i];
+                    for (size_type j = 0; j != tree[i].size(); ++j)
                         num_stolen_threads +=
-                            tree[i][j]->get_num_stolen_from_staged(reset);
+                            t[j]->get_num_stolen_from_staged(reset);
+                }
                 return num_stolen_threads;
             }
 
@@ -399,10 +416,13 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_stolen_threads = 0;
             if (num_thread == std::size_t(-1))
             {
-                for (size_type i = 0; i < tree.size(); ++i)
-                    for (size_type j = 0; j < tree[i].size(); ++j)
+                for (size_type i = 0; i != tree.size(); ++i)
+                {
+                    level_type& t = tree[i];
+                    for (size_type j = 0; j != t.size(); ++j)
                         num_stolen_threads +=
-                            tree[i][j]->get_num_stolen_to_staged(reset);
+                            t[j]->get_num_stolen_to_staged(reset);
+                }
                 return num_stolen_threads;
             }
 
@@ -416,11 +436,12 @@ namespace hpx { namespace threads { namespace policies
         void abort_all_suspended_threads()
         {
             HPX_ASSERT(tree.size());
-            for(size_type i = 0; i < tree.size(); ++i)
+            for(size_type i = 0; i != tree.size(); ++i)
             {
-                for(size_type j = 0; j < tree[i].size(); ++j)
+                level_type& t = tree[i];
+                for(size_type j = 0; j != t.size(); ++j)
                 {
-                    tree[i][j]->abort_all_suspended_threads(j);
+                    t[j]->abort_all_suspended_threads(j);
                 }
             }
         }
@@ -430,11 +451,12 @@ namespace hpx { namespace threads { namespace policies
         {
             HPX_ASSERT(tree.size());
             bool empty = true;
-            for(size_type i = 0; i < tree.size(); ++i)
+            for(size_type i = 0; i != tree.size(); ++i)
             {
-                for(size_type j = 0; j < tree[i].size(); ++j)
+                level_type& t = tree[i];
+                for(size_type j = 0; j != t.size(); ++j)
                 {
-                    empty = tree[i][j]->cleanup_terminated(delete_all) && empty;
+                    empty = t[j]->cleanup_terminated(delete_all) && empty;
                 }
             }
             return empty;

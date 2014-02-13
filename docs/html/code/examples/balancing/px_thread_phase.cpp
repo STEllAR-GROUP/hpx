@@ -9,13 +9,13 @@
 #include <hpx/lcos/local/barrier.hpp>
 #include <hpx/lcos/local/mutex.hpp>
 
-#include <hpx/util/lockfree/fifo.hpp>
+#include <boost/lockfree/queue.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <iostream>
 
-using boost::lockfree::fifo;
+using boost::lockfree::queue;
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -39,7 +39,7 @@ using hpx::threads::set_thread_state;
 using hpx::init;
 using hpx::finalize;
 
-typedef fifo<std::pair<thread_id_type, std::size_t>*> fifo_type;
+typedef queue<std::pair<thread_id_type, std::size_t>*> fifo_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 void lock_and_wait(
@@ -61,7 +61,7 @@ void lock_and_wait(
 
         if (l.owns_lock())
         {
-            pxthreads.enqueue(new std::pair<thread_id_type, std::size_t>
+            pxthreads.push(new std::pair<thread_id_type, std::size_t>
                 (this_, get_thread_phase(this_)));
             break;
         }
@@ -137,7 +137,7 @@ int hpx_main(variables_map& vm)
         // {{{ Print results for this iteration.
         std::pair<thread_id_type, std::size_t>* entry = 0;
 
-        while (pxthreads.dequeue(entry))
+        while (pxthreads.pop(entry))
         {
             HPX_ASSERT(entry);
             std::cout << "  " << entry->first << "," << entry->second << "\n";

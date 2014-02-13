@@ -7,12 +7,6 @@
 #if !defined(HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM)
 #define HPX_EXPORT_DEFINITIONS_SEPTEMBER_25_2008_0214PM
 
-#if defined(__GNUC__)
-# define HPX_WEAK __attribute__((weak))
-#else
-# define HPX_WEAK
-#endif
-
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 # define HPX_SYMBOL_EXPORT      __declspec(dllexport)
 # define HPX_SYMBOL_IMPORT      __declspec(dllimport)

@@ -345,11 +345,11 @@ namespace hpx
         /// \ endcond
 
         /// The function \a get_self returns a reference to the (OS thread
-        /// specific) self reference to the current PX thread.
+        /// specific) self reference to the current HPX thread.
         HPX_API_EXPORT thread_self& get_self();
 
         /// The function \a get_self_ptr returns a pointer to the (OS thread
-        /// specific) self reference to the current PX thread.
+        /// specific) self reference to the current HPX thread.
         HPX_API_EXPORT thread_self* get_self_ptr();
 
         /// The function \a get_ctx_ptr returns a pointer to the internal data
@@ -361,12 +361,12 @@ namespace hpx
         HPX_API_EXPORT thread_self* get_self_ptr_checked(error_code& ec = throws);
 
         /// The function \a get_self_id returns the HPX thread id of the current
-        /// thread (or zero if the current thread is not a PX thread).
+        /// thread (or zero if the current thread is not a HPX thread).
         HPX_API_EXPORT thread_id_type get_self_id();
 
         /// The function \a get_parent_id returns the HPX thread id of the
         /// current thread's parent (or zero if the current thread is not a
-        /// PX thread).
+        /// HPX thread).
         ///
         /// \note This function will return a meaningful value only if the
         ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
@@ -375,7 +375,7 @@ namespace hpx
 
         /// The function \a get_parent_phase returns the HPX phase of the
         /// current thread's parent (or zero if the current thread is not a
-        /// PX thread).
+        /// HPX thread).
         ///
         /// \note This function will return a meaningful value only if the
         ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE
@@ -384,7 +384,7 @@ namespace hpx
 
         /// The function \a get_parent_locality_id returns the id of the locality of
         /// the current thread's parent (or zero if the current thread is not a
-        /// PX thread).
+        /// HPX thread).
         ///
         /// \note This function will return a meaningful value only if the
         ///       code was compiled with HPX_THREAD_MAINTAIN_PARENT_REFERENCE

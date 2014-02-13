@@ -111,7 +111,7 @@ namespace sheneos
 
         // Initialize the partitions and store the mappings.
         partitions_.reserve(num_instances);
-        fill_partitions(datafilename, symbolic_name_base, result);
+        fill_partitions(datafilename, symbolic_name_base, std::move(result));
 
         was_created_ = true;
     }

@@ -39,13 +39,13 @@ namespace hpx { namespace components
 
     /// Stub function which applies the console_error_sink action.
     ///
-    /// \note Must be called from a pxthread.
+    /// \note Must be called from a HPX-thread.
     void console_error_sink(boost::exception_ptr const& e)
     {
         if (HPX_UNLIKELY(!threads::get_self_ptr()))
             HPX_THROW_EXCEPTION(null_thread_id
               , "components::console_error_sink"
-              , "console_error_sink was not called from a pxthread");
+              , "console_error_sink was not called from a HPX-thread");
 
         // retrieve console locality
         naming::gid_type console_gid;

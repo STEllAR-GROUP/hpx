@@ -572,7 +572,7 @@ namespace hpx { namespace components { namespace server
     {
         // re-acquire pointer to self as it might have changed
         threads::thread_self* self = threads::get_self_ptr();
-        HPX_ASSERT(0 != self);    // needs to be executed by a PX thread
+        HPX_ASSERT(0 != self);    // needs to be executed by a HPX thread
 
         // give the scheduler some time to work on remaining tasks
         {
