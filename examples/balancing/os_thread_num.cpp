@@ -7,13 +7,13 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/iostreams.hpp>
 #include <hpx/lcos/local/barrier.hpp>
-#include <hpx/util/lockfree/fifo.hpp>
+#include <boost/lockfree/queue.hpp>
 
 #include <map>
 
 #include <boost/foreach.hpp>
 
-using boost::lockfree::fifo;
+using boost::lockfree::queue;
 
 using boost::program_options::variables_map;
 using boost::program_options::options_description;
@@ -48,10 +48,10 @@ double delay()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void get_os_thread_num(barrier& barr, fifo<std::size_t>& os_threads)
+void get_os_thread_num(barrier& barr, queue<std::size_t>& os_threads)
 {
     global_scratch = delay();
-    os_threads.enqueue(hpx::get_worker_thread_num());
+    os_threads.push(hpx::get_worker_thread_num());
     barr.wait();
 }
 
@@ -76,8 +76,8 @@ int hpx_main(variables_map& vm)
         result_map results;
 
         {
-            // Have the fifo preallocate the nodes.
-            fifo<std::size_t> os_threads(pxthreads);
+            // Have the queue preallocate the nodes.
+            queue<std::size_t> os_threads(pxthreads);
 
             barrier barr(pxthreads + 1);
 
@@ -96,7 +96,7 @@ int hpx_main(variables_map& vm)
 
             std::size_t shepherd = 0;
 
-            while (os_threads.dequeue(shepherd))
+            while (os_threads.pop(shepherd))
                 ++results[shepherd];
         }
 
