@@ -154,7 +154,7 @@ namespace sheneos
 
     ///////////////////////////////////////////////////////////////////////////
     void interpolator::fill_partitions(std::string const& datafilename,
-        std::string symbolic_name_base, async_create_result_type&& future)
+        std::string symbolic_name_base, async_create_result_type future)
     {
         // Read required data from file.
         num_values_[dimension::ye] = extract_data_range(datafilename,

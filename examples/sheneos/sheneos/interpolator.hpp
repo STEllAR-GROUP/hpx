@@ -153,7 +153,7 @@ namespace sheneos
 
         /// Initialize the partitions and store the mappings.
         void fill_partitions(std::string const& datafilename,
-            std::string symbolic_name_base, async_create_result_type&& future);
+            std::string symbolic_name_base, async_create_result_type future);
 
         std::size_t get_partition_index(std::size_t d, double value) const;
 
