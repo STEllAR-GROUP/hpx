@@ -153,13 +153,16 @@ namespace hpx { namespace parcelset
             // enqueue the outgoing parcel ...
             enqueue_parcel(locality_id, std::move(p), std::move(f));
 
-            if (async_serialization())
+            if(enable_parcel_handling_)
             {
-                trigger_sending_parcels(locality_id);
-            }
-            else
-            {
-                get_connection_and_send_parcels(locality_id);
+                if (async_serialization())
+                {
+                    trigger_sending_parcels(locality_id);
+                }
+                else
+                {
+                    get_connection_and_send_parcels(locality_id);
+                }
             }
         }
 
@@ -185,15 +188,20 @@ namespace hpx { namespace parcelset
 #endif
 
             // enqueue the outgoing parcels ...
+            HPX_ASSERT(parcels.size() == handlers.size());
             enqueue_parcels(locality_id, std::move(parcels), std::move(handlers));
 
-            if (async_serialization())
+
+            if(enable_parcel_handling_)
             {
-                trigger_sending_parcels(locality_id);
-            }
-            else
-            {
-                get_connection_and_send_parcels(locality_id);
+                if (async_serialization())
+                {
+                    trigger_sending_parcels(locality_id);
+                }
+                else
+                {
+                    get_connection_and_send_parcels(locality_id);
+                }
             }
         }
 
@@ -524,6 +532,7 @@ namespace hpx { namespace parcelset
             }
             else
             {
+                HPX_ASSERT(e.first.size() == e.second.size());
                 std::size_t new_size = e.first.size() + parcels.size();
                 e.first.reserve(new_size);
                 e.second.reserve(new_size);
@@ -544,6 +553,7 @@ namespace hpx { namespace parcelset
             typedef pending_parcels_map::iterator iterator;
 
             lcos::local::spinlock::scoped_lock l(mtx_);
+            if(!enable_parcel_handling_) return false;
 
             iterator it = pending_parcels_.find(locality_id);
 
@@ -552,6 +562,7 @@ namespace hpx { namespace parcelset
             if (it != pending_parcels_.end() && !it->second.first.empty())
             {
                 HPX_ASSERT(it->first == locality_id);
+                HPX_ASSERT(handlers.size() == parcels.size());
                 std::swap(parcels, it->second.first);
                 std::swap(handlers, it->second.second);
 
@@ -619,14 +630,10 @@ namespace hpx { namespace parcelset
             naming::locality const& locality_id, bool background_ground = false)
         {
             // repeat until no more parcels are to be sent
-            while (enable_parcel_handling_)
+            std::vector<parcel> parcels;
+            std::vector<write_handler_type> handlers;
+            while(dequeue_parcels(locality_id, parcels, handlers))
             {
-                std::vector<parcel> parcels;
-                std::vector<write_handler_type> handlers;
-
-                if (!dequeue_parcels(locality_id, parcels, handlers))
-                    break;
-
                 HPX_ASSERT(!parcels.empty() && !handlers.empty());
                 HPX_ASSERT(parcels.size() == handlers.size());
 
@@ -662,13 +669,17 @@ namespace hpx { namespace parcelset
                         // at this point. As soon as a connection becomes
                         // available it checks for pending parcels and sends
                         // those out.
-                        break;
+                        return;
                     }
                 }
 
                 // send parcels if they didn't get sent by another connection
                 send_pending_parcels(sender_connection, std::move(parcels),
                     std::move(handlers));
+                // This is needed because apparently moving the parcels and
+                // handlers leave the vectors in an undefined state
+                parcels = std::vector<parcel>();
+                handlers = std::vector<write_handler_type>();
             }
         }
 

@@ -702,9 +702,7 @@ namespace hpx { namespace parcelset
     ///////////////////////////////////////////////////////////////////////////
     bool parcelhandler::enable(bool new_state)
     {
-        mutex_type::scoped_lock l(mtx_);
-        std::swap(enable_parcel_handling_, new_state);
-
+        new_state = enable_parcel_handling_.exchange(new_state, boost::memory_order_acquire);
         BOOST_FOREACH(boost::shared_ptr<parcelport> pp, pports_)
         {
             if (pp) pp->enable(enable_parcel_handling_);

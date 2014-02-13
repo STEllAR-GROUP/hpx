@@ -389,7 +389,7 @@ namespace hpx { namespace parcelset
         bool async_serialization_;
 
         /// enable parcelport
-        bool enable_parcel_handling_;
+        boost::atomic<bool> enable_parcel_handling_;
     };
 }}
 

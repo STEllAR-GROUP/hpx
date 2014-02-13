@@ -490,7 +490,7 @@ namespace hpx { namespace parcelset
         /// the runtime systems of all localities are guaranteed to have
         /// reached a certain state).
         boost::atomic<bool> use_alternative_parcelports_;
-        bool enable_parcel_handling_;
+        boost::atomic<bool> enable_parcel_handling_;
 
         /// Store message handlers for actions
         mutex_type handlers_mtx_;
