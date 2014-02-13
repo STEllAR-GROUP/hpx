@@ -11,9 +11,9 @@
 
 #include <boost/detail/lightweight_test.hpp>
 
-#include <hpx/util/lockfree/fifo.hpp>
+#include <boost/lockfree/queue.hpp>
 
-std::vector<boost::lockfree::fifo<boost::uint64_t>*> queues;
+std::vector<boost::lockfree::queue<boost::uint64_t>*> queues;
 std::vector<boost::uint64_t> stolen;
 
 boost::uint64_t threads = 2;
@@ -23,14 +23,14 @@ bool get_next_thread(boost::uint64_t num_thread)
 {
     boost::uint64_t r = 0;
 
-    if ((*queues[num_thread]).dequeue(r))
+    if ((*queues[num_thread]).pop(r))
         return true;
 
     for (boost::uint64_t i = 0; i < threads; ++i)
     {
         if (i == num_thread) continue;
 
-        if ((*queues[i]).dequeue(r))
+        if ((*queues[i]).pop(r))
         {
             ++stolen[num_thread];
             return true;
@@ -91,10 +91,10 @@ int main(int argc, char** argv)
  
     for (boost::uint64_t i = 0; i < threads; ++i)
     {
-        queues.push_back(new boost::lockfree::fifo<boost::uint64_t>);
+        queues.push_back(new boost::lockfree::queue<boost::uint64_t>);
 
         for (boost::uint64_t j = 0; j < items; ++j)
-            (*queues[i]).enqueue(j);
+            (*queues[i]).push(j);
 
         BOOST_TEST(!(*queues[i]).empty());
     }
