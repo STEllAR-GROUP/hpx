@@ -645,7 +645,7 @@ namespace hpx
 #if defined(HPX_STATIC_PRIORITY_SCHEDULER)
         ///////////////////////////////////////////////////////////////////////
         // local static scheduler with priority queue (one queue for each OS
-        // threads plus one separate queue for high priority PX-threads). Doesn't
+        // threads plus one separate queue for high priority HPX-threads). Doesn't
         // steal.
         int run_static(startup_function_type const& startup,
             shutdown_function_type const& shutdown,
@@ -745,7 +745,7 @@ namespace hpx
 
         ///////////////////////////////////////////////////////////////////////
         // local scheduler with priority queue (one queue for each OS threads
-        // plus one separate queue for high priority PX-threads)
+        // plus one separate queue for high priority HPX-threads)
         int run_priority_local(startup_function_type const& startup,
             shutdown_function_type const& shutdown,
             util::command_line_handling& cfg, bool blocking)
@@ -1028,12 +1028,12 @@ namespace hpx
             }
             else if (0 == std::string("priority_local").find(cfg.queuing_)) {
                 // local scheduler with priority queue (one queue for each OS threads
-                // plus separate deques for low/high priority PX-threads)
+                // plus separate deques for low/high priority HPX-threads)
                 result = detail::run_priority_local(startup, shutdown, cfg, blocking);
             }
             else if (0 == std::string("priority_abp").find(cfg.queuing_)) {
                 // local scheduler with priority deque (one deque for each OS threads
-                // plus separate deques for high priority PX-threads), uses
+                // plus separate deques for high priority HPX-threads), uses
                 // abp-style stealing
                 result = detail::run_priority_abp(startup, shutdown, cfg, blocking);
             }

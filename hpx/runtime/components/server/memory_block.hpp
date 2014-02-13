@@ -487,7 +487,7 @@ namespace hpx { namespace components { namespace server
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
         ///
-        /// \param self [in] The PX \a thread used to execute this function.
+        /// \param self [in] The HPX \a thread used to execute this function.
         /// \param appl [in] The applier to be used for finalization of the
         ///             component instance.
         void finalize() {}

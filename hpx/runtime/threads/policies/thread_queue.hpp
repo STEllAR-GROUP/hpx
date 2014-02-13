@@ -865,7 +865,7 @@ namespace hpx { namespace threads { namespace policies
                                     steal);
                 if (!added_new) {
                     // Before exiting each of the OS threads deletes the
-                    // remaining terminated PX threads
+                    // remaining terminated HPX threads
                     // REVIEW: Should we be doing this if we are stealing?
                     bool canexit = cleanup_terminated_locked(true);
                     if (!running && canexit) {
@@ -918,7 +918,7 @@ namespace hpx { namespace threads { namespace policies
         terminated_items_type terminated_items_;     ///< list of terminated threads
         boost::atomic<boost::int64_t> terminated_items_count_; ///< count of terminated items
 
-        std::size_t max_count_;                     ///< maximum number of existing PX-threads
+        std::size_t max_count_;                     ///< maximum number of existing HPX-threads
         task_items_type new_tasks_;                 ///< list of new tasks to run
 
         boost::atomic<boost::int64_t> new_tasks_count_;        ///< count of new tasks to run

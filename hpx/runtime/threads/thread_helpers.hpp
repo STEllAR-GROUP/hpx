@@ -501,7 +501,7 @@ namespace hpx { namespace applier
     ///
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
-    ///                   PX-thread interface, i.e. it takes one argument (a
+    ///                   HPX-thread interface, i.e. it takes one argument (a
     ///                   \a threads#thread_state_ex_enum) and returns a
     ///                   \a threads#thread_state_enum.
     /// \param description [in] A optional string describing the newly created
@@ -517,16 +517,16 @@ namespace hpx { namespace applier
     ///                   will result in creating a thread object later (if
     ///                   no work is available any more). The default is to
     ///                   immediately create the thread object.
-    /// \param priority   [in] This is the priority the newly created PX-thread
+    /// \param priority   [in] This is the priority the newly created HPX-thread
     ///                   should be executed with. The default is \a
     ///                   threads#thread_priority_normal. This parameter is not
     ///                   guaranteed to be taken into account as it depends on
     ///                   the used scheduling policy whether priorities are
     ///                   supported in the first place.
     /// \param os_thread  [in] The number of the shepherd thread the newly
-    ///                   created PX-thread should run on. If this is given it
+    ///                   created HPX-thread should run on. If this is given it
     ///                   will be no more than a hint in any case, mainly
-    ///                   because even if the PX-thread gets scheduled on the
+    ///                   because even if the HPX-thread gets scheduled on the
     ///                   queue of the requested shepherd thread, it still can
     ///                   be stolen by another shepherd thread. If this is not
     ///                   given, the system will select a shepherd thread.
@@ -535,17 +535,17 @@ namespace hpx { namespace applier
     ///                   the function will throw on error instead.
     ///
     /// \returns This function will return the internal id of the newly created
-    ///          PX-thread or threads#invalid_thread_id (if run_now is set to
+    ///          HPX-thread or threads#invalid_thread_id (if run_now is set to
     ///          `false`).
     ///
     /// \note The value returned by the thread function will be interpreted by
-    ///       the thread manager as the new thread state the executed PX-thread
-    ///       needs to be switched to. Normally, PX-threads will either return
+    ///       the thread manager as the new thread state the executed HPX-thread
+    ///       needs to be switched to. Normally, HPX-threads will either return
     ///       \a threads#terminated (if the thread should be destroyed) or
     ///       \a threads#suspended (if the thread needs to be suspended because
     ///       it is waiting for an external event to happen). The external
     ///       event will set the state of the thread back to pending, which
-    ///       will re-schedule the PX-thread.
+    ///       will re-schedule the HPX-thread.
     ///
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
@@ -571,7 +571,7 @@ namespace hpx { namespace applier
     ///
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
-    ///                   PX-thread interface, i.e. it takes one argument (a
+    ///                   HPX-thread interface, i.e. it takes one argument (a
     ///                   \a threads#thread_state_ex_enum). The thread will be
     ///                   terminated after the function returns.
     ///
@@ -594,7 +594,7 @@ namespace hpx { namespace applier
     ///
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
-    ///                   PX-thread interface, i.e. it takes one argument (a
+    ///                   HPX-thread interface, i.e. it takes one argument (a
     ///                   \a threads#thread_state_ex_enum). The thread will be
     ///                   terminated after the function returns.
     ///
@@ -616,7 +616,7 @@ namespace hpx { namespace applier
     ///
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
-    ///                   PX-thread interface, i.e. it takes no arguments. The
+    ///                   HPX-thread interface, i.e. it takes no arguments. The
     ///                   thread will be terminated after the function returns.
     ///
     /// \note All other arguments are equivalent to those of the function
@@ -654,7 +654,7 @@ namespace hpx { namespace applier
     ///
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
-    ///                   PX-thread interface, i.e. it takes one argument (a
+    ///                   HPX-thread interface, i.e. it takes one argument (a
     ///                   \a threads#thread_state_ex_enum) and returns a
     ///                   \a threads#thread_state_enum.
     /// \param description [in] A optional string describing the newly created
@@ -664,16 +664,16 @@ namespace hpx { namespace applier
     ///                   should have. If this is not given it defaults to
     ///                   \a threads#pending, which means that the new thread
     ///                   will be scheduled to run as soon as it is created.
-    /// \param priority   [in] This is the priority the newly created PX-thread
+    /// \param priority   [in] This is the priority the newly created HPX-thread
     ///                   should be executed with. The default is \a
     ///                   threads#thread_priority_normal. This parameter is not
     ///                   guaranteed to be taken into account as it depends on
     ///                   the used scheduling policy whether priorities are
     ///                   supported in the first place.
     /// \param os_thread  [in] The number of the shepherd thread the newly
-    ///                   created PX-thread should run on. If this is given it
+    ///                   created HPX-thread should run on. If this is given it
     ///                   will be no more than a hint in any case, mainly
-    ///                   because even if the PX-thread gets scheduled on the
+    ///                   because even if the HPX-thread gets scheduled on the
     ///                   queue of the requested shepherd thread, it still can
     ///                   be stolen by another shepherd thread. If this is not
     ///                   given, the system will select a shepherd thread.
@@ -682,13 +682,13 @@ namespace hpx { namespace applier
     ///                   the function will throw on error instead.
     ///
     /// \note The value returned by the thread function will be interpreted by
-    ///       the thread manager as the new thread state the executed PX-thread
-    ///       needs to be switched to. Normally, PX-threads will either return
+    ///       the thread manager as the new thread state the executed HPX-thread
+    ///       needs to be switched to. Normally, HPX-threads will either return
     ///       \a threads#terminated (if the thread should be destroyed) or
     ///       \a threads#suspended (if the thread needs to be suspended because
     ///       it is waiting for an external event to happen). The external
     ///       event will set the state of the thread back to pending, which
-    ///       will re-schedule the PX-thread.
+    ///       will re-schedule the HPX-thread.
     ///
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
@@ -719,7 +719,7 @@ namespace hpx { namespace applier
     ///
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
-    ///                   PX-thread interface, i.e. it takes one argument (a
+    ///                   HPX-thread interface, i.e. it takes one argument (a
     ///                   \a threads#thread_state_ex_enum). The thread will be
     ///                   terminated after the function returns.
     ///
@@ -741,7 +741,7 @@ namespace hpx { namespace applier
     ///
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
-    ///                   PX-thread interface, i.e. it takes one argument (a
+    ///                   HPX-thread interface, i.e. it takes one argument (a
     ///                   \a threads#thread_state_ex_enum). The thread will be
     ///                   terminated after the function returns.
     ///
@@ -762,7 +762,7 @@ namespace hpx { namespace applier
     ///
     /// \param func       [in] The function to be executed as the thread-function.
     ///                   This function has to expose the minimal low level
-    ///                   PX-thread interface, i.e. it takes no arguments. The
+    ///                   HPX-thread interface, i.e. it takes no arguments. The
     ///                   thread will be terminated after the function returns.
     ///
     /// \note All other arguments are equivalent to those of the function

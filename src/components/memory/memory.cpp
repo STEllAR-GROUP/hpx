@@ -43,7 +43,7 @@ namespace hpx { namespace performance_counters { namespace memory
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Register a startup function which will be called as a px-thread during
+// Register a startup function which will be called as a HPX-thread during
 // runtime startup. We use this function to register our performance counter
 // type and performance counter instances.
 //

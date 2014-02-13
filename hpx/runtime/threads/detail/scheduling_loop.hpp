@@ -130,7 +130,7 @@ namespace hpx { namespace threads { namespace detail
 
         // Get the state this thread was in before execution (usually pending),
         // this helps making sure no other worker-thread is started to execute this
-        // PX-thread in the meantime.
+        // HPX-thread in the meantime.
         thread_state get_previous() const
         {
             return prev_state_;
@@ -302,7 +302,7 @@ namespace hpx { namespace threads { namespace detail
                         }
                         else {
                             // some other worker-thread got in between and started
-                            // executing this PX-thread, we just continue with
+                            // executing this HPX-thread, we just continue with
                             // the next one
                             thrd_stat.disable_restore();
                             detail::write_new_state_log_warning(
@@ -328,7 +328,7 @@ namespace hpx { namespace threads { namespace detail
                     //detail::write_new_state_log_debug(num_thread, thrd,
                     //    state_val, "normal");
 
-                    // Re-add this work item to our list of work items if the PX
+                    // Re-add this work item to our list of work items if the HPX
                     // thread should be re-scheduled. If the HPX thread is suspended
                     // now we just keep it in the map of threads.
                     if (state_val == pending) {
