@@ -644,14 +644,6 @@ namespace hpx { namespace threads { namespace policies
             return result && 0 == added;
         }
 
-        /// This function gets called by the thread-manager whenever new work
-        /// has been added, allowing the scheduler to reactivate one or more of
-        /// possibly idling OS threads
-        void do_some_work(std::size_t num_thread = std::size_t(-1))
-        {
-            HPX_ASSERT(tree.size());
-        }
-
         ///////////////////////////////////////////////////////////////////////
         void on_start_thread(std::size_t num_thread)
         {

@@ -12,12 +12,33 @@
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 
 #include <boost/noncopyable.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
 {
+#if defined(HPX_THREAD_BACKOFF_ON_IDLE)
+    namespace detail
+    {
+        struct reset_on_exit
+        {
+            reset_on_exit(boost::atomic<bool>& flag)
+              : flag_(flag)
+            {
+                flag_ = true;
+            }
+            ~reset_on_exit()
+            {
+                flag_ = false;
+            }
+            boost::atomic<bool>& flag_;
+        };
+    }
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
@@ -26,6 +47,10 @@ namespace hpx { namespace threads { namespace policies
         scheduler_base(std::size_t num_threads)
           : topology_(get_topology())
           , affinity_data_(num_threads)
+#if defined(HPX_THREAD_BACKOFF_ON_IDLE)
+          , wait_count_(0)
+          , waiting_(false)
+#endif
         {}
 
         virtual ~scheduler_base() {}
@@ -52,6 +77,34 @@ namespace hpx { namespace threads { namespace policies
             return affinity_data_.init(data, topology);
         }
 
+        void idle_callback(std::size_t /*num_thread*/)
+        {
+#if defined(HPX_THREAD_BACKOFF_ON_IDLE)
+            // Put this thread to sleep for some time, additionally it gets
+            // woken up on new work.
+            boost::chrono::milliseconds period(++wait_count_);
+
+            boost::mutex::scoped_lock l(mtx_);
+            reset_on_exit w(waiting_);
+            cond_.wait_for(l, period);
+#endif
+        }
+
+        /// This function gets called by the thread-manager whenever new work
+        /// has been added, allowing the scheduler to reactivate one or more of
+        /// possibly idling OS threads
+        void do_some_work(std::size_t /*num_thread*/)
+        {
+#if defined(HPX_THREAD_BACKOFF_ON_IDLE)
+            wait_count_.store(0, memory_order_release);
+            if (waiting_)
+            {
+                cond_.notify_one();
+            }
+#endif
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         virtual bool numa_sensitive() const { return false; }
 
 #if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
@@ -104,8 +157,6 @@ namespace hpx { namespace threads { namespace policies
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count) = 0;
 
-        virtual void do_some_work(std::size_t num_thread = std::size_t(-1)) = 0;
-
         virtual void on_start_thread(std::size_t num_thread) = 0;
         virtual void on_stop_thread(std::size_t num_thread) = 0;
         virtual void on_error(std::size_t num_thread, boost::exception_ptr const& e) = 0;
@@ -120,6 +171,14 @@ namespace hpx { namespace threads { namespace policies
     protected:
         topology const& topology_;
         detail::affinity_data affinity_data_;
+
+#if defined(HPX_THREAD_BACKOFF_ON_IDLE)
+        // support for suspension on idle queues
+        boost::mutex mtx_;
+        boost::condition_variable cond_;
+        boost::atomic<boost::uint32_t> wait_count_;
+        boost::atomic<bool> waiting_;
+#endif
     };
 }}}
 

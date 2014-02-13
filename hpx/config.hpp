@@ -511,14 +511,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Count number of empty (no HPX thread available) thread manager loop executions
 #if !defined(HPX_IDLE_LOOP_COUNT_MAX)
-#  define HPX_IDLE_LOOP_COUNT_MAX 20000
+#  define HPX_IDLE_LOOP_COUNT_MAX 200000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Count number of busy thread manager loop executions before forcefully
 // cleaning up terminated thread objects
 #if !defined(HPX_BUSY_LOOP_COUNT_MAX)
-#  define HPX_BUSY_LOOP_COUNT_MAX 20000
+#  define HPX_BUSY_LOOP_COUNT_MAX 200000
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

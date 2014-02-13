@@ -534,6 +534,11 @@ if(NOT MSVC)
   endif()
 endif()
 
+hpx_option(HPX_THREAD_BACKOFF_ON_IDLE " (default: OFF)" OFF ADVANCED)
+if(HPX_THREAD_BACKOFF_ON_IDLE)
+  hpx_add_config_define(HPX_THREAD_BACKOFF_ON_IDLE)
+endif()
+
 if(HPX_THREAD_DEBUG_INFO)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_PARENT_REFERENCE 1)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_PHASE_INFORMATION 1)

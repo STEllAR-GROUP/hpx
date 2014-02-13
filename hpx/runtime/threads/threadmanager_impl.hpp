@@ -453,6 +453,8 @@ namespace hpx { namespace threads
         void tfunc(std::size_t num_thread, topology const& topology_);
         void tfunc_impl(std::size_t num_thread);
 
+        void idle_callback(std::size_t num_thread);
+
     public:
         /// this notifies the thread manager that there is some more work
         /// available
