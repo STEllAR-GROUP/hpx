@@ -111,7 +111,7 @@ namespace sheneos
 
         // Initialize the partitions and store the mappings.
         partitions_.reserve(num_instances);
-        fill_partitions(datafilename, symbolic_name_base, result);
+        fill_partitions(datafilename, symbolic_name_base, std::move(result));
 
         was_created_ = true;
     }
@@ -154,7 +154,7 @@ namespace sheneos
 
     ///////////////////////////////////////////////////////////////////////////
     void interpolator::fill_partitions(std::string const& datafilename,
-        std::string symbolic_name_base, async_create_result_type future)
+        std::string symbolic_name_base, async_create_result_type&& future)
     {
         // Read required data from file.
         num_values_[dimension::ye] = extract_data_range(datafilename,
