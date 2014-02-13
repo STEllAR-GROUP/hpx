@@ -44,7 +44,7 @@ namespace hpx_startup
     // As an alternative, the user can provide a function hpx_startup::user_main,
     // which is semantically equivalent to the plain old C-main.
     int user_main();
-    int user_main(int argc, char** argv) HPX_WEAK;
+    int user_main(int argc, char** argv);
 #endif
 }
 
