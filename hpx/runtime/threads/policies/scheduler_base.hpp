@@ -85,7 +85,7 @@ namespace hpx { namespace threads { namespace policies
             boost::chrono::milliseconds period(++wait_count_);
 
             boost::mutex::scoped_lock l(mtx_);
-            reset_on_exit w(waiting_);
+            policies::detail::reset_on_exit w(waiting_);
             cond_.wait_for(l, period);
 #endif
         }
@@ -96,7 +96,7 @@ namespace hpx { namespace threads { namespace policies
         void do_some_work(std::size_t /*num_thread*/)
         {
 #if defined(HPX_THREAD_BACKOFF_ON_IDLE)
-            wait_count_.store(0, memory_order_release);
+            wait_count_.store(0, boost::memory_order_release);
             if (waiting_)
             {
                 cond_.notify_one();

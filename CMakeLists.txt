@@ -534,7 +534,9 @@ if(NOT MSVC)
   endif()
 endif()
 
-hpx_option(HPX_THREAD_BACKOFF_ON_IDLE " (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_THREAD_BACKOFF_ON_IDLE BOOL
+    "HPX scheduler threads are backing off on idle queues (default: OFF)"
+    OFF ADVANCED)
 if(HPX_THREAD_BACKOFF_ON_IDLE)
   hpx_add_config_define(HPX_THREAD_BACKOFF_ON_IDLE)
 endif()
