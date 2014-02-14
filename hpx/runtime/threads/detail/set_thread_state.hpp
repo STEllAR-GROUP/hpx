@@ -172,7 +172,7 @@ namespace hpx { namespace threads { namespace detail
                 }
                 break;
             case suspended:
-                break;      // fine, just setthe new state
+                break;      // fine, just set the new state
             default:
                 HPX_ASSERT(false);    // should not happen
                 break;
@@ -210,7 +210,7 @@ namespace hpx { namespace threads { namespace detail
             // REVIEW: Passing a specific target thread may interfere with the
             // round robin queuing.
             thrd->get_scheduler_base()->schedule_thread(thrd.get(), thread_num, priority);
-            thrd->get_scheduler_base()->do_some_work();
+            thrd->get_scheduler_base()->do_some_work(thread_num);
         }
 
         if (&ec != &throws)

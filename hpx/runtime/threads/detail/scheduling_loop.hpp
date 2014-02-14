@@ -387,7 +387,7 @@ namespace hpx { namespace threads { namespace detail
                 }
             }
 
-            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX*10)
+            if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
             {
                 busy_loop_count = 0;
 
@@ -396,7 +396,7 @@ namespace hpx { namespace threads { namespace detail
                     hpx::parcelset::do_background_work();
                 }
             }
-            else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX*10)
+            else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
             {
                 // call back into invoking context
                 if (!cb.empty())
