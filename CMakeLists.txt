@@ -513,15 +513,15 @@ endif()
 
 ###############################################################################
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-  hpx_option(HPX_THREAD_DEBUG_INFO BOOL 
+  hpx_option(HPX_THREAD_DEBUG_INFO BOOL
     "Enable thread debugging information (default: ON)" ON ADVANCED)
 else()
-  hpx_option(HPX_THREAD_DEBUG_INFO BOOL 
+  hpx_option(HPX_THREAD_DEBUG_INFO BOOL
     "Enable thread debugging information (default: OFF)" OFF ADVANCED)
 endif()
 
 if(NOT MSVC)
-  hpx_option(HPX_THREAD_GUARD_PAGE BOOL 
+  hpx_option(HPX_THREAD_GUARD_PAGE BOOL
     "Enable thread guard page (default: ON)" ON ADVANCED)
   if(HPX_THREAD_GUARD_PAGE)
     hpx_add_config_define(HPX_THREAD_GUARD_PAGE 1)
@@ -582,7 +582,7 @@ else()
   hpx_add_config_define(HPX_THREAD_BACKTRACE_ON_SUSPENSION_DEPTH 0)
 endif()
 
-hpx_option(HPX_THREAD_MAINTAIN_TARGET_ADDRESS BOOL 
+hpx_option(HPX_THREAD_MAINTAIN_TARGET_ADDRESS BOOL
   "Enable storing target address in thread for NUMA awareness (default: OFF)"
   OFF ADVANCED)
 if(HPX_THREAD_MAINTAIN_TARGET_ADDRESS)
@@ -1321,6 +1321,9 @@ else()
 
   # Check if our libraries have unresolved symbols
   #hpx_use_flag_if_available(-Wl,-z,defs NAME no_undefined_symbols)
+  if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+    hpx_use_flag_if_available(-Wno-deprecated-register CXX C)
+  endif()
 
   ##############################################################################
   # GCC-only configuration
