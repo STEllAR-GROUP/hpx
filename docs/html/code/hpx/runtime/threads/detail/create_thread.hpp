@@ -75,6 +75,8 @@ namespace hpx { namespace threads { namespace detail
 #endif
                    << ")";
 
+        // potentially wake up waiting thread
+        scheduler->do_some_work(data.num_os_thread);
         return newid;
     }
 }}}

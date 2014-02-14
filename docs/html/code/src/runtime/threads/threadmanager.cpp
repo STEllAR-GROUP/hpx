@@ -1415,6 +1415,13 @@ namespace hpx { namespace threads
             counter_types, sizeof(counter_types)/sizeof(counter_types[0]));
     }
 
+    template <typename SchedulingPolicy, typename NotificationPolicy>
+    void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
+        idle_callback(std::size_t num_thread)
+    {
+        scheduler_.idle_callback(num_thread);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     void threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
@@ -1428,7 +1435,8 @@ namespace hpx { namespace threads
         // run main scheduling loop until terminated
         detail::scheduling_loop(num_thread, scheduler_, state_,
             executed_threads_[num_thread], executed_thread_phases_[num_thread],
-            tfunc_times[num_thread], exec_times[num_thread]);
+            tfunc_times[num_thread], exec_times[num_thread],
+            util::bind(&threadmanager_impl::idle_callback, this, num_thread));
 
 #if HPX_DEBUG != 0
         // the OS thread is allowed to exit only if no more HPX threads exist
@@ -1484,7 +1492,6 @@ namespace hpx { namespace threads
 #else
                     << "0b" << mask;
 #endif
-
                 // create a new thread
                 threads_.push_back(new boost::thread(boost::bind(
                     &threadmanager_impl::tfunc, this, thread_num,

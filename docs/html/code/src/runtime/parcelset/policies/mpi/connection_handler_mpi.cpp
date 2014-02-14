@@ -136,6 +136,24 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         return sender_connection;
     }
 
+    void connection_handler::enable_parcel_handling(bool new_state)
+    {
+        if(enable_parcel_handling_)
+        {
+            background_work();
+        }
+        else
+        {
+            // Wait until message handler returns
+            std::size_t k = 0;
+            while(handling_messages_)
+            {
+                hpx::lcos::local::spinlock::yield(k);
+                ++k;
+            }
+        }
+    }
+
     void connection_handler::add_sender(boost::shared_ptr<sender> sender_connection)
     {
         hpx::lcos::local::spinlock::scoped_lock l(senders_mtx_);
@@ -212,12 +230,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 
         // We let the message handling loop spin for another 2 seconds to avoid the
         // costs involved with posting it to asio
-        while(bootstrapping || (!stopped_ && has_work) || (t.elapsed() < 2.0))
+        while(bootstrapping || (!stopped_ && has_work) || (!has_work && t.elapsed() < 2.0))
         {
+            // break the loop if someone requested to pause the parcelport
+            if(!enable_parcel_handling_) break;
+
             // handle all send requests
             {
                 hpx::lcos::local::spinlock::scoped_lock l(senders_mtx_);
-                for(senders_type::iterator it = senders_.begin(); it != senders_.end(); /**/)
+                for(
+                    senders_type::iterator it = senders_.begin();
+                    !stopped_ && enable_parcel_handling_ && it != senders_.end();
+                    /**/)
                 {
                     if((*it)->done())
                     {
@@ -293,7 +317,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
 
             // handle all receive requests
-            for(receivers_type::iterator it = receivers_.begin(); it != receivers_.end(); /**/)
+            for(
+                receivers_type::iterator it = receivers_.begin();
+                !stopped_ && enable_parcel_handling_ && it != receivers_.end();
+                /**/)
             {
                 if((*it)->done(*this))
                 {
@@ -315,7 +342,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             // handle completed close requests
             for(
                 std::list<std::pair<int, MPI_Request> >::iterator it = close_requests.begin();
-                it != close_requests.end();
+                !stopped_ && enable_parcel_handling_ && it != close_requests.end();
             )
             {
                 int completed = 0;
@@ -347,8 +374,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
             else
             {
-                hpx::lcos::local::spinlock::yield(k);
-                ++k;
+                if(enable_parcel_handling_)
+                {
+                    hpx::lcos::local::spinlock::yield(k);
+                    ++k;
+                }
             }
         }
 

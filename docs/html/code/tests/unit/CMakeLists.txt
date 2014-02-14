@@ -9,6 +9,7 @@ set(subdirs
     components
     diagnostics
     lcos
+    parcelset
     performance_counters
     threads
     traits
