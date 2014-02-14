@@ -212,7 +212,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 return send_ack();
             }
-            
+
             std::size_t chunk_size
                 = buffer_->transmission_chunks_[recvd_chunks_].second;
 
@@ -260,7 +260,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 next(0);
                 return true;
             }
-            
+
             return next(&receiver::check_ack_sent);
         }
 
@@ -285,17 +285,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             next_ = f;
             return false;
         }
-        
+
         header header_;
         MPI_Comm communicator_;
         int tag_;
         MPI_Request request_;
         int ack_;
-        
+
         next_function_type next_;
         std::size_t recvd_chunks_;
-
-        boost::uint64_t max_inbound_size_;
 
         /// Counters and timers for parcels received.
         util::high_resolution_timer timer_;

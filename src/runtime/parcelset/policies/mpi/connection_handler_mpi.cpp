@@ -130,7 +130,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         naming::locality const& l, error_code& ec)
     {
         boost::shared_ptr<sender> sender_connection(new sender(
-            communicator_, get_next_tag(), tag_mtx_, free_tags_, l,
+            communicator_, get_next_tag(), l,
             *this, this->parcels_sent_));
 
         return sender_connection;
@@ -172,7 +172,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             pending_close_requests_.push_back(std::make_pair(tag, rank));
         }
     }
-    
+
     void close_sender_connection(connection_handler & handler, int tag, int rank)
     {
         handler.close_sender_connection(tag, rank);
@@ -254,7 +254,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 }
                 has_work = !senders_.empty();
             }
-            
+
             // Send the pending close requests
             {
                 hpx::lcos::local::spinlock::scoped_lock l(close_mtx_);
@@ -338,7 +338,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             }
 
             if(!has_work) has_work = !receivers_.empty();
-            
+
             // handle completed close requests
             for(
                 std::list<std::pair<int, MPI_Request> >::iterator it = close_requests.begin();
