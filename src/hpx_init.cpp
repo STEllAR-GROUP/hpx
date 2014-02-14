@@ -29,7 +29,7 @@
 #  include <signal.h>
 #endif
 
-#if defined(HPX_NATIVE_MIC)
+#if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #   include <cstdlib>
 #endif
 
@@ -988,9 +988,21 @@ namespace hpx
         int result = 0;
         set_error_handlers();
 
-#if defined(HPX_NATIVE_MIC)
-        unsetenv("LC_ALL");
+#if defined(HPX_NATIVE_MIC) || defined(__bgq__)
         unsetenv("LANG");
+        unsetenv("LC_CTYPE");
+        unsetenv("LC_NUMERIC");
+        unsetenv("LC_TIME");
+        unsetenv("LC_COLLATE");
+        unsetenv("LC_MONETARY");
+        unsetenv("LC_MESSAGES");
+        unsetenv("LC_PAPER");
+        unsetenv("LC_NAME");
+        unsetenv("LC_ADDRESS");
+        unsetenv("LC_TELEPHONE");
+        unsetenv("LC_MEASUREMENT");
+        unsetenv("LC_IDENTIFICATION");
+        unsetenv("LC_ALL");
 #endif
 
         try {
