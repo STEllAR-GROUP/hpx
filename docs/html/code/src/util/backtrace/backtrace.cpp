@@ -263,7 +263,7 @@ namespace hpx { namespace util {
             try {
                 if(ptr==0)
                     return;
-                for(int i=0;i<size;i++)
+                for(std::size_t i=0;i<size;i++)
                     out << '\n' << ptr[i];
                 free(ptr);
                 ptr = 0;

@@ -45,22 +45,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         /// Construct a sending parcelport_connection with the given io_service.
         sender(MPI_Comm communicator,
             int tag,
-            hpx::lcos::local::spinlock & tag_mtx,
-            std::deque<int> & free_tags,
             naming::locality const& locality_id,
             connection_handler & handler,
             performance_counters::parcels::gatherer& parcels_sent)
           : communicator_(communicator)
           , tag_(tag)
           , receiver_tag_(-1)
-          , tag_mtx_(tag_mtx)
-          , free_tags_(free_tags)
           , sent_chunks_(0)
           , next_(0)
           , parcelport_(handler)
           , there_(locality_id), parcels_sent_(parcels_sent)
         {}
-        
+
         ~sender()
         {
             close_sender_connection(parcelport_, tag_, there_.get_rank());
@@ -166,7 +162,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
                 return recv_tag();
             }
             return next(&sender::check_header_sent);
-            
+
         }
 
         bool recv_tag()
@@ -256,10 +252,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             {
                 return recv_ack();
             }
-            
+
             util::serialization_chunk & c = buffer_->chunks_[sent_chunks_];
             ++sent_chunks_;
-            
+
 
             if(c.type_ == util::chunk_type_pointer)
             {
@@ -339,8 +335,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         int tag_;
         int receiver_tag_;
         char ack_;
-        hpx::lcos::local::spinlock & tag_mtx_;
-        std::deque<int> & free_tags_;
         std::size_t sent_chunks_;
         next_function_type next_;
 

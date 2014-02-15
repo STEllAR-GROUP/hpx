@@ -630,10 +630,14 @@ namespace hpx { namespace parcelset
             naming::locality const& locality_id, bool background_ground = false)
         {
             // repeat until no more parcels are to be sent
-            std::vector<parcel> parcels;
-            std::vector<write_handler_type> handlers;
-            while(dequeue_parcels(locality_id, parcels, handlers))
+            while (true)
             {
+                std::vector<parcel> parcels;
+                std::vector<write_handler_type> handlers;
+
+                if (!dequeue_parcels(locality_id, parcels, handlers))
+                    break;
+
                 HPX_ASSERT(!parcels.empty() && !handlers.empty());
                 HPX_ASSERT(parcels.size() == handlers.size());
 
@@ -643,7 +647,10 @@ namespace hpx { namespace parcelset
                 BOOST_FOREACH(parcel const&p, parcels)
                 {
                     if (p.may_require_id_splitting())
+                    {
                         force_connection = false;
+                        break;
+                    }
                 }
 
                 error_code ec;
@@ -676,10 +683,6 @@ namespace hpx { namespace parcelset
                 // send parcels if they didn't get sent by another connection
                 send_pending_parcels(sender_connection, std::move(parcels),
                     std::move(handlers));
-                // This is needed because apparently moving the parcels and
-                // handlers leave the vectors in an undefined state
-                parcels = std::vector<parcel>();
-                handlers = std::vector<write_handler_type>();
             }
         }
 

@@ -504,6 +504,14 @@ namespace hpx { namespace lcos { namespace detail
                 // take by value, as the future will go away immediately
                 inner_shared_state_ptr inner_state =
                     future_access::get_shared_state(outer.get());
+
+                if (inner_state.get() == 0)
+                {
+                    HPX_THROW_EXCEPTION(no_state,
+                        "unwrap_continuation<ContResult>::on_outer_ready",
+                        "the inner future has no valid shared state");
+                }
+
                 inner_state->set_on_completed(
                     util::bind(inner_ready, std::move(this_), inner_state));
             }
