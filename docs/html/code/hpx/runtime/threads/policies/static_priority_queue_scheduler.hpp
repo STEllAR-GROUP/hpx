@@ -29,7 +29,7 @@ namespace hpx { namespace threads { namespace policies
             , typename TerminatedQueuing
              >
     class static_priority_queue_scheduler
-        : public local_priority_queue_scheduler<    
+        : public local_priority_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
           >
     {
@@ -38,11 +38,11 @@ namespace hpx { namespace threads { namespace policies
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
         > base_type;
 
-        typedef typename base_type::init_parameter_type 
+        typedef typename base_type::init_parameter_type
             init_parameter_type;
 
         static_priority_queue_scheduler(init_parameter_type const& init)
-          : base_type(init) 
+          : base_type(init)
         {}
 
         /// Return the next thread to be executed, return false if non is
@@ -52,44 +52,33 @@ namespace hpx { namespace threads { namespace policies
         {
             std::size_t queues_size = this->queues_.size();
 
+            typedef typename base_type::thread_queue_type thread_queue_type;
+
             if (num_thread < this->high_priority_queues_.size())
             {
-                bool result = this->high_priority_queues_[num_thread]->
-                    get_next_thread(thrd, num_thread);
+                thread_queue_type* q = this->high_priority_queues_[num_thread];
 
-                this->high_priority_queues_[num_thread]->
-                    increment_num_pending_accesses();
-
-                if (!result)
-                    this->high_priority_queues_[num_thread]->
-                        increment_num_pending_misses();
-                else
+                q->increment_num_pending_accesses();
+                if (q->get_next_thread(thrd, num_thread))
                     return true;
+                q->increment_num_pending_misses();
             }
 
             {
                 HPX_ASSERT(num_thread < queues_size);
-                bool result = this->queues_[num_thread]->
-                    get_next_thread(thrd, num_thread);
+                thread_queue_type* q = this->queues_[num_thread];
 
-                this->queues_[num_thread]->increment_num_pending_accesses();
-
-                if (!result)
-                {
-                    this->queues_[num_thread]->increment_num_pending_misses();
-
-                    bool have_staged = (this->queues_[num_thread]->
-                        get_staged_queue_length(boost::memory_order_relaxed) != 0);
-
-                    // Give up, we should have work to convert.
-                    if (have_staged)
-                        return false;
-                }
-                else
+                q->increment_num_pending_accesses();
+                if (q->get_next_thread(thrd, num_thread))
                     return true;
+                q->increment_num_pending_misses();
+
+                // Give up, we should have work to convert.
+                if (q->get_staged_queue_length(boost::memory_order_relaxed) != 0)
+                    return false;
             }
 
-            // Limit access to the low priority queue to one worker thread 
+            // Limit access to the low priority queue to one worker thread
             if ((queues_size - 1) == num_thread)
             {
                 bool result = this->low_priority_queue_.

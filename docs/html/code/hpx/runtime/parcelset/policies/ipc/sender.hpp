@@ -131,10 +131,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             // now we can give this connection back to the cache
             reclaim_data_buffer(buffer_->data_);
 
-            buffer_->data_point_.bytes_ = 0;
-            buffer_->data_point_.time_ = 0;
-            buffer_->data_point_.serialization_time_ = 0;
-            buffer_->data_point_.num_parcels_ = 0;
+            performance_counters::parcels::data_point& data = buffer_->data_point_;
+            data.bytes_ = 0;
+            data.time_ = 0;
+            data.serialization_time_ = 0;
+            data.num_parcels_ = 0;
 
             // Call post-processing handler, which will send remaining pending
             // parcels. Pass along the connection so it can be reused if more

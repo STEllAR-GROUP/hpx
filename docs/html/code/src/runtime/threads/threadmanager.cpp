@@ -1651,7 +1651,7 @@ namespace hpx { namespace threads
         if (std::abs(tfunc_time) < 1e-16)   // avoid division by zero
             return 10000LL;
 
-        double const percent = 1. - (exec_time / tfunc_time); 
+        double const percent = 1. - (exec_time / tfunc_time);
         return boost::int64_t(10000. * percent);   // 0.01 percent
     }
 
@@ -1661,7 +1661,7 @@ namespace hpx { namespace threads
         avg_creation_idle_rate(bool reset)
     {
         double const creation_total =
-            static_cast<double>(scheduler_.get_creation_time(reset)); 
+            static_cast<double>(scheduler_.get_creation_time(reset));
         double const exec_total =
             std::accumulate(exec_times.begin(), exec_times.end(), 0.);
         double const tfunc_total =
@@ -1673,8 +1673,7 @@ namespace hpx { namespace threads
         }
 
         // avoid division by zero
-        if (  (std::abs(exec_total) < 1e-16)
-           && (std::abs(exec_total) < 1e-16))  
+        if (std::abs(tfunc_total - exec_total) == 0.0)
             return 10000LL;
 
         double const percent = (creation_total / (tfunc_total - exec_total));
@@ -1686,7 +1685,7 @@ namespace hpx { namespace threads
         avg_cleanup_idle_rate(bool reset)
     {
         double const cleanup_total =
-            static_cast<double>(scheduler_.get_cleanup_time(reset)); 
+            static_cast<double>(scheduler_.get_cleanup_time(reset));
         double const exec_total =
             std::accumulate(exec_times.begin(), exec_times.end(), 0.);
         double const tfunc_total =
@@ -1698,8 +1697,7 @@ namespace hpx { namespace threads
         }
 
         // avoid division by zero
-        if (  (std::abs(exec_total) < 1e-16)
-           && (std::abs(exec_total) < 1e-16))  
+        if (std::abs(tfunc_total - exec_total) == 0.0)
             return 10000LL;
 
         double const percent = (cleanup_total / (tfunc_total - exec_total));

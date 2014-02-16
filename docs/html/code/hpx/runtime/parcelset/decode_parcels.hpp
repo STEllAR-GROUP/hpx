@@ -101,6 +101,8 @@ namespace hpx { namespace parcelset {
                 // mark start of serialization
                 util::high_resolution_timer timer;
                 boost::int64_t overall_add_parcel_time = 0;
+                performance_counters::parcels::data_point& data =
+                    buffer->data_point_;
 
                 {
                     // De-serialize the parcel data
@@ -154,15 +156,15 @@ namespace hpx { namespace parcelset {
                     }
 
                     // complete received data with parcel count
-                    buffer->data_point_.num_parcels_ = parcel_count;
-                    buffer->data_point_.raw_bytes_ = archive.bytes_read();
+                    data.num_parcels_ = parcel_count;
+                    data.raw_bytes_ = archive.bytes_read();
                 }
 
                 // store the time required for serialization
-                buffer->data_point_.serialization_time_ = timer.elapsed_nanoseconds() -
+                data.serialization_time_ = timer.elapsed_nanoseconds() -
                     overall_add_parcel_time;
 
-                pp.add_received_data(buffer->data_point_);
+                pp.add_received_data(data);
             }
             catch (hpx::exception const& e) {
                 LPT_(error)

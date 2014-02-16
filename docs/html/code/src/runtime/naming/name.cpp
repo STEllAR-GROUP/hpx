@@ -146,9 +146,7 @@ namespace hpx { namespace naming
             else {
                 // If the gid was not split at any point in time we can assume
                 // that the referenced object is fully local.
-                components::component_type t = addr.type_;
-
-                HPX_ASSERT(t != components::component_invalid);
+                HPX_ASSERT(addr.type_ != components::component_invalid);
 
                 // Third parameter is the count of how many components to destroy.
                 // FIXME: The address should still be in the cache, but it could

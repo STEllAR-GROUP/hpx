@@ -254,39 +254,45 @@ namespace hpx { namespace parcelset
         buffer->size_ = buffer->data_.size();
         buffer->data_size_ = arg_size;
 
-        buffer->data_point_.num_parcels_ = pv.size();
-        buffer->data_point_.bytes_ = arg_size;
-        buffer->data_point_.raw_bytes_ = buffer->data_.size();
+        performance_counters::parcels::data_point& data = buffer->data_point_;
+        data.num_parcels_ = pv.size();
+        data.bytes_ = arg_size;
+        data.raw_bytes_ = buffer->data_.size();
 
         // prepare chunk data for transmission, the transmission_chunks data
         // first holds all zero-copy, then all non-zero-copy chunk infos
-        buffer->transmission_chunks_.clear();
-        buffer->transmission_chunks_.reserve(buffer->chunks_.size());
+        typedef typename parcel_buffer_type::transmission_chunk_type
+            transmission_chunk_type;
+        typedef typename parcel_buffer_type::count_chunks_type
+            count_chunks_type;
+
+        std::vector<transmission_chunk_type>& chunks =
+            buffer->transmission_chunks_;
+
+        chunks.clear();
+        chunks.reserve(buffer->chunks_.size());
 
         std::size_t index = 0;
         BOOST_FOREACH(util::serialization_chunk& c, buffer->chunks_)
         {
             if (c.type_ == util::chunk_type_pointer) {
-                buffer->transmission_chunks_.push_back(
-                    typename parcel_buffer_type::transmission_chunk_type(index, c.size_));
+                chunks.push_back(transmission_chunk_type(index, c.size_));
             }
             ++index;
         }
 
-        buffer->num_chunks_ = typename parcel_buffer_type::count_chunks_type(
-                static_cast<boost::uint32_t>(buffer->transmission_chunks_.size()),
-                static_cast<boost::uint32_t>(buffer->chunks_.size() -
-                    buffer->transmission_chunks_.size())
+        buffer->num_chunks_ = count_chunks_type(
+                static_cast<boost::uint32_t>(chunks.size()),
+                static_cast<boost::uint32_t>(buffer->chunks_.size() - chunks.size())
             );
 
-        if (!buffer->transmission_chunks_.empty()) {
+        if (!chunks.empty()) {
             // the remaining number of chunks are non-zero-copy
             BOOST_FOREACH(util::serialization_chunk& c, buffer->chunks_)
             {
                 if (c.type_ == util::chunk_type_index) {
-                    buffer->transmission_chunks_.push_back(
-                        typename parcel_buffer_type::transmission_chunk_type(
-                            c.data_.index_, c.size_));
+                    chunks.push_back(
+                        transmission_chunk_type(c.data_.index_, c.size_));
                 }
             }
         }

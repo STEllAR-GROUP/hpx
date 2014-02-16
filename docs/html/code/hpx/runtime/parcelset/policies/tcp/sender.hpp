@@ -99,10 +99,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             buffers.push_back(boost::asio::buffer(&buffer_->num_chunks_,
                 sizeof(buffer_->num_chunks_)));
 
-            if (!buffer_->transmission_chunks_.empty()) {
-                buffers.push_back(boost::asio::buffer(
-                    buffer_->transmission_chunks_.data(),
-                    buffer_->transmission_chunks_.size() *
+            std::vector<parcel_buffer_type::transmission_chunk_type>& chunks =
+                buffer_->transmission_chunks_;
+            if (!chunks.empty()) {
+                buffers.push_back(
+                    boost::asio::buffer(chunks.data(), chunks.size() *
                         sizeof(parcel_buffer_type::transmission_chunk_type)));
 
                 // add main buffer holding data which was serialized normally

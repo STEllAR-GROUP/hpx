@@ -19,7 +19,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
     class connection_handler;
     void add_sender(connection_handler & handler,
-        boost::shared_ptr<sender> sender_connection);
+        boost::shared_ptr<sender> const& sender_connection);
 
     void close_sender_connection(connection_handler & handler, int tag, int rank);
 
@@ -190,15 +190,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         bool send_transmission_chunks()
         {
             verify_valid();
-            if(buffer_->transmission_chunks_.empty())
+
+            std::vector<parcel_buffer<buffer_type>::transmission_chunk_type>& chunks =
+                buffer_->transmission_chunks_;
+            if(chunks.empty())
             {
                 return send_data();
             }
 
             MPI_Isend(
-                buffer_->transmission_chunks_.data(), // Data pointer
+                chunks.data(), // Data pointer
                 static_cast<int>(
-                    buffer_->transmission_chunks_.size()
+                    chunks.size()
                         * sizeof(parcel_buffer<buffer_type>::transmission_chunk_type)
                     ), // Size
                 MPI_CHAR,               // MPI Datatype

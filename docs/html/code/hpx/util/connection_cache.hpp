@@ -144,7 +144,8 @@ namespace hpx { namespace util
             std::size_t& max_connections = max_num_connections(e);
             if (num_connections > max_connections * 2)
             {
-                max_connections = static_cast<std::size_t>(max_connections * 1.5);
+                max_connections =
+                    static_cast<std::size_t>(max_connections * 1.5); //-V113
             }
         }
 
@@ -161,7 +162,7 @@ namespace hpx { namespace util
             if (num_connections < max_connections / 2)
             {
                 max_connections =
-                    static_cast<std::size_t>(max_connections / 1.5);
+                    static_cast<std::size_t>(max_connections / 1.5); //-V113
             }
         }
 
