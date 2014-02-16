@@ -30,18 +30,20 @@ struct buffer
     {}
 
     buffer(
-        std::deque<char>* ptr
+        std::vector<char>* ptr
         )
       : data_(ptr)
     {}
 
-    boost::shared_ptr<std::deque<char> > data_;
+    boost::shared_ptr<std::vector<char> > data_;
 
   private:
     friend class boost::serialization::access;
 
-    void serialize(hpx::util::portable_binary_oarchive& ar, unsigned);
-    void serialize(hpx::util::portable_binary_iarchive& ar, unsigned);
+    void save(hpx::util::portable_binary_oarchive& ar, unsigned) const;
+    void load(hpx::util::portable_binary_iarchive& ar, unsigned);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER();
 };
 
 namespace server

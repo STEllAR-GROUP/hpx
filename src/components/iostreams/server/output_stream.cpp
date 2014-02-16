@@ -20,14 +20,13 @@
 #include <iostream>
 
 #include <boost/serialization/serialization.hpp>
-#include <boost/serialization/deque.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
-namespace hpx { namespace iostreams
-{
-    void buffer::serialize(hpx::util::portable_binary_oarchive & ar, unsigned)
+namespace hpx { namespace iostreams {
+    void buffer::save(hpx::util::portable_binary_oarchive & ar, unsigned) const
     {
-        bool valid = false;
+        bool valid = (data_ && !data_->empty());
         ar & valid;
         if(valid)
         {
@@ -35,9 +34,9 @@ namespace hpx { namespace iostreams
         }
     }
 
-    void buffer::serialize(hpx::util::portable_binary_iarchive& ar, unsigned)
+    void buffer::load(hpx::util::portable_binary_iarchive& ar, unsigned)
     {
-        bool valid = (data_ && !data_->empty());
+        bool valid = false;
         ar & valid;
         if(valid)
         {

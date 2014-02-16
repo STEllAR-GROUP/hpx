@@ -20,12 +20,12 @@
 namespace hpx { namespace iostreams
 {
 
-typedef HPX_STD_FUNCTION<void(std::deque<char> const&)> write_function_type;
+typedef HPX_STD_FUNCTION<void(std::vector<char> const&)> write_function_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Write function that works on STL OutputIterators
 template <typename Iterator>
-inline void iterator_write_function(std::deque<char> const& in, Iterator it)
+inline void iterator_write_function(std::vector<char> const& in, Iterator it)
 { std::copy(in.begin(), in.end(), it); }
 
 // Factory function
@@ -38,7 +38,7 @@ inline write_function_type make_iterator_write_function(Iterator it)
 
 ///////////////////////////////////////////////////////////////////////////////
 inline void
-std_ostream_write_function(std::deque<char> const& in, std::ostream& os)
+std_ostream_write_function(std::vector<char> const& in, std::ostream& os)
 { std::copy(in.begin(), in.end(), std::ostream_iterator<char>(os)); }
 
 // Factory function
