@@ -23,16 +23,18 @@
 #include <boost/serialization/deque.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
-namespace hpx { namespace iostreams {
+namespace hpx { namespace iostreams
+{
     void buffer::serialize(hpx::util::portable_binary_oarchive & ar, unsigned)
     {
-        bool valid;
+        bool valid = false;
         ar & valid;
         if(valid)
         {
             ar & data_;
         }
     }
+
     void buffer::serialize(hpx::util::portable_binary_iarchive& ar, unsigned)
     {
         bool valid = (data_ && !data_->empty());
