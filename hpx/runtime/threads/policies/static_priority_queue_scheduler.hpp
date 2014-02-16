@@ -52,6 +52,8 @@ namespace hpx { namespace threads { namespace policies
         {
             std::size_t queues_size = this->queues_.size();
 
+            typedef typename base_type::thread_queue_type thread_queue_type;
+
             if (num_thread < this->high_priority_queues_.size())
             {
                 thread_queue_type* q = this->high_priority_queues_[num_thread];
