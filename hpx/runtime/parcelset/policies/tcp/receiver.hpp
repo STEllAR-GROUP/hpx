@@ -72,10 +72,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             buffer_->clear();
 
             // Store the time of the begin of the read operation
-            buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
-            buffer_->data_point_.serialization_time_ = 0;
-            buffer_->data_point_.bytes_ = 0;
-            buffer_->data_point_.num_parcels_ = 0;
+            performance_counters::parcels::data_point& data = buffer_->data_point_;
+            data.time_ = timer_.elapsed_nanoseconds();
+            data.serialization_time_ = 0;
+            data.bytes_ = 0;
+            data.num_parcels_ = 0;
 
             // Issue a read operation to read the message size.
             using boost::asio::buffer;
@@ -150,12 +151,18 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
                         boost::tuple<Handler>) = 0;
 
                 if (num_zero_copy_chunks != 0) {
-                    buffer_->transmission_chunks_.resize(static_cast<std::size_t>(
+                    typedef parcel_buffer_type::transmission_chunk_type
+                        transmission_chunk_type;
+
+                    std::vector<transmission_chunk_type>& chunks =
+                        buffer_->transmission_chunks_;
+
+                    chunks.resize(static_cast<std::size_t>(
                         num_zero_copy_chunks + num_non_zero_copy_chunks));
 
-                    buffers.push_back(boost::asio::buffer(buffer_->transmission_chunks_.data(),
-                        buffer_->transmission_chunks_.size() *
-                            sizeof(parcel_buffer_type::transmission_chunk_type)));
+                    buffers.push_back(
+                        boost::asio::buffer(chunks.data(), chunks.size() *
+                            sizeof(transmission_chunk_type)));
 
                     // add main buffer holding data which was serialized normally
                     buffer_->data_.resize(static_cast<std::size_t>(inbound_size));

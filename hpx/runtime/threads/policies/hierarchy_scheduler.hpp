@@ -143,15 +143,15 @@ namespace hpx { namespace threads { namespace policies
             //std::cout << "added " << n << " queues\n";
             if(n<d)
             {
-                init_tree(1, max_thread_count);
+                init_tree(1, max_thread_count); //-V106
             }
             else if(n%d == 0)
             {
-                init_tree(n/d, max_thread_count);
+                init_tree(n/d, max_thread_count); //-V106
             }
             else
             {
-                init_tree(n/d+1, max_thread_count);
+                init_tree(n/d+1, max_thread_count); //-V106
             }
         }
 

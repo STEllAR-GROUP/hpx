@@ -28,7 +28,7 @@ namespace hpx { namespace threads { namespace policies
             , typename TerminatedQueuing
              >
     class periodic_priority_queue_scheduler
-        : public local_priority_queue_scheduler<    
+        : public local_priority_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
           >
     {
@@ -41,11 +41,11 @@ namespace hpx { namespace threads { namespace policies
 
         typedef typename base_type::thread_queue_type thread_queue_type;
 
-        typedef typename base_type::init_parameter_type 
+        typedef typename base_type::init_parameter_type
             init_parameter_type;
 
         periodic_priority_queue_scheduler(init_parameter_type const& init)
-          : base_type(init) 
+          : base_type(init)
         {}
 
         bool periodic_maintenance(bool running)
@@ -59,59 +59,53 @@ namespace hpx { namespace threads { namespace policies
                 boost::int64_t average_work_count = 0;
                 for(std::size_t i = 0; i < this->high_priority_queues_.size(); ++i)
                 {
-                    average_task_count += this->high_priority_queues_[i]->
-                        get_staged_queue_length();
-                    average_work_count += this->high_priority_queues_[i]->
-                        get_pending_queue_length();
+                    thread_queue_type* q = this->high_priority_queues_[i];
+                    average_task_count += q->get_staged_queue_length();
+                    average_work_count += q->get_pending_queue_length();
                 }
-                average_task_count = average_task_count
-                                   / this->high_priority_queues_.size();
-                average_work_count = average_work_count
-                                   / this->high_priority_queues_.size();
+                average_task_count =
+                    average_task_count / this->high_priority_queues_.size();
+                average_work_count =
+                    average_work_count / this->high_priority_queues_.size();
 
                 // Remove items from queues that have more than the average
-                // FIXME: We should be able to avoid using a thread_queue as 
+                // FIXME: We should be able to avoid using a thread_queue as
                 // a temporary.
                 thread_queue_type tmp_queue;
                 for(std::size_t i = 0; i < this->high_priority_queues_.size(); ++i)
                 {
-                    boost::int64_t task_items = this->high_priority_queues_[i]->
-                        get_staged_queue_length();
-                    boost::int64_t work_items = this->high_priority_queues_[i]->
-                        get_pending_queue_length();
+                    thread_queue_type* q = this->high_priority_queues_[i];
+                    boost::int64_t task_items = q->get_staged_queue_length();
+                    boost::int64_t work_items = q->get_pending_queue_length();
                     if(task_items > average_task_count)
                     {
                         boost::int64_t count = task_items - average_task_count;
-                        tmp_queue.move_task_items_from
-                            (this->high_priority_queues_[i], count);
+                        tmp_queue.move_task_items_from(q, count);
                     }
                     if(work_items > average_work_count)
                     {
                         boost::int64_t count = work_items - average_work_count;
-                        tmp_queue.move_work_items_from
-                            (this->high_priority_queues_[i], count,
+                        tmp_queue.move_work_items_from(q, count,
                                 i + this->queues_.size());
                     }
                 }
 
-                // And readd them to the queues which didn't have enough work ...
+                // And re-add them to the queues which didn't have enough work ...
                 for(std::size_t i = 0; i < this->high_priority_queues_.size(); ++i)
                 {
-                    boost::int64_t task_items = this->high_priority_queues_[i]->
-                        get_staged_queue_length();
-                    boost::int64_t work_items = this->high_priority_queues_[i]->
-                        get_pending_queue_length();
+                    thread_queue_type* q = this->high_priority_queues_[i];
+                    boost::int64_t task_items = q->get_staged_queue_length();
+                    boost::int64_t work_items = q->get_pending_queue_length();
                     if(task_items < average_task_count)
                     {
                         boost::int64_t count = average_task_count - task_items;
-                        this->high_priority_queues_[i]->
-                            move_task_items_from(&tmp_queue, count);
+                        q->move_task_items_from(&tmp_queue, count);
                     }
                     if(work_items < average_work_count)
                     {
                         boost::int64_t count = average_work_count - work_items;
-                        this->high_priority_queues_[i]->move_work_items_from
-                            (&tmp_queue, count, i + this->queues_.size());
+                        q->move_work_items_from(&tmp_queue, count,
+                            i + this->queues_.size());
                     }
                 }
 
@@ -143,8 +137,9 @@ namespace hpx { namespace threads { namespace policies
                 boost::int64_t average_work_count = 0;
                 for(std::size_t i = 0; i < this->queues_.size(); ++i)
                 {
-                    average_task_count += this->queues_[i]->get_staged_queue_length();
-                    average_work_count += this->queues_[i]->get_pending_queue_length();
+                    thread_queue_type* q = this->queues_[i];
+                    average_task_count += q->get_staged_queue_length();
+                    average_work_count += q->get_pending_queue_length();
                 }
                 average_task_count = average_task_count / this->queues_.size();
                 average_work_count = average_work_count / this->queues_.size();
@@ -153,40 +148,38 @@ namespace hpx { namespace threads { namespace policies
                 thread_queue_type tmp_queue;
                 for(std::size_t i = 0; i < this->queues_.size(); ++i)
                 {
-                    boost::int64_t task_items =
-                        this->queues_[i]->get_staged_queue_length();
-                    boost::int64_t work_items =
-                        this->queues_[i]->get_pending_queue_length();
+                    thread_queue_type* q = this->queues_[i];
+                    boost::int64_t task_items = q->get_staged_queue_length();
+                    boost::int64_t work_items = q->get_pending_queue_length();
                     if(task_items > average_task_count)
                     {
                         boost::int64_t count = task_items - average_task_count;
-                        tmp_queue.move_task_items_from(this->queues_[i], count);
+                        tmp_queue.move_task_items_from(q, count);
                     }
                     if(work_items > average_work_count)
                     {
                         boost::int64_t count = work_items - average_work_count;
-                        tmp_queue.move_work_items_from
-                            (this->queues_[i], count, i + this->queues_.size());
+                        tmp_queue.move_work_items_from(q, count,
+                            i + this->queues_.size());
                     }
                 }
 
-                // And readd them to the queues which didn't have enough work ...
+                // And re-add them to the queues which didn't have enough work ...
                 for(std::size_t i = 0; i < this->queues_.size(); ++i)
                 {
-                    boost::int64_t task_items =
-                        this->queues_[i]->get_staged_queue_length();
-                    boost::int64_t work_items =
-                        this->queues_[i]->get_pending_queue_length();
+                    thread_queue_type* q = this->queues_[i];
+                    boost::int64_t task_items = q->get_staged_queue_length();
+                    boost::int64_t work_items = q->get_pending_queue_length();
                     if(task_items < average_task_count)
                     {
                         boost::int64_t count = average_task_count - task_items;
-                        this->queues_[i]->move_task_items_from(&tmp_queue, count);
+                        q->move_task_items_from(&tmp_queue, count);
                     }
                     if(work_items < average_work_count)
                     {
                         boost::int64_t count = average_work_count - work_items;
-                        this->queues_[i]->move_work_items_from
-                            (&tmp_queue, count, i + this->queues_.size());
+                        q->move_work_items_from(&tmp_queue, count,
+                            i + this->queues_.size());
                     }
                 }
                 // Some items might remain in the tmp_queue ... readd them round robin

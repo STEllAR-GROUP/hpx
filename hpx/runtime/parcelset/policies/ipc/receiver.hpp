@@ -65,10 +65,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             buffer_ = get_buffer();
 
             // Store the time of the begin of the read operation
-            buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
-            buffer_->data_point_.serialization_time_ = 0;
-            buffer_->data_point_.bytes_ = 0;
-            buffer_->data_point_.num_parcels_ = 0;
+            performance_counters::parcels::data_point& data = buffer_->data_point_;
+            data.time_ = timer_.elapsed_nanoseconds();
+            data.serialization_time_ = 0;
+            data.bytes_ = 0;
+            data.num_parcels_ = 0;
 
             // Issue a read operation to read the parcel data.
             void (receiver::*f)(boost::system::error_code const&,

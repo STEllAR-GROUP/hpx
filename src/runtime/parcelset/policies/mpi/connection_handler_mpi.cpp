@@ -154,13 +154,15 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         }
     }
 
-    void connection_handler::add_sender(boost::shared_ptr<sender> sender_connection)
+    void connection_handler::add_sender(
+        boost::shared_ptr<sender> const& sender_connection)
     {
         hpx::lcos::local::spinlock::scoped_lock l(senders_mtx_);
         senders_.push_back(sender_connection);
     }
 
-    void add_sender(connection_handler & handler, boost::shared_ptr<sender> sender_connection)
+    void add_sender(connection_handler & handler,
+        boost::shared_ptr<sender> const& sender_connection)
     {
         handler.add_sender(sender_connection);
     }

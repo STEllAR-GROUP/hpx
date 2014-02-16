@@ -61,10 +61,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             recvd_chunks_ = 0;
 
             // Store the time of the begin of the read operation
-            buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
-            buffer_->data_point_.serialization_time_ = 0;
-            buffer_->data_point_.bytes_ = header_.size();
-            buffer_->data_point_.num_parcels_ = 0;
+            performance_counters::parcels::data_point& data = buffer_->data_point_;
+            data.time_ = timer_.elapsed_nanoseconds();
+            data.serialization_time_ = 0;
+            data.bytes_ = header_.size(); //-V101
+            data.num_parcels_ = 0;
 
             if (static_cast<std::size_t>(header_.size()) > get_max_inbound_size(parcelport))
             {

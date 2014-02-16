@@ -564,11 +564,12 @@ response primary_namespace::unbind_gid(
             return response();
         }
 
-        response r(primary_ns_unbind_gid, it->second.first, it->second.second);
+        gva_table_data_type& data = it->second;
+        response r(primary_ns_unbind_gid, data.first, data.second);
         LAGAS_(info) << (boost::format(
             "primary_namespace::unbind_gid, gid(%1%), count(%2%), gva(%3%), "
             "locality_id(%4%)")
-            % id % count % it->second.first % it->second.second);
+            % id % count % data.first % data.second);
 
         gvas_.erase(it);
 
@@ -1162,8 +1163,9 @@ primary_namespace::resolve_gid_locked(
             if (&ec != &throws)
                 ec = make_success_code();
 
+            gva_table_data_type const& data = it->second;
             return boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
-                (it->first, it->second.first, it->second.second);
+                (it->first, data.first, data.second);
         }
 
         // We need to decrement the iterator, first we check that it's safe
@@ -1173,7 +1175,8 @@ primary_namespace::resolve_gid_locked(
             --it;
 
             // Found the GID in a range
-            if ((it->first + it->second.first.count) > id)
+            gva_table_data_type const& data = it->second;
+            if ((it->first + data.first.count) > id)
             {
                 if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
                 {
@@ -1188,7 +1191,7 @@ primary_namespace::resolve_gid_locked(
                     ec = make_success_code();
 
                 return boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
-                    (it->first, it->second.first, it->second.second);
+                    (it->first, data.first, data.second);
             }
         }
     }
@@ -1198,7 +1201,8 @@ primary_namespace::resolve_gid_locked(
         --it;
 
         // Found the GID in a range
-        if ((it->first + it->second.first.count) > id)
+        gva_table_data_type const& data = it->second;
+        if ((it->first + data.first.count) > id)
         {
             if (HPX_UNLIKELY(id.get_msb() != it->first.get_msb()))
             {
@@ -1213,7 +1217,7 @@ primary_namespace::resolve_gid_locked(
                 ec = make_success_code();
 
             return boost::fusion::vector3<naming::gid_type, gva, boost::uint32_t>
-                (it->first, it->second.first, it->second.second);
+                (it->first, data.first, data.second);
         }
     }
 

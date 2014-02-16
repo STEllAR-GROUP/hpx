@@ -83,8 +83,9 @@ namespace hpx { namespace parcelset {
 
             void enable_parcel_handling(bool new_state);
 
-            void add_sender(boost::shared_ptr<sender> sender_connection);
+            void add_sender(boost::shared_ptr<sender> const& sender_connection);
             void close_sender_connection(int tag, int rank);
+
         private:
             int get_next_tag();
             void handle_messages();
