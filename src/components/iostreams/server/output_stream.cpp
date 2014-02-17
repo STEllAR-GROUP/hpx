@@ -23,7 +23,8 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/shared_ptr.hpp>
 
-namespace hpx { namespace iostreams {
+namespace hpx { namespace iostreams
+{
     void buffer::save(hpx::util::portable_binary_oarchive & ar, unsigned) const
     {
         bool valid = (data_ && !data_->empty());
@@ -51,7 +52,8 @@ namespace hpx { namespace iostreams { namespace server
 ///////////////////////////////////////////////////////////////////////////////
 void output_stream::call_write_async(
     buffer const& in
-) { // {{{
+    )
+{ // {{{
     if(in.data_)
     {
         mutex_type::scoped_lock l(mtx);
@@ -63,7 +65,8 @@ void output_stream::call_write_async(
 
 void output_stream::write_async(
     buffer const& in
-) { // {{{
+    )
+{ // {{{
     if(!in.data_) return;
     // Perform the IO in another OS thread.
     hpx::get_thread_pool("io_pool")->get_io_service().post(
@@ -74,7 +77,8 @@ void output_stream::write_async(
 void output_stream::call_write_sync(
     buffer const& in
   , threads::thread_id_type caller
-) {
+    )
+{
     if(in.data_)
     {
         mutex_type::scoped_lock l(mtx);
@@ -89,7 +93,8 @@ void output_stream::call_write_sync(
 
 void output_stream::write_sync(
     buffer const& in
-) { // {{{
+    )
+{ // {{{
     if(!in.data_) return;
 
     // Perform the IO in another OS thread.

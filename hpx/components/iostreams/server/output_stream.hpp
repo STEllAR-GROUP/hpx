@@ -40,8 +40,10 @@ struct buffer
   private:
     friend class boost::serialization::access;
 
-    void save(hpx::util::portable_binary_oarchive& ar, unsigned) const;
-    void load(hpx::util::portable_binary_iarchive& ar, unsigned);
+    HPX_COMPONENT_EXPORT
+        void save(hpx::util::portable_binary_oarchive& ar, unsigned) const;
+    HPX_COMPONENT_EXPORT
+        void load(hpx::util::portable_binary_iarchive& ar, unsigned);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER();
 };
