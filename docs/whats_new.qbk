@@ -12,7 +12,7 @@
 
 [heading General Changes]
 
-* A major API breaking change for this release was introduced by implementing 
+* A major API breaking change for this release was introduced by implementing
   `hpx::future` and `hpx::shared_future` fully in conformance with the
   __cpp11__. While `hpx::shared_future` is new and will not create any
   compatibility problems, we revised the interface and implementation of the
@@ -24,18 +24,39 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1065] - AGAS cache isn't used/populated on worker localities
+* [issue 1064] - Reorder includes to ensure ws2 includes early
+* [issue 1063] - Add hpx::runtime::suspend and hpx::runtime::resume
+* [issue 1062] - Fix async_continue to propery handle return types
+* [issue 1061] - Implement async_colocated and apply_colocated
+* [issue 1060] - Implement minimal component migration
+* [issue 1058] - Remove HPX_UTIL_TUPLE from code base
+* [issue 1057] - Add performance counters for threading subsystem
+* [issue 1056] - Thread allocation uses two memory pools
+* [issue 1053] - Work stealing flawed
+* [issue 1052] - Fix a number of warnings
+* [issue 1049] - Fixes for TLS on OSX and more reliable test running
+* [issue 1048] - Fixing after 588 hang
+* [issue 1047] - Use port '0' for networking when using one locality
+* [issue 1046] - composable_guard test is broken when having more than one
+                 thread
 * [issue 1045] - Security missing headers
 * [issue 1044] - Native TLS on FreeBSD via __thread
 * [issue 1043] - async et.al. compute the wrong result type
 * [issue 1042] - async et.al. implicitly unwrap reference_wrappers
 * [issue 1041] - Remove redundant costly Kleene stars from regex searches
 * [issue 1040] - CMake script regex match patterns has unnecessary kleenes
+* [issue 1039] - Remove use of Boost.Move and replace with std::move and real
+                 rvalue refs
 * [issue 1038] - Bump minimal required Boost to 1.49.0
 * [issue 1037] - Implicit unwrapping of futures in async broken
 * [issue 1036] - Scheduler hangs when user code attempts to "block" OS-threads
 * [issue 1035] - Idle-rate counter always reports 100% idle rate
+* [issue 1034] - Symbolic name registration causes application hangs
 * [issue 1033] - Application options read in from an options file generate an
                  error message
+* [issue 1032] - id_type local reference counting is wrong
+* [issue 1031] - Negative entry in reference count table
 * [issue 1030] - Implement condition_variable
 * [issue 1029] - Deadlock in thread scheduling subsystem
 * [issue 1028] - HPX-thread cumulative count performance counters report
@@ -58,8 +79,11 @@ Here is a list of the important tickets we closed for this release.
                  logging granularity
 * [issue 1012] - `--hpx:debug-hpx-log` and `--hpx:debug-agas-log` lead to
                  non-thread safe writes
+* [issue 1011] - After installation, running applications from the build/staging
+                 directory no longer works
 * [issue 1010] - Mergable decrement requests are not being merged
 * [issue 1009] - `--hpx:list-symbolic-names` crashes
+* [issue 1007] - Components are not properly destroyed
 * [issue 1006] - Segfault/hang in set_data
 * [issue 1003] - Performance counter naming issue
 * [issue 197] - Add `--console=address` option for PBS runs
