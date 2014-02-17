@@ -2188,13 +2188,12 @@ void addressing_service::update_cache_entry(
         return;
     }
 
-    // This causes the caches to stop being populated correctly. See #1065
-    //if (naming::get_locality_id_from_gid(gid) ==
-    //    naming::get_locality_id_from_gid(locality_))
-    //{
-    //    // we prefer not to store any local items in the AGAS cache
-    //    return;
-    //}
+    if (naming::get_locality_id_from_gid(gid) ==
+        naming::get_locality_id_from_gid(locality_))
+    {
+        // we prefer not to store any local items in the AGAS cache
+        return;
+    }
 
     try {
         // The entry in AGAS for a locality's RTS component has a count of 0,

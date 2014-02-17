@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/runtime/applier/apply.hpp>
+#include <hpx/runtime/applier/apply_colocated.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/naming/name.hpp>
@@ -265,6 +266,16 @@ namespace hpx { namespace components { namespace stubs
         typedef server::runtime_support::update_agas_cache_entry_action
             action_type;
         hpx::apply<action_type>(targetgid, gid, g, count, offset);
+    }
+
+    void runtime_support::update_agas_cache_entry_colocated(
+        naming::id_type const& targetgid, naming::gid_type const& gid,
+        naming::address const& g, boost::uint64_t count,
+        boost::uint64_t offset)
+    {
+        typedef server::runtime_support::update_agas_cache_entry_action
+            action_type;
+        hpx::apply_colocated<action_type>(targetgid, gid, g, count, offset);
     }
 
     ///////////////////////////////////////////////////////////////////////
