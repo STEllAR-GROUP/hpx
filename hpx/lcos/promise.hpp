@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -663,7 +663,7 @@ namespace hpx { namespace traits
     template <typename Result, typename RemoteResult>
     struct component_type_database<lcos::detail::promise<Result, RemoteResult> >
     {
-        HPX_ALWAYS_EXPORT static components::component_type value;
+        static components::component_type value;
 
         static components::component_type get()
         {
@@ -684,8 +684,7 @@ namespace hpx { namespace traits
     };
 
     template <typename Result, typename RemoteResult>
-    HPX_ALWAYS_EXPORT components::component_type
-    component_type_database<
+    components::component_type component_type_database<
         lcos::detail::promise<Result, RemoteResult>
     >::value = components::component_invalid;
 }}

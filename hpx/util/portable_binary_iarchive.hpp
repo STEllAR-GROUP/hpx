@@ -52,10 +52,16 @@
 namespace hpx { namespace util
 {
 
+#if defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)
+#define HPX_SERIALIZATION_EXPORT
+#else
+#define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
+#endif
+
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
 // exception to be thrown if integer read from archive doesn't fit
 // variable being loaded
-class HPX_ALWAYS_EXPORT portable_binary_iarchive_exception :
+class HPX_SERIALIZATION_EXPORT portable_binary_iarchive_exception :
     public virtual boost::archive::archive_exception
 {
 public:
@@ -83,12 +89,6 @@ public:
 // "Portable" input binary archive.  It addresses integer size and endianness so
 // that binary archives can be passed across systems. Note:floating point types
 // are passed through as is.
-#if defined(BOOST_MSVC) || defined(BOOST_INTEL_WIN)
-#define HPX_SERIALIZATION_EXPORT
-#else
-#define HPX_SERIALIZATION_EXPORT HPX_ALWAYS_EXPORT
-#endif
-
 class HPX_SERIALIZATION_EXPORT portable_binary_iarchive :
     public hpx::util::basic_binary_iprimitive<
         portable_binary_iarchive
