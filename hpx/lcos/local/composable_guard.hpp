@@ -46,7 +46,7 @@ struct DebugObject {
 
 namespace hpx { namespace lcos { namespace local {
 struct guard_task;
-void free(guard_task *task);
+HPX_API_EXPORT void free(guard_task *task);
 
 struct guard : DebugObject {
     guard_atomic task;
