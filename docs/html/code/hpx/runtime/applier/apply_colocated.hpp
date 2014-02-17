@@ -12,6 +12,8 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
+#include <hpx/runtime/agas/request.hpp>
+#include <hpx/runtime/agas/stubs/primary_namespace.hpp>
 #include <hpx/runtime/applier/apply_continue.hpp>
 #include <hpx/util/functional/colocated_helpers.hpp>
 #include <hpx/util/bind.hpp>

@@ -19,22 +19,55 @@
 
 #include <iostream>
 
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+
+namespace hpx { namespace iostreams
+{
+    void buffer::save(hpx::util::portable_binary_oarchive & ar, unsigned) const
+    {
+        bool valid = (data_ && !data_->empty());
+        ar & valid;
+        if(valid)
+        {
+            ar & data_;
+        }
+    }
+
+    void buffer::load(hpx::util::portable_binary_iarchive& ar, unsigned)
+    {
+        bool valid = false;
+        ar & valid;
+        if(valid)
+        {
+            ar & data_;
+        }
+    }
+}}
+
 namespace hpx { namespace iostreams { namespace server
 {
 
 ///////////////////////////////////////////////////////////////////////////////
 void output_stream::call_write_async(
     buffer const& in
-) { // {{{
-    mutex_type::scoped_lock l(mtx);
+    )
+{ // {{{
+    if(in.data_)
+    {
+        mutex_type::scoped_lock l(mtx);
 
     // Perform the IO operation.
-    write_f(*(in.data_));
+        write_f(*(in.data_));
+    }
 } // }}}
 
 void output_stream::write_async(
     buffer const& in
-) { // {{{
+    )
+{ // {{{
+    if(!in.data_) return;
     // Perform the IO in another OS thread.
     hpx::get_thread_pool("io_pool")->get_io_service().post(
         boost::bind(&output_stream::call_write_async, this, in));
@@ -44,7 +77,9 @@ void output_stream::write_async(
 void output_stream::call_write_sync(
     buffer const& in
   , threads::thread_id_type caller
-) {
+    )
+{
+    if(in.data_)
     {
         mutex_type::scoped_lock l(mtx);
 
@@ -58,7 +93,10 @@ void output_stream::call_write_sync(
 
 void output_stream::write_sync(
     buffer const& in
-) { // {{{
+    )
+{ // {{{
+    if(!in.data_) return;
+
     // Perform the IO in another OS thread.
     hpx::get_thread_pool("io_pool")->get_io_service().post(
         boost::bind(&output_stream::call_write_sync, this, in, threads::get_self_id()));

@@ -1105,7 +1105,7 @@ bool addressing_service::unbind_range_local(
 //             naming::id_type target(
 //                 stubs::primary_namespace::get_service_instance(lower_id)
 //               , naming::id_type::unmanaged);
-// 
+//
 //             rep = stubs::primary_namespace::service(
 //                 target, req, threads::thread_priority_default, ec);
 //         }
@@ -1150,12 +1150,12 @@ bool addressing_service::unbind_range_local(
 //     )
 // {
 //     // Resolve the address of the GID.
-// 
+//
 //     // NOTE: We do not throw here for a reason; it is perfectly valid for the
 //     // GID to not be found in the local AGAS instance.
 //     if (!resolve(id, addr, ec) || ec)
 //         return false;
-// 
+//
 //     return addr.locality_ == get_here();
 // }
 
@@ -1200,10 +1200,10 @@ bool addressing_service::is_local_address_cached(
 //         if (all_resolved)
 //             return locals.any();      // all destinations resolved
 //     }
-// 
+//
 //     if (!resolve_full(gids, addrs, size, locals, ec) || ec)
 //         return false;
-// 
+//
 //     return locals.any();
 // }
 

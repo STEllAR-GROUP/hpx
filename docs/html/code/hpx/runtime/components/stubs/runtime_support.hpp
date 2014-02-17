@@ -276,6 +276,11 @@ namespace hpx { namespace components { namespace stubs
             naming::gid_type const& gid, naming::address const& g,
             boost::uint64_t count, boost::uint64_t offset);
 
+        static void
+        update_agas_cache_entry_colocated(naming::id_type const& targetgid,
+            naming::gid_type const& gid, naming::address const& g,
+            boost::uint64_t count, boost::uint64_t offset);
+
         ///////////////////////////////////////////////////////////////////////
         static void
         garbage_collect_non_blocking(naming::id_type const& targetgid);

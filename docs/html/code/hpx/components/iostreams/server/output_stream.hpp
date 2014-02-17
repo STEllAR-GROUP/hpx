@@ -15,8 +15,6 @@
 #include <hpx/runtime/components/server/managed_component_base.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/deque.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/split_member.hpp>
 
@@ -32,54 +30,22 @@ struct buffer
     {}
 
     buffer(
-        std::deque<char>* ptr
+        std::vector<char>* ptr
         )
       : data_(ptr)
     {}
 
-    boost::shared_ptr<std::deque<char> > data_;
+    boost::shared_ptr<std::vector<char> > data_;
 
   private:
     friend class boost::serialization::access;
 
-    template <
-        typename Archive
-    >
-    void save(
-        Archive& ar
-      , const unsigned int
-        ) const
-    {
-        bool isvalid = data_ != NULL;
-        ar << isvalid;
+    HPX_COMPONENT_EXPORT
+        void save(hpx::util::portable_binary_oarchive& ar, unsigned) const;
+    HPX_COMPONENT_EXPORT
+        void load(hpx::util::portable_binary_iarchive& ar, unsigned);
 
-        if (isvalid)
-        {
-            std::deque<char> const& instance = *data_;
-            ar << instance;
-        }
-    }
-
-    template <
-        typename Archive
-    >
-    void load(
-        Archive& ar
-      , const unsigned int
-        )
-    {
-        bool isvalid;
-        ar >> isvalid;
-
-        if (isvalid)
-        {
-            std::deque<char> instance;
-            ar >> instance;
-            data_.reset(new std::deque<char>(instance));
-        }
-    }
-
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
+    BOOST_SERIALIZATION_SPLIT_MEMBER();
 };
 
 namespace server
