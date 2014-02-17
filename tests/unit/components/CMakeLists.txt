@@ -34,6 +34,21 @@ set(remote_object_PARAMETERS
     LOCALITIES 2
     THREADS_PER_LOCALITY 2)
 
+set(inheritance_2_classes_abstract_FLAGS
+    DEPENDENCIES iostreams_component)
+
+set(inheritance_2_classes_concrete_FLAGS
+    DEPENDENCIES iostreams_component)
+
+set(inheritance_3_classes_1_abstract_FLAGS
+    DEPENDENCIES iostreams_component)
+
+set(inheritance_3_classes_2_abstract_FLAGS
+    DEPENDENCIES iostreams_component)
+
+set(inheritance_3_classes_concrete_FLAGS
+    DEPENDENCIES iostreams_component)
+
 foreach(test ${tests})
   set(sources
       ${test}.cpp)
