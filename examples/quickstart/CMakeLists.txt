@@ -73,6 +73,7 @@ set(component_inheritance_simple_FLAGS DEPENDENCIES iostreams_component)
 set(interest_calculator_FLAGS DEPENDENCIES dataflow_component)
 set(simple_future_continuation_FLAGS DEPENDENCIES iostreams_component)
 set(timed_futures_FLAGS DEPENDENCIES iostreams_component)
+set(pingpong_FLAGS DEPENDENCIES iostreams_component)
 
 foreach(example_program ${example_programs})
   set(sources

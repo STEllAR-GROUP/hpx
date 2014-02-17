@@ -27,7 +27,7 @@ set(get_colocation_id_PARAMETERS
     LOCALITIES 2)
 
 set(local_address_rebind_FLAGS
-    DEPENDENCIES simple_mobile_object_component)
+    DEPENDENCIES iostreams_component simple_mobile_object_component)
 set(local_address_rebind_PARAMETERS
     THREADS_PER_LOCALITY 4)
 
