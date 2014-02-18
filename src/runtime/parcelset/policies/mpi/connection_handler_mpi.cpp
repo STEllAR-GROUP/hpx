@@ -195,8 +195,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         if(next_tag_ + 1 > static_cast<std::size_t>((std::numeric_limits<int>::max)()))
         {
             HPX_THROW_EXCEPTION(network_error, "mpi::connection_handler::get_next_tag",
-                "there are no free tags available. Consider decreasing the cache size");
-            return tag;
+                "there are no free tags available. Consider increasing the cache size");
+            return -1;
         }
         tag = static_cast<int>(next_tag_++);
         return tag;
