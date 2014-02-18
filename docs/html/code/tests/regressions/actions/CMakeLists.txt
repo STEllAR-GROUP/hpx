@@ -33,7 +33,8 @@ if(HPX_HAVE_CXX11)
         THREADS_PER_LOCALITY 2)
 
     set(remote_object_move_semantics_FLAGS
-        DEPENDENCIES dataflow_component action_move_semantics_component remote_object_component)
+        DEPENDENCIES iostreams_component dataflow_component
+                     action_move_semantics_component remote_object_component)
     set(remote_object_move_semantics_PARAMETERS
         LOCALITIES 2
         THREADS_PER_LOCALITY 2)
