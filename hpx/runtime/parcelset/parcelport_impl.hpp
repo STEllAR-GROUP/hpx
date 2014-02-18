@@ -596,7 +596,7 @@ namespace hpx { namespace parcelset
 
         ///////////////////////////////////////////////////////////////////////
         void get_connection_and_send_parcels(
-            naming::locality const& locality_id, bool background_ground = false)
+            naming::locality const& locality_id, bool background = false)
         {
             // repeat until no more parcels are to be sent
             while (true)
@@ -628,7 +628,7 @@ namespace hpx { namespace parcelset
 
                 if (!sender_connection)
                 {
-                    if (!force_connection && background_ground)
+                    if (!force_connection && background)
                     {
                         // retry getting a connection, this time enforcing a
                         // new connection to be created (if needed)
