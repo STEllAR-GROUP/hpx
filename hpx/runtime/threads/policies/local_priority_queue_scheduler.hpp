@@ -491,7 +491,7 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-            local_priority_queue_scheduler::schedule_thread(thrd, priority);
+            local_priority_queue_scheduler::schedule_thread(thrd, num_thread, priority);
         }
 
         /// Destroy the passed thread as it has been terminated
