@@ -56,7 +56,9 @@ void widget::add_label(std::size_t i, double t)
 
 void widget::run_finished()
 {
-    run_button->setEnabled(true);
+  bool value = true;
+  QGenericArgument arg("bool",&value);  
+  QMetaObject::invokeMethod(run_button, "setEnabled", arg);
 }
 
 void widget::set_threads(int no)
