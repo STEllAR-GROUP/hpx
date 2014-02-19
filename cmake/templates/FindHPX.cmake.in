@@ -28,7 +28,7 @@ set(HPX_CXX_COMPILE_FLAGS "@CMAKE_CXX_FLAGS@ @external_definitions@"
 set(HPX_Fortran_COMPILE_FLAGS "@CMAKE_Fortran_FLAGS@ @external_definitions@"
     CACHE STRING "Fortran compile flags for HPX")
 
-set(HPX_PREFIX @CMAKE_INSTALL_PREFIX@
+set(HPX_PREFIX @HPX_PREFIX@
     CACHE PATH "HPX installation prefix")
 
 set(HPX_GIT_COMMIT @HPX_GIT_COMMIT@
@@ -62,8 +62,8 @@ endif()
 
 include(HPX_SetOutputPaths)
 
-mark_as_advanced(FORCE HPX_C_COMPILER HPX_CXX_COMPILER HPX_Fortran_COMPILER) 
-mark_as_advanced(FORCE HPX_C_COMPILE_FLAGS HPX_CXX_COMPILE_FLAGS HPX_Fortran_COMPILE_FLAGS) 
+mark_as_advanced(FORCE HPX_C_COMPILER HPX_CXX_COMPILER HPX_Fortran_COMPILER)
+mark_as_advanced(FORCE HPX_C_COMPILE_FLAGS HPX_CXX_COMPILE_FLAGS HPX_Fortran_COMPILE_FLAGS)
 mark_as_advanced(FORCE HPX_LIBRARIES HPX_LIBRARY_DIR HPX_INCLUDE_DIR HPX_PREFIX HPX_GIT_COMMIT HPX_DEBUG_POSTFIX HPX_PIE)
 
 include(HPX_Utils)
