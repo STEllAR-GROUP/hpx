@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/util/hardware/queue_config.hpp>
 
-#include <boost/type_traits/is_pod.hpp> 
+#include <boost/type_traits/is_pod.hpp>
 #include <boost/cstdint.hpp>
 
 namespace hpx { namespace util { namespace hardware
@@ -103,7 +103,7 @@ class fifo
     bool pop(T& t)
     {
         t = *reinterpret_cast<T>(*cmd2addr(TM_REQ_GETHEAD, tnum_));
-        return true; 
+        return true;
     }
 };
 
@@ -124,7 +124,7 @@ struct basic_hardware_queue_backend
     typedef boost::uint64_t size_type;
 
     basic_lockfree_queue_backend(
-        size_type initial_size = 0 
+        size_type initial_size = 0
       , size_type num_thread = size_type(-1)
         )
       : queue_(initial_size, num_thread)
@@ -134,7 +134,7 @@ struct basic_hardware_queue_backend
     {
         return queue_.push(val);
     }
- 
+
     bool pop(reference val, bool steal = true)
     {
         return queue_.pop(val);

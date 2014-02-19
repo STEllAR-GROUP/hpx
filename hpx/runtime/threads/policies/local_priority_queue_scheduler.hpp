@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -297,15 +297,12 @@ namespace hpx { namespace threads { namespace policies
         void abort_all_suspended_threads()
         {
             for (std::size_t i = 0; i != queues_.size(); ++i)
-                queues_[i]->abort_all_suspended_threads(i);
+                queues_[i]->abort_all_suspended_threads();
 
-            for (std::size_t i = 0; i != high_priority_queues_.size(); ++i) {
-                std::size_t queue_num = queues_.size() + i;
-                high_priority_queues_[i]->abort_all_suspended_threads(queue_num);
-            }
+            for (std::size_t i = 0; i != high_priority_queues_.size(); ++i)
+                high_priority_queues_[i]->abort_all_suspended_threads();
 
-            low_priority_queue_.abort_all_suspended_threads(
-                queues_.size()+high_priority_queues_.size());
+            low_priority_queue_.abort_all_suspended_threads();
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -353,16 +350,16 @@ namespace hpx { namespace threads { namespace policies
             if (data.priority == thread_priority_critical) {
                 std::size_t num = num_thread % high_priority_queues_.size();
                 return high_priority_queues_[num]->create_thread(data,
-                    initial_state, run_now, queue_size + num, ec);
+                    initial_state, run_now, ec);
             }
             else if (data.priority == thread_priority_low) {
                 return low_priority_queue_.create_thread(data, initial_state,
-                    run_now, queue_size + high_priority_queues_.size(), ec);
+                    run_now, ec);
             }
 
             HPX_ASSERT(num_thread < queue_size);
             return queues_[num_thread]->create_thread(data, initial_state,
-                run_now, num_thread, ec);
+                run_now, ec);
         }
 
         /// Return the next thread to be executed, return false if none is
@@ -375,7 +372,7 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread < high_priority_queues_.size())
             {
                 thread_queue_type* q = high_priority_queues_[num_thread];
-                bool result = q->get_next_thread(thrd, queues_size + num_thread);
+                bool result = q->get_next_thread(thrd);
 
                 q->increment_num_pending_accesses();
                 if (result)
@@ -386,7 +383,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 HPX_ASSERT(num_thread < queues_size);
                 thread_queue_type* q = queues_[num_thread];
-                bool result = q->get_next_thread(thrd, num_thread);
+                bool result = q->get_next_thread(thrd);
 
                 q->increment_num_pending_accesses();
                 if (result)
@@ -420,7 +417,7 @@ namespace hpx { namespace threads { namespace policies
                     if (idx < high_priority_queues_.size())
                     {
                         thread_queue_type* q = high_priority_queues_[idx];
-                        if (q->get_next_thread(thrd, queues_size+num_thread))
+                        if (q->get_next_thread(thrd))
                         {
                             q->increment_num_stolen_from_pending();
                             high_priority_queues_[num_thread]->
@@ -429,7 +426,7 @@ namespace hpx { namespace threads { namespace policies
                         }
                     }
 
-                    if (queues_[idx]->get_next_thread(thrd, num_thread))
+                    if (queues_[idx]->get_next_thread(thrd))
                     {
                         queues_[idx]->increment_num_stolen_from_pending();
                         queues_[num_thread]->increment_num_stolen_to_pending();
@@ -450,7 +447,7 @@ namespace hpx { namespace threads { namespace policies
                     if (idx < high_priority_queues_.size())
                     {
                         thread_queue_type* q = high_priority_queues_[idx];
-                        if (q->get_next_thread(thrd, queues_size+num_thread))
+                        if (q->get_next_thread(thrd))
                         {
                             q->increment_num_stolen_from_pending();
                             high_priority_queues_[num_thread]->
@@ -459,7 +456,7 @@ namespace hpx { namespace threads { namespace policies
                         }
                     }
 
-                    if (queues_[idx]->get_next_thread(thrd, num_thread))
+                    if (queues_[idx]->get_next_thread(thrd))
                     {
                         queues_[idx]->increment_num_stolen_from_pending();
                         queues_[num_thread]->increment_num_stolen_to_pending();
@@ -468,12 +465,7 @@ namespace hpx { namespace threads { namespace policies
                 }
             }
 
-            bool result = low_priority_queue_.get_next_thread(thrd,
-                queues_size + high_priority_queues_.size());
-            if (result)
-                return true;
-
-            return false;
+            return low_priority_queue_.get_next_thread(thrd);
         }
 
         /// Schedule the passed thread
@@ -485,23 +477,21 @@ namespace hpx { namespace threads { namespace policies
 
             if (priority == thread_priority_critical) {
                 std::size_t num = num_thread % high_priority_queues_.size();
-                high_priority_queues_[num]->schedule_thread(
-                    thrd, queues_.size()+num);
+                high_priority_queues_[num]->schedule_thread(thrd);
             }
             else if (priority == thread_priority_low) {
-                low_priority_queue_.schedule_thread(thrd,
-                    queues_.size() + high_priority_queues_.size());
+                low_priority_queue_.schedule_thread(thrd);
             }
             else {
                 HPX_ASSERT(num_thread < queues_.size());
-                queues_[num_thread]->schedule_thread(thrd, num_thread);
+                queues_[num_thread]->schedule_thread(thrd);
             }
         }
 
         void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-            local_priority_queue_scheduler::schedule_thread(thrd, num_thread, priority);
+            local_priority_queue_scheduler::schedule_thread(thrd, priority);
         }
 
         /// Destroy the passed thread as it has been terminated
@@ -768,13 +758,12 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread < high_priority_queues_.size())
             {
                 result = high_priority_queues_[num_thread]->
-                    wait_or_add_new(queues_size + num_thread, running,
-                        idle_loop_count, added) && result;
+                    wait_or_add_new(running, idle_loop_count, added) && result;
                 if (0 != added) return result;
             }
 
             result = queues_[num_thread]->wait_or_add_new(
-                num_thread, running, idle_loop_count, added) && result;
+                running, idle_loop_count, added) && result;
             if (0 != added) return result;
 
             if (numa_sensitive_)
@@ -801,8 +790,8 @@ namespace hpx { namespace threads { namespace policies
                         if (idx < high_priority_queues_.size())
                         {
                             result = high_priority_queues_[num_thread]->
-                                wait_or_add_new(queues_size + num_thread, running,
-                                    idle_loop_count, added, high_priority_queues_[idx])
+                                wait_or_add_new(running, idle_loop_count,
+                                    added, high_priority_queues_[idx])
                               && result;
 
                             if (0 != added)
@@ -815,8 +804,8 @@ namespace hpx { namespace threads { namespace policies
                             }
                         }
 
-                        result = queues_[num_thread]->wait_or_add_new(num_thread,
-                            running, idle_loop_count, added, queues_[idx]) && result;
+                        result = queues_[num_thread]->wait_or_add_new(running,
+                            idle_loop_count, added, queues_[idx]) && result;
                         if (0 != added)
                         {
                             queues_[idx]->increment_num_stolen_from_staged(added);
@@ -845,8 +834,8 @@ namespace hpx { namespace threads { namespace policies
                         if (idx < high_priority_queues_.size())
                         {
                             result = high_priority_queues_[num_thread]->
-                                wait_or_add_new(queues_size + num_thread, running,
-                                    idle_loop_count, added, high_priority_queues_[idx])
+                                wait_or_add_new(running, idle_loop_count,
+                                    added, high_priority_queues_[idx])
                                && result;
                             if (0 != added)
                             {
@@ -858,8 +847,8 @@ namespace hpx { namespace threads { namespace policies
                             }
                         }
 
-                        result = queues_[num_thread]->wait_or_add_new(num_thread,
-                            running, idle_loop_count, added, queues_[idx]) && result;
+                        result = queues_[num_thread]->wait_or_add_new(running,
+                            idle_loop_count, added, queues_[idx]) && result;
                         if (0 != added)
                         {
                             queues_[idx]->increment_num_stolen_from_staged(added);
@@ -883,8 +872,8 @@ namespace hpx { namespace threads { namespace policies
                     if (idx < high_priority_queues_.size())
                     {
                         result = high_priority_queues_[num_thread]->
-                            wait_or_add_new(queues_size + num_thread, running,
-                                idle_loop_count, added, high_priority_queues_[idx])
+                            wait_or_add_new(running, idle_loop_count, added,
+                                high_priority_queues_[idx])
                            && result;
                         if (0 != added)
                         {
@@ -896,8 +885,8 @@ namespace hpx { namespace threads { namespace policies
                         }
                     }
 
-                    result = queues_[num_thread]->wait_or_add_new(num_thread,
-                        running, idle_loop_count, added, queues_[idx]) && result;
+                    result = queues_[num_thread]->wait_or_add_new(running,
+                        idle_loop_count, added, queues_[idx]) && result;
                     if (0 != added)
                     {
                         queues_[idx]->increment_num_stolen_from_staged(added);
@@ -933,8 +922,7 @@ namespace hpx { namespace threads { namespace policies
             }
 #endif
 
-            result = low_priority_queue_.wait_or_add_new(
-                queues_size + high_priority_queues_.size(), running,
+            result = low_priority_queue_.wait_or_add_new(running,
                 idle_loop_count, added) && result;
             if (0 != added) return result;
 

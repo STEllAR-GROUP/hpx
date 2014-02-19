@@ -106,8 +106,7 @@ struct lockfree_abp_fifo_backend
     {
         if (steal)
             return queue_.pop_left(val);
-        else
-            return queue_.pop_right(val);
+        return queue_.pop_right(val);
     }
 
     bool empty()
@@ -154,8 +153,7 @@ struct lockfree_abp_lifo_backend
     {
         if (steal)
             return queue_.pop_right(val);
-        else
-            return queue_.pop_left(val);
+        return queue_.pop_left(val);
     }
 
     bool empty()
