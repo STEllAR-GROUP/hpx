@@ -12,6 +12,7 @@ set(subdirs
     async_io
     balancing
     cancelable_action
+    future_reduce
     heartbeat
     interpolate1d
     jacobi
