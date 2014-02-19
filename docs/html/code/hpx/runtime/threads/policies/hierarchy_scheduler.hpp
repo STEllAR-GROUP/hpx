@@ -441,7 +441,7 @@ namespace hpx { namespace threads { namespace policies
                 level_type& t = tree[i];
                 for(size_type j = 0; j != t.size(); ++j)
                 {
-                    t[j]->abort_all_suspended_threads(j);
+                    t[j]->abort_all_suspended_threads();
                 }
             }
         }
@@ -473,7 +473,7 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(tree.size());
             HPX_ASSERT(tree.back().size());
             return tree.back()[0]->create_thread(data, initial_state,
-                run_now, 0, ec);
+                run_now, ec);
         }
 
         void transfer_threads(
@@ -519,7 +519,6 @@ namespace hpx { namespace threads { namespace policies
             dest->move_work_items_from(
                 tq
               , tq->get_pending_queue_length()/d + 1
-              , num_thread
             );
         }
 
@@ -535,14 +534,12 @@ namespace hpx { namespace threads { namespace policies
             thread_queue_type * tq = tree[0][num_thread];
 
             // check if we need to collect new work from parents
-            if(tq->get_pending_queue_length() == 0)
+            if (tq->get_pending_queue_length() == 0)
             {
                 transfer_threads(num_thread/d, num_thread, 1, num_thread);
             }
 
-            if(tq->get_next_thread(thrd, num_thread))
-                return true;
-            return false;
+            return tq->get_next_thread(thrd);
         }
 
         /// Schedule the passed thread
@@ -551,7 +548,7 @@ namespace hpx { namespace threads { namespace policies
         {
             HPX_ASSERT(tree.size());
             HPX_ASSERT(tree.back().size());
-            tree.back()[0]->schedule_thread(thrd, 0);
+            tree.back()[0]->schedule_thread(thrd);
         }
 
         void schedule_thread_last(threads::thread_data_base* thrd, std::size_t num_thread,
@@ -638,9 +635,7 @@ namespace hpx { namespace threads { namespace policies
                 transfer_tasks(num_thread/d, num_thread, 1);
             }
 
-            bool result = tq->wait_or_add_new(
-                num_thread, running, idle_loop_count, added);
-
+            bool result = tq->wait_or_add_new(running, idle_loop_count, added);
             return result && 0 == added;
         }
 

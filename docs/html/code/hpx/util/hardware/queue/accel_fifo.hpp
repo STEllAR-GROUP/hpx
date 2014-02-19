@@ -5,7 +5,7 @@
 
 #include "pci.hh"
 #include "accel_defs.h"
-    
+
 ///////////////////////////////////////////////////////////////////////////
 #ifdef HPX_ACCEL_QUEUING
     // hardware accelerated queuing
@@ -24,7 +24,7 @@
         {
             return work_items.enqueue(thrd, num_thread);
         }
-    
+
         template <typename T, typename ThreadData>
         static bool
         dequeue(accel::fifo<T>& work_items, ThreadData*& thrd,
@@ -32,8 +32,8 @@
         {
             return work_items.dequeue(thrd, num_thread);
         }
-   
-        template <typename T> 
+
+        template <typename T>
         static bool
         empty(accel::fifo<T>& work_items,
             std::size_t num_thread = std::size_t(-1))
@@ -77,15 +77,15 @@ namespace accel
     void map_memory()
     {
       if (pci_system_init() != 0)
-    throw std::runtime_error(std::string("PCI system initialization failed"));
+        throw std::runtime_error(std::string("PCI system initialization failed"));
       // match any Xilinx board
       // (temporary, as there are also boards from Avnet and HTG)
       dev_ = new pci::Device(XilinxID, PCI_MATCH_ANY);
       if (!dev_ || !dev_->valid())
-    throw std::runtime_error(std::string("Failed to find the PCI FPGA board"));
+        throw std::runtime_error(std::string("Failed to find the PCI FPGA board"));
       base_ = reinterpret_cast<char *>(dev_->region(PCI_BAR_ANY));
       if (!base_)
-    throw std::runtime_error(std::string("Cannot map PCI memory space"));
+        throw std::runtime_error(std::string("Cannot map PCI memory space"));
       printf("using accelerated queue at %p\n", base_);
     }
 
@@ -107,15 +107,15 @@ namespace accel
       reset();
       uint64_t qs = *cmd2addr(TM_REQ_GETSIZE);
       if (qs < sz)
-    throw std::runtime_error(std::string("Hardware queue does not have sufficent capacity"));
+        throw std::runtime_error(std::string("Hardware queue does not have sufficent capacity"));
     }
 
     ~fifo()
     {
       if (dev_)
       {
-    delete dev_;
-    pci_system_cleanup();
+        delete dev_;
+        pci_system_cleanup();
       }
     }
 

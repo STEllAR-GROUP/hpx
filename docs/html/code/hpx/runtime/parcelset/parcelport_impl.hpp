@@ -301,27 +301,8 @@ namespace hpx { namespace parcelset
 
         ///////////////////////////////////////////////////////////////////////////
         // the code below is needed to bootstrap the parcel layer
-        static void early_write_handler(boost::system::error_code const& ec,
-            std::size_t size)
-        {
-            if (ec) {
-                // all errors during early parcel handling are fatal
-                try {
-                    HPX_THROW_EXCEPTION(network_error, "early_write_handler",
-                        "error while handling early parcel: " +
-                            ec.message() + "(" +
-                            boost::lexical_cast<std::string>(ec.value())+ ")");
-                }
-                catch (hpx::exception const& e) {
-                    hpx::detail::report_exception_and_terminate(e);
-                }
-                return;
-            }
-        }
-
-        static void early_pending_parcel_handler(
-            boost::system::error_code const& ec,
-            naming::locality const&, boost::shared_ptr<connection> const&)
+        void early_pending_parcel_handler(
+            boost::system::error_code const& ec, std::size_t size, parcel const & p)
         {
             if (ec) {
                 // all errors during early parcel handling are fatal
@@ -346,28 +327,16 @@ namespace hpx { namespace parcelset
         >::type
         send_early_parcel_impl(parcel& p)
         {
-            naming::locality const& l = p.get_destination_locality();
-            error_code ec;
-            boost::shared_ptr<connection> sender_connection =
-                get_connection_wait(l, ec);
-
-            if (ec) {
-                // all errors during early parcel handling are fatal
-                hpx::detail::report_exception_and_terminate(
-                    hpx::detail::access_exception(ec));
-                return;
-            }
-
-            HPX_ASSERT(sender_connection.get() != 0);
-            boost::shared_ptr<parcel_buffer<typename connection::buffer_type> >
-                buffer = encode_parcels(std::vector<parcel>(1, p), 
-                    *sender_connection, archive_flags_, this->enable_security());
-
-            sender_connection->async_write(
-                early_write_handler
-              , early_pending_parcel_handler);
-
-            do_background_work_impl<ConnectionHandler>();
+            put_parcel(
+                p
+              , boost::bind(
+                    &parcelport_impl::early_pending_parcel_handler
+                  , this
+                  , ::_1
+                  , ::_2
+                  , p
+                )
+            );
         }
 
         template <typename ConnectionHandler_>
@@ -627,7 +596,7 @@ namespace hpx { namespace parcelset
 
         ///////////////////////////////////////////////////////////////////////
         void get_connection_and_send_parcels(
-            naming::locality const& locality_id, bool background_ground = false)
+            naming::locality const& locality_id, bool background = false)
         {
             // repeat until no more parcels are to be sent
             while (true)
@@ -659,7 +628,7 @@ namespace hpx { namespace parcelset
 
                 if (!sender_connection)
                 {
-                    if (!force_connection && background_ground)
+                    if (!force_connection && background)
                     {
                         // retry getting a connection, this time enforcing a
                         // new connection to be created (if needed)

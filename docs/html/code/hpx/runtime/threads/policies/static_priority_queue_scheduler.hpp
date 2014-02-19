@@ -1,5 +1,5 @@
 //  Copyright (c)      2013 Thomas Heller
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -59,7 +59,7 @@ namespace hpx { namespace threads { namespace policies
                 thread_queue_type* q = this->high_priority_queues_[num_thread];
 
                 q->increment_num_pending_accesses();
-                if (q->get_next_thread(thrd, num_thread))
+                if (q->get_next_thread(thrd))
                     return true;
                 q->increment_num_pending_misses();
             }
@@ -69,7 +69,7 @@ namespace hpx { namespace threads { namespace policies
                 thread_queue_type* q = this->queues_[num_thread];
 
                 q->increment_num_pending_accesses();
-                if (q->get_next_thread(thrd, num_thread))
+                if (q->get_next_thread(thrd))
                     return true;
                 q->increment_num_pending_misses();
 
@@ -80,12 +80,7 @@ namespace hpx { namespace threads { namespace policies
 
             // Limit access to the low priority queue to one worker thread
             if ((queues_size - 1) == num_thread)
-            {
-                bool result = this->low_priority_queue_.
-                    get_next_thread(thrd, num_thread);
-                if (result)
-                    return true;
-            }
+                return this->low_priority_queue_.get_next_thread(thrd);
 
             return false;
         }
@@ -97,7 +92,9 @@ namespace hpx { namespace threads { namespace policies
         bool wait_or_add_new(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count)
         {
-            HPX_ASSERT(num_thread < this->queues_.size());
+            std::size_t queues_size = this->queues_.size();
+
+            HPX_ASSERT(num_thread < queues_size);
 
             std::size_t added = 0;
             bool result = true;
@@ -105,13 +102,12 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread < this->high_priority_queues_.size())
             {
                 result = this->high_priority_queues_[num_thread]->
-                    wait_or_add_new(num_thread, running, idle_loop_count,
-                        added) && result;
+                    wait_or_add_new(running, idle_loop_count, added) && result;
                 if (0 != added) return result;
             }
 
-            result = this->queues_[num_thread]->wait_or_add_new(
-                num_thread, running, idle_loop_count, added) && result;
+            result = this->queues_[num_thread]->wait_or_add_new(running,
+                idle_loop_count, added) && result;
             if (0 != added) return result;
 
 #if HPX_THREAD_MINIMAL_DEADLOCK_DETECTION
@@ -140,8 +136,8 @@ namespace hpx { namespace threads { namespace policies
             }
 #endif
 
-            result = this->low_priority_queue_.wait_or_add_new(
-                num_thread, running, idle_loop_count, added) && result;
+            result = this->low_priority_queue_.wait_or_add_new(running,
+                idle_loop_count, added) && result;
             if (0 != added) return result;
 
             return result;
