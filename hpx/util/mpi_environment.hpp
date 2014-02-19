@@ -24,6 +24,7 @@ namespace hpx { namespace util
 
         static bool enabled();
         static bool multi_threaded();
+        static bool has_called_init();
 
         static int rank();
         static int size();
@@ -32,6 +33,7 @@ namespace hpx { namespace util
 
     private:
         static bool enabled_;
+        static bool has_called_init_;
         static int provided_threading_flag_;
     };
 }}
