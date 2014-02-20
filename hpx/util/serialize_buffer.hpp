@@ -18,9 +18,133 @@
 
 namespace hpx { namespace util
 {
+    namespace detail
+    {
+        template <typename T> void default_deleter(T* p) { delete p; }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T, typename Allocator = std::allocator<T> >
+    class serialize_buffer
+    {
+    private:
+        static void no_deleter(T*) {}
+        typedef Allocator allocator_type;
+
+    public:
+        enum init_mode
+        {
+            copy = 0,       // constructor copies data
+            reference = 1   // constructor does not copy data and does not
+                            // manage the lifetime of it
+        };
+
+        explicit serialize_buffer(allocator_type const& alloc = Allocator())
+          : size_(0)
+          , alloc_(alloc)
+        {}
+
+        serialize_buffer (T* data, std::size_t size, init_mode mode = copy,
+                allocator_type const& alloc = Allocator())
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
+        {
+            if (mode == copy) {
+                data_.reset(alloc_.allocate(size, &detail::default_deleter<T>, alloc_));
+                std::copy(data, data + size, data_.get());
+            }
+            else {
+                data_ = boost::shared_array<T>(data, &serialize_buffer::no_deleter);
+            }
+        }
+
+        T const* data() const { return data_.get(); }
+        std::size_t size() const { return size_; }
+
+    private:
+        // serialization support
+        friend class boost::serialization::access;
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Archive>
+        void save(Archive& ar, const unsigned int version) const
+        {
+            ar << size_;
+
+            typedef typename
+                boost::serialization::use_array_optimization<Archive>::template apply<
+                    typename boost::remove_const<T>::type
+                >::type use_optimized;
+
+            save_optimized(ar, version, use_optimized());
+        }
+
+        template <typename Archive>
+        void save_optimized(Archive& ar, const unsigned int version, boost::mpl::false_) const
+        {
+            std::size_t c = size_;
+            T* t = data_.get();
+            while(c-- > 0)
+                ar << *t++;
+        }
+
+        template <typename Archive>
+        void save_optimized(Archive& ar, const unsigned int version, boost::mpl::true_) const
+        {
+            boost::serialization::array<T> arr(data_.get(), size_);
+            ar.save_array(arr, version);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Archive>
+        void load(Archive& ar, const unsigned int version)
+        {
+            ar >> size_;
+            data_.reset(alloc_.allocate(size_, &detail::default_deleter<T>, alloc_));
+
+            typedef typename
+                boost::serialization::use_array_optimization<Archive>::template apply<
+                    typename boost::remove_const<T>::type
+                >::type use_optimized;
+
+            load_optimized(ar, version, use_optimized());
+        }
+
+        template <typename Archive>
+        void load_optimized(Archive& ar, const unsigned int version, boost::mpl::false_)
+        {
+            std::size_t c = size_;
+            T* t = data_.get();
+            while(c-- > 0)
+                ar >> *t++;
+        }
+
+        template <typename Archive>
+        void load_optimized(Archive& ar, const unsigned int version, boost::mpl::true_)
+        {
+            boost::serialization::array<T> arr(data_.get(), size_);
+            ar.load_array(arr, version);
+        }
+
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+        // this is needed for util::any
+        friend bool
+        operator==(serialize_buffer const& rhs, serialize_buffer const& lhs)
+        {
+            return rhs.data_.get() == lhs.data_.get() && rhs.size_ == lhs.size_;
+        }
+
+    private:
+        boost::shared_array<T> data_;
+        std::size_t size_;
+        Allocator alloc_;
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    class serialize_buffer
+    class serialize_buffer<T, std::allocator<T> >
     {
     private:
         static void no_deleter(T*) {}
