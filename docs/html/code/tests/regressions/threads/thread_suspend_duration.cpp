@@ -1,7 +1,7 @@
 //  Copyright (c) 2007-2011 Hartmut Kaiser
-//  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach 
-// 
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx.hpp>
@@ -29,7 +29,7 @@ void suspend_test(barrier& b, std::size_t iterations, std::size_t n)
 {
     for (std::size_t i = 0; i < iterations; ++i)
     {
-        // Enter the 'suspended' state for n microseconds. 
+        // Enter the 'suspended' state for n microseconds.
         hpx::this_thread::suspend(microseconds(n), "suspend_test");
     }
 
@@ -44,7 +44,7 @@ int hpx_main(variables_map& vm)
 
     if (vm.count("pxthreads"))
         pxthreads = vm["pxthreads"].as<std::size_t>();
-    
+
     std::size_t iterations = 0;
 
     if (vm.count("iterations"))
@@ -78,11 +78,11 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>()->default_value(0x1000), 
+        ("pxthreads,T", value<std::size_t>()->default_value(0x100),
             "the number of PX threads to invoke")
-        ("iterations", value<std::size_t>()->default_value(32), 
+        ("iterations", value<std::size_t>()->default_value(32),
             "the number of iterations to execute in each thread")
-        ("suspend-duration", value<std::size_t>()->default_value(1000), 
+        ("suspend-duration", value<std::size_t>()->default_value(1000),
             "the number of microseconds to wait in each thread")
         ;
 

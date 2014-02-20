@@ -256,6 +256,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         friend void intrusive_ptr_release(promise* p)
         {
+            naming::gid_type::mutex_type::scoped_lock l(p->gid_.get_mutex());
             long counter = --p->count_;
 
             // if this promise was never asked for its id we need to take
@@ -266,6 +267,7 @@ namespace hpx { namespace lcos { namespace detail
             }
             else if (0 == counter)
             {
+                util::scoped_unlock<naming::gid_type::mutex_type::scoped_lock> ul(l);
                 delete p;
             }
         }
@@ -349,6 +351,7 @@ namespace hpx { namespace lcos { namespace detail
     private:
         friend void intrusive_ptr_release(promise* p)
         {
+            naming::gid_type::mutex_type::scoped_lock l(p->gid_.get_mutex());
             bool get_gid_was_called = !naming::detail::has_credits(p->gid_);
             long counter = --p->count_;
 
@@ -360,6 +363,7 @@ namespace hpx { namespace lcos { namespace detail
             }
             else if (0 == counter)
             {
+                util::scoped_unlock<naming::gid_type::mutex_type::scoped_lock> ul(l);
                 delete p;
             }
         }
@@ -391,7 +395,9 @@ namespace hpx { namespace components
 
         ~managed_promise()
         {
-            promise_->release();
+            // FIXME: uncommenting this leads to random segfaults. Do we have
+            // a leak if we omit it?
+            //promise_->release();
         }
 
     private:

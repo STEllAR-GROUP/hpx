@@ -69,6 +69,7 @@ namespace hpx { namespace util
 namespace hpx { namespace util
 {
     bool mpi_environment::enabled_ = false;
+    bool mpi_environment::has_called_init_ = false;
     int mpi_environment::provided_threading_flag_ = MPI_THREAD_SINGLE;
 
     std::size_t mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg,
@@ -77,16 +78,18 @@ namespace hpx { namespace util
         using namespace boost::assign;
 
         int this_rank = -1;
+        has_called_init_ = false;
 
         // We assume to use the MPI parcelport if it is not explicitly disabled
         enabled_ = detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) != 0;
         if (!enabled_) return std::size_t(this_rank);
 
-        // We disable the MPI parcelport if the application is not run using mpirun
-        // and the tcp/ip parcelport is not explicitly disabled
+        // We disable the MPI parcelport if the application is not run using
+        // mpirun and the tcp/ip parcelport is not explicitly disabled
         //
-        // The bottomline is that we use the MPI parcelport either when the application
-        // was executed using mpirun or if the tcp/ip parcelport was disabled.
+        // The bottom line is that we use the MPI parcelport either when the
+        // application was executed using mpirun or if the tcp/ip parcelport
+        // was disabled.
         if (!detail::detect_mpi_environment(cfg.rtcfg_, HPX_PARCELPORT_MPI_ENV) &&
             detail::get_cfg_entry(cfg, "hpx.parcel.tcp.enable", 1))
         {
@@ -106,26 +109,38 @@ namespace hpx { namespace util
         int retval = MPI_Init_thread(argc, argv, flag, &provided_threading_flag_);
         if (MPI_SUCCESS != retval)
         {
-            // explicitly disable mpi if not run by mpirun
-            cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
+            if (MPI_ERR_OTHER != retval)
+            {
+                // explicitly disable mpi if not run by mpirun
+                cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
 
-            enabled_ = false;
+                enabled_ = false;
 
-            int msglen = 0;
-            char message[MPI_MAX_ERROR_STRING+1];
-            MPI_Error_string(retval, message, &msglen);
-            message[msglen] = '\0';
+                int msglen = 0;
+                char message[MPI_MAX_ERROR_STRING+1];
+                MPI_Error_string(retval, message, &msglen);
+                message[msglen] = '\0';
 
-            std::string msg("mpi_environment::init: MPI_Init_thread failed: ");
-            msg = msg + message + ".";
-            throw std::runtime_error(msg.c_str());
+                std::string msg("mpi_environment::init: MPI_Init_thread failed: ");
+                msg = msg + message + ".";
+                throw std::runtime_error(msg.c_str());
+            }
+
+            // somebody has already called MPI_Init before, we should be fine
+            has_called_init_ = false;
         }
+        else
+        {
+            has_called_init_ = true;
+        }
+
         if (flag != provided_threading_flag_)
         {
             // explicitly disable mpi if not run by mpirun
             cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
 
             enabled_ = false;
+            has_called_init_ = false;
             throw std::runtime_error("mpi_environment::init: MPI_Init_thread: "
                 "provided multi_threading mode is different from requested mode");
         }
@@ -161,7 +176,7 @@ namespace hpx { namespace util
 
     void mpi_environment::finalize()
     {
-        if(enabled())
+        if(enabled() && has_called_init())
         {
             MPI_Finalize();
         }
@@ -175,6 +190,11 @@ namespace hpx { namespace util
     bool mpi_environment::multi_threaded()
     {
         return provided_threading_flag_ == MPI_THREAD_MULTIPLE;
+    }
+
+    bool mpi_environment::has_called_init()
+    {
+        return has_called_init_;
     }
 
     int mpi_environment::size()
