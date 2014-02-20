@@ -1150,28 +1150,31 @@ namespace hpx
         if (&ec != &throws)
             ec = make_success_code();
 
-        if (std::abs(localwait + 1.0) < 1e-16)
-            localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
-        else
+        if (hpx::find_here() == hpx::find_root_locality())
         {
-            hpx::util::high_resolution_timer t;
-            double start_time = t.elapsed();
-            double current = 0.0;
-            do {
-                current = t.elapsed();
-            } while (current - start_time < localwait * 1e-6);
+            if (std::abs(localwait + 1.0) < 1e-16)
+                localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
+            else
+            {
+                hpx::util::high_resolution_timer t;
+                double start_time = t.elapsed();
+                double current = 0.0;
+                do {
+                    current = t.elapsed();
+                } while (current - start_time < localwait * 1e-6);
+            }
+
+            if (std::abs(shutdown_timeout + 1.0) < 1e-16)
+                shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
+
+            components::server::runtime_support* p =
+                reinterpret_cast<components::server::runtime_support*>(
+                      get_runtime().get_runtime_support_lva());
+
+            p->shutdown_all(shutdown_timeout);
         }
 
-        if (std::abs(shutdown_timeout + 1.0) < 1e-16)
-            shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
-
-        components::server::runtime_support* p =
-            reinterpret_cast<components::server::runtime_support*>(
-                  get_runtime().get_runtime_support_lva());
-
-        p->shutdown_all(shutdown_timeout);
         util::apex_finalize();
-
         return 0;
     }
 
