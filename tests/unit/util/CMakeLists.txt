@@ -11,6 +11,7 @@ set(tests
     function
     merging_map
     parse_slurm_nodelist
+    serialize_buffer
     tuple
     zero_copy_serialization
    )
@@ -26,6 +27,10 @@ if(HWLOC_FOUND)
   set(tests ${tests} parse_affinity_options)
   set(parse_affinity_options_PARAMETERS THREADS_PER_LOCALITY 2)
 endif()
+
+set(serialize_buffer_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 2)
 
 foreach(test ${tests})
   set(sources

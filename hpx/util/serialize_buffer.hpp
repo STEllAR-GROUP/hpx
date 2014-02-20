@@ -7,6 +7,7 @@
 #define HPX_UTIL_SERIALIZE_BUFFER_APR_05_2013_0312PM
 
 #include <hpx/hpx_fwd.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/array.hpp>
@@ -14,22 +15,30 @@
 #include <boost/shared_array.hpp>
 #include <boost/mpl/bool.hpp>
 
+#include <hpx/util/serialize_allocator.hpp>
+
 #include <algorithm>
 
 namespace hpx { namespace util
 {
     namespace detail
     {
-        template <typename T> void default_deleter(T* p) { delete p; }
+        struct serialize_buffer_no_allocator {};
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Allocator = std::allocator<T> >
+    template <typename T, typename Allocator = detail::serialize_buffer_no_allocator>
     class serialize_buffer
     {
     private:
-        static void no_deleter(T*) {}
         typedef Allocator allocator_type;
+
+        static void no_deleter(T*) {}
+
+        void deleter(T* p)
+        {
+            alloc_.deallocate(p, size_);
+        }
 
     public:
         enum init_mode
@@ -51,7 +60,9 @@ namespace hpx { namespace util
           , alloc_(alloc)
         {
             if (mode == copy) {
-                data_.reset(alloc_.allocate(size, &detail::default_deleter<T>, alloc_));
+                using util::placeholders::_1;
+                data_.reset(alloc_.allocate(size),
+                    util::bind(&serialize_buffer::deleter, this, _1));
                 std::copy(data, data + size, data_.get());
             }
             else {
@@ -70,7 +81,7 @@ namespace hpx { namespace util
         template <typename Archive>
         void save(Archive& ar, const unsigned int version) const
         {
-            ar << size_;
+            ar << size_ << alloc_;
 
             typedef typename
                 boost::serialization::use_array_optimization<Archive>::template apply<
@@ -100,8 +111,10 @@ namespace hpx { namespace util
         template <typename Archive>
         void load(Archive& ar, const unsigned int version)
         {
-            ar >> size_;
-            data_.reset(alloc_.allocate(size_, &detail::default_deleter<T>, alloc_));
+            using util::placeholders::_1;
+            ar >> size_ >> alloc_;
+            data_.reset(alloc_.allocate(size_),
+                    util::bind(&serialize_buffer::deleter, this, _1));
 
             typedef typename
                 boost::serialization::use_array_optimization<Archive>::template apply<
@@ -144,7 +157,7 @@ namespace hpx { namespace util
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    class serialize_buffer<T, std::allocator<T> >
+    class serialize_buffer<T, detail::serialize_buffer_no_allocator>
     {
     private:
         static void no_deleter(T*) {}
