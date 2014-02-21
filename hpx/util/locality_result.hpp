@@ -59,8 +59,8 @@ namespace hpx { namespace util
         // serialization support
         friend class boost::serialization::access;
 
-        void serialize(hpx::util::portable_binary_oarchive& ar, const unsigned int);
-        void serialize(hpx::util::portable_binary_iarchive& ar, const unsigned int);
+        HPX_EXPORT void serialize(hpx::util::portable_binary_oarchive& ar, const unsigned int);
+        HPX_EXPORT void serialize(hpx::util::portable_binary_iarchive& ar, const unsigned int);
     };
 
     // same as remote_locality_result, except it stores id_type's
