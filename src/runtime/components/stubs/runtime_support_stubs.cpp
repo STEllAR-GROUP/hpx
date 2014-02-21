@@ -160,7 +160,7 @@ namespace hpx { namespace components { namespace stubs
             p->free_component(g, gid, count);
         }
         else {
-            // apply remotely
+            // apply remotely (only if runtime is not stopping)
             typedef server::runtime_support::free_component_action action_type;
             naming::id_type id = get_colocation_id_sync(
                 naming::id_type(gid, naming::id_type::unmanaged));
@@ -183,7 +183,7 @@ namespace hpx { namespace components { namespace stubs
     /// \brief Shutdown the given runtime system
     lcos::unique_future<void>
     runtime_support::shutdown_async(naming::id_type const& targetgid,
-        double timeout)
+        naming::id_type shutdown_barrier, double timeout)
     {
         // Create a promise directly and execute the required action.
         // This action has implemented special response handling as the
@@ -191,16 +191,16 @@ namespace hpx { namespace components { namespace stubs
         typedef server::runtime_support::shutdown_action action_type;
 
         lcos::promise<void> value;
-        hpx::apply<action_type>(targetgid, timeout, value.get_gid());
+        hpx::apply<action_type>(targetgid, timeout, value.get_gid(), shutdown_barrier);
         return value.get_future();
     }
 
     void runtime_support::shutdown(naming::id_type const& targetgid,
-        double timeout)
+        naming::id_type shutdown_barrier, double timeout)
     {
         // The following get yields control while the action above
         // is executed and the result is returned to the future
-        shutdown_async(targetgid, timeout).get();
+        shutdown_async(targetgid, shutdown_barrier, timeout).get();
     }
 
     /// \brief Shutdown the runtime systems of all localities

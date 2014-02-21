@@ -9,7 +9,6 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/applier/applier.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
@@ -150,6 +149,7 @@ namespace hpx { namespace lcos { namespace detail
     public:
         virtual void add_ref() = 0;
         virtual void release() = 0;
+        virtual long count() const = 0;
 
         // retrieve the gid of this promise
         naming::id_type get_gid() const
@@ -253,6 +253,11 @@ namespace hpx { namespace lcos { namespace detail
             intrusive_ptr_release(this);
         }
 
+        long count() const
+        {
+            return this->count_;
+        }
+
     private:
         friend void intrusive_ptr_release(promise* p)
         {
@@ -348,6 +353,11 @@ namespace hpx { namespace lcos { namespace detail
             intrusive_ptr_release(this);
         }
 
+        long count() const
+        {
+            return this->count_;
+        }
+
     private:
         friend void intrusive_ptr_release(promise* p)
         {
@@ -395,17 +405,29 @@ namespace hpx { namespace components
 
         ~managed_promise()
         {
-            promise_->release();
+            release();
         }
 
     private:
+        void release()
+        {
+            if(promise_)
+            {
+                long count = promise_->count();
+                promise_->release();
+                if(count == 1)
+                {
+                    promise_ = 0;
+                }
+            }
+        }
         friend void intrusive_ptr_add_ref(managed_promise* p)
         {
             p->promise_->add_ref();
         }
         friend void intrusive_ptr_release(managed_promise* p)
         {
-            p->promise_->release();
+            p->release();
         }
 
         lcos::detail::promise_base<void, util::unused_type>* promise_;

@@ -284,8 +284,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
 
     ~coroutine_impl_wrapper()
     {
-        //HPX_ASSERT(!m_fun);   // functor should have been reset by now
-        //HPX_ASSERT(!target_);
+        HPX_ASSERT(!m_fun);   // functor should have been reset by now
+        HPX_ASSERT(!target_);
     }
 
     void operator()()

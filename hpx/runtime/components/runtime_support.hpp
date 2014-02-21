@@ -147,14 +147,14 @@ namespace hpx { namespace components
         }
 
         /// \brief Shutdown the given runtime system
-        lcos::unique_future<void> shutdown_async(double timeout = -1)
+        lcos::unique_future<void> shutdown_async(naming::id_type shutdown_barrier, double timeout = -1)
         {
-            return this->base_type::shutdown_async(gid_, timeout);
+            return this->base_type::shutdown_async(gid_, shutdown_barrier, timeout);
         }
 
-        void shutdown(double timeout = -1)
+        void shutdown(naming::id_type shutdown_barrier, double timeout = -1)
         {
-            this->base_type::shutdown(gid_, timeout);
+            this->base_type::shutdown(gid_, shutdown_barrier, timeout);
         }
 
         /// \brief Shutdown the runtime systems of all localities
