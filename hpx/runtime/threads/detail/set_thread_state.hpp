@@ -14,6 +14,7 @@
 #include <hpx/runtime/threads/detail/create_thread.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/io_service_pool.hpp>
+#include <hpx/util/coroutine/coroutine.hpp>
 
 #include <boost/asio/deadline_timer.hpp>
 

@@ -9,6 +9,7 @@
 #include <hpx/util/lightweight_test.hpp>
 
 #include <boost/assign/std/vector.hpp>
+#include <boost/foreach.hpp>
 
 #include <iostream>
 #include <algorithm>

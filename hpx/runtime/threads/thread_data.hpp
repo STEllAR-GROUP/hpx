@@ -601,7 +601,7 @@ namespace hpx { namespace threads
         virtual std::size_t get_thread_data() const = 0;
         virtual std::size_t set_thread_data(std::size_t data) = 0;
 #endif
-        
+
         virtual void rebind(thread_init_data& init_data,
             thread_state_enum newstate) = 0;
 
@@ -734,9 +734,9 @@ namespace hpx { namespace threads
             thread_state_ex current_state_ex = get_state_ex();
             current_state_ex_.store(thread_state_ex(wait_signaled,
                 current_state_ex.get_tag() + 1), boost::memory_order_release);
-    
+
             HPX_ASSERT(this_() == coroutine_.get_thread_id());
-    
+
             return coroutine_(current_state_ex);
         }
 
@@ -836,7 +836,7 @@ namespace hpx { namespace threads
             thread_state_ex current_state_ex = get_state_ex();
             current_state_ex_.store(thread_state_ex(wait_signaled,
                 current_state_ex.get_tag() + 1), boost::memory_order_release);
-    
+
             return coroutine_(current_state_ex);
         }
 

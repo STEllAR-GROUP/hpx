@@ -13,6 +13,7 @@
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 

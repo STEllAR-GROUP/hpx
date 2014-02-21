@@ -10,6 +10,7 @@
 #include <hpx/version.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/runtime/applier/applier.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/future_wait.hpp>

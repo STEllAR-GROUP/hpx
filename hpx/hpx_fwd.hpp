@@ -38,10 +38,16 @@
 #include <hpx/config/function.hpp>
 #include <hpx/traits.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/util/unused.hpp>
 #include <hpx/util/move.hpp>
-#include <hpx/util/coroutine/coroutine.hpp>
+#include <hpx/util/coroutine/detail/default_context_impl.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
+
+namespace boost
+{
+    class exception_ptr;
+}
 
 /// \namespace hpx
 ///
@@ -140,6 +146,29 @@ namespace hpx
             error_code& ec = throws);
 
         HPX_API_EXPORT void do_background_work();
+    }
+
+    namespace util
+    {
+        namespace coroutines
+        {
+            namespace detail
+            {
+                template <typename Coroutine>
+                class coroutine_self;
+
+                template <typename CoroutineImpl>
+                struct coroutine_allocator;
+                template<typename CoroutineType, typename ContextImpl,
+                    template <typename> class Heap>
+                class coroutine_impl;
+            }
+
+            template<typename Signature,
+                template <typename> class Heap,
+                typename ContextImpl = detail::default_context_impl>
+            class coroutine;
+        }
     }
 
     /// \namespace threads
@@ -327,11 +356,19 @@ namespace hpx
             template <typename CoroutineImpl> struct coroutine_allocator;
         }
         /// \ endcond
-
         typedef util::coroutines::coroutine<
             thread_function_type, detail::coroutine_allocator> coroutine_type;
-        typedef coroutine_type::thread_id_repr_type thread_id_repr_type;
-        typedef coroutine_type::self thread_self;
+
+        typedef util::coroutines::detail::coroutine_self<coroutine_type>
+            thread_self;
+        typedef
+            util::coroutines::detail::coroutine_impl<
+                coroutine_type
+              , util::coroutines::detail::default_context_impl
+              , detail::coroutine_allocator
+            >
+            thread_self_impl_type;
+        typedef void * thread_id_repr_type;
 
         typedef boost::intrusive_ptr<thread_data_base> thread_id_type;
 
@@ -354,7 +391,7 @@ namespace hpx
 
         /// The function \a get_ctx_ptr returns a pointer to the internal data
         /// associated with each coroutine.
-        HPX_API_EXPORT thread_self::impl_type* get_ctx_ptr();
+        HPX_API_EXPORT thread_self_impl_type* get_ctx_ptr();
 
         /// The function \a get_self_ptr_checked returns a pointer to the (OS
         /// thread specific) self reference to the current HPX thread.
@@ -1305,13 +1342,13 @@ namespace hpx
     ///
     /// \brief Return the name of the referenced locality.
     ///
-    /// This function returns a future referring to the name for the locality 
+    /// This function returns a future referring to the name for the locality
     /// of the given id.
     ///
     /// \param id [in] The global id of the locality for which the name should
     ///           be retrieved
     ///
-    /// \returns  This function returns the name for the locality of the given 
+    /// \returns  This function returns the name for the locality of the given
     ///           id. The name is retrieved from the underlying networking layer
     ///           and may be different for different parcel ports.
     ///

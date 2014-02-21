@@ -11,7 +11,6 @@
 #include <boost/bind.hpp>
 
 #include <hpx/runtime.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
 

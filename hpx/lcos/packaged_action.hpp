@@ -16,7 +16,6 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/block_profiler.hpp>
 
 #include <boost/mpl/bool.hpp>
