@@ -395,9 +395,7 @@ namespace hpx { namespace components
 
         ~managed_promise()
         {
-            // FIXME: uncommenting this leads to random segfaults. Do we have
-            // a leak if we omit it?
-            //promise_->release();
+            promise_->release();
         }
 
     private:
