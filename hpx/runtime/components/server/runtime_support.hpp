@@ -246,8 +246,8 @@ namespace hpx { namespace components { namespace server
         ///        be properly stopped.
         ///
         /// \note      This function can be called from any thread.
-        void stop(double timeout, naming::id_type const& respond_to, naming::id_type shutdown_barrier,
-            bool remove_from_remote_caches);
+        void stop(double timeout, naming::id_type const& respond_to,
+            naming::id_type shutdown_barrier, bool remove_from_remote_caches);
 
         /// called locally only
         void stopped();
@@ -309,7 +309,7 @@ namespace hpx { namespace components { namespace server
         boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
             components::component_type type);
 
-        void shutdown_barrier() const;
+        void shutdown_barrier(id_type const& barrier_) const;
 
     protected:
         // Load all components from the ini files found in the configuration
@@ -354,7 +354,6 @@ namespace hpx { namespace components { namespace server
         std::list<HPX_STD_FUNCTION<void()> > startup_functions_;
         std::list<HPX_STD_FUNCTION<void()> > pre_shutdown_functions_;
         std::list<HPX_STD_FUNCTION<void()> > shutdown_functions_;
-        id_type shutdown_barrier_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
