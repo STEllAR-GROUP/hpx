@@ -20,6 +20,7 @@
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/once.hpp>
+#include <hpx/lcos/local/spinlock_pool.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
 #include <hpx/util/static_reinit.hpp>
 
@@ -397,6 +398,14 @@ namespace hpx { namespace components
     // for all promise types
     struct managed_promise : boost::noncopyable
     {
+    private:
+        struct tag {};
+        typedef lcos::local::spinlock_pool<tag> mutex_type;
+
+        typedef lcos::detail::promise_base<void, util::unused_type>
+            promise_base_type;
+
+    public:
         managed_promise()
           : promise_(0)
         {
@@ -411,18 +420,23 @@ namespace hpx { namespace components
     private:
         void release()
         {
-            if(promise_)
+            mutex_type::scoped_lock l(this);
+            if (promise_)
             {
-                long count = promise_->count();
-                promise_->release();
-                if(count == 1)
+                promise_base_type* p = promise_;
+                if (p->count() == 1)
                 {
                     promise_ = 0;
                 }
+                l.unlock();
+
+                p->release();
             }
         }
+
         friend void intrusive_ptr_add_ref(managed_promise* p)
         {
+            mutex_type::scoped_lock l(p);
             p->promise_->add_ref();
         }
         friend void intrusive_ptr_release(managed_promise* p)
@@ -430,7 +444,7 @@ namespace hpx { namespace components
             p->release();
         }
 
-        lcos::detail::promise_base<void, util::unused_type>* promise_;
+        promise_base_type* promise_;
     };
 }}
 
