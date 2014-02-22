@@ -66,6 +66,16 @@ namespace hpx { namespace util
             result_type;
         return result_type(locality_result_iterator(v), locality_result_iterator());
     }
+
+    void remote_locality_result::serialize(hpx::util::portable_binary_oarchive & ar, const unsigned int)
+    {
+        ar & prefix_ & gids_ & type_;
+    }
+
+    void remote_locality_result::serialize(hpx::util::portable_binary_iarchive & ar, const unsigned int)
+    {
+        ar & prefix_ & gids_ & type_;
+    }
 }}
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE(

@@ -13,6 +13,7 @@
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/console_logging.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/util/logging.hpp>

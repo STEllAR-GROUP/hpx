@@ -7,6 +7,7 @@
 
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/runtime/threads/thread_data.hpp>
 
 #include <iostream>
 #include <iomanip>

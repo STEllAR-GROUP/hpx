@@ -422,45 +422,6 @@ namespace hpx { namespace parcelset
             return sender_connection;
         }
 
-        boost::shared_ptr<connection> get_connection_wait(
-            naming::locality const& l, error_code& ec)
-        {
-            boost::shared_ptr<connection> sender_connection;
-            bool got_cache_space = false;
-
-            for (std::size_t i = 0; i < HPX_MAX_NETWORK_RETRIES; ++i)
-            {
-                // Get a connection or reserve space for a new connection.
-                if (connection_cache_.get_or_reserve(l, sender_connection))
-                {
-                    got_cache_space = true;
-                    break;
-                }
-
-                // Wait for a really short amount of time.
-                boost::this_thread::sleep(boost::get_system_time() +
-                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
-            }
-
-            // If we didn't get a connection or permission to create one (which is
-            // unlikely), bail.
-            if (!got_cache_space)
-            {
-                HPX_THROWS_IF(ec, invalid_status, "parcelport::get_connection_wait",
-                    "didn't get a connection slot from connection cache, bailing out");
-                return sender_connection;
-            }
-
-            // Check if we need to create the new connection.
-            if (!sender_connection)
-                return connection_handler().create_connection(l, ec);
-
-            if (&ec != &throws)
-                ec = make_success_code();
-
-            return sender_connection;
-        }
-
         ///////////////////////////////////////////////////////////////////////
         void enqueue_parcel(naming::locality const& locality_id,
             parcel&& p, write_handler_type&& f)
@@ -709,7 +670,7 @@ namespace hpx { namespace parcelset
 #endif
             // encode the parcels
             boost::shared_ptr<parcel_buffer<typename connection::buffer_type> >
-                buffer = encode_parcels(parcels, *sender_connection, 
+                buffer = encode_parcels(parcels, *sender_connection,
                     archive_flags_, this->enable_security());
 
             // send them asynchronously

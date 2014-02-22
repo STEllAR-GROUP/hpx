@@ -10,6 +10,7 @@
 #include <hpx/runtime/get_lva.hpp>
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/coroutines/coroutine.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 namespace hpx { namespace components

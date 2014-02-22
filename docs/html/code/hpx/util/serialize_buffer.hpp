@@ -35,9 +35,9 @@ namespace hpx { namespace util
 
         static void no_deleter(T*) {}
 
-        void deleter(T* p)
+        static void deleter(T* p, Allocator alloc, std::size_t size)
         {
-            alloc_.deallocate(p, size_);
+            alloc.deallocate(p, size);
         }
 
     public:
@@ -62,7 +62,7 @@ namespace hpx { namespace util
             if (mode == copy) {
                 using util::placeholders::_1;
                 data_.reset(alloc_.allocate(size),
-                    util::bind(&serialize_buffer::deleter, this, _1));
+                    util::bind(&serialize_buffer::deleter, _1, alloc, size));
                 std::copy(data, data + size, data_.get());
             }
             else {
@@ -114,7 +114,7 @@ namespace hpx { namespace util
             using util::placeholders::_1;
             ar >> size_ >> alloc_;
             data_.reset(alloc_.allocate(size_),
-                    util::bind(&serialize_buffer::deleter, this, _1));
+                    util::bind(&serialize_buffer::deleter, _1, alloc_, size_));
 
             typedef typename
                 boost::serialization::use_array_optimization<Archive>::template apply<
@@ -278,7 +278,7 @@ namespace hpx { namespace traits
     struct supports_streaming_with_any<util::serialize_buffer<T> >
       : boost::mpl::false_
     {};
-   
+
     template <typename T>
     struct type_size<util::serialize_buffer<T> >
     {

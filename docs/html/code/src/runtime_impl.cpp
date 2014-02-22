@@ -375,7 +375,7 @@ namespace hpx {
         // wait for the thread to run
         {
             boost::mutex::scoped_lock lk(mtx);
-            if (!running)
+            while (!running)
                 cond.wait(lk);
         }
 

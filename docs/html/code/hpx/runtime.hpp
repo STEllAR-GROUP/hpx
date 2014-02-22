@@ -13,6 +13,7 @@
 #include <hpx/util/static_reinit.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 #include <hpx/util/one_size_heap_list_base.hpp>
+#include <hpx/util/thread_specific_ptr.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -380,7 +381,7 @@ namespace hpx
         typedef std::map<std::string, boost::uint32_t> used_cores_map_type;
         used_cores_map_type used_cores_map_;
 
-        state state_;
+        boost::atomic<state> state_;
 
         boost::scoped_ptr<components::server::memory> memory_;
         boost::scoped_ptr<components::server::runtime_support> runtime_support_;

@@ -111,8 +111,8 @@ namespace hpx { namespace util { namespace coroutines
 
   /////////////////////////////////////////////////////////////////////////////
   template<typename Signature,
-           template <typename> class Heap = detail::coroutine_allocator,
-           typename ContextImpl = detail::default_context_impl>
+           template <typename> class Heap,
+           typename ContextImpl>
   class coroutine
   {
   private:

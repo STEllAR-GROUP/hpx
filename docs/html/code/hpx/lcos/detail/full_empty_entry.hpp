@@ -15,7 +15,6 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/scoped_unlock.hpp>
 #include <hpx/util/stringstream.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/aligned_storage.hpp>
@@ -111,8 +110,8 @@ namespace hpx { namespace lcos { namespace detail
                 // we know that the id is actually the pointer to the thread
                 LERR_(info) << "~full_empty_entry: aborting pending thread in "
                         << desc << ": "
-                        << get_thread_state_name(id->get_state())
-                        << "(" << id.get() << "): " << id->get_description();
+                        << get_thread_state_name(threads::get_thread_state(id))
+                        << "(" << id.get() << "): " << threads::get_thread_description(id);
 
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
@@ -120,8 +119,8 @@ namespace hpx { namespace lcos { namespace detail
                     threads::wait_abort, threads::thread_priority_default, ec);
                 if (ec) {
                     LERR_(error) << "~full_empty_entry: could not abort thread"
-                        << get_thread_state_name(id->get_state())
-                        << "(" << id.get() << "): " << id->get_description();
+                        << get_thread_state_name(threads::get_thread_state(id))
+                        << "(" << id.get() << "): " << threads::get_thread_description(id);
                 }
             }
         }
@@ -600,8 +599,8 @@ namespace hpx { namespace lcos { namespace detail
                 // we know that the id is actually the pointer to the thread
                 LERR_(info) << "~full_empty_entry: aborting pending thread in "
                         << desc << ": "
-                        << get_thread_state_name(id->get_state())
-                        << "(" << id.get() << "): " << id->get_description();
+                        << get_thread_state_name(threads::get_thread_state(id))
+                        << "(" << id.get() << "): " << threads::get_thread_description(id);
 
                 // forcefully abort thread, do not throw
                 error_code ec(lightweight);
@@ -609,8 +608,8 @@ namespace hpx { namespace lcos { namespace detail
                     threads::wait_abort, threads::thread_priority_default, ec);
                 if (ec) {
                     LERR_(error) << "~full_empty_entry: could not abort thread"
-                        << get_thread_state_name(id->get_state())
-                        << "(" << id.get() << "): " << id->get_description();
+                        << get_thread_state_name(threads::get_thread_state(id))
+                        << "(" << id.get() << "): " << threads::get_thread_description(id);
                 }
             }
         }

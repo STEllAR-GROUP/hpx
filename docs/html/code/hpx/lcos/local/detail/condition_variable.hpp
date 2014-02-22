@@ -11,7 +11,6 @@
 #include <hpx/lcos/local/no_mutex.hpp>
 #include <hpx/util/assert_owns_lock.hpp>
 #include <hpx/util/scoped_unlock.hpp>
-#include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 
 #include <boost/date_time/posix_time/ptime.hpp>

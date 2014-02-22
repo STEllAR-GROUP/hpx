@@ -154,7 +154,7 @@ namespace hpx { namespace components { namespace server
             boost::uint64_t count);
 
         /// \brief Gracefully shutdown this runtime system instance
-        void shutdown(double timeout, naming::id_type const& respond_to);
+        void shutdown(double timeout, naming::id_type const& respond_to, naming::id_type shutdown_barrier);
 
         /// \brief Gracefully shutdown runtime system instances on all localities
         void shutdown_all(double timeout);
@@ -246,7 +246,7 @@ namespace hpx { namespace components { namespace server
         ///        be properly stopped.
         ///
         /// \note      This function can be called from any thread.
-        void stop(double timeout, naming::id_type const& respond_to,
+        void stop(double timeout, naming::id_type const& respond_to, naming::id_type shutdown_barrier,
             bool remove_from_remote_caches);
 
         /// called locally only
@@ -309,6 +309,8 @@ namespace hpx { namespace components { namespace server
         boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
             components::component_type type);
 
+        void shutdown_barrier() const;
+
     protected:
         // Load all components from the ini files found in the configuration
         bool load_components(util::section& ini, naming::gid_type const& prefix,
@@ -352,6 +354,7 @@ namespace hpx { namespace components { namespace server
         std::list<HPX_STD_FUNCTION<void()> > startup_functions_;
         std::list<HPX_STD_FUNCTION<void()> > pre_shutdown_functions_;
         std::list<HPX_STD_FUNCTION<void()> > shutdown_functions_;
+        id_type shutdown_barrier_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
