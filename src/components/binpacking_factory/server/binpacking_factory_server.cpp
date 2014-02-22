@@ -96,8 +96,9 @@ namespace hpx { namespace components { namespace server
         // distribute the number of components to create in a way, so that the
         // overall number of component instances on all localities is
         // approximately the same
-        HPX_ASSERT(maxcount * counts.size() >= std::size_t(existing));
-        std::size_t missing = maxcount * counts.size() - existing;
+        HPX_ASSERT(std::size_t(maxcount) * counts.size() >= std::size_t(existing));
+        std::size_t missing = std::size_t(maxcount) * counts.size() -
+            std::size_t(existing);
         if (missing == 0) missing = 1;
 
         double hole_ratio = (std::min)(count, missing) / double(missing);
@@ -221,8 +222,9 @@ namespace hpx { namespace components { namespace server
         // distribute the number of components to create in a way, so that the
         // overall number of component instances on all localities is
         // approximately the same
-        HPX_ASSERT(maxcount * counts.size() >= std::size_t(existing));
-        std::size_t missing = maxcount * counts.size() - existing;
+        HPX_ASSERT(std::size_t(maxcount) * counts.size() >= std::size_t(existing));
+        std::size_t missing = std::size_t(maxcount) * counts.size() -
+            std::size_t(existing);
         if (missing == 0) missing = 1;
 
         double hole_ratio = (std::min)(count, missing) / double(missing);
