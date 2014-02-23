@@ -5,7 +5,7 @@
 
 set(example_programs
     os_thread_num
-    px_thread_phase)
+    hpx_thread_phase)
 
 set(os_thread_num_FLAGS DEPENDENCIES iostreams_component)
 

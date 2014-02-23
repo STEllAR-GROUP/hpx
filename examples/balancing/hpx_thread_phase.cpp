@@ -46,10 +46,10 @@ void lock_and_wait(
     mutex& m
   , barrier& b0
   , barrier& b1
-  , fifo_type& pxthreads
+  , fifo_type& hpxthreads
   , std::size_t wait
 ) {
-    // Wait for all pxthreads in this iteration to be created.
+    // Wait for all hpxthreads in this iteration to be created.
     b0.wait();
 
     const thread_id_type this_ = get_self_id();
@@ -61,7 +61,7 @@ void lock_and_wait(
 
         if (l.owns_lock())
         {
-            pxthreads.push(new std::pair<thread_id_type, std::size_t>
+            hpxthreads.push(new std::pair<thread_id_type, std::size_t>
                 (this_, get_thread_phase(this_)));
             break;
         }
@@ -69,8 +69,8 @@ void lock_and_wait(
         // Schedule a wakeup.
         set_thread_state(this_, milliseconds(30), pending);
 
-        // Suspend this pxthread.
-        get_self().yield(suspended);
+        // Suspend this HPX thread.
+        hpx::this_thread::suspend(suspended);
     }
 
     // Make hpx_main wait for us to finish.
@@ -80,10 +80,10 @@ void lock_and_wait(
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    std::size_t pxthread_count = 0;
+    std::size_t hpxthread_count = 0;
 
-    if (vm.count("pxthreads"))
-        pxthread_count = vm["pxthreads"].as<std::size_t>();
+    if (vm.count("hpxthreads"))
+        hpxthread_count = vm["hpxthreads"].as<std::size_t>();
 
     std::size_t mutex_count = 0;
 
@@ -105,16 +105,16 @@ int hpx_main(variables_map& vm)
         std::cout << "iteration: " << i << "\n";
 
         // Have the fifo preallocate storage.
-        fifo_type pxthreads(pxthread_count);
+        fifo_type hpxthreads(hpxthread_count);
 
         std::vector<mutex*> m(mutex_count, 0);
-        barrier b0(pxthread_count + 1), b1(pxthread_count + 1);
+        barrier b0(hpxthread_count + 1), b1(hpxthread_count + 1);
 
         // Allocate the mutexes.
         for (std::size_t j = 0; j < mutex_count; ++j)
             m[j] = new mutex;
 
-        for (std::size_t j = 0; j < pxthread_count; ++j)
+        for (std::size_t j = 0; j < hpxthread_count; ++j)
         {
             // Compute the mutex to be used for this thread.
             const std::size_t index = j % mutex_count;
@@ -123,21 +123,21 @@ int hpx_main(variables_map& vm)
                 (&lock_and_wait, boost::ref(*m[index])
                                , boost::ref(b0)
                                , boost::ref(b1)
-                               , boost::ref(pxthreads)
+                               , boost::ref(hpxthreads)
                                , wait)
               , "lock_and_wait");
         }
 
-        // Tell all pxthreads that they can start running.
+        // Tell all hpxthreads that they can start running.
         b0.wait();
 
-        // Wait for all pxthreads to finish.
+        // Wait for all hpxthreads to finish.
         b1.wait();
 
         // {{{ Print results for this iteration.
         std::pair<thread_id_type, std::size_t>* entry = 0;
 
-        while (pxthreads.pop(entry))
+        while (hpxthreads.pop(entry))
         {
             HPX_ASSERT(entry);
             std::cout << "  " << entry->first << "," << entry->second << "\n";
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
        desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
 
     desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>()->default_value(128),
+        ("hpxthreads,T", value<std::size_t>()->default_value(128),
             "the number of PX threads to invoke")
         ("mutexes,M", value<std::size_t>()->default_value(1),
             "the number of mutexes to use")
