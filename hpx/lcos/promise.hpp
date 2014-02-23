@@ -273,7 +273,7 @@ namespace hpx { namespace lcos { namespace detail
             }
             else if (0 == counter)
             {
-                util::scoped_unlock<naming::gid_type::mutex_type::scoped_lock> ul(l);
+                l.unlock();
                 delete p;
             }
         }
@@ -374,7 +374,7 @@ namespace hpx { namespace lcos { namespace detail
             }
             else if (0 == counter)
             {
-                util::scoped_unlock<naming::gid_type::mutex_type::scoped_lock> ul(l);
+                l.unlock();
                 delete p;
             }
         }
