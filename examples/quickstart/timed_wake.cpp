@@ -40,7 +40,7 @@ int hpx_main(variables_map& vm)
         set_thread_state(get_self_id(), seconds(5), pending);
 
         // Suspend this pxthread.
-        get_self().yield(suspended);
+        hpx::this_thread::suspend(suspended);
 
         std::cout << "woke up after " << t.elapsed() << " seconds\n";
     }
