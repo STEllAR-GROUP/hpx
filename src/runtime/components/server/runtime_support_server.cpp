@@ -687,6 +687,7 @@ namespace hpx { namespace components { namespace server
             // wait for all localities to reach this point
             if (shutdown_barrier_id)
             {
+                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
                 lcos::stubs::barrier::wait(shutdown_barrier_id);
             }
 
