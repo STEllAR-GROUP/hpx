@@ -16,6 +16,7 @@
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
+#include <hpx/runtime/naming/unmanaged.hpp>
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
@@ -115,27 +116,24 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::components::server::runtime_support,
     hpx::components::component_runtime_support)
 
-namespace hpx {
-    id_type create_shutdown_barrier_id(std::vector<naming::gid_type> const & localities)
-    {
-        id_type gid_;
-        lcos::barrier b;
-        HPX_ASSERT(hpx::find_here() == hpx::find_root_locality());
-        b.create(hpx::find_here(), localities.size());
-        gid_ = b.get_gid();
-        // we turn the GID into an unmanaged one to avoid extra traffic
-        // during shutdown
-        gid_.make_unmanaged();
-        return gid_;
-    }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
+    namespace detail
+    {
+        id_type create_shutdown_barrier(std::size_t num_localities)
+        {
+            HPX_ASSERT(hpx::find_here() == hpx::find_root_locality());
+
+            lcos::barrier b;
+            b.create(hpx::find_here(), num_localities);
+            return b.get_gid();
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     runtime_support::runtime_support()
-      : stopped_(false), terminated_(false), shutdown_barrier_(naming::invalid_id)
+      : stopped_(false), terminated_(false)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -415,7 +413,11 @@ namespace hpx { namespace components { namespace server
         invoke_shutdown_functions(locality_ids, true);
         invoke_shutdown_functions(locality_ids, false);
 
-        id_type shutdown_barrier_id = create_shutdown_barrier_id(locality_ids);
+        id_type shutdown_barrier_id =
+            detail::create_shutdown_barrier(locality_ids.size());
+
+        naming::id_type unmanaged_shutdown_barrier_id(
+            hpx::unmanaged(shutdown_barrier_id));
 
         // shut down all localities except the the local one
         {
@@ -428,7 +430,8 @@ namespace hpx { namespace components { namespace server
                 {
                     using components::stubs::runtime_support;
                     naming::id_type id(gid, naming::id_type::unmanaged);
-                    lazy_actions.push_back(runtime_support::shutdown_async(id, shutdown_barrier_id, timeout));
+                    lazy_actions.push_back(runtime_support::shutdown_async(id,
+                        unmanaged_shutdown_barrier_id, timeout));
                 }
             }
 
@@ -436,8 +439,9 @@ namespace hpx { namespace components { namespace server
             wait_all(lazy_actions);
         }
 
-        // now make sure this local locality gets shut down as well.
-        stop(timeout, naming::invalid_id, shutdown_barrier_id, false);    // no need to respond
+        // Now make sure this local locality gets shut down as well.
+        // There is no need to respond...
+        stop(timeout, naming::invalid_id, unmanaged_shutdown_barrier_id, false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -606,7 +610,8 @@ namespace hpx { namespace components { namespace server
     }
 
     void runtime_support::stop(double timeout,
-        naming::id_type const& respond_to, naming::id_type shutdown_barrier_id, bool remove_from_remote_caches)
+        naming::id_type const& respond_to, naming::id_type shutdown_barrier_id,
+        bool remove_from_remote_caches)
     {
         mutex_type::scoped_lock l(mtx_);
         if (!stopped_) {
@@ -679,10 +684,14 @@ namespace hpx { namespace components { namespace server
                 }
             }
 
-            shutdown_barrier_ = shutdown_barrier_id;
-            shutdown_barrier();
-            wait_condition_.notify_all();
+            // wait for all localities to reach this point
+            if (shutdown_barrier_id)
+            {
+                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
+                lcos::stubs::barrier::wait(shutdown_barrier_id);
+            }
 
+            wait_condition_.notify_all();
             stop_condition_.wait(l);        // wait for termination
         }
     }
@@ -874,14 +883,6 @@ namespace hpx { namespace components { namespace server
                        << binary_filter_type;
         }
         return bf;
-    }
-
-    void runtime_support::shutdown_barrier() const
-    {
-        if(shutdown_barrier_)
-        {
-            lcos::stubs::barrier::wait(shutdown_barrier_);
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
