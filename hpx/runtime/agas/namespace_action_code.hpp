@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -39,8 +39,8 @@ enum namespace_action_code
     primary_ns_bind_gid                     = BOOST_BINARY_U(1000011),
     primary_ns_resolve_gid                  = BOOST_BINARY_U(1000100),
     primary_ns_unbind_gid                   = BOOST_BINARY_U(1000101),
-    primary_ns_change_credit                = BOOST_BINARY_U(1000110),
-    primary_ns_increment_credit             = BOOST_BINARY_U(1000111),
+    primary_ns_increment_credit             = BOOST_BINARY_U(1000110),
+    primary_ns_decrement_credit             = BOOST_BINARY_U(1000111),
     primary_ns_allocate                     = BOOST_BINARY_U(1001000),
     primary_ns_statistics_counter           = BOOST_BINARY_U(1001001),
 
@@ -287,10 +287,15 @@ namespace detail
           , counter_target_count
           , primary_ns_unbind_gid
           , primary_ns_statistics_counter }
-      , {   "count/change_credit"
+      , {   "count/increment_credit"
           , ""
           , counter_target_count
-          , primary_ns_change_credit
+          , primary_ns_increment_credit
+          , primary_ns_statistics_counter }
+      , {   "count/decrement_credit"
+          , ""
+          , counter_target_count
+          , primary_ns_decrement_credit
           , primary_ns_statistics_counter }
       , {   "count/allocate"
           , ""
@@ -318,10 +323,15 @@ namespace detail
           , counter_target_time
           , primary_ns_unbind_gid
           , primary_ns_statistics_counter }
-      , {   "time/change_credit"
+      , {   "time/increment_credit"
           , "ns"
           , counter_target_time
-          , primary_ns_change_credit
+          , primary_ns_increment_credit
+          , primary_ns_statistics_counter }
+      , {   "time/decrement_credit"
+          , "ns"
+          , counter_target_time
+          , primary_ns_decrement_credit
           , primary_ns_statistics_counter }
       , {   "time/allocate"
           , "ns"

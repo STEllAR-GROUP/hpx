@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -163,7 +163,8 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_bind_gid_count(bool);
         boost::int64_t get_resolve_gid_count(bool);
         boost::int64_t get_unbind_gid_count(bool);
-        boost::int64_t get_change_credit_count(bool);
+        boost::int64_t get_increment_credit_count(bool);
+        boost::int64_t get_decrement_credit_count(bool);
         boost::int64_t get_allocate_count(bool);
         boost::int64_t get_overall_count(bool);
 
@@ -171,7 +172,8 @@ struct HPX_EXPORT primary_namespace
         boost::int64_t get_bind_gid_time(bool);
         boost::int64_t get_resolve_gid_time(bool);
         boost::int64_t get_unbind_gid_time(bool);
-        boost::int64_t get_change_credit_time(bool);
+        boost::int64_t get_increment_credit_time(bool);
+        boost::int64_t get_decrement_credit_time(bool);
         boost::int64_t get_allocate_time(bool);
         boost::int64_t get_overall_time(bool);
 
@@ -180,7 +182,8 @@ struct HPX_EXPORT primary_namespace
         void increment_bind_gid_count();
         void increment_resolve_gid_count();
         void increment_unbind_gid_count();
-        void increment_change_credit_count();
+        void increment_increment_credit_count();
+        void increment_decrement_credit_count();
         void increment_allocate_count();
 
     private:
@@ -192,8 +195,8 @@ struct HPX_EXPORT primary_namespace
         api_counter_data bind_gid_;             // primary_ns_bind_gid
         api_counter_data resolve_gid_;          // primary_ns_resolve_gid
         api_counter_data unbind_gid_;           // primary_ns_unbind_gid
-        api_counter_data change_credit_;        // primary_ns_change_credit_non_blocking
-                                                // primary_ns_change_credit
+        api_counter_data increment_credit_;     // primary_ns_increment_credit
+        api_counter_data decrement_credit_;     // primary_ns_decrement_credit
         api_counter_data allocate_;             // primary_ns_allocate
     };
     counter_data counter_data_;
@@ -309,7 +312,7 @@ struct HPX_EXPORT primary_namespace
       , error_code& ec = throws
         );
 
-    response change_credit(
+    response decrement_credit(
         request const& req
       , error_code& ec = throws
         );
@@ -395,8 +398,8 @@ struct HPX_EXPORT primary_namespace
       , namespace_bind_gid                      = primary_ns_bind_gid
       , namespace_resolve_gid                   = primary_ns_resolve_gid
       , namespace_unbind_gid                    = primary_ns_unbind_gid
-      , namespace_change_credit_non_blocking    = primary_ns_increment_credit
-      , namespace_change_credit_sync            = primary_ns_change_credit
+      , namespace_increment_credit              = primary_ns_increment_credit
+      , namespace_decrement_credit              = primary_ns_decrement_credit
       , namespace_allocate                      = primary_ns_allocate
       , namespace_statistics_counter            = primary_ns_statistics_counter
     }; // }}}

@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Thomas Heller
+//  Copyright (c) 2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -68,7 +69,8 @@ namespace hpx { namespace agas
         // The order of the variant types is significant, and should not be changed
         typedef boost::variant<
             // 0x0
-            // primary_ns_change_credit
+            // primary_ns_increment_credit
+            // primary_ns_decrement_credit
             util::tuple<
                 naming::gid_type // lower
               , naming::gid_type // upper

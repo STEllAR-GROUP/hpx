@@ -20,7 +20,7 @@ system and application performance.
 
           where:[br] `<agas_service>` is one of the following:
             `allocate`, `bind`, `bind_gid`, `bind_name`, `bind_prefix`,
-            `change_credit`, `free`, `get_component_typename`,
+            `increment_credit`, `decrement_credit`, `free`, `get_component_typename`,
             `iterate_names`, `iterate_types`, `localities`,
             `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
             `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
@@ -31,8 +31,8 @@ system and application performance.
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
           Currently, this value will be `locality#0`, where `0` is the root locality
           (the id of the locality hosting the AGAS service). Except for `<agas_service>`
-          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, `change_credit`,
-          `bind`, `resolve`, `unbind`, and `iterate_names`
+          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, `increment_credit`,
+          `decrement_credit`, `bind`, `resolve`, `unbind`, and `iterate_names`
           for which the value for `*` can be any locality id (only the primary and
           symbol AGAS service components live on all localities, whereas all other AGAS services
           are available on `locality#0` only).
@@ -63,7 +63,7 @@ system and application performance.
 
           where:[br] `<agas_service>` is one of the following:
             `allocate`, `bind`, `bind_gid`, `bind_name`, `bind_prefix`,
-            `change_credit`, `free`, `get_component_typename`,
+            `increment_credit`, `decrement_credit`, `free`, `get_component_typename`,
             `iterate_names`, `iterate_types`, `localities`,
             `num_localities`, `num_localities_type`, `num_threads`, `resolve`,
             `resolve_gid`, `resolve_id`, `resolve_locality`, `resolved_localities`,
@@ -74,8 +74,8 @@ system and application performance.
           where:[br] `<agas_instance>` is the name of the AGAS service to query.
           Currently, this value will be `locality#0`, where `0` is the root locality
           (the id of the locality hosting the AGAS service). Except for `<agas_service>`
-          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, , `change_credit`,
-          `bind`, `resolve`, `unbind`, and `iterate_names`
+          `route`, `bind_gid`, `resolve_gid`, `unbind_gid`, `increment_credit`,
+          `decrement_credit`,`bind`, `resolve`, `unbind`, and `iterate_names`
           for which the value for `*` can be any locality id (only the primary and symbol AGAS
           service components live on all localities, whereas all other AGAS services
           are available on `locality#0` only).

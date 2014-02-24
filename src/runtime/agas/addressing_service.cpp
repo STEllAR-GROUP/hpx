@@ -2281,9 +2281,8 @@ void addressing_service::start_shutdown(error_code& ec)
         return;
 
     mutex_type::scoped_lock l(refcnt_requests_mtx_);
-    send_refcnt_requests_sync(l, ec);
-
     enable_refcnt_caching_ = false;
+    send_refcnt_requests_sync(l, ec);
 }
 
 namespace detail
@@ -2564,7 +2563,7 @@ void addressing_service::send_refcnt_requests(
         return;
     }
 
-    if (enable_refcnt_caching_ || max_refcnt_requests_ == ++refcnt_requests_count_)
+    if (!enable_refcnt_caching_ || max_refcnt_requests_ == ++refcnt_requests_count_)
         send_refcnt_requests_non_blocking(l, ec);
 
     else if (&ec != &throws)
@@ -2616,6 +2615,12 @@ void addressing_service::send_refcnt_requests_non_blocking(
     )
 {
     try {
+        if (refcnt_requests_->empty())
+        {
+            l.unlock();
+            return;
+        }
+
         boost::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
 
         p.swap(refcnt_requests_);
@@ -2634,20 +2639,31 @@ void addressing_service::send_refcnt_requests_non_blocking(
                 "addressing_service::send_refcnt_requests_non_blocking");
 #endif
 
+        // collect all requests for each locality
+        typedef std::map<naming::id_type, std::vector<request> > requests_type;
+        requests_type requests;
+
         BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
         {
             HPX_ASSERT(e.data() < 0);
 
             naming::gid_type lower(boost::icl::lower(e.key()));
-            request const req(primary_ns_change_credit
+            request const req(primary_ns_decrement_credit
               , lower, boost::icl::upper(e.key()), e.data());
 
             naming::id_type target(
                 stubs::primary_namespace::get_service_instance(lower)
               , naming::id_type::unmanaged);
 
-            stubs::primary_namespace::service_non_blocking(
-                target, req, action_priority_);
+            requests[target].push_back(req);
+        }
+
+        // send requests to all locality
+        requests_type::const_iterator end = requests.end();
+        for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
+        {
+            stubs::primary_namespace::bulk_service_non_blocking(
+                (*it).first, (*it).second, action_priority_);
         }
 
         if (&ec != &throws)
@@ -2659,11 +2675,17 @@ void addressing_service::send_refcnt_requests_non_blocking(
     }
 }
 
-std::vector<hpx::unique_future<response> >
+std::vector<hpx::unique_future<std::vector<response> > >
 addressing_service::send_refcnt_requests_async(
     addressing_service::mutex_type::scoped_lock& l
     )
 {
+    if (refcnt_requests_->empty())
+    {
+        l.unlock();
+        return std::vector<hpx::unique_future<std::vector<response> > >();
+    }
+
     boost::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
 
     p.swap(refcnt_requests_);
@@ -2682,22 +2704,35 @@ addressing_service::send_refcnt_requests_async(
             "addressing_service::send_refcnt_requests_sync");
 #endif
 
-    std::vector<hpx::unique_future<response> > lazy_results;
+    // collect all requests for each locality
+    typedef std::map<naming::id_type, std::vector<request> > requests_type;
+    requests_type requests;
+
+    std::vector<hpx::unique_future<std::vector<response> > > lazy_results;
     BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
     {
+        HPX_ASSERT(e.data() < 0);
+
         naming::gid_type lower(boost::icl::lower(e.key()));
-        request const req(primary_ns_change_credit
+        request const req(primary_ns_decrement_credit
                         , lower
                         , boost::icl::upper(e.key())
                         , e.data());
 
         naming::id_type target(
             stubs::primary_namespace::get_service_instance(lower)
-            , naming::id_type::unmanaged);
+          , naming::id_type::unmanaged);
 
+        requests[target].push_back(req);
+    }
+
+    // send requests to all locality
+    requests_type::const_iterator end = requests.end();
+    for (requests_type::const_iterator it = requests.begin(); it != end; ++it)
+    {
         lazy_results.push_back(
-            stubs::primary_namespace::service_async<response>(
-                target, req, action_priority_));
+            stubs::primary_namespace::bulk_service_async(
+                (*it).first, (*it).second, action_priority_));
     }
 
     return lazy_results;
@@ -2708,20 +2743,23 @@ void addressing_service::send_refcnt_requests_sync(
   , error_code& ec
     )
 {
-    std::vector<hpx::unique_future<response> > lazy_results =
+    std::vector<hpx::unique_future<std::vector<response> > > lazy_results =
         send_refcnt_requests_async(l);
 
     wait_all(lazy_results);
 
-    BOOST_FOREACH(hpx::unique_future<response> & f, lazy_results)
+    BOOST_FOREACH(hpx::unique_future<std::vector<response> > & f, lazy_results)
     {
-        response const& rep = f.get();
-        if (success != rep.get_status())
+        std::vector<response> const& reps = f.get();
+        BOOST_FOREACH(response const& rep, reps)
         {
-            HPX_THROWS_IF(ec, rep.get_status(),
-                "addressing_service::send_refcnt_requests_sync",
-                "could not decrement reference count");
-            return;
+            if (success != rep.get_status())
+            {
+                HPX_THROWS_IF(ec, rep.get_status(),
+                    "addressing_service::send_refcnt_requests_sync",
+                    "could not decrement reference count");
+                return;
+            }
         }
     }
 
