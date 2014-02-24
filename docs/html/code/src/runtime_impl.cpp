@@ -246,7 +246,7 @@ namespace hpx {
         }
 
         LBT_(info) << "(4th stage) runtime_impl::run_helper: bootstrap complete";
-        state_ = state_running;
+        set_state(state_running);
 
         parcel_handler_.enable_alternative_parcelports();
 
@@ -303,7 +303,7 @@ namespace hpx {
         // {{{ launch main
         // register the given main function with the thread manager
         LBT_(info) << "(1st stage) runtime_impl::start: launching run_helper "
-                      "pxthread";
+                      "HPX thread";
 
         threads::thread_init_data data(
             boost::bind(&runtime_impl::run_helper, this, func,

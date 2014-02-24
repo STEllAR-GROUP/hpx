@@ -66,7 +66,7 @@ namespace hpx
             state_stopped = 7
         };
 
-        state get_state() const { return state_; }
+        state get_state() const { return state_.load(); }
 
         /// The \a hpx_main_function_type is the default function type usable
         /// as the main HPX thread function.
@@ -93,13 +93,13 @@ namespace hpx
         /// \brief Manage runtime 'stopped' state
         void starting()
         {
-            state_ = state_pre_main;
+            state_.store(state_pre_main);
         }
 
         /// \brief Call all registered on_exit functions
         void stopping()
         {
-            state_ = state_stopped;
+            state_.store(state_stopped);
 
             typedef HPX_STD_FUNCTION<void()> value_type;
 
@@ -111,7 +111,7 @@ namespace hpx
         /// This accessor returns whether the runtime instance has been stopped
         bool stopped() const
         {
-            return state_ == state_stopped;
+            return state_.load() == state_stopped;
         }
 
         // the TSS holds a pointer to the runtime associated with a given
@@ -353,7 +353,7 @@ namespace hpx
         void deinit_tss();
 
     public:
-        void set_state(state s) { state_ = s; }
+        void set_state(state s) { state_.store(s); }
 
     protected:
         util::reinit_helper reinit_;
