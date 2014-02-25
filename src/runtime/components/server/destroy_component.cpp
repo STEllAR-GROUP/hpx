@@ -55,6 +55,8 @@ namespace hpx { namespace components { namespace server
         using components::managed_promise;
         managed_promise* promise = reinterpret_cast<managed_promise*>(addr.address_);
 
+        std::cout << "deleting promise " << promise << "\n";
+        HPX_ASSERT(promise->count() == 1);
         promise->~managed_promise();    // call destructor of derived promise
         heap->free(promise);            // ask heap to free memory
 

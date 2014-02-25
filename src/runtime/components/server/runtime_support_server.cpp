@@ -326,11 +326,24 @@ namespace hpx { namespace components { namespace server
             return;
         }
 
+        // we might end up with the same address, so cache the already deleted ones here.
+        std::vector<naming::address> freed_components;
+        freed_components.reserve(count);
         for (std::size_t i = 0; i != count; ++i)
         {
             naming::gid_type target(gid + i);
 
             naming::address addr(g.endpoint, g.type, g.lva(target, gid));
+            bool found = false;
+            BOOST_FOREACH(naming::address const & a, freed_components)
+            {
+                if(a == addr)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if(found) continue;
 
             // FIXME: If this throws then we leak the rest of count.
             // What should we do instead?
@@ -340,6 +353,7 @@ namespace hpx { namespace components { namespace server
 
             LRT_(info) << "successfully destroyed component " << (gid + i)
                 << " of type: " << components::get_component_type_name(g.type);
+            freed_components.push_back(std::move(addr));
         }
     }
 
