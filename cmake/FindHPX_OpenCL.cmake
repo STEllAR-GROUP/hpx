@@ -9,6 +9,6 @@ endif()
 
 hpx_find_package(OpenCL
   LIBRARIES OpenCL.lib cl libcl OpenCL libOpenCL
-  LIBRARY_PATHS lib/x86_64 lib/x64
+  LIBRARY_PATHS lib/x86_64 lib/x64 lib
   HEADERS CL/opencl.h
   HEADER_PATHS include inc)
