@@ -39,10 +39,9 @@ void both() {
 int increments = 3000;
 
 
-void check(hpx::lcos::local::promise<int>* finish)
+void check()
 {
     HPX_TEST(2*increments == i1 && 2*increments == i2);
-    finish->set_value(1);
 }
 
 int hpx_main(boost::program_options::variables_map& vm) {
@@ -60,10 +59,8 @@ int hpx_main(boost::program_options::variables_map& vm) {
         run_guarded(*l2,incr2);
     }
 
-    hpx::lcos::local::promise<int> finish;
-    boost::function<void()> check_func = boost::bind(check,&finish);
+    boost::function<void()> check_func = boost::bind(check);
     run_guarded(guards,check_func);
-    finish.get_future().get();
     return hpx::finalize();
 }
 
