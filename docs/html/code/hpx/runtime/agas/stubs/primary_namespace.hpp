@@ -60,14 +60,7 @@ struct HPX_EXPORT primary_namespace
         naming::id_type const& gid
       , std::vector<request> const& reqs
       , threads::thread_priority priority = threads::thread_priority_default
-        );/*
-    {
-        typedef server_type::bulk_service_action action_type;
-
-        lcos::packaged_action<action_type> p;
-        p.apply_p(launch::async, gid, priority, reqs);
-        return p.get_future();
-    }*/
+        );
 
     /// Fire-and-forget semantics.
     ///

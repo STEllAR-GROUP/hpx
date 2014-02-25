@@ -66,12 +66,12 @@
                   <p>
                     where:<br> <code class="computeroutput">&lt;agas_service&gt;</code> is one of the
                     following: <code class="computeroutput">allocate</code>, <code class="computeroutput">bind</code>, <code class="computeroutput">bind_gid</code>,
-                    <code class="computeroutput">bind_name</code>, <code class="computeroutput">bind_prefix</code>, <code class="computeroutput">change_credit</code>,
-                    <code class="computeroutput">free</code>, <code class="computeroutput">get_component_typename</code>, <code class="computeroutput">iterate_names</code>,
-                    <code class="computeroutput">iterate_types</code>, <code class="computeroutput">localities</code>, <code class="computeroutput">num_localities</code>,
-                    <code class="computeroutput">num_localities_type</code>, <code class="computeroutput">num_threads</code>,
-                    <code class="computeroutput">resolve</code>, <code class="computeroutput">resolve_gid</code>, <code class="computeroutput">resolve_id</code>,
-                    <code class="computeroutput">resolve_locality</code>, <code class="computeroutput">resolved_localities</code>,
+                    <code class="computeroutput">bind_name</code>, <code class="computeroutput">bind_prefix</code>, <code class="computeroutput">increment_credit</code>,
+                    <code class="computeroutput">decrement_credit</code>, <code class="computeroutput">free</code>, <code class="computeroutput">get_component_typename</code>,
+                    <code class="computeroutput">iterate_names</code>, <code class="computeroutput">iterate_types</code>, <code class="computeroutput">localities</code>,
+                    <code class="computeroutput">num_localities</code>, <code class="computeroutput">num_localities_type</code>,
+                    <code class="computeroutput">num_threads</code>, <code class="computeroutput">resolve</code>, <code class="computeroutput">resolve_gid</code>,
+                    <code class="computeroutput">resolve_id</code>, <code class="computeroutput">resolve_locality</code>, <code class="computeroutput">resolved_localities</code>,
                     <code class="computeroutput">route</code>, <code class="computeroutput">unbind</code>, <code class="computeroutput">unbind_gid</code>,
                     <code class="computeroutput">unbind_name</code>.
                   </p>
@@ -86,12 +86,12 @@
                     where <code class="computeroutput">0</code> is the root locality (the id of the locality
                     hosting the AGAS service). Except for <code class="computeroutput">&lt;agas_service&gt;</code>
                     <code class="computeroutput">route</code>, <code class="computeroutput">bind_gid</code>, <code class="computeroutput">resolve_gid</code>,
-                    <code class="computeroutput">unbind_gid</code>, <code class="computeroutput">change_credit</code>, <code class="computeroutput">bind</code>,
-                    <code class="computeroutput">resolve</code>, <code class="computeroutput">unbind</code>, and <code class="computeroutput">iterate_names</code>
-                    for which the value for <code class="computeroutput">*</code> can be any locality id
-                    (only the primary and symbol AGAS service components live on
-                    all localities, whereas all other AGAS services are available
-                    on <code class="computeroutput">locality#0</code> only).
+                    <code class="computeroutput">unbind_gid</code>, <code class="computeroutput">increment_credit</code>, <code class="computeroutput">decrement_credit</code>,
+                    <code class="computeroutput">bind</code>, <code class="computeroutput">resolve</code>, <code class="computeroutput">unbind</code>,
+                    and <code class="computeroutput">iterate_names</code> for which the value for <code class="computeroutput">*</code>
+                    can be any locality id (only the primary and symbol AGAS service
+                    components live on all localities, whereas all other AGAS services
+                    are available on <code class="computeroutput">locality#0</code> only).
                   </p>
                 </td>
 <td>
@@ -153,12 +153,12 @@
                   <p>
                     where:<br> <code class="computeroutput">&lt;agas_service&gt;</code> is one of the
                     following: <code class="computeroutput">allocate</code>, <code class="computeroutput">bind</code>, <code class="computeroutput">bind_gid</code>,
-                    <code class="computeroutput">bind_name</code>, <code class="computeroutput">bind_prefix</code>, <code class="computeroutput">change_credit</code>,
-                    <code class="computeroutput">free</code>, <code class="computeroutput">get_component_typename</code>, <code class="computeroutput">iterate_names</code>,
-                    <code class="computeroutput">iterate_types</code>, <code class="computeroutput">localities</code>, <code class="computeroutput">num_localities</code>,
-                    <code class="computeroutput">num_localities_type</code>, <code class="computeroutput">num_threads</code>,
-                    <code class="computeroutput">resolve</code>, <code class="computeroutput">resolve_gid</code>, <code class="computeroutput">resolve_id</code>,
-                    <code class="computeroutput">resolve_locality</code>, <code class="computeroutput">resolved_localities</code>,
+                    <code class="computeroutput">bind_name</code>, <code class="computeroutput">bind_prefix</code>, <code class="computeroutput">increment_credit</code>,
+                    <code class="computeroutput">decrement_credit</code>, <code class="computeroutput">free</code>, <code class="computeroutput">get_component_typename</code>,
+                    <code class="computeroutput">iterate_names</code>, <code class="computeroutput">iterate_types</code>, <code class="computeroutput">localities</code>,
+                    <code class="computeroutput">num_localities</code>, <code class="computeroutput">num_localities_type</code>,
+                    <code class="computeroutput">num_threads</code>, <code class="computeroutput">resolve</code>, <code class="computeroutput">resolve_gid</code>,
+                    <code class="computeroutput">resolve_id</code>, <code class="computeroutput">resolve_locality</code>, <code class="computeroutput">resolved_localities</code>,
                     <code class="computeroutput">route</code>, <code class="computeroutput">unbind</code>, <code class="computeroutput">unbind_gid</code>,
                     <code class="computeroutput">unbind_name</code>.
                   </p>
@@ -173,7 +173,7 @@
                     where <code class="computeroutput">0</code> is the root locality (the id of the locality
                     hosting the AGAS service). Except for <code class="computeroutput">&lt;agas_service&gt;</code>
                     <code class="computeroutput">route</code>, <code class="computeroutput">bind_gid</code>, <code class="computeroutput">resolve_gid</code>,
-                    <code class="computeroutput">unbind_gid</code>, , <code class="computeroutput">change_credit</code>, <code class="computeroutput">bind</code>,
+                    <code class="computeroutput">unbind_gid</code>, <code class="computeroutput">increment_credit</code>, <code class="computeroutput">decrement_credit</code>,<code class="computeroutput">bind</code>,
                     <code class="computeroutput">resolve</code>, <code class="computeroutput">unbind</code>, and <code class="computeroutput">iterate_names</code>
                     for which the value for <code class="computeroutput">*</code> can be any locality id
                     (only the primary and symbol AGAS service components live on

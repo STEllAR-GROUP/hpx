@@ -9,6 +9,7 @@ set(tests
     function_argument
     function_serialization_728
     protect_with_nullary_pfo
+    serialize_buffer_1069
     tuple_serialization_803
     zero_copy_parcels_1001
    )
@@ -17,6 +18,8 @@ set(function_argument_FLAGS DEPENDENCIES iostreams_component)
 
 set(function_serialization_728_dependencies
   iostreams_component)
+
+set(serialize_buffer_1069_FLAGS DEPENDENCIES iostreams_component)
 
 if(HPX_HAVE_COMPRESSION_ZLIB AND ZLIB_FOUND)
   set(function_serialization_728_dependencies

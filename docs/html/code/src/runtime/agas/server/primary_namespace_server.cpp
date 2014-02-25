@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2013 Hartmut Kaiser
+//  Copyright (c) 2012-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -90,19 +90,19 @@ response primary_namespace::service(
             {
                 update_time_on_exit update(
                     counter_data_
-                  , counter_data_.change_credit_.time_
+                  , counter_data_.increment_credit_.time_
                 );
-                counter_data_.increment_change_credit_count();
+                counter_data_.increment_increment_credit_count();
                 return increment_credit(req, ec);
             }
-        case primary_ns_change_credit:
+        case primary_ns_decrement_credit:
             {
                 update_time_on_exit update(
                     counter_data_
-                  , counter_data_.change_credit_.time_
+                  , counter_data_.decrement_credit_.time_
                 );
-                counter_data_.increment_change_credit_count();
-                return change_credit(req, ec);
+                counter_data_.increment_decrement_credit_count();
+                return decrement_credit(req, ec);
             }
         case primary_ns_allocate:
             {
@@ -624,11 +624,11 @@ response primary_namespace::increment_credit(
     return response(primary_ns_increment_credit, credits);
 }
 
-response primary_namespace::change_credit(
+response primary_namespace::decrement_credit(
     request const& req
   , error_code& ec
     )
-{ // change_credit_sync implementation
+{ // decrement_credit implementation
     // parameters
     boost::int64_t credits = req.get_credit();
     naming::gid_type lower = req.get_lower_bound();
@@ -637,15 +637,8 @@ response primary_namespace::change_credit(
     naming::detail::strip_internal_bits_from_gid(lower);
     naming::detail::strip_internal_bits_from_gid(upper);
 
-    // Increment.
-    if (credits > 0)
-    {
-        increment(lower, upper, credits, ec);
-        if (ec) return response();
-    }
-
     // Decrement.
-    else if (credits < 0)
+    if (credits < 0)
     {
         std::list<free_entry> free_list;
         decrement_sweep(free_list, lower, upper, -credits, ec);
@@ -658,12 +651,12 @@ response primary_namespace::change_credit(
     else
     {
         HPX_THROWS_IF(ec, bad_parameter
-          , "primary_namespace::change_credit_sync"
+          , "primary_namespace::decrement_credit"
           , boost::str(boost::format("invalid credit count of %1%") % credits));
         return response();
     }
 
-    return response(primary_ns_change_credit, credits);
+    return response(primary_ns_decrement_credit, credits);
 }
 
 response primary_namespace::allocate(
@@ -1109,7 +1102,7 @@ void primary_namespace::free_components_sync(
         if (HPX_UNLIKELY(!threads::threadmanager_is(running)))
         {
             LAGAS_(info) << (boost::format(
-                "primary_namespace::kill_sync, cancelling free "
+                "primary_namespace::free_components_sync, cancelling free "
                 "operation because the threadmanager is down, lower(%1%), "
                 "upper(%2%), base(%3%), gva(%4%), count(%5%), locality_id(%6%)")
                 % lower
@@ -1119,7 +1112,7 @@ void primary_namespace::free_components_sync(
         }
 
         LAGAS_(info) << (boost::format(
-            "primary_namespace::kill_sync, freeing component%1%, "
+            "primary_namespace::free_components_sync, freeing component%1%, "
             "lower(%2%), upper(%3%), base(%4%), gva(%5%), count(%6%), locality_id(%7%)")
             % ((at_c<2>(e) == naming::gid_type(0, 1)) ? "" : "s")
             % lower
@@ -1290,8 +1283,10 @@ response primary_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_gid_count, &counter_data_, ::_1);
             break;
         case primary_ns_increment_credit:
-        case primary_ns_change_credit:
-            get_data_func = boost::bind(&cd::get_change_credit_count, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_increment_credit_count, &counter_data_, ::_1);
+            break;
+        case primary_ns_decrement_credit:
+            get_data_func = boost::bind(&cd::get_decrement_credit_count, &counter_data_, ::_1);
             break;
         case primary_ns_allocate:
             get_data_func = boost::bind(&cd::get_allocate_count, &counter_data_, ::_1);
@@ -1322,8 +1317,10 @@ response primary_namespace::statistics_counter(
             get_data_func = boost::bind(&cd::get_unbind_gid_time, &counter_data_, ::_1);
             break;
         case primary_ns_increment_credit:
-        case primary_ns_change_credit:
-            get_data_func = boost::bind(&cd::get_change_credit_time, &counter_data_, ::_1);
+            get_data_func = boost::bind(&cd::get_increment_credit_time, &counter_data_, ::_1);
+            break;
+        case primary_ns_decrement_credit:
+            get_data_func = boost::bind(&cd::get_decrement_credit_time, &counter_data_, ::_1);
             break;
         case primary_ns_allocate:
             get_data_func = boost::bind(&cd::get_allocate_time, &counter_data_, ::_1);
@@ -1381,10 +1378,16 @@ boost::int64_t primary_namespace::counter_data::get_unbind_gid_count(bool reset)
     return util::get_and_reset_value(unbind_gid_.count_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_change_credit_count(bool reset)
+boost::int64_t primary_namespace::counter_data::get_increment_credit_count(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(change_credit_.count_, reset);
+    return util::get_and_reset_value(increment_credit_.count_, reset);
+}
+
+boost::int64_t primary_namespace::counter_data::get_decrement_credit_count(bool reset)
+{
+    mutex_type::scoped_lock l(mtx_);
+    return util::get_and_reset_value(decrement_credit_.count_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_allocate_count(bool reset)
@@ -1400,7 +1403,8 @@ boost::int64_t primary_namespace::counter_data::get_overall_count(bool reset)
         util::get_and_reset_value(bind_gid_.count_, reset) +
         util::get_and_reset_value(resolve_gid_.count_, reset) +
         util::get_and_reset_value(unbind_gid_.count_, reset) +
-        util::get_and_reset_value(change_credit_.count_, reset) +
+        util::get_and_reset_value(increment_credit_.count_, reset) +
+        util::get_and_reset_value(decrement_credit_.count_, reset) +
         util::get_and_reset_value(allocate_.count_, reset);
 }
 
@@ -1429,10 +1433,16 @@ boost::int64_t primary_namespace::counter_data::get_unbind_gid_time(bool reset)
     return util::get_and_reset_value(unbind_gid_.time_, reset);
 }
 
-boost::int64_t primary_namespace::counter_data::get_change_credit_time(bool reset)
+boost::int64_t primary_namespace::counter_data::get_increment_credit_time(bool reset)
 {
     mutex_type::scoped_lock l(mtx_);
-    return util::get_and_reset_value(change_credit_.time_, reset);
+    return util::get_and_reset_value(increment_credit_.time_, reset);
+}
+
+boost::int64_t primary_namespace::counter_data::get_decrement_credit_time(bool reset)
+{
+    mutex_type::scoped_lock l(mtx_);
+    return util::get_and_reset_value(decrement_credit_.time_, reset);
 }
 
 boost::int64_t primary_namespace::counter_data::get_allocate_time(bool reset)
@@ -1448,7 +1458,8 @@ boost::int64_t primary_namespace::counter_data::get_overall_time(bool reset)
         util::get_and_reset_value(bind_gid_.time_, reset) +
         util::get_and_reset_value(resolve_gid_.time_, reset) +
         util::get_and_reset_value(unbind_gid_.time_, reset) +
-        util::get_and_reset_value(change_credit_.time_, reset) +
+        util::get_and_reset_value(increment_credit_.time_, reset) +
+        util::get_and_reset_value(decrement_credit_.time_, reset) +
         util::get_and_reset_value(allocate_.time_, reset);
 }
 
@@ -1477,10 +1488,16 @@ void primary_namespace::counter_data::increment_unbind_gid_count()
     ++unbind_gid_.count_;
 }
 
-void primary_namespace::counter_data::increment_change_credit_count()
+void primary_namespace::counter_data::increment_increment_credit_count()
 {
     mutex_type::scoped_lock l(mtx_);
-    ++change_credit_.count_;
+    ++increment_credit_.count_;
+}
+
+void primary_namespace::counter_data::increment_decrement_credit_count()
+{
+    mutex_type::scoped_lock l(mtx_);
+    ++decrement_credit_.count_;
 }
 
 void primary_namespace::counter_data::increment_allocate_count()

@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
+//  Copyright (c) 2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -130,7 +131,8 @@ namespace hpx { namespace agas
             // component_ns_iterate_types
             // symbol_ns_bind
             // symbol_ns_iterate_names
-            // primary_ns_change_credit
+            // primary_ns_increment_credit
+            // primary_ns_decrement_credit
           , util::tuple<
             >
             // 0x8
@@ -347,7 +349,7 @@ namespace hpx { namespace agas
     {
         HPX_ASSERT(
             type_ == primary_ns_increment_credit
-         || type_ == primary_ns_change_credit);
+         || type_ == primary_ns_decrement_credit);
     }
 
     response::response(

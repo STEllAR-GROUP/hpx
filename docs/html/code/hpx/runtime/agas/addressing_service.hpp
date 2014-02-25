@@ -246,7 +246,8 @@ private:
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
-    std::vector<hpx::unique_future<response> > send_refcnt_requests_async(
+    std::vector<hpx::unique_future<std::vector<response> > >
+    send_refcnt_requests_async(
         mutex_type::scoped_lock& l
         );
 
