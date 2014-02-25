@@ -279,7 +279,6 @@ namespace hpx { namespace lcos { namespace detail
             }
             else if (0 == counter)
             {
-                //HPX_ASSERT(naming::detail::has_credits(this->gid_));
                 return true;
             }
             return false;
@@ -287,7 +286,7 @@ namespace hpx { namespace lcos { namespace detail
 
         friend void intrusive_ptr_release(promise* p)
         {
-            if(p->requires_delete())
+            if (p->requires_delete())
             {
                 delete p;
             }
@@ -398,7 +397,7 @@ namespace hpx { namespace lcos { namespace detail
 
         friend void intrusive_ptr_release(promise* p)
         {
-            if(p->requires_delete())
+            if (p->requires_delete())
             {
                 delete p;
             }

@@ -137,7 +137,6 @@ struct gva
         // This is a hack to make sure that if resolve() or lva() is called on
         // the returned GVA, an exact copy will be returned (see the last two
         // lines of lva() above.
-        g.offset = 0;
         g.count = 1;
         return g;
     }
