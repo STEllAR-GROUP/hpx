@@ -156,7 +156,11 @@ namespace hpx { namespace lcos { namespace detail
         naming::id_type get_gid() const
         {
             naming::gid_type::mutex_type::scoped_lock l(gid_.get_mutex());
+            return get_gid_locked();
+        }
 
+        naming::id_type get_gid_locked() const
+        {
             // take all credits to avoid a self reference
             naming::gid_type gid = gid_;
             naming::detail::strip_credits_from_gid(
@@ -209,6 +213,7 @@ namespace hpx { namespace lcos { namespace detail
         // actual managed component object
         ~promise()
         {
+            // This lock is needed to not interfere with the intrusive pointer deletion
             this->finalize();
         }
 
@@ -260,20 +265,29 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     private:
-        friend void intrusive_ptr_release(promise* p)
+        bool requires_delete()
         {
-            naming::gid_type::mutex_type::scoped_lock l(p->gid_.get_mutex());
-            long counter = --p->count_;
+            naming::gid_type::mutex_type::scoped_lock l(this->gid_.get_mutex());
+            long counter = --this->count_;
 
             // if this promise was never asked for its id we need to take
             // special precautions for it to go out of scope
-            if (1 == counter && naming::detail::has_credits(p->gid_))
+            if (1 == counter && naming::detail::has_credits(this->gid_))
             {
-                p->get_gid();          // this will trigger normal destruction
+                this->get_gid_locked();          // this will trigger normal destruction
+                return false;
             }
             else if (0 == counter)
             {
-                l.unlock();
+                return true;
+            }
+            return false;
+        }
+
+        friend void intrusive_ptr_release(promise* p)
+        {
+            if (p->requires_delete())
+            {
                 delete p;
             }
         }
@@ -312,6 +326,7 @@ namespace hpx { namespace lcos { namespace detail
         // actual managed component object
         ~promise()
         {
+            // This lock is needed to not interfere with the intrusive pointer deletion
             this->finalize();
         }
 
@@ -360,21 +375,30 @@ namespace hpx { namespace lcos { namespace detail
         }
 
     private:
-        friend void intrusive_ptr_release(promise* p)
+        bool requires_delete()
         {
-            naming::gid_type::mutex_type::scoped_lock l(p->gid_.get_mutex());
-            bool get_gid_was_called = !naming::detail::has_credits(p->gid_);
-            long counter = --p->count_;
+            naming::gid_type::mutex_type::scoped_lock l(this->gid_.get_mutex());
+            long counter = --this->count_;
 
             // if this promise was never asked for its id we need to take
             // special precautions for it to go out of scope
-            if (1 == counter && !get_gid_was_called)
+            if (1 == counter && naming::detail::has_credits(this->gid_))
             {
-                p->get_gid();          // this will trigger normal destruction
+                this->get_gid_locked();          // this will trigger normal destruction
+                return false;
             }
             else if (0 == counter)
             {
-                l.unlock();
+                //HPX_ASSERT(naming::detail::has_credits(this->gid_));
+                return true;
+            }
+            return false;
+        }
+
+        friend void intrusive_ptr_release(promise* p)
+        {
+            if (p->requires_delete())
+            {
                 delete p;
             }
         }
@@ -414,34 +438,22 @@ namespace hpx { namespace components
 
         ~managed_promise()
         {
-            release();
+            promise_->release();
+        }
+
+        long count() const
+        {
+            return promise_->count();
         }
 
     private:
-        void release()
-        {
-            mutex_type::scoped_lock l(this);
-            if (promise_)
-            {
-                promise_base_type* p = promise_;
-                if (p->count() == 1)
-                {
-                    promise_ = 0;
-                }
-                l.unlock();
-
-                p->release();
-            }
-        }
-
         friend void intrusive_ptr_add_ref(managed_promise* p)
         {
-            mutex_type::scoped_lock l(p);
             p->promise_->add_ref();
         }
         friend void intrusive_ptr_release(managed_promise* p)
         {
-            p->release();
+            p->promise_->release();
         }
 
         promise_base_type* promise_;

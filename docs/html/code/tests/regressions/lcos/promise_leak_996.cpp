@@ -31,6 +31,7 @@ int hpx_main(boost::program_options::variables_map & vm)
     }
     // Flush pending reference counting operations.
     hpx::agas::garbage_collect();
+    hpx::this_thread::yield();
     hpx::agas::garbage_collect();
     HPX_TEST_EQ(test::count, 0);
 

@@ -42,6 +42,7 @@
 #include <hpx/util/unused.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/coroutine/detail/default_context_impl.hpp>
+#include <hpx/util/coroutine/detail/coroutine_impl.hpp>
 #include <hpx/runtime/threads/detail/tagged_thread_state.hpp>
 
 namespace boost
