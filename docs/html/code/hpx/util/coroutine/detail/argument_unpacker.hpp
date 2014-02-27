@@ -33,6 +33,8 @@
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/preprocessor/arithmetic/inc.hpp>
 #include <boost/utility/result_of.hpp>
+#include <boost/tuple/tuple.hpp>
+
 #include <hpx/util/coroutine/detail/index.hpp>
 #include <hpx/util/coroutine/detail/arg_max.hpp>
 
