@@ -51,6 +51,7 @@ namespace hpx { namespace lcos { namespace local
             mutex_type::scoped_lock l(mtx_);
             util::scoped_unlock<Lock> unlock(lock);
             cond_.wait(l, ec);
+            l.unlock();
         }
 
         template <class Lock, class Predicate>
@@ -73,6 +74,7 @@ namespace hpx { namespace lcos { namespace local
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_until(l, at, ec);
+            l.unlock();
             if (ec) return cv_status::error;
 
             // if the timer has hit, the waiting period timed out
@@ -122,6 +124,7 @@ namespace hpx { namespace lcos { namespace local
 
             threads::thread_state_ex_enum const reason =
                 cond_.wait_for(l, p, ec);
+            l.unlock();
             if (ec) return cv_status::error;
 
             // if the timer has hit, the waiting period timed out
