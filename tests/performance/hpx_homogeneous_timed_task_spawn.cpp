@@ -386,9 +386,6 @@ int hpx_main(
             // We check earlier to make sure that there are never more
             // suspended tasks than tasks requested.
             no_suspend_step = (tasks_per_feeder / gcd) - suspend_step;
-
-            std::cout << "ns_step: " << no_suspend_step << "\n"
-                      << "s_step: " << suspend_step << "\n";
         }
 
         ///////////////////////////////////////////////////////////////////////
