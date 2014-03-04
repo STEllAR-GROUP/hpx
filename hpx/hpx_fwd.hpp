@@ -722,12 +722,16 @@ namespace hpx
 
         namespace detail
         {
-            ///////////////////////////////////////////////////////////////////////////
             enum full_empty_state
             {
                 empty = false,
                 full = true
             };
+        }
+
+        namespace local
+        {
+            class barrier;
         }
     }
 

@@ -80,7 +80,8 @@ namespace hpx { namespace threads { namespace executors
 
         private:
             // internal run method
-            void run(std::size_t virt_core, std::size_t num_thread);
+            void run(std::size_t virt_core, std::size_t num_thread,
+                lcos::local::barrier& b);
 
             threads::thread_state_enum thread_function_nullary(
                 HPX_STD_FUNCTION<void()> const& func);
