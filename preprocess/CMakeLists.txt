@@ -54,8 +54,6 @@ set(action_argument_limit_preprocessing_files
   "hpx/lcos/reduce.hpp"
   "hpx/lcos/packaged_action_constructors.hpp"
   "hpx/lcos/packaged_action_constructors_direct.hpp"
-  "hpx/lcos/deferred_packaged_task_constructors.hpp"
-  "hpx/lcos/deferred_packaged_task_constructors_direct.hpp"
   "hpx/lcos/local/dataflow.hpp"
   "hpx/lcos/local/packaged_task.hpp"
   "hpx/runtime/actions/component_action_implementations.hpp"

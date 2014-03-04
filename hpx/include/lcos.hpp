@@ -11,7 +11,6 @@
 #include <hpx/include/actions.hpp>
 
 #include <hpx/lcos/packaged_action.hpp>
-#include <hpx/lcos/deferred_packaged_task.hpp>
 
 #include <hpx/lcos/queue.hpp>
 #include <hpx/lcos/barrier.hpp>
