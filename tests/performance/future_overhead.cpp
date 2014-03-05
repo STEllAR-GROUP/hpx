@@ -55,6 +55,14 @@ double null_function()
 
 HPX_PLAIN_ACTION(null_function, null_action)
 
+struct scratcher
+{
+    void operator()(std::size_t, double r) const
+    {
+        global_scratch += r;
+    }
+};
+
 void measure_action_futures(boost::uint64_t count, bool csv)
 {
     const id_type here = find_here();
@@ -68,7 +76,7 @@ void measure_action_futures(boost::uint64_t count, bool csv)
     for (boost::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
 
-    wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
+    wait(futures, scratcher());
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -97,7 +105,7 @@ void measure_function_futures(boost::uint64_t count, bool csv)
     for (boost::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(&null_function));
 
-    wait(futures, [&] (std::size_t, double r) { global_scratch += r; });
+    wait(futures, scratcher());
 
     // stop the clock
     const double duration = walltime.elapsed();
