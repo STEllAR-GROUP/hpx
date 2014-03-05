@@ -48,13 +48,13 @@ void test(hpx::id_type dest, char* send_buffer, std::size_t size)
     buffer_type recv_buffer;
 
     std::vector<hpx::unique_future<buffer_type> > recv_buffers;
-    recv_buffers.resize(10);
+    recv_buffers.reserve(10);
 
     Action act;
     for(std::size_t j = 0; j != 10; ++j)
     {
-        recv_buffers[j] = hpx::async(act, dest,
-            buffer_type(send_buffer, size, buffer_type::reference));
+        recv_buffers.push_back(hpx::async(act, dest,
+            buffer_type(send_buffer, size, buffer_type::reference)));
     }
     hpx::wait_all(recv_buffers);
 
@@ -74,13 +74,13 @@ void test_stateful_allocator(hpx::id_type dest, char* send_buffer,
     buffer_type recv_buffer;
 
     std::vector<hpx::unique_future<buffer_type> > recv_buffers;
-    recv_buffers.resize(10);
+    recv_buffers.reserve(10);
 
     bounce_allocator_action act;
     for(std::size_t j = 0; j != 10; ++j)
     {
-        recv_buffers[j] = hpx::async(act, dest,
-            buffer_type(send_buffer, size, buffer_type::reference, alloc));
+        recv_buffers.push_back(hpx::async(act, dest,
+            buffer_type(send_buffer, size, buffer_type::reference, alloc)));
     }
     hpx::wait_all(recv_buffers);
 
