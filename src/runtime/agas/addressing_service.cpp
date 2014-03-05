@@ -1731,7 +1731,6 @@ boost::int64_t addressing_service::synchronize_with_async_incref(
   , boost::int64_t compensated_credit
     )
 {
-    HPX_ASSERT(compensated_credit >= 0);
     return fut.get() + compensated_credit;
 }
 
