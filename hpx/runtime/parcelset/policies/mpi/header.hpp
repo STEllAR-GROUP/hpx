@@ -29,8 +29,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             parcel_buffer<BufferType, ChunkType> const & buffer)
           : rank_(rank)
         {
-            boost::uint64_t size = static_cast<boost::uint64_t>(buffer.size_);
-            boost::uint64_t numbytes = static_cast<boost::uint64_t>(buffer.data_size_);
+            boost::int64_t size = static_cast<boost::uint64_t>(buffer.size_);
+            boost::int64_t numbytes = static_cast<boost::uint64_t>(buffer.data_size_);
 
             HPX_ASSERT(rank_ != util::mpi_environment::rank());
             HPX_ASSERT(size <= (std::numeric_limits<value_type>::max)());
