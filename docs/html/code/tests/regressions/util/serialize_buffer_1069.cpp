@@ -71,14 +71,14 @@ void receive(hpx::naming::id_type dest, char* send_buffer,
         std::size_t size, std::size_t window_size)
 {
     std::vector<hpx::unique_future<buffer_allocator_type> > recv_buffers;
-    recv_buffers.resize(window_size);
+    recv_buffers.reserve(window_size);
 
     allocator_message_action msg;
     for(std::size_t j = 0; j != window_size; ++j)
     {
-        recv_buffers[j] = hpx::async(msg, dest,
+        recv_buffers.push_back(hpx::async(msg, dest,
             buffer_allocator_type(send_buffer, size,
-                buffer_allocator_type::reference));
+                buffer_allocator_type::reference)));
     }
     hpx::wait_all(recv_buffers);
 }

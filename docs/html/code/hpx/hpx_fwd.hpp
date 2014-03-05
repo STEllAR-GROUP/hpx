@@ -691,12 +691,6 @@ namespace hpx
             typename DirectExecute = typename Action::direct_execution>
         class packaged_action;
 
-        template <typename Action,
-            typename Result = typename traits::promise_local_result<
-                typename Action::result_type>::type,
-            typename DirectExecute = typename Action::direct_execution>
-        class deferred_packaged_task;
-
         template <typename R>
         class unique_future;
 
@@ -728,12 +722,16 @@ namespace hpx
 
         namespace detail
         {
-            ///////////////////////////////////////////////////////////////////////////
             enum full_empty_state
             {
                 empty = false,
                 full = true
             };
+        }
+
+        namespace local
+        {
+            class barrier;
         }
     }
 

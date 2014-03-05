@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,6 +15,7 @@
 #include <hpx/runtime/threads/executors/thread_pool_executors.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/register_locks.hpp>
+#include <hpx/lcos/local/barrier.hpp>
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
@@ -289,7 +290,7 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     // execute all work
     template <typename Scheduler>
     void thread_pool_executor<Scheduler>::run(std::size_t virt_core,
-        std::size_t thread_num)
+        std::size_t thread_num, lcos::local::barrier& b)
     {
         // Set the state to 'running' only if it's still in 'starting' state,
         // otherwise our destructor is currently being executed, which means
@@ -301,6 +302,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
             scheduler_.add_punit(virt_core, thread_num);
             scheduler_.on_start_thread(virt_core);
+
+            b.wait();
 
             on_run_exit on_exit(current_concurrency_, shutdown_sem_);
 
@@ -316,6 +319,9 @@ namespace hpx { namespace threads { namespace executors { namespace detail
             HPX_ASSERT(!scheduler_.get_thread_count(
                 unknown, thread_priority_default, thread_num));
 #endif
+        }
+        else {
+            b.wait();
         }
     }
 
@@ -362,11 +368,18 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     void thread_pool_executor<Scheduler>::add_processing_unit(
         std::size_t virt_core, std::size_t thread_num, error_code& ec)
     {
+        lcos::local::barrier b(2);
         register_thread_nullary(
-            util::bind(&thread_pool_executor::run, this, virt_core, thread_num),
+            util::bind(
+                &thread_pool_executor::run, this,
+                virt_core, thread_num, boost::ref(b)
+            ),
             "thread_pool_executor thread", threads::pending, true,
             threads::thread_priority_normal, thread_num,
             threads::thread_stacksize_default, ec);
+
+        // wait for the thread to actually run
+        b.wait();
     }
 
     // Remove the given processing unit from the scheduler.

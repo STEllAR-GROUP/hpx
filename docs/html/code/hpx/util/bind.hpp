@@ -215,7 +215,7 @@ namespace hpx { namespace util
               , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f);
+                return util::invoke_r<type>(f);
             }
         };
 
@@ -311,8 +311,10 @@ namespace hpx { namespace util
             typename result<one_shot_wrapper()>::type
             operator()()
             {
+                typedef typename result<one_shot_wrapper()>::type result_type;
+
                 check_call();
-                return util::invoke(_f);
+                return util::invoke_r<result_type>(_f);
             }
 
 #           define HPX_UTIL_BIND_ONE_SHOT_WRAPPER_FUNCTION_OP(Z, N, D)        \
@@ -334,8 +336,12 @@ namespace hpx { namespace util
             typename result<one_shot_wrapper(BOOST_PP_ENUM_PARAMS(N, T))>::type\
             operator()(HPX_ENUM_FWD_ARGS(N, T, t))                            \
             {                                                                 \
+                typedef typename result<                                      \
+                    one_shot_wrapper(BOOST_PP_ENUM_PARAMS(N, T))              \
+                >::type result_type;                                          \
                 check_call();                                                 \
-                return util::invoke(_f, HPX_ENUM_FORWARD_ARGS(N, T, t));      \
+                return util::invoke_r<result_type>(_f,                        \
+                    HPX_ENUM_FORWARD_ARGS(N, T, t));                          \
             }                                                                 \
             /**/
 
@@ -592,7 +598,8 @@ namespace hpx { namespace util
               , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _));
+                return util::invoke_r<type>(f,
+                    BOOST_PP_ENUM(N, HPX_UTIL_BIND_EVAL, _));
             }
         };
 

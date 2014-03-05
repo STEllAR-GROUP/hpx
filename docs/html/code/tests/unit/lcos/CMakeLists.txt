@@ -15,7 +15,6 @@ set(tests
     condition_variable
     barrier
     dataflow
-    deferred_packaged_task
     future
     future_ref
     future_then
@@ -56,8 +55,6 @@ set(broadcast_PARAMETERS LOCALITIES 2)
 
 set(dataflow_FLAGS DEPENDENCIES dataflow_component)
 set(dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
-
-set(deferred_packaged_task_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(future_PARAMETERS THREADS_PER_LOCALITY 4)
 

@@ -33,7 +33,8 @@ namespace hpx { namespace util
               , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke_r<type>(f,
+                    detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -94,7 +95,8 @@ namespace hpx { namespace util
               , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke_r<type>(f,
+                    detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -155,7 +157,8 @@ namespace hpx { namespace util
               , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke_r<type>(f,
+                    detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -216,7 +219,8 @@ namespace hpx { namespace util
               , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke_r<type>(f,
+                    detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -277,7 +281,8 @@ namespace hpx { namespace util
               , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke_r<type>(f,
+                    detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -338,7 +343,8 @@ namespace hpx { namespace util
               , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke_r<type>(f,
+                    detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -399,7 +405,8 @@ namespace hpx { namespace util
               , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke_r<type>(f,
+                    detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>
@@ -460,7 +467,8 @@ namespace hpx { namespace util
               , UnboundArgs && unbound_args
             )
             {
-                return util::invoke(f, detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
+                return util::invoke_r<type>(f,
+                    detail::bind_eval<F>( util::get< 0>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 1>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 2>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 3>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 4>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 5>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 6>(bound_args) , std::forward<UnboundArgs>(unbound_args) ) , detail::bind_eval<F>( util::get< 7>(bound_args) , std::forward<UnboundArgs>(unbound_args) ));
             }
         };
         template <typename F, typename BoundArgs, typename UnboundArgs>

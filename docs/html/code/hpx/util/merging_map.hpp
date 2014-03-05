@@ -653,8 +653,9 @@ struct merging_map : boost::noncopyable
         }
 
         value_type* node = new value_type(key, std::forward<T>(data));
-        // TODO: Check for insertion failure?
-        return merge(map_.insert(*node).first);
+        std::pair<iterator, bool> r = map_.insert(*node);
+        HPX_ASSERT(r.second);
+        return merge(r.first);
     }
 
     iterator bind(
@@ -721,8 +722,9 @@ struct merging_map : boost::noncopyable
             ++matches.first;
         }
 
-        // TODO: Check for insertion failure?
-        return merge(map_.insert(*node).first);
+        std::pair<iterator, bool> r = map_.insert(*node);
+        HPX_ASSERT(r.second);
+        return merge(r.first);
     } // }}}
 
     static data_type default_data(key_type const&) { return data_type(); }
@@ -833,6 +835,8 @@ struct merging_map : boost::noncopyable
             return;
         }
 
+        HPX_ASSERT(matches.first != matches.second);
+
         std::list<value_type*> save_list;
 
         while (matches.first != matches.second)
@@ -942,8 +946,9 @@ struct merging_map : boost::noncopyable
         f(node->data_);
 
         // Insert and merge the baseline.
-        // TODO: Check for insertion failure?
-        merge(map_.insert(*node).first);
+        std::pair<iterator, bool> r = map_.insert(*node);
+        HPX_ASSERT(r.second);
+        merge(r.first);
 
         typename std::list<value_type*>::iterator it = save_list.begin()
                                                 , e = save_list.end();

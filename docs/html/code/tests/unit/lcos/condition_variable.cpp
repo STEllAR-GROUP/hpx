@@ -473,21 +473,10 @@ void condition_test_waits(condition_test_data* data)
     xt = boost::posix_time::second_clock::local_time()
        + boost::posix_time::milliseconds(10);
     cond_predicate pred(data->notified, 4);
-    // wait_until with a predicate might return even though the predicate is false
-    // this might happen when the timeout was triggered
-    //HPX_TEST(data->condition.wait_until(lock, xt, pred));
-    bool predicate_fullfilled = data->condition.wait_until(lock, xt, pred);
+    HPX_TEST(data->condition.wait_until(lock, xt, pred));
     HPX_TEST(lock ? true : false);
-    HPX_TEST(predicate_fullfilled ? pred() : !pred());
-    HPX_TEST(predicate_fullfilled ? data->notified == 4 : data->notified == 3);
-    if(!predicate_fullfilled)
-    {
-        while (data->notified != 4)
-            data->condition.wait(lock);
-        HPX_TEST(lock ? true : false);
-        HPX_TEST(pred());
-        HPX_TEST_EQ(data->notified, 4);
-    }
+    HPX_TEST(pred());
+    HPX_TEST_EQ(data->notified, 4);
     data->awoken++;
     data->condition.notify_one();
 
@@ -564,7 +553,7 @@ bool fake_predicate()
     return false;
 }
 
-unsigned const timeout_seconds=100;
+unsigned const timeout_milliseconds=100;
 unsigned const timeout_grace=1;
 boost::posix_time::milliseconds const timeout_resolution(10);
 
@@ -574,7 +563,7 @@ void test_wait_until_times_out()
     hpx::lcos::local::condition_variable cond;
     hpx::lcos::local::spinlock m;
 
-    boost::posix_time::milliseconds const delay(timeout_seconds);
+    boost::posix_time::milliseconds const delay(timeout_milliseconds);
     boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
     boost::system_time const start=boost::get_system_time();
     boost::system_time const timeout=start+delay;
@@ -590,7 +579,7 @@ void test_wait_until_with_predicate_times_out()
     hpx::lcos::local::condition_variable cond;
     hpx::lcos::local::spinlock m;
 
-    boost::posix_time::milliseconds const delay(timeout_seconds);
+    boost::posix_time::milliseconds const delay(timeout_milliseconds);
     boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
     boost::system_time const start=boost::get_system_time();
     boost::system_time const timeout=start+delay;
@@ -607,7 +596,7 @@ void test_relative_wait_until_with_predicate_times_out()
     hpx::lcos::local::condition_variable cond;
     hpx::lcos::local::spinlock m;
 
-    boost::posix_time::milliseconds const delay(timeout_seconds);
+    boost::posix_time::milliseconds const delay(timeout_milliseconds);
     boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
     boost::system_time const start=boost::get_system_time();
 
@@ -623,7 +612,7 @@ void test_wait_until_relative_times_out()
     hpx::lcos::local::condition_variable cond;
     hpx::lcos::local::spinlock m;
 
-    boost::posix_time::milliseconds const delay(timeout_seconds);
+    boost::posix_time::milliseconds const delay(timeout_milliseconds);
     boost::unique_lock<hpx::lcos::local::spinlock> lock(m);
     boost::system_time const start=boost::get_system_time();
 
