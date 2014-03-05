@@ -12,12 +12,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 boost::int32_t final_result;
 hpx::util::spinlock result_mutex;
+hpx::lcos::local::condition_variable result_cv;
 
 void receive_result(boost::int32_t i)
 {
     hpx::util::spinlock::scoped_lock l(result_mutex);
     if (i > final_result)
         final_result = i;
+    result_cv.notify_one();
 }
 HPX_PLAIN_ACTION(receive_result);
 
@@ -98,6 +100,12 @@ int hpx_main()
         hpx::apply<call_action>(inc, here, 1);
     }
 
+    hpx::util::spinlock::scoped_lock l(result_mutex);
+    result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
+        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(final_result), 10));
+
+    HPX_TEST_EQ(final_result, 10);
+
     return hpx::finalize();
 }
 
@@ -108,8 +116,6 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
-
-    HPX_TEST_EQ(final_result, 10);
 
     return hpx::util::report_errors();
 }

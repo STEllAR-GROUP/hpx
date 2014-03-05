@@ -11,10 +11,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::atomic<boost::int32_t> accumulator;
+hpx::lcos::local::condition_variable result_cv;
 
 void increment(boost::int32_t i)
 {
     accumulator += i;
+    result_cv.notify_one();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,6 +106,20 @@ int hpx_main()
     }
 #   endif
 
+    hpx::lcos::local::no_mutex result_mutex;
+    hpx::lcos::local::no_mutex::scoped_lock l(result_mutex);
+#   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
+    result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
+        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 15));
+
+    HPX_TEST_EQ(accumulator.load(), 15);
+#   else
+    result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
+        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(accumulator), 12));
+
+    HPX_TEST_EQ(accumulator.load(), 12);
+#   endif
+
     return hpx::finalize();
 }
 
@@ -114,12 +130,6 @@ int main(int argc, char* argv[])
     // Initialize and run HPX
     HPX_TEST_EQ_MSG(hpx::init(argc, argv), 0,
         "HPX main exited with non-zero status");
-    
-#   if !defined(BOOST_NO_CXX11_LAMBDAS) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS)
-    HPX_TEST_EQ(accumulator.load(), 15);
-#   else
-    HPX_TEST_EQ(accumulator.load(), 12);
-#   endif
 
     return hpx::util::report_errors();
 }
