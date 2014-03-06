@@ -835,8 +835,6 @@ struct merging_map : boost::noncopyable
             return;
         }
 
-        HPX_ASSERT(matches.first != matches.second);
-
         std::list<value_type*> save_list;
 
         while (matches.first != matches.second)
