@@ -803,7 +803,7 @@ struct merging_map : boost::noncopyable
     >
     void apply(
         key_type const& key
-      , F f
+      , F && f
         )
     {
         apply(key, std::forward<F>(f), &merging_map::default_data);
