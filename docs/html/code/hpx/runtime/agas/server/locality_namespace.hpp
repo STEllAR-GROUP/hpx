@@ -19,7 +19,6 @@
 #include <hpx/runtime/components/server/fixed_component_base.hpp>
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/util/insert_checked.hpp>
-#include <hpx/util/merging_map.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 #include <hpx/lcos/local/mutex.hpp>

@@ -12,12 +12,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 boost::int32_t final_result;
 hpx::util::spinlock result_mutex;
+hpx::lcos::local::condition_variable result_cv;
 
 void receive_result(boost::int32_t i)
 {
     hpx::util::spinlock::scoped_lock l(result_mutex);
     if (i > final_result)
         final_result = i;
+    result_cv.notify_one();
 }
 HPX_PLAIN_ACTION(receive_result);
 
@@ -87,7 +89,12 @@ int hpx_main()
     // finalize will synchronize will all pending operations
     int result = hpx::finalize();
 
+    hpx::util::spinlock::scoped_lock l(result_mutex);
+    result_cv.wait_for(result_mutex, boost::chrono::seconds(1),
+        hpx::util::bind(std::equal_to<boost::int32_t>(), boost::ref(final_result), 3));
+
     HPX_TEST_EQ(final_result, 3);
+
     return result;
 }
 
