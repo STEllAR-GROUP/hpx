@@ -1373,7 +1373,7 @@ namespace hpx
     /// \brief Set the error state for the LCO referenced by the given id
     ///
     /// \param id [in] this represents the id of the LCO which should
-    ///           eceive the error value.
+    ///           receive the error value.
     /// \param e  [in] this is the error value which should be sent to
     ///           the LCO.
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
