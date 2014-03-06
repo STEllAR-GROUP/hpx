@@ -61,7 +61,7 @@ namespace hpx { namespace components
 
             if (filepath.empty()) {
                 fillini += std::string("path = ") +
-                    util::find_prefix(HPX_COMPONENT_STRING) + "/lib/hpx";
+                    util::find_prefixes("/lib/hpx", HPX_COMPONENT_STRING);
             }
             else {
                 fillini += std::string("path = ") + filepath;

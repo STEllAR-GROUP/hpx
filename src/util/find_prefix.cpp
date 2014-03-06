@@ -30,6 +30,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/tokenizer.hpp>
 
 namespace hpx { namespace util
 {
@@ -62,6 +63,22 @@ namespace hpx { namespace util
         return HPX_PREFIX;
     }
 
+    std::string find_prefixes(std::string suffix, std::string library)
+    {
+        std::string prefixes = find_prefix(library);
+        typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+        boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
+        tokenizer tokens(prefixes, sep);
+        std::string result;
+        for(tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+        {
+            result += *it;
+            result += suffix;
+            result += HPX_INI_PATH_DELIMITER;
+        }
+        return result;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     std::string get_executable_prefix(char const* argv0)
     {
@@ -91,7 +108,7 @@ namespace hpx { namespace util
         char buf[PATH_MAX + 1];
         ssize_t length = ::readlink("/proc/self/exe", buf, sizeof(buf));
 
-        if (length != -1) 
+        if (length != -1)
         {
             buf[length] = '\0';
             r = buf;
@@ -113,12 +130,12 @@ namespace hpx { namespace util
                 // Get the current working directory.
 
                 // NOTE: getcwd does give you a null terminated string,
-                // while readlink (above) does not. 
+                // while readlink (above) does not.
                 if (::getcwd(buf, PATH_MAX))
                 {
                     r = buf;
                     r += '/';
-                    r += argv0_; 
+                    r += argv0_;
                     return r;
                 }
             }
@@ -137,7 +154,7 @@ namespace hpx { namespace util
                 {
                     r = path_dirs[i];
                     r += '/';
-                    r += argv0_; 
+                    r += argv0_;
 
                     // Can't use Boost.Filesystem as it doesn't let me access
                     // st_uid and st_gid.
@@ -151,7 +168,7 @@ namespace hpx { namespace util
                         if ((s.st_uid == ::geteuid()) && (s.st_mode & S_IXUSR)
                          && (s.st_gid == ::getegid()) && (s.st_mode & S_IXGRP)
                                                       && (s.st_mode & S_IXOTH))
-                            return r; 
+                            return r;
                 }
             }
         }

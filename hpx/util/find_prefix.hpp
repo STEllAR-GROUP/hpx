@@ -17,6 +17,9 @@ namespace hpx { namespace util
     // return the installation path of the specified module
     HPX_EXPORT std::string find_prefix(std::string library = "hpx");
 
+    // return a list of paths delimited by HPX_INI_PATH_DELIMITER
+    HPX_EXPORT std::string find_prefixes(std::string suffix, std::string library = "hpx");
+
     // return the full path of the current executable
     HPX_EXPORT std::string get_executable_filename(char const* argv0 = 0);
     HPX_EXPORT std::string get_executable_prefix(char const* argv0 = 0);
