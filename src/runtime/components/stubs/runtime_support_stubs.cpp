@@ -105,6 +105,11 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(id, count, act);
     }
 
+    template lcos::unique_future<naming::id_type>
+    HPX_EXPORT runtime_support::create_memory_block_async<boost::uint8_t, void>(
+        naming::id_type const& id, std::size_t count,
+        hpx::actions::manage_object_action<boost::uint8_t, void> const& act);
+
     lcos::unique_future<bool>
     runtime_support::load_components_async(naming::id_type const& gid)
     {

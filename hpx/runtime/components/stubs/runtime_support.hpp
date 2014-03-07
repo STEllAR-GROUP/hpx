@@ -78,7 +78,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
 #define HPX_RUNTIME_SUPPORT_STUB_REMOVE_REFERENCE(Z, N, D)                    \
-        typename boost::remove_reference<BOOST_PP_CAT(D, N)>::type             \
+        typename boost::remove_reference<BOOST_PP_CAT(D, N)>::type            \
 /**/
 #define HPX_RUNTIME_SUPPORT_STUB_CREATE(Z, N, D)                              \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>  \
