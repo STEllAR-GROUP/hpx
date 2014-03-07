@@ -58,7 +58,7 @@ HPX_UTIL_REGISTER_FUNCTION_DECLARATION(                                       \
   , (hpx::util::functional::detail::apply_continuation_impl<                  \
         hpx::util::detail::bound_action<                                      \
             Action                                                            \
-          , typename hpx::detail::apply_colocated_bound_tuple<                \
+          , hpx::detail::apply_colocated_bound_tuple<                         \
                 Action ::arguments_type                                       \
             >::type                                                           \
         >                                                                     \
@@ -73,7 +73,7 @@ HPX_UTIL_REGISTER_FUNCTION(                                                   \
   , (hpx::util::functional::detail::apply_continuation_impl<                  \
         hpx::util::detail::bound_action<                                      \
             action                                                            \
-          , typename hpx::detail::apply_colocated_bound_tuple<                \
+          , hpx::detail::apply_colocated_bound_tuple<                         \
                 action::arguments_type                                        \
             >::type                                                           \
         >                                                                     \
