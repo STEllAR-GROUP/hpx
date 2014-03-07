@@ -158,5 +158,9 @@ HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load32_action, 
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load64_action, load64_action)
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load128_action, load128_action)
 
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    hpx::components::server::memory::uint128_t
+  , hpx_components_memory_uint128_t
+)
 #endif
 
