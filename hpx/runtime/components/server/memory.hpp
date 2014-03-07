@@ -16,7 +16,7 @@
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
-    class memory
+    class HPX_EXPORT memory
     {
     public:
         typedef memory type_holder;
@@ -30,16 +30,28 @@ namespace hpx { namespace components { namespace server
             components::set_component_type<memory>(t);
         }
 
+        struct uint128_t
+        {
+            uint128_t(boost::uint64_t msb_ = 0, boost::uint64_t lsb_ = 0)
+              : msb(msb_), lsb(lsb_)
+            {}
+
+            boost::uint64_t msb;
+            boost::uint64_t lsb;
+
+        private:
+            friend class boost::serialization::access;
+
+            template <typename Archive>
+            void serialize(Archive& ar, const unsigned int version);
+        };
+
         // constructor
         memory()
         {}
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        ///
-        /// \param self [in] The HPX \a thread used to execute this function.
-        /// \param appl [in] The applier to be used for finalization of the
-        ///             component instance.
         void finalize() {}
 
         ///////////////////////////////////////////////////////////////////////
@@ -69,6 +81,12 @@ namespace hpx { namespace components { namespace server
             *reinterpret_cast<boost::uint64_t*>(addr) = value;
         }
 
+        /// \brief Action to store an 64 bit value to a memory location
+        void store128(boost::uint64_t addr, uint128_t const& value)
+        {
+            *reinterpret_cast<uint128_t*>(addr) = value;
+        }
+
         /// \brief Action to load an 8 bit value to a memory location
         boost::uint8_t load8(boost::uint64_t addr)
         {
@@ -93,6 +111,12 @@ namespace hpx { namespace components { namespace server
             return *reinterpret_cast<boost::uint64_t*>(addr);
         }
 
+        /// \brief Action to load an 128 bit value to a memory location
+        uint128_t load128(boost::uint64_t addr)
+        {
+            return *reinterpret_cast<uint128_t*>(addr);
+        }
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all require boilerplate code for threads,
@@ -101,11 +125,13 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(memory, store16);
         HPX_DEFINE_COMPONENT_ACTION(memory, store32);
         HPX_DEFINE_COMPONENT_ACTION(memory, store64);
+        HPX_DEFINE_COMPONENT_ACTION(memory, store128);
 
         HPX_DEFINE_COMPONENT_ACTION(memory, load8);
         HPX_DEFINE_COMPONENT_ACTION(memory, load16);
         HPX_DEFINE_COMPONENT_ACTION(memory, load32);
         HPX_DEFINE_COMPONENT_ACTION(memory, load64);
+        HPX_DEFINE_COMPONENT_ACTION(memory, load128);
 
         /// This is the default hook implementation for decorate_action which 
         /// does no hooking at all.
@@ -124,11 +150,13 @@ HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store8_action, 
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store16_action, store16_action)
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store32_action, store32_action)
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store64_action, store64_action)
+HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store128_action, store128_action)
 
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load8_action, load8_action)
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load16_action, load16_action)
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load32_action, load32_action)
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load64_action, load64_action)
+HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load128_action, load128_action)
 
 #endif
 

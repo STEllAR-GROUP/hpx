@@ -216,6 +216,7 @@ addressing_service::addressing_service(
         threads::thread_priority_normal : threads::thread_priority_critical)
   , here_()         // defer initializing this
   , rts_lva_(0)
+  , mem_lva_(0)
   , state_(starting)
   , locality_()
 { // {{{
@@ -1238,8 +1239,11 @@ bool addressing_service::resolve_locally_known_addresses(
         }
         else
         {
+            if (!mem_lva_)
+                mem_lva_ = get_runtime().get_memory_lva();
+
             addr.type_ = components::component_memory;
-            addr.address_ = lsb;
+            addr.address_ = mem_lva_;
         }
 
         return true;

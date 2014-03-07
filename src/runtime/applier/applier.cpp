@@ -455,7 +455,14 @@ namespace hpx { namespace applier
             // by convention, a zero address references the local runtime
             // support component
             if (0 == lva)
+            {
                 lva = get_runtime_support_raw_gid().get_lsb();
+            }
+            else if (comptype == components::component_memory)
+            {
+                HPX_ASSERT(naming::refers_to_virtual_memory(ids[i].get_gid()));
+                lva = get_memory_raw_gid().get_lsb();
+            }
 
 #if defined(HPX_HAVE_SECURITY)
             if (verify_capabilities_) {

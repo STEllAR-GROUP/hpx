@@ -28,9 +28,24 @@ HPX_REGISTER_ACTION(hpx::components::server::memory::store8_action, store8_actio
 HPX_REGISTER_ACTION(hpx::components::server::memory::store16_action, store16_action)
 HPX_REGISTER_ACTION(hpx::components::server::memory::store32_action, store32_action)
 HPX_REGISTER_ACTION(hpx::components::server::memory::store64_action, store64_action)
+HPX_REGISTER_ACTION(hpx::components::server::memory::store128_action, store128_action)
 
 HPX_REGISTER_ACTION(hpx::components::server::memory::load8_action, load8_action)
 HPX_REGISTER_ACTION(hpx::components::server::memory::load16_action, load16_action)
 HPX_REGISTER_ACTION(hpx::components::server::memory::load32_action, load32_action)
 HPX_REGISTER_ACTION(hpx::components::server::memory::load64_action, load64_action)
+HPX_REGISTER_ACTION(hpx::components::server::memory::load128_action, load128_action)
 
+namespace hpx { namespace components { namespace server
+{
+    template <typename Archive>
+    void memory::uint128_t::serialize(Archive& ar, const unsigned int version)
+    {
+        ar & msb & lsb;
+    }
+
+    template void memory::uint128_t::serialize<util::portable_binary_oarchive>(
+        util::portable_binary_oarchive& ar, const unsigned int version);
+    template void memory::uint128_t::serialize<util::portable_binary_iarchive>(
+        util::portable_binary_iarchive& ar, const unsigned int version);
+}}}

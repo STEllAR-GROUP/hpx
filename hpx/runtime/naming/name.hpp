@@ -77,6 +77,7 @@ namespace hpx { namespace naming
         static boost::uint64_t const is_locked_mask = 0x20000000ul; //-V112
 
         static boost::uint64_t const locality_id_mask = 0xffffffff00000000ull;
+        static boost::uint64_t const virtual_memory_mask = 0xffffffffull;
 
         static boost::uint64_t const credit_bits_mask =
             credit_mask | was_split_mask | has_credits_mask;
@@ -423,6 +424,12 @@ namespace hpx { namespace naming
     }
 
     boost::uint32_t const invalid_locality_id = ~0U;
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline bool refers_to_virtual_memory(gid_type const& gid)
+    {
+        return !(gid.get_msb() & gid_type::virtual_memory_mask);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail

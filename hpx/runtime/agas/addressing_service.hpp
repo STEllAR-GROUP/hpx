@@ -108,6 +108,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
     mutable naming::locality here_;
     boost::uint64_t rts_lva_;
+    boost::uint64_t mem_lva_;
 
     boost::shared_ptr<bootstrap_data_type> bootstrap;
     boost::shared_ptr<hosted_data_type> hosted;
