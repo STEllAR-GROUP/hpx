@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
+#include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 
 #include <utility>
@@ -118,9 +119,6 @@ namespace hpx { namespace components { namespace server
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // Each of the exposed functions needs to be encapsulated into an action
-        // type, allowing to generate all require boilerplate code for threads,
-        // serialization, etc.
         HPX_DEFINE_COMPONENT_ACTION(memory, store8);
         HPX_DEFINE_COMPONENT_ACTION(memory, store16);
         HPX_DEFINE_COMPONENT_ACTION(memory, store32);
@@ -142,10 +140,17 @@ namespace hpx { namespace components { namespace server
             return std::move(f);
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT naming::gid_type allocate(std::size_t size);
+
+    HPX_DEFINE_PLAIN_ACTION(allocate, allocate_action);
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the runtime_support actions
+HPX_REGISTER_PLAIN_ACTION_DECLARATION(hpx::components::server::allocate_action)
+
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store8_action, store8_action)
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store16_action, store16_action)
 HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store32_action, store32_action)

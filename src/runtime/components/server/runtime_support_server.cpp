@@ -20,6 +20,7 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/runtime/components/server/create_component.hpp>
 #include <hpx/runtime/components/server/memory_block.hpp>
+#include <hpx/runtime/components/server/memory.hpp>
 #include <hpx/runtime/components/stubs/runtime_support.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
 #include <hpx/runtime/components/base_lco_factory.hpp>
@@ -295,6 +296,12 @@ namespace hpx { namespace components { namespace server
                 LRT_(info) << "successfully destroyed memory block " << target;
             }
 
+            return;
+        }
+        else if (naming::refers_to_virtual_memory(gid))
+        {
+            // simply delete the memory
+            delete [] reinterpret_cast<boost::uint8_t*>(gid.get_lsb());
             return;
         }
 

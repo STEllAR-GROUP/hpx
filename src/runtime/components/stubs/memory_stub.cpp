@@ -9,6 +9,19 @@
 
 namespace hpx { namespace components { namespace stubs
 {
+    ///////////////////////////////////////////////////////////////////////////
+    hpx::unique_future<naming::id_type> memory::allocate(hpx::id_type const& id,
+        std::size_t size)
+    {
+        return hpx::async<components::server::allocate_action>(id, size);
+    }
+    naming::id_type memory::allocate_sync(hpx::id_type const& id,
+        std::size_t size, error_code& ec)
+    {
+        return allocate(id, size).get(ec);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     hpx::unique_future<void> memory::store8(hpx::id_type const& id,
         boost::uint8_t value)
     {

@@ -24,6 +24,8 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(hpx::components::server::memory,
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the runtime_support actions
+HPX_REGISTER_PLAIN_ACTION(hpx::components::server::allocate_action, allocate_action);
+
 HPX_REGISTER_ACTION(hpx::components::server::memory::store8_action, store8_action)
 HPX_REGISTER_ACTION(hpx::components::server::memory::store16_action, store16_action)
 HPX_REGISTER_ACTION(hpx::components::server::memory::store32_action, store32_action)
@@ -43,6 +45,14 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(
 
 namespace hpx { namespace components { namespace server
 {
+    naming::gid_type allocate(std::size_t size)
+    {
+        naming::gid_type gid(hpx::applier::get_applier().get_raw_locality());
+        gid.set_lsb(new boost::uint8_t[size]);
+        naming::detail::set_credit_for_gid(gid, HPX_GLOBALCREDIT_INITIAL);
+        return gid;
+    }
+
     template <typename Archive>
     void memory::uint128_t::serialize(Archive& ar, const unsigned int version)
     {

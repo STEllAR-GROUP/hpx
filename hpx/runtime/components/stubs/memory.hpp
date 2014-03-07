@@ -17,6 +17,12 @@ namespace hpx { namespace components { namespace stubs
     struct HPX_EXPORT memory
     {
         ///////////////////////////////////////////////////////////////////////
+        static hpx::unique_future<naming::id_type> allocate(
+            hpx::id_type const& id, std::size_t size);
+        static naming::id_type allocate_sync(hpx::id_type const& id,
+            std::size_t size, error_code& ec = throws);
+
+        ///////////////////////////////////////////////////////////////////////
         static hpx::unique_future<void> store8(hpx::id_type const& id,
             boost::uint8_t value);
         static void store8_sync(hpx::id_type const& id, boost::uint8_t value,
