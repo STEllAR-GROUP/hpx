@@ -53,7 +53,7 @@ namespace hpx { namespace util
           , alloc_(alloc)
         {}
 
-        serialize_buffer (T* data, std::size_t size, init_mode mode = copy,
+        serialize_buffer (T const* data, std::size_t size, init_mode mode = copy,
                 allocator_type const& alloc = Allocator())
           : data_()
           , size_(size)
@@ -66,7 +66,8 @@ namespace hpx { namespace util
                 std::copy(data, data + size, data_.get());
             }
             else {
-                data_ = boost::shared_array<T>(data, &serialize_buffer::no_deleter);
+                data_ = boost::shared_array<T>(const_cast<T*>(data),
+                    &serialize_buffer::no_deleter);
             }
         }
 
@@ -175,7 +176,7 @@ namespace hpx { namespace util
           : size_(0)
         {}
 
-        serialize_buffer (T* data, std::size_t size, init_mode mode = copy)
+        serialize_buffer (T const* data, std::size_t size, init_mode mode = copy)
           : data_(), size_(size)
         {
             if (mode == copy) {
@@ -183,7 +184,8 @@ namespace hpx { namespace util
                 std::copy(data, data + size, data_.get());
             }
             else {
-                data_ = boost::shared_array<T>(data, &serialize_buffer::no_deleter);
+                data_ = boost::shared_array<T>(const_cast<T*>(data),
+                    &serialize_buffer::no_deleter);
             }
         }
 

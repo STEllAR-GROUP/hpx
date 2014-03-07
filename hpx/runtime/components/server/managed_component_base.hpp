@@ -554,7 +554,7 @@ namespace hpx { namespace components
 
         /// \brief  The function \a create is used for allocation and
         //          initialization of arrays of wrappers.
-        static value_type* create(std::size_t count)
+        static value_type* create(std::size_t count = 1)
         {
             // allocate the memory
             void* p = heap_type::alloc(count);
