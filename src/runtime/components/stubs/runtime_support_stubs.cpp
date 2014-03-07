@@ -384,3 +384,9 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<action_type>(gid, l);
     }
 }}}
+
+HPX_REGISTER_APPLY_COLOCATED(
+    hpx::components::server::runtime_support::update_agas_cache_entry_action
+  , hpx_apply_colocated_update_agas_cache_entry_action
+)
+

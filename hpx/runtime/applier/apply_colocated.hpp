@@ -24,6 +24,64 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/repetition/enum_binary_params.hpp>
 
+namespace hpx { namespace detail {
+    template <typename Tuple>
+    struct apply_colocated_bound_tuple;
+
+    template <
+        BOOST_PP_ENUM_PARAMS(
+            HPX_TUPLE_LIMIT
+          , typename T
+        )
+    >
+    struct apply_colocated_bound_tuple<
+        util::tuple<
+            BOOST_PP_ENUM_PARAMS(HPX_TUPLE_LIMIT, T)
+        >
+    >
+    {
+        typedef
+            util::tuple<
+                hpx::util::detail::bound<
+                    hpx::util::functional::extract_locality
+                  , hpx::util::tuple<hpx::util::detail::placeholder<2ul> >
+                >
+              , BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(HPX_TUPLE_LIMIT), T)
+            >
+            type;
+    };
+}}
+
+#define HPX_REGISTER_APPLY_COLOCATED_DECLARATION(Action, Name)                \
+HPX_UTIL_REGISTER_FUNCTION_DECLARATION(                                       \
+    void (hpx::naming::id_type, hpx::agas::response)                          \
+  , (hpx::util::functional::detail::apply_continuation_impl<                  \
+        hpx::util::detail::bound_action<                                      \
+            Action                                                            \
+          , typename hpx::detail::apply_colocated_bound_tuple<                \
+                Action ::arguments_type                                       \
+            >::type                                                           \
+        >                                                                     \
+    >)                                                                        \
+  , Name                                                                      \
+);                                                                            \
+/**/
+
+#define HPX_REGISTER_APPLY_COLOCATED(action, name)                            \
+HPX_UTIL_REGISTER_FUNCTION(                                                   \
+    void (hpx::naming::id_type, hpx::agas::response)                          \
+  , (hpx::util::functional::detail::apply_continuation_impl<                  \
+        hpx::util::detail::bound_action<                                      \
+            action                                                            \
+          , typename hpx::detail::apply_colocated_bound_tuple<                \
+                action::arguments_type                                        \
+            >::type                                                           \
+        >                                                                     \
+    >)                                                                        \
+  , name                                                                      \
+);                                                                            \
+/**/
+
 #if !defined(HPX_USE_PREPROCESSOR_LIMIT_EXPANSION)
 #  include <hpx/runtime/applier/preprocessed/apply_colocated.hpp>
 #else

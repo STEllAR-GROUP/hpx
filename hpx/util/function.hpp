@@ -17,6 +17,7 @@
 #include <hpx/util/detail/vtable.hpp>
 #include <hpx/util/detail/get_empty_table.hpp>
 #include <hpx/util/detail/empty_vtable.hpp>
+#include <hpx/util/detail/pp_strip_parens.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <boost/preprocessor/cat.hpp>
@@ -42,9 +43,9 @@
                 Sig                                                           \
               , portable_binary_iarchive                                      \
               , portable_binary_oarchive                                      \
-              , vtable<sizeof(util::decay<Functor>::type) <=                  \
+              , vtable<sizeof(util::decay<HPX_UTIL_STRIP(Functor)>::type) <=  \
                        sizeof(void *)>::type<                                 \
-                    util::decay<Functor>::type                                \
+                    util::decay<HPX_UTIL_STRIP(Functor)>::type                \
                   , Sig                                                       \
                   , portable_binary_iarchive                                  \
                   , portable_binary_oarchive                                  \

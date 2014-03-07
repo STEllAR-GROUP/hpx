@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/server/runtime_support.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/runtime/applier/apply_colocated.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/async.hpp>
 
@@ -319,5 +320,46 @@ namespace hpx { namespace components { namespace stubs
             naming::locality const& l);
     };
 }}}
+/*
+hpx::util::detail::get_function_name_impl<
+    hpx::util::detail::vtable_ptr<
+        void ()(hpx::naming::id_type, hpx::agas::response)
+      , hpx::util::portable_binary_iarchive
+      , hpx::util::portable_binary_oarchive
+      , hpx::util::detail::vtable<false>::type<
+            hpx::util::functional::detail::apply_continuation_impl<
+                hpx::util::detail::bound_action<
+                    hpx::actions::action4<
+                        void (hpx::components::server::runtime_support::*)(hpx::naming::gid_type const&, hpx::naming::address const&, unsigned long, unsigned long)
+                      , &(hpx::components::server::runtime_support::update_agas_cache_entry(hpx::naming::gid_type const&, hpx::naming::address const&, unsigned long, unsigned long))
+                      , hpx::actions::detail::this_type
+                    >
+                  , hpx::util::tuple<
+                        hpx::util::detail::bound<
+                            hpx::util::functional::extract_locality
+                          , hpx::util::tuple<hpx::util::detail::placeholder<2ul>, void, void, void, void, void, void, void>
+                        >
+                      , hpx::naming::gid_type
+                      , hpx::naming::address
+                      , unsigned long
+                      , unsigned long
+                      , void
+                      , void
+                      , void
+                    >
+                >
+            >
+          , void ()(hpx::naming::id_type, hpx::agas::response)
+          , hpx::util::portable_binary_iarchive
+          , hpx::util::portable_binary_oarchive
+        >
+    >
+>
+*/
+
+HPX_REGISTER_APPLY_COLOCATED_DECLARATION(
+    hpx::components::server::runtime_support::update_agas_cache_entry_action
+  , hpx_apply_colocated_update_agas_cache_entry_action
+)
 
 #endif
