@@ -63,7 +63,8 @@ namespace hpx { namespace util
                 using util::placeholders::_1;
                 data_.reset(alloc_.allocate(size),
                     util::bind(&serialize_buffer::deleter, _1, alloc_, size_));
-                std::copy(data, data + size, data_.get());
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
             }
             else {
                 data_ = boost::shared_array<T>(const_cast<T*>(data),
@@ -104,8 +105,11 @@ namespace hpx { namespace util
         template <typename Archive>
         void save_optimized(Archive& ar, const unsigned int version, boost::mpl::true_) const
         {
-            boost::serialization::array<T> arr(data_.get(), size_);
-            ar.save_array(arr, version);
+            if (size_ != 0)
+            {
+                boost::serialization::array<T> arr(data_.get(), size_);
+                ar.save_array(arr, version);
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -138,8 +142,11 @@ namespace hpx { namespace util
         template <typename Archive>
         void load_optimized(Archive& ar, const unsigned int version, boost::mpl::true_)
         {
-            boost::serialization::array<T> arr(data_.get(), size_);
-            ar.load_array(arr, version);
+            if (size_ != 0)
+            {
+                boost::serialization::array<T> arr(data_.get(), size_);
+                ar.load_array(arr, version);
+            }
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -181,7 +188,8 @@ namespace hpx { namespace util
         {
             if (mode == copy) {
                 data_.reset(new T[size]);
-                std::copy(data, data + size, data_.get());
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
             }
             else {
                 data_ = boost::shared_array<T>(const_cast<T*>(data),
@@ -222,8 +230,11 @@ namespace hpx { namespace util
         template <typename Archive>
         void save_optimized(Archive& ar, const unsigned int version, boost::mpl::true_) const
         {
-            boost::serialization::array<T> arr(data_.get(), size_);
-            ar.save_array(arr, version);
+            if (size_ != 0)
+            {
+                boost::serialization::array<T> arr(data_.get(), size_);
+                ar.save_array(arr, version);
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -253,8 +264,11 @@ namespace hpx { namespace util
         template <typename Archive>
         void load_optimized(Archive& ar, const unsigned int version, boost::mpl::true_)
         {
-            boost::serialization::array<T> arr(data_.get(), size_);
-            ar.load_array(arr, version);
+            if (size_ != 0)
+            {
+                boost::serialization::array<T> arr(data_.get(), size_);
+                ar.load_array(arr, version);
+            }
         }
 
         BOOST_SERIALIZATION_SPLIT_MEMBER()
