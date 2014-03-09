@@ -63,8 +63,6 @@ namespace hpx
 
     //////////////////////////////////////////////////////////////////////////
     // handling special case of triggering an LCO
-    HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id);
-
     template <typename T>
     void set_lco_value(naming::id_type const& id, T && t)
     {

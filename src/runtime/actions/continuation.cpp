@@ -18,6 +18,12 @@ namespace hpx
         apply(set, id);
     }
 
+    void trigger_lco_event(naming::id_type const& id, naming::id_type const& cont)
+    {
+        lcos::base_lco::set_event_action set;
+        apply_c(set, cont, id);
+    }
+
     void set_lco_error(naming::id_type const& id, boost::exception_ptr const& e)
     {
         lcos::base_lco::set_exception_action set;
@@ -29,6 +35,20 @@ namespace hpx
     {
         lcos::base_lco::set_exception_action set;
         apply(set, id, std::move(e));
+    }
+
+    void set_lco_error(naming::id_type const& id, boost::exception_ptr const& e,
+        naming::id_type const& cont)
+    {
+        lcos::base_lco::set_exception_action set;
+        apply_c(set, cont, id, e);
+    }
+
+    void set_lco_error(naming::id_type const& id, //-V659
+        boost::exception_ptr && e, naming::id_type const& cont)
+    {
+        lcos::base_lco::set_exception_action set;
+        apply_c(set, cont, id, std::move(e));
     }
 }
 
