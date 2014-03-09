@@ -6,6 +6,14 @@
 #if !defined(HPX_RUNTIME_APPLIER_REGISTER_APPLY_COLOCATED_MAR_09_2014_1214PM)
 #define HPX_RUNTIME_APPLIER_REGISTER_APPLY_COLOCATED_MAR_09_2014_1214PM
 
+#include <hpx/hpx_fwd.hpp>
+#include <hpx/runtime/agas/request.hpp>
+#include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/tuple.hpp>
+#include <hpx/util/functional/colocated_helpers.hpp>
+
+#include <boost/preprocessor/repetition/enum_params.hpp>
+
 namespace hpx { namespace detail
 {
     template <typename Tuple>
