@@ -74,6 +74,16 @@ namespace hpx
         apply(set, id, util::detail::decay_copy(std::forward<T>(t)));
     }
 
+    template <typename T>
+    void set_lco_value(naming::id_type const& id, T && t,
+        naming::id_type const& cont)
+    {
+        typename lcos::base_lco_with_value<
+            typename boost::remove_reference<T>::type
+        >::set_value_action set;
+        apply_c(set, cont, id, util::detail::decay_copy(std::forward<T>(t)));
+    }
+
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
         boost::exception_ptr const& e);
 }

@@ -52,7 +52,8 @@
 namespace hpx
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action
+    template <
+        typename Action
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
       , typename F>
     typename boost::enable_if_c<
@@ -60,7 +61,8 @@ namespace hpx
         bool
     >::type
     apply_continue(naming::id_type const& gid
-      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg), F && f)
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+      , F && f)
     {
         typedef typename hpx::actions::extract_action<Action>::type action_type;
         typedef typename action_type::result_type result_type;
@@ -72,10 +74,13 @@ namespace hpx
           BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Result, typename Arguments,
-        typename Derived
-      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg), typename F>
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)
+      , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N,
         bool
@@ -83,7 +88,8 @@ namespace hpx
     apply_continue(
         hpx::actions::action<
             Component, Result, Arguments, Derived
-        > /*act*/, naming::id_type const& gid
+        > /*act*/
+      , naming::id_type const& gid
       BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
       , F && f)
     {
@@ -91,6 +97,53 @@ namespace hpx
             gid
           BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
           , std::forward<F>(f));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <
+        typename Action
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    typename boost::enable_if_c<
+        util::tuple_size<typename Action::arguments_type>::value == N,
+        bool
+    >::type
+    apply_continue(
+        naming::id_type const& gid
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+      , naming::id_type const& cont)
+    {
+        typedef typename hpx::actions::extract_action<Action>::type action_type;
+        typedef typename action_type::result_type result_type;
+
+        return apply<Action>(
+            new hpx::actions::typed_continuation<result_type>(
+                cont, make_continuation())
+          , gid
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg));
+    }
+
+    template <
+        typename Component
+      , typename Result
+      , typename Arguments
+      , typename Derived
+      BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
+    typename boost::enable_if_c<
+        util::tuple_size<Arguments>::value == N,
+        bool
+    >::type
+    apply_continue(
+        hpx::actions::action<
+            Component, Result, Arguments, Derived
+        > /*act*/
+      , naming::id_type const& gid
+      BOOST_PP_COMMA_IF(N) HPX_ENUM_FWD_ARGS(N, Arg, arg)
+      , naming::id_type const& cont)
+    {
+        return apply_continue<Derived>(
+            gid
+          BOOST_PP_COMMA_IF(N) HPX_ENUM_FORWARD_ARGS(N, Arg, arg)
+          , cont);
     }
 }
 

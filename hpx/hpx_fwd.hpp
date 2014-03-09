@@ -1358,23 +1358,33 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Trigger the LCO referenced by the given id
     ///
-    /// \param id [in] this represents the id of the LCO which should be
+    /// \param id [in] This represents the id of the LCO which should be
     ///           triggered.
     HPX_API_EXPORT void trigger_lco_event(naming::id_type const& id);
 
     /// \brief Set the result value for the LCO referenced by the given id
     ///
-    /// \param id [in] this represents the id of the LCO which should
+    /// \param id [in] This represents the id of the LCO which should
     ///           receive the given value.
-    /// \param t  [in] this is the value which should be sent to the LCO.
+    /// \param t  [in] This is the value which should be sent to the LCO.
     template <typename T>
     void set_lco_value(naming::id_type const& id, T && t);
 
+    /// \brief Set the result value for the LCO referenced by the given id
+    ///
+    /// \param id   [in] This represents the id of the LCO which should
+    ///             receive the given value.
+    /// \param t    [in] This is the value which should be sent to the LCO.
+    /// \param cont [in] This represents the LCO to trigger after completion.
+    template <typename T>
+    void set_lco_value(naming::id_type const& id, T && t,
+        naming::id_type const& cont);
+
     /// \brief Set the error state for the LCO referenced by the given id
     ///
-    /// \param id [in] this represents the id of the LCO which should
+    /// \param id [in] This represents the id of the LCO which should
     ///           receive the error value.
-    /// \param e  [in] this is the error value which should be sent to
+    /// \param e  [in] This is the error value which should be sent to
     ///           the LCO.
     HPX_API_EXPORT void set_lco_error(naming::id_type const& id,
         boost::exception_ptr const& e);
