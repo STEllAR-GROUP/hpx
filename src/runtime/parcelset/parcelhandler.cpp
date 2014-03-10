@@ -216,7 +216,7 @@ namespace hpx { namespace parcelset
                 "enable_security = ${HPX_PARCEL_" + name_uc +
                     "_ENABLE_SECURITY:"
                     "$[hpx.parcel.enable_security]}",
-                "async_serialiazation = ${HPX_PARCEL_" + name_uc +
+                "async_serialization = ${HPX_PARCEL_" + name_uc +
                     "_ASYNC_SERIALIZATION:"
                     "$[hpx.parcel.async_serialization]}"
                 ;
