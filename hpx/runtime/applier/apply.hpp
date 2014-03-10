@@ -17,6 +17,7 @@
 #include <hpx/runtime/applier/apply_helper.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
+#include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/util/remove_local_destinations.hpp>
 
 #include <boost/dynamic_bitset.hpp>

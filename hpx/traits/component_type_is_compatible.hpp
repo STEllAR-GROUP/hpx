@@ -7,6 +7,7 @@
 #define HPX_TRAITS_COMPONENT_TYPES_COMPATIBLE_MAR_10_2014_1131AM
 
 #include <hpx/traits.hpp>
+#include <hpx/runtime/components/component_type.hpp>
 
 namespace hpx { namespace traits
 {
