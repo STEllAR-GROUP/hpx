@@ -77,12 +77,14 @@ namespace hpx { namespace util
             // create default installation location and logging settings
             "[hpx]",
             "location = ${HPX_LOCATION:$[system.prefix]}",
-            "component_path = $[hpx.location]/lib/hpx"
-                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/lib/hpx"
-                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/../lib/hpx",
-            "master_ini_path = $[hpx.location]/share/" HPX_BASE_DIR_NAME
-                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/share/" HPX_BASE_DIR_NAME
-                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]/../share/" HPX_BASE_DIR_NAME,
+            "component_path = $[hpx.location]"
+                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]"
+                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]",
+            "component_path_suffixes = /lib/hpx" HPX_INI_PATH_DELIMITER "/../lib/hpx",
+            "master_ini_path = $[hpx.location]" HPX_BASE_DIR_NAME
+                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]" HPX_BASE_DIR_NAME
+                HPX_INI_PATH_DELIMITER "$[system.executable_prefix]" HPX_BASE_DIR_NAME,
+            "master_ini_path_suffixes = /share/" HPX_INI_PATH_DELIMITER "/../share/",
 #if HPX_HAVE_ITTNOTIFY != 0
             "use_itt_notify = ${HPX_HAVE_ITTNOTIFY:0}",
 #endif
@@ -241,6 +243,9 @@ namespace hpx { namespace util
         std::string component_path(
             get_entry("hpx.component_path", HPX_DEFAULT_COMPONENT_PATH));
 
+        std::string component_path_suffixes(
+            get_entry("hpx.component_path_suffixes", "/lib/hpx"));
+
         // protect against duplicate paths
         std::set<std::string> component_paths;
 
@@ -248,26 +253,34 @@ namespace hpx { namespace util
         std::map<std::string, fs::path> basenames;
 
         boost::char_separator<char> sep (HPX_INI_PATH_DELIMITER);
-        tokenizer_type tok(component_path, sep);
-        tokenizer_type::iterator end = tok.end();
-        for (tokenizer_type::iterator it = tok.begin(); it != end; ++it)
+        tokenizer_type tok_path(component_path, sep);
+        tokenizer_type tok_suffixes(component_path_suffixes, sep);
+        tokenizer_type::iterator end_path = tok_path.end();
+        tokenizer_type::iterator end_suffixes = tok_suffixes.end();
+        for (tokenizer_type::iterator it = tok_path.begin(); it != end_path; ++it)
         {
-            if (!(*it).empty()) {
-                fs::path this_p(*it);
-                boost::system::error_code fsec;
-                fs::path canonical_p = util::canonical_path(this_p, fsec);
-                if (fsec)
-                    canonical_p = this_p;
-
-                std::pair<std::set<std::string>::iterator, bool> p =
-                    component_paths.insert(
-                        util::native_file_string(canonical_p));
-                if (p.second) {
-                    // have all path elements, now find ini files in there...
-                    fs::path this_path (hpx::util::create_path(*p.first));
-                    if (fs::exists(this_path)) {
-                        util::init_ini_data_default(
-                            this_path.string(), *this, basenames, modules);
+            std::string path = *it;
+            for(tokenizer_type::iterator jt = tok_suffixes.begin(); jt != end_suffixes; ++jt)
+            {
+                path += *jt;
+                
+                if (!path.empty()) {
+                    fs::path this_p(path);
+                    boost::system::error_code fsec;
+                    fs::path canonical_p = util::canonical_path(this_p, fsec);
+                    if (fsec)
+                        canonical_p = this_p;
+                    
+                    std::pair<std::set<std::string>::iterator, bool> p =
+                        component_paths.insert(
+                            util::native_file_string(canonical_p));
+                    if (p.second) {
+                        // have all path elements, now find ini files in there...
+                        fs::path this_path (hpx::util::create_path(*p.first));
+                        if (fs::exists(this_path)) {
+                            util::init_ini_data_default(
+                                this_path.string(), *this, basenames, modules);
+                        }
                     }
                 }
             }

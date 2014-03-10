@@ -78,21 +78,28 @@ namespace hpx { namespace util
 
         // fall back: use compile time prefix
         std::string ini_paths(ini.get_entry("hpx.master_ini_path"));
+        std::string ini_paths_suffixes(ini.get_entry("hpx.master_ini_path_suffixes"));
 
         // split off the separate paths from the given path list
         typedef boost::tokenizer<boost::char_separator<char> > tokenizer_type;
 
         boost::char_separator<char> sep (HPX_INI_PATH_DELIMITER);
-        tokenizer_type tok(ini_paths, sep);
-        tokenizer_type::iterator end = tok.end();
+        tokenizer_type tok_paths(ini_paths, sep);
+        tokenizer_type::iterator end_paths = tok_paths.end();
+        tokenizer_type tok_suffixes(ini_paths_suffixes, sep);
+        tokenizer_type::iterator end_suffixes = tok_suffixes.end();
 
         bool result = false;
-        for (tokenizer_type::iterator it = tok.begin (); it != end; ++it) {
-            bool result2 = handle_ini_file (ini, *it + "/hpx.ini");
-            if (result2) {
-                LBT_(info) << "loaded configuration: " << *it << "/hpx.ini";
+        for (tokenizer_type::iterator it = tok_paths.begin (); it != end_paths; ++it) {
+            std::string path = *it;
+            for (tokenizer_type::iterator jt = tok_suffixes.begin (); jt != end_suffixes; ++jt) {
+                path += *jt;
+                bool result2 = handle_ini_file (ini, path + "/hpx.ini");
+                if (result2) {
+                    LBT_(info) << "loaded configuration: " << path << "/hpx.ini";
+                }
+                result = result2 || result;
             }
-            result = result2 || result;
         }
 
         // look in the current directory first
