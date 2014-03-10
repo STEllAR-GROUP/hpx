@@ -72,8 +72,8 @@ namespace hpx { namespace util
     bool mpi_environment::has_called_init_ = false;
     int mpi_environment::provided_threading_flag_ = MPI_THREAD_SINGLE;
 
-    std::size_t mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg,
-        std::size_t /*node*/)
+    void mpi_environment::init(int *argc, char ***argv, command_line_handling& cfg,
+        std::size_t & node)
     {
         using namespace boost::assign;
 
@@ -82,7 +82,10 @@ namespace hpx { namespace util
 
         // We assume to use the MPI parcelport if it is not explicitly disabled
         enabled_ = detail::get_cfg_entry(cfg, "hpx.parcel.mpi.enable", 1) != 0;
-        if (!enabled_) return std::size_t(this_rank);
+        if (!enabled_)
+        {
+            return;
+        }
 
         // We disable the MPI parcelport if the application is not run using
         // mpirun and the tcp/ip parcelport is not explicitly disabled
@@ -97,7 +100,7 @@ namespace hpx { namespace util
             cfg.rtcfg_.add_entry("hpx.parcel.mpi.enable", "0");
 
             enabled_ = false;
-            return std::size_t(this_rank);
+            return;
         }
 
         cfg.ini_config_ += "hpx.parcel.bootstrap!=mpi";
@@ -162,7 +165,7 @@ namespace hpx { namespace util
         cfg.ini_config_ += std::string("hpx.parcel.mpi.processorname!=") +
             get_processor_name();
 
-        return std::size_t(this_rank);
+        node = std::size_t(this_rank);
     }
 
     std::string mpi_environment::get_processor_name()

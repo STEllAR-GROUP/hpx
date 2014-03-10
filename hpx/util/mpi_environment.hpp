@@ -18,8 +18,8 @@ namespace hpx { namespace util
 
     struct HPX_EXPORT mpi_environment
     {
-        static std::size_t init(int *argc, char ***argv, command_line_handling& cfg,
-            std::size_t node);
+        static void init(int *argc, char ***argv, command_line_handling& cfg,
+            std::size_t & node);
         static void finalize();
 
         static bool enabled();

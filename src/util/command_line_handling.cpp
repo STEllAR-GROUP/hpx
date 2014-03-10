@@ -806,8 +806,7 @@ namespace hpx { namespace util
         // Re-run program option analysis, ini settings (such as aliases)
         // will be considered now.
 
-        node = static_cast<std::size_t>(
-            util::mpi_environment::init(&argc, &argv, *this, node));
+        util::mpi_environment::init(&argc, &argv, *this, node);
 
         // minimally assume one locality and this is the console
         if (node == std::size_t(-1))
