@@ -17,6 +17,7 @@
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
+#include <boost/asio/placeholders.hpp>
 #include <boost/assign/std/vector.hpp>
 #include <boost/shared_ptr.hpp>
 
