@@ -81,8 +81,7 @@ namespace hpx
                 return boost::shared_ptr<Component>();
             }
 
-            if (!components::types_are_compatible(addr.type_,
-                    components::get_component_type<Component>()))
+            if (!traits::component_type_is_compatible<Component>::call(addr))
             {
                 HPX_THROW_EXCEPTION(bad_component_type,
                     "hpx::get_ptr_postproc<Component, Deleter>",

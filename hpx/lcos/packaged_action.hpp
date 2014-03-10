@@ -17,6 +17,7 @@
 #include <hpx/runtime/applier/apply_callback.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/util/block_profiler.hpp>
+#include <hpx/traits/component_type_is_compatible.hpp>
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/identity.hpp>
@@ -233,9 +234,8 @@ namespace hpx { namespace lcos
             naming::address addr;
             if (agas::is_local_address_cached(gid, addr)) {
                 // local, direct execution
-                HPX_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<
-                        typename action_type::component_type>()));
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
 
                 (*this->impl_)->set_data(
                     std::move(action_type::execute_function(addr.address_,
@@ -258,9 +258,8 @@ namespace hpx { namespace lcos
             // Determine whether the gid is local or remote
             if (addr.locality_ == hpx::get_locality()) {
                 // local, direct execution
-                HPX_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<
-                        typename action_type::component_type>()));
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
 
                 (*this->impl_)->set_data(
                     std::move(action_type::execute_function(addr.address_,

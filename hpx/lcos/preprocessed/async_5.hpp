@@ -33,9 +33,8 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0)
             {
-                HPX_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<
-                        typename Action::component_type>()));
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
                 return Action::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 )));
             }
@@ -135,9 +134,8 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1)
             {
-                HPX_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<
-                        typename Action::component_type>()));
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
                 return Action::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 )));
             }
@@ -237,9 +235,8 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
             {
-                HPX_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<
-                        typename Action::component_type>()));
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
                 return Action::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 )));
             }
@@ -339,9 +336,8 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
             {
-                HPX_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<
-                        typename Action::component_type>()));
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
                 return Action::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 )));
             }
@@ -441,9 +437,8 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
             {
-                HPX_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<
-                        typename Action::component_type>()));
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
                 return Action::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 )));
             }

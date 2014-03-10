@@ -156,9 +156,8 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type_;
 
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type_::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type_::component_type>::call(addr));
 
             util::tuple<> env;
             apply_helper<action_type_>::call(target, addr.address_, priority, env);
@@ -336,9 +335,8 @@ namespace hpx
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type_;
 
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type_::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type_::component_type>::call(addr));
 
             actions::continuation_type cont(c);
             util::tuple<> env;

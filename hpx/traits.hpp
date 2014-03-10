@@ -21,7 +21,13 @@ namespace hpx { namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
+    struct is_component;
+
+    template <typename Component, typename Enable = void>
     struct component_type_database;
+
+    template <typename Component, typename Enable = void>
+    struct component_type_is_compatible;
 
     ///////////////////////////////////////////////////////////////////////////
     // control the way managed_components are constructed
@@ -97,9 +103,6 @@ namespace hpx { namespace traits
     struct is_future_tuple;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Enable = void>
-    struct is_component;
-
     template <typename Plugin, typename Enable = void>
     struct component_config_data;
 

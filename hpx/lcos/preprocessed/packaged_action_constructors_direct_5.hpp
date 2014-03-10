@@ -16,9 +16,8 @@
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
             
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ))))
@@ -40,9 +39,8 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ))))
@@ -77,9 +75,8 @@
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
             
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))))
@@ -101,9 +98,8 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ))))
@@ -138,9 +134,8 @@
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
             
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))))
@@ -162,9 +157,8 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ))))
@@ -199,9 +193,8 @@
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
             
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))))
@@ -223,9 +216,8 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ))))
@@ -260,9 +252,8 @@
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
             
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))))
@@ -284,9 +275,8 @@
         util::block_profiler_wrapper<profiler_tag> bp(apply_logger_);
         if (addr.locality_ == hpx::get_locality()) {
             
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
                     util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ))))

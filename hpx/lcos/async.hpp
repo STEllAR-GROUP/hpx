@@ -10,7 +10,7 @@
 #define HPX_LCOS_ASYNC_SEP_28_2011_0840AM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/traits.hpp>
+#include <hpx/traits/component_type_is_compatible.hpp>
 #include <hpx/runtime/actions/action_support.hpp>
 #include <hpx/lcos/packaged_action.hpp>
 #include <hpx/lcos/future.hpp>
@@ -51,10 +51,8 @@ namespace hpx
             BOOST_FORCEINLINE static lcos::unique_future<R> call(
                 naming::id_type const& /*gid*/, naming::address const& addr)
             {
-                HPX_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<
-                        typename Action::component_type>()));
-
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
                 return Action::execute_function(addr.address_,
                     util::forward_as_tuple());
             }
@@ -189,10 +187,8 @@ namespace hpx
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, HPX_ENUM_FWD_ARGS(N, Arg, arg))
             {
-                HPX_ASSERT(components::types_are_compatible(addr.type_,
-                    components::get_component_type<
-                        typename Action::component_type>()));
-
+                HPX_ASSERT(traits::component_type_is_compatible<
+                    typename Action::component_type>::call(addr));
                 return Action::execute_function(addr.address_,
                     util::forward_as_tuple(HPX_ENUM_FORWARD_ARGS(N, Arg, arg)));
             }

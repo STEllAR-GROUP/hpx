@@ -43,9 +43,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 )));
             return true; 
@@ -57,9 +56,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0)));
             return true; 
@@ -151,9 +149,8 @@ namespace hpx
             Arg0 && arg0)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -323,9 +320,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 )));
             return true; 
@@ -337,9 +333,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1)));
             return true; 
@@ -431,9 +426,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -603,9 +597,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 )));
             return true; 
@@ -617,9 +610,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2)));
             return true; 
@@ -711,9 +703,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -883,9 +874,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 )));
             return true; 
@@ -897,9 +887,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3)));
             return true; 
@@ -991,9 +980,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -1163,9 +1151,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 )));
             return true; 
@@ -1177,9 +1164,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4)));
             return true; 
@@ -1271,9 +1257,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -1443,9 +1428,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 )));
             return true; 
@@ -1457,9 +1441,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5)));
             return true; 
@@ -1551,9 +1534,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -1723,9 +1705,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 )));
             return true; 
@@ -1737,9 +1718,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6)));
             return true; 
@@ -1831,9 +1811,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -2003,9 +1982,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 )));
             return true; 
@@ -2017,9 +1995,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7)));
             return true; 
@@ -2111,9 +2088,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -2283,9 +2259,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 )));
             return true; 
@@ -2297,9 +2272,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8)));
             return true; 
@@ -2391,9 +2365,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -2563,9 +2536,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 )));
             return true; 
@@ -2577,9 +2549,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9)));
             return true; 
@@ -2671,9 +2642,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -2843,9 +2813,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 )));
             return true; 
@@ -2857,9 +2826,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9 , Arg10 arg10)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9) , std::move(arg10)));
             return true; 
@@ -2951,9 +2919,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -3123,9 +3090,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 )));
             return true; 
@@ -3137,9 +3103,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9 , Arg10 arg10 , Arg11 arg11)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9) , std::move(arg10) , std::move(arg11)));
             return true; 
@@ -3231,9 +3196,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -3403,9 +3367,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 )));
             return true; 
@@ -3417,9 +3380,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9 , Arg10 arg10 , Arg11 arg11 , Arg12 arg12)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9) , std::move(arg10) , std::move(arg11) , std::move(arg12)));
             return true; 
@@ -3511,9 +3473,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -3683,9 +3644,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 )));
             return true; 
@@ -3697,9 +3657,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9 , Arg10 arg10 , Arg11 arg11 , Arg12 arg12 , Arg13 arg13)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9) , std::move(arg10) , std::move(arg11) , std::move(arg12) , std::move(arg13)));
             return true; 
@@ -3791,9 +3750,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -3963,9 +3921,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 )));
             return true; 
@@ -3977,9 +3934,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9 , Arg10 arg10 , Arg11 arg11 , Arg12 arg12 , Arg13 arg13 , Arg14 arg14)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9) , std::move(arg10) , std::move(arg11) , std::move(arg12) , std::move(arg13) , std::move(arg14)));
             return true; 
@@ -4071,9 +4027,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -4243,9 +4198,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 )));
             return true; 
@@ -4257,9 +4211,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9 , Arg10 arg10 , Arg11 arg11 , Arg12 arg12 , Arg13 arg13 , Arg14 arg14 , Arg15 arg15)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9) , std::move(arg10) , std::move(arg11) , std::move(arg12) , std::move(arg13) , std::move(arg14) , std::move(arg15)));
             return true; 
@@ -4351,9 +4304,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -4523,9 +4475,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 )));
             return true; 
@@ -4537,9 +4488,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9 , Arg10 arg10 , Arg11 arg11 , Arg12 arg12 , Arg13 arg13 , Arg14 arg14 , Arg15 arg15 , Arg16 arg16)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9) , std::move(arg10) , std::move(arg11) , std::move(arg12) , std::move(arg13) , std::move(arg14) , std::move(arg15) , std::move(arg16)));
             return true; 
@@ -4631,9 +4581,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -4803,9 +4752,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 )));
             return true; 
@@ -4817,9 +4765,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9 , Arg10 arg10 , Arg11 arg11 , Arg12 arg12 , Arg13 arg13 , Arg14 arg14 , Arg15 arg15 , Arg16 arg16 , Arg17 arg17)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9) , std::move(arg10) , std::move(arg11) , std::move(arg12) , std::move(arg13) , std::move(arg14) , std::move(arg15) , std::move(arg16) , std::move(arg17)));
             return true; 
@@ -4911,9 +4858,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -5083,9 +5029,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 )));
             return true; 
@@ -5097,9 +5042,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9 , Arg10 arg10 , Arg11 arg11 , Arg12 arg12 , Arg13 arg13 , Arg14 arg14 , Arg15 arg15 , Arg16 arg16 , Arg17 arg17 , Arg18 arg18)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9) , std::move(arg10) , std::move(arg11) , std::move(arg12) , std::move(arg13) , std::move(arg14) , std::move(arg15) , std::move(arg16) , std::move(arg17) , std::move(arg18)));
             return true; 
@@ -5191,9 +5135,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,
@@ -5363,9 +5306,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::forward<Arg0>( arg0 ) , std::forward<Arg1>( arg1 ) , std::forward<Arg2>( arg2 ) , std::forward<Arg3>( arg3 ) , std::forward<Arg4>( arg4 ) , std::forward<Arg5>( arg5 ) , std::forward<Arg6>( arg6 ) , std::forward<Arg7>( arg7 ) , std::forward<Arg8>( arg8 ) , std::forward<Arg9>( arg9 ) , std::forward<Arg10>( arg10 ) , std::forward<Arg11>( arg11 ) , std::forward<Arg12>( arg12 ) , std::forward<Arg13>( arg13 ) , std::forward<Arg14>( arg14 ) , std::forward<Arg15>( arg15 ) , std::forward<Arg16>( arg16 ) , std::forward<Arg17>( arg17 ) , std::forward<Arg18>( arg18 ) , std::forward<Arg19>( arg19 )));
             return true; 
@@ -5377,9 +5319,8 @@ namespace hpx
             threads::thread_priority priority, Arg0 arg0 , Arg1 arg1 , Arg2 arg2 , Arg3 arg3 , Arg4 arg4 , Arg5 arg5 , Arg6 arg6 , Arg7 arg7 , Arg8 arg8 , Arg9 arg9 , Arg10 arg10 , Arg11 arg11 , Arg12 arg12 , Arg13 arg13 , Arg14 arg14 , Arg15 arg15 , Arg16 arg16 , Arg17 arg17 , Arg18 arg18 , Arg19 arg19)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             apply_helper<action_type>::call(target, addr.address_, priority,
                 util::forward_as_tuple(std::move(arg0) , std::move(arg1) , std::move(arg2) , std::move(arg3) , std::move(arg4) , std::move(arg5) , std::move(arg6) , std::move(arg7) , std::move(arg8) , std::move(arg9) , std::move(arg10) , std::move(arg11) , std::move(arg12) , std::move(arg13) , std::move(arg14) , std::move(arg15) , std::move(arg16) , std::move(arg17) , std::move(arg18) , std::move(arg19)));
             return true; 
@@ -5471,9 +5412,8 @@ namespace hpx
             Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9 , Arg10 && arg10 , Arg11 && arg11 , Arg12 && arg12 , Arg13 && arg13 , Arg14 && arg14 , Arg15 && arg15 , Arg16 && arg16 , Arg17 && arg17 , Arg18 && arg18 , Arg19 && arg19)
         {
             typedef typename hpx::actions::extract_action<Action>::type action_type;
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename action_type::component_type>::call(addr));
             actions::continuation_type cont(c);
             apply_helper<action_type>::call(
                 cont, target, addr.address_, priority,

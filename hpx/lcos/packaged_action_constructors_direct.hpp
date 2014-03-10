@@ -55,9 +55,8 @@
         naming::address addr;
         if (agas::is_local_address_cached(gid, addr)) {
             // local, direct execution
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
 
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
@@ -82,9 +81,8 @@
 
         if (addr.locality_ == hpx::get_locality()) {
             // local, direct execution
-            HPX_ASSERT(components::types_are_compatible(addr.type_,
-                components::get_component_type<
-                    typename action_type::component_type>()));
+            HPX_ASSERT(traits::component_type_is_compatible<
+                typename Action::component_type>::call(addr));
 
             (*this->impl_)->set_data(
                 std::move(action_type::execute_function(addr.address_,
