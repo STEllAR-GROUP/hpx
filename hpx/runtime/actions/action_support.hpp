@@ -22,6 +22,7 @@
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_may_require_id_splitting.hpp>
+#include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/runtime/get_lva.hpp>

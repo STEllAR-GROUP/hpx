@@ -76,6 +76,9 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct action_may_require_id_splitting;
 
+    template <typename Action, typename Enable = void>
+    struct action_is_target_valid;
+
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for type_size
     template <typename T, typename Enable = void>

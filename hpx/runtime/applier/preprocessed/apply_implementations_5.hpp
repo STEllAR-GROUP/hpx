@@ -80,7 +80,7 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -176,7 +176,7 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, Arg0 && arg0)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -360,7 +360,7 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -456,7 +456,7 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -640,7 +640,7 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -736,7 +736,7 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -920,7 +920,7 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -1016,7 +1016,7 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -1200,7 +1200,7 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -1296,7 +1296,7 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"

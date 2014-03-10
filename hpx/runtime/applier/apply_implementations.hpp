@@ -163,7 +163,7 @@ namespace hpx
     apply_p(naming::id_type const& gid, threads::thread_priority priority,
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -341,7 +341,7 @@ namespace hpx
     apply_p(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p",
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"

@@ -54,7 +54,7 @@ namespace hpx
     apply_p_cb(naming::id_type const& gid, threads::thread_priority priority,
         Callback && cb)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -135,7 +135,7 @@ namespace hpx
         naming::id_type const& gid, threads::thread_priority priority,
         Callback && cb)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
                 boost::str(boost::format(
                     "the target (destination) does not match the action type (%s)"
@@ -159,7 +159,7 @@ namespace hpx
     inline bool apply_p_cb(actions::continuation* c, naming::id_type const& gid,
         threads::thread_priority priority, Callback && cb)
     {
-        if (!Action::is_target_valid(gid)) {
+        if (!traits::action_is_target_valid<Action>::call(gid)) {
             HPX_THROW_EXCEPTION(bad_parameter, "apply_p_cb", 
                 "the target (destination) does not match the action type");
             return false;
