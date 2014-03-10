@@ -185,7 +185,7 @@ namespace hpx { namespace parcelset
             "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
                 "$[hpx.parcel.array_optimization]}",
             "enable_security = ${HPX_PARCEL_ENABLE_SECURITY:0}",
-            "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}"
+            "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:0}"
             ;
 
         for(int i = 0; i < connection_type::connection_last; ++i)
