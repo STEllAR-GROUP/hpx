@@ -53,7 +53,21 @@ namespace hpx { namespace util
           , alloc_(alloc)
         {}
 
-        serialize_buffer (T const* data, std::size_t size, init_mode mode = copy,
+        serialize_buffer (T const* data, std::size_t size,
+                allocator_type const& alloc = Allocator())
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
+        {
+            // create from const data implies 'copy' mode
+            using util::placeholders::_1;
+            data_.reset(alloc_.allocate(size),
+                util::bind(&serialize_buffer::deleter, _1, alloc_, size_));
+            if (size != 0)
+                std::copy(data, data + size, data_.get());
+        }
+
+        serialize_buffer (T* data, std::size_t size, init_mode mode,
                 allocator_type const& alloc = Allocator())
           : data_()
           , size_(size)
@@ -67,12 +81,14 @@ namespace hpx { namespace util
                     std::copy(data, data + size, data_.get());
             }
             else {
-                data_ = boost::shared_array<T>(const_cast<T*>(data),
+                data_ = boost::shared_array<T>(data,
                     &serialize_buffer::no_deleter);
             }
         }
 
+        T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
+
         std::size_t size() const { return size_; }
 
     private:
@@ -94,7 +110,7 @@ namespace hpx { namespace util
         }
 
         template <typename Archive>
-        void save_optimized(Archive& ar, const unsigned int version, boost::mpl::false_) const
+        void save_optimized(Archive& ar, const unsigned int, boost::mpl::false_) const
         {
             std::size_t c = size_;
             T* t = data_.get();
@@ -131,7 +147,7 @@ namespace hpx { namespace util
         }
 
         template <typename Archive>
-        void load_optimized(Archive& ar, const unsigned int version, boost::mpl::false_)
+        void load_optimized(Archive& ar, const unsigned int, boost::mpl::false_)
         {
             std::size_t c = size_;
             T* t = data_.get();
@@ -183,7 +199,16 @@ namespace hpx { namespace util
           : size_(0)
         {}
 
-        serialize_buffer (T const* data, std::size_t size, init_mode mode = copy)
+        serialize_buffer (T const* data, std::size_t size)
+          : data_(), size_(size)
+        {
+            // create from const data implies 'copy' mode
+            data_.reset(new T[size]);
+            if (size != 0)
+                std::copy(data, data + size, data_.get());
+        }
+
+        serialize_buffer (T* data, std::size_t size, init_mode mode)
           : data_(), size_(size)
         {
             if (mode == copy) {
@@ -192,12 +217,14 @@ namespace hpx { namespace util
                     std::copy(data, data + size, data_.get());
             }
             else {
-                data_ = boost::shared_array<T>(const_cast<T*>(data),
+                data_ = boost::shared_array<T>(data,
                     &serialize_buffer::no_deleter);
             }
         }
 
+        T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
+
         std::size_t size() const { return size_; }
 
     private:
@@ -219,7 +246,7 @@ namespace hpx { namespace util
         }
 
         template <typename Archive>
-        void save_optimized(Archive& ar, const unsigned int version, boost::mpl::false_) const
+        void save_optimized(Archive& ar, const unsigned int, boost::mpl::false_) const
         {
             std::size_t c = size_;
             T* t = data_.get();
@@ -253,7 +280,7 @@ namespace hpx { namespace util
         }
 
         template <typename Archive>
-        void load_optimized(Archive& ar, const unsigned int version, boost::mpl::false_)
+        void load_optimized(Archive& ar, const unsigned int, boost::mpl::false_)
         {
             std::size_t c = size_;
             T* t = data_.get();
