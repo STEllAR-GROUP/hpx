@@ -89,47 +89,47 @@ namespace hpx { namespace components { namespace server
         }
 
         /// \brief Action to load an 8 bit value to a memory location
-        boost::uint8_t load8(boost::uint64_t addr)
+        boost::uint8_t load8(boost::uint64_t addr) const
         {
             return *reinterpret_cast<boost::uint8_t*>(addr);
         }
 
         /// \brief Action to load an 16 bit value to a memory location
-        boost::uint16_t load16(boost::uint64_t addr)
+        boost::uint16_t load16(boost::uint64_t addr) const
         {
             return *reinterpret_cast<boost::uint16_t*>(addr);
         }
 
         /// \brief Action to load an 32 bit value to a memory location
-        boost::uint32_t load32(boost::uint64_t addr)
+        boost::uint32_t load32(boost::uint64_t addr) const
         {
             return *reinterpret_cast<boost::uint32_t*>(addr);
         }
 
         /// \brief Action to load an 64 bit value to a memory location
-        boost::uint64_t load64(boost::uint64_t addr)
+        boost::uint64_t load64(boost::uint64_t addr) const
         {
             return *reinterpret_cast<boost::uint64_t*>(addr);
         }
 
         /// \brief Action to load an 128 bit value to a memory location
-        uint128_t load128(boost::uint64_t addr)
+        uint128_t load128(boost::uint64_t addr) const
         {
             return *reinterpret_cast<uint128_t*>(addr);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_DEFINE_COMPONENT_ACTION(memory, store8);
-        HPX_DEFINE_COMPONENT_ACTION(memory, store16);
-        HPX_DEFINE_COMPONENT_ACTION(memory, store32);
-        HPX_DEFINE_COMPONENT_ACTION(memory, store64);
-        HPX_DEFINE_COMPONENT_ACTION(memory, store128);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, store8);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, store16);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, store32);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, store64);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(memory, store128);
 
-        HPX_DEFINE_COMPONENT_ACTION(memory, load8);
-        HPX_DEFINE_COMPONENT_ACTION(memory, load16);
-        HPX_DEFINE_COMPONENT_ACTION(memory, load32);
-        HPX_DEFINE_COMPONENT_ACTION(memory, load64);
-        HPX_DEFINE_COMPONENT_ACTION(memory, load128);
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load8);
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load16);
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load32);
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load64);
+        HPX_DEFINE_COMPONENT_CONST_DIRECT_ACTION(memory, load128);
 
         /// This is the default hook implementation for decorate_action which 
         /// does no hooking at all.
@@ -151,17 +151,27 @@ namespace hpx { namespace components { namespace server
 // Declaration of serialization support for the runtime_support actions
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(hpx::components::server::allocate_action)
 
-HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store8_action, store8_action)
-HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store16_action, store16_action)
-HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store32_action, store32_action)
-HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store64_action, store64_action)
-HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::store128_action, store128_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::memory::store8_action, store8_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::memory::store16_action, store16_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::memory::store32_action, store32_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::memory::store64_action, store64_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::memory::store128_action, store128_action)
 
-HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load8_action, load8_action)
-HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load16_action, load16_action)
-HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load32_action, load32_action)
-HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load64_action, load64_action)
-HPX_REGISTER_ACTION_DECLARATION(hpx::components::server::memory::load128_action, load128_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::memory::load8_action, load8_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::memory::load16_action, load16_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::memory::load32_action, load32_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::memory::load64_action, load64_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::memory::load128_action, load128_action)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::components::server::memory::uint128_t
