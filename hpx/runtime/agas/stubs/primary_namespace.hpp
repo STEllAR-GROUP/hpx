@@ -89,7 +89,7 @@ struct HPX_EXPORT primary_namespace
             HPX_THROW_EXCEPTION(bad_parameter,
                 "primary_namespace::get_service_instance",
                 boost::str(boost::format(
-                        "can't retrieve a valid locality id from global address: "
+                        "can't retrieve a valid locality id from global address (%1%): "
                     ) % dest));
             return naming::gid_type();
         }
