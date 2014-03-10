@@ -342,6 +342,12 @@ namespace hpx
             return threads::get_thread_interruption_requested(threads::get_self_id());
         }
 
+        void interrupt()
+        {
+            threads::interrupt_thread(threads::get_self_id());
+            threads::interruption_point(threads::get_self_id());
+        }
+
         void sleep_until(boost::posix_time::ptime const& at)
         {
             this_thread::suspend(at, "this_thread::sleep_until");

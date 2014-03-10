@@ -201,6 +201,8 @@ namespace hpx
         HPX_API_EXPORT bool interruption_enabled();
         HPX_API_EXPORT bool interruption_requested();
 
+        HPX_API_EXPORT void interrupt();
+
         HPX_API_EXPORT void sleep_until(boost::posix_time::ptime const& at);
         HPX_API_EXPORT void sleep_for(boost::posix_time::time_duration const& p);
 
