@@ -13,12 +13,15 @@
 #include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime/parcelset/encode_parcels.hpp>
 #include <hpx/runtime/parcelset/detail/call_for_each.hpp>
-#include <hpx/runtime/parcelset/detail/call_for_each.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/connection_cache.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <boost/asio/placeholders.hpp>
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx
+{
+    bool is_starting();
+}
 
 namespace hpx { namespace parcelset
 {
@@ -611,8 +614,25 @@ namespace hpx { namespace parcelset
                 }
 
                 // send parcels if they didn't get sent by another connection
-                send_pending_parcels(sender_connection, std::move(parcels),
-                    std::move(handlers));
+                if (!hpx::is_starting() && threads::get_self_id() == threads::invalid_thread_id)
+                {
+                    std::size_t thread_num = get_worker_thread_num();
+                    hpx::applier::register_thread_nullary(
+                        hpx::util::bind(
+                            hpx::util::one_shot(&parcelport_impl::send_pending_parcels)
+                          , this
+                          , sender_connection
+                          , std::move(parcels)
+                          , std::move(handlers)
+                        )
+                      , "parcelport_impl::send_pending_parcels"
+                      , threads::pending, true, threads::thread_priority_critical,
+                        thread_num, threads::thread_stacksize_default
+                    );
+                }
+                else
+                    send_pending_parcels(sender_connection, std::move(parcels),
+                        std::move(handlers));
             }
         }
 
