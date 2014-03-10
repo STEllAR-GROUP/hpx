@@ -8,6 +8,7 @@
 
 #include <hpx/traits.hpp>
 #include <hpx/runtime/components/component_type.hpp>
+#include <hpx/runtime/naming/address.hpp>
 
 namespace hpx { namespace traits
 {
