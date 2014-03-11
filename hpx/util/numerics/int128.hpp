@@ -16,15 +16,17 @@
 #include <cstdio>
 #include <new>
 
-// CLASS
+#include <boost/cstdint.hpp>
+
 namespace hpx { namespace util { namespace numerics
 {
+    ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT int128
     {
     private:
         // Binary correct representation of signed 128bit integer
-        unsigned __int64    lo;
-        signed   __int64    hi;
+        boost::uint64_t lo;
+        boost::int64_t hi;
 
     protected:
         // Some global operator functions must be friends
