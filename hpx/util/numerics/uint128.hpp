@@ -17,6 +17,7 @@
 #include <new>
 
 #include <boost/cstdint.hpp>
+#include <boost/serialization/serialization.hpp>
 
 namespace hpx { namespace util { namespace numerics
 {

@@ -210,11 +210,11 @@ namespace hpx { namespace util { namespace numerics
         // only remainder
         if (ds > dd) {
             remainder = *this;
-            return 0ull;
+            return 0ll;
         };
 
-        int128 r = 0ull;
-        int128 q = 0ull;
+        int128 r = 0ll;
+        int128 q = 0ll;
     //    while (dd >= ds) { dd -= ds; q += 1; }; // extreme slow version
 
         unsigned int b = 127;
@@ -353,7 +353,7 @@ namespace hpx { namespace util { namespace numerics
     bool operator <  (const int128 & a, const int128 & b) throw () {
         if (a.hi == b.hi) {
             if (a.hi < 0)
-                return (signed boost::int64_t) a.lo < (signed boost::int64_t) b.lo;
+                return (boost::int64_t) a.lo < (boost::int64_t) b.lo;
             else
                 return a.lo < b.lo;
         } else
@@ -372,14 +372,31 @@ namespace hpx { namespace util { namespace numerics
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive>
-    void int128::serialize(Archive& ar, unsigned int version)
+    void int128::save(Archive& ar, const unsigned int version) const
     {
-        ar & lo & hi;
+        boost::int64_t hi_ = hi;
+        boost::uint64_t lo_ = lo;
+        ar & lo_ & hi_;
     }
 
-    template void int128::serialize<util::portable_binary_oarchive>(
+    template void int128::save<util::portable_binary_oarchive>(
+        util::portable_binary_oarchive& ar, const unsigned int version) const;
+    template void int128::save<util::portable_binary_iarchive>(
+        util::portable_binary_iarchive& ar, const unsigned int version) const;
+
+    template <typename Archive>
+    void int128::load(Archive& ar, const unsigned int version)
+    {
+        boost::int64_t hi_;
+        boost::uint64_t lo_;
+        ar & lo_ & hi_;
+        hi = hi_;
+        lo = lo_;
+    }
+
+    template void int128::load<util::portable_binary_oarchive>(
         util::portable_binary_oarchive& ar, const unsigned int version);
-    template void int128::serialize<util::portable_binary_iarchive>(
+    template void int128::load<util::portable_binary_iarchive>(
         util::portable_binary_iarchive& ar, const unsigned int version);
 }}}
 

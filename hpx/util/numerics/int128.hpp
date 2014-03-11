@@ -17,6 +17,8 @@
 #include <new>
 
 #include <boost/cstdint.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/split_member.hpp>
 
 namespace hpx { namespace util { namespace numerics
 {
@@ -123,8 +125,12 @@ namespace hpx { namespace util { namespace numerics
     private:
         friend class boost::serialization::access;
 
+        BOOST_SERIALIZATION_SPLIT_MEMBER()
+
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int version);
+        void save(Archive& ar, const unsigned int version) const;
+        template <typename Archive>
+        void load(Archive& ar, const unsigned int version);
     }
 #ifdef __GNUC__
     __attribute__ ((__aligned__ (16), __packed__))
