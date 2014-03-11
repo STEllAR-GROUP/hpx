@@ -9,9 +9,6 @@
 #ifndef UINT128_HPP
 #define UINT128_HPP
 
-#include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_UINT128)
 #include <hpx/hpx_fwd.hpp>
 
 #include <exception>
@@ -181,7 +178,6 @@ namespace hpx { namespace util { namespace numerics
 
 // MISC
 
-typedef hpx::util::numerics::uint128 __uint128_t;
+// typedef hpx::util::numerics::uint128 __uint128_t;
 
-#endif
 #endif

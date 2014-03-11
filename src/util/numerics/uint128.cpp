@@ -6,9 +6,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-
-#if defined(HPX_HAVE_UINT128)
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/numerics/uint128.hpp>
 
@@ -369,4 +366,3 @@ namespace hpx { namespace util { namespace numerics
         util::portable_binary_iarchive& ar, const unsigned int version);
 }}}
 
-#endif

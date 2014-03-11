@@ -1144,10 +1144,6 @@ if(MSVC)
   endif()
   hpx_add_config_define(PSAPI_VERSION 1)
 
-  # need 128 bit integer emulation
-  hpx_add_config_define(HPX_HAVE_INT128)
-  hpx_add_config_define(HPX_HAVE_UINT128)
-
 ################################################################################
 # GCC-compatible compiler configuration
 ################################################################################
@@ -1474,11 +1470,6 @@ else()
   hpx_check_for_gnu_128bit_integers(HPX_GNU_128BIT_INTEGERS
     DEFINITIONS HPX_HAVE_GNU_128BIT_INTEGERS
                 BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS) # for integral casts
-
-  if(NOT HPX_GNU_128BIT_INTEGERS)
-    hpx_add_config_define(HPX_HAVE_INT128)
-    hpx_add_config_define(HPX_HAVE_UINT128)
-  endif()
 
   # we use movdqa for atomic 128bit loads and stores
   hpx_cpuid("sse2" HPX_SSE2

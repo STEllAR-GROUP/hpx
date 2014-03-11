@@ -11,10 +11,7 @@
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
-
-#if defined(HPX_HAVE_UINT128)
 #include <hpx/util/numerics/uint128.hpp>
-#endif
 
 #include <utility>
 
@@ -35,11 +32,7 @@ namespace hpx { namespace components { namespace server
             components::set_component_type<memory>(t);
         }
 
-#if defined(HPX_HAVE_UINT128)
         typedef util::numerics::uint128 uint128_t;
-#else
-        typedef unsigned __int128 uint128_t;
-#endif
 
         // constructor
         memory()
