@@ -1475,7 +1475,7 @@ else()
     DEFINITIONS HPX_HAVE_GNU_128BIT_INTEGERS
                 BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS) # for integral casts
 
-  if(not HPX_GNU_128BIT_INTEGERS)
+  if(NOT HPX_GNU_128BIT_INTEGERS)
     hpx_add_config_define(HPX_HAVE_INT128)
     hpx_add_config_define(HPX_HAVE_UINT128)
   endif()
