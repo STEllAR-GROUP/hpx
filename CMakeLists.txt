@@ -624,6 +624,22 @@ else()
   hpx_add_config_define(HPX_AGAS_DUMP_REFCNT_ENTRIES 0)
 endif()
 
+##############################################################################
+if(MSVC)
+  hpx_option(HPX_HAVE_INT128 BOOL "Enable emulation of __in128_t (default: ON)" ON ADVANCED)
+  hpx_option(HPX_HAVE_UINT128 BOOL "Enable emulation of __uin128_t (default: ON)" ON ADVANCED)
+else()
+  hpx_option(HPX_HAVE_INT128 BOOL "Enable emulation of __in128_t (default: OFF)" OFF ADVANCED)
+  hpx_option(HPX_HAVE_UINT128 BOOL "Enable emulation of __uin128_t (default: OFF)" OFF ADVANCED)
+endif()
+
+if(HPX_HAVE_INT128)
+  hpx_add_config_define(HPX_HAVE_INT128)
+endif()
+if(HPX_HAVE_UINT128)
+  hpx_add_config_define(HPX_HAVE_UINT128)
+endif()
+
 ################################################################################
 # PAPI event counters
 ################################################################################

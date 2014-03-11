@@ -52,15 +52,4 @@ namespace hpx { namespace components { namespace server
         naming::detail::set_credit_for_gid(gid, HPX_GLOBALCREDIT_INITIAL);
         return gid;
     }
-
-    template <typename Archive>
-    void memory::uint128_t::serialize(Archive& ar, const unsigned int version)
-    {
-        ar & msb & lsb;
-    }
-
-    template void memory::uint128_t::serialize<util::portable_binary_oarchive>(
-        util::portable_binary_oarchive& ar, const unsigned int version);
-    template void memory::uint128_t::serialize<util::portable_binary_iarchive>(
-        util::portable_binary_iarchive& ar, const unsigned int version);
 }}}

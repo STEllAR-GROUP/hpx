@@ -12,6 +12,10 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/lcos/base_lco_with_value.hpp>
 
+#if defined(HPX_HAVE_UINT128)
+#include <hpx/util/numerics/uint128.hpp>
+#endif
+
 #include <utility>
 
 namespace hpx { namespace components { namespace server
@@ -31,21 +35,7 @@ namespace hpx { namespace components { namespace server
             components::set_component_type<memory>(t);
         }
 
-        struct uint128_t
-        {
-            uint128_t(boost::uint64_t msb_ = 0, boost::uint64_t lsb_ = 0)
-              : msb(msb_), lsb(lsb_)
-            {}
-
-            boost::uint64_t msb;
-            boost::uint64_t lsb;
-
-        private:
-            friend class boost::serialization::access;
-
-            template <typename Archive>
-            void serialize(Archive& ar, const unsigned int version);
-        };
+        typedef util::numerics::uint128 uint128_t;
 
         // constructor
         memory()
