@@ -355,14 +355,31 @@ namespace hpx { namespace util { namespace numerics
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive>
-    void uint128::serialize(Archive& ar, unsigned int version)
+    void uint128::save(Archive& ar, const unsigned int version) const
     {
-        ar & lo & hi;
+        boost::uint64_t hi_ = hi;
+        boost::uint64_t lo_ = lo;
+        ar & lo_ & hi_;
     }
 
-    template void uint128::serialize<util::portable_binary_oarchive>(
+    template void uint128::save<util::portable_binary_oarchive>(
+        util::portable_binary_oarchive& ar, const unsigned int version) const;
+    template void uint128::save<util::portable_binary_iarchive>(
+        util::portable_binary_iarchive& ar, const unsigned int version) const;
+
+    template <typename Archive>
+    void uint128::load(Archive& ar, const unsigned int version)
+    {
+        boost::uint64_t hi_;
+        boost::uint64_t lo_;
+        ar & lo_ & hi_;
+        hi = hi_;
+        lo = lo_;
+    }
+
+    template void uint128::load<util::portable_binary_oarchive>(
         util::portable_binary_oarchive& ar, const unsigned int version);
-    template void uint128::serialize<util::portable_binary_iarchive>(
+    template void uint128::load<util::portable_binary_iarchive>(
         util::portable_binary_iarchive& ar, const unsigned int version);
 }}}
 
