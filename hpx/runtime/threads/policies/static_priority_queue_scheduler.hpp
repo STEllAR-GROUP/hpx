@@ -92,9 +92,7 @@ namespace hpx { namespace threads { namespace policies
         bool wait_or_add_new(std::size_t num_thread, bool running,
             boost::int64_t& idle_loop_count)
         {
-            std::size_t queues_size = this->queues_.size();
-
-            HPX_ASSERT(num_thread < queues_size);
+            HPX_ASSERT(num_thread < this->queues_.size());
 
             std::size_t added = 0;
             bool result = true;
