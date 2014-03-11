@@ -493,14 +493,6 @@ system and application performance.
          the counter will return the overall number of executed __hpx__-thread
          phases for all worker threads separately.]
     ]
-        [None]
-        [Returns the overall number of executed (retired) __hpx__-threads on the
-         given locality since application start. If the instance name is `total`
-         the counter returns the accumulated number of retired __hpx__-threads
-         for all worker threads (cores) on that locality. If the instance name
-         is `worker-thread#*` the counter will return the overall number of
-         retired __hpx__-threads for the specified worker thread.]
-    ]
     [   [`/threads/count/instantaneous/<thread-state>`
 
           where:[br] `<thread-state>` is one of the following:
