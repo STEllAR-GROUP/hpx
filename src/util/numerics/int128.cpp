@@ -387,8 +387,8 @@ namespace hpx { namespace util { namespace numerics
     template <typename Archive>
     void int128::load(Archive& ar, const unsigned int version)
     {
-        boost::int64_t hi_;
-        boost::uint64_t lo_;
+        boost::int64_t hi_ = 0;
+        boost::uint64_t lo_ = 0;
         ar & lo_ & hi_;
         hi = hi_;
         lo = lo_;
