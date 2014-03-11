@@ -624,22 +624,6 @@ else()
   hpx_add_config_define(HPX_AGAS_DUMP_REFCNT_ENTRIES 0)
 endif()
 
-##############################################################################
-if(MSVC)
-  hpx_option(HPX_HAVE_INT128 BOOL "Enable emulation of __in128_t (default: ON)" ON ADVANCED)
-  hpx_option(HPX_HAVE_UINT128 BOOL "Enable emulation of __uin128_t (default: ON)" ON ADVANCED)
-else()
-  hpx_option(HPX_HAVE_INT128 BOOL "Enable emulation of __in128_t (default: OFF)" OFF ADVANCED)
-  hpx_option(HPX_HAVE_UINT128 BOOL "Enable emulation of __uin128_t (default: OFF)" OFF ADVANCED)
-endif()
-
-if(HPX_HAVE_INT128)
-  hpx_add_config_define(HPX_HAVE_INT128)
-endif()
-if(HPX_HAVE_UINT128)
-  hpx_add_config_define(HPX_HAVE_UINT128)
-endif()
-
 ################################################################################
 # PAPI event counters
 ################################################################################
@@ -1160,6 +1144,10 @@ if(MSVC)
   endif()
   hpx_add_config_define(PSAPI_VERSION 1)
 
+  # need 128 bit integer emulation
+  hpx_add_config_define(HPX_HAVE_INT128)
+  hpx_add_config_define(HPX_HAVE_UINT128)
+
 ################################################################################
 # GCC-compatible compiler configuration
 ################################################################################
@@ -1303,8 +1291,6 @@ else()
     #hpx_use_flag_if_available(-Wno-attributes LANGUAGES CXX)
     hpx_use_flag_if_available(-Wno-cast-align LANGUAGES CXX)
   endif()
-
-
 
   # VLAs are a GNU extensions that we forbid as they are not supported on MSVC
   hpx_use_flag_if_available(-Werror=vla LANGUAGES CXX C)
@@ -1488,6 +1474,11 @@ else()
   hpx_check_for_gnu_128bit_integers(HPX_GNU_128BIT_INTEGERS
     DEFINITIONS HPX_HAVE_GNU_128BIT_INTEGERS
                 BOOST_ATOMIC_HAVE_GNU_128BIT_INTEGERS) # for integral casts
+
+  if(not HPX_GNU_128BIT_INTEGERS)
+    hpx_add_config_define(HPX_HAVE_INT128)
+    hpx_add_config_define(HPX_HAVE_UINT128)
+  endif()
 
   # we use movdqa for atomic 128bit loads and stores
   hpx_cpuid("sse2" HPX_SSE2
