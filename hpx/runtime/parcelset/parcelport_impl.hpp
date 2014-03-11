@@ -158,7 +158,7 @@ namespace hpx { namespace parcelset
 
             if(enable_parcel_handling_)
             {
-                if (async_serialization())
+                if (hpx::is_running() && async_serialization())
                 {
                     trigger_sending_parcels(locality_id);
                 }
@@ -197,7 +197,7 @@ namespace hpx { namespace parcelset
 
             if(enable_parcel_handling_)
             {
-                if (async_serialization())
+                if (hpx::is_running() && async_serialization())
                 {
                     trigger_sending_parcels(locality_id);
                 }

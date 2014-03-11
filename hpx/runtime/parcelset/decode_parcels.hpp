@@ -32,6 +32,9 @@ namespace hpx
     ///
     HPX_API_EXPORT bool verify_parcel_suffix(std::vector<char> const& data,
         naming::gid_type& parcel_id, error_code& ec = throws);
+
+    bool is_starting();
+    bool is_running();
 }
 #endif
 
@@ -80,7 +83,7 @@ namespace hpx { namespace parcelset {
 #endif
 
     template <typename Parcelport, typename Buffer>
-    bool decode_message(Parcelport & pp,
+    void decode_message(Parcelport & pp,
         boost::shared_ptr<Buffer> buffer,
         std::vector<util::serialization_chunk> const *chunks,
         bool first_message = false)
@@ -138,7 +141,7 @@ namespace hpx { namespace parcelset {
                             HPX_THROW_EXCEPTION(security_error,
                                 "decode_message",
                                 "parcel id mismatch");
-                            return false;
+                            return;
                         }
 #else
                         // de-serialize parcel and add it to incoming parcel queue
@@ -196,23 +199,20 @@ namespace hpx { namespace parcelset {
                 << "decode_message: caught unknown exception.";
             hpx::report_error(boost::current_exception());
         }
-
-        return first_message;
     }
 
-    template <typename Parcelport, typename Connection, typename Buffer>
+    template <typename Parcelport, typename Buffer>
     void decode_parcels_impl(
         Parcelport & parcelport
-      , Connection connection
       , boost::shared_ptr<Buffer> buffer
-      , boost::shared_ptr<std::vector<util::serialization_chunk> > chunks)
+      , boost::shared_ptr<std::vector<util::serialization_chunk> > chunks
+      , bool first_message)
     {
         std::vector<util::serialization_chunk> *chunks_ = 0;
         if(chunks) chunks_ = chunks.get();
 
 #if defined(HPX_HAVE_SECURITY)
-        connection->first_message_ = decode_message(parcelport_, buffer, chunks_,
-            connection->first_message_);
+        decode_message(parcelport_, buffer, chunks_, first_message);
 #else
         decode_message(parcelport, buffer, chunks_);
 #endif
@@ -272,18 +272,27 @@ namespace hpx { namespace parcelset {
             }
             HPX_ASSERT(index == num_zero_copy_chunks + num_non_zero_copy_chunks);
         }
-        if(parcelport.async_serialization())
+        bool first_message = false;
+#if defined(HPX_HAVE_SECURITY)
+        if(connection->first_message_)
+        {
+            connection->first_message_ = false;
+            first_message = true;
+        }
+#endif
+        if(hpx::is_running() && parcelport.async_serialization())
         {
                 hpx::applier::register_thread_nullary(
                     HPX_STD_BIND(
-                        &decode_parcels_impl<Parcelport, Connection, Buffer>,
-                            boost::ref(parcelport), connection, buffer, chunks),
+                        &decode_parcels_impl<Parcelport, Buffer>,
+                            boost::ref(parcelport), buffer, chunks, first_message),
                     "decode_parcels",
                     threads::pending, true, threads::thread_priority_critical);
+                connection->reset_buffer();
         }
         else
         {
-            decode_parcels_impl(parcelport, connection, buffer, chunks);
+            decode_parcels_impl(parcelport, buffer, chunks, first_message);
         }
     }
 }}
