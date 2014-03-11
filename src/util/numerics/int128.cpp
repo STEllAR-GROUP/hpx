@@ -90,16 +90,16 @@ namespace hpx { namespace util { namespace numerics
     };
 
     int128::int128 (const float a) throw ()
-        : lo ((unsigned __int64) fmodf (a, 18446744073709551616.0f)),
-          hi ((__int64) (a / 18446744073709551616.0f)) {};
+        : lo ((boost::uint64_t) fmodf (a, 18446744073709551616.0f)),
+          hi ((boost::int64_t) (a / 18446744073709551616.0f)) {};
 
     int128::int128 (const double & a) throw ()
-        : lo ((unsigned __int64) fmod (a, 18446744073709551616.0)),
-          hi ((__int64) (a / 18446744073709551616.0)) {};
+        : lo ((boost::uint64_t) fmod (a, 18446744073709551616.0)),
+          hi ((boost::int64_t) (a / 18446744073709551616.0)) {};
 
     int128::int128 (const long double & a) throw ()
-        : lo ((unsigned __int64) fmodl (a, 18446744073709551616.0l)),
-          hi ((__int64) (a / 18446744073709551616.0l)) {};
+        : lo ((boost::uint64_t) fmodl (a, 18446744073709551616.0l)),
+          hi ((boost::int64_t) (a / 18446744073709551616.0l)) {};
 
     float int128::toFloat () const throw () {
         return (float) this->hi * 18446744073709551616.0f
@@ -167,7 +167,7 @@ namespace hpx { namespace util { namespace numerics
     };
 
     int128 & int128::operator += (const int128 & b) throw () {
-        unsigned __int64 old_lo = this->lo;
+        boost::uint64_t old_lo = this->lo;
 
         this->lo += b.lo;
         this->hi += b.hi + (this->lo < old_lo);
@@ -283,7 +283,7 @@ namespace hpx { namespace util { namespace numerics
             this->lo >>= n;
 
             // get lower N bits of high qword
-            unsigned __int64 mask = 0ull;
+            boost::uint64_t mask = 0ull;
             for (unsigned int i = 0; i < n; ++i) 
                 mask |= (1ll << i);
 
@@ -311,7 +311,7 @@ namespace hpx { namespace util { namespace numerics
             this->hi <<= n;
 
             // get higher N bits of low qword
-            unsigned __int64 mask = 0ull;
+            boost::uint64_t mask = 0ull;
             for (unsigned int i = 0; i < n; ++i)
                 mask |= (1ll << (63 - i));
 
@@ -353,7 +353,7 @@ namespace hpx { namespace util { namespace numerics
     bool operator <  (const int128 & a, const int128 & b) throw () {
         if (a.hi == b.hi) {
             if (a.hi < 0)
-                return (signed __int64) a.lo < (signed __int64) b.lo;
+                return (signed boost::int64_t) a.lo < (signed boost::int64_t) b.lo;
             else
                 return a.lo < b.lo;
         } else

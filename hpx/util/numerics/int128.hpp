@@ -45,8 +45,8 @@ namespace hpx { namespace util { namespace numerics
             if (a < 0) this->hi = -1ll;
         };
 
-        inline int128 (const unsigned __int64 & a) throw () : lo (a), hi (0ll) {};
-        inline int128 (const signed __int64 & a) throw () : lo (a), hi (0ll) {
+        inline int128 (const boost::uint64_t & a) throw () : lo (a), hi (0ll) {};
+        inline int128 (const boost::int64_t & a) throw () : lo (a), hi (0ll) {
             if (a < 0) this->hi = -1ll;
         };
 
@@ -61,7 +61,7 @@ namespace hpx { namespace util { namespace numerics
 
     private:
         // Special internal constructors
-        int128 (const unsigned __int64 & a, const signed __int64 & b) throw ()
+        int128 (const boost::uint64_t & a, const boost::int64_t & b) throw ()
             : lo (a), hi (b) {};
 
     public:
@@ -104,8 +104,9 @@ namespace hpx { namespace util { namespace numerics
         };
 
         // Common methods
-        int toInt () const throw () {  return (int) this->lo; };
-        __int64 toInt64 () const throw () {  return (__int64) this->lo; };
+        int toInt () const throw () { return (int) this->lo; };
+        boost::int64_t toInt64 () const throw ()
+            { return (boost::uint64_t) this->lo; };
 
         const char * toString (unsigned int radix = 10) const throw ();
         float toFloat () const throw ();

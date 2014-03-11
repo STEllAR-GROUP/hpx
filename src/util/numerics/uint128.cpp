@@ -87,16 +87,16 @@ namespace hpx { namespace util { namespace numerics
     };
 
     uint128::uint128 (const float a) throw ()
-        : lo ((unsigned __int64) fmodf (a, 18446744073709551616.0f)),
-          hi ((unsigned __int64) (a / 18446744073709551616.0f)) {};
+        : lo ((boost::uint64_t) fmodf (a, 18446744073709551616.0f)),
+          hi ((boost::uint64_t) (a / 18446744073709551616.0f)) {};
 
     uint128::uint128 (const double & a) throw ()
-        : lo ((unsigned __int64) fmod (a, 18446744073709551616.0)),
-          hi ((unsigned __int64) (a / 18446744073709551616.0)) {};
+        : lo ((boost::uint64_t) fmod (a, 18446744073709551616.0)),
+          hi ((boost::uint64_t) (a / 18446744073709551616.0)) {};
 
     uint128::uint128 (const long double & a) throw ()
-        : lo ((unsigned __int64) fmodl (a, 18446744073709551616.0l)),
-          hi ((unsigned __int64) (a / 18446744073709551616.0l)) {};
+        : lo ((boost::uint64_t) fmodl (a, 18446744073709551616.0l)),
+          hi ((boost::uint64_t) (a / 18446744073709551616.0l)) {};
 
     float uint128::toFloat () const throw () {
         return (float) this->hi * 18446744073709551616.0f
@@ -164,7 +164,7 @@ namespace hpx { namespace util { namespace numerics
     };
 
     uint128 & uint128::operator += (const uint128 & b) throw () {
-        unsigned __int64 old_lo = this->lo;
+        boost::uint64_t old_lo = this->lo;
 
         this->lo += b.lo;
         this->hi += b.hi + (this->lo < old_lo);
@@ -272,7 +272,7 @@ namespace hpx { namespace util { namespace numerics
             this->lo >>= n;
 
             // get lower N bits of high qword
-            unsigned __int64 mask = 0ull;
+            boost::uint64_t mask = 0ull;
             for (unsigned int i = 0; i < n; ++i)
                 mask |= (1ll << i);
 
@@ -300,7 +300,7 @@ namespace hpx { namespace util { namespace numerics
             this->hi <<= n;
 
             // get higher N bits of low qword
-            unsigned __int64 mask = 0ull;
+            boost::uint64_t mask = 0ull;
             for (unsigned int i = 0; i < n; ++i)
                 mask |= (1ll << (63 - i));
 
