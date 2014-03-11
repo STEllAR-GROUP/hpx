@@ -210,11 +210,11 @@ namespace hpx { namespace util { namespace numerics
         // only remainder
         if (ds > dd) {
             remainder = *this;
-            return 0ll;
+            return boost::int64_t(0ll);
         };
 
-        int128 r = 0ll;
-        int128 q = 0ll;
+        int128 r = boost::int64_t(0ll);
+        int128 q = boost::int64_t(0ll);
     //    while (dd >= ds) { dd -= ds; q += 1; }; // extreme slow version
 
         unsigned int b = 127;
