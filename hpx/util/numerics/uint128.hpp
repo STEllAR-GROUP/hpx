@@ -35,11 +35,6 @@ namespace hpx { namespace util { namespace numerics
         friend bool operator || (const uint128 &, const uint128 &) throw ();
         friend bool operator && (const uint128 &, const uint128 &) throw ();
 
-        #ifdef __GNUC__
-            friend uint128 operator <? (const uint128 &, const uint128 &) throw ();
-            friend uint128 operator >? (const uint128 &, const uint128 &) throw ();
-        #endif
-
     public:
         // Constructors
         inline uint128 () throw () {};
@@ -136,13 +131,6 @@ namespace hpx { namespace util { namespace numerics
     bool operator == (const uint128 & a, const uint128 & b) throw ();
     bool operator || (const uint128 & a, const uint128 & b) throw ();
     bool operator && (const uint128 & a, const uint128 & b) throw ();
-
-#ifdef __GNUC__
-        inline uint128 operator <? (const uint128 & a, const uint128 & b) throw () {
-            return (a < b) ? a : b; };
-        inline uint128 operator >? (const uint128 & a, const uint128 & b) throw () {
-            return (a < b) ? b : a; };
-#endif
 
     // GLOBAL OPERATOR INLINES
 
