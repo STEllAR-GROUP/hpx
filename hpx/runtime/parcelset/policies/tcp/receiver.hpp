@@ -68,6 +68,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
         template <typename Handler>
         void async_read(Handler handler)
         {
+            if(hpx::is_running() && parcelport_.async_serialization())
+            {
+                reset_buffer();
+                HPX_ASSERT(!buffer_);
+            }
             buffer_ = get_buffer();
             buffer_->clear();
 
