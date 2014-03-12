@@ -80,6 +80,9 @@ namespace hpx { namespace components
         explicit client_base(future_type && gid)
           : gid_(std::move(gid))
         {}
+        explicit client_base(unique_future<naming::id_type> && gid)
+          : gid_(gid.share())
+        {}
 
         explicit client_base(client_base const& rhs)
           : gid_(rhs.gid_)
