@@ -1,9 +1,24 @@
+//  Copyright (c) 2014 John Biddiscombe
+//
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/lcos/when_all.hpp>
 #include <hpx/include/iostreams.hpp>
 //
 #include <random>
+
+//
+// This is a simple example which generates random numbers and returns
+// pass or fail from a routine. 
+// When called by many threads returning a vector of futures - if the user wants to 
+// reduce the vector of pass/fails into a single pass fail based on a simple
+// any fail = !pass rule, then this example shows how to do it.
+// The user can experiment with the failure rate to see if the statistics match
+// their expectations.
+// Also. Routine can use either a lamda, or a function under control of USE_LAMBDA
 
 #define TEST_SUCCESS 1
 #define TEST_FAIL    0
