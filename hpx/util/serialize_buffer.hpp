@@ -44,8 +44,10 @@ namespace hpx { namespace util
         enum init_mode
         {
             copy = 0,       // constructor copies data
-            reference = 1   // constructor does not copy data and does not
+            reference = 1,  // constructor does not copy data and does not
                             // manage the lifetime of it
+            take = 2        // constructor does not copy data but does take 
+                            // ownership and manages the lifetime of it
         };
 
         explicit serialize_buffer(allocator_type const& alloc = Allocator())
@@ -80,9 +82,14 @@ namespace hpx { namespace util
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
-            else {
+            else if (mode == reference) {
                 data_ = boost::shared_array<T>(data,
                     &serialize_buffer::no_deleter);
+            }
+            else { // take 
+                using util::placeholders::_1;
+                data_ = boost::shared_array<T>(data,
+                    util::bind(&serialize_buffer::deleter, _1, alloc_, size_));
             }
         }
 
@@ -193,7 +200,7 @@ namespace hpx { namespace util
             copy = 0,       // constructor copies data
             reference = 1   // constructor does not copy data and does not
                             // manage the lifetime of it
-        };
+         };
 
         serialize_buffer()
           : size_(0)

@@ -4,9 +4,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <QtGui/QDialog>
-#include <hpx/lcos/local/spinlock.hpp>
 
+#ifndef Q_MOC_RUN
+#include <hpx/lcos/local/spinlock.hpp>
 #include <boost/function.hpp>
+#endif
 
 class QWidget;
 class QListWidget;
