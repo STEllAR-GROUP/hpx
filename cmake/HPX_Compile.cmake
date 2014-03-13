@@ -49,7 +49,7 @@ if(NOT CMAKE_CROSSCOMPILING)
   macro(hpx_compile name)
     hpx_parse_arguments(${name}
       "SOURCE;LANGUAGE;FLAGS;OUTPUT" "QUIET" ${ARGN})
-  
+
     if(NOT MSVC)
       set(outflag "-o")
       set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "${${name}_OUTPUT}")
@@ -57,7 +57,7 @@ if(NOT CMAKE_CROSSCOMPILING)
       set(outflag "")
       set(${name}_${${name}_LANGUAGE}_COMPILEROUTNAME "-Fo${${name}_OUTPUT}")
     endif()
-  
+
     if(${name}_QUIET)
       hpx_debug("compile" "${CMAKE_${${name}_LANGUAGE}_COMPILER}"
           " ${${name}_FLAGS} ${${name}_SOURCE} "
@@ -98,21 +98,21 @@ else()
   macro(hpx_compile name)
     hpx_parse_arguments(${name}
       "SOURCE;LANGUAGE;FLAGS;OUTPUT" "QUIET" ${ARGN})
-  
+
     get_filename_component(${name}_OUTPUT_DIR ${${name}_OUTPUT} PATH)
-  
+
     set(${name}_FLAGS_STRING "${CMAKE_${${name}_LANGUAGE}_FLAGS}")
     foreach(flag ${${name}_FLAGS})
       set(${name}_FLAGS_STRING "${${name}_FLAGS_STRING} ${flag}")
     endforeach()
-  
+
     set(${name_RESULT} "test")
     try_compile(
       ${name}_RESULT ${${name}_OUTPUT_DIR} ${${name}_SOURCE}
       COMPILE_DEFINITIONS "${${name}_FLAGS_STRING}"
       OUTPUT_VARIABLE ${name}_OUT
       COPY_FILE ${${name}_OUTPUT})
-    
+
     hpx_debug("compile" "${${name}_OUT}")
     if(${name}_OUT)
       file(WRITE ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${name}.${${name}_LANGUAGE}.log ${${name}_OUT})

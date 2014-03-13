@@ -434,7 +434,9 @@
 #  define HPX_PATH_DELIMITERS               "/"
 #  ifdef __APPLE__    // apple
 #    define HPX_SHARED_LIB_EXTENSION        ".dylib"
-#  else               // linux & co
+#  elif defined(HPX_STATIC_LINKING)
+#    define HPX_SHARED_LIB_EXTENSION        ".a"
+#  else  // linux & co
 #    define HPX_SHARED_LIB_EXTENSION        ".so"
 #  endif
 #endif
