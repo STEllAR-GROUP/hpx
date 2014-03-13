@@ -29,7 +29,7 @@ namespace hpx { namespace components
     };
 }}
 
-#if HPX_STATIC_LINKING
+#if defined(HPX_STATIC_LINKING)
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_STATIC_DECLARE_COMPONENT(prefix, name)                            \
     extern "C" void HPX_PLUGIN_FORCE_LOAD_NAME(prefix, name)();               \
