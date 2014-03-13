@@ -93,6 +93,21 @@ if(HPX_PLATFORM)
 endif()
 
 ################################################################################
+# Some platforms do not support dynamic linking. Enable this to link all
+# libraries statically. This also changes some of the internals of HPX related
+# to how components are loaded.
+################################################################################
+hpx_option(HPX_STATIC_LINKING BOOL
+  "Compile HPX staticly linked libraries (Default: OFF)" OFF ADVANCED)
+if(HPX_STATIC_LINKING)
+  hpx_add_config_define(HPX_STATIC_LINKING 1)
+  set(hpx_library_link_mode STATIC)
+else()
+  hpx_add_config_define(HPX_STATIC_LINKING 0)
+  set(hpx_library_link_mode SHARED)
+endif()
+
+################################################################################
 # Boost configuration
 ################################################################################
 
@@ -456,7 +471,7 @@ hpx_include(SetOutputPaths)
 ################################################################################
 # RPATH configuration
 ################################################################################
-if(NOT MSVC)
+if(NOT MSVC AND NOT HPX_STATIC_LINKING)
   set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
       CACHE STRING "Base RPATH for linking" FORCE)
 endif()
@@ -1236,7 +1251,7 @@ else()
 
 
   # This is necessary to ensure that our executables are ELF DYN objects.
-  if(HPX_PIE)
+  if(HPX_PIE AND (NOT HPX_STATIC_LINKING))
     hpx_use_flag_if_available(-rdynamic LANGUAGES CXX C Fortran)
     hpx_use_flag_if_available(-fPIC LANGUAGES CXX C Fortran)
   endif()
@@ -1590,6 +1605,14 @@ endif()
 # Recurse into some subdirectories. This does not actually cause another cmake
 # executable to run. The same process will walk through the project's entire
 # directory structure.
+
+hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
+
+if(HPX_BUILD_TOOLS OR HPX_STATIC_LINKING)
+  add_hpx_pseudo_target(tools)
+  add_subdirectory(tools)
+endif()
+
 add_subdirectory(src)
 
 hpx_option(HPX_BUILD_EXAMPLES BOOL "Build HPX examples (default: ON)" ON ADVANCED)
@@ -1634,13 +1657,6 @@ hpx_option(HPX_BUILD_RUNTIME BOOL "Build HPX runtime (default: ON)" ON ADVANCED)
 if(HPX_BUILD_RUNTIME)
   add_hpx_pseudo_target(runtime)
   add_subdirectory(runtime)
-endif()
-
-hpx_option(HPX_BUILD_TOOLS BOOL "Build HPX tools (default: OFF)" OFF ADVANCED)
-
-if(HPX_BUILD_TOOLS)
-  add_hpx_pseudo_target(tools)
-  add_subdirectory(tools)
 endif()
 
 hpx_option(HPX_BUILD_DOCUMENTATION BOOL "The HPX documentation toolchain is available (default OFF)." OFF)
@@ -2017,19 +2033,25 @@ if(NOT HPX_NO_INSTALL)
           DESTINATION share/${cmake_dir}/Modules)
 endif()
 
+if(NOT HPX_STATIC_LINKING)
+  set(hpx_pc_rpath "")
+else()
+  set(hpx_pc_rpath "_no_rpath")
+endif()
+
 if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
-    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application.pc.in
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application${hpx_pc_rpath}.pc.in
                    ${output_dir}/lib/pkgconfig/hpx_application.pc
                    @ONLY)
-    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component.pc.in
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component${hpx_pc_rpath}.pc.in
                    ${output_dir}/lib/pkgconfig/hpx_component.pc
                    @ONLY)
 else()
-    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug.pc.in
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_application_debug${hpx_pc_rpath}.pc.in
                    ${output_dir}/lib/pkgconfig/hpx_application_debug.pc
                    @ONLY)
 
-    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug.pc.in
+    configure_file(${hpx_SOURCE_DIR}/cmake/templates/hpx_component_debug${hpx_pc_rpath}.pc.in
                    ${output_dir}/lib/pkgconfig/hpx_component_debug.pc
                    @ONLY)
 endif()
