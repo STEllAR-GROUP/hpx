@@ -199,8 +199,10 @@ namespace hpx { namespace util
         enum init_mode
         {
             copy = 0,       // constructor copies data
-            reference = 1   // constructor does not copy data and does not
+            reference = 1,  // constructor does not copy data and does not
                             // manage the lifetime of it
+            take = 2        // constructor does not copy data but does take
+                            // ownership and manages the lifetime of it
          };
 
         serialize_buffer()
