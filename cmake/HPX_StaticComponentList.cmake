@@ -8,7 +8,6 @@ set(HPX_STATIC_COMPONENTLIST_LOADED TRUE)
 include(HPX_Include)
 
 hpx_include(Message)
-hpx_include(ListContains)
 
 if(NOT HPX_STATIC_LINKING)
   macro(hpx_static_componentlist)
@@ -16,7 +15,6 @@ if(NOT HPX_STATIC_LINKING)
 else()
   macro(hpx_static_componentlist)
     # build the executable
-    hpx_debug("hpx_static_componentlist" "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
     add_executable(create_static_module_data_exe
       create_static_module_data.cpp)
     set_target_properties(create_static_module_data_exe
@@ -27,9 +25,9 @@ else()
 
     # create custom build step for generating the file static_component_data.hpp
     set(component_list_files
-      "${hpx_SOURCE_DIR}/src/components/static_components.list")
+      ${hpx_SOURCE_DIR}/src/components/static_components.list)
     set(static_component_data_dependencies
-      "${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in")
+      ${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in)
 
     if(MSVC)
       set(create_static_module_data_dir
@@ -39,9 +37,12 @@ else()
         "${CMAKE_CURRENT_BINARY_DIR}")
     endif()
 
+    hpx_debug("hpx_static_componentlist"
+        "create_static_module_data_dir: ${create_static_module_data_dir}")
+
     add_custom_command(
-      OUTPUT "${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp"
-      COMMAND 
+      OUTPUT ${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp
+      COMMAND
           "${create_static_module_data_dir}/create_static_module_data_exe"
           "${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in"
           "${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp"
@@ -49,19 +50,23 @@ else()
       COMMENT "Generating static component list."
       DEPENDS create_static_module_data_exe ${static_component_data_dependencies})
 
+    set(static_component_data_files
+      ${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in
+      ${hpx_SOURCE_DIR}/src/components/static_components.list
+      ${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp)
+
     add_custom_target(static_component_data_hpp
-      DEPENDS "${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp"
-      SOURCES "${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in")
+      DEPENDS ${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp
+      SOURCES ${static_component_data_files})
 
     # add files to created project file
     if(MSVC)
-      SET(static_component_data_files
-        ${component_list_files}
-        "${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in"
-        "${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp")
-      source_group(Files FILES ${static_component_data_files})
+      hpx_print_list("DEBUG" "hpx_static_componentlist"
+        "static_component_data_files" static_component_data_files)
+
+      source_group("Files" FILES ${static_component_data_files})
       set_source_files_properties(${static_component_data_files}
-        HEADER_FILE_ONLY FALSE)
-endif()
+        HEADER_FILE_ONLY TRUE)
+    endif()
   endmacro()
 endif()
