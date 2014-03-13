@@ -27,7 +27,7 @@ struct static_module_load_data_type
     unsigned long (*get_version)(); // function to force linking version API
 };
 
-#if defined(HPX_BUILD_STATIC)
+#if defined(HPX_STATIC_LINKING)
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_STATIC_DECLARE_COMPONENT(prefix, name)                            \
     extern "C" void HPX_PLUGIN_FORCE_LOAD_NAME(prefix, name)();               \
@@ -74,7 +74,7 @@ struct static_module_load_data_type
 // table of components to link statically
 static_component_load_data_type static_component_load_data[] =
 {
-#if defined(HPX_BUILD_STATIC)
+#if defined(HPX_STATIC_LINKING)
 @HPX_REPLACE@[[
     HPX_STATIC_DEFINE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, @COMPONENT_NAME@),
 ]]
@@ -85,7 +85,7 @@ static_component_load_data_type static_component_load_data[] =
 // table of modules to link statically
 static_module_load_data_type static_module_load_data[] =
 {
-#if defined(HPX_BUILD_STATIC)
+#if defined(HPX_STATIC_LINKING)
 @HPX_REPLACE@[[
     HPX_STATIC_DEFINE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, @MODULE_NAME@),
 ]]
@@ -95,7 +95,7 @@ static_module_load_data_type static_module_load_data[] =
 
 ///////////////////////////////////////////////////////////////////////////////
 // enable auto-linking on supported platforms
-#if defined(HPX_BUILD_STATIC)
+#if defined(HPX_STATIC_LINKING)
 // auto-link modules
 @HPX_REPLACE@[[
     #define HPX_AUTOLINK_LIB_NAME "@MODULE_NAME@"
