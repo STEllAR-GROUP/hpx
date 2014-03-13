@@ -110,8 +110,8 @@ else()
     try_compile(
       "${name}_RESULT" "${${name}_OUTPUT_DIR}" "${${name}_SOURCE}"
       COMPILE_DEFINITIONS "${${name}_FLAGS_STRING}"
-      OUTPUT_VARIABLE "${name}_OUT"
-      COPY_FILE "${${name}_OUTPUT}")
+      OUTPUT_VARIABLE ${name}_OUT
+      COPY_FILE ${${name}_OUTPUT})
 
     hpx_debug("compile" "${${name}_OUT}")
     if(${name}_OUT)

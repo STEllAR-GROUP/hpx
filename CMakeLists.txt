@@ -482,7 +482,7 @@ hpx_include(SetOutputPaths)
 # RPATH configuration
 ################################################################################
 if(NOT MSVC AND NOT HPX_STATIC_LINKING)
-  set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB}/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
+  set(HPX_RPATH "${CMAKE_INSTALL_PREFIX}/lib/hpx:${CMAKE_BINARY_DIR}/lib/hpx"
       CACHE STRING "Base RPATH for linking" FORCE)
 endif()
 
