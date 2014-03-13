@@ -8,6 +8,7 @@
 [section:whats_new What's New]
 
 [/////////////////////////////////////////////////////////////////////////////]
+[/Move to whats_new_previous/]
 [section:hpx_0_9_8 __hpx__ V0.9.8]
 
 [heading General Changes]
@@ -89,6 +90,11 @@ Here is a list of the important tickets we closed for this release.
 * [issue 197] - Add `--console=address` option for PBS runs
 * [issue 175] - Asynchronous AGAS API
 
+[endsect]
+
+[//////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_9_9 __hpx__ V0.9.9]
+FIXME
 [endsect]
 
 [include whats_new_previous.qbk]
