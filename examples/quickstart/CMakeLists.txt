@@ -10,6 +10,7 @@ set(example_programs
     component_inheritance
     component_inheritance_simple
     composable_guard
+    data_actions
     error_handling
     event_synchronization
     factorial
