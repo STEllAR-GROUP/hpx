@@ -201,7 +201,7 @@ public:
     execute_function(hpx::naming::address::address_type, Arguments && args)
     {
         derived_type::set_value_function(
-            hpx::util::get<0>(std::forward<Arguments>(data)));
+            hpx::util::get<0>(std::forward<Arguments>(args)));
     }
 };
 
