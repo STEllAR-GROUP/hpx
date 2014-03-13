@@ -98,10 +98,14 @@ macro(add_hpx_library name)
   hpx_print_list("DEBUG" "add_library.${name}" "Dependencies for ${name}" ${name}_DEPENDENCIES)
   hpx_print_list("DEBUG" "add_library.${name}" "Component dependencies for ${name}" ${name}_COMPONENT_DEPENDENCIES)
 
+  if(NOT hpx_library_link_mode)
+    set(hpx_library_link_mode SHARED)
+  endif()
+
   if(${${name}_STATIC})
     set(${name}_lib_linktype STATIC)
   else()
-    set(${name}_lib_linktype SHARED)
+    set(${name}_lib_linktype ${hpx_library_link_mode})
   endif()
 
   if(NOT HPX_EXTERNAL_CMAKE)

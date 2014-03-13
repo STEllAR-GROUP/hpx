@@ -110,11 +110,15 @@ macro(add_hpx_component name)
     set(exclude_from_all EXCLUDE_FROM_ALL)
   endif()
 
+  if(NOT hpx_library_link_mode)
+    set(hpx_library_link_mode SHARED)
+  endif()
+
   if(${${name}_ESSENTIAL})
-    add_library(${name}_component SHARED
+    add_library(${name}_component ${hpx_library_link_mode}
       ${${name}_SOURCES} ${${name}_HEADERS})
   else()
-    add_library(${name}_component SHARED ${exclude_from_all}
+    add_library(${name}_component ${hpx_library_link_mode} ${exclude_from_all}
       ${${name}_SOURCES} ${${name}_HEADERS})
   endif()
 

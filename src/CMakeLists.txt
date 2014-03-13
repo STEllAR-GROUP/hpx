@@ -178,6 +178,12 @@ add_hpx_library_headers(hpx
   GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/plugins/*.hpp"
   APPEND)
 
+if(HPX_STATIC_LINKING)
+  add_hpx_library_headers(hpx
+    GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/components/*.hpp"
+    APPEND)
+endif()
+
 # libhpx_init headers
 #add_hpx_library_headers(hpx_init
 #  GLOB GLOBS "${hpx_SOURCE_DIR}/hpx/hpx_init.hpp")
@@ -228,11 +234,19 @@ add_hpx_source_group(
 
 ################################################################################
 # libhpx_serialization
+if(MSVC)
+  # The MSVC linker can't handle a static library as large as we get when
+  # statically linking the main HPX library.
+  set(hpx_library_link_mode_core SHARED)
+else()
+  set(hpx_library_link_mode_core ${hpx_library_link_mode})
+endif()
+
 if(HPX_DEFAULT_BUILD_TARGETS)
-  add_library(hpx_serialization SHARED
+  add_library(hpx_serialization ${hpx_library_link_mode_core}
     ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
 else()
-  add_library(hpx_serialization SHARED EXCLUDE_FROM_ALL
+  add_library(hpx_serialization ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
     ${hpx_serialization_SOURCES} ${hpx_serialization_HEADERS})
 endif()
 
@@ -318,11 +332,15 @@ endif()
 ################################################################################
 # libhpx
 if(HPX_DEFAULT_BUILD_TARGETS)
-  add_library(hpx SHARED
+  add_library(hpx ${hpx_library_link_mode_core}
     ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
 else()
-  add_library(hpx SHARED EXCLUDE_FROM_ALL
+  add_library(hpx ${hpx_library_link_mode_core} EXCLUDE_FROM_ALL
     ${hpx_SOURCES} ${hpx_external_SOURCES} ${hpx_external_OBJECTS} ${hpx_HEADERS})
+endif()
+
+if(HPX_STATIC_LINKING)
+  add_dependencies(hpx static_component_data_hpp)
 endif()
 
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
@@ -338,7 +356,6 @@ else()
     OUTPUT_NAME hpx
     FOLDER "Core")
 endif()
-
 
 set(hpx_link_flag_properties)
 if(MSVC)

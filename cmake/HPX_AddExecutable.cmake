@@ -157,7 +157,7 @@ macro(add_hpx_executable name)
     hpx_append_property(${name}_exe COMPILE_FLAGS ${${name}_COMPILE_FLAGS})
   endif()
 
-  if(NOT MSVC)
+  if(NOT MSVC AND NOT HPX_STATIC_LINKING)
     hpx_append_property(${name}_exe COMPILE_FLAGS "-fPIC")
   endif()
 
@@ -182,7 +182,7 @@ macro(add_hpx_executable name)
                                      BUILD_WITH_INSTALL_RPATH TRUE
                                      INSTALL_RPATH_USE_LINK_PATH TRUE
                                      INSTALL_RPATH ${HPX_RPATH})
-    if(HPX_PIE)
+    if(HPX_PIE AND (NOT HPX_STATIC_LINKING))
        hpx_append_property(${name}_exe LINK_FLAGS -pie)
     endif()
   endif()
@@ -241,7 +241,8 @@ macro(add_hpx_executable name)
   endif()
 
   if(MSVC AND HPX_LINK_FLAG_TARGET_PROPERTIES)
-    set_target_properties(${name}_exe PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
+    set_target_properties(${name}_exe
+      PROPERTIES LINK_FLAGS "${HPX_LINK_FLAG_TARGET_PROPERTIES}")
   endif()
 
   if(NOT HPX_NO_INSTALL)
