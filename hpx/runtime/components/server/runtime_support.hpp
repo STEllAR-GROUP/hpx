@@ -26,6 +26,7 @@
 #include <hpx/runtime/agas/gva.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/component_factory_base.hpp>
+#include <hpx/runtime/components/static_component_data.hpp>
 #include <hpx/runtime/components/server/create_component_with_args.hpp>
 #include <hpx/runtime/actions/component_action.hpp>
 #include <hpx/runtime/actions/manage_object_action.hpp>
@@ -85,6 +86,7 @@ namespace hpx { namespace components { namespace server
         typedef std::map<std::string, plugin_factory_type> plugin_map_type;
 
         typedef std::map<std::string, hpx::util::plugin::dll> modules_map_type;
+        typedef std::vector<static_factory_load_data_type> static_modules_type;
 
     public:
         typedef runtime_support type_holder;
@@ -323,6 +325,21 @@ namespace hpx { namespace components { namespace server
             boost::program_options::options_description& options,
             std::set<std::string>& startup_handled);
 
+        bool load_component_static(
+            util::section& ini, std::string const& instance,
+            std::string const& component, boost::filesystem::path lib,
+            naming::gid_type const& prefix, naming::resolver_client& agas_client,
+            bool isdefault, bool isenabled,
+            boost::program_options::options_description& options,
+            std::set<std::string>& startup_handled);
+        bool load_component_dynamic(
+            util::section& ini, std::string const& instance,
+            std::string const& component, boost::filesystem::path lib,
+            naming::gid_type const& prefix, naming::resolver_client& agas_client,
+            bool isdefault, bool isenabled,
+            boost::program_options::options_description& options,
+            std::set<std::string>& startup_handled);
+
         bool load_startup_shutdown_functions(hpx::util::plugin::dll& d,
             error_code& ec);
         bool load_commandline_options(hpx::util::plugin::dll& d,
@@ -348,6 +365,7 @@ namespace hpx { namespace components { namespace server
         component_map_type components_;
         plugin_map_type plugins_;
         modules_map_type modules_;
+        static_modules_type static_modules_;
 
         lcos::local::spinlock globals_mtx_;
         std::list<HPX_STD_FUNCTION<void()> > pre_startup_functions_;

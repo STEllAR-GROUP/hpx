@@ -171,6 +171,14 @@ namespace hpx { namespace util { namespace plugin
 #define HPX_REGISTER_COMPONENT_FACTORY(FactoryType, componentname)            \
     HPX_PLUGIN_EXPORT(HPX_PLUGIN_COMPONENT_PREFIX,                            \
         hpx::components::component_factory_base, FactoryType,                 \
+        componentname, factory);                                              \
+    HPX_INIT_REGISTRY_FACTORY_STATIC(HPX_PLUGIN_COMPONENT_PREFIX,             \
+        componentname, factory)                                               \
+/**/
+
+#define HPX_REGISTER_COMPONENT_FACTORY_DYNAMIC(FactoryType, componentname)    \
+    HPX_PLUGIN_EXPORT_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX,                    \
+        hpx::components::component_factory_base, FactoryType,                 \
         componentname, factory)                                               \
 /**/
 
@@ -182,10 +190,15 @@ namespace hpx { namespace util { namespace plugin
     HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, factory)              \
     HPX_REGISTER_REGISTRY_MODULE()                                            \
 /**/
+#define HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()                               \
+    HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX, factory)      \
+    HPX_REGISTER_REGISTRY_MODULE_DYNAMIC()                                    \
+/**/
 #else
 // in executables (when HPX_APPLICATION_NAME is defined) this needs to expand
 // to nothing
 #define HPX_REGISTER_COMPONENT_MODULE()
+#define HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()
 #endif
 
 #endif

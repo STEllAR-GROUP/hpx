@@ -28,12 +28,19 @@ namespace hpx
         class query_counters;
         class unique_id_ranges;
     }
-    namespace components { namespace server {
-        class runtime_support;
-        class memory;
-    }}
+    namespace components
+    {
+        struct static_factory_load_data_type;
 
-    namespace performance_counters {
+        namespace server
+        {
+            class runtime_support;
+            class memory;
+        }
+    }
+
+    namespace performance_counters
+    {
         class registry;
     }
 

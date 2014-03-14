@@ -38,7 +38,7 @@ namespace hpx { namespace util { namespace plugin {
         {
             typedef typename boost::remove_pointer<get_plugins_list_type>::type PointedType;
 
-            exported_plugins_type& e = f();
+            exported_plugins_type& e = *f();
             std::string clsname(class_name);
             boost::algorithm::to_lower(clsname);
 
@@ -101,8 +101,8 @@ namespace hpx { namespace util { namespace plugin {
         {
             typedef boost::function<void (get_plugins_list_type)> DeleterType;
 
-            std::string plugin_entry(
-                HPX_PLUGIN_SYMBOLS_PREFIX_STR "_exported_plugins_list_");
+            std::string plugin_entry(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR
+                "_exported_plugins_list_");
             plugin_entry += d.get_mapname();
             plugin_entry += "_" + base_name;
 
@@ -114,14 +114,28 @@ namespace hpx { namespace util { namespace plugin {
                 class_name, d.get_name(), ec);
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        inline void
+        get_abstract_factory_names_static(get_plugins_list_type f,
+            std::vector<std::string>& names, error_code& ec = throws)
+        {
+            exported_plugins_type& e = *f();
+
+            exported_plugins_type::iterator end = e.end();
+            for (exported_plugins_type::iterator it = e.begin(); it != end; ++it)
+            {
+                names.push_back((*it).first);
+            }
+        }
+
         inline void
         get_abstract_factory_names(dll const& d, std::string const &base_name,
             std::vector<std::string>& names, error_code& ec = throws)
         {
             typedef boost::function<void (get_plugins_list_type)> DeleterType;
 
-            std::string plugin_entry(
-                HPX_PLUGIN_SYMBOLS_PREFIX_STR "_exported_plugins_list_");
+            std::string plugin_entry(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR
+                "_exported_plugins_list_");
             plugin_entry += d.get_mapname();
             plugin_entry += "_" + base_name;
 
@@ -129,13 +143,7 @@ namespace hpx { namespace util { namespace plugin {
                 d.get<get_plugins_list_type, DeleterType>(plugin_entry, ec);
             if (ec) return;
 
-            exported_plugins_type& e = (f.first)();
-
-            exported_plugins_type::iterator end = e.end();
-            for (exported_plugins_type::iterator it = e.begin(); it != end; ++it)
-            {
-                names.push_back((*it).first);
-            }
+            get_abstract_factory_names_static(f.first, names, ec);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -245,6 +253,11 @@ namespace hpx { namespace util { namespace plugin {
 
             void create(int******) const;
 
+            void get_names(std::vector<std::string>& names, error_code& ec = throws) const
+            {
+                get_abstract_factory_names_static(f, names, ec);
+            }
+
         protected:
             get_plugins_list_type f;
         };
@@ -265,7 +278,7 @@ namespace hpx { namespace util { namespace plugin {
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                     get_abstract_factory_static<BasePlugin>(
-                        this->f, &empty_deleter, name, ec);
+                        this->f, &empty_deleter, name, "", ec);
                 if (ec) return 0;
 
                 return r.first->create(r.second);
@@ -293,7 +306,7 @@ namespace hpx { namespace util { namespace plugin {
             {
                 std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                     get_abstract_factory_static<BasePlugin>(
-                        this->f, &empty_deleter, name, ec);
+                        this->f, &empty_deleter, name, "", ec);
                 if (ec) return 0;
 
                 return r.first->create(r.second, a1);

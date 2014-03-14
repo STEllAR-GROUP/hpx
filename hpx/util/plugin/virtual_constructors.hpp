@@ -21,8 +21,8 @@ namespace hpx { namespace util { namespace plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     typedef std::map<std::string, boost::any> exported_plugins_type;
-    typedef exported_plugins_type& (HPX_PLUGIN_API *get_plugins_list_type)();
-    typedef exported_plugins_type& (HPX_PLUGIN_API get_plugins_list_np)();
+    typedef exported_plugins_type* (HPX_PLUGIN_API *get_plugins_list_type)();
+    typedef exported_plugins_type* (HPX_PLUGIN_API get_plugins_list_np)();
     typedef boost::shared_ptr<get_plugins_list_np> dll_handle;
 
     ///////////////////////////////////////////////////////////////////////////

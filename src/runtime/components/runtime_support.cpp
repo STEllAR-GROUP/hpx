@@ -8,6 +8,7 @@
 
 namespace hpx { namespace components
 {
+    ///////////////////////////////////////////////////////////////////////////
     int runtime_support::get_factory_properties(components::component_type type)
     {
         return this->base_type::get_factory_properties(gid_, type);

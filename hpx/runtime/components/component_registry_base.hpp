@@ -10,6 +10,8 @@
 
 #include <hpx/util/plugin.hpp>
 #include <hpx/util/plugin/export_plugin.hpp>
+#include <hpx/runtime/components/static_component_data.hpp>
+
 #include <boost/mpl/list.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,7 +35,7 @@ namespace hpx { namespace components
         ///         successfully initialized with the registry data of all
         ///         implemented in this module.
         virtual bool get_component_info(std::vector<std::string>& fillini,
-            std::string const& filepath) = 0;
+            std::string const& filepath, bool is_static = false) = 0;
     };
 }}
 
@@ -51,12 +53,17 @@ namespace hpx { namespace components
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.
 #define HPX_REGISTER_REGISTRY_MODULE()                                        \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, registry)             \
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, registry);            \
+    HPX_INIT_REGISTRY_MODULE_STATIC(HPX_PLUGIN_COMPONENT_PREFIX, registry)    \
+/**/
+#define HPX_REGISTER_REGISTRY_MODULE_DYNAMIC()                                \
+    HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX, registry)     \
 /**/
 #else
 // in executables (when HPX_APPLICATION_NAME is defined) this needs to expand
 // to nothing
 #define HPX_REGISTER_REGISTRY_MODULE()
+#define HPX_REGISTER_REGISTRY_MODULE_DYNAMIC()
 #endif
 
 #endif

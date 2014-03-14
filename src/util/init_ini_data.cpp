@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2013 Hartmut Kaiser
+//  Copyright (c) 2005-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -209,6 +209,52 @@ namespace hpx { namespace util
     ///////////////////////////////////////////////////////////////////////////
     // iterate over all shared libraries in the given directory and construct
     // default ini settings assuming all of those are components
+    void load_component_factory_static(util::section& ini, std::string name,
+        hpx::util::plugin::get_plugins_list_type get_factory, error_code& ec)
+    {
+        hpx::util::plugin::static_plugin_factory<
+            components::component_registry_base> pf(get_factory);
+
+        // retrieve the names of all known registries
+        std::vector<std::string> names;
+        pf.get_names(names, ec);
+        if (ec) return;
+
+        std::vector<std::string> ini_data;
+        if (names.empty()) {
+            // This HPX module does not export any factories, but
+            // might export startup/shutdown functions. Create some
+            // default configuration data.
+            using namespace boost::assign;
+#if defined(HPX_DEBUG)
+            // demangle the name in debug mode
+            if (name[name.size()-1] == 'd')
+                name.resize(name.size()-1);
+#endif
+            ini_data += std::string("[hpx.components.") + name + "]";
+            ini_data += "name = " + name;
+            ini_data += "no_factory = 1";
+            ini_data += "enabled = 1";
+            ini_data += "static = 1";
+        }
+        else {
+            // ask all registries
+            BOOST_FOREACH(std::string const& s, names)
+            {
+                // create the component registry object
+                boost::shared_ptr<components::component_registry_base>
+                    registry (pf.create(s, ec));
+                if (ec) return;
+
+                registry->get_component_info(ini_data, "", true);
+            }
+        }
+
+        // incorporate all information from this module's
+        // registry into our internal ini object
+        ini.parse("component registry", ini_data, false);
+    }
+
     void load_component_factory(hpx::util::plugin::dll& d, util::section& ini,
         std::string const& curr, std::string name, error_code& ec)
     {
@@ -227,7 +273,7 @@ namespace hpx { namespace util
             // default configuration data.
             using namespace boost::assign;
 #if defined(HPX_DEBUG)
-            // unmangle the name in debug mode
+            // demangle the name in debug mode
             if (name[name.size()-1] == 'd')
                 name.resize(name.size()-1);
 #endif
@@ -255,6 +301,7 @@ namespace hpx { namespace util
         ini.parse("component registry", ini_data, false);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     void load_plugin_factory(hpx::util::plugin::dll& d, util::section& ini,
         std::string const& curr, std::string const& name, error_code& ec)
     {
