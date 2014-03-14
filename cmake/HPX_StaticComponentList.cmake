@@ -26,8 +26,10 @@ else()
     # create custom build step for generating the file static_component_data.hpp
     set(component_list_files
       ${hpx_SOURCE_DIR}/src/components/static_components.list)
+
     set(static_component_data_dependencies
-      ${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in)
+      ${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in
+      ${component_list_files})
 
     if(MSVC)
       set(create_static_module_data_dir
