@@ -98,7 +98,7 @@ namespace detail {
         {
             std::pair<abstract_factory<BasePlugin> *, dll_handle> r =
                 get_abstract_factory_static<BasePlugin>(
-                    this->f, &empty_deleter, name, ec);
+                    this->f, &empty_deleter, name, "", ec);
             if (ec) return 0;
 
             return r.first->create(r.second, BOOST_PP_ENUM_PARAMS(N, a));

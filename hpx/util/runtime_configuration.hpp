@@ -12,6 +12,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/naming/locality.hpp>
+#include <hpx/runtime/components/static_component_data.hpp>
 #include <hpx/util/ini.hpp>
 #include <hpx/util/plugin/dll.hpp>
 
@@ -40,6 +41,8 @@ namespace hpx { namespace util
         void reconfigure(std::vector<std::string> const& ini_defs);
 
         void load_components(std::map<std::string, hpx::util::plugin::dll>& modules);
+        void load_components_static(std::vector<
+            components::static_factory_load_data_type> const& static_modules);
 
         // Returns the AGAS mode of this locality, returns either hosted (for
         // localities connecting to a remote AGAS server) or bootstrap for the

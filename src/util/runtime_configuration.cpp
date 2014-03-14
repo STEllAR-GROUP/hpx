@@ -229,6 +229,19 @@ namespace hpx { namespace util
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // load information about statically known components
+    void runtime_configuration::load_components_static(std::vector<
+        components::static_factory_load_data_type> const& static_modules)
+    {
+        BOOST_FOREACH(components::static_factory_load_data_type const& d,
+            static_modules)
+        {
+            util::load_component_factory_static(*this, d.name, d.get_factory);
+        }
+    }
+
+    // load information about dynamically discovered components
     void runtime_configuration::load_components(
         std::map<std::string, hpx::util::plugin::dll>& modules)
     {
@@ -263,14 +276,14 @@ namespace hpx { namespace util
             for(tokenizer_type::iterator jt = tok_suffixes.begin(); jt != end_suffixes; ++jt)
             {
                 path += *jt;
-                
+
                 if (!path.empty()) {
                     fs::path this_p(path);
                     boost::system::error_code fsec;
                     fs::path canonical_p = util::canonical_path(this_p, fsec);
                     if (fsec)
                         canonical_p = this_p;
-                    
+
                     std::pair<std::set<std::string>::iterator, bool> p =
                         component_paths.insert(
                             util::native_file_string(canonical_p));
@@ -302,7 +315,7 @@ namespace hpx { namespace util
         // invoke last reconfigure
         reconfigure();
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration(char const* argv0_)
       : num_localities(0),

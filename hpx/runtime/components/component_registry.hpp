@@ -52,7 +52,7 @@ namespace hpx { namespace components
         ///         successfully initialized with the registry data of all
         ///         implemented in this module.
         bool get_component_info(std::vector<std::string>& fillini,
-            std::string const& filepath)
+            std::string const& filepath, bool is_static = false)
         {
             using namespace boost::assign;
             fillini += std::string("[hpx.components.") +
@@ -77,6 +77,10 @@ namespace hpx { namespace components
             case factory_check:
                 fillini += "enabled = $[hpx.components.load_external]";
                 break;
+            }
+
+            if (is_static) {
+                fillini += "static = 1";
             }
 
             char const* more = traits::component_config_data<Component>::call();

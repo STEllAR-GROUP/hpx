@@ -11,6 +11,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/plugin/dll.hpp>
+#include <hpx/util/plugin/virtual_constructors.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util
@@ -26,6 +27,12 @@ namespace hpx { namespace util
     // returns true if at least one alternative location has been read
     // successfully
     bool init_ini_data_base(section& ini, std::string& hpx_ini_file);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // load registry information for all statically registered modules
+    void load_component_factory_static(util::section& ini, std::string name,
+        hpx::util::plugin::get_plugins_list_type get_factory,
+        error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     // global function to read component ini information
