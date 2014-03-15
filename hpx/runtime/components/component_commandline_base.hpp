@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -53,7 +53,13 @@ namespace hpx { namespace components
 /// This macro has to be used in not more than one compilation unit of a
 /// component module.
 #define HPX_REGISTER_COMMANDLINE_OPTIONS()                                    \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, commandline_options)  \
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, commandline_options); \
+    HPX_INIT_REGISTRY_COMMANDLINE_STATIC(HPX_PLUGIN_COMPONENT_PREFIX,         \
+        commandline_options)                                                  \
+/**/
+#define HPX_REGISTER_COMMANDLINE_OPTIONS_DYNAMIC()                            \
+    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX_DYNAMIC,               \
+        commandline_options)                                                  \
 /**/
 
 #endif
