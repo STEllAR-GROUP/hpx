@@ -1,5 +1,5 @@
 [/==============================================================================
-    Copyright (C) 2007-2013 Hartmut Kaiser
+    Copyright (C) 2007-2014 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,7 @@ over 180 tickets (bugs, feature requests, etc.).
 * Ported HPX to BlueGene/Q
 * Improved HPX support for Xeon/Phi accelerators
 * Reimplemented `hpx::bind`, `hpx::tuple`, and `hpx::function` for better
-  performance and better compliance with the C++11 Standard. Added `hpx::mem_fn`.
+  performance and better compliance with the __cpp11__. Added `hpx::mem_fn`.
 * Reworked `hpx::when_all` and `hpx::when_any` for better compliance with the
   ongoing C++ standardization effort, added heterogeneous version for those
   functions. Added `hpx::when_any_swapped`.
@@ -275,7 +275,7 @@ roughly 140 tickets (bugs, feature requests, etc.).
 The major new fetures in this release are:
 
 * We further consolidated the API exposed by __hpx__. We aligned our APIs as much as
-  possible with the existing C++11 Standard and related proposals to the
+  possible with the existing __cpp11__ and related proposals to the
   C++ standardization committee (such as __cpp11_n3632__ and __cpp11_n3634__).
 * We implemented a first version of a distributed AGAS service which essentially
   eliminates all explicit AGAS network traffic.
@@ -502,7 +502,7 @@ encapsulating possibly concurrent remote function invocations) are now well
 integrated with all other API facilities such like `hpx::bind`.
 
 All of the API has been aligned as much as possible with established paradigms.
-HPX now mirrors many of the facilities as defined in the C++11 Standard, such
+HPX now mirrors many of the facilities as defined in the __cpp11__, such
 as `hpx::thread`, `hpx::function`, `hpx::future`, etc.
 
 A lot of work has been put into improving the documentation. Many of the API
@@ -707,8 +707,8 @@ approximately 80 tickets (bugs, feature requests, etc.).
 * Significant improvements made to the usability of __hpx__ in large-scale,
   distributed environments.
 * Renamed [classref hpx::lcos::packaged_task]`<>` to [classref hpx::lcos::packaged_action]`<>` to
-  reflect the semantic differences to a packaged_task as defined by the C++11
-  standard.
+  reflect the semantic differences to a packaged_task as defined by the
+  __cpp11__.
 * __hpx__ now exposes [classref hpx::thread] which is compliant to the C++11 std::thread
   type except that it (purely locally) represents an __hpx__ thread. This new type
   does not expose any of the remote capabilities of the underlying __hpx__-thread
