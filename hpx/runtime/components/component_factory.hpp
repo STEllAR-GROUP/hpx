@@ -304,5 +304,53 @@ namespace hpx { namespace components
         ComponentType, componentname, state)                                  \
 /**/
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC(...)                   \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_(__VA_ARGS__)              \
+/**/
+
+#define HPX_REGISTER_ENABLED_COMPONENT_FACTORY_DYNAMIC(ComponentType,         \
+            componentname)                                                    \
+        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(                     \
+            ComponentType, componentname, ::hpx::components::factory_enabled) \
+        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
+/**/
+
+#define HPX_REGISTER_DISABLED_COMPONENT_FACTORY_DYNAMIC(ComponentType,        \
+            componentname)                                                    \
+        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(                     \
+            ComponentType, componentname, ::hpx::components::factory_disabled)\
+        HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)            \
+/**/
+
+
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_(...)                  \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_,                      \
+            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_1(ComponentType)       \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(                         \
+        ComponentType, ComponentType, ::hpx::components::factory_check)       \
+    HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
+/**/
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_2(ComponentType,       \
+        componentname)                                                        \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(                         \
+        ComponentType, componentname, ::hpx::components::factory_check)       \
+    HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
+/**/
+#define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(                     \
+        ComponentType, componentname, state)                                  \
+    HPX_REGISTER_COMPONENT_FACTORY_DYNAMIC(                                   \
+        hpx::components::component_factory<ComponentType>, componentname)     \
+    HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
+        hpx::components::component_factory<ComponentType>, componentname)     \
+    template struct hpx::components::component_factory<ComponentType>;        \
+    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_3(                        \
+        ComponentType, componentname, state)                                  \
+/**/
+
 #endif
 

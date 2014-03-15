@@ -260,13 +260,13 @@ namespace performance_counters { namespace sine
 // type and performance counter instances.
 //
 // Note that this macro can be used not more than once in one module.
-HPX_REGISTER_STARTUP_MODULE(::performance_counters::sine::get_startup);
+HPX_REGISTER_STARTUP_MODULE_DYNAMIC(::performance_counters::sine::get_startup);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Register a function to be called to populate the special command line
 // options supported by this component.
 //
 // Note that this macro can be used not more than once in one module.
-HPX_REGISTER_COMMANDLINE_MODULE(
+HPX_REGISTER_COMMANDLINE_MODULE_DYNAMIC(
     ::performance_counters::sine::command_line_options);
 

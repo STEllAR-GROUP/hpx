@@ -47,6 +47,11 @@ namespace hpx { namespace components
         hpx::components::component_registry_base, RegistryType,               \
         componentname, registry)                                              \
 /**/
+#define HPX_REGISTER_COMPONENT_REGISTRY_DYNAMIC(RegistryType, componentname)  \
+    HPX_PLUGIN_EXPORT_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX,                    \
+        hpx::components::component_registry_base, RegistryType,               \
+        componentname, registry)                                              \
+/**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_APPLICATION_NAME)

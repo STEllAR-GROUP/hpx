@@ -596,6 +596,10 @@ namespace hpx { namespace traits
     HPX_PLAIN_DIRECT_ACTION_(__VA_ARGS__)                                     \
 /**/
 
+#define HPX_REGISTER_PLAIN_ACTION_DYNAMIC(...)                                \
+    HPX_REGISTER_PLAIN_ACTION_DYNAMIC_(__VA_ARGS__)                           \
+/**/
+
 /// \endcond
 
 // bring in the rest of the implementations

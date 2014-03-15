@@ -47,6 +47,11 @@ namespace hpx { namespace components
         hpx::components::component_commandline_base, RegistryType,            \
         componentname, commandline_options)                                   \
 /**/
+#define HPX_REGISTER_COMMANDLINE_REGISTRY_DYNAMIC(RegistryType, componentname)\
+    HPX_PLUGIN_EXPORT_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX,                    \
+        hpx::components::component_commandline_base, RegistryType,            \
+        componentname, commandline_options)                                   \
+/**/
 
 /// The macro \a HPX_REGISTER_COMMANDLINE_OPTIONS is used to define the
 /// required Hpx.Plugin entry point for the command line option registry.
@@ -58,7 +63,7 @@ namespace hpx { namespace components
         commandline_options)                                                  \
 /**/
 #define HPX_REGISTER_COMMANDLINE_OPTIONS_DYNAMIC()                            \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX_DYNAMIC,               \
+    HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX,               \
         commandline_options)                                                  \
 /**/
 

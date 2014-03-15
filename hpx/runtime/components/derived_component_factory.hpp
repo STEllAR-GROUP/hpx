@@ -313,4 +313,36 @@ namespace hpx { namespace components
         componentname, state)                                                 \
 /**/
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC(...)                   \
+    HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_(__VA_ARGS__)              \
+/**/
+
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_(...)                  \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_,                      \
+            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+    )(__VA_ARGS__))                                                           \
+/**/
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_3(ComponentType,       \
+        componentname, basecomponentname)                                     \
+    HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_4(                         \
+        ComponentType, componentname, basecomponentname,                      \
+        ::hpx::components::factory_check)                                     \
+    HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                \
+/**/
+#define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_4(ComponentType,       \
+        componentname, basecomponentname, state)                              \
+    HPX_REGISTER_COMPONENT_FACTORY_DYNAMIC(                                   \
+        hpx::components::derived_component_factory<ComponentType>,            \
+        componentname)                                                        \
+    HPX_DEF_UNIQUE_DERIVED_COMPONENT_NAME(                                    \
+        hpx::components::derived_component_factory<ComponentType>,            \
+        componentname, basecomponentname)                                     \
+    template struct                                                           \
+        hpx::components::derived_component_factory<ComponentType>;            \
+    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_3(ComponentType,          \
+        componentname, state)                                                 \
+/**/
+
 #endif

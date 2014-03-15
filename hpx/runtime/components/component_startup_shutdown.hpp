@@ -78,8 +78,7 @@ namespace hpx { namespace components
     /***/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(startup, shutdown)               \
-    HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                                 \
+#define HPX_REGISTER_STARTUP_SHUTDOWN_MODULE_(startup, shutdown)              \
     HPX_DEFINE_COMPONENT_STARTUP_SHUTDOWN(startup, shutdown)                  \
     namespace hpx { namespace components { namespace startup_shutdown_provider\
     {                                                                         \
@@ -97,17 +96,51 @@ namespace hpx { namespace components
                 BOOST_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _shutdown)          \
         >;                                                                    \
     }}                                                                        \
+    /**/
+
+#define HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(startup, shutdown)               \
+    HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                                 \
+    HPX_REGISTER_STARTUP_SHUTDOWN_MODULE_(startup, shutdown)                  \
     HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY(                                   \
+        hpx::components::startup_shutdown_provider::                          \
+        BOOST_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _provider), startup_shutdown) \
+    /**/
+#define HPX_REGISTER_STARTUP_SHUTDOWN_MODULE_DYNAMIC(startup, shutdown)       \
+    HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS_DYNAMIC()                         \
+    HPX_REGISTER_STARTUP_SHUTDOWN_MODULE_(startup, shutdown)                  \
+    HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY_DYNAMIC(                           \
         hpx::components::startup_shutdown_provider::                          \
         BOOST_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _provider), startup_shutdown) \
     /**/
 
 #define HPX_REGISTER_STARTUP_MODULE(startup)                                  \
-        HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(startup, 0)                      \
+    HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                                 \
+    HPX_REGISTER_STARTUP_SHUTDOWN_MODULE_(startup, 0)                         \
+    HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY(                                   \
+        hpx::components::startup_shutdown_provider::                          \
+        BOOST_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _provider), startup_shutdown) \
+    /**/
+#define HPX_REGISTER_STARTUP_MODULE_DYNAMIC(startup)                          \
+    HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS_DYNAMIC()                         \
+    HPX_REGISTER_STARTUP_SHUTDOWN_MODULE_(startup, 0)                         \
+    HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY_DYNAMIC(                           \
+        hpx::components::startup_shutdown_provider::                          \
+        BOOST_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _provider), startup_shutdown) \
     /**/
 
 #define HPX_REGISTER_SHUTDOWN_MODULE(shutdown)                                \
-        HPX_REGISTER_STARTUP_SHUTDOWN_MODULE(0, shutdown)                     \
+    HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                                 \
+    HPX_REGISTER_STARTUP_SHUTDOWN_MODULE_(0, shutdown)                        \
+    HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY(                                   \
+        hpx::components::startup_shutdown_provider::                          \
+        BOOST_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _provider), startup_shutdown) \
+    /**/
+#define HPX_REGISTER_SHUTDOWN_MODULE_DYNAMIC(shutdown)                        \
+    HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS_DYNAMIC()                         \
+    HPX_REGISTER_STARTUP_SHUTDOWN_MODULE_(0, shutdown)                        \
+    HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY_DYNAMIC(                           \
+        hpx::components::startup_shutdown_provider::                          \
+        BOOST_PP_CAT(HPX_PLUGIN_COMPONENT_PREFIX, _provider), startup_shutdown) \
     /**/
 
 #endif // HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649

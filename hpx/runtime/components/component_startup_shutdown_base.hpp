@@ -58,6 +58,12 @@ namespace hpx { namespace components
         hpx::components::component_startup_shutdown_base, RegistryType,       \
         componentname, startup_shutdown)                                      \
 /**/
+#define HPX_REGISTER_STARTUP_SHUTDOWN_REGISTRY_DYNAMIC(RegistryType,          \
+        componentname)                                                        \
+    HPX_PLUGIN_EXPORT_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX,                    \
+        hpx::components::component_startup_shutdown_base, RegistryType,       \
+        componentname, startup_shutdown)                                      \
+/**/
 
 /// This macro is used to define the required Hpx.Plugin entry point for the
 /// startup/shutdown registry. This macro has to be used in not more than one
@@ -68,7 +74,7 @@ namespace hpx { namespace components
         startup_shutdown)                                                     \
 /**/
 #define HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS_DYNAMIC()                     \
-    HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX_DYNAMIC,               \
+    HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX,               \
         startup_shutdown)                                                     \
 /**/
 

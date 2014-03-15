@@ -125,5 +125,34 @@ namespace hpx { namespace components
         ComponentType, state>;                                                \
 /**/
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC(...)                  \
+        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_(__VA_ARGS__)         \
+    /**/
+
+#define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_(...)                 \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_,                     \
+            HPX_UTIL_PP_NARG(__VA_ARGS__)                                     \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_2(                    \
+        ComponentType, componentname)                                         \
+    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_3(                        \
+        ComponentType, componentname, ::hpx::components::factory_check)       \
+/**/
+#define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_3(                    \
+        ComponentType, componentname, state)                                  \
+    typedef hpx::components::component_registry<ComponentType, state>         \
+        componentname ## _component_registry_type;                            \
+    HPX_REGISTER_COMPONENT_REGISTRY_DYNAMIC(                                  \
+        componentname ## _component_registry_type, componentname)             \
+    HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
+        componentname ## _component_registry_type, componentname)             \
+    template struct hpx::components::component_registry<                      \
+        ComponentType, state>;                                                \
+/**/
+
 #endif
 
