@@ -61,6 +61,12 @@ namespace hpx { namespace components
             hpx::components::component_commandline, commandline_options)      \
         HPX_DEFINE_COMPONENT_COMMANDLINE_OPTIONS(add_options_function)        \
     /**/
+#define HPX_REGISTER_COMMANDLINE_MODULE_DYNAMIC(add_options_function)         \
+        HPX_REGISTER_COMMANDLINE_OPTIONS_DYNAMIC()                            \
+        HPX_REGISTER_COMMANDLINE_REGISTRY_DYNAMIC(                            \
+            hpx::components::component_commandline, commandline_options)      \
+        HPX_DEFINE_COMPONENT_COMMANDLINE_OPTIONS(add_options_function)        \
+    /**/
 
 #endif // HPX_A7F46A4F_9AF9_4909_B0D8_5304FEFC5649
 

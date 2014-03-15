@@ -262,6 +262,40 @@ namespace hpx { namespace components
         hpx::components::server::plain_function<action_type>)                 \
 /**/
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_PLAIN_ACTION_DYNAMIC_(...)                               \
+    HPX_UTIL_EXPAND_(BOOST_PP_CAT(                                            \
+        HPX_REGISTER_PLAIN_ACTION_DYNAMIC_, HPX_UTIL_PP_NARG(__VA_ARGS__)     \
+    )(__VA_ARGS__))                                                           \
+/**/
+
+#define HPX_REGISTER_PLAIN_ACTION_DYNAMIC_1(action_type)                      \
+    HPX_REGISTER_PLAIN_ACTION_DYNAMIC_3(action_type, action_type,             \
+        ::hpx::components::factory_check)                                     \
+/**/
+
+#define HPX_REGISTER_PLAIN_ACTION_DYNAMIC_2(action_type, plain_action_name)   \
+    HPX_REGISTER_PLAIN_ACTION_DYNAMIC_3(action_type, plain_action_name,       \
+        ::hpx::components::factory_check)                                     \
+/**/
+
+#define HPX_REGISTER_PLAIN_ACTION_DYNAMIC_3(action_type, plain_action_name,   \
+        state)                                                                \
+    HPX_REGISTER_ACTION_2(action_type, plain_action_name)                     \
+    HPX_REGISTER_COMPONENT_FACTORY_DYNAMIC(                                   \
+        hpx::components::plain_component_factory<action_type>,                \
+        plain_action_name)                                                    \
+    HPX_DEF_UNIQUE_COMPONENT_NAME(                                            \
+        hpx::components::plain_component_factory<action_type>,                \
+        plain_action_name)                                                    \
+    template struct hpx::components::plain_component_factory<action_type>;    \
+    HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_3(                        \
+        hpx::components::server::plain_function<action_type>,                 \
+        plain_action_name, state)                                             \
+    HPX_DEFINE_GET_COMPONENT_TYPE(                                            \
+        hpx::components::server::plain_function<action_type>)                 \
+/**/
+
 /// \endcond
 
 #endif

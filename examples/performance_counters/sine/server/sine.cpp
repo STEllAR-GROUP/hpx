@@ -16,7 +16,7 @@ typedef hpx::components::managed_component<
     ::performance_counters::sine::server::sine_counter
 > sine_counter_type;
 
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC(
     sine_counter_type, sine_counter, "base_performance_counter");
 
 ///////////////////////////////////////////////////////////////////////////////

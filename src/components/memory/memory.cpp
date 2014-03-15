@@ -49,5 +49,6 @@ namespace hpx { namespace performance_counters { namespace memory
 // type and performance counter instances.
 //
 // Note that this macro can be used not more than once in one module.
-HPX_REGISTER_STARTUP_MODULE(hpx::performance_counters::memory::get_startup);
+HPX_REGISTER_STARTUP_MODULE_DYNAMIC(
+    hpx::performance_counters::memory::get_startup);
 
