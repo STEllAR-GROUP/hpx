@@ -348,7 +348,7 @@ namespace hpx { namespace components { namespace server
 
         bool load_startup_shutdown_functions_static(std::string const& module,
             error_code& ec);
-        bool runtime_support::load_commandline_options_static(
+        bool load_commandline_options_static(
             std::string const& module,
             boost::program_options::options_description& options,
             error_code& ec);
