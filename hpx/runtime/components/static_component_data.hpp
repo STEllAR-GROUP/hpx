@@ -53,9 +53,7 @@ namespace hpx { namespace components
                     HPX_STATIC_DEFINE_FACTORY(HPX_COMPONENT_NAME, name, base);\
                 hpx::components::init_registry_module(data);                  \
             }                                                                 \
-        };                                                                    \
-        BOOST_PP_CAT(init_registry_module_static_, name)                      \
-            BOOST_PP_CAT(module_data_, __LINE__);                             \
+        } BOOST_PP_CAT(module_data_, __LINE__);                               \
     }                                                                         \
     /**/
 
@@ -71,10 +69,7 @@ namespace hpx { namespace components
                     HPX_STATIC_DEFINE_FACTORY(componentname, name, base);     \
                 hpx::components::init_registry_factory(data);                 \
             }                                                                 \
-        };                                                                    \
-        BOOST_PP_CAT(init_registry_factory_static_, componentname)            \
-            BOOST_PP_CAT(componentname, BOOST_PP_CAT(_factory_data_,          \
-                __LINE__));                                                   \
+        } BOOST_PP_CAT(componentname, BOOST_PP_CAT(_factory_data_, __LINE__));\
     }                                                                         \
     /**/
 
@@ -90,9 +85,7 @@ namespace hpx { namespace components
                     HPX_STATIC_DEFINE_FACTORY(HPX_COMPONENT_NAME, name, base);\
                 hpx::components::init_registry_commandline(data);             \
             }                                                                 \
-        };                                                                    \
-        BOOST_PP_CAT(init_registry_module_commandline_, name)                 \
-            BOOST_PP_CAT(module_data_, __LINE__);                             \
+        } BOOST_PP_CAT(module_commandline_data_, __LINE__);                   \
     }                                                                         \
     /**/
 
@@ -108,9 +101,7 @@ namespace hpx { namespace components
                     HPX_STATIC_DEFINE_FACTORY(HPX_COMPONENT_NAME, name, base);\
                 hpx::components::init_registry_startup_shutdown(data);        \
             }                                                                 \
-        };                                                                    \
-        BOOST_PP_CAT(init_registry_module_startup_shutdown_, name)            \
-            BOOST_PP_CAT(module_data_, __LINE__);                             \
+        } BOOST_PP_CAT(module_startup_shutdown_data_, __LINE__);              \
     }                                                                         \
     /**/
 
