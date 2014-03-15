@@ -25,6 +25,7 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1078] - Improve robustness of component loading
 * [issue 1077] - Fix a missing enum definition for 'take' mode
 * [issue 1076] - Merge Jb master
 * [issue 1075] - Unknown CMake command "add_hpx_pseudo_target"
