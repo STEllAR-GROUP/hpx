@@ -145,7 +145,8 @@ namespace hpx { namespace components
 
     void init_registry_factory(static_factory_load_data_type const& data)
     {
-        get_static_factory_data().insert(std::make_pair(data.name, data.get_factory));
+        get_static_factory_data().insert(
+            std::make_pair(data.name, data.get_factory));
     }
 
     bool get_static_factory(std::string const& instance,
@@ -155,6 +156,66 @@ namespace hpx { namespace components
             map_type;
 
         map_type const& m = get_static_factory_data();
+        map_type::const_iterator it = m.find(instance);
+        if (it == m.end())
+            return false;
+
+        f = it->second;
+        return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::map<std::string, util::plugin::get_plugins_list_type>&
+    get_static_commandline_data()
+    {
+        static std::map<std::string, util::plugin::get_plugins_list_type>
+            global_commandline_init_data;
+        return global_commandline_init_data;
+    }
+
+    void init_registry_commandline(static_factory_load_data_type const& data)
+    {
+        get_static_commandline_data().insert(
+            std::make_pair(data.name, data.get_factory));
+    }
+
+    bool get_static_commandline(std::string const& instance,
+        util::plugin::get_plugins_list_type& f)
+    {
+        typedef std::map<std::string, util::plugin::get_plugins_list_type>
+            map_type;
+
+        map_type const& m = get_static_commandline_data();
+        map_type::const_iterator it = m.find(instance);
+        if (it == m.end())
+            return false;
+
+        f = it->second;
+        return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    std::map<std::string, util::plugin::get_plugins_list_type>&
+    get_static_startup_shutdown_data()
+    {
+        static std::map<std::string, util::plugin::get_plugins_list_type>
+            global_startup_shutdown_init_data;
+        return global_startup_shutdown_init_data;
+    }
+
+    void init_registry_startup_shutdown(static_factory_load_data_type const& data)
+    {
+        get_static_startup_shutdown_data().insert(
+            std::make_pair(data.name, data.get_factory));
+    }
+
+    bool get_static_startup_shutdown(std::string const& instance,
+        util::plugin::get_plugins_list_type& f)
+    {
+        typedef std::map<std::string, util::plugin::get_plugins_list_type>
+            map_type;
+
+        map_type const& m = get_static_startup_shutdown_data();
         map_type::const_iterator it = m.find(instance);
         if (it == m.end())
             return false;
@@ -1065,14 +1126,14 @@ namespace hpx { namespace components { namespace server
                             << components::get_component_type_name(t);
             }
 
-//             // make sure startup/shutdown registration is called once for each
-//             // module, same for plugins
-//             if (startup_handled.find(d.get_name()) == startup_handled.end()) {
-//                 startup_handled.insert(d.get_name());
-//                 load_commandline_options(d, options, ec);
-//                 if (ec) ec = error_code(lightweight);
-//                 load_startup_shutdown_functions(d, ec);
-//             }
+            // make sure startup/shutdown registration is called once for each
+            // module, same for plugins
+            if (startup_handled.find(component) == startup_handled.end()) {
+                startup_handled.insert(component);
+                load_commandline_options_static(component, options, ec);
+                if (ec) ec = error_code(lightweight);
+                load_startup_shutdown_functions_static(component, ec);
+            }
         }
         catch (hpx::exception const&) {
             throw;
@@ -1300,6 +1361,68 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    bool runtime_support::load_startup_shutdown_functions_static(
+        std::string const& module, error_code& ec)
+    {
+        try {
+            // get the factory, may fail
+            util::plugin::get_plugins_list_type f;
+            if (!components::get_static_startup_shutdown(module, f))
+            {
+                LRT_(debug) << "static loading of startup/shutdown functions "
+                    "failed: " << module << ": couldn't find module in global "
+                        << "static startup/shutdown functions data map";
+                return false;
+            }
+
+            util::plugin::static_plugin_factory<
+                component_startup_shutdown_base> pf (f);
+
+            // create the startup_shutdown object
+            boost::shared_ptr<component_startup_shutdown_base>
+                startup_shutdown(pf.create("startup_shutdown", ec));
+            if (ec) {
+                LRT_(debug) << "static loading of startup/shutdown functions "
+                    "failed: " << module << ": " << get_error_what(ec);
+                return false;
+            }
+
+            startup_function_type startup;
+            bool pre_startup = true;
+            if (startup_shutdown->get_startup_function(startup, pre_startup))
+            {
+                if (pre_startup)
+                    pre_startup_functions_.push_back(startup);
+                else
+                    startup_functions_.push_back(startup);
+            }
+
+            shutdown_function_type s;
+            bool pre_shutdown = false;
+            if (startup_shutdown->get_shutdown_function(s, pre_shutdown))
+            {
+                if (pre_shutdown)
+                    pre_shutdown_functions_.push_back(s);
+                else
+                    shutdown_functions_.push_back(s);
+            }
+        }
+        catch (hpx::exception const&) {
+            throw;
+        }
+        catch (std::logic_error const& e) {
+            LRT_(debug) << "static loading of startup/shutdown functions failed: "
+                        << module << ": " << e.what();
+            return false;
+        }
+        catch (std::exception const& e) {
+            LRT_(debug) << "static loading of startup/shutdown functions failed: "
+                        << module << ": " << e.what();
+            return false;
+        }
+        return true;    // startup/shutdown functions got registered
+    }
+
     bool runtime_support::load_startup_shutdown_functions(hpx::util::plugin::dll& d,
         error_code& ec)
     {
@@ -1354,6 +1477,51 @@ namespace hpx { namespace components { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    bool runtime_support::load_commandline_options_static(
+        std::string const& module,
+        boost::program_options::options_description& options, error_code& ec)
+    {
+        try {
+            util::plugin::get_plugins_list_type f;
+            if (!components::get_static_commandline(module, f))
+            {
+                LRT_(debug) << "static loading of command-line options failed: "
+                        << module << ": couldn't find module in global "
+                        << "static command line data map";
+                return false;
+            }
+
+            // get the factory, may fail
+            hpx::util::plugin::static_plugin_factory<
+                component_commandline_base> pf (f);
+
+            // create the startup_shutdown object
+            boost::shared_ptr<component_commandline_base>
+                commandline_options(pf.create("commandline_options", ec));
+            if (ec) {
+                LRT_(debug) << "static loading of command-line options failed: "
+                            << module << ": " << get_error_what(ec);
+                return false;
+            }
+
+            options.add(commandline_options->add_commandline_options());
+        }
+        catch (hpx::exception const&) {
+            throw;
+        }
+        catch (std::logic_error const& e) {
+            LRT_(debug) << "static loading of command-line options failed: "
+                        << module << ": " << e.what();
+            return false;
+        }
+        catch (std::exception const& e) {
+            LRT_(debug) << "static loading of command-line options failed: "
+                        << module << ": " << e.what();
+            return false;
+        }
+        return true;    // startup/shutdown functions got registered
+    }
+
     bool runtime_support::load_commandline_options(hpx::util::plugin::dll& d,
         boost::program_options::options_description& options, error_code& ec)
     {
@@ -1424,7 +1592,7 @@ namespace hpx { namespace components { namespace server
                     pf.create(instance, ec, glob_ini, component_ini, isenabled));
                 if (ec) {
                     LRT_(warning) << "dynamic loading failed: " << lib.string()
-                                  << ": " << instance << ": " 
+                                  << ": " << instance << ": "
                                   << get_error_what(ec);
                     return false;
                 }
