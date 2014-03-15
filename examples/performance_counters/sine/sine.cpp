@@ -13,8 +13,9 @@
 #include "server/sine.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-// Add factory registration functionality
-HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory
+// Add factory registration functionality, We register the module dynamically
+// as no executable links against it.
+HPX_REGISTER_COMPONENT_MODULE_DYNAMIC();
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::managed_component<

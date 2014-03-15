@@ -11,8 +11,9 @@
 #include <hpx/components/memory/mem_counter.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Add factory registration functionality
-HPX_REGISTER_COMPONENT_MODULE()
+// Add factory registration functionality, We register the module dynamically
+// as no executable links against it.
+HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace memory

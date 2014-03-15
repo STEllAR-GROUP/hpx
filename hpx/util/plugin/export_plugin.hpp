@@ -144,7 +144,7 @@
     HPX_PLUGIN_EXPORT_LIST_(HPX_PLUGIN_SYMBOLS_PREFIX, name, classname)       \
     /**/
 
-#define HPX_PLUGIN_EXPORT_LIST_DYNAMIC(prefix, name, classname)               \
+#define HPX_PLUGIN_EXPORT_LIST_DYNAMIC(name, classname)                       \
     HPX_PLUGIN_EXPORT_LIST_(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC, name,          \
         classname)                                                            \
     /**/
