@@ -18,7 +18,7 @@ namespace hpx { namespace components
     ///////////////////////////////////////////////////////////////////////////
     struct static_factory_load_data_type
     {
-        char const* const name;     // component name
+        char const* name;     // component name
         hpx::util::plugin::get_plugins_list_type get_factory;
     };
 
