@@ -25,6 +25,17 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1077] - Fix a missing enum definition for 'take' mode
+* [issue 1076] - Merge Jb master
+* [issue 1075] - Unknown CMake command "add_hpx_pseudo_target"
+* [issue 1074] - Implement apply_continue_callback and apply_colocated_callback
+* [issue 1073] - The new apply_colocated and async_colocated functions lead
+                 to automatic registered functions
+* [issue 1071] - Remove deferred_packaged_task
+* [issue 1069] - serialize_buffer with allocator fails at destruction
+* [issue 1068] - Coroutine include and forward declarations missing
+* [issue 1067] - Add allocator support to util::serialize_buffer
+* [issue 1066] - Allow for MPI_Init being called before HPX launches
 * [issue 1065] - AGAS cache isn't used/populated on worker localities
 * [issue 1064] - Reorder includes to ensure ws2 includes early
 * [issue 1063] - Add hpx::runtime::suspend and hpx::runtime::resume
@@ -33,7 +44,7 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1060] - Implement minimal component migration
 * [issue 1058] - Remove HPX_UTIL_TUPLE from code base
 * [issue 1057] - Add performance counters for threading subsystem
-* [issue 1056] - Thread allocation uses two memory pools
+* [issue 1055] - Thread allocation uses two memory pools
 * [issue 1053] - Work stealing flawed
 * [issue 1052] - Fix a number of warnings
 * [issue 1049] - Fixes for TLS on OSX and more reliable test running
@@ -87,8 +98,9 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1007] - Components are not properly destroyed
 * [issue 1006] - Segfault/hang in set_data
 * [issue 1003] - Performance counter naming issue
-* [issue 197] - Add `--console=address` option for PBS runs
-* [issue 175] - Asynchronous AGAS API
+* [issue 912]  - OS X: component type not found in map
+* [issue 197]  - Add `--console=address` option for PBS runs
+* [issue 175]  - Asynchronous AGAS API
 
 [endsect]
 
