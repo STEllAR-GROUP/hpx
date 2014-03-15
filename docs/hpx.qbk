@@ -47,6 +47,9 @@
 [def __stellar_hpx_buildbot__   [@http://hermione.cct.lsu.edu/ HPX Buildbot Website]]
 [def __stellar_support__        [@http://stellar.cct.lsu.edu/support/ Support Website]]
 
+[def __hpxpi__                  [@http://github.com/STEllAR-GROUP/hpx/ HPXPI]]
+[def __xpi_spec__               [@https://github.com/STEllAR-GROUP/hpxpi/blob/master/spec.pdf?raw=true XPI specification]]
+
 [def __lsu__                    [@http://www.lsu.edu Louisiana State University (LSU)]]
 [def __cct__                    [@http://www.cct.lsu.edu Center for Computation and Technology (CCT)]]
 [def __iu__                     [@http://www.iu.edu Indiana University (IU)]]

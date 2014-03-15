@@ -10,6 +10,9 @@
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_8 __hpx__ V0.9.8]
 
+We have had over 800 commits since the last release and we have closed
+over 65 tickets (bugs, feature requests, etc.).
+
 [heading General Changes]
 
 * A major API breaking change for this release was introduced by implementing
@@ -18,7 +21,35 @@
   compatibility problems, we revised the interface and implementation of the
   existing `hpx::future` implementation. For more details please see the
   [@http://mail.cct.lsu.edu/pipermail/hpx-users/2014-January/000141.html mailing list archive].
-
+  To avoid any incompatibilities for existing code we named the type which
+  implements the `std::future` interface as `hpx::unique_future`. For the next
+  release this will be renamed to `hpx::future`, making it full conforming to
+  __cpp11__.
+* A large part of the code base of __hpx__ has been refactored and partially
+  re-implemented. The main changes were related to
+  * The threading subsystem: these changes significantly reduce the amount of
+    overheads caused by the schedulers, improve the modularity of the code
+    base, and extend the variety of available scheduling algorithms.
+  * The parcel subsystem: these changes improve the performance of the __hpx__
+    networking layer, modularize the structure of the parcelports, and
+    simplify the creation of new parcelports for other underlying networking
+    libraries.
+  * The API subsystem: these changes improved the conformance of the API to
+    __cpp11__, extend and unify the available API functionality, and decrease
+    the overheads created by various elements of the API.
+  * The robustness of the component loading subsystem has been improved
+    significantly, allowing to more protably and more reliably register the
+    components needed by an application as startup. This additionally speeds up
+    general application initialization.
+* We removed the use of C++11 move emulation using Boost.Move, replacing it
+  with C++11 rvalue references. This is the first step towards using more and
+  more native C++11 facilities which we plan to introduce in the future.
+* We improved the reference counting scheme used by __hpx__ which helps
+  managing distributed objects and memory. This improves the overall stability
+  of __hpx__ and further simplifies writing real world applications.
+* The minimal Boost version required to use __hpx__ is now V1.49.0.
+* This release coincides with the first release of __hpxpi__ (V0.1.0), the
+  first implementation of the __xpi_spec__.
 
 [heading Bug Fixes (Closed Tickets)]
 
@@ -27,8 +58,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1077] - Fix a missing enum definition for 'take' mode
 * [issue 1076] - Merge Jb master
 * [issue 1075] - Unknown CMake command "add_hpx_pseudo_target"
-* [issue 1074] - Implement apply_continue_callback and apply_colocated_callback
-* [issue 1073] - The new apply_colocated and async_colocated functions lead
+* [issue 1074] - Implement `apply_continue_callback` and `apply_colocated_callback`
+* [issue 1073] - The new `apply_colocated` and `async_colocated` functions lead
                  to automatic registered functions
 * [issue 1071] - Remove deferred_packaged_task
 * [issue 1069] - serialize_buffer with allocator fails at destruction
@@ -37,11 +68,11 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1066] - Allow for MPI_Init being called before HPX launches
 * [issue 1065] - AGAS cache isn't used/populated on worker localities
 * [issue 1064] - Reorder includes to ensure ws2 includes early
-* [issue 1063] - Add hpx::runtime::suspend and hpx::runtime::resume
-* [issue 1062] - Fix async_continue to propery handle return types
-* [issue 1061] - Implement async_colocated and apply_colocated
+* [issue 1063] - Add `hpx::runtime::suspend` and `hpx::runtime::resume`
+* [issue 1062] - Fix `async_continue` to propery handle return types
+* [issue 1061] - Implement `async_colocated` and `apply_colocated`
 * [issue 1060] - Implement minimal component migration
-* [issue 1058] - Remove HPX_UTIL_TUPLE from code base
+* [issue 1058] - Remove `HPX_UTIL_TUPLE` from code base
 * [issue 1057] - Add performance counters for threading subsystem
 * [issue 1055] - Thread allocation uses two memory pools
 * [issue 1053] - Work stealing flawed
@@ -49,12 +80,12 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1049] - Fixes for TLS on OSX and more reliable test running
 * [issue 1048] - Fixing after 588 hang
 * [issue 1047] - Use port '0' for networking when using one locality
-* [issue 1046] - composable_guard test is broken when having more than one
+* [issue 1046] - `composable_guard` test is broken when having more than one
                  thread
 * [issue 1045] - Security missing headers
 * [issue 1044] - Native TLS on FreeBSD via __thread
-* [issue 1043] - async et.al. compute the wrong result type
-* [issue 1042] - async et.al. implicitly unwrap reference_wrappers
+* [issue 1043] - `async` et.al. compute the wrong result type
+* [issue 1042] - `async` et.al. implicitly unwrap reference_wrappers
 * [issue 1041] - Remove redundant costly Kleene stars from regex searches
 * [issue 1040] - CMake script regex match patterns has unnecessary kleenes
 * [issue 1039] - Remove use of Boost.Move and replace with std::move and real
@@ -66,17 +97,17 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1034] - Symbolic name registration causes application hangs
 * [issue 1033] - Application options read in from an options file generate an
                  error message
-* [issue 1032] - id_type local reference counting is wrong
+* [issue 1032] - `hpx::id_type` local reference counting is wrong
 * [issue 1031] - Negative entry in reference count table
 * [issue 1030] - Implement condition_variable
 * [issue 1029] - Deadlock in thread scheduling subsystem
 * [issue 1028] - HPX-thread cumulative count performance counters report
                  incorrect value
-* [issue 1027] - Expose hpx::thread_interrupted error code as a separate
+* [issue 1027] - Expose `hpx::thread_interrupted` error code as a separate
                  exception type
 * [issue 1026] - Exceptions thrown in asynchronous calls can be lost if the
                  value of the future is never queried
-* [issue 1025] - future::wait_for/wait_until do not remove callback
+* [issue 1025] - `future::wait_for`/`wait_until` do not remove callback
 * [issue 1024] - Remove dependence to boost assert and create hpx assert
 * [issue 1023] - Segfaults with tcmalloc
 * [issue 1022] - prerequisites link in readme is broken
@@ -98,6 +129,8 @@ Here is a list of the important tickets we closed for this release.
 * [issue 1006] - Segfault/hang in set_data
 * [issue 1003] - Performance counter naming issue
 * [issue 912]  - OS X: component type not found in map
+* [issue 663]  - Create a buildbot slave based on Clang 3.2/OSX
+* [issue 636]  - Expose `this_locality::apply<act>(p1, p2);` for local execution
 * [issue 197]  - Add `--console=address` option for PBS runs
 * [issue 175]  - Asynchronous AGAS API
 
