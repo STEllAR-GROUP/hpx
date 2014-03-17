@@ -1657,57 +1657,57 @@ if(NOT HPX_NO_INSTALL)
     PATTERN "CMakeFiles" EXCLUDE
     PATTERN "CTestFiles" EXCLUDE)
 
-  file(COPY hpx
-      DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-      FILES_MATCHING PATTERN "*.hpp")
+#  file(COPY hpx
+#      DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
+#      FILES_MATCHING PATTERN "*.hpp")
 
-#  install( # install all hpx header files
-#    DIRECTORY hpx
-#    DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-#    COMPONENT core
-#    FILES_MATCHING PATTERN "*.hpp"
-#    PATTERN ".git" EXCLUDE
-#    PATTERN "CMakeFiles" EXCLUDE
-#    PATTERN "CTestFiles" EXCLUDE)
+  install( # install all hpx header files
+    DIRECTORY hpx
+    DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
+    COMPONENT core
+    FILES_MATCHING PATTERN "*.hpp"
+    PATTERN ".git" EXCLUDE
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "CTestFiles" EXCLUDE)
 
-  file(COPY src
-      DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-      PATTERN "CMakeFiles" EXCLUDE
-      PATTERN "CTestFiles" EXCLUDE)
+#  file(COPY src
+#      DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
+#      PATTERN "CMakeFiles" EXCLUDE
+#      PATTERN "CTestFiles" EXCLUDE)
 
-#  install( # install all hpx source files
-#    DIRECTORY src
-#    DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-#    COMPONENT core
-#    PATTERN ".git" EXCLUDE
-#    PATTERN "CMakeFiles" EXCLUDE
-#    PATTERN "CTestFiles" EXCLUDE)
+  install( # install all hpx source files
+    DIRECTORY src
+    DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
+    COMPONENT core
+    PATTERN ".git" EXCLUDE
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "CTestFiles" EXCLUDE)
 
-  file(COPY examples
-      DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-      PATTERN "CMakeFiles" EXCLUDE
-      PATTERN "CTestFiles" EXCLUDE)
+#  file(COPY examples
+#      DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
+#      PATTERN "CMakeFiles" EXCLUDE
+#      PATTERN "CTestFiles" EXCLUDE)
 
-#  install( # install all hpx examples source files
-#    DIRECTORY examples
-#    DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-#    COMPONENT core
-#    PATTERN ".git" EXCLUDE
-#    PATTERN "CMakeFiles" EXCLUDE
-#    PATTERN "CTestFiles" EXCLUDE)
+  install( # install all hpx examples source files
+    DIRECTORY examples
+    DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
+    COMPONENT core
+    PATTERN ".git" EXCLUDE
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "CTestFiles" EXCLUDE)
 
-  file(COPY tests
-      DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-      PATTERN "CMakeFiles" EXCLUDE
-      PATTERN "CTestFiles" EXCLUDE)
+#  file(COPY tests
+#      DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
+#      PATTERN "CMakeFiles" EXCLUDE
+#      PATTERN "CTestFiles" EXCLUDE)
 
-#  install( # install all hpx tests source files
-#    DIRECTORY tests
-#    DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
-#    COMPONENT core
-#    PATTERN ".git" EXCLUDE
-#    PATTERN "CMakeFiles" EXCLUDE
-#    PATTERN "CTestFiles" EXCLUDE)
+  install( # install all hpx tests source files
+    DIRECTORY tests
+    DESTINATION share/hpx-${HPX_VERSION}/docs/html/code
+    COMPONENT core
+    PATTERN ".git" EXCLUDE
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "CTestFiles" EXCLUDE)
 
   install( # Install all HPX cmake utility files
     DIRECTORY cmake/
@@ -1825,35 +1825,35 @@ if(NOT HPX_NO_INSTALL)
       PATTERN "*.pdf"
       PATTERN ".git" EXCLUDE)
 
-    file(COPY ${hpx_SOURCE_DIR}/docs/index.html
-      DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/)
+#    file(COPY ${hpx_SOURCE_DIR}/docs/index.html
+#      DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/)
 
     install(
       FILES ${hpx_SOURCE_DIR}/docs/index.html
       DESTINATION share/hpx-${HPX_VERSION}/
       COMPONENT docs)
 
-    file(COPY ${hpx_SOURCE_DIR}/docs/html/src/
-      DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/docs/html/src
-      FILES_MATCHING PATTERN "*.css")
+#    file(COPY ${hpx_SOURCE_DIR}/docs/html/src/
+#      DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/docs/html/src
+#      FILES_MATCHING PATTERN "*.css")
 
-#    install(
-#      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/src/
-#      DESTINATION share/hpx-${HPX_VERSION}/docs/html/src
-#      COMPONENT docs
-#      FILES_MATCHING PATTERN "*.css"
-#      PATTERN ".git" EXCLUDE)
+    install(
+      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/src/
+      DESTINATION share/hpx-${HPX_VERSION}/docs/html/src
+      COMPONENT docs
+      FILES_MATCHING PATTERN "*.css"
+      PATTERN ".git" EXCLUDE)
 
-    file(COPY ${hpx_SOURCE_DIR}/docs/html/images/
-      DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/docs/html/images
-      FILES_MATCHING PATTERN "*.png")
+#    file(COPY ${hpx_SOURCE_DIR}/docs/html/images/
+#      DESTINATION ${doc_dir}/share/hpx-${HPX_VERSION}/docs/html/images
+#      FILES_MATCHING PATTERN "*.png")
 
-#    install(
-#      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/images/
-#      DESTINATION share/hpx-${HPX_VERSION}/docs/html/images
-#      COMPONENT docs
-#      FILES_MATCHING PATTERN "*.png"
-#      PATTERN ".git" EXCLUDE)
+    install(
+      DIRECTORY ${hpx_SOURCE_DIR}/docs/html/images/
+      DESTINATION share/hpx-${HPX_VERSION}/docs/html/images
+      COMPONENT docs
+      FILES_MATCHING PATTERN "*.png"
+      PATTERN ".git" EXCLUDE)
   endif()
 endif()
 
