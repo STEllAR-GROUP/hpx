@@ -55,7 +55,9 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         if (data.pu_offset_ != std::size_t(-1))
             pu_offset_ = data.pu_offset_;
 
-        pu_step_ = data.pu_step_ % num_system_pus;
+        if(num_system_pus > 1)
+            pu_step_ = data.pu_step_ % num_system_pus;
+
         affinity_domain_ = data.affinity_domain_;
         pu_nums_.clear();
 
@@ -180,7 +182,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail
         HPX_ASSERT(pu_offset_ < hardware_concurrency);
 
         // The distance between assigned processing units shouldn't be zero
-        HPX_ASSERT(pu_step_ > 0 && pu_step_ < hardware_concurrency);
+        HPX_ASSERT(pu_step_ > 0 && pu_step_ <= hardware_concurrency);
 
         // We 'scale' the thread number to compute the corresponding
         // processing unit number.
