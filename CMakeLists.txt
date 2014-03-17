@@ -1162,7 +1162,11 @@ else()
     hpx_use_flag_if_available(-fno-inline LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo")
     # Optimize for speed
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
+    if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+      hpx_use_flag_if_available(-O0 LANGUAGES CXX C Fortran)
+    else()
+      hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
+    endif()
 
     # Generate debugging information
     hpx_use_flag_if_available(-g LANGUAGES CXX C Fortran)
@@ -1186,7 +1190,11 @@ else()
     hpx_use_flag_if_available(-Os LANGUAGES CXX C Fortran)
   elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
     # Optimize for speed
-    hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
+    if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
+      hpx_use_flag_if_available(-O0 LANGUAGES CXX C Fortran)
+    else()
+      hpx_use_flag_if_available(-O3 LANGUAGES CXX C Fortran)
+    endif()
   endif()
 
   if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
