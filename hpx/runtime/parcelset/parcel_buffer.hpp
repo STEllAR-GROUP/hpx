@@ -12,6 +12,7 @@
 #include <hpx/performance_counters/parcels/data_point.hpp>
 
 #include <boost/integer/endian.hpp>
+#include <boost/atomic.hpp>
 
 #include <vector>
 
@@ -27,18 +28,21 @@ namespace hpx { namespace parcelset
         parcel_buffer()
           : num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
+          , parcels_decoded_(false)
         {}
 
         parcel_buffer(BufferType const & data)
           : data_(data)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
+          , parcels_decoded_(false)
         {}
 
         parcel_buffer(BufferType && data)
           : data_(std::move(data))
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
+          , parcels_decoded_(false)
         {}
 
         void clear()
@@ -49,6 +53,7 @@ namespace hpx { namespace parcelset
             num_chunks_ = count_chunks_type(0, 0);
             size_ = 0;
             data_size_ = 0;
+            parcels_decoded_ = false;
         }
 
         BufferType data_;
@@ -63,6 +68,8 @@ namespace hpx { namespace parcelset
 
         boost::integer::ulittle64_t size_;
         boost::integer::ulittle64_t data_size_;
+
+        boost::atomic<bool> parcels_decoded_;
 
         /// Counters and their data containers.
         performance_counters::parcels::data_point data_point_;

@@ -57,7 +57,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         {
             // generate the name for this data_buffer
             std::string data_buffer_name(p.get_parcel_id().to_string());
-            if(!buffer_)
+            if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
             {
                 // clear and preallocate out_buffer_ (or fetch from cache)
                 buffer_ = boost::make_shared<parcel_buffer_type>(
@@ -67,7 +67,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             }
             else
             {
-                buffer_->data_ = 
+                buffer_->data_ =
                     get_data_buffer((arg_size * 12) / 10 + 1024,
                         data_buffer_name);
             }
@@ -81,7 +81,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
             /// Increment sends and begin timer.
             buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
 
-            // Write the serialized data to the socket. 
+            // Write the serialized data to the socket.
             //
             // this additional wrapping of the handler into a bind object is
             // needed to keep  this sender object alive for the whole
@@ -120,7 +120,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                       boost::tuple<Handler, ParcelPostprocess>)
                 = &sender::handle_read_ack<Handler, ParcelPostprocess>;
 
-            window_.async_read_ack(boost::bind(f, shared_from_this(), 
+            window_.async_read_ack(boost::bind(f, shared_from_this(),
                 boost::asio::placeholders::error, handler));
         }
 

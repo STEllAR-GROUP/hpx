@@ -50,7 +50,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
         boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p = parcel(), std::size_t arg_size = 0)
         {
-            if(!buffer_)
+            if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
             {
                 buffer_ = boost::make_shared<parcel_buffer_type>(buffer_type());
             }
@@ -100,7 +100,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
                     buffer_->data_point_.time_;
 
                 // now send acknowledgment message
-                void (receiver::*f)(boost::system::error_code const&, 
+                void (receiver::*f)(boost::system::error_code const&,
                           boost::tuple<Handler>)
                     = &receiver::handle_write_ack<Handler>;
 
@@ -109,7 +109,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
                 // acknowledge to have received the parcel
                 window_.async_write_ack(
-                    boost::bind(f, shared_from_this(), 
+                    boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
             }
         }

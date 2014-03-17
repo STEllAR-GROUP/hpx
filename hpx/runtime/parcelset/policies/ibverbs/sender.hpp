@@ -29,7 +29,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             there_(there), parcels_sent_(parcels_sent)
         {
         }
-        
+
         ~sender()
         {
             // gracefully and portably shutdown the socket
@@ -40,7 +40,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         /// Get the window associated with the parcelport_connection.
         client_context& context() { return context_; }
-        
+
         void verify(naming::locality const & parcel_locality_id)
         {
             HPX_ASSERT(parcel_locality_id == there_);
@@ -53,7 +53,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p, std::size_t arg_size)
         {
-            if(!buffer_)
+            if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
             {
                 boost::system::error_code ec;
                 std::string buffer_size_str = get_config_entry("hpx.parcel.ibverbs.buffer_size", "4096");
@@ -66,7 +66,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             }
             return buffer_;
         }
-        
+
         /// Asynchronously write a data structure to the socket.
         template <typename Handler, typename ParcelPostprocess>
         void async_write(Handler handler, ParcelPostprocess parcel_postprocess)
@@ -111,7 +111,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                       boost::tuple<Handler, ParcelPostprocess>)
                 = &sender::handle_read_ack<Handler, ParcelPostprocess>;
 
-            context_.async_read_ack(boost::bind(f, shared_from_this(), 
+            context_.async_read_ack(boost::bind(f, shared_from_this(),
                 boost::asio::placeholders::error, handler));
         }
 
@@ -124,7 +124,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             // parcels have to be sent.
             boost::get<1>(handler)(e, there_, shared_from_this());
         }
-        
+
         /// Context for the parcelport_connection.
         client_context context_;
 

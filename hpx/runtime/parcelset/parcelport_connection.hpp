@@ -79,7 +79,7 @@ namespace hpx { namespace parcelset {
 
         virtual boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p = parcel(), std::size_t arg_size = 0)
         {
-            if(!buffer_)
+            if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
             {
                 buffer_ = boost::make_shared<parcel_buffer_type>();
                 buffer_->data_.reserve(arg_size);

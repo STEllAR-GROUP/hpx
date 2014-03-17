@@ -46,7 +46,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p = parcel(), std::size_t arg_size = 0)
         {
-            if(!buffer_)
+            if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
             {
                 boost::system::error_code ec;
                 std::string buffer_size_str = get_config_entry("hpx.parcel.ibverbs.buffer_size", "4096");
@@ -62,7 +62,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         /// Get the data window associated with the parcelport_connection.
         server_context& context() { return context_; }
-        
+
         /// Asynchronously read a data structure from the socket.
         template <typename Handler>
         void async_read(Handler handler)
@@ -104,7 +104,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                     buffer_->data_point_.time_;
 
                 // now send acknowledgment message
-                void (receiver::*f)(boost::system::error_code const&, 
+                void (receiver::*f)(boost::system::error_code const&,
                           boost::tuple<Handler>)
                     = &receiver::handle_write_ack<Handler>;
 
@@ -113,7 +113,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
                 // acknowledge to have received the parcel
                 context_.async_write_ack(
-                    boost::bind(f, shared_from_this(), 
+                    boost::bind(f, shared_from_this(),
                         boost::asio::placeholders::error, handler));
             }
         }

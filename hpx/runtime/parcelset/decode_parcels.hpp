@@ -216,6 +216,7 @@ namespace hpx { namespace parcelset {
 #else
         decode_message(parcelport, buffer, chunks_);
 #endif
+        buffer->parcels_decoded_ = true;
     }
 
 
@@ -280,6 +281,7 @@ namespace hpx { namespace parcelset {
             first_message = true;
         }
 #endif
+        HPX_ASSERT(!buffer->parcels_decoded_);
         if(hpx::is_running() && parcelport.async_serialization())
         {
                 hpx::applier::register_thread_nullary(
@@ -288,7 +290,6 @@ namespace hpx { namespace parcelset {
                             boost::ref(parcelport), buffer, chunks, first_message),
                     "decode_parcels",
                     threads::pending, true, threads::thread_priority_critical);
-                connection->reset_buffer();
         }
         else
         {
