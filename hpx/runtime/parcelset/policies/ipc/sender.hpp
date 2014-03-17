@@ -15,6 +15,8 @@
 #include <hpx/performance_counters/parcels/gatherer.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 
+#include <boost/asio/placeholders.hpp>
+
 namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
     class sender
