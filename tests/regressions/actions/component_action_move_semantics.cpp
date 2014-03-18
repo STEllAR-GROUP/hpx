@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -7,6 +7,7 @@
 #include <hpx/include/plain_actions.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/util/lightweight_test.hpp>
+#include <hpx/config/compiler_specific.hpp>
 
 #include <boost/foreach.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -158,18 +159,34 @@ void test_actions()
         // test non_movable_object()
         if (is_local)
         {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600
+            HPX_TEST_RANGE((
+                return_object<
+                    action_move_semantics::return_test_non_movable_action, non_movable_object
+                >(id)
+            ), 1u, 4u);
+#else
             HPX_TEST_RANGE((
                 return_object<
                     action_move_semantics::return_test_non_movable_action, non_movable_object
                 >(id)
             ), 1u, 3u); // ?call + value_or_error(w) + ?return
+#endif
         } else {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600
+            HPX_TEST_RANGE((
+                return_object<
+                    action_move_semantics::return_test_non_movable_action, non_movable_object
+                >(id)
+            ), 4u, 7u);
+#else
             HPX_TEST_RANGE((
                 return_object<
                     action_move_semantics::return_test_non_movable_action, non_movable_object
                 >(id)
             ), 4u, 6u); // transfer_action + bind + function + ?call +
                     // value_or_error(w) + ?return
+#endif
         }
     }
 }
@@ -265,12 +282,20 @@ void test_direct_actions()
                 >(id)
             ), 1u, 3u); // ?call + value_or_error(w) + ?return
         } else {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 40600
+            HPX_TEST_RANGE((
+                return_object<
+                    action_move_semantics::return_test_non_movable_direct_action, non_movable_object
+                >(id)
+            ), 4u, 7u);
+#else
             HPX_TEST_RANGE((
                 return_object<
                     action_move_semantics::return_test_non_movable_direct_action, non_movable_object
                 >(id)
             ), 4u, 6u); // transfer_action + bind + function + ?call +
                     // value_or_error(w) + ?return
+#endif
         }
     }
 }
