@@ -1098,8 +1098,9 @@ void primary_namespace::free_components_sync(
 
     BOOST_FOREACH(free_entry const& e, free_list)
     {
-        // Bail if we're in late shutdown.
-        if (HPX_UNLIKELY(!threads::threadmanager_is(running)))
+        // Bail if we're in late shutdown and non-local.
+        if (HPX_UNLIKELY(!threads::threadmanager_is(running)) &&
+            at_c<3>(e) != locality_id_)
         {
             LAGAS_(info) << (boost::format(
                 "primary_namespace::free_components_sync, cancelling free "
@@ -1111,6 +1112,10 @@ void primary_namespace::free_components_sync(
             continue;
         }
 
+        naming::id_type const target_locality(
+            naming::get_gid_from_locality_id(at_c<3>(e))
+          , naming::id_type::unmanaged);
+
         LAGAS_(info) << (boost::format(
             "primary_namespace::free_components_sync, freeing component%1%, "
             "lower(%2%), upper(%3%), base(%4%), gva(%5%), count(%6%), locality_id(%7%)")
@@ -1118,10 +1123,6 @@ void primary_namespace::free_components_sync(
             % lower
             % upper
             % at_c<1>(e) % at_c<0>(e) % at_c<2>(e) % at_c<3>(e));
-
-        naming::id_type const target_locality(
-            naming::get_gid_from_locality_id(at_c<3>(e))
-          , naming::id_type::unmanaged);
 
         futures.push_back(
             hpx::async(act, target_locality, at_c<0>(e), at_c<1>(e), at_c<2>(e).get_lsb())
