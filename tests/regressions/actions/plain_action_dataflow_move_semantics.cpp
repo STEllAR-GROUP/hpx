@@ -296,13 +296,13 @@ int hpx_main(variables_map&)
             return_object<
                 return_non_movable_object_action, non_movable_object
             >(id)
-        ), is_local ? 8u : 10u);
+        ), is_local ? 8u : 11u);
 
         HPX_TEST_LTE((
             return_object<
                 return_non_movable_object_direct_action, non_movable_object
             >(id)
-        ), is_local ? 8u : 10u);
+        ), is_local ? 8u : 11u);
     }
 
     finalize();
