@@ -19,7 +19,7 @@ over 65 tickets (bugs, feature requests, etc.).
   `hpx::future` and `hpx::shared_future` fully in conformance with the
   __cpp11__. While `hpx::shared_future` is new and will not create any
   compatibility problems, we revised the interface and implementation of the
-  existing `hpx::future` implementation. For more details please see the
+  existing `hpx::future`. For more details please see the
   [@http://mail.cct.lsu.edu/pipermail/hpx-users/2014-January/000141.html mailing list archive].
   To avoid any incompatibilities for existing code we named the type which
   implements the `std::future` interface as `hpx::unique_future`. For the next
@@ -38,10 +38,14 @@ over 65 tickets (bugs, feature requests, etc.).
     __cpp11__, extend and unify the available API functionality, and decrease
     the overheads created by various elements of the API.
   * The robustness of the component loading subsystem has been improved
-    significantly, allowing to more protably and more reliably register the
+    significantly, allowing to more portably and more reliably register the
     components needed by an application as startup. This additionally speeds up
     general application initialization.
-* We removed the use of C++11 move emulation using Boost.Move, replacing it
+* We added new API functionality like `hpx::migrate` and `hpx::copy_component`
+  which are the basic building blocks necessary for implementing higher level
+  abstractions for system-wide load balancing, runtime-adaptive resource
+  management, and object-oriented checkpointing and state-management.
+* We removed the use of C++11 move emulation (using Boost.Move), replacing it
   with C++11 rvalue references. This is the first step towards using more and
   more native C++11 facilities which we plan to introduce in the future.
 * We improved the reference counting scheme used by __hpx__ which helps
