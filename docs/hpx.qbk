@@ -249,6 +249,10 @@
     </indexterm>
 ''']
 
+[template copymark[]'''&copy;''']
+[template regmark[]'''&reg;''']
+[template trademark[]'''&#8482;''']
+
 [/ CONTENT]
 
 The __stellar__ Group ([*S]ystems [*T]echnology, [*E]mergent Para[*ll]elism,
