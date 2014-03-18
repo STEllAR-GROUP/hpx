@@ -7,11 +7,44 @@
 
 [section:whats_new What's New]
 
+[//////////////////////////////////////////////////////////////////////////////]
+[section:hpx_0_9_9 __hpx__ V0.9.9]
+TBD
+[endsect]
+
 [/////////////////////////////////////////////////////////////////////////////]
 [section:hpx_0_9_8 __hpx__ V0.9.8]
 
 We have had over 800 commits since the last release and we have closed
 over 65 tickets (bugs, feature requests, etc.).
+
+With the changes below, __hpx__ is once again leading the charge of a whole
+new era of computation. By intrinsically breaking down and synchronizing the
+work to be done, __hpx__ insures that application developers will no longer
+have to fret about where a segment of code executes. That allows coders to
+focus their time and energy to understanding the data dependencies of their
+algorithms and thereby the core obstacles to an efficient code. Here are some
+of the advantages of using __hpx__:
+
+* __hpx__ is solidly rooted in a sophisticated theoretical execution model -- 
+  ParalleX
+* __hpx__ exposes an API fully conforming to the C++11 and the draft C++14
+  standards, extended and applied to distributed computing. Everything
+  programmers know about the concurrency primitives of the standard C++ library
+  is still valid in the context of __hpx__.
+* It provides a competitive, high performance implementation of modern,
+  future-proof ideas which gives an smooth migration path from todays
+  mainstream techniques
+* There is no need for the programmer to worry about lower level
+  parallelization paradigms like threads or message passing; no need to
+  understand pthreads, MPI, OpenMP, or Windows threads, etc.
+* There is no need to think about different types of parallelism such as tasks,
+  pipelines, or fork-join, task or data parallelism.
+* The same source of your program compiles and runs on Linux, BlueGene/Q,
+  Mac OS X, Windows, and Android.
+* The same code runs on shared memory multi-core systems and supercomputers,
+  on handheld devices and Intel[regmark] Xeon Phi[trademark] accelerators, or
+  a heterogeneous mix of those.
 
 [heading General Changes]
 
