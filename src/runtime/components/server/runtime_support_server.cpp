@@ -119,6 +119,8 @@ HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
 
 namespace hpx { namespace components
 {
+    bool initial_static_loading = true;
+
     ///////////////////////////////////////////////////////////////////////////
     // There is no need to protect these global from thread concurrent access
     // as they are access during early startup only.
@@ -131,7 +133,8 @@ namespace hpx { namespace components
 
     void init_registry_module(static_factory_load_data_type const& data)
     {
-        get_static_module_data().push_back(data);
+        if (initial_static_loading)
+            get_static_module_data().push_back(data);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -145,8 +148,9 @@ namespace hpx { namespace components
 
     void init_registry_factory(static_factory_load_data_type const& data)
     {
-        get_static_factory_data().insert(
-            std::make_pair(data.name, data.get_factory));
+        if (initial_static_loading)
+            get_static_factory_data().insert(
+                std::make_pair(data.name, data.get_factory));
     }
 
     bool get_static_factory(std::string const& instance,
@@ -175,8 +179,9 @@ namespace hpx { namespace components
 
     void init_registry_commandline(static_factory_load_data_type const& data)
     {
-        get_static_commandline_data().insert(
-            std::make_pair(data.name, data.get_factory));
+        if (initial_static_loading)
+            get_static_commandline_data().insert(
+                std::make_pair(data.name, data.get_factory));
     }
 
     bool get_static_commandline(std::string const& instance,
@@ -205,8 +210,9 @@ namespace hpx { namespace components
 
     void init_registry_startup_shutdown(static_factory_load_data_type const& data)
     {
-        get_static_startup_shutdown_data().insert(
-            std::make_pair(data.name, data.get_factory));
+        if (initial_static_loading)
+            get_static_startup_shutdown_data().insert(
+                std::make_pair(data.name, data.get_factory));
     }
 
     bool get_static_startup_shutdown(std::string const& instance,
@@ -850,6 +856,9 @@ namespace hpx { namespace components { namespace server
 
         // first static components
         ini.load_components_static(components::get_static_module_data());
+
+        // modules loaded dynamically should not register themselves statically
+        components::initial_static_loading = false;
 
         // then dynamic ones
         ini.load_components(modules_);

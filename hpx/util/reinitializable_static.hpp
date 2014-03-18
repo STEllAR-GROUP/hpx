@@ -82,7 +82,8 @@ namespace hpx { namespace util
         static void default_constructor()
         {
             default_construct();
-            reinit_register(&reinitializable_static::default_construct,
+            reinit_register(
+                &reinitializable_static::default_construct,
                 &reinitializable_static::destruct);
         }
 
