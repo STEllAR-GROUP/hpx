@@ -27,7 +27,7 @@ namespace hpx { namespace parcelset {
     {
         typedef policies::ibverbs::sender connection_type;
         typedef boost::mpl::false_  send_early_parcel;
-        typedef boost::mpl::false_ do_background_work;
+        typedef boost::mpl::true_ do_background_work;
         typedef boost::mpl::false_ do_enable_parcel_handling;
 
         static const char * name()
@@ -68,6 +68,8 @@ namespace hpx { namespace parcelset {
             /// Stop the handling of connections.
             void do_stop();
 
+            void background_work();
+
             /// Retrieve the type of the locality represented by this parcelport
             connection_type get_type() const
             {
@@ -79,20 +81,27 @@ namespace hpx { namespace parcelset {
 
             boost::shared_ptr<sender> create_connection(
                 naming::locality const& l, error_code& ec);
+    
+            void add_sender(boost::shared_ptr<sender> const& sender_connection);
 
         private:
             // helper functions for receiving parcels
-            void handle_accept(boost::system::error_code const& e,
-                boost::shared_ptr<receiver>);
-            void handle_read_completion(boost::system::error_code const& e,
-                boost::shared_ptr<receiver>);
+            void handle_messages();
 
             /// Acceptor used to listen for incoming connections.
-            acceptor* acceptor_;
+            acceptor acceptor_;
+            
+            typedef std::list<boost::shared_ptr<receiver> > receivers_type;
+            receivers_type receivers_;
 
-            /// The list of accepted connections
-            typedef std::set<boost::shared_ptr<receiver> > accepted_connections_set;
-            accepted_connections_set accepted_connections_;
+            hpx::lcos::local::spinlock senders_mtx_;
+            typedef std::list<boost::shared_ptr<sender> > senders_type;
+            senders_type senders_;
+            
+            boost::atomic<bool> stopped_;
+            boost::atomic<bool> handling_messages_;
+            
+            bool use_io_pool_;
         };
     }}
 }}

@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef HPX_PARCELSET_POLICIES_IBVERBS_RECEIVER_HPP
+#define HPX_PARCELSET_POLICIES_IBVERBS_RECEIVER_HPP
+
+
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/runtime/parcelset/parcelport_connection.hpp>
 #include <hpx/runtime/parcelset/decode_parcels.hpp>
@@ -28,13 +32,17 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     class receiver
       : public parcelport_connection<receiver, data_buffer, std::vector<char> >
     {
+        typedef bool(receiver::*next_function_type)();
     public:
         /// Construct a listening parcelport_connection with the given io_service.
-        receiver(boost::asio::io_service& io_service,
-                connection_handler& parcelport)
-          : context_(io_service),
-            parcelport_(parcelport)
+        receiver(connection_handler& parcelport)
+          : parcelport_(parcelport)
         {
+            boost::system::error_code ec;
+            std::string buffer_size_str = get_config_entry("hpx.parcel.ibverbs.buffer_size", "4096");
+
+            buffer_size_ = boost::lexical_cast<std::size_t>(buffer_size_str);
+            mr_buffer_ = context_.set_buffer_size(buffer_size_, ec);
         }
 
         ~receiver()
@@ -48,14 +56,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         {
             if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
             {
-                boost::system::error_code ec;
-                std::string buffer_size_str = get_config_entry("hpx.parcel.ibverbs.buffer_size", "4096");
-
-                std::size_t buffer_size = boost::lexical_cast<std::size_t>(buffer_size_str);
-                char * mr_buffer = context_.set_buffer_size(buffer_size, ec);
-
                 buffer_ = boost::shared_ptr<parcel_buffer_type>(new parcel_buffer_type());
-                buffer_->data_.set_mr_buffer(mr_buffer, buffer_size);
+                buffer_->data_.set_mr_buffer(mr_buffer_, buffer_size_);
             }
             return buffer_;
         }
@@ -64,10 +66,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         server_context& context() { return context_; }
 
         /// Asynchronously read a data structure from the socket.
-        template <typename Handler>
-        void async_read(Handler handler)
+        void async_read()
         {
             buffer_ = get_buffer();
+            buffer_->clear();
 
             // Store the time of the begin of the read operation
             buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
@@ -75,62 +77,54 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             buffer_->data_point_.bytes_ = 0;
             buffer_->data_point_.num_parcels_ = 0;
 
-            // Issue a read operation to read the parcel priority and size.
-            void (receiver::*f)(boost::system::error_code const&,
-                    boost::tuple<Handler>)
-                = &receiver::handle_read_data<Handler>;
-
-            context_.async_read(buffer_->data_,
-                boost::bind(f, shared_from_this(),
-                    boost::asio::placeholders::error,
-                    boost::make_tuple(handler)));
+            next(&receiver::read_data);
         }
-
-    private:
-        /// Handle a completed read of message data.
-        template <typename Handler>
-        void handle_read_data(boost::system::error_code const& e,
-            boost::tuple<Handler> handler)
+        
+        bool done(connection_handler & pp)
         {
-            if (e) {
-                boost::get<0>(handler)(e);
-
-                // Issue a read operation to read the next parcel.
-                async_read(boost::get<0>(handler));
-            }
-            else {
-                // complete data point and pass it along
+            HPX_ASSERT(next_ != 0);
+            if(((*this).*next_)())
+            {
+                // take measurement of overall receive time
                 buffer_->data_point_.time_ = timer_.elapsed_nanoseconds() -
                     buffer_->data_point_.time_;
 
-                // now send acknowledgment message
-                void (receiver::*f)(boost::system::error_code const&,
-                          boost::tuple<Handler>)
-                    = &receiver::handle_write_ack<Handler>;
-
                 // decode the received parcels.
-                decode_parcels(parcelport_, shared_from_this(), buffer_);
-
-                // acknowledge to have received the parcel
-                context_.async_write_ack(
-                    boost::bind(f, shared_from_this(),
-                        boost::asio::placeholders::error, handler));
+                decode_parcels(pp, shared_from_this(), buffer_);
+                return true;
             }
+            return false;
         }
 
-        template <typename Handler>
-        void handle_write_ack(boost::system::error_code const& e,
-            boost::tuple<Handler> handler)
+    private:
+        bool read_data()
         {
-            // Inform caller that data has been received ok.
-            boost::get<0>(handler)(e);
+            std::size_t size = context_.try_read_data(buffer_->data_, boost::system::throws);
+            if(size == 0)
+            {
+                return next(&receiver::read_data);
+            }
+            return next(&receiver::write_ack);
+        }
 
-            // Issue a read operation to handle the next parcel.
-            async_read(boost::get<0>(handler));
+        bool write_ack()
+        {
+            context_.write_ack(boost::system::throws);
+            next(0);
+            return true;
+        }
+
+        bool next(next_function_type f)
+        {
+            next_ = f;
+            return false;
         }
 
         /// Data window for the receiver.
         server_context context_;
+        std::size_t buffer_size_;
+        char * mr_buffer_;
+        next_function_type next_;
 
         /// The handler used to process the incoming request.
         connection_handler& parcelport_;
@@ -146,3 +140,5 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         return lhs.get() < rhs.get();
     }
 }}}}
+
+#endif
