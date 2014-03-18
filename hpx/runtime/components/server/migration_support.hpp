@@ -36,7 +36,7 @@ namespace hpx { namespace components
         {
             // prevent base destructor from unregistering the gid if this
             // instance has been migrated
-            if (pin_count_ == ~0x0)
+            if (pin_count_ == ~0x0u)
                 this->gid_ = naming::invalid_gid;
         }
 
@@ -53,7 +53,7 @@ namespace hpx { namespace components
         {
             typename mutex_type::scoped_lock l(mtx_);
             HPX_ASSERT(pin_count_ != 0);
-            if (pin_count_ != ~0x0)
+            if (pin_count_ != ~0x0u)
                 --pin_count_;
         }
         boost::uint32_t pin_count() const
@@ -65,7 +65,7 @@ namespace hpx { namespace components
         {
             typename mutex_type::scoped_lock l(mtx_);
             HPX_ASSERT(1 == pin_count_);
-            pin_count_ = ~0x0;
+            pin_count_ = ~0x0u;
         }
 
         /// This is the hook implementation for decorate_action which makes
