@@ -20,16 +20,37 @@
 
 namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 {
+    class connection_handler;
+    void add_sender(connection_handler & handler,
+        boost::shared_ptr<sender> const& sender_connection);
+
     class sender
       : public parcelset::parcelport_connection<sender, data_buffer>
     {
+        typedef bool(sender::*next_function_type)();
     public:
-        sender(boost::asio::io_service& io_service,
-            naming::locality const& there,
+        typedef
+            HPX_STD_FUNCTION<void(boost::system::error_code const &, std::size_t)>
+            handler_function_type;
+        typedef
+            HPX_STD_FUNCTION<
+                void(
+                    boost::system::error_code const &
+                  , naming::locality const&
+                  ,  boost::shared_ptr<sender>
+                )
+            >
+            postprocess_function_type;
+
+        sender(connection_handler & handler, naming::locality const& there,
             performance_counters::parcels::gatherer& parcels_sent)
-          : context_(io_service),
-            there_(there), parcels_sent_(parcels_sent)
+          : parcelport_(handler), there_(there), parcels_sent_(parcels_sent)
         {
+            boost::system::error_code ec;
+            std::string buffer_size_str = get_config_entry("hpx.parcel.ibverbs.buffer_size", "4096");
+
+            buffer_size_ = boost::lexical_cast<std::size_t>(buffer_size_str);
+            mr_buffer_ = context_.set_buffer_size(buffer_size_, ec);
         }
 
         ~sender()
@@ -57,14 +78,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         {
             if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
             {
-                boost::system::error_code ec;
-                std::string buffer_size_str = get_config_entry("hpx.parcel.ibverbs.buffer_size", "4096");
-
-                std::size_t buffer_size = boost::lexical_cast<std::size_t>(buffer_size_str);
-                char * mr_buffer = context_.set_buffer_size(buffer_size, ec);
-
                 buffer_ = boost::shared_ptr<parcel_buffer_type>(new parcel_buffer_type());
-                buffer_->data_.set_mr_buffer(mr_buffer, buffer_size);
+                buffer_->data_.set_mr_buffer(mr_buffer_, buffer_size_);
             }
             return buffer_;
         }
@@ -76,59 +91,74 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             /// Increment sends and begin timer.
             buffer_->data_point_.time_ = timer_.elapsed_nanoseconds();
 
-            void (sender::*f)(boost::system::error_code const&, std::size_t,
-                    boost::tuple<Handler, ParcelPostprocess>)
-                = &sender::handle_write<Handler, ParcelPostprocess>;
-
-            context_.async_write(buffer_->data_,
-                boost::bind(f, shared_from_this(),
-                    boost::asio::placeholders::error, ::_2,
-                    boost::make_tuple(handler, parcel_postprocess)));
+            handler_ = handler;
+            postprocess_ = parcel_postprocess;
+            
+            next(&sender::send_data);
+            add_sender(parcelport_, shared_from_this());
+        }
+        
+        bool done()
+        {
+            next_function_type f = 0;
+            {
+                hpx::lcos::local::spinlock::scoped_lock l(mtx_);
+                f = next_;
+            }
+            if(f != 0)
+            {
+                if(((*this).*f)())
+                {
+                    error_code ec;
+                    handler_(ec, buffer_->data_.size());
+                    buffer_->data_point_.time_ = timer_.elapsed_nanoseconds()
+                        - buffer_->data_point_.time_;
+                    parcels_sent_.add_data(buffer_->data_point_);
+                    postprocess_function_type pp;
+                    std::swap(pp, postprocess_);
+                    pp(ec, there_, shared_from_this());
+                    return true;
+                }
+            }
+            return false;
         }
 
     private:
-        /// handle completed write operation
-        template <typename Handler, typename ParcelPostprocess>
-        void handle_write(boost::system::error_code const& e, std::size_t bytes,
-            boost::tuple<Handler, ParcelPostprocess> handler)
+        bool send_data()
         {
-            // just call initial handler
-            boost::get<0>(handler)(e, bytes);
-
-            // complete data point and push back onto gatherer
-            buffer_->data_point_.time_ =
-                timer_.elapsed_nanoseconds() - buffer_->data_point_.time_;
-            parcels_sent_.add_data(buffer_->data_point_);
-
-            // now we can give this connection back to the cache
-            buffer_->clear();
-
-            buffer_->data_point_.bytes_ = 0;
-            buffer_->data_point_.time_ = 0;
-            buffer_->data_point_.serialization_time_ = 0;
-            buffer_->data_point_.num_parcels_ = 0;
-
-            // now handle the acknowledgement byte which is sent by the receiver
-            void (sender::*f)(boost::system::error_code const&,
-                      boost::tuple<Handler, ParcelPostprocess>)
-                = &sender::handle_read_ack<Handler, ParcelPostprocess>;
-
-            context_.async_read_ack(boost::bind(f, shared_from_this(),
-                boost::asio::placeholders::error, handler));
+            context_.write(buffer_->data_, boost::system::throws);
+            return next(&sender::read_ack);
         }
 
-        template <typename Handler, typename ParcelPostprocess>
-        void handle_read_ack(boost::system::error_code const& e,
-            boost::tuple<Handler, ParcelPostprocess> handler)
+        bool read_ack()
         {
-            // Call post-processing handler, which will send remaining pending
-            // parcels. Pass along the connection so it can be reused if more
-            // parcels have to be sent.
-            boost::get<1>(handler)(e, there_, shared_from_this());
+            if(context_.try_read_ack(boost::system::throws))
+            {
+                next(0);
+                return true;
+            }
+            return next(&sender::read_ack);
+        }
+
+        bool next(next_function_type f)
+        {
+            hpx::lcos::local::spinlock::scoped_lock l(mtx_);
+            next_ = f;
+            return false;
         }
 
         /// Context for the parcelport_connection.
         client_context context_;
+        std::size_t buffer_size_;
+        char * mr_buffer_;
+        
+        hpx::lcos::local::spinlock mtx_;
+        next_function_type next_;
+        
+        handler_function_type handler_;
+        postprocess_function_type postprocess_;
+        
+        connection_handler & parcelport_;
 
         /// the other (receiving) end of this connection
         naming::locality there_;

@@ -67,6 +67,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     else boost::asio::detail::throw_error(code);                                \
 /**/
 
+#define HPX_IBVERBS_THROWS(code)                                                \
+    boost::asio::detail::throw_error(code)                                      \
+/**/
+
 #define HPX_IBVERBS_RESET_EC(ec)                                                \
     if (&ec != &boost::system::throws) ec = boost::system::error_code();        \
 /**/
