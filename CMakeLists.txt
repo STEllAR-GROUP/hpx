@@ -607,11 +607,18 @@ else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES 0)
 endif()
 
-hpx_option(HPX_THREAD_MAINTAIN_IDLE_RATE BOOL "Enable measuring the percentage of time spent in the scheduler (default: OFF)" OFF ADVANCED)
+hpx_option(HPX_THREAD_MAINTAIN_IDLE_RATE BOOL "Enable measuring the percentage of time spent in the scheduler (default: ON)" ON ADVANCED)
 if(HPX_THREAD_MAINTAIN_IDLE_RATE)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATE 1)
 else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATE 0)
+endif()
+
+hpx_option(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS BOOL "Enable measuring the percentage of time spent in the scheduler (default: ON)" ON ADVANCED)
+if(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS 1)
+else()
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS 0)
 endif()
 
 ##############################################################################
