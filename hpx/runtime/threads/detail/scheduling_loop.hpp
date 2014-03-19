@@ -160,7 +160,7 @@ namespace hpx { namespace threads { namespace detail
         bool need_restore_state_;
     };
 
-#if HPX_THREAD_MAINTAIN_IDLE_RATE
+#if HPX_THREAD_MAINTAIN_IDLE_RATES
     struct idle_collect_rate
     {
         idle_collect_rate(boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)

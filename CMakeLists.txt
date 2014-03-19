@@ -600,25 +600,39 @@ else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_QUEUE_WAITTIME 0)
 endif()
 
-hpx_option(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES BOOL "Enable measuring thread creation and cleanup times (default: OFF)" OFF ADVANCED)
-if(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
-  hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES 1)
+hpx_option(HPX_THREAD_MAINTAIN_IDLE_RATES BOOL
+    "Enable measuring the percentage of overhead times spent in the scheduler (default: ON)"
+    ON ADVANCED)
+if(HPX_THREAD_MAINTAIN_IDLE_RATES)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATES 1)
+  hpx_option(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES BOOL 
+    "Enable measuring thread creation and cleanup times (default: OFF)"
+    OFF ADVANCED)
+  if(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
+    hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES 1)
+  else()
+    hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES 0)
+  endif()
 else()
-  hpx_add_config_define(HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES 0)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATES 0)
 endif()
 
-hpx_option(HPX_THREAD_MAINTAIN_IDLE_RATE BOOL "Enable measuring the percentage of time spent in the scheduler (default: ON)" ON ADVANCED)
-if(HPX_THREAD_MAINTAIN_IDLE_RATE)
-  hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATE 1)
-else()
-  hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATE 0)
-endif()
-
-hpx_option(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS BOOL "Enable measuring the percentage of time spent in the scheduler (default: ON)" ON ADVANCED)
+hpx_option(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS BOOL
+  "Enable keeping track of cumulative thread counts in the schedulers (default: ON)"
+  ON ADVANCED)
 if(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS)
   hpx_add_config_define(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS 1)
 else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS 0)
+endif()
+
+hpx_option(HPX_THREAD_MAINTAIN_STEALING_COUNTS BOOL
+  "Enable keeping track of counts of thread stealing incidents in the schedulers (default: ON)"
+  ON ADVANCED)
+if(HPX_THREAD_MAINTAIN_STEALING_COUNTS)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_STEALING_COUNTS 1)
+else()
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_STEALING_COUNTS 0)
 endif()
 
 ##############################################################################

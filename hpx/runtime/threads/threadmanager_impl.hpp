@@ -439,7 +439,7 @@ namespace hpx { namespace threads
             std::size_t data, error_code& ec = throws);
 #endif
 
-#if HPX_THREAD_MAINTAIN_IDLE_RATE
+#if HPX_THREAD_MAINTAIN_IDLE_RATES
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_idle_rate(bool reset);
         boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);

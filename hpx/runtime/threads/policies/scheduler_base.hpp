@@ -112,6 +112,7 @@ namespace hpx { namespace threads { namespace policies
         virtual boost::uint64_t get_cleanup_time(bool reset) = 0;
 #endif
 
+#if HPX_THREAD_MAINTAIN_STEALING_COUNTS
         virtual std::size_t get_num_pending_misses(std::size_t num_thread,
             bool reset) = 0;
         virtual std::size_t get_num_pending_accesses(std::size_t num_thread,
@@ -125,6 +126,7 @@ namespace hpx { namespace threads { namespace policies
             bool reset) = 0;
         virtual std::size_t get_num_stolen_to_staged(std::size_t num_thread,
             bool reset) = 0;
+#endif
 
         virtual boost::int64_t get_queue_length(
             std::size_t num_thread = std::size_t(-1)) const = 0;

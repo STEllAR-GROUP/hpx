@@ -540,6 +540,7 @@ namespace hpx { namespace threads { namespace policies
 
         // TODO: #ifdef these
 
+#if HPX_THREAD_MAINTAIN_STEALING_COUNTS
         std::size_t get_num_pending_misses(bool reset)
         {
             return util::get_and_reset_value(pending_misses_, reset);
@@ -599,6 +600,14 @@ namespace hpx { namespace threads { namespace policies
         {
             stolen_to_staged_ += num;
         }
+#else
+        void increment_num_pending_misses(std::size_t num = 1) {}
+        void increment_num_pending_accesses(std::size_t num = 1) {}
+        void increment_num_stolen_from_pending(std::size_t num = 1) {}
+        void increment_num_stolen_from_staged(std::size_t num = 1) {}
+        void increment_num_stolen_to_pending(std::size_t num = 1) {}
+        void increment_num_stolen_to_staged(std::size_t num = 1) {}
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // create a new thread and schedule it if the initial state is equal to
@@ -932,6 +941,7 @@ namespace hpx { namespace threads { namespace policies
         boost::uint64_t cleanup_terminated_time_;
 #endif
 
+#if HPX_THREAD_MAINTAIN_STEALING_COUNTS
         // # of times our associated worker-thread couldn't find work in work_items
         boost::atomic<boost::int64_t> pending_misses_;
 
@@ -942,6 +952,8 @@ namespace hpx { namespace threads { namespace policies
         boost::atomic<boost::int64_t> stolen_from_staged_; ///< count of new_tasks stolen from this queue
         boost::atomic<boost::int64_t> stolen_to_pending_; ///< count of work_items stolen to this queue from other queues
         boost::atomic<boost::int64_t> stolen_to_staged_; ///< count of new_tasks stolen to this queue from other queues
+#endif
+
         util::block_profiler<add_new_tag> add_new_logger_;
     };
 }}}
