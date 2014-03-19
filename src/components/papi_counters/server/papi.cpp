@@ -25,7 +25,7 @@ typedef hpx::components::managed_component<
     papi_ns::server::papi_counter
 > papi_counter_type;
 
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC(
     papi_counter_type, papi_counter, "base_performance_counter");
 
 ///////////////////////////////////////////////////////////////////////////////
