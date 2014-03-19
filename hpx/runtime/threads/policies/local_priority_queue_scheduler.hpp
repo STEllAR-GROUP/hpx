@@ -165,6 +165,7 @@ namespace hpx { namespace threads { namespace policies
         }
 #endif
 
+#if HPX_THREAD_MAINTAIN_STEALING_COUNTS
         std::size_t get_num_pending_misses(std::size_t num_thread, bool reset)
         {
             std::size_t num_pending_misses = 0;
@@ -292,6 +293,7 @@ namespace hpx { namespace threads { namespace policies
             num_stolen_threads += queues_[num_thread]->get_num_stolen_to_staged(reset);
             return num_stolen_threads;
         }
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         void abort_all_suspended_threads()
