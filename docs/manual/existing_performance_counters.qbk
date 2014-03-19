@@ -465,9 +465,11 @@ system and application performance.
          the counter returns the accumulated number of retired __hpx__-threads
          for all worker threads (cores) on that locality. If the instance name
          is `worker-thread#*` the counter will return the overall number of
-         retired __hpx__-threads for all worker threads separately.]
+         retired __hpx__-threads for all worker threads separately.
+         This counter is available only if the configuration time constant
+         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` is set to `ON`.]
     ]
-    [   [`/threads/count/cumulative_phases`]
+    [   [`/threads/count/cumulative-phases`]
         [`locality#*/total` or[br]
          `locality#*/worker-thread#*`
 
@@ -491,7 +493,9 @@ system and application performance.
          of executed __hpx__-thread phases (invocations) for all worker threads
          (cores) on that locality. If the instance name is `worker-thread#*`
          the counter will return the overall number of executed __hpx__-thread
-         phases for all worker threads separately.]
+         phases for all worker threads separately.
+         This counter is available only if the configuration time constant
+         `HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS` is set to `ON`.]
     ]
     [   [`/threads/count/instantaneous/<thread-state>`
 
@@ -587,7 +591,63 @@ system and application performance.
         [Returns the average idle rate for the given worker thread(s) on the
          given locality. The idle rate is defined as the ratio of the time
          spent on scheduling and management tasks and the overall time spent
-         executing work since the application started.]
+         executing work since the application started.
+         This counter is available only if the configuration time constant
+         `HPX_THREAD_MAINTAIN_IDLE_RATE` is set to `ON`.]
+    ]
+    [   [`/threads/creation-idle-rate`]
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
+
+          where:[br]
+          `locality#*` is defining the locality for which the average
+          idle rate of all (or one) worker threads should be queried for. The
+          locality id (given by `*`) is a (zero based) number identifying the
+          locality
+
+          `worker-thread#*` is defining the worker thread for which the
+          averaged idle rate should be queried for. The
+          worker thread number (given by the `*`) is a (zero based) number
+          identifying the worker thread. The number of available worker threads
+          is usually specified on the command line for the application using the
+          option [hpx_cmdline `--hpx:threads`].
+        ]
+        [None]
+        [Returns the average idle rate for the given worker thread(s) on the
+         given locality which is caused by creating new threads. The creation
+         idle rate is defined as the ratio of the time spent on creating new
+         threads and the overall time spent executing work since the
+         application started.
+         This counter is available only if the configuration time constants
+         `HPX_THREAD_MAINTAIN_IDLE_RATE` and
+         `HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES` are set to `ON`.]
+    ]
+    [   [`/threads/cleanup-idle-rate`]
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
+
+          where:[br]
+          `locality#*` is defining the locality for which the average
+          idle rate of all (or one) worker threads should be queried for. The
+          locality id (given by `*`) is a (zero based) number identifying the
+          locality
+
+          `worker-thread#*` is defining the worker thread for which the
+          averaged idle rate should be queried for. The
+          worker thread number (given by the `*`) is a (zero based) number
+          identifying the worker thread. The number of available worker threads
+          is usually specified on the command line for the application using the
+          option [hpx_cmdline `--hpx:threads`].
+        ]
+        [None]
+        [Returns the average idle rate for the given worker thread(s) on the
+         given locality which is caused by cleaning up terminated threads. The 
+         cleanup idle rate is defined as the ratio of the time spent on
+         cleaning up terminated thread objects and the overall time spent
+         executing work since the application started.
+         This counter is available only if the configuration time constants
+         `HPX_THREAD_MAINTAIN_IDLE_RATES` and
+         `HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES` are set to `ON`.]
     ]
     [   [`/threadqueue/length`]
         [`locality#*/total` or[br]
@@ -633,7 +693,7 @@ system and application performance.
         [Returns the total number of __hpx__-thread recycling operations
          performed.]
     ]
-    [   [`/threads/count/stolen`]
+    [   [`/threads/count/stolen-from-pending`]
         [`locality#*/total`
 
           where:[br] `*` is the locality id of the locality the number of
@@ -641,9 +701,135 @@ system and application performance.
           (zero based) number identifying the locality.
         ]
         [None]
-        [Returns the total number of __hpx__-threads 'stolen' from a
-         neighboring worker thread (these threads are executed by a
-         different worker thread than they were initially scheduled on).]
+        [Returns the total number of __hpx__-threads 'stolen' from the pending
+         thread queue by a neighboring thread worker thread (these threads are
+         executed by a different worker thread than they were initially
+         scheduled on).
+         This counter is available only if the configuration time constant
+         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`.]
+    ]
+    [   [`/threads/count/pending-misses`]
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
+
+          where:[br]
+          `locality#*` is defining the locality for which the average
+          idle rate of all (or one) worker threads should be queried for. The
+          locality id (given by `*`) is a (zero based) number identifying the
+          locality
+
+          `worker-thread#*` is defining the worker thread for which the
+          averaged idle rate should be queried for. The
+          worker thread number (given by the `*`) is a (zero based) number
+          identifying the worker thread. The number of available worker threads
+          is usually specified on the command line for the application using the
+          option [hpx_cmdline `--hpx:threads`].
+        ]
+        [None]
+        [Returns the total number of times that the referenced worker-thread
+         on the referenced locality failed to find pending HPX-threads in its
+         associated queue.
+         This counter is available only if the configuration time constant
+         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`.]
+    ]
+    [   [`/threads/count/pending-accesses`]
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
+
+          where:[br]
+          `locality#*` is defining the locality for which the average
+          idle rate of all (or one) worker threads should be queried for. The
+          locality id (given by `*`) is a (zero based) number identifying the
+          locality
+
+          `worker-thread#*` is defining the worker thread for which the
+          averaged idle rate should be queried for. The
+          worker thread number (given by the `*`) is a (zero based) number
+          identifying the worker thread. The number of available worker threads
+          is usually specified on the command line for the application using the
+          option [hpx_cmdline `--hpx:threads`].
+        ]
+        [None]
+        [Returns the total number of times that the referenced worker-thread
+         on the referenced locality looked for pending HPX-threads in its
+         associated queue.
+         This counter is available only if the configuration time constant
+         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`.]
+    ]
+    [   [`/threads/count/stolen-from-staged`]
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
+
+          where:[br]
+          `locality#*` is defining the locality for which the average
+          idle rate of all (or one) worker threads should be queried for. The
+          locality id (given by `*`) is a (zero based) number identifying the
+          locality
+
+          `worker-thread#*` is defining the worker thread for which the
+          averaged idle rate should be queried for. The
+          worker thread number (given by the `*`) is a (zero based) number
+          identifying the worker thread. The number of available worker threads
+          is usually specified on the command line for the application using the
+          option [hpx_cmdline `--hpx:threads`].
+        ]
+        [None]
+        [Returns the total number of __hpx__-threads 'stolen' from the staged
+         thread queue by a neighboring worker thread (these threads are
+         executed by a different worker thread than they were initially
+         scheduled on).
+         This counter is available only if the configuration time constant
+         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`.]
+    ]
+    [   [`/threads/count/stolen-to-pending`]
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
+
+          where:[br]
+          `locality#*` is defining the locality for which the average
+          idle rate of all (or one) worker threads should be queried for. The
+          locality id (given by `*`) is a (zero based) number identifying the
+          locality
+
+          `worker-thread#*` is defining the worker thread for which the
+          averaged idle rate should be queried for. The
+          worker thread number (given by the `*`) is a (zero based) number
+          identifying the worker thread. The number of available worker threads
+          is usually specified on the command line for the application using the
+          option [hpx_cmdline `--hpx:threads`].
+        ]
+        [None]
+        [Returns the total number of __hpx__-threads 'stolen' from the pending
+         thread queue of a neighboring worker thread (these threads are
+         executed by a different worker thread than they were initially
+         scheduled on).
+         This counter is available only if the configuration time constant
+         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`.]
+    ]
+    [   [`/threads/count/stolen-to-staged`]
+        [`locality#*/total` or[br]
+         `locality#*/worker-thread#*`
+
+          where:[br]
+          `locality#*` is defining the locality for which the average
+          idle rate of all (or one) worker threads should be queried for. The
+          locality id (given by `*`) is a (zero based) number identifying the
+          locality
+
+          `worker-thread#*` is defining the worker thread for which the
+          averaged idle rate should be queried for. The
+          worker thread number (given by the `*`) is a (zero based) number
+          identifying the worker thread. The number of available worker threads
+          is usually specified on the command line for the application using the
+          option [hpx_cmdline `--hpx:threads`].
+        ]
+        [None]
+        [Returns the total number of __hpx__-threads 'stolen' from the staged
+         thread queue of a neighboring worker thread (these threads are
+         executed by a different worker thread than they were initially
+         scheduled on).
+         This counter is available only if the configuration time constant
+         `HPX_THREAD_MAINTAIN_STEALING_COUNTS` is set to `ON`.]
     ]
     [   [`/threads/count/objects`]
         [`locality#*/total` or[br]
