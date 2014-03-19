@@ -928,6 +928,7 @@ namespace hpx { namespace threads
         return true;
     }
 
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
     ///////////////////////////////////////////////////////////////////////////
     // idle rate counter creation function
     template <typename SchedulingPolicy, typename NotificationPolicy>
@@ -983,6 +984,7 @@ namespace hpx { namespace threads
             "invalid counter instance name: " + paths.instancename_);
         return naming::invalid_gid;
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type
@@ -1067,6 +1069,7 @@ namespace hpx { namespace threads
               "", 0
             },
 #endif
+#if HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
             // /threads{locality#%d/total}/count/cumulative
             // /threads{locality#%d/worker-thread%d}/count/cumulative
             { "count/cumulative",
@@ -1083,6 +1086,7 @@ namespace hpx { namespace threads
                   static_cast<std::size_t>(paths.instanceindex_), _1),
               "worker-thread", shepherd_count
             },
+#endif
             // /threads{locality#%d/total}/count/instantaneous/all
             // /threads{locality#%d/worker-thread%d}/count/instantaneous/all
             { "count/instantaneous/all",
@@ -1273,6 +1277,7 @@ namespace hpx { namespace threads
               "ns"
             },
 #endif
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
             // idle rate
             { "/threads/idle-rate", performance_counters::counter_raw,
               "returns the idle rate for the referenced object",
@@ -1281,6 +1286,7 @@ namespace hpx { namespace threads
               &performance_counters::locality_thread_counter_discoverer,
               "0.01%"
             },
+#endif
 #if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
             { "/threads/creation-idle-rate", performance_counters::counter_raw,
               "returns the % of idle-rate spent creating HPX-threads for the "
@@ -1574,6 +1580,7 @@ namespace hpx { namespace threads
         startup_ = NULL;
     }
 
+#if HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
     template <typename SchedulingPolicy, typename NotificationPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
         get_executed_threads(std::size_t num, bool reset)
@@ -1613,7 +1620,9 @@ namespace hpx { namespace threads
         }
         return result;
     }
+#endif
 
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulingPolicy, typename NotificationPolicy>
     boost::int64_t threadmanager_impl<SchedulingPolicy, NotificationPolicy>::
@@ -1654,6 +1663,7 @@ namespace hpx { namespace threads
         double const percent = 1. - (exec_time / tfunc_time);
         return boost::int64_t(10000. * percent);   // 0.01 percent
     }
+#endif
 
 #if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
     template <typename SchedulingPolicy, typename NotificationPolicy>

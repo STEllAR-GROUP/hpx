@@ -439,10 +439,11 @@ namespace hpx { namespace threads
             std::size_t data, error_code& ec = throws);
 #endif
 
+#if HPX_THREAD_MAINTAIN_IDLE_RATE
         /// Get percent maintenance time in main thread-manager loop.
         boost::int64_t avg_idle_rate(bool reset);
         boost::int64_t avg_idle_rate(std::size_t num_thread, bool reset);
-
+#endif
 #if HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES
         boost::int64_t avg_creation_idle_rate(bool reset);
         boost::int64_t avg_cleanup_idle_rate(bool reset);
@@ -470,10 +471,12 @@ namespace hpx { namespace threads
             scheduler_.on_error(num_thread, e);
         }
 
+#if HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS
         boost::int64_t get_executed_threads(
             std::size_t num = std::size_t(-1), bool reset = false);
         boost::int64_t get_executed_thread_phases(
             std::size_t num = std::size_t(-1), bool reset = false);
+#endif
 
     protected:
         ///
