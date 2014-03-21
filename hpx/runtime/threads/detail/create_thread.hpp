@@ -63,6 +63,15 @@ namespace hpx { namespace threads { namespace detail
         if (0 == data.scheduler_base)
             data.scheduler_base = scheduler;
 
+        // Pass critical priority from parent to child.
+        thread_self* self = get_self_ptr();
+        if (self)
+        {
+            if (thread_priority_critical == threads::get_self_id()->get_priority())
+                data.priority = thread_priority_critical;
+        }
+
+
         // create the new thread
         thread_id_type newid = scheduler->create_thread(
             data, initial_state, run_now, ec, data.num_os_thread);
