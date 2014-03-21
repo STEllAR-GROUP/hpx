@@ -642,6 +642,11 @@ else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_STEALING_COUNTS 0)
 endif()
 
+hpx_option(HPX_THREAD_MAINTAIN_IDLE_RATE BOOL "Enable measuring the percentage of time spent in the scheduler (default: OFF)" OFF ADVANCED)
+if(HPX_THREAD_MAINTAIN_IDLE_RATE OR HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_IDLE_RATE 1)
+endif()
+
 hpx_option(HPX_THREAD_MAINTAIN_THREAD_DATA BOOL
   "Enable thread local storage for all HPX threads (default: ON)"
   ON ADVANCED)
