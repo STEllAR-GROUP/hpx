@@ -86,7 +86,10 @@ for (key, dataset) in sorted(master.iteritems()):
         if sample_size is None:
             sample_size = len(dvs)
         else:
-            assert sample_size is len(dvs) 
+            if sample_size is not len(dvs):
+                missing = sample_size - len(dvs)
+                print "WARNING: Missing "+str(missing)+" sample(s) for "+\
+                      "("+", ".join(str(x) for x in ivs)+")"
 
         for dv in dvs:
             if number_of_dvars is None:
