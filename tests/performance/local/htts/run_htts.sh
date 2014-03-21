@@ -11,13 +11,13 @@
 
 usage()
 {
-    echo "Usage: $0 -b /path/to/benchmark -t max_cores -T 'x y ...' -d 'x y ...' [-s samples] [-f /path/to/options/file]"
+    echo "Usage: $0 -b /path/to/benchmark -t 'x y ...' -T 'x y ...' -d 'x y ...' [-s samples] [-f /path/to/options/file]"
     echo
     echo "This script runs a parameter sweep for the HTTS benchmark" 
     echo
     echo "Options:"
     echo "  -b    Path to the benchmark."
-    echo "  -t    Maximum number of cores to use." 
+    echo "  -t    Space-separated list of core counts to use." 
     echo "  -T    Space-separated list of task counts to use."
     echo "  -d    Space-separated list of delays to use [microseconds]."
     echo "  -s    Number of samples to collect for each combination of parameters."
@@ -26,7 +26,7 @@ usage()
 
 BENCHMARK=""
 
-MAX_CORES=""
+CORES=""
 
 DELAY=""
 
@@ -47,7 +47,7 @@ while getopts "b:t:T:d:s:f:h" OPTION; do case $OPTION in
         BENCHMARK=$OPTARG
         ;;
     t)
-        MAX_CORES=$OPTARG
+        CORES=$OPTARG
         ;;
     T)
         TASKS="$OPTARG"
@@ -68,7 +68,7 @@ while getopts "b:t:T:d:s:f:h" OPTION; do case $OPTION in
 esac; done
 
 if [ "$BENCHMARK" == "" ] || \
-   [ "$MAX_CORES" == "" ] || \
+   [ "$CORES"     == "" ] || \
    [ "$DELAY"     == "" ] || \
    [ "$TASKS"     == "" ] 
 then
@@ -79,7 +79,7 @@ fi
 J=0
 for delay in $DELAY; do
     for tasks in $TASKS; do
-        for cores in $(bash -c "echo {1..$MAX_CORES}"); do
+        for cores in $CORES; do
             for samples in $(bash -c "echo {1..$SAMPLES}"); do
                 header="--no-header"
                 if [ $J == 0 ]; then
