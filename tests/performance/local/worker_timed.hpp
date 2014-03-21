@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
+//  Copyright (c) 2011-2014 Bryce Adelstein-Lelbach
 //  Copyright (c) 2007-2012 Hartmut Kaiser
 //  Copyright (c)      2013 Thomas Heller
 //  Copyright (c)      2013 Patricia Grubel
