@@ -105,20 +105,20 @@ Linux
    add the -jN flag to your make invocation, where N is the number of cores
    on your machine plus one::
 
-      gmake -j5
+    gmake -j5
 
 5) To complete the build and install HPX::
 
-      gmake install
+    gmake install
 
-   This will build and install the essential core components of HPX only. Use::
+   This will build and install the essential core components of HPX only. Use
 
-      gmake tests
+        gmake tests
 
-   to build and run the tests and::
+   to build and run the tests and
 
-      gmake examples
-      gmake install
+        gmake examples
+        gmake install
 
    to build and install the examples.
 
@@ -193,11 +193,11 @@ we describe two possibilities:
 
     make install
 
-   This will build and install the essential core components of HPX only. Use::
+   This will build and install the essential core components of HPX only. Use
 
     make tests
 
-   to build and run the tests and::
+   to build and run the tests and
 
     make examples
     make install
@@ -210,18 +210,18 @@ required libraries via MacPorts:
 
 1) Install MacPorts <http://www.macports.org/>
 
-2) Install Boost, CMake, gcc 4.8, and hwloc::
+2) Install Boost, CMake, gcc 4.8, and hwloc:
 
     sudo port install boost
     sudo port install gcc48
     sudo port install hwloc
 
-   You may also want::
+   You may also want:
 
     sudo port install cmake
     sudo port install git-core
 
-3) Make this version of gcc your default compiler::
+3) Make this version of gcc your default compiler:
 
     sudo port install gcc_select
     sudo port select gcc mp-gcc48
