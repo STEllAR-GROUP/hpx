@@ -30,7 +30,6 @@
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/applier/apply.hpp>
-#include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/wait_all.hpp>
 
 #include <hpx/util/assert.hpp>
@@ -237,18 +236,6 @@ namespace hpx { namespace components
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server
 {
-    namespace detail
-    {
-        id_type create_shutdown_barrier(std::size_t num_localities)
-        {
-            HPX_ASSERT(hpx::find_here() == hpx::find_root_locality());
-
-            lcos::barrier b;
-            b.create(hpx::find_here(), num_localities);
-            return b.get_gid();
-        }
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     runtime_support::runtime_support()
       : stopped_(false), terminated_(false), dijkstra_color_(false)
@@ -492,10 +479,10 @@ namespace hpx { namespace components { namespace server
     // function to be called during shutdown
     // Action: shut down this runtime system instance
     void runtime_support::shutdown(double timeout,
-        naming::id_type const& respond_to, naming::id_type shutdown_barrier)
+        naming::id_type const& respond_to)
     {
         // initiate system shutdown
-        stop(timeout, respond_to, shutdown_barrier, false);
+        stop(timeout, respond_to, false);
     }
 
     // function to be called to terminate this locality immediately
@@ -631,21 +618,21 @@ namespace hpx { namespace components { namespace server
 
         boost::uint32_t initiating_locality_id = get_locality_id();
 
-        // Rule 4: Machine nr.0 initiates a probe by making itself white and
-        // sending a white token to machine nr.N - 1.
-        {
-            lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
-            dijkstra_color_ = false;        // start off with white
-        }
+        // send token to previous node
+        boost::uint32_t target_id = initiating_locality_id;
+        if (0 == target_id)
+            target_id = static_cast<boost::uint32_t>(num_localities);
 
         do {
-            // send token to previous node
-            boost::uint32_t target_id = initiating_locality_id;
-            if (0 == target_id)
-                target_id = static_cast<boost::uint32_t>(num_localities);
+            // Rule 4: Machine nr.0 initiates a probe by making itself white
+            // and sending a white token to machine nr.N - 1.
+            {
+                lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+                dijkstra_color_ = false;        // start off with white
+            }
 
             send_dijkstra_termination_token(target_id - 1,
-                initiating_locality_id, num_localities, dijkstra_color_);
+                initiating_locality_id, num_localities, false);
 
             // wait for token to come back to us
             lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
@@ -653,6 +640,7 @@ namespace hpx { namespace components { namespace server
 
             // Rule 3: After the completion of an unsuccessful probe, machine
             // nr.0 initiates a next probe.
+
         } while (dijkstra_color_);
     }
 
@@ -673,12 +661,6 @@ namespace hpx { namespace components { namespace server
         invoke_shutdown_functions(locality_ids, true);
         invoke_shutdown_functions(locality_ids, false);
 
-        id_type shutdown_barrier_id =
-            detail::create_shutdown_barrier(locality_ids.size());
-
-        naming::id_type unmanaged_shutdown_barrier_id(
-            hpx::unmanaged(shutdown_barrier_id));
-
         // shut down all localities except the the local one
         {
             boost::uint32_t locality_id = get_locality_id();
@@ -691,7 +673,7 @@ namespace hpx { namespace components { namespace server
                     using components::stubs::runtime_support;
                     naming::id_type id(gid, naming::id_type::unmanaged);
                     lazy_actions.push_back(runtime_support::shutdown_async(id,
-                        unmanaged_shutdown_barrier_id, timeout));
+                        timeout));
                 }
             }
 
@@ -701,7 +683,7 @@ namespace hpx { namespace components { namespace server
 
         // Now make sure this local locality gets shut down as well.
         // There is no need to respond...
-        stop(timeout, naming::invalid_id, unmanaged_shutdown_barrier_id, false);
+        stop(timeout, naming::invalid_id, false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -870,8 +852,7 @@ namespace hpx { namespace components { namespace server
     }
 
     void runtime_support::stop(double timeout,
-        naming::id_type const& respond_to, naming::id_type shutdown_barrier_id,
-        bool remove_from_remote_caches)
+        naming::id_type const& respond_to, bool remove_from_remote_caches)
     {
         mutex_type::scoped_lock l(mtx_);
         if (!stopped_) {
@@ -942,13 +923,6 @@ namespace hpx { namespace components { namespace server
                     hpx::applier::detail::apply_r_sync<action_type>(addr,
                         respond_to);
                 }
-            }
-
-            // wait for all localities to reach this point
-            if (shutdown_barrier_id)
-            {
-                util::scoped_unlock<mutex_type::scoped_lock> ul(l);
-                lcos::stubs::barrier::wait(shutdown_barrier_id);
             }
 
             wait_condition_.notify_all();

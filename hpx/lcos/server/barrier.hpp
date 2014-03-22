@@ -9,7 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 
 #include <hpx/lcos/local/detail/condition_variable.hpp>
-#include <hpx/lcos/local/mutex.hpp>
+#include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/components/component_type.hpp>
 #include <hpx/runtime/components/server/managed_component_base.hpp>
@@ -30,7 +30,7 @@ namespace hpx { namespace lcos { namespace server
     private:
         typedef components::managed_component_base<barrier> base_type;
 
-        typedef hpx::lcos::local::mutex mutex_type;
+        typedef hpx::lcos::local::spinlock mutex_type;
         mutex_type mtx_;
 
     public:
