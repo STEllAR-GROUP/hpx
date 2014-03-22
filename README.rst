@@ -83,19 +83,19 @@ Linux
 
 1) Clone the master HPX git repository (or a stable tag)::
 
-    $ git clone git://github.com/STEllAR-GROUP/hpx.git
+    git clone git://github.com/STEllAR-GROUP/hpx.git
 
 2) Create a build directory. HPX requires an out-of-tree build. This means you
    will be unable to run CMake in the HPX source directory::
 
-    $ cd hpx
-    $ mkdir my_hpx_build
-    $ cd my_hpx_build
+    cd hpx
+    mkdir my_hpx_build
+    cd my_hpx_build
 
 3) Invoke CMake from your build directory, pointing the CMake driver to the root
    of your HPX source tree::
 
-    $ cmake -DBOOST_ROOT=/your_boost_directory \
+    cmake -DBOOST_ROOT=/your_boost_directory \
          -DHWLOC_ROOT=/your_hwloc_directory \
          -DCMAKE_INSTALL_PREFIX=/where_hpx_should_be_installed \
          [other CMake variable definitions] \
@@ -105,20 +105,20 @@ Linux
    add the -jN flag to your make invocation, where N is the number of cores
    on your machine plus one::
 
-    $ gmake -j5
+    gmake -j5
 
 5) To complete the build and install HPX::
 
-    $ gmake install
+    gmake install
 
    This will build and install the essential core components of HPX only. Use
 
-    $ gmake tests
+    gmake tests
 
    to build and run the tests and
 
-    $ gmake examples
-    $ gmake install
+    gmake examples
+    gmake install
 
    to build and install the examples.
 
@@ -171,36 +171,36 @@ we describe two possibilities:
 
 4) Clone the master HPX git repository (or a stable tag)::
 
-    $ git clone git://github.com/STEllAR-GROUP/hpx.git
+    git clone git://github.com/STEllAR-GROUP/hpx.git
 
 5) Build HPX, finally::
 
-      $ cd hpx
-      $ mkdir my_hpx_build
-      $ cd my_hpx_build
+    cd hpx
+    mkdir my_hpx_build
+    cd my_hpx_build
 
    To build with Clang 3.2, execute::
 
-      $ cmake /path/to/hpx/source/tree \
-           -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ \
-           -DCMAKE_C_COMPILER=/usr/local/bin/clang-3.2 \
-           -DBOOST_ROOT=/your_boost_directory \
-           -DCMAKE_CXX_FLAGS="-isystem /path/to/libcxx/include" \
-           -DLINK_FLAGS="-L /path/to/libcxx/lib"
-      $ make -j5
+    cmake /path/to/hpx/source/tree \
+         -DCMAKE_CXX_COMPILER=/usr/local/bin/clang++ \
+         -DCMAKE_C_COMPILER=/usr/local/bin/clang-3.2 \
+         -DBOOST_ROOT=/your_boost_directory \
+         -DCMAKE_CXX_FLAGS="-isystem /path/to/libcxx/include" \
+         -DLINK_FLAGS="-L /path/to/libcxx/lib"
+    make -j5
 
 6) To complete the build and install HPX::
 
-    $ make install
+    make install
 
    This will build and install the essential core components of HPX only. Use
 
-    $ make tests
+    make tests
 
    to build and run the tests and
 
-    $ make examples
-    $ make install
+    make examples
+    make install
 
    to build and install the examples.
 
@@ -212,19 +212,19 @@ required libraries via MacPorts:
 
 2) Install Boost, CMake, gcc 4.8, and hwloc:
 
-   $ sudo port install boost
-   $ sudo port install gcc48
-   $ sudo port install hwloc
+    sudo port install boost
+    sudo port install gcc48
+    sudo port install hwloc
 
    You may also want:
 
-   $ sudo port install cmake
-   $ sudo port install git-core
+    sudo port install cmake
+    sudo port install git-core
 
 3) Make this version of gcc your default compiler:
 
-   $ sudo port install gcc_select
-   $ sudo port select gcc mp-gcc48
+    sudo port install gcc_select
+    sudo port select gcc mp-gcc48
 
 4) Build HPX as described above in the ``Linux'' section.
 
@@ -279,14 +279,14 @@ So far we only support BGClang for compiling HPX on the BlueGene/Q.
 2) Build (and install) a recent version of `Hwloc <http://www.open-mpi.org/projects/hwloc/>`_
    With the following commands::
 
-      $ ./configure \
-            --host=powerpc64-bgq-linux \
-            --prefix=$HOME/install/hwloc \
-            --disable-shared \
-            --enable-static \
-            CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
-      $ make
-      $ make install
+    ./configure \
+          --host=powerpc64-bgq-linux \
+          --prefix=$HOME/install/hwloc \
+          --disable-shared \
+          --enable-static \
+          CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
+    make
+    make install
 
 3) Build (and install) a recent version of Boost, using BGClang::
    To build Boost with BGClang, you'll need to set up the following in your Boost
@@ -301,32 +301,32 @@ So far we only support BGClang for compiling HPX on the BlueGene/Q.
 
    You can then use this as your build command::
 
-      $ ./bootstrap.sh
-      $ ./b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang -j12
+        ./bootstrap.sh
+        ./b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang -j12
 
 4) Clone the master HPX git repository (or a stable tag)::
 
-    $ git clone git://github.com/STEllAR-GROUP/hpx.git
+    git clone git://github.com/STEllAR-GROUP/hpx.git
 
 5) Generate the HPX buildfiles using cmake::
 
-    $ cmake -DHPX_PLATFORM=BlueGeneQ                 \
-            -DCMAKE_CXX_COMPILER=bgclang++11         \
-            -DMPI_CXX_COMPILER=mpiclang++11          \
-            -DHWLOC_ROOT=/path/to/hwloc/installation \
-            -DBOOST_ROOT=/path/to/boost              \
-            -DHPX_MALLOC=system                      \
-            /path/to/hpx
+    cmake -DHPX_PLATFORM=BlueGeneQ \
+         -DCMAKE_CXX_COMPILER=bgclang++11 \
+         -DMPI_CXX_COMPILER=mpiclang++11 \
+         -DHWLOC_ROOT=/path/to/hwloc/installation \
+         -DBOOST_ROOT=/path/to/boost \
+         -DHPX_MALLOC=system \
+         /path/to/hpx
 
 6) To complete the build and install HPX::
 
-    $ make -j24
-    $ make install
+    make -j24
+    make install
 
    This will build and install the essential core components of HPX only. Use::
 
-    $ make -j24 examples
-    $ make -j24 install
+    make -j24 examples
+    make -j24 install
 
    to build and install the examples.
 
@@ -339,11 +339,11 @@ and 1240655 (STAR). Any opinions, findings, and conclusions or recommendations e
 in this material are those of the author(s) and do not necessarily reflect the views of
 the National Science Foundation.
 
-Additionally, this work is supported by the Department of Energy (DoE) 
-through the award DE-SC0008714 (XPRESS). Any opinions, findings, and conclusions 
-or recommendations expressed in this material are those of the author(s) and do not 
+Additionally, this work is supported by the Department of Energy (DoE)
+through the award DE-SC0008714 (XPRESS). Any opinions, findings, and conclusions
+or recommendations expressed in this material are those of the author(s) and do not
 necessarily reflect the views of the Department of Energy.
 
 This work is also supported by the Center of Computation and
-Technology at Louisiana State University and the Chair for Computer Science 3 at 
+Technology at Louisiana State University and the Department of Computer Science 3 at
 the University of Erlangen Nuremberg.
