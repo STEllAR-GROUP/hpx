@@ -22,6 +22,7 @@
 #include <hpx/traits/action_serialization_filter.hpp>
 #include <hpx/traits/action_message_handler.hpp>
 #include <hpx/traits/action_may_require_id_splitting.hpp>
+#include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/traits/is_future.hpp>
@@ -301,6 +302,9 @@ namespace hpx { namespace actions
 
         /// Return whether the embedded action may require id-splitting
         virtual bool may_require_id_splitting() const = 0;
+
+        /// Return whether the embedded action is part of termination detection
+        virtual bool does_termination_detection() const = 0;
 
         virtual void load(hpx::util::portable_binary_iarchive & ar) = 0;
         virtual void save(hpx::util::portable_binary_oarchive & ar) const = 0;
@@ -598,6 +602,12 @@ namespace hpx { namespace actions
         bool may_require_id_splitting() const
         {
             return traits::action_may_require_id_splitting<Action>::call(arguments_);
+        }
+
+        /// Return whether the embedded action is part of termination detection
+        bool does_termination_detection() const
+        {
+            return traits::action_does_termination_detection<Action>::call();
         }
 
         /// Return all data needed for thread initialization

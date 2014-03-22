@@ -102,6 +102,8 @@ namespace hpx { namespace parcelset
 
             virtual bool may_require_id_splitting() const = 0;
 
+            virtual bool does_termination_detection() const = 0;
+
             // default copy constructor is ok
             // default assignment operator is ok
 
@@ -327,6 +329,11 @@ namespace hpx { namespace parcelset
             bool may_require_id_splitting() const
             {
                 return this->get_action()->may_require_id_splitting();
+            }
+
+            bool does_termination_detection() const
+            {
+                return this->get_action()->does_termination_detection();
             }
 
             void save(util::portable_binary_oarchive& ar) const;
@@ -709,6 +716,11 @@ namespace hpx { namespace parcelset
         bool may_require_id_splitting() const
         {
             return data_->may_require_id_splitting();
+        }
+
+        bool does_termination_detection() const
+        {
+            return data_->does_termination_detection();
         }
 
         // generate unique parcel id

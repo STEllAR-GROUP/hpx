@@ -32,6 +32,7 @@
 #include <hpx/runtime/actions/manage_object_action.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/lcos/local/condition_variable.hpp>
 
 #include <hpx/plugins/plugin_factory_base.hpp>
 
@@ -195,6 +196,10 @@ namespace hpx { namespace components { namespace server
         /// \brief Remove the given locality from our connection cache
         void remove_from_connection_cache(naming::locality const& l);
 
+        /// \brief termination detection
+        void dijkstra_termination(boost::uint32_t initiating_locality_id,
+            boost::uint32_t num_localities, bool dijkstra_token);
+
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
@@ -230,6 +235,8 @@ namespace hpx { namespace components { namespace server
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_performance_counter);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, get_instance_count);
         HPX_DEFINE_COMPONENT_ACTION(runtime_support, remove_from_connection_cache);
+
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, dijkstra_termination);
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Start the runtime_support component
@@ -302,6 +309,9 @@ namespace hpx { namespace components { namespace server
             char const* binary_filter_type, bool compress,
             util::binary_filter* next_filter, error_code& ec);
 
+        // notify of message being sent
+        void dijkstra_make_black();
+
 #if defined(HPX_HAVE_SECURITY)
         components::security::capability get_factory_capabilities(
             components::component_type type);
@@ -359,12 +369,24 @@ namespace hpx { namespace components { namespace server
             std::string const& component, boost::filesystem::path const& lib,
             bool isenabled);
 
+        // the name says it all
+        void dijkstra_termination_detection(boost::uint32_t num_localities);
+
+        void send_dijkstra_termination_token(
+            boost::uint32_t target_locality_id,
+            boost::uint32_t initiating_locality_id,
+            boost::uint32_t num_localities, bool dijkstra_token);
+
     private:
         mutex_type mtx_;
         boost::condition wait_condition_;
         boost::condition stop_condition_;
         bool stopped_;
         bool terminated_;
+        bool dijkstra_color_;   // false: white, true: black
+
+        lcos::local::spinlock dijkstra_mtx_;
+        lcos::local::condition_variable dijkstra_cond_;
 
         component_map_mutex_type cm_mtx_;
         plugin_map_mutex_type p_mtx_;
@@ -626,6 +648,9 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
     remove_from_connection_cache_action)
+HPX_REGISTER_ACTION_DECLARATION(
+    hpx::components::server::runtime_support::dijkstra_termination_action,
+    dijkstra_termination_action)
 
 namespace hpx { namespace components { namespace server
 {
@@ -665,6 +690,21 @@ namespace hpx { namespace components { namespace server
     {};
 #endif
 }}}
+
+///////////////////////////////////////////////////////////////////////////////
+// Termination detection does not make this locality black
+namespace hpx { namespace traits
+{
+    template <>
+    struct action_does_termination_detection<
+        hpx::components::server::runtime_support::dijkstra_termination_action>
+    {
+        static bool call()
+        {
+            return true;
+        }
+    };
+}}
 
 #if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION <= 40400)
 #  include <hpx/runtime/components/server/gcc44/runtime_support_implementations.hpp>

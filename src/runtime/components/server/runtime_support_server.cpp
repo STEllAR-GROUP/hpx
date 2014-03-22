@@ -111,6 +111,9 @@ HPX_REGISTER_ACTION(
 HPX_REGISTER_ACTION(
     hpx::components::server::runtime_support::remove_from_connection_cache_action,
     remove_from_connection_cache_action)
+HPX_REGISTER_ACTION(
+    hpx::components::server::runtime_support::dijkstra_termination_action,
+    dijkstra_termination_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
@@ -248,7 +251,7 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_support::runtime_support()
-      : stopped_(false), terminated_(false)
+      : stopped_(false), terminated_(false), dijkstra_color_(false)
     {}
 
     ///////////////////////////////////////////////////////////////////////////
@@ -541,6 +544,118 @@ namespace hpx { namespace components { namespace server
         wait_all(lazy_actions);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    void runtime_support::dijkstra_make_black()
+    {
+        // Rule 1: A machine sending a message makes itself black.
+        lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+        dijkstra_color_ = true;
+    }
+
+    void runtime_support::send_dijkstra_termination_token(
+        boost::uint32_t target_locality_id,
+        boost::uint32_t initiating_locality_id,
+        boost::uint32_t num_localities, bool dijkstra_token)
+    {
+        // First wait for this locality to become passive. We do this by 
+        // periodically checking the number of still running threads.
+        //
+        // Rule 0: When active, machine nr.i + 1 keeps the token; when passive,
+        // it hands over the token to machine nr.i.
+        applier::applier& appl = hpx::applier::get_applier();
+        threads::threadmanager_base& tm = appl.get_thread_manager();
+
+        while (tm.get_thread_count() > 1)
+        {
+            this_thread::sleep_for(boost::posix_time::millisec(100));
+        }
+
+        // Now this locality has become passive, thus we can send the token
+        // to the next locality.
+        //
+        // Rule 2: When machine nr.i + 1 propagates the probe, it hands over a
+        // black token to machine nr.i if it is black itself, whereas while
+        // being white it leaves the color of the token unchanged.
+        {
+            lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+            if (dijkstra_color_)
+                dijkstra_token = dijkstra_color_;
+
+            // Rule 5: Upon transmission of the token to machine nr.i, machine
+            // nr.i + 1 becomes white.
+            dijkstra_color_ = false;
+        }
+
+        naming::id_type id(naming::get_id_from_locality_id(target_locality_id));
+        apply<dijkstra_termination_action>(id, initiating_locality_id,
+            num_localities, dijkstra_token);
+    }
+
+    // invoked during termination detection
+    void runtime_support::dijkstra_termination(
+        boost::uint32_t initiating_locality_id, boost::uint32_t num_localities,
+        bool dijkstra_token)
+    {
+        applier::applier& appl = hpx::applier::get_applier();
+        naming::resolver_client& agas_client = appl.get_agas_client();
+
+        agas_client.start_shutdown();
+
+        boost::uint32_t locality_id = get_locality_id();
+        if (initiating_locality_id == locality_id)
+        {
+            // we received the token after a full circle
+            if (dijkstra_token)
+            {
+                lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+                dijkstra_color_ = true;     // unsuccessful termination
+            }
+
+            dijkstra_cond_.notify_one();
+            return;
+        }
+
+        if (0 == locality_id)
+            locality_id = num_localities;
+
+        send_dijkstra_termination_token(locality_id - 1,
+            initiating_locality_id, num_localities, dijkstra_token);
+    }
+
+    // kick off termination detection
+    void runtime_support::dijkstra_termination_detection(
+        boost::uint32_t num_localities)
+    {
+        if (num_localities == 1)
+            return;
+
+        boost::uint32_t initiating_locality_id = get_locality_id();
+
+        // Rule 4: Machine nr.0 initiates a probe by making itself white and
+        // sending a white token to machine nr.N - 1.
+        {
+            lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+            dijkstra_color_ = false;        // start off with white
+        }
+
+        do {
+            // send token to previous node
+            boost::uint32_t target_id = initiating_locality_id;
+            if (0 == target_id)
+                target_id = static_cast<boost::uint32_t>(num_localities);
+
+            send_dijkstra_termination_token(target_id - 1,
+                initiating_locality_id, num_localities, dijkstra_color_);
+
+            // wait for token to come back to us
+            lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+            dijkstra_cond_.wait(l);
+
+            // Rule 3: After the completion of an unsuccessful probe, machine
+            // nr.0 initiates a next probe.
+        } while (dijkstra_color_);
+    }
+
     void runtime_support::shutdown_all(double timeout)
     {
         std::vector<naming::gid_type> locality_ids;
@@ -548,9 +663,11 @@ namespace hpx { namespace components { namespace server
         naming::resolver_client& agas_client = appl.get_agas_client();
 
         agas_client.start_shutdown();
-
         agas_client.get_localities(locality_ids);
         std::reverse(locality_ids.begin(), locality_ids.end());
+
+        dijkstra_termination_detection(
+            static_cast<boost::uint32_t>(locality_ids.size()));
 
         // execute registered shutdown functions on all localities
         invoke_shutdown_functions(locality_ids, true);

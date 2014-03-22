@@ -40,6 +40,12 @@
 #include <boost/foreach.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
+namespace hpx { namespace detail
+{
+    void dijkstra_make_black();     // forward declaration only
+}}
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parcelset
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -517,9 +523,14 @@ namespace hpx { namespace parcelset
         // copy serialization).
         void parcel_sent_handler(boost::system::error_code const& ec,
             std::size_t size, parcelhandler::write_handler_type const& f,
-            parcel const&)
+            parcel const& p)
         {
-            f(ec, size);    // invoke the original handler
+            // invoke the original handler
+            f(ec, size);
+
+            // inform termination detection of a sent message
+            if (!p.does_termination_detection())
+                hpx::detail::dijkstra_make_black();
         }
     }
 
