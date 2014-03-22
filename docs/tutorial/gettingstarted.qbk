@@ -156,8 +156,8 @@ listed below.
 
            [teletype]
            ``
-               $ export CFLAGS='-DHDatexit=""'
-               $ export CPPFLAGS='-DHDatexit=""'
+               export CFLAGS='-DHDatexit=""'
+               export CPPFLAGS='-DHDatexit=""'
            ``
            ]
 
@@ -205,32 +205,32 @@ detail in the sections __unix_installation__ and __windows_installation__.
   will be unable to run CMake in the __hpx__ source tree.
 
 ``
-    $ cd hpx
-    $ mkdir my_hpx_build
-    $ cd my_hpx_build
+    cd hpx
+    mkdir my_hpx_build
+    cd my_hpx_build
 ``
 
 * Invoke CMake from your build directory, pointing the CMake driver to the root
   of your __hpx__ source tree.
 
 ``
-    $ cmake -DBOOST_ROOT=/root/of/boost/installation \
-        -DHWLOC_ROOT=/root/of/hwloc/installation
-        [other CMake variable definitions] \
-        /path/to/source/tree
+    cmake -DBOOST_ROOT=/root/of/boost/installation \
+          -DHWLOC_ROOT=/root/of/hwloc/installation
+          [other CMake variable definitions] \
+          /path/to/source/tree
 ``
 
 [:for instance:]
 
 ``
-    $ cmake -DBOOST_ROOT=~/packages/boost -DHWLOC=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.9.6
+    cmake -DBOOST_ROOT=~/packages/boost -DHWLOC=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.9.6
 ``
 
 * Invoke GNU make. If you are on a machine with multiple cores, add the -jN flag to
   your make invocation, where N is the number of parallel processes __hpx__ gets compiled with.
 
 ``
-    $ gmake -j4
+    gmake -j4
 ``
 
 [caution Compiling and linking __hpx__ needs a considerable amount of memory. It is advisable that
@@ -241,18 +241,18 @@ detail in the sections __unix_installation__ and __windows_installation__.
 * To complete the build and install __hpx__:
 
 ``
-    $ gmake install
+    gmake install
 ``
 
 [important These commands will build and install the essential core components of
            __hpx__ only. In order to build and run the tests, please invoke:
            ``
-               $ gmake tests
+               gmake tests
            ``
            and in order to build (and install) all examples invoke:
            ``
-               $ gmake examples
-               $ gmake install
+               gmake examples
+               gmake install
            ``
            ]
 [c++]
@@ -276,14 +276,14 @@ So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
    With the following commands:
 
 ``
-      $ ./configure \
+      ./configure \
         --host=powerpc64-bgq-linux \
         --prefix=$HOME/install/hwloc \
         --disable-shared \
         --enable-static \
         CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
-      $ make
-      $ make install
+      make
+      make install
 ``
 
 * Build (and install) a recent version of Boost, using BGClang::
@@ -302,20 +302,20 @@ So far we only support BGClang for compiling __hpx__ on the BlueGene/Q.
 You can then use this as your build command:
 
 ``
-      $ ./bootstrap.sh
-      $ ./b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang -j12
+      ./bootstrap.sh
+      ./b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang -j12
 ``
 
 * Clone the master __hpx__ git repository (or a stable tag):
 
 ``
-    $ git clone git://github.com/STEllAR-GROUP/hpx.git
+    git clone git://github.com/STEllAR-GROUP/hpx.git
 ``
 
 * Generate the __hpx__ buildfiles using cmake:
 
 ``
-    $ cmake -DHPX_PLATFORM=BlueGeneQ \
+    cmake -DHPX_PLATFORM=BlueGeneQ \
             -DCMAKE_CXX_COMPILER=bgclang++11 \
             -DMPI_CXX_COMPILER=mpiclang++11 \
             -DHWLOC_ROOT=/path/to/hwloc/installation \
@@ -327,15 +327,15 @@ You can then use this as your build command:
 * To complete the build and install __hpx__:
 
 ``
-    $ make -j24
-    $ make install
+    make -j24
+    make install
 ``
 
    This will build and install the essential core components of __hpx__ only. Use:
 
 ``
-    $ make -j24 examples
-    $ make -j24 install
+    make -j24 examples
+    make -j24 install
 ``
 
    to build and install the examples.
@@ -476,18 +476,18 @@ required libraries via MacPorts:
 
 # Install CMake, gcc 4.8, and hwloc:
 ``
-   $ sudo port install gcc48
-   $ sudo port install hwloc
+   sudo port install gcc48
+   sudo port install hwloc
 ``
    You may also want:
 ``
-   $ sudo port install cmake
-   $ sudo port install git-core
+   sudo port install cmake
+   sudo port install git-core
 ``
 # Make this version of gcc your default compiler:
 ``
-   $ sudo port install gcc_select
-   $ sudo port select gcc mp-gcc48
+   sudo port install gcc_select
+   sudo port select gcc mp-gcc48
 ``
 # Build Boost manually (the Boost package of MacPorts is built with Clang, and unfortunately doesn't work with a GCC-build version of HPX):
 ``
@@ -631,8 +631,8 @@ and also the section __cmake_hpx__.
 * Change to the directory you unpacked boost in (from now on referred to as $BOOST_ROOT)
   and execute the following commands:
 ```
-        $ ./bootstrap.sh
-        $ ./b2 toolset=intel-mic -j<N>
+        ./bootstrap.sh
+        ./b2 toolset=intel-mic -j<N>
 ```
   You should now have all the required boost libraries.
 
@@ -642,9 +642,9 @@ and also the section __cmake_hpx__.
   created directory
 * Run the configure-make-install procedure as follows:
 ```
-        $ CC=icc CFLAGS=-mmic CXX=icpc CXXFLAGS=-mmic LDFLAGS=-mmic ./configure --host=k1om --prefix=$HWLOC_ROOT
-        $ make
-        $ make install
+        CC=icc CFLAGS=-mmic CXX=icpc CXXFLAGS=-mmic LDFLAGS=-mmic ./configure --host=k1om --prefix=$HWLOC_ROOT
+        make
+        make install
 ```
 You now have a working hwloc installation in $HWLOC_ROOT.
 
@@ -775,7 +775,7 @@ the contents of the PBS script were saved in file [^pbs_hello_world.sh] in the
 current directory, this is accomplished by typing:
 
 ``
-    $ __qsub__ ./pbs_hello_world_pbs.sh
+    __qsub__ ./pbs_hello_world_pbs.sh
 ``
 
 If the job is accepted, __qsub__ will print out the assigned job ID, which may
@@ -788,7 +788,7 @@ look like:
 To check the status of your job, issue the following command:
 
 ``
-    $ __qstat__ 42.supercomputer.some.university.edu
+    __qstat__ 42.supercomputer.some.university.edu
 ``
 
 and look for a single-letter job status symbol. The common cases include:

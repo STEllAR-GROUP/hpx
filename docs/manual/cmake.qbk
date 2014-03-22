@@ -44,14 +44,14 @@ We use here the command-line, non-interactive __cmake__ interface.
 # Create a directory for containing the build. It is not supported to build
   __hpx__ on the source directory. cd to this directory:
 ``
-    $ mkdir mybuilddir
-    $ cd mybuilddir
+    mkdir mybuilddir
+    cd mybuilddir
 ``
 
 # Execute this command on the shell replacing path/to/hpx/ with the path to
   the root of your __hpx__ source tree:
 ``
-    $ cmake path/to/hpx
+    cmake path/to/hpx
 ``
 
 CMake will detect your development environment, perform a series of tests and
@@ -101,13 +101,13 @@ explicitly specify the generator with the command line option
 `-G "Name of the generator"`. For knowing the available generators on your
 platform, execute:
 ``
-    $ cmake --help
+    cmake --help
 ``
 
 This will list the generator names at the end of the help text. Generator names
 are case-sensitive. Example:
 ``
-    $ cmake -G "Visual Studio 9 2008" path/to/hpx
+    cmake -G "Visual Studio 9 2008" path/to/hpx
 ``
 
 For a given development platform there can be more than one adequate generator.
@@ -129,13 +129,13 @@ Variables customize how the build will be generated. Options are boolean
 variables, with possible values ON/OFF. Options and variables are defined on
 the CMake command line like this:
 ``
-    $ cmake -DVARIABLE=value path/to/hpx
+    cmake -DVARIABLE=value path/to/hpx
 ``
 
 You can set a variable after the initial CMake invocation for changing its
 value. You can also undefine a variable:
 ``
-    $ cmake -UVARIABLE path/to/hpx
+    cmake -UVARIABLE path/to/hpx
 ``
 
 Variables are stored on the CMake cache. This is a file named CMakeCache.txt on
@@ -144,7 +144,7 @@ the root of the build directory. Do not hand-edit it.
 Variables are listed here appending its type after a colon. It is correct to
 write the variable and the type on the CMake command line:
 ``
-    $ cmake -DVARIABLE:TYPE=value path/to/llvm/source
+    cmake -DVARIABLE:TYPE=value path/to/llvm/source
 ``
 
 CMake supports the following variable types: `BOOL` (options), `STRING`
@@ -565,8 +565,8 @@ Now, in the directory where you put hello_world.cpp, issue the following command
 [teletype]
 
 ``
-    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -liostreams -DHPX_APPLICATION_NAME=hello_world
+    export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+    c++ -o hello_world hello_world.cpp `pkg-config --cflags --libs hpx_application` -liostreams -DHPX_APPLICATION_NAME=hello_world
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
@@ -582,7 +582,7 @@ Now, in the directory where you put hello_world.cpp, issue the following command
 To test the program, type:
 
 ``
-    $ ./hello_world
+    ./hello_world
 ``
 
 which should print [^Hello World!] and exit.
@@ -626,16 +626,16 @@ build the component library. (where [^$HPX_LOCATION] is the
 [teletype]
 
 ``
-    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o libhello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
+    export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+    c++ -o libhello_world.so hello_world_component.cpp `pkg-config --cflags --libs hpx_component` -DHPX_COMPONENT_NAME=hello_world
 ``
 
 Now pick a directory in which to install your __hpx__ component libraries. For
 this example, we'll choose a directory named ''my_hpx_libs''.
 
 ``
-    $ mkdir ~/my_hpx_libs
-    $ mv libhello_world.so ~/my_hpx_libs
+    mkdir ~/my_hpx_libs
+    mv libhello_world.so ~/my_hpx_libs
 ``
 
 [note If __hpx__ was build in debug mode (`cmake -DCMAKE_BUILD_TYPE=Debug`) the
@@ -670,8 +670,8 @@ Now, to build the application that uses this component (hello_world_client.cpp),
 we do:
 
 ``
-    $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-    $ c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -liostreams -L${HOME}/my_hpx_libs -lhello_world
+    export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+    c++ -o hello_world_client hello_world_client.cpp `pkg-config --cflags --libs hpx_application` -liostreams -L${HOME}/my_hpx_libs -lhello_world
 ``
 
 [important When using pkg-config with __hpx__, the pkg-config flags must go after
@@ -682,8 +682,8 @@ Finally, you'll need to set your LD_LIBRARY_PATH before you can run the program.
 To run the program, type:
 
 ``
-    $ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/my_hpx_libs"
-    $ ./hello_world_client
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/my_hpx_libs"
+    ./hello_world_client
 ``
 
 which should print [^Hello __hpx__ World!] and exit.

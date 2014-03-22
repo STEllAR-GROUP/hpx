@@ -62,13 +62,13 @@ To compile this program, go to your __hpx__ build directory (see __getting_start
 for information on configuring and building __hpx__) and enter:
 
 ``
-    $ make examples.quickstart.fibonacci
+    make examples.quickstart.fibonacci
 ``
 
 To run the program type:
 
 ``
-    $ ./bin/fibonacci
+    ./bin/fibonacci
 ``
 
 This should print (time should be approximate):
@@ -85,7 +85,7 @@ the [^--n-value] option. Additionally you can use the
 wish to use when running the program. For instance, running:
 
 ```
-    $ ./bin/fibonacci --n-value 20 ``[hpx_cmdline --hpx:threads]`` 4
+    ./bin/fibonacci --n-value 20 ``[hpx_cmdline --hpx:threads]`` 4
 ```
 
 Will yield:
@@ -212,13 +212,13 @@ To compile this program, go to your __hpx__ build directory (see __getting_start
 for information on configuring and building __hpx__) and enter:
 
 ``
-    $ make examples.quickstart.hello_world
+    make examples.quickstart.hello_world
 ``
 
 To run the program type:
 
 ``
-    $ ./bin/hello_world
+    ./bin/hello_world
 ``
 
 This should print:
@@ -231,7 +231,7 @@ To use more OS-threads use the command line option [hpx_cmdline [^--hpx:threads]
 and type the number of threads that you wish to use. For example, typing:
 
 ```
-    $ ./bin/hello_world ``[hpx_cmdline --hpx:threads]`` 2
+    ./bin/hello_world ``[hpx_cmdline --hpx:threads]`` 2
 ```
 
 will yield:
@@ -366,7 +366,7 @@ To compile this program, go to your __hpx__ build directory (see __getting_start
 for information on configuring and building __hpx__) and enter:
 
 ``
-    $ make examples.accumulator.managed_accumulator
+    make examples.accumulator.managed_accumulator
 ``
 
 To run the program type:
@@ -633,13 +633,13 @@ To compile this program, go to your __hpx__ build directory (see __getting_start
 for information on configuring and building __hpx__) and enter:
 
 ``
-    $ make examples.quickstart.interest_calculator
+    make examples.quickstart.interest_calculator
 ``
 
 To run the program type:
 
 ``
-    $ ./bin/interest_calculator --principal 100 --rate 5 --cp 6 --time 36
+    ./bin/interest_calculator --principal 100 --rate 5 --cp 6 --time 36
 ``
 
 This should print:
