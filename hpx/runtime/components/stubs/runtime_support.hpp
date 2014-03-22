@@ -246,9 +246,8 @@ namespace hpx { namespace components { namespace stubs
 
         /// \brief Shutdown the given runtime system
         static lcos::unique_future<void>
-        shutdown_async(naming::id_type const& targetgid, naming::id_type shutdown_barrier,
-            double timeout = -1);
-        static void shutdown(naming::id_type const& targetgid, naming::id_type shutdown_barrier,
+        shutdown_async(naming::id_type const& targetgid, double timeout = -1);
+        static void shutdown(naming::id_type const& targetgid, 
             double timeout = - 1);
 
         /// \brief Shutdown the runtime systems of all localities

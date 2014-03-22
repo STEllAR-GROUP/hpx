@@ -156,7 +156,7 @@ namespace hpx { namespace parcelset
             // enqueue the outgoing parcel ...
             enqueue_parcel(locality_id, std::move(p), std::move(f));
 
-            if(enable_parcel_handling_)
+            if (enable_parcel_handling_)
             {
                 if (hpx::is_running() && async_serialization())
                 {
@@ -194,8 +194,7 @@ namespace hpx { namespace parcelset
             HPX_ASSERT(parcels.size() == handlers.size());
             enqueue_parcels(locality_id, std::move(parcels), std::move(handlers));
 
-
-            if(enable_parcel_handling_)
+            if (enable_parcel_handling_)
             {
                 if (hpx::is_running() && async_serialization())
                 {
@@ -614,8 +613,9 @@ namespace hpx { namespace parcelset
                 }
 
                 // send parcels if they didn't get sent by another connection
-                if (!hpx::is_starting() && threads::get_self_id() == threads::invalid_thread_id)
+                if (!hpx::is_starting() && threads::get_self_ptr() == 0)
                 {
+                    // Re-schedule if this is not executed by an HPX thread
                     std::size_t thread_num = get_worker_thread_num();
                     hpx::applier::register_thread_nullary(
                         hpx::util::bind(
@@ -631,8 +631,10 @@ namespace hpx { namespace parcelset
                     );
                 }
                 else
+                {
                     send_pending_parcels(sender_connection, std::move(parcels),
                         std::move(handlers));
+                }
             }
         }
 

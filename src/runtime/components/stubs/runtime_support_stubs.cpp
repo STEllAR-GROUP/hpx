@@ -188,7 +188,7 @@ namespace hpx { namespace components { namespace stubs
     /// \brief Shutdown the given runtime system
     lcos::unique_future<void>
     runtime_support::shutdown_async(naming::id_type const& targetgid,
-        naming::id_type shutdown_barrier, double timeout)
+        double timeout)
     {
         // Create a promise directly and execute the required action.
         // This action has implemented special response handling as the
@@ -196,16 +196,16 @@ namespace hpx { namespace components { namespace stubs
         typedef server::runtime_support::shutdown_action action_type;
 
         lcos::promise<void> value;
-        hpx::apply<action_type>(targetgid, timeout, value.get_gid(), shutdown_barrier);
+        hpx::apply<action_type>(targetgid, timeout, value.get_gid());
         return value.get_future();
     }
 
     void runtime_support::shutdown(naming::id_type const& targetgid,
-        naming::id_type shutdown_barrier, double timeout)
+        double timeout)
     {
         // The following get yields control while the action above
         // is executed and the result is returned to the future
-        shutdown_async(targetgid, shutdown_barrier, timeout).get();
+        shutdown_async(targetgid, timeout).get();
     }
 
     /// \brief Shutdown the runtime systems of all localities

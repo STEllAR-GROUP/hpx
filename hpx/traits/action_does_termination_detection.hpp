@@ -3,8 +3,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#if !defined(HPX_TRAITS_ACTION_IS_TARGET_VALID_MAR_10_2014_1103AM)
-#define HPX_TRAITS_ACTION_IS_TARGET_VALID_MAR_10_2014_1103AM
+#if !defined(HPX_TRAITS_ACTION_DOES_TERMINATION_DETECTION_MAR_21_2014_0818PM)
+#define HPX_TRAITS_ACTION_DOES_TERMINATION_DETECTION_MAR_21_2014_0818PM
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/util/always_void.hpp>
@@ -12,20 +12,20 @@
 namespace hpx { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    // Customization point for Action::is_target_valid
+    // Customization point for Action::does_termination_detection
     template <typename Action, typename Enable>
-    struct action_is_target_valid
+    struct action_does_termination_detection
     {
-        static bool call(naming::id_type const& id)
+        static bool call()
         {
-            return Action::is_target_valid(id);
+            return false;
         }
     };
 
     template <typename Action>
-    struct action_is_target_valid<Action
+    struct action_does_termination_detection<Action
       , typename util::always_void<typename Action::type>::type>
-      : action_is_target_valid<typename Action::type>
+      : action_does_termination_detection<typename Action::type>
     {};
 }}
 

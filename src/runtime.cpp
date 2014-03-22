@@ -996,6 +996,12 @@ namespace hpx
 
             return get_runtime().get_next_id(count);
         }
+
+        ///////////////////////////////////////////////////////////////////////////
+        void dijkstra_make_black()
+        {
+            get_runtime_support_ptr()->dijkstra_make_black();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
