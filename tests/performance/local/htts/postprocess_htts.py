@@ -34,16 +34,17 @@ def ivars(row):
 def dvars(row):
     return row[(LAST_IVAR + 1):]
 
-op = OptionParser(usage="%prog [input-data] [output-data] [output-gnuplot-header]")
+op = OptionParser(usage="%prog [input-data] [output-data] [output-gnuplot-header] [sample-size]")
 args = op.parse_args()[1]
 
-if len(args) != 3:
+if len(args) != 4:
     op.print_help()
     exit(1)
 
 input_data = open(args[0], 'r')
 output_data = open(args[1], 'w')
 output_header = open(args[2], 'w')
+sample_size = int(args[3])
 
 master = {}
 legend = []
@@ -78,7 +79,6 @@ try:
 except StopIteration:
     pass
 
-sample_size = None
 number_of_dvars = None
 
 for (key, dataset) in sorted(master.iteritems()):
@@ -86,7 +86,7 @@ for (key, dataset) in sorted(master.iteritems()):
         if sample_size is None:
             sample_size = len(dvs)
         else:
-            if sample_size is not len(dvs):
+            if sample_size > len(dvs):
                 missing = sample_size - len(dvs)
                 print "WARNING: Missing "+str(missing)+" sample(s) for "+\
                       "("+", ".join(str(x) for x in ivs)+")"
