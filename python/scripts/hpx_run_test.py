@@ -247,9 +247,10 @@ if __name__ == '__main__':
         print >> f, "Timed out:", result[3]
         print >> f, ("#" * 80)
 
-        if 0 != len(result[4]):
-          print >> f, result[4],
-          print >> f, ("#" * 80)
+        if result[4] is not None:
+          if 0 != len(result[4]):
+            print >> f, result[4],
+            print >> f, ("#" * 80)
 
         print >> f, ""
 
