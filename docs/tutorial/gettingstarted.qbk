@@ -182,7 +182,7 @@ you are on:
 
     cd $BOOST
     bootstrap --prefix=<where to install boost>
-    ./b2 -j<N>
+    ./b2 -j<N> --build-type=complete
     ./b2 install
 
 where: `<where to install boost>` is the directory the built binaries will be
@@ -193,6 +193,11 @@ After the above sequence of command has been executed (this may take a while!)
 you will need to specify the directory where Boost was installed as `BOOST_ROOT`
 (`<where to install boost>`) while executing cmake for __hpx__ as explained in
 detail in the sections __unix_installation__ and __windows_installation__.
+
+[important On Windows, depending on the installed versions of Visual Studio, you
+    might also want to pass the correct toolset to the b2 command depending on
+    which version of the IDE you want to use. In addition, passing address-model=64
+    is always safe]
 
 [endsect]
 
