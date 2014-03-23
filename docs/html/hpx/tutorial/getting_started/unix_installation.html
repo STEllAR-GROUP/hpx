@@ -4,13 +4,13 @@
 <title>How to Install HPX on Unix Variants</title>
 <link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../index.html" title="HPX 0.9.8">
+<link rel="home" href="../../../index.html" title="HPX 0.9.9">
 <link rel="up" href="../getting_started.html" title="Getting Started">
 <link rel="prev" href="boost_installation.html" title="Installing Boost Libraries">
 <link rel="next" href="bgq_installation.html" title="How to Install HPX on BlueGene/Q">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="../../../images/hpx_0_9_8_draft.png"></td></tr></table>
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="440" height="104" src="../../../images/hpx_0_9_9_draft.png"></td></tr></table>
 <hr>
 <div class="spirit-nav">
 <a accesskey="p" href="boost_installation.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="bgq_installation.html"><img src="../../../images/next.png" alt="Next"></a>
@@ -25,30 +25,30 @@
               build. This means you will be unable to run CMake in the <span class="emphasis"><em>HPX</em></span>
               source tree.
             </li></ul></div>
-<pre class="programlisting">$ cd hpx
-$ mkdir my_hpx_build
-$ cd my_hpx_build
+<pre class="programlisting">cd hpx
+mkdir my_hpx_build
+cd my_hpx_build
 </pre>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
               Invoke CMake from your build directory, pointing the CMake driver to
               the root of your <span class="emphasis"><em>HPX</em></span> source tree.
             </li></ul></div>
-<pre class="programlisting">$ cmake -DBOOST_ROOT=/root/of/boost/installation \
-    -DHWLOC_ROOT=/root/of/hwloc/installation
-    [other CMake variable definitions] \
-    /path/to/source/tree
+<pre class="programlisting">cmake -DBOOST_ROOT=/root/of/boost/installation \
+      -DHWLOC_ROOT=/root/of/hwloc/installation
+      [other CMake variable definitions] \
+      /path/to/source/tree
 </pre>
 <div class="blockquote"><blockquote class="blockquote"><p>
             for instance:
           </p></blockquote></div>
-<pre class="programlisting">$ cmake -DBOOST_ROOT=~/packages/boost -DHWLOC=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.9.6
+<pre class="programlisting">cmake -DBOOST_ROOT=~/packages/boost -DHWLOC=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_0.9.6
 </pre>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
               Invoke GNU make. If you are on a machine with multiple cores, add the
               -jN flag to your make invocation, where N is the number of parallel
               processes <span class="emphasis"><em>HPX</em></span> gets compiled with.
             </li></ul></div>
-<pre class="programlisting">$ gmake -j4
+<pre class="programlisting">gmake -j4
 </pre>
 <div class="caution"><table border="0" summary="Caution">
 <tr>
@@ -73,7 +73,7 @@ $ cd my_hpx_build
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
               To complete the build and install <span class="emphasis"><em>HPX</em></span>:
             </li></ul></div>
-<pre class="programlisting">$ gmake install
+<pre class="programlisting">gmake install
 </pre>
 <div class="important"><table border="0" summary="Important">
 <tr>
@@ -86,13 +86,13 @@ $ cd my_hpx_build
             <span class="emphasis"><em>HPX</em></span> only. In order to build and run the tests, please
             invoke:
           </p>
-<pre class="programlisting">$ gmake tests
+<pre class="programlisting">gmake tests
 </pre>
 <p>
             and in order to build (and install) all examples invoke:
           </p>
-<pre class="programlisting">$ gmake examples
-$ gmake install
+<pre class="programlisting">gmake examples
+gmake install
 </pre>
 </td></tr>
 </table></div>

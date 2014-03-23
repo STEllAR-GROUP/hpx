@@ -4,13 +4,13 @@
 <title>Existing HPX Performance Counters</title>
 <link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../index.html" title="HPX 0.9.8">
+<link rel="home" href="../../../index.html" title="HPX 0.9.9">
 <link rel="up" href="../performance_counters.html" title="Performance Counters">
 <link rel="prev" href="providing/full_counters.html" title="Implementing a Full Performance Counter">
 <link rel="next" href="../schedulers.html" title="HPX Thread Scheduling Policies">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="../../../images/hpx_0_9_8_draft.png"></td></tr></table>
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="440" height="104" src="../../../images/hpx_0_9_9_draft.png"></td></tr></table>
 <hr>
 <div class="spirit-nav">
 <a accesskey="p" href="providing/full_counters.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../performance_counters.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="../schedulers.html"><img src="../../../images/next.png" alt="Next"></a>
@@ -918,14 +918,16 @@
                     number of retired <span class="emphasis"><em>HPX</em></span>-threads for all worker
                     threads (cores) on that locality. If the instance name is <code class="computeroutput">worker-thread#*</code>
                     the counter will return the overall number of retired <span class="emphasis"><em>HPX</em></span>-threads
-                    for all worker threads separately.
+                    for all worker threads separately. This counter is available
+                    only if the configuration time constant <code class="computeroutput">HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS</code>
+                    is set to <code class="computeroutput">ON</code>.
                   </p>
                 </td>
 </tr>
 <tr>
 <td>
                   <p>
-                    <code class="computeroutput">/threads/count/cumulative_phases</code>
+                    <code class="computeroutput">/threads/count/cumulative-phases</code>
                   </p>
                 </td>
 <td>
@@ -962,50 +964,9 @@
                     phases (invocations) for all worker threads (cores) on that locality.
                     If the instance name is <code class="computeroutput">worker-thread#*</code> the counter
                     will return the overall number of executed <span class="emphasis"><em>HPX</em></span>-thread
-                    phases for all worker threads separately.
-                  </p>
-                </td>
-</tr>
-<tr>
-<td>
-                  <p>
-                    <code class="computeroutput">/threads/count/cumulative_phases</code>
-                  </p>
-                </td>
-<td>
-                  <p>
-                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
-                  </p>
-                  <p>
-                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
-                    for which the overall number of executed <span class="emphasis"><em>HPX</em></span>-thread
-                    phases (invocations) should be queried for. The locality id (given
-                    by <code class="computeroutput">*</code>) is a (zero based) number identifying the locality.
-                  </p>
-                  <p>
-                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
-                    which the overall number of executed <span class="emphasis"><em>HPX</em></span>-thread
-                    phases (invocations) should be queried for. The worker thread
-                    number (given by the <code class="computeroutput">*</code>) is a (zero based) number
-                    identifying the worker thread. The number of available worker
-                    threads is usually specified on the command line for the application
-                    using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
-                  </p>
-                </td>
-<td>
-                  <p>
-                    None
-                  </p>
-                </td>
-<td>
-                  <p>
-                    Returns the overall number of executed (retired) <span class="emphasis"><em>HPX</em></span>-threads
-                    on the given locality since application start. If the instance
-                    name is <code class="computeroutput">total</code> the counter returns the accumulated
-                    number of retired <span class="emphasis"><em>HPX</em></span>-threads for all worker
-                    threads (cores) on that locality. If the instance name is <code class="computeroutput">worker-thread#*</code>
-                    the counter will return the overall number of retired <span class="emphasis"><em>HPX</em></span>-threads
-                    for the specified worker thread.
+                    phases for all worker threads separately. This counter is available
+                    only if the configuration time constant <code class="computeroutput">HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS</code>
+                    is set to <code class="computeroutput">ON</code>.
                   </p>
                 </td>
 </tr>
@@ -1157,6 +1118,94 @@
                     on the given locality. The idle rate is defined as the ratio
                     of the time spent on scheduling and management tasks and the
                     overall time spent executing work since the application started.
+                    This counter is available only if the configuration time constant
+                    <code class="computeroutput">HPX_THREAD_MAINTAIN_IDLE_RATE</code> is set to <code class="computeroutput">ON</code>.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/creation-idle-rate</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the average idle rate of all (or one) worker threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the averaged idle rate should be queried for. The worker
+                    thread number (given by the <code class="computeroutput">*</code>) is a (zero based)
+                    number identifying the worker thread. The number of available
+                    worker threads is usually specified on the command line for the
+                    application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the average idle rate for the given worker thread(s)
+                    on the given locality which is caused by creating new threads.
+                    The creation idle rate is defined as the ratio of the time spent
+                    on creating new threads and the overall time spent executing
+                    work since the application started. This counter is available
+                    only if the configuration time constants <code class="computeroutput">HPX_THREAD_MAINTAIN_IDLE_RATE</code>
+                    and <code class="computeroutput">HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES</code>
+                    are set to <code class="computeroutput">ON</code>.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/cleanup-idle-rate</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the average idle rate of all (or one) worker threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the averaged idle rate should be queried for. The worker
+                    thread number (given by the <code class="computeroutput">*</code>) is a (zero based)
+                    number identifying the worker thread. The number of available
+                    worker threads is usually specified on the command line for the
+                    application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the average idle rate for the given worker thread(s)
+                    on the given locality which is caused by cleaning up terminated
+                    threads. The cleanup idle rate is defined as the ratio of the
+                    time spent on cleaning up terminated thread objects and the overall
+                    time spent executing work since the application started. This
+                    counter is available only if the configuration time constants
+                    <code class="computeroutput">HPX_THREAD_MAINTAIN_IDLE_RATES</code> and <code class="computeroutput">HPX_THREAD_MAINTAIN_CREATION_AND_CLEANUP_RATES</code>
+                    are set to <code class="computeroutput">ON</code>.
                   </p>
                 </td>
 </tr>
@@ -1258,7 +1307,7 @@
 <tr>
 <td>
                   <p>
-                    <code class="computeroutput">/threads/count/stolen</code>
+                    <code class="computeroutput">/threads/count/stolen-from-pending</code>
                   </p>
                 </td>
 <td>
@@ -1279,9 +1328,214 @@
 <td>
                   <p>
                     Returns the total number of <span class="emphasis"><em>HPX</em></span>-threads
-                    'stolen' from a neighboring worker thread (these threads are
-                    executed by a different worker thread than they were initially
-                    scheduled on).
+                    'stolen' from the pending thread queue by a neighboring thread
+                    worker thread (these threads are executed by a different worker
+                    thread than they were initially scheduled on). This counter is
+                    available only if the configuration time constant <code class="computeroutput">HPX_THREAD_MAINTAIN_STEALING_COUNTS</code>
+                    is set to <code class="computeroutput">ON</code>.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/pending-misses</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the average idle rate of all (or one) worker threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the averaged idle rate should be queried for. The worker
+                    thread number (given by the <code class="computeroutput">*</code>) is a (zero based)
+                    number identifying the worker thread. The number of available
+                    worker threads is usually specified on the command line for the
+                    application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total number of times that the referenced worker-thread
+                    on the referenced locality failed to find pending HPX-threads
+                    in its associated queue. This counter is available only if the
+                    configuration time constant <code class="computeroutput">HPX_THREAD_MAINTAIN_STEALING_COUNTS</code>
+                    is set to <code class="computeroutput">ON</code>.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/pending-accesses</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the average idle rate of all (or one) worker threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the averaged idle rate should be queried for. The worker
+                    thread number (given by the <code class="computeroutput">*</code>) is a (zero based)
+                    number identifying the worker thread. The number of available
+                    worker threads is usually specified on the command line for the
+                    application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total number of times that the referenced worker-thread
+                    on the referenced locality looked for pending HPX-threads in
+                    its associated queue. This counter is available only if the configuration
+                    time constant <code class="computeroutput">HPX_THREAD_MAINTAIN_STEALING_COUNTS</code>
+                    is set to <code class="computeroutput">ON</code>.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/stolen-from-staged</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the average idle rate of all (or one) worker threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the averaged idle rate should be queried for. The worker
+                    thread number (given by the <code class="computeroutput">*</code>) is a (zero based)
+                    number identifying the worker thread. The number of available
+                    worker threads is usually specified on the command line for the
+                    application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total number of <span class="emphasis"><em>HPX</em></span>-threads
+                    'stolen' from the staged thread queue by a neighboring worker
+                    thread (these threads are executed by a different worker thread
+                    than they were initially scheduled on). This counter is available
+                    only if the configuration time constant <code class="computeroutput">HPX_THREAD_MAINTAIN_STEALING_COUNTS</code>
+                    is set to <code class="computeroutput">ON</code>.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/stolen-to-pending</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the average idle rate of all (or one) worker threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the averaged idle rate should be queried for. The worker
+                    thread number (given by the <code class="computeroutput">*</code>) is a (zero based)
+                    number identifying the worker thread. The number of available
+                    worker threads is usually specified on the command line for the
+                    application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total number of <span class="emphasis"><em>HPX</em></span>-threads
+                    'stolen' from the pending thread queue of a neighboring worker
+                    thread (these threads are executed by a different worker thread
+                    than they were initially scheduled on). This counter is available
+                    only if the configuration time constant <code class="computeroutput">HPX_THREAD_MAINTAIN_STEALING_COUNTS</code>
+                    is set to <code class="computeroutput">ON</code>.
+                  </p>
+                </td>
+</tr>
+<tr>
+<td>
+                  <p>
+                    <code class="computeroutput">/threads/count/stolen-to-staged</code>
+                  </p>
+                </td>
+<td>
+                  <p>
+                    <code class="computeroutput">locality#*/total</code> or<br> <code class="computeroutput">locality#*/worker-thread#*</code>
+                  </p>
+                  <p>
+                    where:<br> <code class="computeroutput">locality#*</code> is defining the locality
+                    for which the average idle rate of all (or one) worker threads
+                    should be queried for. The locality id (given by <code class="computeroutput">*</code>)
+                    is a (zero based) number identifying the locality
+                  </p>
+                  <p>
+                    <code class="computeroutput">worker-thread#*</code> is defining the worker thread for
+                    which the averaged idle rate should be queried for. The worker
+                    thread number (given by the <code class="computeroutput">*</code>) is a (zero based)
+                    number identifying the worker thread. The number of available
+                    worker threads is usually specified on the command line for the
+                    application using the option <a class="link" href="../init/commandline.html" title="HPX Command Line Options"><code class="computeroutput">--hpx:threads</code></a>.
+                  </p>
+                </td>
+<td>
+                  <p>
+                    None
+                  </p>
+                </td>
+<td>
+                  <p>
+                    Returns the total number of <span class="emphasis"><em>HPX</em></span>-threads
+                    'stolen' from the staged thread queue of a neighboring worker
+                    thread (these threads are executed by a different worker thread
+                    than they were initially scheduled on). This counter is available
+                    only if the configuration time constant <code class="computeroutput">HPX_THREAD_MAINTAIN_STEALING_COUNTS</code>
+                    is set to <code class="computeroutput">ON</code>.
                   </p>
                 </td>
 </tr>

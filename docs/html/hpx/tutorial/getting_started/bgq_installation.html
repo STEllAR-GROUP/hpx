@@ -4,13 +4,13 @@
 <title>How to Install HPX on BlueGene/Q</title>
 <link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
-<link rel="home" href="../../../index.html" title="HPX 0.9.8">
+<link rel="home" href="../../../index.html" title="HPX 0.9.9">
 <link rel="up" href="../getting_started.html" title="Getting Started">
 <link rel="prev" href="unix_installation.html" title="How to Install HPX on Unix Variants">
 <link rel="next" href="macos_installation.html" title="How to Install HPX on OS X (Mac)">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="461" height="106" src="../../../images/hpx_0_9_8_draft.png"></td></tr></table>
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="440" height="104" src="../../../images/hpx_0_9_9_draft.png"></td></tr></table>
 <hr>
 <div class="spirit-nav">
 <a accesskey="p" href="unix_installation.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../getting_started.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="macos_installation.html"><img src="../../../images/next.png" alt="Next"></a>
@@ -30,18 +30,18 @@
               install a copy from the <code class="computeroutput">BGClang trac page &lt;https://trac.alcf.anl.gov/projects/llvm-bgq&gt;</code>_
             </li>
 <li class="listitem">
-              Build (and install) a recent version of <a href="http://http://www.open-mpi.org/software/hwloc/v1.7/" target="_top">hwloc
+              Build (and install) a recent version of <a href="http://www.open-mpi.org/software/hwloc/v1.7/" target="_top">hwloc
               Downloads</a> With the following commands:
             </li>
 </ul></div>
-<pre class="programlisting">$ ./configure \
+<pre class="programlisting">./configure \
   --host=powerpc64-bgq-linux \
   --prefix=$HOME/install/hwloc \
   --disable-shared \
   --enable-static \
   CPPFLAGS='-I/bgsys/drivers/ppcfloor -I/bgsys/drivers/ppcfloor/spi/include/kernel/cnk/'
-$ make
-$ make install
+make
+make install
 </pre>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
               Build (and install) a recent version of Boost, using BGClang:: To build
@@ -58,19 +58,19 @@ using clang
 <p>
           You can then use this as your build command:
         </p>
-<pre class="programlisting">$ ./bootstrap.sh
-$ ./b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang -j12
+<pre class="programlisting">./bootstrap.sh
+./b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang -j12
 </pre>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
               Clone the master <span class="emphasis"><em>HPX</em></span> git repository (or a stable
               tag):
             </li></ul></div>
-<pre class="programlisting">$ git clone git://github.com/STEllAR-GROUP/hpx.git
+<pre class="programlisting">git clone git://github.com/STEllAR-GROUP/hpx.git
 </pre>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
               Generate the <span class="emphasis"><em>HPX</em></span> buildfiles using cmake:
             </li></ul></div>
-<pre class="programlisting">$ cmake -DHPX_PLATFORM=BlueGeneQ \
+<pre class="programlisting">cmake -DHPX_PLATFORM=BlueGeneQ \
         -DCMAKE_CXX_COMPILER=bgclang++11 \
         -DMPI_CXX_COMPILER=mpiclang++11 \
         -DHWLOC_ROOT=/path/to/hwloc/installation \
@@ -81,13 +81,13 @@ $ ./b2 --build-dir=/tmp/build-boost --layout=versioned toolset=clang -j12
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
               To complete the build and install <span class="emphasis"><em>HPX</em></span>:
             </li></ul></div>
-<pre class="programlisting">$ make -j24
-$ make install
+<pre class="programlisting">make -j24
+make install
 </pre>
 <pre class="programlisting">This will build and install the essential core components of <span class="emphasis"><em>HPX</em></span> only. Use:
 </pre>
-<pre class="programlisting">$ make -j24 examples
-$ make -j24 install
+<pre class="programlisting">make -j24 examples
+make -j24 install
 </pre>
 <pre class="programlisting">to build and install the examples.
 </pre>
