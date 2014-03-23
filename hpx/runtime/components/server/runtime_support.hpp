@@ -197,8 +197,12 @@ namespace hpx { namespace components { namespace server
         void remove_from_connection_cache(naming::locality const& l);
 
         /// \brief termination detection
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+        bool dijkstra_termination();
+#else
         void dijkstra_termination(boost::uint32_t initiating_locality_id,
             boost::uint32_t num_localities, bool dijkstra_token);
+#endif
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into a action
@@ -368,12 +372,15 @@ namespace hpx { namespace components { namespace server
             bool isenabled);
 
         // the name says it all
-        void dijkstra_termination_detection(boost::uint32_t num_localities);
+        void dijkstra_termination_detection(
+            std::vector<naming::id_type> const& locality_ids);
 
+#if defined(HPX_GCC_VERSION) && (HPX_GCC_VERSION > 40400)
         void send_dijkstra_termination_token(
             boost::uint32_t target_locality_id,
             boost::uint32_t initiating_locality_id,
             boost::uint32_t num_localities, bool dijkstra_token);
+#endif
 
     private:
         mutex_type mtx_;

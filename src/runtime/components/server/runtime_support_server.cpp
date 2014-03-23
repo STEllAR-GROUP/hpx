@@ -31,6 +31,10 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/wait_all.hpp>
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#include <hpx/lcos/broadcast.hpp>
+#include <hpx/lcos/reduce.hpp>
+#endif
 
 #include <hpx/util/assert.hpp>
 #include <hpx/util/portable_binary_iarchive.hpp>
@@ -511,24 +515,52 @@ namespace hpx { namespace components { namespace server
 
         std::abort();
     }
+}}}
 
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+
+///////////////////////////////////////////////////////////////////////////////
+typedef hpx::components::server::runtime_support::call_shutdown_functions_action
+    call_shutdown_functions_action;
+
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action)
+HPX_REGISTER_BROADCAST_ACTION(call_shutdown_functions_action)
+
+///////////////////////////////////////////////////////////////////////////////
+typedef std::logical_or<bool> std_logical_or_type;
+
+typedef hpx::components::server::runtime_support::dijkstra_termination_action
+    dijkstra_termination_action;
+
+HPX_REGISTER_REDUCE_ACTION_DECLARATION(dijkstra_termination_action, std_logical_or_type)
+HPX_REGISTER_REDUCE_ACTION(dijkstra_termination_action, std_logical_or_type)
+
+#endif
+
+namespace hpx { namespace components { namespace server
+{
     ///////////////////////////////////////////////////////////////////////////
     // initiate system shutdown for all localities
     void invoke_shutdown_functions(
-        std::vector<naming::gid_type> const& prefixes, bool pre_shutdown)
+        std::vector<naming::id_type> const& prefixes, bool pre_shutdown)
     {
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+        call_shutdown_functions_action act;
+        lcos::broadcast(act, prefixes, pre_shutdown).get();
+#else
         std::vector<lcos::unique_future<void> > lazy_actions;
-        BOOST_FOREACH(naming::gid_type const& gid, prefixes)
+        BOOST_FOREACH(naming::id_type const& gid, prefixes)
         {
             using components::stubs::runtime_support;
-            naming::id_type id(gid, naming::id_type::unmanaged);
             lazy_actions.push_back(
-                std::move(runtime_support::call_shutdown_functions_async(id, pre_shutdown)));
+                std::move(runtime_support::call_shutdown_functions_async(
+                    id, pre_shutdown)));
         }
 
         // wait for all localities to finish executing their registered
         // shutdown functions
         wait_all(lazy_actions);
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -539,6 +571,75 @@ namespace hpx { namespace components { namespace server
         dijkstra_color_ = true;
     }
 
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+    // invoked during termination detection
+    bool runtime_support::dijkstra_termination()
+    {
+        applier::applier& appl = hpx::applier::get_applier();
+        naming::resolver_client& agas_client = appl.get_agas_client();
+
+        agas_client.start_shutdown();
+
+        // First wait for this locality to become passive. We do this by 
+        // periodically checking the number of still running threads.
+        //
+        // Rule 0: When active, machine nr.i + 1 keeps the token; when passive,
+        // it hands over the token to machine nr.i.
+        threads::threadmanager_base& tm = appl.get_thread_manager();
+
+        while (tm.get_thread_count() > 1)
+        {
+            this_thread::sleep_for(boost::posix_time::millisec(100));
+        }
+
+        // Now this locality has become passive, thus we can send the token
+        // to the next locality.
+        //
+        // Rule 2: When machine nr.i + 1 propagates the probe, it hands over a
+        // black token to machine nr.i if it is black itself, whereas while
+        // being white it leaves the color of the token unchanged.
+        lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+        bool dijkstra_token = dijkstra_color_;
+
+        // Rule 5: Upon transmission of the token to machine nr.i, machine
+        // nr.i + 1 becomes white.
+        dijkstra_color_ = false;
+
+        // The reduce-function (logical_or) will make sure black will be
+        // propagated.
+        return dijkstra_token;
+    }
+
+    // kick off termination detection
+    void runtime_support::dijkstra_termination_detection(
+        std::vector<naming::id_type> const& locality_ids)
+    {
+        boost::uint32_t num_localities =
+            static_cast<boost::uint32_t>(locality_ids.size());
+        if (num_localities == 1)
+            return;
+
+        do {
+            // Rule 4: Machine nr.0 initiates a probe by making itself white
+            // and sending a white token to machine nr.N - 1.
+            {
+                lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+                dijkstra_color_ = false;        // start off with white
+            }
+
+            dijkstra_termination_action act;
+            if (lcos::reduce(act, locality_ids, std_logical_or_type()).get())
+            {
+                lcos::local::spinlock::scoped_lock l(dijkstra_mtx_);
+                dijkstra_color_ = true;     // unsuccessful termination
+            }
+
+            // Rule 3: After the completion of an unsuccessful probe, machine
+            // nr.0 initiates a next probe.
+
+        } while (dijkstra_color_);
+    }
+#else
     void runtime_support::send_dijkstra_termination_token(
         boost::uint32_t target_locality_id,
         boost::uint32_t initiating_locality_id,
@@ -579,7 +680,7 @@ namespace hpx { namespace components { namespace server
     }
 
     // invoked during termination detection
-    void runtime_support::dijkstra_termination(
+    bool runtime_support::dijkstra_termination(
         boost::uint32_t initiating_locality_id, boost::uint32_t num_localities,
         bool dijkstra_token)
     {
@@ -599,7 +700,7 @@ namespace hpx { namespace components { namespace server
             }
 
             dijkstra_cond_.notify_one();
-            return;
+            return true;
         }
 
         if (0 == locality_id)
@@ -607,12 +708,15 @@ namespace hpx { namespace components { namespace server
 
         send_dijkstra_termination_token(locality_id - 1,
             initiating_locality_id, num_localities, dijkstra_token);
+        return false;
     }
 
     // kick off termination detection
     void runtime_support::dijkstra_termination_detection(
-        boost::uint32_t num_localities)
+        std::vector<naming::id_type> const& locality_ids)
     {
+        boost::uint32_t num_localities =
+            static_cast<boost::uint32_t>(locality_ids.size());
         if (num_localities == 1)
             return;
 
@@ -643,43 +747,43 @@ namespace hpx { namespace components { namespace server
 
         } while (dijkstra_color_);
     }
+#endif
 
+    ///////////////////////////////////////////////////////////////////////////
     void runtime_support::shutdown_all(double timeout)
     {
-        std::vector<naming::gid_type> locality_ids;
         applier::applier& appl = hpx::applier::get_applier();
         naming::resolver_client& agas_client = appl.get_agas_client();
 
         agas_client.start_shutdown();
-        agas_client.get_localities(locality_ids);
-        std::reverse(locality_ids.begin(), locality_ids.end());
 
-        dijkstra_termination_detection(
-            static_cast<boost::uint32_t>(locality_ids.size()));
+        std::vector<naming::id_type> locality_ids = find_all_localities();
+        dijkstra_termination_detection(locality_ids);
 
         // execute registered shutdown functions on all localities
         invoke_shutdown_functions(locality_ids, true);
         invoke_shutdown_functions(locality_ids, false);
 
-        // shut down all localities except the the local one
+        // Shut down all localities except the the local one, we can't use
+        // broadcast here as we have to handle the back parcel in a special
+        // way.
+        std::reverse(locality_ids.begin(), locality_ids.end());
+
+        boost::uint32_t locality_id = get_locality_id();
+        std::vector<lcos::unique_future<void> > lazy_actions;
+
+        BOOST_FOREACH(naming::id_type id, locality_ids)
         {
-            boost::uint32_t locality_id = get_locality_id();
-            std::vector<lcos::unique_future<void> > lazy_actions;
-
-            BOOST_FOREACH(naming::gid_type gid, locality_ids)
+            if (locality_id != naming::get_locality_id_from_id(id))
             {
-                if (locality_id != naming::get_locality_id_from_gid(gid))
-                {
-                    using components::stubs::runtime_support;
-                    naming::id_type id(gid, naming::id_type::unmanaged);
-                    lazy_actions.push_back(runtime_support::shutdown_async(id,
-                        timeout));
-                }
+                using components::stubs::runtime_support;
+                lazy_actions.push_back(runtime_support::shutdown_async(id,
+                    timeout));
             }
-
-            // wait for all localities to be stopped
-            wait_all(lazy_actions);
         }
+
+        // wait for all localities to be stopped
+        wait_all(lazy_actions);
 
         // Now make sure this local locality gets shut down as well.
         // There is no need to respond...
@@ -695,7 +799,9 @@ namespace hpx { namespace components { namespace server
         appl.get_agas_client().get_localities(locality_ids);
         std::reverse(locality_ids.begin(), locality_ids.end());
 
-        // terminate all localities except the the local one
+        // Terminate all localities except the the local one, we can't use
+        // broadcast here as we have to handle the back parcel in a special
+        // way.
         {
             boost::uint32_t locality_id = get_locality_id();
             std::vector<lcos::unique_future<void> > lazy_actions;
@@ -963,12 +1069,14 @@ namespace hpx { namespace components { namespace server
     void runtime_support::call_startup_functions(bool pre_startup)
     {
         if (pre_startup) {
+            get_runtime().set_state(runtime::state_pre_startup);
             BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, pre_startup_functions_)
             {
                 f();
             }
         }
         else {
+            get_runtime().set_state(runtime::state_startup);
             BOOST_FOREACH(HPX_STD_FUNCTION<void()> const& f, startup_functions_)
             {
                 f();

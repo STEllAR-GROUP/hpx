@@ -15,6 +15,9 @@
 #include <hpx/lcos/barrier.hpp>
 #include <hpx/lcos/future_wait.hpp>
 #include <hpx/lcos/detail/full_empty_entry.hpp>
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#include <hpx/lcos/broadcast.hpp>
+#endif
 #include <hpx/runtime/agas/interface.hpp>
 
 namespace
@@ -29,11 +32,24 @@ namespace
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+
+///////////////////////////////////////////////////////////////////////////////
+typedef hpx::components::server::runtime_support::call_startup_functions_action
+    call_startup_functions_action;
+
+HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_startup_functions_action)
+HPX_REGISTER_BROADCAST_ACTION(call_startup_functions_action)
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 namespace hpx
 {
 
 ///////////////////////////////////////////////////////////////////////////////
-// Create a new barrier and register its gid with the given symbolic name.
+// Create a new barrier and register its id with the given symbolic name.
 inline lcos::barrier
 create_barrier(std::size_t num_localities, char const* symname)
 {
@@ -151,7 +167,6 @@ bool pre_main(runtime_mode mode)
         if (agas_client.is_bootstrap())
         {
             naming::gid_type console_;
-
             if (HPX_UNLIKELY(!agas_client.get_console_locality(console_)))
             {
                 HPX_THROW_EXCEPTION(network_error
@@ -204,7 +219,21 @@ bool pre_main(runtime_mode mode)
         if (agas_client.is_bootstrap())
             agas::unregister_name_sync(second_barrier);
 
-        rt.set_state(runtime::state_pre_startup);
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+        if (agas_client.is_bootstrap())
+        {
+            std::vector<naming::id_type> localities = hpx::find_all_localities();
+
+            call_startup_functions_action act;
+            lcos::broadcast(act, localities, true).get();
+            agas::unregister_name_sync(third_barrier);
+            LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
+
+            lcos::broadcast(act, localities, false).get();
+            agas::unregister_name_sync(fourth_barrier);
+            LBT_(info) << "(4th stage) pre_main: ran startup functions";
+        }
+#else
         runtime_support::call_startup_functions(find_here(), true);
         LBT_(info) << "(3rd stage) pre_main: ran pre-startup functions";
 
@@ -216,7 +245,6 @@ bool pre_main(runtime_mode mode)
         if (agas_client.is_bootstrap())
             agas::unregister_name_sync(third_barrier);
 
-        rt.set_state(runtime::state_startup);
         runtime_support::call_startup_functions(find_here(), false);
         LBT_(info) << "(4th stage) pre_main: ran startup functions";
 
@@ -230,6 +258,7 @@ bool pre_main(runtime_mode mode)
         // Tear down the fourth stage barrier.
         if (agas_client.is_bootstrap())
             agas::unregister_name_sync(fourth_barrier);
+#endif
     }
 
     // Enable logging. Even if we terminate at this point we will see all
