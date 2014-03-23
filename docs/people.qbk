@@ -12,7 +12,7 @@ The STE||AR Group (pronounced as stellar) stands for "[*S]ystems [*T]echnology,
 international group of faculty, researchers, and students working at different
 organizations. Everything we do is centered around building technologies for
 scalable parallel applications. In particular, this documentation is describing
-__hpx__, our general purpose C++ runtime system for paralle and distributed
+__hpx__, our general purpose C++ runtime system for parallel and distributed
 applications of any scale. We use __hpx__ for a broad range of scientific
 applications, helping scientists and developers to write code which scales
 better and shows better performance if compared to more conventional
@@ -93,7 +93,7 @@ Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
 * John Biddiscombe (CSCS - Swiss National Supercomputing Centre), who helped
-  ith the BlueGene/Q port of __hpx__ and made several other contributions.
+  with the BlueGene/Q port of __hpx__ and made several other contributions.
 * Erik Schnetter (Perimeter Institute for Theoretical Physics), who greatly
   helped to make __hpx__ more robust by sumbitting a large amount of problem
   reports, feature requests, and made several direct contributions.
