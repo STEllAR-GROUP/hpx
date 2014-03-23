@@ -56,7 +56,7 @@
 [def __iu__                     [@http://www.iu.edu Indiana University (IU)]]
 [def __crest__                  [@http://pti.iu.edu Center for Research in Extreme Scale Technologies (CREST)]]
 [def __fau__                    [@http://www.fau.de Friedrich-Alexander University Erlangen-Nuremberg (FAU)]]
-[def __inf3__                   [@http://www3.cs.fau.de Chair of Computer Science 3 - Computer Architecture]]
+[def __inf3__                   [@http://www3.cs.fau.de Department of Computer Science 3 - Computer Architecture]]
 [def __sandia__                 [@http://www.sandia.gov Sandia National Labs (Albuquerque)]]
 [def __tue__                    [@http://www.tui.nl Technische Universiteit Eindhoven]]
 
@@ -256,9 +256,12 @@
 [/ CONTENT]
 
 The __stellar__ Group ([*S]ystems [*T]echnology, [*E]mergent Para[*ll]elism,
-and [*A]lgorithm [*R]esearch) is a research group at __lsu__'s __cct__. For
-a list of people working in this group and participating in writing this
-documentation see __people__.
+and [*A]lgorithm [*R]esearch) is an international research group focussing on
+developing technology for improving the scalability of parallel applications.
+The main contributors to __hpx__ in the __stellar__ Group are researchers
+from __lsu__'s __cct__ and the __fau__'s __inf3__. For a full list of people
+working in this group and participating in writing this documentation see
+__people__.
 
 This documentation is automatically generated for __hpx__ __version__ (from Git
 commit: [git_commit_link __hpx_git_commit__]) by the Boost __boost_quickbook__
