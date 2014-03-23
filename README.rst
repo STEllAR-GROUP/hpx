@@ -340,10 +340,18 @@ in this material are those of the author(s) and do not necessarily reflect the v
 the National Science Foundation.
 
 Additionally, this work is supported by the Department of Energy (DoE)
-through the award DE-SC0008714 (XPRESS). Any opinions, findings, and conclusions
-or recommendations expressed in this material are those of the author(s) and do not
-necessarily reflect the views of the Department of Energy.
+through the award DE-SC0008714 (XPRESS). Neither the United States Government nor any
+agency thereof, nor any of their employees, makes any warranty, express or
+implied, or assumes any legal liability or responsibility for the accuracy,
+completeness, or usefulness of any information, apparatus, product, or process
+disclosed, or represents that its use would not infringe privately owned
+rights. Reference herein to any specific commercial product, process, or
+service by trade name, trademark, manufacturer, or otherwise does not
+necessarily constitute or imply its endorsement, recommendation, or favoring
+by the United States Government or any agency thereof. The views and opinions
+of authors expressed herein do not necessarily state or reflect those of the
+United States Government or any agency thereof.
 
-This work is also supported by the Center of Computation and
-Technology at Louisiana State University and the Department of Computer Science 3 at
+This work is also supported by the Center of Computation and Technology at
+Louisiana State University and the Department of Computer Science 3 at
 the University of Erlangen Nuremberg.
