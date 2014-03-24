@@ -96,7 +96,8 @@ namespace hpx { namespace util
 
         T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
-
+        boost::shared_array<T> data_array() const { return data_; }
+ 
         std::size_t size() const { return size_; }
 
     private:
@@ -238,7 +239,8 @@ namespace hpx { namespace util
 
         T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
-
+        boost::shared_array<T> data_array() const { return data_; }
+ 
         std::size_t size() const { return size_; }
 
     private:
