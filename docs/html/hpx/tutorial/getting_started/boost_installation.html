@@ -46,7 +46,7 @@
         </p>
 <pre class="programlisting">cd $BOOST
 bootstrap --prefix=&lt;where to install boost&gt;
-./b2 -j&lt;N&gt;
+./b2 -j&lt;N&gt; --build-type=complete
 ./b2 install
 </pre>
 <p>
@@ -63,6 +63,18 @@ bootstrap --prefix=&lt;where to install boost&gt;
           to Install <span class="emphasis"><em>HPX</em></span> on Unix Variants</a> and <a class="link" href="windows_installation.html" title="How to Install HPX on Windows">How
           to Install <span class="emphasis"><em>HPX</em></span> on Windows</a>.
         </p>
+<div class="important"><table border="0" summary="Important">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Important]" src="../../../images/important.png"></td>
+<th align="left">Important</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            On Windows, depending on the installed versions of Visual Studio, you
+            might also want to pass the correct toolset to the b2 command depending
+            on which version of the IDE you want to use. In addition, passing address-model=64
+            is always safe
+          </p></td></tr>
+</table></div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
