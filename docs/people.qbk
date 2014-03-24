@@ -120,14 +120,18 @@ the project through discussions, pull requests, documentation patches, etc.
 
 In addition to the people who worked directly with __hpx__ development we would
 like to acknowledge the NSF, DoE, DARPA, __cct__, and __inf3__ who fund and
-support our work.
+support our work. We would also like to thank the following organizations for 
+granting us allocatons of thier compute resources: 
+LSU HPC, LONI, XSEDE and the Gauss Center for Supercomputing.
 
-This work is supported by the National Science Foundation through awards 
+_hpx_ is currently funded by:
+
+The National Science Foundation through awards 
 1117470 (APX) and 1240655 (STAR). Any opinions, findings, and conclusions or
 recommendations expressed in this material are those of the author(s) and do
 not necessarily reflect the views of the National Science Foundation.
 
-Additionally, this work is supported by the Department of Energy (DoE) through
+The Department of Energy (DoE) through
 the award DE-SC0008714 (XPRESS). Neither the United States Government nor any
 agency thereof, nor any of their employees, makes any warranty, express or
 implied, or assumes any legal liability or responsibility for the accuracy,
@@ -139,6 +143,10 @@ necessarily constitute or imply its endorsement, recommendation, or favoring
 by the United States Government or any agency thereof. The views and opinions
 of authors expressed herein do not necessarily state or reflect those of the
 United States Government or any agency thereof.
+
+The Bavarian Research Foundation (Bayerische Forschungsstfitung) 
+through the grant AZ-987-11. 
+
 
 [endsect] [/ People]
 
