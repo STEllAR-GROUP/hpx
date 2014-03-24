@@ -39,10 +39,15 @@ the lines as they are completed to avoid confusion.
     in ``docs/whats_new.qbk``.
 
 #.  Build the docs, and proof-read them. Update any documentation that may have
-    changed, and correct any typos.
+    changed, and correct any typos. Pay special attention to:
 
-    *   Pay particular attention to ``$HPX_SOURCE/README.rst`` and 
-        ``docs/whats_new.qbk``.
+    *   ``$HPX_SOURCE/README.rst`` 
+     *   Update grant information
+    *   ``docs/whats_new.qbk``
+    *   ``docs/people.qbk``
+     *   Update collaborators
+     *   Update grant information
+     
 
 #.  Delete the old release branch, and create a new one by branching a stable
     point from master. 
@@ -50,9 +55,9 @@ the lines as they are completed to avoid confusion.
 #.  Checkout the main branch, and bump the HPX version to the next release
     target. The following files contain version info:
 
-        *   ``hpx/version.hpp``
-        *   ``docs/hpx.qbk``
-        *   ``CMakeLists.txt``
+    *   ``hpx/version.hpp``
+    *   ``docs/hpx.qbk``
+    *   ``CMakeLists.txt``
 
 #.  Create new logos for documentation. Update the logo size accordingly in
     ``docs/cmakelist.txt`` lines 124/125, remove '_draft' suffix in logo file
@@ -67,6 +72,9 @@ the lines as they are completed to avoid confusion.
 
 #.  Tag a release candidate from the release branch.
 
+    *   ``git tag -a [tag name] -m '[description]'``
+    *   ``git push origin [tag name]``
+
 #.  Notify hpx-users@stellar.cct.lsu.edu and stellar@cct.lsu.edu of the
     availability of the release candidate. Ask users to test the candidate by 
     checking out the release candidate tag.
@@ -77,6 +85,10 @@ the lines as they are completed to avoid confusion.
     *   Use ``git merge`` when possible, and fall back to ``git cherry-pick``
         when needed.
 
+#.  Update ``$HPX_SOURCE/README.rst`` 
+    *   Update version
+    *   Update links to documentation
+     
 #.  Tag the release.
 
 #.  Roll a release candidate using ``tools/roll_release.sh``, and add the
