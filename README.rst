@@ -111,14 +111,14 @@ Linux
 
     gmake install
 
-   This will build and install the essential core components of HPX only. Use
+   This will build and install the essential core components of HPX only. Use::
 
-        gmake tests
+    gmake tests
 
-   to build and run the tests and
+   to build and run the tests and::
 
-        gmake examples
-        gmake install
+    gmake examples
+    gmake install
 
    to build and install the examples.
 
@@ -193,11 +193,11 @@ we describe two possibilities:
 
     make install
 
-   This will build and install the essential core components of HPX only. Use
+   This will build and install the essential core components of HPX only. Use::
 
     make tests
 
-   to build and run the tests and
+   to build and run the tests and::
 
     make examples
     make install
@@ -210,18 +210,18 @@ required libraries via MacPorts:
 
 1) Install MacPorts <http://www.macports.org/>
 
-2) Install Boost, CMake, gcc 4.8, and hwloc:
+2) Install Boost, CMake, gcc 4.8, and hwloc::
 
     sudo port install boost
     sudo port install gcc48
     sudo port install hwloc
 
-   You may also want:
+   You may also want::
 
     sudo port install cmake
     sudo port install git-core
 
-3) Make this version of gcc your default compiler:
+3) Make this version of gcc your default compiler::
 
     sudo port install gcc_select
     sudo port select gcc mp-gcc48
@@ -269,7 +269,7 @@ Windows
 9) Build the INSTALL target.
 
 BlueGene/Q
--------
+----------
 
 So far we only support BGClang for compiling HPX on the BlueGene/Q.
 
@@ -355,3 +355,4 @@ United States Government or any agency thereof.
 This work is also supported by the Center of Computation and Technology at
 Louisiana State University and the Department of Computer Science 3 at
 the University of Erlangen Nuremberg.
+
