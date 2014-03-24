@@ -7,10 +7,15 @@
 
 [section People]
 
-The STE||AR Group (pronounced as stellar) stands for "[*S]ystems [*T]echnology,
+The __stellar__ Group (pronounced as stellar) stands for "[*S]ystems [*T]echnology,
 [*E]mergent Para[*ll]elism, and [*A]lgorithm [*R]esearch". We are an
 international group of faculty, researchers, and students working at different
-organizations. Everything we do is centered around building technologies for
+organizations. The goal of the __stellar__ Group is to promote the development of
+scalable parallel applications by providing a community for ideas, a framework
+for collaboration, and a platform for communicating these concepts to the
+broader community.
+
+Everything we do is centered around building technologies for
 scalable parallel applications. In particular, this documentation is describing
 __hpx__, our general purpose C++ runtime system for parallel and distributed
 applications of any scale. We use __hpx__ for a broad range of scientific

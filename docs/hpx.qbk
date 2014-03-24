@@ -255,8 +255,10 @@
 [/ CONTENT]
 
 The __stellar__ Group ([*S]ystems [*T]echnology, [*E]mergent Para[*ll]elism,
-and [*A]lgorithm [*R]esearch) is an international research group focussing on
-developing technology for improving the scalability of parallel applications.
+and [*A]lgorithm [*R]esearch) is an international research group with the
+goal of promoting the development of scalable parallel applications by
+providing a community for ideas, a framework for collaboration, and a platform
+for communicating these concepts to the broader community.
 The main contributors to __hpx__ in the __stellar__ Group are researchers
 from __lsu__'s __cct__ and the __fau__'s __inf3__. For a full list of people
 working in this group and participating in writing this documentation see
