@@ -93,6 +93,11 @@ of the advantages of using __hpx__:
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1086] - Expose internal boost::shared_array to allow user management
+                 of array lifetime
+* [issue 1083] - Make shell examples copyable in docs
+* [issue 1080] - /threads{locality#*/total}/count/cumulative broken
+* [issue 1079] - Build problems on OS X
 * [issue 1078] - Improve robustness of component loading
 * [issue 1077] - Fix a missing enum definition for 'take' mode
 * [issue 1076] - Merge Jb master
