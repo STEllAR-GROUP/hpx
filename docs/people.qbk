@@ -15,25 +15,24 @@ scalable parallel applications by providing a community for ideas, a framework
 for collaboration, and a platform for communicating these concepts to the
 broader community.
 
-Everything we do is centered around building technologies for
-scalable parallel applications. In particular, this documentation is describing
-__hpx__, our general purpose C++ runtime system for parallel and distributed
-applications of any scale. We use __hpx__ for a broad range of scientific
-applications, helping scientists and developers to write code which scales
-better and shows better performance if compared to more conventional
-programming models such as MPI.
+All of our work is centered around building technologies for
+scalable parallel applications. __hpx__, our general purpose C++ runtime system 
+for parallel and distributed applications, is no exeption. We use __hpx__ for 
+a broad range of scientific applications, helping scientists and developers 
+to write code which scales better and shows better performance compared 
+to more conventional programming models such as MPI.
 
-__hpx__ is based on a solid theoretical basis, /ParalleX/ which is a new
+__hpx__ is based on /ParalleX/ which is a new
 (and still experimental) parallel execution model aiming to
 overcome the limitations imposed by the current hardware and the way we write
 applications today. Our group focuses on two types of applications - those
 requiring excellent strong scaling, allowing for a dramatic reduction of
 execution time for fixed workloads and those needing highest level of sustained
-performance through massive parallelism. These applications are either
+performance through massive parallelism. These applications are 
 presently unable (through conventional practices) to effectively exploit a
-relatively small number of cores in a multi-core system. At the same time
-more often than not these application will not be able to exploit high-end
-computing systems likely to employ hundreds of millions of such cores by the
+relatively small number of cores in a multi-core system. By extention, 
+these application will not be able to exploit high-end
+computing systems which are likely to employ hundreds of millions of such cores by the
 end of this decade.
 
 Critical bottlenecks to the effective use of new generation high performance
@@ -49,17 +48,16 @@ computing (HPC) systems include:
 
 The ParalleX model has been devised to address these challenges by enabling a
 new computing dynamic through the application of message-driven computation in
-a global address space context with lightweight synchronization. The work of
-our group is centered around implementing the concepts as defined by ParalleX.
-We develop __hpx__ - a parallel runtime system
-currently targetted at conventional machines, such as classical Linux based
+a global address space context with lightweight synchronization. The work on 
+_hpx_ is centered around implementing the concepts as defined by the ParalleX
+model. __hpx__ is currently targetted at conventional machines, such as classical Linux based
 Beowulf clusters and SMP nodes.
 
 We fully understand that the success of __hpx__ (and ParalleX) is very much the
 result of the work of many people. To see a list of who is contributing see
 our tables below.
 
-[heading The STE||AR Group]
+[heading HPX Contributors]
 
 [table:contributors Contributors
   [[Name]                    [Institution]        [email]]
