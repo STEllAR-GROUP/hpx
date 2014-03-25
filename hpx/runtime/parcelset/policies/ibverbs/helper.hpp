@@ -6,6 +6,8 @@
 #if !defined(HPX_PARCELSET_POLICIES_IBVERBS_HELPER_HPP)
 #define HPX_PARCELSET_POLICIES_IBVERBS_HELPER_HPP
 
+#include <boost/cache/entries/lru_entry.hpp>
+#include <boost/cache/local_cache.hpp>
 
 #include <netdb.h>
 #include <rdma/rdma_cma.h>
@@ -60,7 +62,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
             if(event_copy.event == RDMA_CM_EVENT_DISCONNECTED)
             {
                 c->on_disconnect(event_copy.id);
-                return get_next_event(event_channel, event_copy, c, ec);
+                return false;//get_next_event(event_channel, event_copy, c, ec);
             }
 
             return true;
@@ -69,6 +71,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
         {
             int verrno = errno;
             if(verrno == EBADF) return false;
+            if(verrno == EAGAIN) return false;
+            if(verrno == EWOULDBLOCK) return false;
+
             boost::system::error_code err(verrno, boost::system::system_category());
             HPX_IBVERBS_THROWS_IF(
                 ec
@@ -84,7 +89,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
     inline void set_nonblocking(int fd, boost::system::error_code &ec)
     {
         int flags = fcntl(fd, F_GETFL);
-        int rc = fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+        int rc = fcntl(fd, F_SETFL, flags | O_NONBLOCK | FASYNC);
         if(rc < 0)
         {
             int verrno = errno;
@@ -95,6 +100,35 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
             );
         }
     }
+
+    struct ibverbs_mr
+    {
+        static void deleter(ibv_mr * mr)
+        {
+            ibv_dereg_mr(mr);
+        };
+
+        ibverbs_mr() {}
+
+        ibverbs_mr(ibv_pd *pd, void * buffer, std::size_t size, int access)
+          : size_(size)
+        {
+            ibv_mr * mr = ibv_reg_mr(pd, buffer, size, access);
+            if(!mr)
+            {
+                int verrno = errno;
+                boost::system::error_code err(verrno, boost::system::system_category());
+                HPX_IBVERBS_THROWS(err);
+            }
+            mr_ = boost::shared_ptr<ibv_mr>(mr, deleter);
+        }
+
+        boost::shared_ptr<ibv_mr> mr_;
+        std::size_t size_;
+    };
+
+    typedef boost::cache::entries::lru_entry<ibverbs_mr> mr_cache_entry_type;
+    typedef boost::cache::local_cache<void *, mr_cache_entry_type> mr_cache_type;
 
 }}}}
 

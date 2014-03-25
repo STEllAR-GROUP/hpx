@@ -12,6 +12,7 @@
 #include <hpx/runtime/naming/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport_impl.hpp>
 #include <hpx/runtime/parcelset/policies/ibverbs/acceptor.hpp>
+#include <hpx/runtime/parcelset/policies/ibverbs/memory_pool.hpp>
 
 
 namespace hpx { namespace parcelset {
@@ -55,6 +56,8 @@ namespace hpx { namespace parcelset {
 
         public:
             static std::vector<std::string> runtime_configuration();
+            static std::size_t memory_chunk_size(util::runtime_configuration const& ini);
+            static std::size_t max_memory_chunks(util::runtime_configuration const& ini);
 
             connection_handler(util::runtime_configuration const& ini,
                 HPX_STD_FUNCTION<void(std::size_t, char const*)> const& on_start_thread,
@@ -81,26 +84,55 @@ namespace hpx { namespace parcelset {
 
             boost::shared_ptr<sender> create_connection(
                 naming::locality const& l, error_code& ec);
-    
+
             void add_sender(boost::shared_ptr<sender> const& sender_connection);
+
+            ibv_pd *get_pd(ibv_context *context, boost::system::error_code & ec);
+
+            ibv_mr register_buffer(ibv_pd * pd, char * buffer, std::size_t size, int access);
+            ibv_mr get_mr(ibv_pd * pd, char * buffer, std::size_t);
 
         private:
             // helper functions for receiving parcels
-            void handle_messages();
+            void handle_sends();
+            bool do_sends();
+            void handle_receives();
+            bool do_receives();
+
+            memory_pool memory_pool_;
+
+            typedef std::map<ibv_context *, ibv_pd *> pd_map_type;
+            hpx::lcos::local::spinlock pd_map_mtx_;
+            pd_map_type pd_map_;
+
+            typedef
+                std::map<void *, ibverbs_mr>
+                mr_cache_type;
+            typedef
+                std::map<ibv_pd *, mr_cache_type>
+                mr_map_type;
+
+            hpx::lcos::local::spinlock mr_map_mtx_;
+            mr_map_type mr_map_;
+
+            ibv_device **device_list_;
+            std::vector<ibv_context *> context_list_;
 
             /// Acceptor used to listen for incoming connections.
             acceptor acceptor_;
-            
+
+            hpx::lcos::local::spinlock receivers_mtx_;
             typedef std::list<boost::shared_ptr<receiver> > receivers_type;
             receivers_type receivers_;
 
             hpx::lcos::local::spinlock senders_mtx_;
             typedef std::list<boost::shared_ptr<sender> > senders_type;
             senders_type senders_;
-            
+
             boost::atomic<bool> stopped_;
-            boost::atomic<bool> handling_messages_;
-            
+            boost::atomic<bool> handling_sends_;
+            boost::atomic<bool> handling_receives_;
+
             bool use_io_pool_;
         };
     }}

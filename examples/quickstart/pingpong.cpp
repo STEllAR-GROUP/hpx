@@ -93,7 +93,7 @@ int hpx_main(boost::program_options::variables_map &b_arg)
         if (verbose) {
             std::cout << "[hpx_pingpong]" << std::endl
                     << "total_time(secs)=" << time << std::endl
-                    << "vsize=" << vsize
+                    << "vsize=" << vsize << std::endl
                     << "bandwidth(GB/s)="
                     << (((vsize * sizeof(double) * numiter) / time) / 1024) / 1024 << std::endl
                     << "localities=" << localities.size() << std::endl

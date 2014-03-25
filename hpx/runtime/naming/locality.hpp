@@ -79,52 +79,34 @@ namespace hpx { namespace naming
     {
     public:
         locality()
-          : address_(), port_(boost::uint16_t(-1))
+          : port_(boost::uint16_t(-1))
 #if defined(HPX_HAVE_PARCELPORT_MPI)
           , rank_(-1)
 #endif
         {}
 
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        locality(std::string const& addr, std::string const & ibverbs_addr, boost::uint16_t port)
+          : address_(addr), ibverbs_address_(ibverbs_addr), port_(port)
+#else
         locality(std::string const& addr, boost::uint16_t port)
           : address_(addr), port_(port)
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-          , rank_(util::mpi_environment::rank())
 #endif
-        {}
-
-        locality(boost::asio::ip::address addr, boost::uint16_t port)
-          : address_(addr.to_string()), port_(port)
 #if defined(HPX_HAVE_PARCELPORT_MPI)
           , rank_(util::mpi_environment::rank())
 #endif
         {}
 
 #if defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        locality(std::string const& addr, std::string const & ibverbs_addr, boost::uint16_t port, int rank)
+          : address_(addr), ibverbs_address_(ibverbs_addr), port_(port), rank_(rank)
+#else
         locality(std::string const& addr, boost::uint16_t port, int rank)
           : address_(addr), port_(port), rank_(rank)
-        {}
-
-        locality(boost::asio::ip::address addr, boost::uint16_t port, int rank)
-          : address_(addr.to_string()), port_(port), rank_(rank)
-        {}
-#endif
-
-        explicit locality(boost::asio::ip::tcp::endpoint ep)
-          : address_(ep.address().to_string()), port_(ep.port())
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-          , rank_(util::mpi_environment::rank())
 #endif
         {}
-
-        locality& operator= (boost::asio::ip::tcp::endpoint ep)
-        {
-            address_ = ep.address().to_string();
-            port_ = ep.port();
-#if defined(HPX_HAVE_PARCELPORT_MPI)
-            rank_ = hpx::util::mpi_environment::rank();
 #endif
-            return *this;
-        }
 
         ///////////////////////////////////////////////////////////////////////
         typedef detail::tcp_locality_iterator_type iterator_type;
@@ -172,6 +154,11 @@ namespace hpx { namespace naming
         std::string const& get_address() const { return address_; }
         void set_address(char const* address) { address_ = address; }
 
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        std::string const& get_ibverbs_address() const { return ibverbs_address_; }
+        void set_ibverbs_address(char const* address) { ibverbs_address_ = address; }
+#endif
+
         boost::uint16_t get_port() const { return port_; }
         void set_port(boost::uint16_t port) { port_ = port; }
 
@@ -209,6 +196,9 @@ namespace hpx { namespace naming
 
     private:
         std::string address_;
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        std::string ibverbs_address_;
+#endif
         boost::uint16_t port_;
 #if defined(HPX_HAVE_PARCELPORT_MPI)
         boost::int16_t rank_;
@@ -219,6 +209,9 @@ namespace hpx { namespace naming
     {
         boost::io::ios_flags_saver ifs(os);
         os << l.address_ << ":" << l.port_;
+#if defined(HPX_HAVE_PARCELPORT_IBVERBS)
+        os << "ibverbs:" << l.ibverbs_address_;
+#endif
 #if defined(HPX_HAVE_PARCELPORT_MPI)
         if (l.rank_ != -1)
             os << ":" << l.rank_;
@@ -231,7 +224,7 @@ namespace hpx { namespace naming
     ///        endpoint suitable for a call to accept() related to this
     ///        locality
     locality::iterator_type accept_begin(locality const& loc,
-        boost::asio::io_service& io_service);
+        boost::asio::io_service& io_service, bool ibverbs = false);
 
     inline locality::iterator_type accept_end(locality const&)
     {
@@ -242,7 +235,7 @@ namespace hpx { namespace naming
     ///        endpoint suitable for a call to connect() related to this
     ///        locality
     locality::iterator_type connect_begin(locality const& loc,
-        boost::asio::io_service& io_service);
+        boost::asio::io_service& io_service, bool ibverbs = false);
 
     inline locality::iterator_type connect_end(locality const&) //-V524
     {

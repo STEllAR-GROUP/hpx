@@ -25,21 +25,24 @@ namespace hpx { namespace parcelset
             boost::integer::ulittle32_t, boost::integer::ulittle32_t
         > count_chunks_type;
 
-        parcel_buffer()
-          : num_chunks_(count_chunks_type(0, 0))
-          , size_(0), data_size_(0)
-          , parcels_decoded_(false)
-        {}
+        typedef typename BufferType::allocator_type allocator_type;
 
-        parcel_buffer(BufferType const & data)
-          : data_(data)
+        explicit parcel_buffer(allocator_type allocator = allocator_type())
+          : data_(allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
           , parcels_decoded_(false)
         {}
 
-        parcel_buffer(BufferType && data)
-          : data_(std::move(data))
+        explicit parcel_buffer(BufferType const & data, allocator_type allocator = allocator_type())
+          : data_(data, allocator)
+          , num_chunks_(count_chunks_type(0, 0))
+          , size_(0), data_size_(0)
+          , parcels_decoded_(false)
+        {}
+
+        explicit parcel_buffer(BufferType && data, allocator_type allocator = allocator_type())
+          : data_(std::move(data), allocator)
           , num_chunks_(count_chunks_type(0, 0))
           , size_(0), data_size_(0)
           , parcels_decoded_(false)

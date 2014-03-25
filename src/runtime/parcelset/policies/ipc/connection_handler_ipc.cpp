@@ -35,7 +35,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
         using namespace boost::assign;
         lines +=
-            "data_buffer_cache_size = ${HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE:512}"
+            "data_buffer_cache_size = ${HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE:512}",
+            "zero_copy_optimization = 0"
             ;
 
         return lines;
@@ -205,7 +206,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
 
         return sender_connection;
     }
-    
+
     // accepted new incoming connection
     void connection_handler::handle_accept(boost::system::error_code const & e,
         boost::shared_ptr<receiver> receiver_conn)
