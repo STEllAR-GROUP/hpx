@@ -110,7 +110,9 @@ the lines as they are completed to avoid confusion.
 #.  Write a new blog post announcing the release.
 
 #.  Announce the release on hpx-users@stellar.cct.lsu.edu, 
-    stellar@cct.lsu.edu, isocpp.org, HPC Wire, and a CCT press release.
+    stellar@cct.lsu.edu, allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
+    xpress@crest.iu.edu, Sonia Sachs, our list of external collaborators,
+    isocpp.org, HPC Wire, Inside HPC, and a CCT press release.
 
 #.  Beer and pizza.
 
