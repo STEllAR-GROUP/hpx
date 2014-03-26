@@ -1384,54 +1384,6 @@ namespace hpx { namespace components { namespace server
         return true;    // component got loaded
     }
 
-    bool runtime_support::load_component_dynamic(
-        util::section& ini, std::string const& instance,
-        std::string const& component, boost::filesystem::path lib,
-        naming::gid_type const& prefix, naming::resolver_client& agas_client,
-        bool isdefault, bool isenabled,
-        boost::program_options::options_description& options,
-        std::set<std::string>& startup_handled)
-    {
-        modules_map_type::iterator it = modules_.find(HPX_MANGLE_STRING(component));
-        if (it != modules_.end()) {
-            // use loaded module, instantiate the requested factory
-            if (!load_component((*it).second, ini, instance, component, lib,
-                    prefix, agas_client, isdefault, isenabled, options,
-                    startup_handled))
-            {
-                return false;   // next please :-P
-            }
-        }
-        else {
-            // first, try using the path as the full path to the library
-            error_code ec(lightweight);
-            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
-            d.load_library(ec);
-            if (ec) {
-                // build path to component to load
-                std::string libname(HPX_MAKE_DLL_STRING(component));
-                lib /= hpx::util::create_path(libname);
-                d.load_library(ec);
-                if (ec) {
-                    LRT_(warning) << "dynamic loading failed: " << lib.string()
-                                    << ": " << instance << ": " << get_error_what(ec);
-                    return false;   // next please :-P
-                }
-            }
-
-            // now, instantiate the requested factory
-            if (!load_component(d, ini, instance, component, lib, prefix,
-                    agas_client, isdefault, isenabled, options,
-                    startup_handled))
-            {
-                return false;   // next please :-P
-            }
-
-            modules_.insert(std::make_pair(HPX_MANGLE_STRING(component), d));
-        }
-        return true;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     bool runtime_support::load_components(util::section& ini,
@@ -1451,6 +1403,7 @@ namespace hpx { namespace components { namespace server
         //  name = ...           # the name of this component module
         //  path = ...           # the path where to find this component module
         //  enabled = false      # optional (default is assumed to be true)
+        //  static = false       # optional (default is assumed to be false)
         //
         // # optional section defining additional properties for this module
         // [hpx.components.instance_name.settings]
@@ -1519,9 +1472,16 @@ namespace hpx { namespace components { namespace server
                         isenabled, options, startup_handled);
                 }
                 else {
+#if defined(HPX_STATIC_LINKING)
+                    HPX_THROW_EXCEPTION(service_unavailable,
+                        "runtime_support::load_components",
+                        "static linking configuration does not support dynamic "
+                        "loading of component '" + instance + "'");
+#else
                     load_component_dynamic(ini, instance,
                         component, lib, prefix, agas_client, isdefault,
                         isenabled, options, startup_handled);
+#endif
                 }
             }
             catch (hpx::exception const& e) {
@@ -1532,7 +1492,8 @@ namespace hpx { namespace components { namespace server
                 {
                     std::cerr << "runtime_support::load_components: "
                               << "invalid command line option(s) to "
-                              << instance << " component: " << e.what() << std::endl;
+                              << instance << " component: " << e.what()
+                              << std::endl;
                 }
             }
         } // for
@@ -1656,6 +1617,101 @@ namespace hpx { namespace components { namespace server
         return true;    // startup/shutdown functions got registered
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    bool runtime_support::load_commandline_options_static(
+        std::string const& module,
+        boost::program_options::options_description& options, error_code& ec)
+    {
+        try {
+            util::plugin::get_plugins_list_type f;
+            if (!components::get_static_commandline(module, f))
+            {
+                LRT_(debug) << "static loading of command-line options failed: "
+                        << module << ": couldn't find module in global "
+                        << "static command line data map";
+                return false;
+            }
+
+            // get the factory, may fail
+            hpx::util::plugin::static_plugin_factory<
+                component_commandline_base> pf (f);
+
+            // create the startup_shutdown object
+            boost::shared_ptr<component_commandline_base>
+                commandline_options(pf.create("commandline_options", ec));
+            if (ec) {
+                LRT_(debug) << "static loading of command-line options failed: "
+                            << module << ": " << get_error_what(ec);
+                return false;
+            }
+
+            options.add(commandline_options->add_commandline_options());
+        }
+        catch (hpx::exception const&) {
+            throw;
+        }
+        catch (std::logic_error const& e) {
+            LRT_(debug) << "static loading of command-line options failed: "
+                        << module << ": " << e.what();
+            return false;
+        }
+        catch (std::exception const& e) {
+            LRT_(debug) << "static loading of command-line options failed: "
+                        << module << ": " << e.what();
+            return false;
+        }
+        return true;    // startup/shutdown functions got registered
+    }
+
+#if !defined(HPX_STATIC_LINKING)
+    bool runtime_support::load_component_dynamic(
+        util::section& ini, std::string const& instance,
+        std::string const& component, boost::filesystem::path lib,
+        naming::gid_type const& prefix, naming::resolver_client& agas_client,
+        bool isdefault, bool isenabled,
+        boost::program_options::options_description& options,
+        std::set<std::string>& startup_handled)
+    {
+        modules_map_type::iterator it = modules_.find(HPX_MANGLE_STRING(component));
+        if (it != modules_.end()) {
+            // use loaded module, instantiate the requested factory
+            if (!load_component((*it).second, ini, instance, component, lib,
+                    prefix, agas_client, isdefault, isenabled, options,
+                    startup_handled))
+            {
+                return false;   // next please :-P
+            }
+        }
+        else {
+            // first, try using the path as the full path to the library
+            error_code ec(lightweight);
+            hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
+            d.load_library(ec);
+            if (ec) {
+                // build path to component to load
+                std::string libname(HPX_MAKE_DLL_STRING(component));
+                lib /= hpx::util::create_path(libname);
+                d.load_library(ec);
+                if (ec) {
+                    LRT_(warning) << "dynamic loading failed: " << lib.string()
+                                    << ": " << instance << ": " << get_error_what(ec);
+                    return false;   // next please :-P
+                }
+            }
+
+            // now, instantiate the requested factory
+            if (!load_component(d, ini, instance, component, lib, prefix,
+                    agas_client, isdefault, isenabled, options,
+                    startup_handled))
+            {
+                return false;   // next please :-P
+            }
+
+            modules_.insert(std::make_pair(HPX_MANGLE_STRING(component), d));
+        }
+        return true;
+    }
+
     bool runtime_support::load_startup_shutdown_functions(hpx::util::plugin::dll& d,
         error_code& ec)
     {
@@ -1704,52 +1760,6 @@ namespace hpx { namespace components { namespace server
         catch (std::exception const& e) {
             LRT_(debug) << "loading of startup/shutdown functions failed: "
                         << d.get_name() << ": " << e.what();
-            return false;
-        }
-        return true;    // startup/shutdown functions got registered
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    bool runtime_support::load_commandline_options_static(
-        std::string const& module,
-        boost::program_options::options_description& options, error_code& ec)
-    {
-        try {
-            util::plugin::get_plugins_list_type f;
-            if (!components::get_static_commandline(module, f))
-            {
-                LRT_(debug) << "static loading of command-line options failed: "
-                        << module << ": couldn't find module in global "
-                        << "static command line data map";
-                return false;
-            }
-
-            // get the factory, may fail
-            hpx::util::plugin::static_plugin_factory<
-                component_commandline_base> pf (f);
-
-            // create the startup_shutdown object
-            boost::shared_ptr<component_commandline_base>
-                commandline_options(pf.create("commandline_options", ec));
-            if (ec) {
-                LRT_(debug) << "static loading of command-line options failed: "
-                            << module << ": " << get_error_what(ec);
-                return false;
-            }
-
-            options.add(commandline_options->add_commandline_options());
-        }
-        catch (hpx::exception const&) {
-            throw;
-        }
-        catch (std::logic_error const& e) {
-            LRT_(debug) << "static loading of command-line options failed: "
-                        << module << ": " << e.what();
-            return false;
-        }
-        catch (std::exception const& e) {
-            LRT_(debug) << "static loading of command-line options failed: "
-                        << module << ": " << e.what();
             return false;
         }
         return true;    // startup/shutdown functions got registered
@@ -1890,6 +1900,7 @@ namespace hpx { namespace components { namespace server
         }
         return true;    // component got loaded
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
@@ -1908,6 +1919,7 @@ namespace hpx { namespace components { namespace server
         //  name = ...           # the name of this component module
         //  path = ...           # the path where to find this component module
         //  enabled = false      # optional (default is assumed to be true)
+        //  static = false       # optional (default is assumed to be false)
         //
         // # optional section defining additional properties for this module
         // [hpx.plugins.instance_name.settings]
@@ -1954,16 +1966,28 @@ namespace hpx { namespace components { namespace server
                 else
                     lib = hpx::util::create_path(HPX_DEFAULT_COMPONENT_PATH);
 
-                // first, try using the path as the full path to the library
-                if (!load_plugin(ini, instance, component, lib, isenabled))
-                {
-                    // build path to component to load
-                    std::string libname(HPX_MAKE_DLL_STRING(component));
-                    lib /= hpx::util::create_path(libname);
+                if (sect.get_entry("static", "0") == "1") {
+                    // FIXME: implement statically linked plugins
+                }
+                else {
+#if defined(HPX_STATIC_LINKING)
+                    HPX_THROW_EXCEPTION(service_unavailable,
+                        "runtime_support::load_plugins",
+                        "static linking configuration does not support dynamic "
+                        "loading of plugin '" + instance + "'");
+#else
+                    // first, try using the path as the full path to the library
                     if (!load_plugin(ini, instance, component, lib, isenabled))
                     {
-                        continue;   // next please :-P
+                        // build path to component to load
+                        std::string libname(HPX_MAKE_DLL_STRING(component));
+                        lib /= hpx::util::create_path(libname);
+                        if (!load_plugin(ini, instance, component, lib, isenabled))
+                        {
+                            continue;   // next please :-P
+                        }
                     }
+#endif
                 }
             }
             catch (hpx::exception const& e) {
@@ -1975,6 +1999,7 @@ namespace hpx { namespace components { namespace server
         return true;
     }
 
+#if !defined(HPX_STATIC_LINKING)
     bool runtime_support::load_plugin(util::section& ini,
         std::string const& instance, std::string const& plugin,
         boost::filesystem::path const& lib, bool isenabled)
@@ -2053,6 +2078,7 @@ namespace hpx { namespace components { namespace server
         }
         return true;    // component got loaded
     }
+#endif
 
 #if defined(HPX_HAVE_SECURITY)
     components::security::capability

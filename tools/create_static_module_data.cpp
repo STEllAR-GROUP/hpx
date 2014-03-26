@@ -32,7 +32,7 @@ bool split_module_line(std::string const& line, std::string& module,
         return false;
 
     module = entries[0];
-    if (entries.size() > 1 && !entries[1].empty())
+    if (entries.size() > 1 && !entries[1].empty() && entries[1] != "<none>")
     {
         std::copy(++entries.begin(), entries.end(),
             std::inserter(components, components.end()));

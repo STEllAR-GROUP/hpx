@@ -59,14 +59,20 @@ namespace hpx { namespace components
 
 ///////////////////////////////////////////////////////////////////////////////
 // prototypes of functions used to force linking of components
-@HPX_REPLACE@[[
-HPX_STATIC_DECLARE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, @COMPONENT_NAME@);
-]]
+HPX_STATIC_DECLARE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, binpacking_factory);
+HPX_STATIC_DECLARE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, dataflow);
+HPX_STATIC_DECLARE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, dataflow_trigger);
+HPX_STATIC_DECLARE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, distributing_factory);
+HPX_STATIC_DECLARE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, output_stream_factory);
+HPX_STATIC_DECLARE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, remote_object);
 
 // prototypes of functions used to force linking of modules
-@HPX_REPLACE@[[
-HPX_STATIC_DECLARE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, @MODULE_NAME@);
-]]
+HPX_STATIC_DECLARE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, binpacking_factory);
+HPX_STATIC_DECLARE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, dataflow);
+HPX_STATIC_DECLARE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, distributing_factory);
+HPX_STATIC_DECLARE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, iostreams);
+HPX_STATIC_DECLARE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, memory);
+HPX_STATIC_DECLARE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, remote_object);
 
 #endif
 
@@ -77,10 +83,13 @@ namespace hpx { namespace components
     static static_component_load_data_type const static_component_load_data[] =
     {
     #if defined(HPX_STATIC_LINKING)
-    @HPX_REPLACE@[[
-    HPX_STATIC_DEFINE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, @COMPONENT_NAME@),
-    ]]
-#endif
+        HPX_STATIC_DEFINE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, binpacking_factory),
+        HPX_STATIC_DEFINE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, dataflow),
+        HPX_STATIC_DEFINE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, dataflow_trigger),
+        HPX_STATIC_DEFINE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, distributing_factory),
+        HPX_STATIC_DEFINE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, output_stream_factory),
+        HPX_STATIC_DEFINE_COMPONENT(HPX_PLUGIN_COMPONENT_PREFIX, remote_object),
+    #endif
         { NULL, NULL }
     };
 
@@ -88,10 +97,13 @@ namespace hpx { namespace components
     static static_module_load_data_type const static_module_load_data[] =
     {
     #if defined(HPX_STATIC_LINKING)
-    @HPX_REPLACE@[[
-    HPX_STATIC_DEFINE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, @MODULE_NAME@),
-    ]]
-#endif
+        HPX_STATIC_DEFINE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, binpacking_factory),
+        HPX_STATIC_DEFINE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, dataflow),
+        HPX_STATIC_DEFINE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, distributing_factory),
+        HPX_STATIC_DEFINE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, iostreams),
+        HPX_STATIC_DEFINE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, memory),
+        HPX_STATIC_DEFINE_MODULE(HPX_PLUGIN_COMPONENT_PREFIX, remote_object),
+    #endif
         { NULL, NULL }
     };
 }}
@@ -100,10 +112,18 @@ namespace hpx { namespace components
 // enable auto-linking on supported platforms
 #if defined(BOOST_MSVC) && defined(HPX_STATIC_LINKING)
 // auto-link modules
-@HPX_REPLACE@[[
-    #define HPX_AUTOLINK_LIB_NAME "@MODULE_NAME@"
+    #define HPX_AUTOLINK_LIB_NAME "binpacking_factory"
     #include <hpx/config/autolink.hpp>
-]]
+    #define HPX_AUTOLINK_LIB_NAME "dataflow"
+    #include <hpx/config/autolink.hpp>
+    #define HPX_AUTOLINK_LIB_NAME "distributing_factory"
+    #include <hpx/config/autolink.hpp>
+    #define HPX_AUTOLINK_LIB_NAME "iostreams"
+    #include <hpx/config/autolink.hpp>
+    #define HPX_AUTOLINK_LIB_NAME "memory"
+    #include <hpx/config/autolink.hpp>
+    #define HPX_AUTOLINK_LIB_NAME "remote_object"
+    #include <hpx/config/autolink.hpp>
 #endif
 
 #endif
