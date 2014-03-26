@@ -67,17 +67,17 @@ namespace hpx { namespace util { namespace coroutines
             template <typename T>
             T get_data() const
             {
-                HPX_ASSERT(data_ != 0);
-                return *reinterpret_cast<T*>(data_);
+                HPX_ASSERT(value_ != 0);
+                return *reinterpret_cast<T*>(value_);
             }
 
             template <typename T>
             void set_data(T const& val)
             {
-                if (data_ == 0)
-                    data_ = new T(val);
+                if (value_ == 0)
+                    value_ = new T(val);
                 else
-                    *reinterpret_cast<T*>(data_) = val;
+                    *reinterpret_cast<T*>(value_) = val;
             }
 
             void cleanup(bool cleanup_existing = true);
