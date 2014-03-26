@@ -39,10 +39,12 @@
  */
 #include <hpx/util/assert.hpp>
 #include <hpx/util/coroutine/detail/swap_context.hpp> //for swap hints
+#include <hpx/util/coroutine/detail/tss.hpp>
 #include <hpx/util/coroutine/exception.hpp>
 
 #include <cstddef>
 #include <algorithm> //for swap
+#include <map>
 
 #include <boost/atomic.hpp>
 #include <boost/version.hpp>
@@ -175,14 +177,15 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       m_phase = 0;
 #endif
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
-      m_thread_data = 0;
+      if (m_thread_data)
+        delete_tss_storage(m_thread_data);
 #endif
     }
 
 #if HPX_THREAD_MAINTAIN_OPERATIONS_COUNT
     void count_down() throw()
     {
-      HPX_ASSERT(m_operation_counter) ;
+      HPX_ASSERT(m_operation_counter);
       --m_operation_counter;
     }
 
@@ -450,18 +453,26 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
       catch(...) {
         /**/;
       }
+      delete_tss_storage(m_thread_data);
     }
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
     std::size_t get_thread_data() const
     {
-        return m_thread_data;
+        if (!m_thread_data)
+            return 0;
+        return get_tss_thread_data(m_thread_data);
     }
     std::size_t set_thread_data(std::size_t data)
     {
-        std::size_t t = m_thread_data;
-        m_thread_data = data;
-        return t;
+        return set_tss_thread_data(m_thread_data, data);
+    }
+
+    tss_storage* get_thread_tss_data(bool create_if_needed) const
+    {
+        if (!m_thread_data && create_if_needed)
+            m_thread_data = create_tss_storage();
+        return m_thread_data;
     }
 #endif
 
@@ -603,7 +614,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     std::size_t m_phase;
 #endif
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
-    std::size_t m_thread_data;
+    mutable detail::tss_storage* m_thread_data;
 #endif
 
     // This is used to generate a meaningful exception trace.

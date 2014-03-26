@@ -635,6 +635,16 @@ else()
   hpx_add_config_define(HPX_THREAD_MAINTAIN_STEALING_COUNTS 0)
 endif()
 
+hpx_option(HPX_THREAD_MAINTAIN_THREAD_DATA BOOL
+  "Enable thread local storage for all HPX threads (default: ON)"
+  ON ADVANCED)
+if(HPX_THREAD_MAINTAIN_THREAD_DATA)
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_THREAD_DATA 1)
+else()
+  hpx_add_config_define(HPX_THREAD_MAINTAIN_THREAD_DATA 0)
+endif()
+
+
 ##############################################################################
 hpx_option(HPX_AGAS_DUMP_REFCNT_ENTRIES BOOL
   "Enable dumps of the AGAS refcnt tables to logs (default: OFF)" OFF ADVANCED)

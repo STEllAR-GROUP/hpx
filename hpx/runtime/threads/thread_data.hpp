@@ -109,7 +109,7 @@ namespace hpx { namespace threads
     /// A \a thread is the representation of a ParalleX thread. It's a first
     /// class object in ParalleX. In our implementation this is a user level
     /// thread running on top of one of the OS threads spawned by the \a
-    /// threadmanager.
+    /// thread-manager.
     ///
     /// A \a thread encapsulates:
     ///  - A thread status word (see the functions \a thread#get_state and
@@ -121,7 +121,7 @@ namespace hpx { namespace threads
     ///
     /// Generally, \a threads are not created or executed directly. All
     /// functionality related to the management of \a thread's is
-    /// implemented by the \a threadmanager.
+    /// implemented by the thread-manager.
     class thread_data_base : private boost::noncopyable
     {
     public:
