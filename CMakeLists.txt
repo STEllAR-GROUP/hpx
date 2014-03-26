@@ -1565,25 +1565,6 @@ if(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
   hpx_add_config_define(HPX_DISABLE_AUTOMATIC_SERIALIZATION_REGISTRATION)
 endif()
 
-###############################################################################
-# Deprecated future
-###############################################################################
-hpx_option(HPX_ENABLE_DEPRECATED_FUTURE BOOL
-  "Define deprecated hpx::future (default: OFF)."
-  OFF ADVANCED)
-
-if(HPX_ENABLE_DEPRECATED_FUTURE)
-  hpx_add_config_define(HPX_ENABLE_DEPRECATED_FUTURE)
-elseif(HPX_HAVE_CXX11_ALIAS_TEMPLATES)
-  hpx_option(HPX_UNIQUE_FUTURE_ALIAS BOOL
-    "HPX will define future<R> as a template alias of unique_future<R> (default: OFF)."
-    OFF ADVANCED)
-
-  if(HPX_UNIQUE_FUTURE_ALIAS)
-    hpx_add_config_define(HPX_UNIQUE_FUTURE_ALIAS)
-  endif()
-endif()
-
 ################################################################################
 # Target specification
 ################################################################################

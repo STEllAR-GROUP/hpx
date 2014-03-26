@@ -25,13 +25,6 @@ namespace hpx { namespace traits
       : boost::mpl::false_
     {};
 
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    template <typename Result>
-    struct is_future<lcos::future<Result> >
-      : boost::mpl::true_
-    {};
-#endif
-
     template <typename R>
     struct is_future<lcos::unique_future<R> >
       : boost::mpl::true_

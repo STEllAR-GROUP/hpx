@@ -156,20 +156,6 @@ namespace hpx { namespace actions
             typedef hpx::util::unused_type type;
         };
 
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-        template <typename Result>
-        struct remote_action_result<lcos::future<Result> >
-        {
-            typedef Result type;
-        };
-
-        template <>
-        struct remote_action_result<lcos::future<void> >
-        {
-            typedef hpx::util::unused_type type;
-        };
-#endif
-
         ///////////////////////////////////////////////////////////////////////
         template <typename Action>
         struct action_registration

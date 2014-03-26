@@ -50,14 +50,6 @@ namespace hpx { namespace lcos { namespace detail
       : future_traits<Future>
     {};
 
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    template <typename T>
-    struct future_traits<lcos::future<T> >
-    {
-        typedef T type;
-    };
-#endif
-
     template <typename R>
     struct future_traits<lcos::unique_future<R> >
     {
@@ -106,13 +98,6 @@ namespace hpx { namespace lcos { namespace detail
       : shared_state_ptr<R>
     {};
 
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    template <typename R>
-    struct shared_state_ptr_for<future<R> >
-      : shared_state_ptr<R>
-    {};
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     struct future_access
     {
@@ -152,49 +137,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             return f.shared_state_;
         }
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-        template <typename R>
-        BOOST_FORCEINLINE static
-        typename shared_state_ptr<R>::type const&
-        get_shared_state(future<R> const& f)
-        {
-            return f.future_data_;
-        }
-#endif
     };
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
-    inline lcos::future<Result> make_future_from_data(
-        boost::intrusive_ptr<detail::future_data<Result> > const& p)
-    {
-        return future_access::create<lcos::future<Result> >(p);
-    }
-
-    template <typename Result>
-    inline lcos::future<Result> make_future_from_data( //-V659
-        boost::intrusive_ptr<detail::future_data<Result> > && p)
-    {
-        return future_access::create<lcos::future<Result> >(std::move(p));
-    }
-
-    template <typename Result>
-    inline lcos::future<Result> make_future_from_data(
-        detail::future_data<Result>* p)
-    {
-        boost::intrusive_ptr<detail::future_data<Result> > shared_state_ptr(p);
-        return future_access::create<lcos::future<Result> >(std::move(shared_state_ptr));
-    }
-
-    template <typename Result>
-    inline detail::future_data<Result>*
-        get_future_data(lcos::future<Result> const& f)
-    {
-        return future_access::get_shared_state(f).get();
-    }
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename F, typename Enable = void>
@@ -232,27 +175,6 @@ namespace hpx { namespace lcos { namespace detail
             >::type> type;
     };
 
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    template <typename Result, typename F>
-    struct future_then_result<
-        future<Result>, F
-      , typename util::always_void<
-            typename util::result_of<F(future<Result>)>::type
-        >::type
-    >
-    {
-        typedef typename util::result_of<F(future<Result>)>::type result;
-
-        typedef
-            typename boost::mpl::if_<
-                traits::is_future<result>
-              , result
-              , lcos::future<result>
-            >::type
-            type;
-    };
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename Enable = void>
     struct future_unwrap_result
@@ -267,13 +189,6 @@ namespace hpx { namespace lcos { namespace detail
             >::type> type;
     };
 
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    template <typename Result>
-    struct future_unwrap_result<future<Result> >
-      : boost::mpl::if_<traits::is_future<Result>, Result, void>
-    {};
-#endif
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter>
     struct future_iterator_traits
@@ -284,12 +199,6 @@ namespace hpx { namespace lcos { namespace detail
 
         typedef future_traits<type> traits_type;
     };
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    template <typename T>
-    struct future_iterator_traits<future<T> >
-    {};
-#endif
 
     template <typename T>
     struct future_iterator_traits<unique_future<T> >
@@ -906,7 +815,14 @@ namespace hpx { namespace lcos
         using base_type::wait_for;
         using base_type::wait_until;
     };
+}}
 
+HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(
+    hpx::lcos::unique_future<void>,
+    hpx_lcos_unique_future_void_typed_continuation)
+
+namespace hpx { namespace lcos
+{
     ///////////////////////////////////////////////////////////////////////////
     template <typename R>
     class shared_future : public detail::future_base<shared_future<R>, R>
@@ -1063,7 +979,14 @@ namespace hpx { namespace lcos
         using base_type::wait_for;
         using base_type::wait_until;
     };
+}}
 
+HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(
+    hpx::lcos::shared_future<void>,
+    hpx_lcos_shared_future_void_typed_continuation)
+
+namespace hpx { namespace lcos
+{
     ///////////////////////////////////////////////////////////////////////////
     namespace local { namespace detail
     {
@@ -1075,286 +998,6 @@ namespace hpx { namespace lcos
             >
         {};
     }}
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Result>
-    class future
-    {
-    public:
-        typedef lcos::detail::future_data<Result> future_data_type;
-
-    private:
-        friend struct detail::future_access;
-
-        explicit future(
-            boost::intrusive_ptr<future_data_type> const& future_data
-        ) : future_data_(future_data)
-        {}
-
-        explicit future(
-            boost::intrusive_ptr<future_data_type> && future_data
-        ) : future_data_(std::move(future_data))
-        {}
-
-        template <typename U>
-        explicit future(boost::intrusive_ptr<U> const& future_data)
-          : future_data_(boost::static_pointer_cast<future_data_type>(future_data))
-        {}
-
-    public:
-        typedef Result result_type;
-
-        future()
-        {}
-
-        ~future()
-        {}
-
-        future(future const& other)
-          : future_data_(other.future_data_)
-        {
-        }
-
-        future(future && other)
-          : future_data_(other.future_data_)
-        {
-            other.future_data_.reset();
-        }
-
-        // accept unique_future future
-        future(unique_future<Result> && other)
-          : future_data_(detail::future_access::get_shared_state(other))
-        {
-            other = unique_future<Result>();
-        }
-
-        // accept wrapped future
-        future(future<future> && other)
-        {
-            future f = other.unwrap();
-            future_data_ = std::move(f.future_data_);
-        }
-
-        future(unique_future<future> && other)
-        {
-            future f = other.unwrap();
-            future_data_ = std::move(f.future_data_);
-        }
-
-        typedef lcos::local::promise<Result> promise_type;
-#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        // [N3722, 4.1] asks for this... defined at promise.hpp
-        explicit future(promise_type& promise);
-#endif
-
-        // assignment
-        future& operator=(future const & other)
-        {
-            if (this != &other)
-                future_data_ = other.future_data_;
-            return *this;
-        }
-
-        future& operator=(future && other)
-        {
-            if (this != &other)
-            {
-                future_data_ = other.future_data_;
-                other.future_data_.reset();
-            }
-            return *this;
-        }
-
-        void swap(future& other)
-        {
-            future_data_.swap(other.future_data_);
-        }
-
-        // retrieving the value
-        Result const& get() const
-        {
-            if (!future_data_) {
-                HPX_THROW_EXCEPTION(no_state,
-                    "future<Result>::get",
-                    "this future has no valid shared state");
-            }
-
-            typedef typename future_data_type::data_type data_type;
-            data_type& data = future_data_->get_result();
-
-            // no error has been reported, return the result
-            return data.get_value();
-        }
-
-        Result const& get(error_code& ec) const
-        {
-            static result_type default_;
-
-            if (!future_data_) {
-                HPX_THROWS_IF(ec, no_state,
-                    "future<Result>::get",
-                    "this future has no valid shared state");
-                return default_;
-            }
-
-            typedef typename future_data_type::data_type data_type;
-            data_type& data = future_data_->get_result(ec);
-            if (ec) return default_;
-
-            // no error has been reported, return the result
-            return data.get_value();
-        }
-
-    private:
-        struct invalidate
-        {
-            invalidate(future& f)
-              : f_(f)
-            {}
-
-            ~invalidate()
-            {
-                // This resets the intrusive pointer itself, not the future_data_.
-                f_.future_data_.reset();
-            }
-
-            future& f_;
-        };
-        friend struct invalidate;
-
-    public:
-        Result move()
-        {
-            if (!future_data_) {
-                HPX_THROW_EXCEPTION(no_state,
-                    "future<Result>::move",
-                    "this future has no valid shared state");
-            }
-
-            invalidate on_exit(*this);
-
-            typedef typename future_data_type::data_type data_type;
-            data_type& data = future_data_->get_result();
-
-            // no error has been reported, return the result
-            return data.move_value();
-        }
-
-        Result move(error_code& ec)
-        {
-            static result_type default_;
-
-            if (!future_data_) {
-                HPX_THROWS_IF(ec, no_state,
-                    "future<Result>::move",
-                    "this future has no valid shared state");
-                return default_;
-            }
-
-            invalidate on_exit(*this);
-
-            typedef typename future_data_type::data_type data_type;
-            data_type& data = future_data_->get_result(ec);
-            if (ec) return default_;
-
-            // no error has been reported, return the result
-            return data.move_value();
-        }
-
-        // state introspection
-        bool is_ready() const
-        {
-            return future_data_ != 0 && future_data_->is_ready();
-        }
-
-        bool has_value() const
-        {
-            return future_data_ != 0 && future_data_->has_value();
-        }
-
-        bool has_exception() const
-        {
-            return future_data_ != 0 && future_data_->has_exception();
-        }
-
-        BOOST_SCOPED_ENUM(future_status) get_status() const
-        {
-            if (!future_data_)
-                return future_status::uninitialized;
-
-            return future_data_->get_status();
-        }
-
-        // cancellation support
-        bool cancelable() const
-        {
-            return future_data_->cancelable();
-        }
-
-        void cancel()
-        {
-            future_data_->cancel();
-        }
-
-        bool valid() const BOOST_NOEXCEPT
-        {
-            // avoid warning about conversion to bool
-            return future_data_.get() ? true : false;
-        }
-
-        // continuation support
-        template <typename F>
-        typename detail::future_then_result<future, F>::type
-        then(F && f);
-
-        template <typename F>
-        typename detail::future_then_result<future, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, F && f);
-
-        template <typename F>
-        typename detail::future_then_result<future, F>::type
-        then(threads::executor& sched, F && f);
-
-        // wait support
-        void wait() const
-        {
-            future_data_->wait();
-        }
-
-        BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::posix_time::ptime const& at)
-        {
-            return future_data_->wait_until(at);
-        }
-
-        BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::posix_time::time_duration const& p)
-        {
-            return future_data_->wait_for(p);
-        }
-
-        template <typename Clock, typename Duration>
-        BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time)
-        {
-            return wait_until(util::to_ptime(abs_time));
-        }
-
-        template <typename Rep, typename Period>
-        BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::chrono::duration<Rep, Period> const& rel_time)
-        {
-            return wait_for(util::to_time_duration(rel_time));
-        }
-
-        typename detail::future_unwrap_result<future>::type
-        unwrap(error_code& ec = throws);
-
-    protected:
-        boost::intrusive_ptr<future_data_type> future_data_;
-    };
-#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
@@ -1436,209 +1079,6 @@ namespace hpx { namespace lcos
             util::to_time_duration(d), std::forward<Result>(init));
     }
 
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    ///////////////////////////////////////////////////////////////////////////
-    template <>
-    class future<void>
-    {
-    public:
-        typedef lcos::detail::future_data<void> future_data_type;
-        typedef future_data_type::data_type data_type;
-
-    private:
-        friend struct detail::future_access;
-
-        template <typename U>
-        explicit future(boost::intrusive_ptr<U> const& u)
-          : future_data_(boost::static_pointer_cast<future_data_type>(u))
-        {}
-
-    public:
-        typedef void result_type;
-
-        future()
-        {}
-
-        ~future()
-        {}
-
-        future(future const& other)
-          : future_data_(other.future_data_)
-        {
-        }
-
-        future(future && other)
-          : future_data_(other.future_data_)
-        {
-            other.future_data_.reset();
-        }
-
-        // accept unique_future future
-        future(unique_future<void> && other)
-          : future_data_(detail::future_access::get_shared_state(other))
-        {
-            other = unique_future<void>();
-        }
-
-        // extension: accept wrapped future
-        future(future<future> && other)
-        {
-            future f = other.unwrap();
-            future_data_ = std::move(f.future_data_);
-        }
-
-        future(unique_future<future> && other)
-        {
-            future f = other.unwrap();
-            future_data_ = std::move(f.future_data_);
-        }
-
-        typedef lcos::local::promise<void> promise_type;
-#ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
-        // [N3722, 4.1] asks for this... defined at promise.hpp
-        explicit future(promise_type& promise);
-#endif
-
-        // assignment
-        future& operator=(future const & other)
-        {
-            if (this != &other)
-                future_data_ = other.future_data_;
-            return *this;
-        }
-
-        future& operator=(future && other)
-        {
-            if (this != &other)
-            {
-                future_data_ = other.future_data_;
-                other.future_data_.reset();
-            }
-            return *this;
-        }
-
-        void swap(future& other)
-        {
-            future_data_.swap(other.future_data_);
-        }
-
-        // retrieving the value
-        void get(error_code& ec = throws) const
-        {
-            if (!future_data_) {
-                HPX_THROW_EXCEPTION(no_state,
-                    "future<void>::get",
-                    "this future has no valid shared state");
-            }
-
-            future_data_->get_result(ec);
-        }
-
-        void move(error_code& ec = throws)
-        {
-            if (!future_data_) {
-                HPX_THROW_EXCEPTION(no_state,
-                    "future<void>::get",
-                    "this future has no valid shared state");
-            }
-
-            future_data_->get_result(ec);
-
-            // This resets the intrusive pointer itself, not the future_data_
-            future_data_.reset();
-        }
-
-        // state introspection
-        bool is_ready() const
-        {
-            return future_data_ != 0 && future_data_->is_ready();
-        }
-
-        bool has_value() const
-        {
-            return future_data_ != 0 && future_data_->has_value();
-        }
-
-        bool has_exception() const
-        {
-            return future_data_ != 0 && future_data_->has_exception();
-        }
-
-        BOOST_SCOPED_ENUM(future_status) get_status() const
-        {
-            if (!future_data_)
-                return future_status::uninitialized;
-
-            return future_data_->get_status();
-        }
-
-        // cancellation support
-        bool cancelable() const
-        {
-            return future_data_->cancelable();
-        }
-
-        void cancel()
-        {
-            future_data_->cancel();
-        }
-
-        bool valid() const BOOST_NOEXCEPT
-        {
-            // avoid warning about conversion to bool
-            return future_data_.get() ? true : false;
-        }
-
-        // continuation support
-        template <typename F>
-        typename detail::future_then_result<future, F>::type
-        then(F && f);
-
-        template <typename F>
-        typename detail::future_then_result<future, F>::type
-        then(BOOST_SCOPED_ENUM(launch) policy, F && f);
-
-        template <typename F>
-        typename detail::future_then_result<future, F>::type
-        then(threads::executor& sched, F && f);
-
-        // wait support
-        void wait() const
-        {
-            future_data_->wait();
-        }
-
-        BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::posix_time::ptime const& at)
-        {
-            return future_data_->wait_until(at);
-        }
-
-        BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::posix_time::time_duration const& p)
-        {
-            return future_data_->wait_for(p);
-        }
-
-        template <typename Clock, typename Duration>
-        BOOST_SCOPED_ENUM(future_status)
-        wait_until(boost::chrono::time_point<Clock, Duration> const& abs_time)
-        {
-            return wait_until(util::to_ptime(abs_time));
-        }
-
-        template <typename Rep, typename Period>
-        BOOST_SCOPED_ENUM(future_status)
-        wait_for(boost::chrono::duration<Rep, Period> const& rel_time)
-        {
-            return wait_for(util::to_time_duration(rel_time));
-        }
-
-    protected:
-        boost::intrusive_ptr<future_data_type> future_data_;
-    };
-#endif
-
     // extension: create a pre-initialized future object
     inline unique_future<void> make_ready_future()
     {
@@ -1687,12 +1127,6 @@ namespace hpx { namespace lcos
         return make_ready_future_after(util::to_time_duration(d));
     }
 }}
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(
-    hpx::lcos::future<void>,
-    hpx_lcos_future_void_typed_continuation)
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace actions
@@ -2125,227 +1559,6 @@ namespace hpx { namespace actions
 
         util::function<void(naming::id_type)> f_;
     };
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-    template <typename Result>
-    struct typed_continuation<lcos::future<Result> > : continuation
-    {
-        typed_continuation()
-        {}
-
-        explicit typed_continuation(naming::id_type const& gid)
-          : continuation(gid)
-        {}
-
-        explicit typed_continuation(naming::id_type && gid)
-          : continuation(std::move(gid))
-        {}
-
-        template <typename F>
-        explicit typed_continuation(naming::id_type const& gid,
-                F && f)
-          : continuation(gid), f_(std::forward<F>(f))
-        {}
-
-        template <typename F>
-        explicit typed_continuation(naming::id_type && gid,
-                F && f)
-          : continuation(std::move(gid)), f_(std::forward<F>(f))
-        {}
-
-        template <typename F>
-        explicit typed_continuation(F && f)
-          : f_(std::forward<F>(f))
-        {}
-
-        ~typed_continuation()
-        {
-            init_registration<typed_continuation>::g.register_continuation();
-        }
-
-        void deferred_trigger(lcos::future<Result> result) const
-        {
-            if (f_.empty()) {
-                if (!this->get_gid()) {
-                    HPX_THROW_EXCEPTION(invalid_status,
-                        "typed_continuation<lcos::future<Result> >::trigger_value",
-                        "attempt to trigger invalid LCO (the id is invalid)");
-                    return;
-                }
-                hpx::set_lco_value(this->get_gid(), result.get());
-            }
-            else {
-                f_(this->get_gid(), result.get());
-            }
-        }
-
-        void trigger_value(lcos::future<Result> && result) const
-        {
-            LLCO_(info)
-                << "typed_continuation<lcos::future<hpx::lcos::future<Result> > >::trigger("
-                << this->get_gid() << ")";
-
-            // if the future is ready, send the result back immediately
-            if (result.is_ready()) {
-                deferred_trigger(result);
-                return;
-            }
-
-            // attach continuation to this future which will send the result back
-            // once its ready
-            result.then(
-                util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(
-                        shared_from_this()),
-                    util::placeholders::_1));
-        }
-
-    private:
-        char const* get_continuation_name() const
-        {
-            return detail::get_continuation_name<typed_continuation>();
-        }
-
-        /// serialization support
-        void load(hpx::util::portable_binary_iarchive& ar)
-        {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::load(ar);
-
-            // serialize function
-            bool have_function = false;
-            ar.load(have_function);
-            if (have_function)
-                ar >> f_;
-        }
-        void save(hpx::util::portable_binary_oarchive& ar) const
-        {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::save(ar);
-
-            // serialize function
-            bool have_function = !f_.empty();
-            ar.save(have_function);
-            if (have_function)
-                ar << f_;
-        }
-
-        util::function<void(naming::id_type, Result)> f_;
-    };
-
-    // special handling of actions returning a future
-    template <>
-    struct typed_continuation<lcos::future<void> > : continuation
-    {
-        typed_continuation()
-        {}
-
-        explicit typed_continuation(naming::id_type const& gid)
-          : continuation(gid)
-        {}
-
-        explicit typed_continuation(naming::id_type && gid)
-          : continuation(std::move(gid))
-        {}
-
-        template <typename F>
-        explicit typed_continuation(naming::id_type const& gid,
-                F && f)
-          : continuation(gid), f_(std::forward<F>(f))
-        {}
-
-        template <typename F>
-        explicit typed_continuation(naming::id_type && gid,
-                F && f)
-          : continuation(std::move(gid)), f_(std::forward<F>(f))
-        {}
-
-        template <typename F>
-        explicit typed_continuation(F && f)
-          : f_(std::forward<F>(f))
-        {}
-
-        ~typed_continuation()
-        {
-            init_registration<typed_continuation>::g.register_continuation();
-        }
-
-        void deferred_trigger(lcos::future<void> result) const
-        {
-            if (f_.empty()) {
-                if (!this->get_gid()) {
-                    HPX_THROW_EXCEPTION(invalid_status,
-                        "typed_continuation<lcos::future<void> >::trigger_value",
-                        "attempt to trigger invalid LCO (the id is invalid)");
-                    return;
-                }
-                result.get();
-                hpx::trigger_lco_event(this->get_gid());
-            }
-            else {
-                result.get();
-                f_(this->get_gid());
-            }
-        }
-
-        void trigger_value(lcos::future<void> && result) const
-        {
-            LLCO_(info)
-                << "typed_continuation<lcos::future<hpx::lcos::future<void> > >::trigger("
-                << this->get_gid() << ")";
-
-            // if the future is ready, send the result back immediately
-            if (result.is_ready()) {
-                deferred_trigger(result);
-                return;
-            }
-
-            // attach continuation to this future which will send the result back
-            // once its ready
-            result.then(
-                util::bind(&typed_continuation::deferred_trigger,
-                    boost::static_pointer_cast<typed_continuation const>(
-                        shared_from_this()),
-                    util::placeholders::_1));
-        }
-
-    private:
-        char const* get_continuation_name() const
-        {
-            return detail::get_continuation_name<typed_continuation>();
-        }
-
-        /// serialization support
-        void load(hpx::util::portable_binary_iarchive& ar)
-        {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::load(ar);
-
-            // serialize function
-            bool have_function = false;
-            ar.load(have_function);
-            if (have_function)
-                ar >> f_;
-        }
-        void save(hpx::util::portable_binary_oarchive& ar) const
-        {
-            // serialize base class
-            typedef continuation base_type;
-            this->base_type::save(ar);
-
-            // serialize function
-            bool have_function = !f_.empty();
-            ar.save(have_function);
-            if (have_function)
-                ar << f_;
-        }
-
-        util::function<void(naming::id_type)> f_;
-    };
-#endif
 }}
 
 #include <hpx/lcos/local/packaged_continuation.hpp>

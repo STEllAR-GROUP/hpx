@@ -60,15 +60,6 @@ namespace hpx { namespace lcos
             {
                 return future;
             }
-
-#if defined(HPX_ENABLE_DEPRECATED_FUTURE)
-            template <typename Result>
-            BOOST_FORCEINLINE hpx::future<Result>
-            operator()(hpx::future<Result>& future) const
-            {
-                return future;
-            }
-#endif
         };
 
         ///////////////////////////////////////////////////////////////////////
