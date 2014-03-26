@@ -697,6 +697,11 @@ namespace hpx
         template <typename R>
         class shared_future;
 
+#if defined(HPX_UNIQUE_FUTURE_ALIAS)
+        template <typename R>
+        using unique_future = future<R>;
+#endif
+
         template <typename ValueType>
         struct object_semaphore;
 
@@ -787,6 +792,10 @@ namespace hpx
 
     using lcos::future;
     using lcos::shared_future;
+#if defined(HPX_UNIQUE_FUTURE_ALIAS)
+    template <typename R>
+    using lcos::unique_future;
+#endif
     using lcos::promise;
 
     /// \endcond
