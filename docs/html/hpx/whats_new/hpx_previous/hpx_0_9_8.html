@@ -1,0 +1,425 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>HPX V0.9.8</title>
+<link rel="stylesheet" href="../../../src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<link rel="home" href="../../../index.html" title="HPX 0.9.9">
+<link rel="up" href="../hpx_previous.html" title="Previous HPX Releases">
+<link rel="prev" href="../hpx_previous.html" title="Previous HPX Releases">
+<link rel="next" href="hpx_0_9_7.html" title="HPX V0.9.7">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr><td valign="top"><img alt="HPX - High Performance ParalleX" width="440" height="104" src="../../../images/hpx_0_9_9_draft.png"></td></tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../hpx_previous.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_previous.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="hpx_0_9_7.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="hpx.whats_new.hpx_previous.hpx_0_9_8"></a><a class="link" href="hpx_0_9_8.html" title="HPX V0.9.8"><span class="emphasis"><em>HPX</em></span>
+        V0.9.8</a>
+</h4></div></div></div>
+<p>
+          We have had over 800 commits since the last release and we have closed
+          over 65 tickets (bugs, feature requests, etc.).
+        </p>
+<p>
+          With the changes below, <span class="emphasis"><em>HPX</em></span> is once again leading
+          the charge of a whole new era of computation. By intrinsically breaking
+          down and synchronizing the work to be done, <span class="emphasis"><em>HPX</em></span> insures
+          that application developers will no longer have to fret about where a segment
+          of code executes. That allows coders to focus their time and energy to
+          understanding the data dependencies of their algorithms and thereby the
+          core obstacles to an efficient code. Here are some of the advantages of
+          using <span class="emphasis"><em>HPX</em></span>:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <span class="emphasis"><em>HPX</em></span> is solidly rooted in a sophisticated theoretical
+              execution model -- ParalleX
+            </li>
+<li class="listitem">
+              <span class="emphasis"><em>HPX</em></span> exposes an API fully conforming to the C++11
+              and the draft C++14 standards, extended and applied to distributed
+              computing. Everything programmers know about the concurrency primitives
+              of the standard C++ library is still valid in the context of <span class="emphasis"><em>HPX</em></span>.
+            </li>
+<li class="listitem">
+              It provides a competitive, high performance implementation of modern,
+              future-proof ideas which gives an smooth migration path from todays
+              mainstream techniques
+            </li>
+<li class="listitem">
+              There is no need for the programmer to worry about lower level parallelization
+              paradigms like threads or message passing; no need to understand pthreads,
+              MPI, OpenMP, or Windows threads, etc.
+            </li>
+<li class="listitem">
+              There is no need to think about different types of parallelism such
+              as tasks, pipelines, or fork-join, task or data parallelism.
+            </li>
+<li class="listitem">
+              The same source of your program compiles and runs on Linux, BlueGene/Q,
+              Mac OS X, Windows, and Android.
+            </li>
+<li class="listitem">
+              The same code runs on shared memory multi-core systems and supercomputers,
+              on handheld devices and Intel&#174; Xeon Phi&#8482; accelerators, or a heterogeneous
+              mix of those.
+            </li>
+</ul></div>
+<h6>
+<a name="hpx.whats_new.hpx_previous.hpx_0_9_8.h0"></a>
+          <span class="phrase"><a name="hpx.whats_new.hpx_previous.hpx_0_9_8.general_changes"></a></span><a class="link" href="hpx_0_9_8.html#hpx.whats_new.hpx_previous.hpx_0_9_8.general_changes">General
+          Changes</a>
+        </h6>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              A major API breaking change for this release was introduced by implementing
+              <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span></code> and <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">shared_future</span></code>
+              fully in conformance with the <a href="http://www.open-std.org/jtc1/sc22/wg21" target="_top">C++11
+              Standard</a>. While <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">shared_future</span></code>
+              is new and will not create any compatibility problems, we revised the
+              interface and implementation of the existing <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span></code>.
+              For more details please see the <a href="http://mail.cct.lsu.edu/pipermail/hpx-users/2014-January/000141.html" target="_top">mailing
+              list archive</a>. To avoid any incompatibilities for existing code
+              we named the type which implements the <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">future</span></code>
+              interface as <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">unique_future</span></code>. For the next release
+              this will be renamed to <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span></code>,
+              making it full conforming to <a href="http://www.open-std.org/jtc1/sc22/wg21" target="_top">C++11
+              Standard</a>.
+            </li>
+<li class="listitem">
+              A large part of the code base of <span class="emphasis"><em>HPX</em></span> has been
+              refactored and partially re-implemented. The main changes were related
+              to
+              <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; ">
+<li class="listitem">
+                    The threading subsystem: these changes significantly reduce the
+                    amount of overheads caused by the schedulers, improve the modularity
+                    of the code base, and extend the variety of available scheduling
+                    algorithms.
+                  </li>
+<li class="listitem">
+                    The parcel subsystem: these changes improve the performance of
+                    the <span class="emphasis"><em>HPX</em></span> networking layer, modularize the
+                    structure of the parcelports, and simplify the creation of new
+                    parcelports for other underlying networking libraries.
+                  </li>
+<li class="listitem">
+                    The API subsystem: these changes improved the conformance of
+                    the API to <a href="http://www.open-std.org/jtc1/sc22/wg21" target="_top">C++11
+                    Standard</a>, extend and unify the available API functionality,
+                    and decrease the overheads created by various elements of the
+                    API.
+                  </li>
+<li class="listitem">
+                    The robustness of the component loading subsystem has been improved
+                    significantly, allowing to more portably and more reliably register
+                    the components needed by an application as startup. This additionally
+                    speeds up general application initialization.
+                  </li>
+</ul></div>
+            </li>
+<li class="listitem">
+              We added new API functionality like <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">migrate</span></code>
+              and <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">copy_component</span></code> which are the basic
+              building blocks necessary for implementing higher level abstractions
+              for system-wide load balancing, runtime-adaptive resource management,
+              and object-oriented checkpointing and state-management.
+            </li>
+<li class="listitem">
+              We removed the use of C++11 move emulation (using Boost.Move), replacing
+              it with C++11 rvalue references. This is the first step towards using
+              more and more native C++11 facilities which we plan to introduce in
+              the future.
+            </li>
+<li class="listitem">
+              We improved the reference counting scheme used by <span class="emphasis"><em>HPX</em></span>
+              which helps managing distributed objects and memory. This improves
+              the overall stability of <span class="emphasis"><em>HPX</em></span> and further simplifies
+              writing real world applications.
+            </li>
+<li class="listitem">
+              The minimal Boost version required to use <span class="emphasis"><em>HPX</em></span>
+              is now V1.49.0.
+            </li>
+<li class="listitem">
+              This release coincides with the first release of <a href="http://github.com/STEllAR-GROUP/hpx/" target="_top">HPXPI</a>
+              (V0.1.0), the first implementation of the <a href="https://github.com/STEllAR-GROUP/hpxpi/blob/master/spec.pdf?raw=true" target="_top">XPI
+              specification</a>.
+            </li>
+</ul></div>
+<h6>
+<a name="hpx.whats_new.hpx_previous.hpx_0_9_8.h1"></a>
+          <span class="phrase"><a name="hpx.whats_new.hpx_previous.hpx_0_9_8.bug_fixes_closed_tickets"></a></span><a class="link" href="hpx_0_9_8.html#hpx.whats_new.hpx_previous.hpx_0_9_8.bug_fixes_closed_tickets">Bug
+          Fixes (Closed Tickets)</a>
+        </h6>
+<p>
+          Here is a list of the important tickets we closed for this release.
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1086" target="_top">#1086</a> - Expose internal boost::shared_array to allow user management
+              of array lifetime
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1083" target="_top">#1083</a> - Make shell examples copyable in docs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1080" target="_top">#1080</a> - /threads{locality#*/total}/count/cumulative broken
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1079" target="_top">#1079</a> - Build problems on OS X
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1078" target="_top">#1078</a> - Improve robustness of component loading
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1077" target="_top">#1077</a> - Fix a missing enum definition for 'take' mode
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1076" target="_top">#1076</a> - Merge Jb master
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1075" target="_top">#1075</a> - Unknown CMake command "add_hpx_pseudo_target"
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1074" target="_top">#1074</a> - Implement <code class="computeroutput"><span class="identifier">apply_continue_callback</span></code>
+              and <code class="computeroutput"><span class="identifier">apply_colocated_callback</span></code>
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1073" target="_top">#1073</a> - The new <code class="computeroutput"><span class="identifier">apply_colocated</span></code>
+              and <code class="computeroutput"><span class="identifier">async_colocated</span></code>
+              functions lead to automatic registered functions
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1071" target="_top">#1071</a> - Remove deferred_packaged_task
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1069" target="_top">#1069</a> - serialize_buffer with allocator fails at destruction
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1068" target="_top">#1068</a> - Coroutine include and forward declarations missing
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1067" target="_top">#1067</a> - Add allocator support to util::serialize_buffer
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1066" target="_top">#1066</a> - Allow for MPI_Init being called before HPX launches
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1065" target="_top">#1065</a> - AGAS cache isn't used/populated on worker localities
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1064" target="_top">#1064</a> - Reorder includes to ensure ws2 includes early
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1063" target="_top">#1063</a> - Add <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">runtime</span><span class="special">::</span><span class="identifier">suspend</span></code>
+              and <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">runtime</span><span class="special">::</span><span class="identifier">resume</span></code>
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1062" target="_top">#1062</a> - Fix <code class="computeroutput"><span class="identifier">async_continue</span></code>
+              to propery handle return types
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1061" target="_top">#1061</a> - Implement <code class="computeroutput"><span class="identifier">async_colocated</span></code>
+              and <code class="computeroutput"><span class="identifier">apply_colocated</span></code>
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1060" target="_top">#1060</a> - Implement minimal component migration
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1058" target="_top">#1058</a> - Remove <code class="computeroutput"><span class="identifier">HPX_UTIL_TUPLE</span></code>
+              from code base
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1057" target="_top">#1057</a> - Add performance counters for threading subsystem
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1055" target="_top">#1055</a> - Thread allocation uses two memory pools
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1053" target="_top">#1053</a> - Work stealing flawed
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1052" target="_top">#1052</a> - Fix a number of warnings
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1049" target="_top">#1049</a> - Fixes for TLS on OSX and more reliable test running
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1048" target="_top">#1048</a> - Fixing after 588 hang
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1047" target="_top">#1047</a> - Use port '0' for networking when using one locality
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1046" target="_top">#1046</a> - <code class="computeroutput"><span class="identifier">composable_guard</span></code>
+              test is broken when having more than one thread
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1045" target="_top">#1045</a> - Security missing headers
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1044" target="_top">#1044</a> - Native TLS on FreeBSD via __thread
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1043" target="_top">#1043</a> - <code class="computeroutput"><span class="identifier">async</span></code> et.al.
+              compute the wrong result type
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1042" target="_top">#1042</a> - <code class="computeroutput"><span class="identifier">async</span></code> et.al.
+              implicitly unwrap reference_wrappers
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1041" target="_top">#1041</a> - Remove redundant costly Kleene stars from regex searches
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1040" target="_top">#1040</a> - CMake script regex match patterns has unnecessary kleenes
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1039" target="_top">#1039</a> - Remove use of Boost.Move and replace with std::move and
+              real rvalue refs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1038" target="_top">#1038</a> - Bump minimal required Boost to 1.49.0
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1037" target="_top">#1037</a> - Implicit unwrapping of futures in async broken
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1036" target="_top">#1036</a> - Scheduler hangs when user code attempts to "block"
+              OS-threads
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1035" target="_top">#1035</a> - Idle-rate counter always reports 100% idle rate
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1034" target="_top">#1034</a> - Symbolic name registration causes application hangs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1033" target="_top">#1033</a> - Application options read in from an options file generate
+              an error message
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1032" target="_top">#1032</a> - <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">id_type</span></code> local reference counting
+              is wrong
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1031" target="_top">#1031</a> - Negative entry in reference count table
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1030" target="_top">#1030</a> - Implement condition_variable
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1029" target="_top">#1029</a> - Deadlock in thread scheduling subsystem
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1028" target="_top">#1028</a> - HPX-thread cumulative count performance counters report
+              incorrect value
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1027" target="_top">#1027</a> - Expose <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">thread_interrupted</span></code>
+              error code as a separate exception type
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1026" target="_top">#1026</a> - Exceptions thrown in asynchronous calls can be lost if the
+              value of the future is never queried
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1025" target="_top">#1025</a> - <code class="computeroutput"><span class="identifier">future</span><span class="special">::</span><span class="identifier">wait_for</span></code>/<code class="computeroutput"><span class="identifier">wait_until</span></code>
+              do not remove callback
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1024" target="_top">#1024</a> - Remove dependence to boost assert and create hpx assert
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1023" target="_top">#1023</a> - Segfaults with tcmalloc
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1022" target="_top">#1022</a> - prerequisites link in readme is broken
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1020" target="_top">#1020</a> - HPX Deadlock on external synchronization
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1019" target="_top">#1019</a> - Convert using <code class="computeroutput"><span class="identifier">BOOST_ASSERT</span></code>
+              to <code class="computeroutput"><span class="identifier">HPX_ASSERT</span></code>
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1018" target="_top">#1018</a> - compiling bug with gcc 4.8.1
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1017" target="_top">#1017</a> - Possible crash in io_pool executor
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1016" target="_top">#1016</a> - Crash at startup
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1014" target="_top">#1014</a> - Implement Increment/Decrement Merging
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1013" target="_top">#1013</a> - Add more logging channels to enable greater control over
+              logging granularity
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1012" target="_top">#1012</a> - <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">debug</span><span class="special">-</span><span class="identifier">hpx</span><span class="special">-</span><span class="identifier">log</span></code>
+              and <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">debug</span><span class="special">-</span><span class="identifier">agas</span><span class="special">-</span><span class="identifier">log</span></code>
+              lead to non-thread safe writes
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1011" target="_top">#1011</a> - After installation, running applications from the build/staging
+              directory no longer works
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1010" target="_top">#1010</a> - Mergable decrement requests are not being merged
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1009" target="_top">#1009</a> - <code class="computeroutput"><span class="special">--</span><span class="identifier">hpx</span><span class="special">:</span><span class="identifier">list</span><span class="special">-</span><span class="identifier">symbolic</span><span class="special">-</span><span class="identifier">names</span></code>
+              crashes
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1007" target="_top">#1007</a> - Components are not properly destroyed
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1006" target="_top">#1006</a> - Segfault/hang in set_data
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/1003" target="_top">#1003</a> - Performance counter naming issue
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/912" target="_top">#912</a>  - OS X: component type not found in map
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/663" target="_top">#663</a>  - Create a buildbot slave based on Clang 3.2/OSX
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/636" target="_top">#636</a>  - Expose <code class="computeroutput"><span class="identifier">this_locality</span><span class="special">::</span><span class="identifier">apply</span><span class="special">&lt;</span><span class="identifier">act</span><span class="special">&gt;(</span><span class="identifier">p1</span><span class="special">,</span> <span class="identifier">p2</span><span class="special">);</span></code> for local execution
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/197" target="_top">#197</a>  - Add <code class="computeroutput"><span class="special">--</span><span class="identifier">console</span><span class="special">=</span><span class="identifier">address</span></code>
+              option for PBS runs
+            </li>
+<li class="listitem">
+              <a href="http://github.com/STEllAR-GROUP/hpx/issues/175" target="_top">#175</a>  - Asynchronous AGAS API
+            </li>
+</ul></div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2011-2014 The
+      STE||AR Group, Louisiana State University<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">LICENSE_1_0.txt</a>
+        or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../hpx_previous.html"><img src="../../../images/prev.png" alt="Prev"></a><a accesskey="u" href="../hpx_previous.html"><img src="../../../images/up.png" alt="Up"></a><a accesskey="h" href="../../../index.html"><img src="../../../images/home.png" alt="Home"></a><a accesskey="n" href="hpx_0_9_7.html"><img src="../../../images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
