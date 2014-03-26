@@ -114,11 +114,11 @@ namespace hpx { namespace util { namespace coroutines
         ///////////////////////////////////////////////////////////////////////
         class tss_storage;
 
-        tss_storage* create_tss_storage();
-        void delete_tss_storage(tss_storage*& storage);
+        HPX_EXPORT tss_storage* create_tss_storage();
+        HPX_EXPORT void delete_tss_storage(tss_storage*& storage);
 
-        std::size_t get_tss_thread_data(tss_storage* storage);
-        std::size_t set_tss_thread_data(tss_storage* storage, std::size_t);
+        HPX_EXPORT std::size_t get_tss_thread_data(tss_storage* storage);
+        HPX_EXPORT std::size_t set_tss_thread_data(tss_storage* storage, std::size_t);
     }
 
     ///////////////////////////////////////////////////////////////////////////
