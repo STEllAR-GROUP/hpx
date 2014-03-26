@@ -44,7 +44,6 @@ void test_tss_thread()
         int& n = tss_value->value;
         if (n != i)
         {
-            boost::unique_lock<hpx::lcos::local::spinlock> lock(check_mutex);
             HPX_TEST_EQ(n, i);
         }
         ++n;
