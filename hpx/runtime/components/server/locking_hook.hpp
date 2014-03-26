@@ -38,13 +38,13 @@ namespace hpx { namespace components
         /// the component ensuring that only one action is executed at a time
         /// for this component instance.
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
-            naming::address::address_type lva)
+        wrap_action(naming::address::address_type lva,
+            HPX_STD_FUNCTION<threads::thread_function_type> f)
         {
             return HPX_STD_BIND(&locking_hook::thread_function,
                 get_lva<this_component_type>::call(lva),
                 HPX_STD_PLACEHOLDERS::_1,
-                base_type::wrap_action(std::move(f), lva));
+                base_type::wrap_action(lva, std::move(f)));
         }
 
     protected:

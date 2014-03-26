@@ -18,7 +18,7 @@ namespace hpx { namespace components
     class simple_component;
 
     template <typename Component>
-    class abstract_simple_component_base 
+    class abstract_simple_component_base
       : private detail::simple_component_tag
     {
     private:
@@ -39,13 +39,22 @@ namespace hpx { namespace components
             hpx::components::set_component_type<outer_wrapping_type>(t);
         }
 
-        /// This is the default hook implementation for decorate_action which 
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
-        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
-            naming::address::address_type)
+        static HPX_STD_FUNCTION<threads::thread_function_type>
+        wrap_action(naming::address::address_type,
+            HPX_STD_FUNCTION<threads::thread_function_type> f)
         {
             return std::move(f);
+        }
+
+        /// This is the default hook implementation for schedule_thread which
+        /// forwards to the default scheduler.
+        static void schedule_thread(naming::address::address_type,
+            threads::thread_init_data& data,
+            threads::thread_state_enum initial_state)
+        {
+            hpx::threads::register_work_plain(data, initial_state);
         }
     };
 
@@ -74,13 +83,22 @@ namespace hpx { namespace components
             hpx::components::set_component_type<wrapping_type>(t);
         }
 
-        /// This is the default hook implementation for decorate_action which 
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
-        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
-            naming::address::address_type)
+        static HPX_STD_FUNCTION<threads::thread_function_type>
+        wrap_action(naming::address::address_type,
+            HPX_STD_FUNCTION<threads::thread_function_type> f)
         {
             return std::move(f);
+        }
+
+        /// This is the default hook implementation for schedule_thread which
+        /// forwards to the default scheduler.
+        static void schedule_thread(naming::address::address_type,
+            threads::thread_init_data& data,
+            threads::thread_state_enum initial_state)
+        {
+            hpx::threads::register_work_plain(data, initial_state);
         }
     };
 
@@ -89,7 +107,7 @@ namespace hpx { namespace components
     class fixed_component;
 
     template <typename Component>
-    class abstract_fixed_component_base 
+    class abstract_fixed_component_base
       : private detail::fixed_component_tag
     {
     private:
@@ -110,13 +128,22 @@ namespace hpx { namespace components
             hpx::components::set_component_type<outer_wrapping_type>(t);
         }
 
-        /// This is the default hook implementation for decorate_action which 
+        /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
-        static HPX_STD_FUNCTION<threads::thread_function_type> 
-        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
-            naming::address::address_type)
+        static HPX_STD_FUNCTION<threads::thread_function_type>
+        wrap_action(naming::address::address_type,
+            HPX_STD_FUNCTION<threads::thread_function_type> f)
         {
             return std::move(f);
+        }
+
+        /// This is the default hook implementation for schedule_thread which
+        /// forwards to the default scheduler.
+        static void schedule_thread(naming::address::address_type,
+            threads::thread_init_data& data,
+            threads::thread_state_enum initial_state)
+        {
+            hpx::threads::register_work_plain(data, initial_state);
         }
     };
 }}

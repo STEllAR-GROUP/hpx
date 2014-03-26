@@ -72,13 +72,13 @@ namespace hpx { namespace components
         /// sure that the object becomes pinned during the execution of an
         /// action.
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
-            naming::address::address_type lva)
+        wrap_action(naming::address::address_type lva,
+            HPX_STD_FUNCTION<threads::thread_function_type> f)
         {
             using util::placeholders::_1;
             return util::bind(&migration_support::thread_function,
                 get_lva<this_component_type>::call(lva),
-                _1, base_type::wrap_action(std::move(f), lva));
+                _1, base_type::wrap_action(lva, std::move(f)));
         }
 
     protected:

@@ -497,21 +497,15 @@ namespace hpx { namespace applier
             // continuation support
             if (!cont) {
                 // No continuation is to be executed, register the plain
-                // action and the local-virtual address with the TM only.
-                threads::thread_init_data data;
-                tm.register_work(
-                    act->get_thread_init_data(ids[i], lva, data),
-                    threads::pending);
+                // action and the local-virtual address.
+                act->schedule_thread(ids[i], lva, threads::pending);
             }
             else {
                 // This parcel carries a continuation, register a wrapper
                 // which first executes the original thread function as
                 // required by the action and triggers the continuations
                 // afterwards.
-                threads::thread_init_data data;
-                tm.register_work(
-                    act->get_thread_init_data(cont, ids[i], lva, data),
-                    threads::pending);
+                act->schedule_thread(cont, ids[i], lva, threads::pending);
             }
         }
     }
