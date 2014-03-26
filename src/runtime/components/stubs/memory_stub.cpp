@@ -10,7 +10,7 @@
 namespace hpx { namespace components { namespace stubs
 {
     ///////////////////////////////////////////////////////////////////////////
-    hpx::unique_future<naming::id_type> memory::allocate(hpx::id_type const& id,
+    hpx::future<naming::id_type> memory::allocate(hpx::id_type const& id,
         std::size_t size)
     {
         return hpx::async<components::server::allocate_action>(id, size);
@@ -29,7 +29,7 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<components::server::memory::store8_action>(
             id, id.get_lsb(), value);
     }
-    hpx::unique_future<void> memory::store8(hpx::id_type const& id,
+    hpx::future<void> memory::store8(hpx::id_type const& id,
         boost::uint8_t value)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
@@ -49,7 +49,7 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<components::server::memory::store16_action>(
             id, id.get_lsb(), value);
     }
-    hpx::unique_future<void> memory::store16(hpx::id_type const& id,
+    hpx::future<void> memory::store16(hpx::id_type const& id,
         boost::uint16_t value)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
@@ -69,7 +69,7 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<components::server::memory::store32_action>(
             id, id.get_lsb(), value);
     }
-    hpx::unique_future<void> memory::store32(hpx::id_type const& id,
+    hpx::future<void> memory::store32(hpx::id_type const& id,
         boost::uint32_t value)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
@@ -89,7 +89,7 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<components::server::memory::store64_action>(
             id, id.get_lsb(), value);
     }
-    hpx::unique_future<void> memory::store64(hpx::id_type const& id,
+    hpx::future<void> memory::store64(hpx::id_type const& id,
         boost::uint64_t value)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
@@ -109,7 +109,7 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<components::server::memory::store128_action>(
             id, id.get_lsb(), value);
     }
-    hpx::unique_future<void> memory::store128(hpx::id_type const& id,
+    hpx::future<void> memory::store128(hpx::id_type const& id,
         components::server::memory::uint128_t const& value)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
@@ -123,7 +123,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::unique_future<boost::uint8_t> memory::load8(hpx::id_type const& id)
+    hpx::future<boost::uint8_t> memory::load8(hpx::id_type const& id)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
         return hpx::async<components::server::memory::load8_action>(
@@ -134,7 +134,7 @@ namespace hpx { namespace components { namespace stubs
         return load8(id).get(ec);
     }
 
-    hpx::unique_future<boost::uint16_t> memory::load16(hpx::id_type const& id)
+    hpx::future<boost::uint16_t> memory::load16(hpx::id_type const& id)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
         return hpx::async<components::server::memory::load16_action>(
@@ -145,7 +145,7 @@ namespace hpx { namespace components { namespace stubs
         return load16(id).get(ec);
     }
 
-    hpx::unique_future<boost::uint32_t> memory::load32(hpx::id_type const& id)
+    hpx::future<boost::uint32_t> memory::load32(hpx::id_type const& id)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
         return hpx::async<components::server::memory::load32_action>(
@@ -156,7 +156,7 @@ namespace hpx { namespace components { namespace stubs
         return load32(id).get(ec);
     }
 
-    hpx::unique_future<boost::uint64_t> memory::load64(hpx::id_type const& id)
+    hpx::future<boost::uint64_t> memory::load64(hpx::id_type const& id)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));
         return hpx::async<components::server::memory::load64_action>(
@@ -167,7 +167,7 @@ namespace hpx { namespace components { namespace stubs
         return load64(id).get(ec);
     }
 
-    hpx::unique_future<components::server::memory::uint128_t> memory::load128(
+    hpx::future<components::server::memory::uint128_t> memory::load128(
         hpx::id_type const& id)
     {
         HPX_ASSERT(naming::refers_to_virtual_memory(id.get_gid()));

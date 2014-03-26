@@ -93,7 +93,7 @@ HPX_PLAIN_ACTION(null_tree, null_tree_action);
 void null_callback(
     std::vector<double>& dd
   , boost::uint64_t j
-  , hpx::unique_future<double> f
+  , hpx::future<double> f
     )
 {
     dd[j] = f.get();
@@ -114,7 +114,7 @@ double null_tree(
     std::vector<double> dd;
     dd.resize(children, 0.);
 
-    std::vector<hpx::unique_future<void> > futures;
+    std::vector<hpx::future<void> > futures;
     futures.reserve(children);
 
     boost::uint64_t p = seed + ipow(depth, children);
@@ -124,7 +124,7 @@ double null_tree(
         hpx::id_type const target
             = hpx::naming::get_id_from_locality_id((j + p) % num_localities);
 
-        hpx::unique_future<double> f =
+        hpx::future<double> f =
             hpx::async<null_tree_action>(target, j + p, depth + 1
                                        , max_depth
                                        , children

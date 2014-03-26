@@ -118,7 +118,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // Result retrieval
-        lcos::unique_future<Result> get_future(error_code& ec = throws)
+        lcos::future<Result> get_future(error_code& ec = throws)
         {
             typename mutex_type::scoped_lock l(mtx_);
 
@@ -131,12 +131,12 @@ namespace hpx { namespace lcos { namespace local
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<Result>::get_future",
                     "future already has been retrieved from this promise");
-                return lcos::unique_future<Result>();
+                return lcos::future<Result>();
             }
 
             using lcos::detail::future_access;
             future_obtained_ = true;
-            return future_access::create<unique_future<Result> >(task_);
+            return future_access::create<future<Result> >(task_);
         }
 
         template <typename T>
@@ -189,7 +189,7 @@ namespace hpx { namespace lcos { namespace local
 
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this...
-        explicit operator lcos::unique_future<Result>()
+        explicit operator lcos::future<Result>()
         {
             return get_future();
         }
@@ -277,7 +277,7 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // Result retrieval
-        lcos::unique_future<void> get_future(error_code& ec = throws)
+        lcos::future<void> get_future(error_code& ec = throws)
         {
             mutex_type::scoped_lock l(mtx_);
 
@@ -290,12 +290,12 @@ namespace hpx { namespace lcos { namespace local
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<void>::get_future",
                     "future already has been retrieved from this promise");
-                return lcos::unique_future<void>();
+                return lcos::future<void>();
             }
 
             using lcos::detail::future_access;
             future_obtained_ = true;
-            return future_access::create<unique_future<void> >(task_);
+            return future_access::create<future<void> >(task_);
         }
 
         void set_value()
@@ -347,7 +347,7 @@ namespace hpx { namespace lcos { namespace local
 
 #ifndef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // [N3722, 4.1] asks for this...
-        explicit operator lcos::unique_future<void>()
+        explicit operator lcos::future<void>()
         {
             return get_future();
         }
@@ -370,7 +370,7 @@ namespace hpx { namespace lcos
 {
     // [N3722, 4.1] asks for this...
     template <typename Result>
-    inline unique_future<Result>::unique_future(local::promise<Result>& promise)
+    inline future<Result>::future(local::promise<Result>& promise)
     {
         promise.get_future().swap(*this);
     }
@@ -383,7 +383,7 @@ namespace hpx { namespace lcos
 
     // [N3722, 4.1] asks for this...
     template <>
-    inline unique_future<void>::unique_future(local::promise<void>& promise)
+    inline future<void>::future(local::promise<void>& promise)
     {
         promise.get_future().swap(*this);
     }

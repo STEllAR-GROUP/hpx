@@ -139,12 +139,12 @@ struct channel
         data_->reset();
    }
 
-    hpx::unique_future<T> get_future()
+    hpx::future<T> get_future()
     {
         HPX_ASSERT(data_);
         
         using lcos::detail::future_access;
-        return future_access::create<hpx::unique_future<T> >(data_);
+        return future_access::create<hpx::future<T> >(data_);
     }
 
     T get(hpx::error_code& ec = hpx::throws) const
@@ -178,13 +178,13 @@ struct channel
     }
 
     template <typename F>
-    hpx::unique_future<typename util::result_of<F(hpx::unique_future<T>)>::type>
+    hpx::future<typename util::result_of<F(hpx::future<T>)>::type>
     then(F && f)
     {
         HPX_ASSERT(data_);
         
         using lcos::detail::future_access;
-        return future_access::create<hpx::unique_future<T> >(data_).then
+        return future_access::create<hpx::future<T> >(data_).then
             (std::forward<F>(f));
     }
 
@@ -264,12 +264,12 @@ struct channel<void>
         data_->reset();
    }
 
-    hpx::unique_future<void> get_future()
+    hpx::future<void> get_future()
     {
         HPX_ASSERT(data_);
         
         using lcos::detail::future_access;
-        return future_access::create<hpx::unique_future<void> >(data_);
+        return future_access::create<hpx::future<void> >(data_);
     }
 
     void get(hpx::error_code& ec = hpx::throws) const
@@ -293,13 +293,13 @@ struct channel<void>
     }
 
     template <typename F>
-    hpx::unique_future<typename util::result_of<F(hpx::unique_future<void>)>::type>
+    hpx::future<typename util::result_of<F(hpx::future<void>)>::type>
     then(F && f)
     {
         HPX_ASSERT(data_);
         
         using lcos::detail::future_access;
-        return future_access::create<hpx::unique_future<void> >(data_).then
+        return future_access::create<hpx::future<void> >(data_).then
             (std::forward<completed_callback_type>(f));
     }
 

@@ -37,7 +37,7 @@ using boost::program_options::value;
 using hpx::naming::id_type;
 using hpx::naming::invalid_id;
 
-using hpx::lcos::unique_future;
+using hpx::lcos::future;
 using hpx::async;
 using hpx::lcos::wait;
 
@@ -144,7 +144,7 @@ double wave(boost::uint64_t t, boost::uint64_t x)
       u[t][x].u_value = std::sin(2.*pi*x*dx); // initial u(x) value
       return u[t][x].u_value;
     }
-  unique_future<double> n1;
+  future<double> n1;
 
 
 
@@ -156,9 +156,9 @@ double wave(boost::uint64_t t, boost::uint64_t x)
   else
     n1 = async<wave_action>(here,t-1,x-1);
 
-  unique_future<double> n2 = async<wave_action>(here,t-1,x);
+  future<double> n2 = async<wave_action>(here,t-1,x);
 
-  unique_future<double> n3;
+  future<double> n3;
 
   if (x == (nx-1))
     n3 = async<wave_action>(here,t-1,0);
@@ -216,7 +216,7 @@ int hpx_main(variables_map& vm)
     // Keep track of the time required to execute.
     high_resolution_timer t;
 
-    std::vector<unique_future<double> > futures;
+    std::vector<future<double> > futures;
     for (boost::uint64_t i=0;i<nx;i++)
       futures.push_back(async<wave_action>(here,nt-1,i));
 

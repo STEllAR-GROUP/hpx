@@ -56,16 +56,16 @@ int hpx_main(boost::program_options::variables_map&)
   test_blocked();
 #elif 0
   // Async function calls
-  hpx::unique_future<void> f1 = hpx::async(test_dense);
-  hpx::unique_future<void> f2 = hpx::async(test_blocked);
+  hpx::future<void> f1 = hpx::async(test_dense);
+  hpx::future<void> f2 = hpx::async(test_blocked);
   hpx::wait_all(f1, f2);
 #elif 0
   // Async action calls
   test_dense_action act_test_dense;
   test_blocked_action act_test_blocked;
   hpx::id_type here = hpx::find_here();
-  hpx::unique_future<void> f1 = hpx::async(act_test_dense, here);
-  hpx::unique_future<void> f2 = hpx::async(act_test_blocked, here);
+  hpx::future<void> f1 = hpx::async(act_test_dense, here);
+  hpx::future<void> f2 = hpx::async(act_test_blocked, here);
   hpx::wait_all(f1, f2);
 #elif 1
   // Async action calls on remote localities
@@ -75,8 +75,8 @@ int hpx_main(boost::program_options::variables_map&)
   std::vector<hpx::id_type> locs = hpx::find_all_localities();
   hpx::id_type loc1 = locs[1 % nlocs];
   hpx::id_type loc2 = locs[2 % nlocs];
-  hpx::unique_future<void> f1 = hpx::async(act_test_dense, loc1);
-  hpx::unique_future<void> f2 = hpx::async(act_test_blocked, loc2);
+  hpx::future<void> f1 = hpx::async(act_test_dense, loc1);
+  hpx::future<void> f2 = hpx::async(act_test_blocked, loc2);
   hpx::wait_all(f1, f2);
 #endif
   

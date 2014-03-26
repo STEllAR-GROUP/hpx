@@ -24,7 +24,7 @@ HPX_PLAIN_ACTION(runner, runner_action)
 
 void run(widget * w, std::size_t num_threads)
 {
-    std::vector<hpx::lcos::unique_future<double> > futures(num_threads);
+    std::vector<hpx::lcos::future<double> > futures(num_threads);
 
     for(std::size_t i = 0; i < num_threads; ++i)
     {
@@ -52,7 +52,7 @@ int hpx_main(int argc, char ** argv)
         // Get a reference to one of the main thread
         hpx::threads::executors::main_pool_executor scheduler;
         // run an async function on the main thread to start the Qt application
-        hpx::unique_future<void> qt_application
+        hpx::future<void> qt_application
             = hpx::async(scheduler, qt_main, argc, argv);
 
         // do something else while qt is executing in the background ...

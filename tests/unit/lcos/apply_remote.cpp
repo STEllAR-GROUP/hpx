@@ -75,7 +75,7 @@ int hpx_main()
     }
 
     {
-        hpx::unique_future<hpx::id_type> inc_f =
+        hpx::future<hpx::id_type> inc_f =
             hpx::components::new_<increment_server>(there);
         hpx::id_type inc = inc_f.get();
 
@@ -93,7 +93,7 @@ int hpx_main()
     }
 
     {
-        hpx::unique_future<hpx::id_type> inc_f =
+        hpx::future<hpx::id_type> inc_f =
             hpx::components::new_<increment_server>(there);
         hpx::id_type inc = inc_f.get();
 

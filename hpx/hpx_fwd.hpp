@@ -692,7 +692,7 @@ namespace hpx
         class packaged_action;
 
         template <typename R>
-        class unique_future;
+        class future;
 
         template <typename R>
         class shared_future;
@@ -785,7 +785,7 @@ namespace hpx
     using naming::id_type;
     using naming::invalid_id;
 
-    using lcos::unique_future;
+    using lcos::future;
     using lcos::shared_future;
     using lcos::promise;
 
@@ -1067,7 +1067,7 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT lcos::unique_future<boost::uint32_t> get_num_localities();
+    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities();
 
     /// \brief Return the number of localities which are currently registered
     ///        for the running application.
@@ -1109,7 +1109,7 @@ namespace hpx
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_API_EXPORT lcos::unique_future<boost::uint32_t> get_num_localities(
+    HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities(
         components::component_type t);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1308,7 +1308,7 @@ namespace hpx
     ///        referenced by the given id is currently located on
     ///
     /// \see    \a hpx::get_colocation_id_sync()
-    HPX_API_EXPORT lcos::unique_future<naming::id_type> get_colocation_id(
+    HPX_API_EXPORT lcos::future<naming::id_type> get_colocation_id(
         naming::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1341,7 +1341,7 @@ namespace hpx
     ///           and may be different for different parcel ports.
     ///
     /// \see      \a std::string get_locality_name()
-    HPX_API_EXPORT unique_future<std::string> get_locality_name(
+    HPX_API_EXPORT future<std::string> get_locality_name(
         naming::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////

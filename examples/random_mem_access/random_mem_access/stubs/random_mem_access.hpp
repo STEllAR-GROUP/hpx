@@ -25,7 +25,7 @@ namespace hpx { namespace components { namespace stubs
         /// with the given \a gid. This is a non-blocking call. The caller
         /// needs to call \a future#get on the return value of
         /// this function to obtain the result as returned by the simple_accumulator.
-        static lcos::unique_future<int> query_async(naming::id_type gid)
+        static lcos::future<int> query_async(naming::id_type gid)
         {
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs
@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace stubs
             return hpx::async<action_type>(gid);
         }
 
-        static lcos::unique_future<void> add_async(naming::id_type gid)
+        static lcos::future<void> add_async(naming::id_type gid)
         {
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs
@@ -43,7 +43,7 @@ namespace hpx { namespace components { namespace stubs
             return hpx::async<action_type>(gid);
         }
 
-        static lcos::unique_future<void> print_async(naming::id_type gid)
+        static lcos::future<void> print_async(naming::id_type gid)
         {
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs

@@ -47,7 +47,7 @@ namespace hpx
         return detail::get_locality_name();
     }
 
-    unique_future<std::string> get_locality_name(naming::id_type const& id)
+    future<std::string> get_locality_name(naming::id_type const& id)
     {
         return async<hpx_get_locality_name_action>(id);
     }

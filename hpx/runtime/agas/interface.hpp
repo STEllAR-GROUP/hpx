@@ -33,7 +33,7 @@ HPX_API_EXPORT bool register_name_sync(
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT lcos::unique_future<bool> register_name(
+HPX_API_EXPORT lcos::future<bool> register_name(
     std::string const& name
   , naming::id_type const& id
     );
@@ -50,7 +50,7 @@ HPX_API_EXPORT naming::id_type unregister_name_sync(
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT lcos::unique_future<naming::id_type> unregister_name(
+HPX_API_EXPORT lcos::future<naming::id_type> unregister_name(
     std::string const& name
     );
 
@@ -72,12 +72,12 @@ HPX_API_EXPORT naming::id_type resolve_name_sync(
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT lcos::unique_future<naming::id_type> resolve_name(
+HPX_API_EXPORT lcos::future<naming::id_type> resolve_name(
     std::string const& name
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-// HPX_API_EXPORT lcos::unique_future<std::vector<naming::id_type> > get_localities(
+// HPX_API_EXPORT lcos::future<std::vector<naming::id_type> > get_localities(
 //     components::component_type type = components::component_invalid
 //     );
 //
@@ -93,7 +93,7 @@ HPX_API_EXPORT lcos::unique_future<naming::id_type> resolve_name(
 //     return get_localities(components::component_invalid, ec);
 // }
 
-HPX_API_EXPORT lcos::unique_future<boost::uint32_t> get_num_localities(
+HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_localities(
     components::component_type type = components::component_invalid
     );
 
@@ -109,13 +109,13 @@ inline boost::uint32_t get_num_localities_sync(
     return agas::get_num_localities_sync(components::component_invalid, ec);
 }
 
-HPX_API_EXPORT lcos::unique_future<std::vector<boost::uint32_t> > get_num_threads();
+HPX_API_EXPORT lcos::future<std::vector<boost::uint32_t> > get_num_threads();
 
 HPX_API_EXPORT std::vector<boost::uint32_t> get_num_threads_sync(
     error_code& ec = throws
     );
 
-HPX_API_EXPORT lcos::unique_future<boost::uint32_t> get_num_overall_threads();
+HPX_API_EXPORT lcos::future<boost::uint32_t> get_num_overall_threads();
 
 HPX_API_EXPORT boost::uint32_t get_num_overall_threads_sync(
     error_code& ec = throws
@@ -204,7 +204,7 @@ inline bool is_local_lva_encoded_address(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT hpx::unique_future<naming::address> resolve(
+HPX_API_EXPORT hpx::future<naming::address> resolve(
     naming::id_type const& id
     );
 
@@ -213,7 +213,7 @@ HPX_API_EXPORT naming::address resolve_sync(
   , error_code& ec = throws
     );
 
-HPX_API_EXPORT hpx::unique_future<bool> bind(
+HPX_API_EXPORT hpx::future<bool> bind(
     naming::gid_type const& id
   , naming::address const& addr
   , boost::uint32_t locality_id
@@ -280,7 +280,7 @@ HPX_API_EXPORT bool add_remote_incref_request(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT hpx::unique_future<boost::int64_t> incref_async(
+HPX_API_EXPORT hpx::future<boost::int64_t> incref_async(
     naming::gid_type const& gid
   , boost::int64_t credits
   , naming::id_type const& keep_alive = naming::invalid_id
@@ -294,7 +294,7 @@ HPX_API_EXPORT boost::int64_t incref(
     );
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_API_EXPORT hpx::unique_future<naming::id_type> get_colocation_id(
+HPX_API_EXPORT hpx::future<naming::id_type> get_colocation_id(
     naming::id_type const& id);
 
 HPX_API_EXPORT naming::id_type get_colocation_id_sync(

@@ -14,7 +14,7 @@ namespace hpx { namespace agas { namespace stubs
 {
 
 template <typename Result>
-lcos::unique_future<Result> primary_namespace::service_async(
+lcos::future<Result> primary_namespace::service_async(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
@@ -27,28 +27,28 @@ lcos::unique_future<Result> primary_namespace::service_async(
     return p.get_future();
 }
 
-template lcos::unique_future<response>
+template lcos::future<response>
     primary_namespace::service_async<response>(
         naming::id_type const& gid
       , request const& req
       , threads::thread_priority priority
         );
 
-template lcos::unique_future<bool>
+template lcos::future<bool>
     primary_namespace::service_async<bool>(
         naming::id_type const& gid
       , request const& req
       , threads::thread_priority priority
         );
 
-template lcos::unique_future<boost::int64_t>
+template lcos::future<boost::int64_t>
     primary_namespace::service_async<boost::int64_t>(
         naming::id_type const& gid
       , request const& req
       , threads::thread_priority priority
         );
 
-template lcos::unique_future<naming::id_type>
+template lcos::future<naming::id_type>
     primary_namespace::service_async<naming::id_type>(
         naming::id_type const& gid
       , request const& req
@@ -76,7 +76,7 @@ void primary_namespace::service_non_blocking(
     hpx::apply_p<action_type>(gid, priority, req);
 }
 
-lcos::unique_future<std::vector<response> > 
+lcos::future<std::vector<response> > 
     primary_namespace::bulk_service_async(
         naming::id_type const& gid
       , std::vector<request> const& reqs

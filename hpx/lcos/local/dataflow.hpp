@@ -79,7 +79,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
             >::type
             result_type;
 
-        typedef hpx::lcos::unique_future<result_type> type;
+        typedef hpx::lcos::future<result_type> type;
 
         typedef
             typename boost::fusion::result_of::end<Futures>::type

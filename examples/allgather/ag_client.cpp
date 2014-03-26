@@ -61,7 +61,7 @@ void test_allgather(std::size_t np)
 
     hpx::util::high_resolution_timer kernel1time;
     {
-      std::vector<hpx::lcos::unique_future<void> > init_phase;
+      std::vector<hpx::lcos::future<void> > init_phase;
       ag::server::allgather::init_action init;
       for (std::size_t i=0;i<np;i++) {
         init_phase.push_back(hpx::async(init, components[i], i, np));
@@ -72,7 +72,7 @@ void test_allgather(std::size_t np)
 
     hpx::util::high_resolution_timer computetime;
     {
-      std::vector<hpx::lcos::unique_future<void> > compute_phase;
+      std::vector<hpx::lcos::future<void> > compute_phase;
       ag::server::allgather::compute_action compute;
       for (std::size_t i=0;i<np;i++) {
         compute_phase.push_back(hpx::async(compute, components[i], components));
@@ -119,7 +119,7 @@ void test_allgather_and_gate(std::size_t np)
 
     hpx::util::high_resolution_timer inittimer;
     {
-      std::vector<hpx::lcos::unique_future<void> > init_phase;
+      std::vector<hpx::lcos::future<void> > init_phase;
       ag::server::allgather_and_gate::init_action init;
       for (std::size_t i = 0; i < np; ++i)
       {
@@ -131,7 +131,7 @@ void test_allgather_and_gate(std::size_t np)
 
     hpx::util::high_resolution_timer computetimer;
     {
-      std::vector<hpx::lcos::unique_future<void> > compute_phase;
+      std::vector<hpx::lcos::future<void> > compute_phase;
       ag::server::allgather_and_gate::compute_action compute;
       for (std::size_t i = 0; i < np; ++i)
       {

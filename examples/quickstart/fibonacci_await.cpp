@@ -31,24 +31,24 @@ BOOST_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// hpx::unique_future<boost::uint64_t> fibonacci(boost::uint64_t) resumable
+// hpx::future<boost::uint64_t> fibonacci(boost::uint64_t) resumable
 // {
 //     if (n < 2) return hpx::make_ready_future(n);
 //     if (n < threshold) return hpx::make_ready_future(fibonacci_serial(n));
 //
-//     hpx::unique_future<boost::uint64_t> lhs = hpx::async(&fibonacci, n-1).unwrap();
-//     hpx::unique_future<boost::uint64_t> rhs = fibonacci(n-2);
+//     hpx::future<boost::uint64_t> lhs = hpx::async(&fibonacci, n-1).unwrap();
+//     hpx::future<boost::uint64_t> rhs = fibonacci(n-2);
 //
 //     return await lhs + await rhs;
 // }
 //
 
-hpx::unique_future<boost::uint64_t> fibonacci(boost::uint64_t n);
+hpx::future<boost::uint64_t> fibonacci(boost::uint64_t n);
 
 struct _fibonacci_frame
 {
     int state_;
-    hpx::unique_future<boost::uint64_t> result_;
+    hpx::future<boost::uint64_t> result_;
     hpx::lcos::local::promise<boost::uint64_t> result_promise_;
 
     _fibonacci_frame(boost::uint64_t n)
@@ -58,8 +58,8 @@ struct _fibonacci_frame
 
     // local variables
     boost::uint64_t n_;
-    hpx::unique_future<boost::uint64_t> lhs_;
-    hpx::unique_future<boost::uint64_t> rhs_;
+    hpx::future<boost::uint64_t> lhs_;
+    hpx::future<boost::uint64_t> rhs_;
     boost::uint64_t lhs_result_;
     boost::uint64_t rhs_result_;
 };
@@ -99,10 +99,10 @@ void _fibonacci(boost::shared_ptr<_fibonacci_frame> const& frame_)
         return;
     }
 
-    // hpx::unique_future<boost::uint64_t> lhs = hpx::async(&fibonacci, n-1).unwrap();
+    // hpx::future<boost::uint64_t> lhs = hpx::async(&fibonacci, n-1).unwrap();
     frame->lhs_ = hpx::async(&fibonacci, frame->n_-1); //.unwrap();
 
-    // hpx::unique_future<boost::uint64_t> rhs = fibonacci(n-2);
+    // hpx::future<boost::uint64_t> rhs = fibonacci(n-2);
     frame->rhs_ = fibonacci(frame->n_-2);
 
     if (!frame->lhs_.is_ready())
@@ -137,7 +137,7 @@ L2:
     return;
 }
 
-hpx::unique_future<boost::uint64_t> fibonacci(boost::uint64_t n)
+hpx::future<boost::uint64_t> fibonacci(boost::uint64_t n)
 {
     boost::shared_ptr<_fibonacci_frame> frame =
         boost::make_shared<_fibonacci_frame>(n);

@@ -40,7 +40,7 @@
     }
 
     BOOST_FORCEINLINE
-    hpx::lcos::unique_future<result_type>
+    hpx::lcos::future<result_type>
     async() const
     {
         return
@@ -119,7 +119,7 @@
 
     template <BOOST_PP_ENUM_PARAMS(N, typename U)>
     BOOST_FORCEINLINE
-    hpx::lcos::unique_future<result_type>
+    hpx::lcos::future<result_type>
     async(HPX_ENUM_FWD_ARGS(N, U, u)) const
     {
         return

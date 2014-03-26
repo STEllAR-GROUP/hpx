@@ -124,7 +124,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -158,7 +158,7 @@ namespace hpx
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename Arg)>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>

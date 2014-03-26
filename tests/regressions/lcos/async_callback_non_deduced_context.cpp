@@ -19,7 +19,7 @@ int test()
 HPX_PLAIN_ACTION(test, test_action);
 
 ///////////////////////////////////////////////////////////////////////////////
-int future_callback(hpx::lcos::unique_future<int> p)
+int future_callback(hpx::lcos::future<int> p)
 {
     HPX_TEST(p.has_value());
     int result = p.get();
@@ -30,14 +30,14 @@ int future_callback(hpx::lcos::unique_future<int> p)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    using hpx::lcos::unique_future;
+    using hpx::lcos::future;
     using hpx::async;
 
     {
         test_action do_test;
 
-        unique_future<int> f = async(do_test, hpx::find_here());
-        unique_future<int> p = f.then(hpx::util::bind(future_callback, 
+        future<int> f = async(do_test, hpx::find_here());
+        future<int> p = f.then(hpx::util::bind(future_callback, 
             hpx::util::placeholders::_1));
 
         HPX_TEST_EQ(p.get(), 42);

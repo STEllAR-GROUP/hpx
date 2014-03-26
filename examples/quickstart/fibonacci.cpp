@@ -41,9 +41,9 @@ boost::uint64_t fibonacci(boost::uint64_t n)
     // heavy workload.
 
     fibonacci_action fib;
-    hpx::unique_future<boost::uint64_t> n1 =
+    hpx::future<boost::uint64_t> n1 =
         hpx::async(fib, locality_id, n - 1);
-    hpx::unique_future<boost::uint64_t> n2 =
+    hpx::future<boost::uint64_t> n2 =
         hpx::async(fib, locality_id, n - 2);
 
     return n1.get() + n2.get();   // wait for the Futures to return their values

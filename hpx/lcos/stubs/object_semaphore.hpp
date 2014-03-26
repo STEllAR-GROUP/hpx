@@ -22,7 +22,7 @@ struct object_semaphore : components::stub_base<
     typedef lcos::server::object_semaphore<ValueType> server_type;
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::unique_future<void> signal_async(
+    static lcos::future<void> signal_async(
         naming::id_type const& gid
       , ValueType const& val
       , boost::uint64_t count)
@@ -48,7 +48,7 @@ struct object_semaphore : components::stub_base<
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::unique_future<ValueType>
+    static lcos::future<ValueType>
     get_async(naming::id_type const& gid)
     {
         typedef typename server_type::get_action action_type;
@@ -68,7 +68,7 @@ struct object_semaphore : components::stub_base<
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::unique_future<void> abort_pending_async(
+    static lcos::future<void> abort_pending_async(
         naming::id_type const& gid
       , error ec)
     {
@@ -91,7 +91,7 @@ struct object_semaphore : components::stub_base<
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    static lcos::unique_future<void> wait_async(
+    static lcos::future<void> wait_async(
         naming::id_type const& gid)
     {
         typedef typename server_type::wait_action action_type;

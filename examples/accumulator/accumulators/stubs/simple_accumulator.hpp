@@ -73,7 +73,7 @@ namespace examples { namespace stubs
         ///          the future should be called. If the value is available,
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
-        static hpx::lcos::unique_future<argument_type>
+        static hpx::lcos::future<argument_type>
         query_async(hpx::naming::id_type const& gid)
         {
             typedef server::simple_accumulator::query_action action_type;

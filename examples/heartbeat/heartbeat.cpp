@@ -61,7 +61,7 @@ int monitor(double runfor, std::string const& name, boost::uint64_t pause)
     hpx::register_shutdown_function(boost::bind(&stop_monitor, stop_flag));
 
     boost::int64_t zero_time = 0;
-    hpx::unique_future<void> f = stop_flag.get_future();
+    hpx::future<void> f = stop_flag.get_future();
 
     hpx::util::high_resolution_timer t;
     while (runfor < 0 || t.elapsed() < runfor)

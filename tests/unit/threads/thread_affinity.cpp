@@ -110,7 +110,7 @@ void thread_affinity_foreman()
         // Each iteration, we create a task for each element in the set of
         // OS-threads that have not said "Hello world". Each of these tasks
         // is encapsulated in a future.
-        std::vector<hpx::lcos::unique_future<std::size_t> > futures;
+        std::vector<hpx::lcos::future<std::size_t> > futures;
         futures.reserve(attendance.size());
 
         BOOST_FOREACH(std::size_t worker, attendance)
@@ -144,7 +144,7 @@ int hpx_main(boost::program_options::variables_map& /*vm*/)
             hpx::find_all_localities();
 
         // Reserve storage space for futures, one for each locality.
-        std::vector<hpx::lcos::unique_future<void> > futures;
+        std::vector<hpx::lcos::future<void> > futures;
         futures.reserve(localities.size());
 
         BOOST_FOREACH(hpx::naming::id_type const& node, localities)

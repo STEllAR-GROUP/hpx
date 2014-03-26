@@ -29,7 +29,7 @@ using hpx::actions::plain_result_action0;
 
 using hpx::lcos::wait;
 using hpx::async;
-using hpx::lcos::unique_future;
+using hpx::lcos::future;
 
 using hpx::find_here;
 
@@ -148,7 +148,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Async wait, vector of futures, void return.
         {
-            std::vector<unique_future<void> > futures;
+            std::vector<future<void> > futures;
             futures.reserve(64);
 
             for (std::size_t i = 0; i < 64; ++i)
@@ -166,7 +166,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Async wait, vector of futures, non-void return.
         {
-            std::vector<unique_future<bool> > futures;
+            std::vector<future<bool> > futures;
             futures.reserve(64);
 
             for (std::size_t i = 0; i < 64; ++i)

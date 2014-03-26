@@ -94,7 +94,7 @@ namespace hpx { namespace components
         explicit object(naming::id_type const & gid) : gid_(gid) {}
         naming::id_type gid_;
         template <typename F>
-        lcos::unique_future<
+        lcos::future<
             typename util::result_of<typename hpx::util::decay<F>::type(T &)>::type
         >
         operator<=(F && f) const
@@ -107,7 +107,7 @@ namespace hpx { namespace components
         }
 
         template <typename F>
-        lcos::unique_future<
+        lcos::future<
             typename util::result_of<typename hpx::util::decay<F>::type(T &)>::type
         >
         apply(F && f) const

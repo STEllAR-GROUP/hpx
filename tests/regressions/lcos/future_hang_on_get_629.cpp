@@ -104,7 +104,7 @@ double null_tree(
 
     double d = 0.;
 
-    std::vector<hpx::unique_future<double> > futures;
+    std::vector<hpx::future<double> > futures;
     futures.reserve(children);
 
     boost::uint64_t p = seed + ipow(depth, children);

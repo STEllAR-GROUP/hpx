@@ -106,7 +106,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
     // Create the three-dimensional future grid.
-    //std::vector<hpx::lcos::unique_future<std::vector<double> > > tests;
+    //std::vector<hpx::lcos::future<std::vector<double> > > tests;
     for (std::size_t i = 0; i < sequence_ye.size(); ++i)
     {
         std::size_t const& ii = sequence_ye[i];
@@ -231,7 +231,7 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
         }
     }
     
-    //hpx::lcos::unique_future<std::vector<double> > bulk_one_tests =
+    //hpx::lcos::future<std::vector<double> > bulk_one_tests =
     //    shen.interpolate_one_bulk_async(values_ye, values_temp, values_rho,
     //        sheneos::server::partition3d::logpress);
 
@@ -303,7 +303,7 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
     // Execute bulk operation
-    //hpx::lcos::unique_future<std::vector<std::vector<double> > > bulk_tests =
+    //hpx::lcos::future<std::vector<std::vector<double> > > bulk_tests =
     //    shen.interpolate_bulk_async(values_ye, values_temp, values_rho);
 
     for (std::size_t i = 0; i < sequence_ye.size(); ++i)
@@ -385,7 +385,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 #if 0
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
-        std::vector<hpx::lcos::unique_future<void> > tests;
+        std::vector<hpx::lcos::future<void> > tests;
         BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
         {
             using hpx::async;
@@ -407,7 +407,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
-        std::vector<hpx::lcos::unique_future<void> > bulk_one_tests;
+        std::vector<hpx::lcos::future<void> > bulk_one_tests;
         BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
         {
             using hpx::async;
@@ -430,7 +430,7 @@ int hpx_main(boost::program_options::variables_map& vm)
 
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
-        std::vector<hpx::lcos::unique_future<void> > bulk_tests;
+        std::vector<hpx::lcos::future<void> > bulk_tests;
         BOOST_FOREACH(hpx::naming::id_type const& id, locality_ids)
         {
             using hpx::async;

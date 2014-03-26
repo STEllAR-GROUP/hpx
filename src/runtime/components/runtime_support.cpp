@@ -14,7 +14,7 @@ namespace hpx { namespace components
         return this->base_type::get_factory_properties(gid_, type);
     }
 
-    lcos::unique_future<int>
+    lcos::future<int>
     runtime_support::get_factory_properties_async(components::component_type type)
     {
         return this->base_type::get_factory_properties_async(gid_, type);

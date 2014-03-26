@@ -83,65 +83,65 @@ auto increment_lambda = [](boost::int32_t i){ return i + 1; };
 int hpx_main()
 {
     {
-        hpx::unique_future<boost::int32_t> f1 = hpx::async(&increment, 42);
+        hpx::future<boost::int32_t> f1 = hpx::async(&increment, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::unique_future<boost::int32_t> f2 =
+        hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, &increment, 42);
         HPX_TEST_EQ(f2.get(), 43);
 
-        hpx::unique_future<void> f3 = hpx::async(&do_nothing, 42);
+        hpx::future<void> f3 = hpx::async(&do_nothing, 42);
         f3.get();
 
-        hpx::unique_future<void> f4 = hpx::async(hpx::launch::sync, &do_nothing, 42);
+        hpx::future<void> f4 = hpx::async(hpx::launch::sync, &do_nothing, 42);
         f4.get();
     }
 
     {
         using hpx::util::placeholders::_1;
 
-        hpx::unique_future<boost::int32_t> f1 =
+        hpx::future<boost::int32_t> f1 =
             hpx::async(hpx::util::bind(&increment, 42));
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::unique_future<boost::int32_t> f2 =
+        hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, hpx::util::bind(&increment, _1), 42);
         HPX_TEST_EQ(f2.get(), 43);
 
-        hpx::unique_future<boost::int32_t> f3 =
+        hpx::future<boost::int32_t> f3 =
             hpx::async(hpx::util::bind(&increment, 42));
         HPX_TEST_EQ(f3.get(), 43);
 
-        hpx::unique_future<boost::int32_t> f4 =
+        hpx::future<boost::int32_t> f4 =
             hpx::async(hpx::launch::all, hpx::util::bind(&increment, _1), 42);
         HPX_TEST_EQ(f4.get(), 43);
 
-        hpx::unique_future<void> f5 = hpx::async(hpx::launch::all,
+        hpx::future<void> f5 = hpx::async(hpx::launch::all,
             hpx::util::bind(&do_nothing, _1), 42);
         f5.get();
 
-        hpx::unique_future<void> f6 = hpx::async(hpx::launch::sync,
+        hpx::future<void> f6 = hpx::async(hpx::launch::sync,
             hpx::util::bind(&do_nothing, _1), 42);
         f6.get();
     }
 
     {
-        hpx::unique_future<boost::int32_t> f1 = hpx::async(increment, 42);
+        hpx::future<boost::int32_t> f1 = hpx::async(increment, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
         // VS2010 bails out with the following code
 #if !defined(BOOST_MSVC) || BOOST_MSVC >= 1700
-        hpx::unique_future<boost::int32_t> f2 =
+        hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, increment, 42);
         HPX_TEST_EQ(f2.get(), 43);
 #endif
 
-        hpx::unique_future<void> f3 = hpx::async(do_nothing, 42);
+        hpx::future<void> f3 = hpx::async(do_nothing, 42);
         f3.get();
 
         // VS2010 bails out with the following code
 #if !defined(BOOST_MSVC) || BOOST_MSVC >= 1700
-        hpx::unique_future<void> f4 = hpx::async(hpx::launch::sync, do_nothing, 42);
+        hpx::future<void> f4 = hpx::async(hpx::launch::sync, do_nothing, 42);
         f4.get();
 #endif
     }
@@ -149,27 +149,27 @@ int hpx_main()
     {
         using hpx::util::placeholders::_1;
 
-        hpx::unique_future<boost::int32_t> f1 =
+        hpx::future<boost::int32_t> f1 =
             hpx::async(hpx::util::bind(increment, 42));
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::unique_future<boost::int32_t> f2 =
+        hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, hpx::util::bind(increment, _1), 42);
         HPX_TEST_EQ(f2.get(), 43);
 
-        hpx::unique_future<boost::int32_t> f3 =
+        hpx::future<boost::int32_t> f3 =
             hpx::async(hpx::util::bind(increment, 42));
         HPX_TEST_EQ(f3.get(), 43);
 
-        hpx::unique_future<boost::int32_t> f4 =
+        hpx::future<boost::int32_t> f4 =
             hpx::async(hpx::launch::all, hpx::util::bind(increment, _1), 42);
         HPX_TEST_EQ(f4.get(), 43);
 
-        hpx::unique_future<void> f5 = hpx::async(hpx::launch::all,
+        hpx::future<void> f5 = hpx::async(hpx::launch::all,
             hpx::util::bind(do_nothing, _1), 42);
         f5.get();
 
-        hpx::unique_future<void> f6 = hpx::async(hpx::launch::sync,
+        hpx::future<void> f6 = hpx::async(hpx::launch::sync,
             hpx::util::bind(do_nothing, _1), 42);
         f6.get();
     }
@@ -177,40 +177,40 @@ int hpx_main()
     {
         mult2 mult;
         
-        hpx::unique_future<boost::int32_t> f1 = hpx::async(mult, 42);
+        hpx::future<boost::int32_t> f1 = hpx::async(mult, 42);
         HPX_TEST_EQ(f1.get(), 84);
 
-        hpx::unique_future<boost::int32_t> f2 = hpx::async(hpx::launch::all, mult, 42);
+        hpx::future<boost::int32_t> f2 = hpx::async(hpx::launch::all, mult, 42);
         HPX_TEST_EQ(f2.get(), 84);
     }
 
     {
         mult2 mult;
 
-        hpx::unique_future<boost::int32_t> f1 =
+        hpx::future<boost::int32_t> f1 =
            hpx::async(hpx::util::bind(mult, 42));
         HPX_TEST_EQ(f1.get(), 84);
 
         using hpx::util::placeholders::_1;
 
-        hpx::unique_future<boost::int32_t> f2 =
+        hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, hpx::util::bind(mult, 42));
         HPX_TEST_EQ(f2.get(), 84);
 
-        hpx::unique_future<boost::int32_t> f3 =
+        hpx::future<boost::int32_t> f3 =
            hpx::async(hpx::util::bind(mult, _1), 42);
         HPX_TEST_EQ(f3.get(), 84);
 
-        hpx::unique_future<boost::int32_t> f4 =
+        hpx::future<boost::int32_t> f4 =
             hpx::async(hpx::launch::all, hpx::util::bind(mult, _1), 42);
         HPX_TEST_EQ(f4.get(), 84);
 
         do_nothing_obj do_nothing_f;
-        hpx::unique_future<void> f5 = hpx::async(hpx::launch::all,
+        hpx::future<void> f5 = hpx::async(hpx::launch::all,
             hpx::util::bind(do_nothing_f, _1), 42);
         f5.get();
 
-        hpx::unique_future<void> f6 = hpx::async(hpx::launch::sync,
+        hpx::future<void> f6 = hpx::async(hpx::launch::sync,
             hpx::util::bind(do_nothing_f, _1), 42);
         f6.get();
     }
@@ -218,19 +218,19 @@ int hpx_main()
     {
         decrement dec;
 
-        hpx::unique_future<boost::int32_t> f1 = hpx::async(&decrement::call, dec, 42);
+        hpx::future<boost::int32_t> f1 = hpx::async(&decrement::call, dec, 42);
         HPX_TEST_EQ(f1.get(), 41);
 
-        hpx::unique_future<boost::int32_t> f2 =
+        hpx::future<boost::int32_t> f2 =
             hpx::async(hpx::launch::all, &decrement::call, dec, 42);
         HPX_TEST_EQ(f2.get(), 41);
 
         do_nothing_member dnm;
-        hpx::unique_future<void> f3 = hpx::async(hpx::launch::all,
+        hpx::future<void> f3 = hpx::async(hpx::launch::all,
             &do_nothing_member::call, dnm, 42);
         f3.get();
 
-        hpx::unique_future<void> f4 = hpx::async(hpx::launch::sync,
+        hpx::future<void> f4 = hpx::async(hpx::launch::sync,
             &do_nothing_member::call, dnm, 42);
         f4.get();
     }
@@ -240,28 +240,28 @@ int hpx_main()
 
         using hpx::util::placeholders::_1;
 
-        hpx::unique_future<boost::int32_t> f1 =
+        hpx::future<boost::int32_t> f1 =
             hpx::async(hpx::util::bind(&decrement::call, dec, 42));
         HPX_TEST_EQ(f1.get(), 41);
 
-        hpx::unique_future<boost::int32_t> f2 = hpx::async(
+        hpx::future<boost::int32_t> f2 = hpx::async(
             hpx::launch::all, hpx::util::bind(&decrement::call, dec, 42));
         HPX_TEST_EQ(f2.get(), 41);
 
-        hpx::unique_future<boost::int32_t> f3 =
+        hpx::future<boost::int32_t> f3 =
             hpx::async(hpx::util::bind(&decrement::call, dec, _1), 42);
         HPX_TEST_EQ(f3.get(), 41);
 
-        hpx::unique_future<boost::int32_t> f4 = hpx::async(
+        hpx::future<boost::int32_t> f4 = hpx::async(
             hpx::launch::all, hpx::util::bind(&decrement::call, dec, _1), 42);
         HPX_TEST_EQ(f4.get(), 41);
 
         do_nothing_member dnm;
-        hpx::unique_future<void> f5 = hpx::async(hpx::launch::all,
+        hpx::future<void> f5 = hpx::async(hpx::launch::all,
             hpx::util::bind(&do_nothing_member::call, dnm, _1), 42);
         f5.get();
 
-        hpx::unique_future<void> f6 = hpx::async(hpx::launch::sync,
+        hpx::future<void> f6 = hpx::async(hpx::launch::sync,
             hpx::util::bind(&do_nothing_member::call, dnm, _1), 42);
         f6.get();
     }

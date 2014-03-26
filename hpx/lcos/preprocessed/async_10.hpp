@@ -16,7 +16,7 @@ namespace hpx
         struct sync_local_invoke_1
         {
             template <typename Arg0>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 Arg0 && arg0)
             {
@@ -26,10 +26,10 @@ namespace hpx
             }
         };
         template <typename Action, typename R>
-        struct sync_local_invoke_1<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_1<Action, lcos::future<R> >
         {
             template <typename Arg0>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0)
             {
@@ -42,7 +42,7 @@ namespace hpx
     }
     
     template <typename Action, typename Arg0>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -70,7 +70,7 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -82,7 +82,7 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -96,7 +96,7 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -117,7 +117,7 @@ namespace hpx
         struct sync_local_invoke_2
         {
             template <typename Arg0 , typename Arg1>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 Arg0 && arg0 , Arg1 && arg1)
             {
@@ -127,10 +127,10 @@ namespace hpx
             }
         };
         template <typename Action, typename R>
-        struct sync_local_invoke_2<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_2<Action, lcos::future<R> >
         {
             template <typename Arg0 , typename Arg1>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1)
             {
@@ -143,7 +143,7 @@ namespace hpx
     }
     
     template <typename Action, typename Arg0 , typename Arg1>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -171,7 +171,7 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -183,7 +183,7 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -197,7 +197,7 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -218,7 +218,7 @@ namespace hpx
         struct sync_local_invoke_3
         {
             template <typename Arg0 , typename Arg1 , typename Arg2>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
             {
@@ -228,10 +228,10 @@ namespace hpx
             }
         };
         template <typename Action, typename R>
-        struct sync_local_invoke_3<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_3<Action, lcos::future<R> >
         {
             template <typename Arg0 , typename Arg1 , typename Arg2>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2)
             {
@@ -244,7 +244,7 @@ namespace hpx
     }
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -272,7 +272,7 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -284,7 +284,7 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -298,7 +298,7 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -319,7 +319,7 @@ namespace hpx
         struct sync_local_invoke_4
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
             {
@@ -329,10 +329,10 @@ namespace hpx
             }
         };
         template <typename Action, typename R>
-        struct sync_local_invoke_4<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_4<Action, lcos::future<R> >
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3)
             {
@@ -345,7 +345,7 @@ namespace hpx
     }
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -373,7 +373,7 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -385,7 +385,7 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -399,7 +399,7 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -420,7 +420,7 @@ namespace hpx
         struct sync_local_invoke_5
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
             {
@@ -430,10 +430,10 @@ namespace hpx
             }
         };
         template <typename Action, typename R>
-        struct sync_local_invoke_5<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_5<Action, lcos::future<R> >
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4)
             {
@@ -446,7 +446,7 @@ namespace hpx
     }
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -474,7 +474,7 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -486,7 +486,7 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -500,7 +500,7 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -521,7 +521,7 @@ namespace hpx
         struct sync_local_invoke_6
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
             {
@@ -531,10 +531,10 @@ namespace hpx
             }
         };
         template <typename Action, typename R>
-        struct sync_local_invoke_6<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_6<Action, lcos::future<R> >
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5)
             {
@@ -547,7 +547,7 @@ namespace hpx
     }
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -575,7 +575,7 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -587,7 +587,7 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -601,7 +601,7 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -622,7 +622,7 @@ namespace hpx
         struct sync_local_invoke_7
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
             {
@@ -632,10 +632,10 @@ namespace hpx
             }
         };
         template <typename Action, typename R>
-        struct sync_local_invoke_7<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_7<Action, lcos::future<R> >
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6)
             {
@@ -648,7 +648,7 @@ namespace hpx
     }
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -676,7 +676,7 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -688,7 +688,7 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -702,7 +702,7 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -723,7 +723,7 @@ namespace hpx
         struct sync_local_invoke_8
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
             {
@@ -733,10 +733,10 @@ namespace hpx
             }
         };
         template <typename Action, typename R>
-        struct sync_local_invoke_8<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_8<Action, lcos::future<R> >
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7)
             {
@@ -749,7 +749,7 @@ namespace hpx
     }
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -777,7 +777,7 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -789,7 +789,7 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -803,7 +803,7 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -824,7 +824,7 @@ namespace hpx
         struct sync_local_invoke_9
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
             {
@@ -834,10 +834,10 @@ namespace hpx
             }
         };
         template <typename Action, typename R>
-        struct sync_local_invoke_9<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_9<Action, lcos::future<R> >
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8)
             {
@@ -850,7 +850,7 @@ namespace hpx
     }
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -878,7 +878,7 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -890,7 +890,7 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -904,7 +904,7 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -925,7 +925,7 @@ namespace hpx
         struct sync_local_invoke_10
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
             {
@@ -935,10 +935,10 @@ namespace hpx
             }
         };
         template <typename Action, typename R>
-        struct sync_local_invoke_10<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_10<Action, lcos::future<R> >
         {
             template <typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, Arg0 && arg0 , Arg1 && arg1 , Arg2 && arg2 , Arg3 && arg3 , Arg4 && arg4 , Arg5 && arg5 , Arg6 && arg6 , Arg7 && arg7 , Arg8 && arg8 , Arg9 && arg9)
             {
@@ -951,7 +951,7 @@ namespace hpx
     }
     
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -979,7 +979,7 @@ namespace hpx
         return p.get_future();
     }
     template <typename Action, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -991,7 +991,7 @@ namespace hpx
     
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -1005,7 +1005,7 @@ namespace hpx
     }
     template <typename Component, typename Result,
         typename Arguments, typename Derived, typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>

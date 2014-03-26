@@ -36,7 +36,7 @@ namespace hpx { namespace components { namespace stubs
         ///         be created in blocks (i.e. more than one instance at once).
         ///         This function is used by the \a distributing_factory to
         ///         determine a correct allocation strategy
-        static lcos::unique_future<int> get_factory_properties_async(
+        static lcos::future<int> get_factory_properties_async(
             naming::id_type const& targetgid, components::component_type type);
 
         static int get_factory_properties(naming::id_type const& targetgid,
@@ -48,7 +48,7 @@ namespace hpx { namespace components { namespace stubs
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
         template <typename Component>
-        static lcos::unique_future<naming::id_type>
+        static lcos::future<naming::id_type>
         create_component_async(naming::id_type const& gid)
         {
             if (!naming::is_locality(gid))
@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace stubs
 /**/
 #define HPX_RUNTIME_SUPPORT_STUB_CREATE(Z, N, D)                              \
         template <typename Component, BOOST_PP_ENUM_PARAMS(N, typename Arg)>  \
-        static lcos::unique_future<naming::id_type>                           \
+        static lcos::future<naming::id_type>                           \
         create_component_async(naming::id_type const& gid,                    \
             HPX_ENUM_FWD_ARGS(N, Arg, arg))                                   \
         {                                                                     \
@@ -127,7 +127,7 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // copy construct a component
         template <typename Component>
-        static lcos::unique_future<naming::id_type>
+        static lcos::future<naming::id_type>
         copy_create_component_async(naming::id_type const& gid,
             boost::shared_ptr<Component> const& p, bool local_op)
         {
@@ -157,7 +157,7 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         // copy construct a component
         template <typename Component>
-        static lcos::unique_future<naming::id_type>
+        static lcos::future<naming::id_type>
         migrate_component_async(naming::id_type const& target_locality,
             boost::shared_ptr<Component> const& p,
             naming::id_type const& to_migrate)
@@ -189,7 +189,7 @@ namespace hpx { namespace components { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::unique_future<std::vector<naming::id_type> >
+        static lcos::future<std::vector<naming::id_type> >
         bulk_create_components_async(
             naming::id_type const& gid, components::component_type type,
             std::size_t count = 1);
@@ -206,7 +206,7 @@ namespace hpx { namespace components { namespace stubs
         /// to call \a future#get on the result of this function
         /// to obtain the global id of the newly created object.
         template <typename T, typename Config>
-        static lcos::unique_future<naming::id_type>
+        static lcos::future<naming::id_type>
         create_memory_block_async(
             naming::id_type const& id, std::size_t count,
             hpx::actions::manage_object_action<T, Config> const& act);
@@ -223,17 +223,17 @@ namespace hpx { namespace components { namespace stubs
             return create_memory_block_async(id, count, act).get();
         }
 
-        static lcos::unique_future<bool>
+        static lcos::future<bool>
         load_components_async(naming::id_type const& gid);
         static bool load_components(naming::id_type const& gid);
 
-        static lcos::unique_future<void>
+        static lcos::future<void>
         call_startup_functions_async(naming::id_type const& gid,
             bool pre_startup);
         static void call_startup_functions(naming::id_type const& gid,
             bool pre_startup);
 
-        static lcos::unique_future<void>
+        static lcos::future<void>
         call_shutdown_functions_async(naming::id_type const& gid,
             bool pre_shutdown);
 
@@ -245,7 +245,7 @@ namespace hpx { namespace components { namespace stubs
             naming::gid_type const& gid);
 
         /// \brief Shutdown the given runtime system
-        static lcos::unique_future<void>
+        static lcos::future<void>
         shutdown_async(naming::id_type const& targetgid, double timeout = -1);
         static void shutdown(naming::id_type const& targetgid, 
             double timeout = - 1);
@@ -259,7 +259,7 @@ namespace hpx { namespace components { namespace stubs
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
         /// \brief Terminate the given runtime system
-        static lcos::unique_future<void>
+        static lcos::future<void>
         terminate_async(naming::id_type const& targetgid);
 
         static void terminate(naming::id_type const& targetgid);
@@ -285,14 +285,14 @@ namespace hpx { namespace components { namespace stubs
         static void
         garbage_collect_non_blocking(naming::id_type const& targetgid);
 
-        static lcos::unique_future<void>
+        static lcos::future<void>
         garbage_collect_async(naming::id_type const& targetgid);
 
         static void
         garbage_collect(naming::id_type const& targetgid);
 
         ///////////////////////////////////////////////////////////////////////
-        static lcos::unique_future<naming::id_type>
+        static lcos::future<naming::id_type>
         create_performance_counter_async(naming::id_type targetgid,
             performance_counters::counter_info const& info);
         static naming::id_type
@@ -302,13 +302,13 @@ namespace hpx { namespace components { namespace stubs
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve configuration information
-        static lcos::unique_future<util::section> get_config_async(
+        static lcos::future<util::section> get_config_async(
             naming::id_type const& targetgid);
         static void get_config(naming::id_type const& targetgid, util::section& ini);
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Retrieve instance count for given component type
-        static lcos::unique_future<boost::int32_t > get_instance_count_async(
+        static lcos::future<boost::int32_t > get_instance_count_async(
             naming::id_type const& targetgid, components::component_type type);
         static boost::int32_t  get_instance_count(naming::id_type const& targetgid,
             components::component_type type);

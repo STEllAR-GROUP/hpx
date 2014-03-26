@@ -31,13 +31,13 @@ namespace hpx { namespace detail
     template <typename F, typename Result = typename util::deferred_call_result_of<F>::type>
     struct create_future
     {
-        typedef lcos::unique_future<Result> type;
+        typedef lcos::future<Result> type;
     };
 #else
     template <typename F, typename ResultOf = util::deferred_call_result_of<F> >
     struct create_future
     {
-        typedef lcos::unique_future<typename ResultOf::type> type;
+        typedef lcos::future<typename ResultOf::type> type;
     };
 #endif
 
@@ -147,7 +147,7 @@ namespace hpx
     // Launch the given bound action asynchronously and return a future
     // allowing to synchronize with the returned result.
     template <typename Action, typename BoundArgs>
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -266,7 +266,7 @@ namespace hpx
         typename Action, typename BoundArgs
       BOOST_PP_COMMA_IF(N) BOOST_PP_ENUM_PARAMS(N, typename A)
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type

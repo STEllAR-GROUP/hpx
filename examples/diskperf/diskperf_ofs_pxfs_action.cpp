@@ -172,7 +172,7 @@ RESULT write_files_test(ofs_test_info_type ofs_test_info, int proc)
    boost::shared_array<int> fd_array(new int[wfiles]);
    boost::shared_array<char> buf(new char[bufsiz]);
    boost::shared_array<ssize_t> num_written_array(new ssize_t[count * wfiles]);
-   std::vector<hpx::lcos::unique_future<int> > futures;
+   std::vector<hpx::lcos::future<int> > futures;
 
    boost::shared_array<int_promise_type> int_promise_array(new int_promise_type[count * wfiles]);
    boost::shared_array<promise_rt_ptr_type> promise_rt_ptr_array(new promise_rt_ptr_type[count * wfiles]);
@@ -292,7 +292,7 @@ RESULT read_files_test(ofs_test_info_type ofs_test_info, int proc)
    boost::shared_array<int> fd_array(new int[rfiles]);
    boost::shared_array<char> buf_array(new char[bufsiz * count]);
    boost::shared_array<ssize_t> num_read_array(new ssize_t[count * rfiles]);
-   std::vector<hpx::lcos::unique_future<int> > futures;
+   std::vector<hpx::lcos::future<int> > futures;
 
    boost::shared_array<int_promise_type> int_promise_array(new int_promise_type[count * rfiles]);
    boost::shared_array<promise_rt_ptr_type> promise_rt_ptr_array(new promise_rt_ptr_type[count * rfiles]);
@@ -448,7 +448,7 @@ int hpx_main(variables_map& vm)
         // Find the localities connected to this application.
         std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
-        std::vector<hpx::lcos::unique_future<RESULT> > futures;
+        std::vector<hpx::lcos::future<RESULT> > futures;
         futures.reserve(procs * localities.size());
 
         boost::shared_array<RESULT> r_ptr (new RESULT[procs * localities.size()]);

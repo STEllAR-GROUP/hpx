@@ -33,14 +33,14 @@ BOOST_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::unique_future<boost::uint64_t> fibonacci(boost::uint64_t n)
+hpx::future<boost::uint64_t> fibonacci(boost::uint64_t n)
 {
     if (n < 2) return hpx::make_ready_future(n);
     if (n < threshold) return hpx::make_ready_future(fibonacci_serial(n));
 
-    hpx::unique_future<boost::uint64_t> lhs_future =
+    hpx::future<boost::uint64_t> lhs_future =
         hpx::async(&fibonacci, n-1).unwrap();
-    hpx::unique_future<boost::uint64_t> rhs_future = fibonacci(n-2);
+    hpx::future<boost::uint64_t> rhs_future = fibonacci(n-2);
 
     return
         hpx::lcos::local::dataflow(

@@ -29,8 +29,8 @@ BOOST_NOINLINE boost::uint64_t fibonacci_serial(boost::uint64_t n)
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t add(
-    hpx::unique_future<boost::uint64_t> f1,
-    hpx::unique_future<boost::uint64_t> f2)
+    hpx::future<boost::uint64_t> f1,
+    hpx::future<boost::uint64_t> f2)
 {
     return f1.get() + f2.get();
 }
@@ -40,11 +40,11 @@ struct when_all_wrapper
 {
     typedef boost::uint64_t result_type;
     typedef HPX_STD_TUPLE<
-            hpx::unique_future<uint64_t>
-          , hpx::unique_future<uint64_t> > data_type;
+            hpx::future<uint64_t>
+          , hpx::future<uint64_t> > data_type;
 
     boost::uint64_t operator()(
-        hpx::unique_future<data_type> data
+        hpx::future<data_type> data
     ) const
     {
         data_type v = data.get();
@@ -53,7 +53,7 @@ struct when_all_wrapper
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::unique_future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n);
+hpx::future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n);
 
 struct fibonacci_future_one_continuation
 {
@@ -63,7 +63,7 @@ struct fibonacci_future_one_continuation
       : n_(n)
     {}
 
-    result_type operator()(hpx::unique_future<boost::uint64_t> res) const
+    result_type operator()(hpx::future<boost::uint64_t> res) const
     {
         return add(fibonacci_future_one(n_ - 2), boost::move(res));
     }
@@ -76,7 +76,7 @@ boost::uint64_t fib(boost::uint64_t n)
     return fibonacci_future_one(n).get();
 }
 
-hpx::unique_future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n)
+hpx::future<boost::uint64_t> fibonacci_future_one(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -104,7 +104,7 @@ boost::uint64_t fibonacci(boost::uint64_t n)
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
-    hpx::unique_future<boost::uint64_t> f =
+    hpx::future<boost::uint64_t> f =
         hpx::async(policy(n), &fibonacci, n-1);
     boost::uint64_t r = fibonacci(n-2);
 
@@ -114,7 +114,7 @@ boost::uint64_t fibonacci(boost::uint64_t n)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::unique_future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
+hpx::future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -124,14 +124,14 @@ hpx::unique_future<boost::uint64_t> fibonacci_future(boost::uint64_t n)
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
-    hpx::unique_future<hpx::unique_future<boost::uint64_t> > f =
+    hpx::future<hpx::future<boost::uint64_t> > f =
         hpx::async(&fibonacci_future, n-1);
-    hpx::unique_future<boost::uint64_t> r = fibonacci_future(n-2);
+    hpx::future<boost::uint64_t> r = fibonacci_future(n-2);
 
     return hpx::async(&add, f.get(), boost::move(r));
 }
 
-hpx::unique_future<boost::uint64_t> fibonacci_future_when_all(boost::uint64_t n)
+hpx::future<boost::uint64_t> fibonacci_future_when_all(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -141,14 +141,14 @@ hpx::unique_future<boost::uint64_t> fibonacci_future_when_all(boost::uint64_t n)
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
-    hpx::unique_future<hpx::unique_future<boost::uint64_t> > f =
+    hpx::future<hpx::future<boost::uint64_t> > f =
         hpx::async(&fibonacci_future, n-1);
-    hpx::unique_future<boost::uint64_t> r = fibonacci_future(n-2);
+    hpx::future<boost::uint64_t> r = fibonacci_future(n-2);
 
     return hpx::when_all(f.get(), r).then(when_all_wrapper());
 }
 
-hpx::unique_future<boost::uint64_t> fibonacci_future_unwrapped_when_all(boost::uint64_t n)
+hpx::future<boost::uint64_t> fibonacci_future_unwrapped_when_all(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -158,15 +158,15 @@ hpx::unique_future<boost::uint64_t> fibonacci_future_unwrapped_when_all(boost::u
 
     // asynchronously launch the creation of one of the sub-terms of the
     // execution graph
-    hpx::unique_future<boost::uint64_t> f =
+    hpx::future<boost::uint64_t> f =
         hpx::async(&fibonacci_future, n-1).unwrap();
-    hpx::unique_future<boost::uint64_t> r = fibonacci_future(n-2);
+    hpx::future<boost::uint64_t> r = fibonacci_future(n-2);
 
     return hpx::when_all(f, r).then(when_all_wrapper());
 }
 
 /////////////////////////////////////////////////////////////////////////////
-hpx::unique_future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
+hpx::future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -175,8 +175,8 @@ hpx::unique_future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
         return hpx::make_ready_future(fibonacci_serial(n));
 
     // asynchronously launch the calculation of both of the sub-terms
-    hpx::unique_future<boost::uint64_t> f1 = fibonacci_future_all(n - 1);
-    hpx::unique_future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
+    hpx::future<boost::uint64_t> f1 = fibonacci_future_all(n - 1);
+    hpx::future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
 
     // create a future representing the successful calculation of both sub-terms
     // attach a continuation to this future which is called asynchronously on
@@ -185,7 +185,7 @@ hpx::unique_future<boost::uint64_t> fibonacci_future_all(boost::uint64_t n)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-hpx::unique_future<boost::uint64_t> fibonacci_future_all_when_all(boost::uint64_t n)
+hpx::future<boost::uint64_t> fibonacci_future_all_when_all(boost::uint64_t n)
 {
     // if we know the answer, we return a future encapsulating the final value
     if (n < 2)
@@ -194,8 +194,8 @@ hpx::unique_future<boost::uint64_t> fibonacci_future_all_when_all(boost::uint64_
         return hpx::make_ready_future(fibonacci_serial(n));
 
     // asynchronously launch the calculation of both of the sub-terms
-    hpx::unique_future<boost::uint64_t> f1 = fibonacci_future_all(n - 1);
-    hpx::unique_future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
+    hpx::future<boost::uint64_t> f1 = fibonacci_future_all(n - 1);
+    hpx::future<boost::uint64_t> f2 = fibonacci_future_all(n - 2);
 
     // create a future representing the successful calculation of both sub-terms
     // attach a continuation to this future which is called asynchronously on

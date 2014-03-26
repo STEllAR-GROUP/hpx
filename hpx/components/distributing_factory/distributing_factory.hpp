@@ -33,7 +33,7 @@ namespace hpx { namespace components
         distributing_factory(naming::id_type gid)
           : base_type(gid)
         {}
-        distributing_factory(lcos::unique_future<naming::id_type> gid)
+        distributing_factory(lcos::future<naming::id_type> gid)
           : base_type(std::move(gid))
         {}
 
@@ -44,7 +44,7 @@ namespace hpx { namespace components
         typedef base_type::iterator_type iterator_type;
         typedef base_type::iterator_range_type iterator_range_type;
 
-        typedef lcos::unique_future<result_type> async_create_result_type;
+        typedef lcos::future<result_type> async_create_result_type;
 
         ///
         async_create_result_type create_components_async(

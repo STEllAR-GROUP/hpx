@@ -16,7 +16,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -31,7 +31,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 0
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -49,7 +49,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 1
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -64,7 +64,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 1
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -82,7 +82,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 2
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -97,7 +97,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 2
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -115,7 +115,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 3
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -130,7 +130,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 3
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -148,7 +148,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 4
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -163,7 +163,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 4
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -181,7 +181,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 5
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -196,7 +196,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 5
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -214,7 +214,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 6
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -229,7 +229,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 6
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -247,7 +247,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 7
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -262,7 +262,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 7
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -280,7 +280,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 8
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -295,7 +295,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 8
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -313,7 +313,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 9
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -328,7 +328,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 9
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -346,7 +346,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 10
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -361,7 +361,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 10
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -379,7 +379,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 11
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -394,7 +394,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 11
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -412,7 +412,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 12
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -427,7 +427,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 12
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -445,7 +445,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 13
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -460,7 +460,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 13
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -478,7 +478,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 14
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -493,7 +493,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 14
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -511,7 +511,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 15
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -526,7 +526,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 15
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -544,7 +544,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 16
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -559,7 +559,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 16
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -577,7 +577,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 17
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -592,7 +592,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 17
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -610,7 +610,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 18
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -625,7 +625,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 18
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -643,7 +643,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 19
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -658,7 +658,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 19
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type
@@ -676,7 +676,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 20
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -691,7 +691,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 20
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type

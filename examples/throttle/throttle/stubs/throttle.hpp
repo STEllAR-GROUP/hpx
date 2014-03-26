@@ -18,7 +18,7 @@ namespace throttle { namespace stubs
     struct throttle : hpx::components::stub_base<server::throttle>
     {
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::unique_future<void>
+        static hpx::lcos::future<void>
         suspend_async(hpx::naming::id_type const& gid, std::size_t thread_num)
         {
             // Create a future, execute the required action,
@@ -35,7 +35,7 @@ namespace throttle { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::unique_future<void>
+        static hpx::lcos::future<void>
         resume_async(hpx::naming::id_type const& gid, std::size_t thread_num)
         {
             // Create a future, execute the required action,

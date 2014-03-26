@@ -213,24 +213,24 @@ namespace hpx { namespace lcos { namespace local
         }
 
         // Result retrieval
-        lcos::unique_future<Result> get_future(error_code& ec = throws)
+        lcos::future<Result> get_future(error_code& ec = throws)
         {
             if (!task_) {
                 HPX_THROWS_IF(ec, task_moved,
                     "futures_factory<Result()>::get_future",
                     "futures_factory invalid (has it been moved?)");
-                return lcos::unique_future<Result>();
+                return lcos::future<Result>();
             }
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "futures_factory<Result()>::get_future",
                     "future already has been retrieved from this promise");
-                return lcos::unique_future<Result>();
+                return lcos::future<Result>();
             }
 
             using lcos::detail::future_access;
             future_obtained_ = true;
-            return future_access::create<unique_future<Result> >(task_);
+            return future_access::create<future<Result> >(task_);
         }
 
         bool valid() const BOOST_NOEXCEPT
@@ -329,13 +329,13 @@ namespace hpx { namespace lcos { namespace local
             }
 
             // Result retrieval
-            lcos::unique_future<Result> get_future(error_code& ec = throws)
+            lcos::future<Result> get_future(error_code& ec = throws)
             {
                 if (function_.empty()) {
                     HPX_THROWS_IF(ec, no_state,
                         "packaged_task_base<Signature>::get_future",
                         "this packaged_task has no valid shared state");
-                    return lcos::unique_future<Result>();
+                    return lcos::future<Result>();
                 }
                 return promise_.get_future();
             }
@@ -351,7 +351,7 @@ namespace hpx { namespace lcos { namespace local
                     HPX_THROWS_IF(ec, no_state,
                         "packaged_task_base<Signature>::get_future",
                         "this packaged_task has no valid shared state");
-                    return lcos::unique_future<Result>();
+                    return lcos::future<Result>();
                 }
                 promise_ = local::promise<Result>();
             }

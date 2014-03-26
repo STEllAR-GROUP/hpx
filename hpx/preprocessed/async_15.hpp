@@ -68,7 +68,7 @@ namespace hpx
     
     
     template <typename Action, typename BoundArgs>
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -155,7 +155,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -245,7 +245,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -335,7 +335,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -425,7 +425,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -515,7 +515,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -605,7 +605,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -695,7 +695,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -785,7 +785,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -875,7 +875,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -965,7 +965,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -1055,7 +1055,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -1145,7 +1145,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -1235,7 +1235,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -1325,7 +1325,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type
@@ -1415,7 +1415,7 @@ namespace hpx
         typename Action, typename BoundArgs
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12 , typename A13 , typename A14
     >
-    lcos::unique_future<
+    lcos::future<
         typename hpx::util::detail::bound_action<
             Action, BoundArgs
         >::result_type

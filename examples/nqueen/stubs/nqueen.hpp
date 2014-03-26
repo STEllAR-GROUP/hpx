@@ -27,7 +27,7 @@ namespace nqueen { namespace stubs
         }
         //--------------------------------------------------------------
 
-        static hpx::lcos::unique_future<list_type>
+        static hpx::lcos::future<list_type>
         access_board_async(hpx::naming::id_type const& gid)
         {
             typedef server::board::access_action action_type;
@@ -49,7 +49,7 @@ namespace nqueen { namespace stubs
 
         //------------------------------------------------------------
 
-        static hpx::lcos::unique_future<bool>
+        static hpx::lcos::future<bool>
         check_board_async(hpx::naming::id_type const& gid, list_type const& list,
             std::size_t level)
         {
@@ -71,7 +71,7 @@ namespace nqueen { namespace stubs
             return solve_board_async(gid, list, size, level, col).get();
         }
 
-        static hpx::lcos::unique_future<std::size_t> solve_board_async(
+        static hpx::lcos::future<std::size_t> solve_board_async(
             hpx::naming::id_type const& gid, list_type const& list,
             std::size_t size, std::size_t level, std::size_t col)
         {

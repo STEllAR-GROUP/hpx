@@ -38,7 +38,7 @@ namespace hpx { namespace lcos
     ///                  of the overall folding operation.
     ///
     template <typename Action, typename FoldOp, typename Init, typename ArgN, ...>
-    hpx::unique_future<decltype(Action(hpx::id_type, ArgN, ...))>
+    hpx::future<decltype(Action(hpx::id_type, ArgN, ...))>
     fold(
         std::vector<hpx::id_type> const & ids
       , FoldOp&& fold_op
@@ -77,7 +77,7 @@ namespace hpx { namespace lcos
     ///                  of the overall folding operation.
     ///
     template <typename Action, typename FoldOp, typename Init, typename ArgN, ...>
-    hpx::unique_future<decltype(Action(hpx::id_type, ArgN, ..., std::size_t))>
+    hpx::future<decltype(Action(hpx::id_type, ArgN, ..., std::size_t))>
     fold_with_index(
         std::vector<hpx::id_type> const & ids
       , FoldOp&& fold_op
@@ -113,7 +113,7 @@ namespace hpx { namespace lcos
     ///                  of the overall folding operation.
     ///
     template <typename Action, typename FoldOp, typename Init, typename ArgN, ...>
-    hpx::unique_future<decltype(Action(hpx::id_type, ArgN, ...))>
+    hpx::future<decltype(Action(hpx::id_type, ArgN, ...))>
     inverse_fold(
         std::vector<hpx::id_type> const & ids
       , FoldOp&& fold_op
@@ -153,7 +153,7 @@ namespace hpx { namespace lcos
     ///                  of the overall folding operation.
     ///
     template <typename Action, typename FoldOp, typename Init, typename ArgN, ...>
-    hpx::unique_future<decltype(Action(hpx::id_type, ArgN, ..., std::size_t))>
+    hpx::future<decltype(Action(hpx::id_type, ArgN, ..., std::size_t))>
     inverse_fold_with_index(
         std::vector<hpx::id_type> const & ids
       , FoldOp&& fold_op
@@ -240,9 +240,9 @@ namespace hpx { namespace lcos
             {}
 
             Result operator()(
-                hpx::unique_future<std::vector<hpx::unique_future<Result> > > r) const
+                hpx::future<std::vector<hpx::future<Result> > > r) const
             {
-                std::vector<hpx::unique_future<Result> > fres = std::move(r.get());
+                std::vector<hpx::future<Result> > fres = std::move(r.get());
                 HPX_ASSERT(!fres.empty());
 
                 // we're at the beginning of the folding chain, incroporate the initial
@@ -472,7 +472,7 @@ namespace hpx { namespace lcos
 
             if(ids.empty()) return result_type();
 
-            std::vector<hpx::unique_future<result_type> > fold_futures;
+            std::vector<hpx::future<result_type> > fold_futures;
             fold_futures.reserve(2);
 
             // first kick off the possibly remote operation
@@ -589,7 +589,7 @@ namespace hpx { namespace lcos
       , typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::fold_result<Action>::type
     >
     fold(
@@ -635,7 +635,7 @@ namespace hpx { namespace lcos
       , typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::fold_result<Derived>::type
     >
     fold(
@@ -661,7 +661,7 @@ namespace hpx { namespace lcos
       , typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::fold_result<Action>::type
     >
     fold_with_index(
@@ -687,7 +687,7 @@ namespace hpx { namespace lcos
       , typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::fold_result<Derived>::type
     >
     fold_with_index(
@@ -714,7 +714,7 @@ namespace hpx { namespace lcos
       , typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::fold_result<Action>::type
     >
     inverse_fold(
@@ -764,7 +764,7 @@ namespace hpx { namespace lcos
       , typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::fold_result<Derived>::type
     >
     inverse_fold(
@@ -790,7 +790,7 @@ namespace hpx { namespace lcos
       , typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::fold_result<Action>::type
     >
     inverse_fold_with_index(
@@ -816,7 +816,7 @@ namespace hpx { namespace lcos
       , typename Init
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::fold_result<Derived>::type
     >
     inverse_fold_with_index(

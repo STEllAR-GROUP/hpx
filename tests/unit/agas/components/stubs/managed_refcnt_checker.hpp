@@ -19,7 +19,7 @@ namespace hpx { namespace test { namespace stubs
 struct managed_refcnt_checker
   : components::stub_base<server::managed_refcnt_checker>
 {
-    static lcos::unique_future<void> take_reference_async(
+    static lcos::future<void> take_reference_async(
         naming::id_type const& this_
       , naming::id_type const& gid
         )

@@ -14,7 +14,7 @@
 namespace hpx { namespace agas { namespace stubs
 {
 template <typename Result>
-lcos::unique_future<Result> locality_namespace::service_async(
+lcos::future<Result> locality_namespace::service_async(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
@@ -27,25 +27,25 @@ lcos::unique_future<Result> locality_namespace::service_async(
     return p.get_future();
 }
 
-template lcos::unique_future<response> locality_namespace::service_async<response>(
+template lcos::future<response> locality_namespace::service_async<response>(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
     );
 
-template lcos::unique_future<std::vector<naming::locality> > locality_namespace::service_async<std::vector<naming::locality> >(
+template lcos::future<std::vector<naming::locality> > locality_namespace::service_async<std::vector<naming::locality> >(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
     );
 
-template lcos::unique_future<std::vector<boost::uint32_t> > locality_namespace::service_async<std::vector<boost::uint32_t> >(
+template lcos::future<std::vector<boost::uint32_t> > locality_namespace::service_async<std::vector<boost::uint32_t> >(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
     );
 
-template lcos::unique_future<boost::uint32_t> locality_namespace::service_async<boost::uint32_t>(
+template lcos::future<boost::uint32_t> locality_namespace::service_async<boost::uint32_t>(
     naming::id_type const& gid
   , request const& req
   , threads::thread_priority priority
@@ -61,7 +61,7 @@ void locality_namespace::service_non_blocking(
     hpx::apply_p<action_type>(gid, priority, req);
 }
 
-lcos::unique_future<std::vector<response> > locality_namespace::bulk_service_async(
+lcos::future<std::vector<response> > locality_namespace::bulk_service_async(
     naming::id_type const& gid
   , std::vector<request> const& reqs
   , threads::thread_priority priority

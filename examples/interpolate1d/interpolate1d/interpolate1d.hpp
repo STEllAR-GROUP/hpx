@@ -31,7 +31,7 @@ namespace interpolate1d
         // Return the interpolated  function value for the given argument. This
         // function dispatches to the proper partition for the actual
         // interpolation.
-        hpx::lcos::unique_future<double>
+        hpx::lcos::future<double>
         interpolate_async(double value)
         {
             return stubs::partition::interpolate_async(get_gid(value), value);

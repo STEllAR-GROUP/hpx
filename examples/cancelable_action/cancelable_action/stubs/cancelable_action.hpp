@@ -18,7 +18,7 @@ namespace examples { namespace stubs
       : hpx::components::stub_base<server::cancelable_action>
     {
         // Do some lengthy work
-        static hpx::lcos::unique_future<void>
+        static hpx::lcos::future<void>
         do_it_async(hpx::naming::id_type const& gid)
         {
             typedef server::cancelable_action::do_it_action action_type;

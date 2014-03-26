@@ -1090,7 +1090,7 @@ void primary_namespace::free_components_sync(
 { // {{{ kill_sync implementation
     using boost::fusion::at_c;
 
-    std::vector<lcos::unique_future<void> > futures;
+    std::vector<lcos::future<void> > futures;
 
     ///////////////////////////////////////////////////////////////////////////
     // Delete the objects on the free list.

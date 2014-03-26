@@ -969,7 +969,7 @@ namespace hpx
         return get_runtime().get_agas_client().get_num_localities(type, ec);
     }
 
-    lcos::unique_future<boost::uint32_t> get_num_localities()
+    lcos::future<boost::uint32_t> get_num_localities()
     {
         if (NULL == hpx::get_runtime_ptr())
             return lcos::make_ready_future<boost::uint32_t>(0);
@@ -977,7 +977,7 @@ namespace hpx
         return get_runtime().get_agas_client().get_num_localities_async();
     }
 
-    lcos::unique_future<boost::uint32_t> get_num_localities(
+    lcos::future<boost::uint32_t> get_num_localities(
         components::component_type type)
     {
         if (NULL == hpx::get_runtime_ptr())

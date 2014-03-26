@@ -22,7 +22,7 @@ namespace hpx { namespace lcos { namespace detail
         virtual ~dataflow_base_impl()
         {}
 
-        explicit dataflow_base_impl(lcos::unique_future<naming::id_type> promise)
+        explicit dataflow_base_impl(lcos::future<naming::id_type> promise)
             : gid_promise(std::move(promise))
             , count_(0)
         {}

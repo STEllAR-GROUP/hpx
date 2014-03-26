@@ -19,7 +19,7 @@ namespace interpolate1d { namespace stubs
       : hpx::components::stub_base<interpolate1d::server::partition>
     {
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::unique_future<void>
+        static hpx::lcos::future<void>
         init_async(hpx::naming::id_type const& gid, std::string datafilename,
             dimension const& dim, std::size_t num_nodes)
         {
@@ -39,7 +39,7 @@ namespace interpolate1d { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::unique_future<double>
+        static hpx::lcos::future<double>
         interpolate_async(hpx::naming::id_type const& gid, double value)
         {
             // Create a future, execute the required action,

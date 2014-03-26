@@ -57,7 +57,7 @@ void test_tss()
 
     int const NUMTHREADS = 5;
 
-    std::vector<hpx::unique_future<void> > threads;
+    std::vector<hpx::future<void> > threads;
     for (int i = 0; i < NUMTHREADS; ++i)
         threads.push_back(hpx::async(&test_tss_thread));
     hpx::wait_all(threads);

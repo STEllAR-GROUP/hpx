@@ -61,7 +61,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == N
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Action, F>::type
         >
     >::type
@@ -97,7 +97,7 @@ namespace hpx
       , typename F>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == N
-      , lcos::unique_future<
+      , lcos::future<
             typename util::result_of_async_continue<Derived, F>::type
         >
     >::type

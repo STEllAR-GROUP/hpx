@@ -22,7 +22,7 @@ namespace hpx { namespace lcos
         dataflow_base()
         {}
 
-        explicit dataflow_base(lcos::unique_future<naming::id_type> promise)
+        explicit dataflow_base(lcos::future<naming::id_type> promise)
             : impl(new detail::dataflow_base_impl(std::move(promise)))
         {}
 
@@ -31,7 +31,7 @@ namespace hpx { namespace lcos
             impl->connect(id);
         }
 
-        unique_future<void> get_future() const
+        future<void> get_future() const
         {
             promise<void> p;
             impl->connect(p.get_gid());

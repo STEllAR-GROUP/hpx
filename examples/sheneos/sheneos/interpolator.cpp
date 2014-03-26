@@ -204,7 +204,7 @@ namespace sheneos
         dimension dim_y(num_values_[dimension::temp]);
         dimension dim_z(num_values_[dimension::rho]);
 
-        std::vector<hpx::lcos::unique_future<void> > lazy_sync;
+        std::vector<hpx::lcos::future<void> > lazy_sync;
         for (std::size_t x = 0; x != num_partitions_per_dim_; ++x)
         {
             dim_x.offset_ = partition_size_x * x;
@@ -336,7 +336,7 @@ namespace sheneos
           : data_(data), overall_result_(overall_result), partitions_(parts)
         {}
 
-        void operator()(hpx::lcos::unique_future<std::vector<double> > f)
+        void operator()(hpx::lcos::future<std::vector<double> > f)
         {
             std::vector<double> result = f.get();
             std::vector<std::size_t> const& indicies = data_.get().indicies_;
@@ -377,7 +377,7 @@ namespace sheneos
             overall_result.resize(size);
 
             // asynchronously invoke the interpolation on the different partitions
-            std::vector<lcos::unique_future<void> > lazy_results;
+            std::vector<lcos::future<void> > lazy_results;
             lazy_results.reserve(partitions->size());
 
             typedef std::map<naming::id_type, context_data>::value_type value_type;
@@ -407,7 +407,7 @@ namespace sheneos
         boost::uint32_t eosvalue;
     };
 
-    hpx::lcos::unique_future<std::vector<double> >
+    hpx::lcos::future<std::vector<double> >
     interpolator::interpolate_one_bulk_async(
         std::vector<sheneos_coord> const& coords,
         boost::uint32_t eosvalue) const
@@ -452,7 +452,7 @@ namespace sheneos
           : data_(data), overall_results_(overall_results), partitions_(parts)
         {}
 
-        void operator()(hpx::lcos::unique_future<std::vector<std::vector<double> > > f)
+        void operator()(hpx::lcos::future<std::vector<std::vector<double> > > f)
         {
             std::vector<std::vector<double> > result = f.get();
             std::vector<std::size_t> const& indicies = data_.get().indicies_;
@@ -495,7 +495,7 @@ namespace sheneos
             overall_results.resize(size);
 
             // asynchronously invoke the interpolation on the different partitions
-            std::vector<lcos::unique_future<void> > lazy_results;
+            std::vector<lcos::future<void> > lazy_results;
             lazy_results.reserve(partitions->size());
 
             typedef std::map<naming::id_type, context_data>::value_type value_type;
@@ -525,7 +525,7 @@ namespace sheneos
         boost::uint32_t eosvalues;
     };
 
-    hpx::lcos::unique_future<std::vector<std::vector<double> > >
+    hpx::lcos::future<std::vector<std::vector<double> > >
     interpolator::interpolate_bulk_async(
         std::vector<sheneos_coord> const& coords, boost::uint32_t eosvalues) const
     {

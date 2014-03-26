@@ -667,7 +667,7 @@ void test_wait_for_either_of_two_futures_1()
 
     pt1();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > > r =
         hpx::when_any(f1, f2);
@@ -692,7 +692,7 @@ void test_wait_for_either_of_two_futures_2()
 
     pt2();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > > r =
         hpx::when_any(f1, f2);
@@ -718,7 +718,7 @@ void test_wait_for_either_of_two_futures_list_1()
 
     pt1();
 
-    hpx::lcos::unique_future<std::vector<hpx::lcos::shared_future<int> > > r =
+    hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
         hpx::when_any(futures);
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
@@ -740,7 +740,7 @@ void test_wait_for_either_of_two_futures_list_2()
 
     pt2();
 
-    hpx::lcos::unique_future<std::vector<hpx::lcos::shared_future<int> > > r =
+    hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
         hpx::when_any(futures);
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
@@ -762,7 +762,7 @@ void test_wait_swapped_for_either_of_two_futures_list_1()
 
     pt1();
 
-    hpx::lcos::unique_future<std::vector<hpx::lcos::shared_future<int> > > r =
+    hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
         hpx::when_any_swapped(futures);
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
@@ -784,7 +784,7 @@ void test_wait_swapped_for_either_of_two_futures_list_2()
 
     pt2();
 
-    hpx::lcos::unique_future<std::vector<hpx::lcos::shared_future<int> > > r =
+    hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
         hpx::when_any_swapped(futures);
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
@@ -807,7 +807,7 @@ void test_wait_for_either_of_three_futures_1()
 
     pt1();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > > r =
@@ -837,7 +837,7 @@ void test_wait_for_either_of_three_futures_2()
 
     pt2();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > > r =
@@ -867,7 +867,7 @@ void test_wait_for_either_of_three_futures_3()
 
     pt3();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > > r =
@@ -899,7 +899,7 @@ void test_wait_for_either_of_four_futures_1()
 
     pt1();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
@@ -934,7 +934,7 @@ void test_wait_for_either_of_four_futures_2()
 
     pt2();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
@@ -969,7 +969,7 @@ void test_wait_for_either_of_four_futures_3()
 
     pt3();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
@@ -1004,7 +1004,7 @@ void test_wait_for_either_of_four_futures_4()
 
     pt4();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
@@ -1048,7 +1048,7 @@ void test_wait_for_either_of_five_futures_1_from_list()
 
     pt1();
 
-    hpx::lcos::unique_future<std::vector<hpx::lcos::shared_future<int> > > r =
+    hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
         hpx::when_any(futures);
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
@@ -1085,7 +1085,7 @@ void test_wait_for_either_of_five_futures_1_from_list_iterators()
 
     pt1();
 
-    hpx::lcos::unique_future<std::vector<hpx::lcos::shared_future<int> > > r =
+    hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
         hpx::when_any(futures.begin(), futures.end());
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
@@ -1122,7 +1122,7 @@ void test_wait_swapped_for_either_of_five_futures_1_from_list()
 
     pt1();
 
-    hpx::lcos::unique_future<std::vector<hpx::lcos::shared_future<int> > > r =
+    hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
         hpx::when_any_swapped(futures);
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
@@ -1159,7 +1159,7 @@ void test_wait_swapped_for_either_of_five_futures_1_from_list_iterators()
 
     pt1();
 
-    hpx::lcos::unique_future<std::vector<hpx::lcos::shared_future<int> > > r =
+    hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
         hpx::when_any_swapped(futures.begin(), futures.end());
     std::vector<hpx::lcos::shared_future<int> > t = r.get();
 
@@ -1189,7 +1189,7 @@ void test_wait_for_either_of_five_futures_1()
 
     pt1();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
@@ -1229,7 +1229,7 @@ void test_wait_for_either_of_five_futures_2()
 
     pt2();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
@@ -1269,7 +1269,7 @@ void test_wait_for_either_of_five_futures_3()
 
     pt3();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
@@ -1309,7 +1309,7 @@ void test_wait_for_either_of_five_futures_4()
 
     pt4();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
@@ -1349,7 +1349,7 @@ void test_wait_for_either_of_five_futures_5()
 
     pt5();
 
-    hpx::lcos::unique_future<HPX_STD_TUPLE<
+    hpx::lcos::future<HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
@@ -1436,7 +1436,7 @@ void test_wait_for_all_from_list()
         task.apply();
     }
 
-    hpx::lcos::unique_future<std::vector<hpx::lcos::shared_future<int> > > r =
+    hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
         hpx::when_all(futures);
 
     std::vector<hpx::lcos::shared_future<int> > result = r.get();
@@ -1460,7 +1460,7 @@ void test_wait_for_all_from_list_iterators()
         task.apply();
     }
 
-    hpx::lcos::unique_future<std::vector<hpx::lcos::shared_future<int> > > r =
+    hpx::lcos::future<std::vector<hpx::lcos::shared_future<int> > > r =
         hpx::when_all(futures.begin(), futures.end());
 
     std::vector<hpx::lcos::shared_future<int> > result = r.get();
@@ -1485,7 +1485,7 @@ void test_wait_for_all_two_futures()
     typedef HPX_STD_TUPLE<
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > result_type;
-    hpx::lcos::unique_future<result_type> r =
+    hpx::lcos::future<result_type> r =
         hpx::when_all(f1, f2);
 
     result_type result = r.get();
@@ -1512,7 +1512,7 @@ void test_wait_for_all_three_futures()
         hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > result_type;
-    hpx::lcos::unique_future<result_type> r =
+    hpx::lcos::future<result_type> r =
         hpx::when_all(f1, f2, f3);
 
     result_type result = r.get();
@@ -1545,7 +1545,7 @@ void test_wait_for_all_four_futures()
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > result_type;
-    hpx::lcos::unique_future<result_type> r =
+    hpx::lcos::future<result_type> r =
         hpx::when_all(f1, f2, f3, f4);
 
     result_type result = r.get();
@@ -1584,7 +1584,7 @@ void test_wait_for_all_five_futures()
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > result_type;
-    hpx::lcos::unique_future<result_type> r =
+    hpx::lcos::future<result_type> r =
         hpx::when_all(f1, f2, f3, f4, f5);
 
     result_type result = r.get();
@@ -1624,7 +1624,7 @@ void test_wait_for_two_out_of_five_futures()
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > result_type;
-    hpx::lcos::unique_future<result_type> r = hpx::when_n(count, f1, f2, f3, f4, f5);
+    hpx::lcos::future<result_type> r = hpx::when_n(count, f1, f2, f3, f4, f5);
 
     result_type result = r.get();
 
@@ -1664,7 +1664,7 @@ void test_wait_for_three_out_of_five_futures()
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int>
       , hpx::lcos::shared_future<int> > result_type;
-    hpx::lcos::unique_future<result_type> r = hpx::when_n(count, f1, f2, f3, f4, f5);
+    hpx::lcos::future<result_type> r = hpx::when_n(count, f1, f2, f3, f4, f5);
 
     result_type result = r.get();
 

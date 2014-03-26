@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace stubs
     ///         be created in blocks (i.e. more than one instance at once).
     ///         This function is used by the \a distributing_factory to
     ///         determine a correct allocation strategy
-    lcos::unique_future<int> runtime_support::get_factory_properties_async(
+    lcos::future<int> runtime_support::get_factory_properties_async(
         naming::id_type const& targetgid, components::component_type type)
     {
         // Create a future, execute the required action,
@@ -47,7 +47,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////
-    lcos::unique_future<std::vector<naming::id_type> >
+    lcos::future<std::vector<naming::id_type> >
     runtime_support::bulk_create_components_async(
         naming::id_type const& gid, components::component_type type,
         std::size_t count)
@@ -83,7 +83,7 @@ namespace hpx { namespace components { namespace stubs
     /// to call \a future#get on the result of this function
     /// to obtain the global id of the newly created object.
     template <typename T, typename Config>
-    lcos::unique_future<naming::id_type>
+    lcos::future<naming::id_type>
     runtime_support::create_memory_block_async(
         naming::id_type const& id, std::size_t count,
         hpx::actions::manage_object_action<T, Config> const& act)
@@ -105,12 +105,12 @@ namespace hpx { namespace components { namespace stubs
         return hpx::async<action_type>(id, count, act);
     }
 
-    template lcos::unique_future<naming::id_type>
+    template lcos::future<naming::id_type>
     HPX_EXPORT runtime_support::create_memory_block_async<boost::uint8_t, void>(
         naming::id_type const& id, std::size_t count,
         hpx::actions::manage_object_action<boost::uint8_t, void> const& act);
 
-    lcos::unique_future<bool>
+    lcos::future<bool>
     runtime_support::load_components_async(naming::id_type const& gid)
     {
         typedef server::runtime_support::load_components_action action_type;
@@ -122,7 +122,7 @@ namespace hpx { namespace components { namespace stubs
         return load_components_async(gid).get();
     }
 
-    lcos::unique_future<void>
+    lcos::future<void>
     runtime_support::call_startup_functions_async(naming::id_type const& gid,
         bool pre_startup)
     {
@@ -136,7 +136,7 @@ namespace hpx { namespace components { namespace stubs
         call_startup_functions_async(gid, pre_startup).get();
     }
 
-    lcos::unique_future<void>
+    lcos::future<void>
     runtime_support::call_shutdown_functions_async(naming::id_type const& gid,
         bool pre_shutdown)
     {
@@ -186,7 +186,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     /// \brief Shutdown the given runtime system
-    lcos::unique_future<void>
+    lcos::future<void>
     runtime_support::shutdown_async(naming::id_type const& targetgid,
         double timeout)
     {
@@ -227,7 +227,7 @@ namespace hpx { namespace components { namespace stubs
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve configuration information
     /// \brief Terminate the given runtime system
-    lcos::unique_future<void>
+    lcos::future<void>
     runtime_support::terminate_async(naming::id_type const& targetgid)
     {
         // Create a future directly and execute the required action.
@@ -292,7 +292,7 @@ namespace hpx { namespace components { namespace stubs
         hpx::apply<action_type>(targetgid);
     }
 
-    lcos::unique_future<void> runtime_support::garbage_collect_async(
+    lcos::future<void> runtime_support::garbage_collect_async(
         naming::id_type const& targetgid)
     {
         typedef server::runtime_support::garbage_collect_action
@@ -308,7 +308,7 @@ namespace hpx { namespace components { namespace stubs
     }
 
     ///////////////////////////////////////////////////////////////////////
-    lcos::unique_future<naming::id_type>
+    lcos::future<naming::id_type>
     runtime_support::create_performance_counter_async(naming::id_type targetgid,
         performance_counters::counter_info const& info)
     {
@@ -336,7 +336,7 @@ namespace hpx { namespace components { namespace stubs
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve configuration information
-    lcos::unique_future<util::section> runtime_support::get_config_async(
+    lcos::future<util::section> runtime_support::get_config_async(
         naming::id_type const& targetgid)
     {
         // Create a future, execute the required action,
@@ -356,7 +356,7 @@ namespace hpx { namespace components { namespace stubs
 
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve instance count for given component type
-    lcos::unique_future<boost::int32_t> runtime_support::get_instance_count_async(
+    lcos::future<boost::int32_t> runtime_support::get_instance_count_async(
         naming::id_type const& targetgid, components::component_type type)
     {
         // Create a future, execute the required action,

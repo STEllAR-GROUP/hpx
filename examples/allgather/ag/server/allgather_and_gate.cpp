@@ -52,7 +52,7 @@ namespace ag { namespace server
     {
         // synchronize with all operations to finish
         std::size_t generation = 0;
-        hpx::unique_future<void> f = gate_.get_future(components_.size(), &generation);
+        hpx::future<void> f = gate_.get_future(components_.size(), &generation);
 
         // Send our value to all participants of this allgather operation. We
         // assume components_, rank_ and value to be constant, thus no locking

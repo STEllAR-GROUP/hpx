@@ -37,7 +37,7 @@ namespace hpx { namespace util
     public:
         void reset_counters(error_code& ec = throws);
 
-        typedef std::vector<unique_future<performance_counters::counter_value> >
+        typedef std::vector<future<performance_counters::counter_value> >
             async_counter_values_type;
 
         typedef std::vector<performance_counters::counter_value>

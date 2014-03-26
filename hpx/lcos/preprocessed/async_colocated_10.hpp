@@ -16,7 +16,7 @@ namespace hpx
        >
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 0
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -47,7 +47,7 @@ namespace hpx
        >
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 0
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
@@ -70,7 +70,7 @@ namespace hpx
       , typename Arg0>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 1
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -101,7 +101,7 @@ namespace hpx
       , typename Arg0>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 1
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
@@ -124,7 +124,7 @@ namespace hpx
       , typename Arg0 , typename Arg1>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 2
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -155,7 +155,7 @@ namespace hpx
       , typename Arg0 , typename Arg1>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 2
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
@@ -178,7 +178,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 3
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -209,7 +209,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 3
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
@@ -232,7 +232,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 4
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -263,7 +263,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 4
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
@@ -286,7 +286,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 5
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -317,7 +317,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 5
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
@@ -340,7 +340,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 6
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -371,7 +371,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 6
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
@@ -394,7 +394,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 7
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -425,7 +425,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 7
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
@@ -448,7 +448,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 8
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -479,7 +479,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 8
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
@@ -502,7 +502,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 9
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -533,7 +533,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 9
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>
@@ -556,7 +556,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     typename boost::enable_if_c<
         util::tuple_size<typename Action::arguments_type>::value == 10
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Action>::remote_result_type
             >::type>
@@ -587,7 +587,7 @@ namespace hpx
       , typename Arg0 , typename Arg1 , typename Arg2 , typename Arg3 , typename Arg4 , typename Arg5 , typename Arg6 , typename Arg7 , typename Arg8 , typename Arg9>
     typename boost::enable_if_c<
         util::tuple_size<Arguments>::value == 10
-      , lcos::unique_future<
+      , lcos::future<
             typename traits::promise_local_result<
                 typename hpx::actions::extract_action<Derived>::remote_result_type
             >::type>

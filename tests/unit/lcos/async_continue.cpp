@@ -33,7 +33,7 @@ int hpx_main()
 
     // test locally, fully equivalent to plain hpx::async
     {
-        hpx::unique_future<int> f = hpx::async_continue(
+        hpx::future<int> f = hpx::async_continue(
             inc, hpx::find_here(), 42, make_continuation());
         HPX_TEST_EQ(f.get(), 43);
     }
@@ -42,14 +42,14 @@ int hpx_main()
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
     if (!localities.empty())
     {
-        hpx::unique_future<int> f = hpx::async_continue(
+        hpx::future<int> f = hpx::async_continue(
             inc, localities[0], 42, make_continuation());
         HPX_TEST_EQ(f.get(), 43);
     }
 
     // test chaining locally
     {
-        hpx::unique_future<int> f = hpx::async_continue(
+        hpx::future<int> f = hpx::async_continue(
             inc, hpx::find_here(), 42, make_continuation(mult));
         HPX_TEST_EQ(f.get(), 86);
 
@@ -69,7 +69,7 @@ int hpx_main()
     // test chaining remotely, if possible
     if (!localities.empty())
     {
-        hpx::unique_future<int> f = hpx::async_continue(inc, localities[0], 42,
+        hpx::future<int> f = hpx::async_continue(inc, localities[0], 42,
             make_continuation(mult, localities[0]));
         HPX_TEST_EQ(f.get(), 86);
 

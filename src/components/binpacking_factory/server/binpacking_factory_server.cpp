@@ -44,7 +44,7 @@ namespace hpx { namespace components { namespace server
         }
 
         naming::gid_type locality_;
-        lcos::unique_future<std::vector<naming::gid_type> > gids_;
+        lcos::future<std::vector<naming::gid_type> > gids_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ namespace hpx { namespace components { namespace server
             count = localities.size();
 
         // retrieve the current number of instances of the given component
-        std::vector<lcos::unique_future<boost::int32_t> > lazy_counts;
+        std::vector<lcos::future<boost::int32_t> > lazy_counts;
         BOOST_FOREACH(naming::id_type const& id, localities)
         {
             lazy_counts.push_back(
@@ -86,7 +86,7 @@ namespace hpx { namespace components { namespace server
 
         std::vector<long> counts;
         counts.reserve(lazy_counts.size());
-        BOOST_FOREACH(lcos::unique_future<boost::int32_t> & f, lazy_counts)
+        BOOST_FOREACH(lcos::future<boost::int32_t> & f, lazy_counts)
         {
             counts.push_back(f.get());
             maxcount = (std::max)(maxcount, counts.back());
@@ -192,7 +192,7 @@ namespace hpx { namespace components { namespace server
         performance_counters::get_counter_type_path_elements(countername, p);
 
         // FIXME: make loop asynchronous
-        typedef lcos::unique_future<naming::id_type> future_type;
+        typedef lcos::future<naming::id_type> future_type;
 
         std::vector<future_type> lazy_counts;
         BOOST_FOREACH(naming::id_type const& id, localities)

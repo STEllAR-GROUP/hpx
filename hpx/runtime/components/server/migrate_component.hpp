@@ -23,7 +23,7 @@ namespace hpx { namespace components { namespace server
         // clean up (source) memory of migrated object
         template <typename Component>
         naming::id_type migrate_component_cleanup(
-            unique_future<naming::id_type> f,
+            future<naming::id_type> f,
             boost::shared_ptr<Component> ptr,
             naming::id_type const& to_migrate)
         {
@@ -33,8 +33,8 @@ namespace hpx { namespace components { namespace server
 
         // trigger the actual migration
         template <typename Component>
-        unique_future<naming::id_type> migrate_component_postproc(
-            unique_future<boost::shared_ptr<Component> > f,
+        future<naming::id_type> migrate_component_postproc(
+            future<boost::shared_ptr<Component> > f,
             naming::id_type const& to_migrate,
             naming::id_type const& target_locality)
         {
@@ -70,7 +70,7 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    unique_future<naming::id_type> migrate_component(
+    future<naming::id_type> migrate_component(
         naming::id_type const& to_migrate,
         naming::id_type const& target_locality)
     {
@@ -96,7 +96,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component>
     struct migrate_component_action
       : ::hpx::actions::plain_result_action2<
-            unique_future<naming::id_type>,
+            future<naming::id_type>,
             naming::id_type const&, naming::id_type const&
           , &migrate_component<Component>
           , migrate_component_action<Component> >

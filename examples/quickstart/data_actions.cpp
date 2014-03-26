@@ -220,12 +220,12 @@ int main(int argc, char* argv[])
     data = 0;
 
     set_action set;
-    hpx::unique_future<void> f1 = hpx::async(set, hpx::find_here(), 42);
+    hpx::future<void> f1 = hpx::async(set, hpx::find_here(), 42);
 
     f1.get();
 
     get_action get;
-    hpx::unique_future<int> f2 = hpx::async(get, hpx::find_here());
+    hpx::future<int> f2 = hpx::async(get, hpx::find_here());
 
     std::cout << f2.get() << std::endl;
 

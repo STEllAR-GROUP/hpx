@@ -20,7 +20,7 @@ namespace sheneos { namespace stubs
       : hpx::components::stub_base<sheneos::server::configuration>
     {
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::unique_future<void>
+        static hpx::lcos::future<void>
         init_async(hpx::naming::id_type const& gid, std::string const& datafile,
             std::string const& symbolic_name, std::size_t num_instances)
         {
@@ -39,7 +39,7 @@ namespace sheneos { namespace stubs
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::unique_future<config_data>
+        static hpx::lcos::future<config_data>
         get_async(hpx::naming::id_type const& gid)
         {
             // The following get yields control while the action above

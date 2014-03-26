@@ -97,7 +97,7 @@ namespace examples
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
         //[managed_accumulator_client_query_async
-        hpx::lcos::unique_future<argument_type> query_async()
+        hpx::lcos::future<argument_type> query_async()
         {
             HPX_ASSERT(this->get_gid());
             return this->base_type::query_async(this->get_gid());

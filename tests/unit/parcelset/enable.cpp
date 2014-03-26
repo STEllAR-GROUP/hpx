@@ -42,7 +42,7 @@ void test_non_disabled(std::vector<hpx::id_type> const & localities)
     std::size_t sent = send_count();
     std::size_t received = receive_count();
     
-    std::vector<hpx::unique_future<void> > futures;
+    std::vector<hpx::future<void> > futures;
     futures.reserve(localities.size());
     BOOST_FOREACH(hpx::id_type id, localities)
     {
@@ -65,7 +65,7 @@ void test_disable_enable(std::vector<hpx::id_type> const & localities)
         std::size_t sent = send_count();
         std::size_t received = receive_count();
         
-        std::vector<hpx::unique_future<void> > futures;
+        std::vector<hpx::future<void> > futures;
         futures.reserve(localities.size());
         BOOST_FOREACH(hpx::id_type id, localities)
         {
@@ -78,7 +78,7 @@ void test_disable_enable(std::vector<hpx::id_type> const & localities)
         HPX_TEST_EQ(received, receive_count());
 
         hpx::this_thread::yield();
-        BOOST_FOREACH(hpx::unique_future<void> const & f, futures)
+        BOOST_FOREACH(hpx::future<void> const & f, futures)
         {
             HPX_TEST(!f.is_ready());
         }
@@ -97,7 +97,7 @@ void test_disable(std::vector<hpx::id_type> const & localities)
     hpx::id_type here = hpx::find_here();
     std::size_t sent = 0;
     std::size_t received = 0;
-    std::vector<hpx::unique_future<void> > futures;
+    std::vector<hpx::future<void> > futures;
     futures.reserve(localities.size());
     {
         hpx::parcelset::disable d;
@@ -116,7 +116,7 @@ void test_disable(std::vector<hpx::id_type> const & localities)
         HPX_TEST_EQ(received, receive_count());
 
         hpx::this_thread::yield();
-        BOOST_FOREACH(hpx::unique_future<void> const & f, futures)
+        BOOST_FOREACH(hpx::future<void> const & f, futures)
         {
             HPX_TEST(!f.is_ready());
         }
@@ -148,7 +148,7 @@ int main()
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
     test(localities);
-    std::vector<hpx::unique_future<void> > futures;
+    std::vector<hpx::future<void> > futures;
     futures.reserve(localities.size());
     BOOST_FOREACH(hpx::id_type id, localities)
     {

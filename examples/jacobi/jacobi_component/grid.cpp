@@ -32,7 +32,7 @@ namespace jacobi
             factory.create_components(type, ny);
 
         rows.reserve(ny);
-        std::vector<hpx::lcos::unique_future<void> > init_futures;
+        std::vector<hpx::lcos::future<void> > init_futures;
         init_futures.reserve(ny);
         BOOST_FOREACH(hpx::naming::id_type id, hpx::util::locality_results(rows_allocated))
         {

@@ -9,7 +9,7 @@
 namespace hpx { namespace components { namespace stubs
 {
 
-lcos::unique_future<components::memory_block_data> memory_block::get_async(
+lcos::future<components::memory_block_data> memory_block::get_async(
     naming::id_type const& targetgid)
 {
     // Create a future, execute the required action,
@@ -19,7 +19,7 @@ lcos::unique_future<components::memory_block_data> memory_block::get_async(
     return hpx::async<action_type>(targetgid);
 }
 
-lcos::unique_future<components::memory_block_data> memory_block::get_async(
+lcos::future<components::memory_block_data> memory_block::get_async(
     naming::id_type const& targetgid,
     components::memory_block_data const& cfg)
 {
@@ -30,7 +30,7 @@ lcos::unique_future<components::memory_block_data> memory_block::get_async(
     return hpx::async<action_type>(targetgid, cfg);
 }
 
-lcos::unique_future<components::memory_block_data> memory_block::checkout_async(
+lcos::future<components::memory_block_data> memory_block::checkout_async(
     naming::id_type const& targetgid)
 {
     // Create a future, execute the required action,
@@ -40,7 +40,7 @@ lcos::unique_future<components::memory_block_data> memory_block::checkout_async(
     return hpx::async<action_type>(targetgid);
 }
 
-lcos::unique_future<naming::id_type>
+lcos::future<naming::id_type>
 memory_block::clone_async(naming::id_type const& targetgid)
 {
     // Create a future, execute the required action,

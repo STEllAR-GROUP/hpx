@@ -9,7 +9,7 @@
 
 
         template <typename A0>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0
           , boost::mpl::false_
@@ -30,7 +30,7 @@
                 );
         }
         template <typename A0>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0
           , boost::mpl::true_
@@ -65,7 +65,7 @@
         {
         }
         template <typename A0 , typename A1>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1
           , boost::mpl::false_
@@ -86,7 +86,7 @@
                 );
         }
         template <typename A0 , typename A1>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1
           , boost::mpl::true_
@@ -121,7 +121,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2
           , boost::mpl::false_
@@ -142,7 +142,7 @@
                 );
         }
         template <typename A0 , typename A1 , typename A2>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2
           , boost::mpl::true_
@@ -177,7 +177,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3
           , boost::mpl::false_
@@ -198,7 +198,7 @@
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3
           , boost::mpl::true_
@@ -233,7 +233,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4
           , boost::mpl::false_
@@ -254,7 +254,7 @@
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4
           , boost::mpl::true_
@@ -289,7 +289,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5
           , boost::mpl::false_
@@ -310,7 +310,7 @@
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5
           , boost::mpl::true_
@@ -345,7 +345,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6
           , boost::mpl::false_
@@ -366,7 +366,7 @@
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6
           , boost::mpl::true_
@@ -401,7 +401,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7
           , boost::mpl::false_
@@ -422,7 +422,7 @@
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7
           , boost::mpl::true_
@@ -457,7 +457,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8
           , boost::mpl::false_
@@ -478,7 +478,7 @@
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8
           , boost::mpl::true_
@@ -513,7 +513,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9
           , boost::mpl::false_
@@ -534,7 +534,7 @@
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9
           , boost::mpl::true_
@@ -569,7 +569,7 @@
         {
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10
           , boost::mpl::false_
@@ -590,7 +590,7 @@
                 );
         }
         template <typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10
           , boost::mpl::true_

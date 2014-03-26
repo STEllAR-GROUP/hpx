@@ -70,7 +70,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -180,7 +180,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -213,7 +213,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -235,7 +235,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -257,7 +257,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
@@ -337,7 +337,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -447,7 +447,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -480,7 +480,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -502,7 +502,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -524,7 +524,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
@@ -604,7 +604,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -714,7 +714,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -747,7 +747,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -769,7 +769,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -791,7 +791,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
@@ -871,7 +871,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -981,7 +981,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -1014,7 +1014,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -1036,7 +1036,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -1058,7 +1058,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
@@ -1138,7 +1138,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -1248,7 +1248,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -1281,7 +1281,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -1303,7 +1303,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -1325,7 +1325,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
@@ -1405,7 +1405,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -1515,7 +1515,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -1548,7 +1548,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -1570,7 +1570,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -1592,7 +1592,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
@@ -1672,7 +1672,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -1782,7 +1782,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -1815,7 +1815,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -1837,7 +1837,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -1859,7 +1859,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
@@ -1939,7 +1939,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -2049,7 +2049,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -2082,7 +2082,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -2104,7 +2104,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -2126,7 +2126,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
@@ -2206,7 +2206,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -2316,7 +2316,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -2349,7 +2349,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -2371,7 +2371,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -2393,7 +2393,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
@@ -2473,7 +2473,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -2583,7 +2583,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -2616,7 +2616,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -2638,7 +2638,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -2660,7 +2660,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(
@@ -2740,7 +2740,7 @@ namespace hpx { namespace lcos
                 typename reduce_result<Action>::type
                 result_type;
             if(ids.empty()) return result_type();
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
             id_type id_first = ids[0];
             if(ids.size() > 1)
@@ -2850,7 +2850,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -2883,7 +2883,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -2905,7 +2905,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -2927,7 +2927,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       , typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(

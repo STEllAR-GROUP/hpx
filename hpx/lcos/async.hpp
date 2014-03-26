@@ -36,7 +36,7 @@ namespace hpx
         template <typename Action, typename Result>
         struct sync_local_invoke_0
         {
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const& /*addr*/)
             {
                 lcos::packaged_action<Action, Result> p;
@@ -46,9 +46,9 @@ namespace hpx
         };
 
         template <typename Action, typename R>
-        struct sync_local_invoke_0<Action, lcos::unique_future<R> >
+        struct sync_local_invoke_0<Action, lcos::future<R> >
         {
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 naming::id_type const& /*gid*/, naming::address const& addr)
             {
                 HPX_ASSERT(traits::component_type_is_compatible<
@@ -61,7 +61,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -92,7 +92,7 @@ namespace hpx
     }
 
     template <typename Action>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -104,7 +104,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result,
         typename Arguments, typename Derived>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -118,7 +118,7 @@ namespace hpx
 
     template <typename Component, typename Result,
         typename Arguments, typename Derived>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -169,7 +169,7 @@ namespace hpx
         struct BOOST_PP_CAT(sync_local_invoke_, N)
         {
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-            BOOST_FORCEINLINE static lcos::unique_future<Result> call(
+            BOOST_FORCEINLINE static lcos::future<Result> call(
                 naming::id_type const& gid, naming::address const&,
                 HPX_ENUM_FWD_ARGS(N, Arg, arg))
             {
@@ -180,10 +180,10 @@ namespace hpx
         };
 
         template <typename Action, typename R>
-        struct BOOST_PP_CAT(sync_local_invoke_, N)<Action, lcos::unique_future<R> >
+        struct BOOST_PP_CAT(sync_local_invoke_, N)<Action, lcos::future<R> >
         {
             template <BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-            BOOST_FORCEINLINE static lcos::unique_future<R> call(
+            BOOST_FORCEINLINE static lcos::future<R> call(
                 boost::mpl::true_, naming::id_type const&,
                 naming::address const& addr, HPX_ENUM_FWD_ARGS(N, Arg, arg))
             {
@@ -197,7 +197,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -229,7 +229,7 @@ namespace hpx
     }
 
     template <typename Action, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Action>::remote_result_type
         >::type>
@@ -242,7 +242,7 @@ namespace hpx
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Result,
         typename Arguments, typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>
@@ -257,7 +257,7 @@ namespace hpx
 
     template <typename Component, typename Result,
         typename Arguments, typename Derived, BOOST_PP_ENUM_PARAMS(N, typename Arg)>
-    lcos::unique_future<
+    lcos::future<
         typename traits::promise_local_result<
             typename hpx::actions::extract_action<Derived>::remote_result_type
         >::type>

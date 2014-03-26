@@ -20,7 +20,7 @@ int func1()
 }
 
 // this continuation function will be executed by an HPX thread
-int cont1(hpx::unique_future<int> f)
+int cont1(hpx::future<int> f)
 {
     hpx::cout << "cont1 thread id: " << hpx::this_thread::get_id() << hpx::endl;
     hpx::cout << "Status code (HPX thread): " << f.get() << hpx::endl;
@@ -30,7 +30,7 @@ int cont1(hpx::unique_future<int> f)
 
 // this continuation function will be executed by the UI (main) thread, which is 
 // not an HPX thread
-int cont2(hpx::unique_future<int> f)
+int cont2(hpx::future<int> f)
 {
     std::cout << "Status code (main thread): " << f.get() << std::endl;
     return 1;
@@ -40,23 +40,23 @@ int main(int argc, char* argv[])
 {
     // executing continuation cont1 on same thread as func1
     {
-        hpx::unique_future<int> t = hpx::async(&func1);
-        hpx::unique_future<int> t2 = t.then(&cont1);
+        hpx::future<int> t = hpx::async(&func1);
+        hpx::future<int> t2 = t.then(&cont1);
         t2.get();
     }
 
     // executing continuation cont1 on new HPX thread
     {
-        hpx::unique_future<int> t = hpx::async(&func1);
-        hpx::unique_future<int> t2 = t.then(hpx::launch::async, &cont1);
+        hpx::future<int> t = hpx::async(&func1);
+        hpx::future<int> t2 = t.then(hpx::launch::async, &cont1);
         t2.get();
     }
 
     // executing continuation cont2 on UI (main) thread
     {
         hpx::threads::executors::main_pool_executor exec;
-        hpx::unique_future<int> t = hpx::async(&func1);
-        hpx::unique_future<int> t2 = t.then(exec, &cont2);
+        hpx::future<int> t = hpx::async(&func1);
+        hpx::future<int> t2 = t.then(exec, &cont2);
         t2.get();
     }
 

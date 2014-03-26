@@ -12,7 +12,7 @@
     
     template <typename T, typename A0>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0)
     {
@@ -36,7 +36,7 @@
     }
     template <typename T, typename A0 , typename A1>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1)
     {
@@ -60,7 +60,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2)
     {
@@ -84,7 +84,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
     {
@@ -108,7 +108,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
     {
@@ -132,7 +132,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5)
     {
@@ -156,7 +156,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6)
     {
@@ -180,7 +180,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7)
     {
@@ -204,7 +204,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8)
     {
@@ -228,7 +228,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9)
     {
@@ -252,7 +252,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10)
     {
@@ -276,7 +276,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11)
     {
@@ -300,7 +300,7 @@
     }
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7 , typename A8 , typename A9 , typename A10 , typename A11 , typename A12>
     inline typename boost::disable_if<
-        traits::is_component<T>, lcos::unique_future<object<T> >
+        traits::is_component<T>, lcos::future<object<T> >
     >::type
     new_(naming::id_type const & target_id, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7 , A8 && a8 , A9 && a9 , A10 && a10 , A11 && a11 , A12 && a12)
     {

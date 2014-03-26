@@ -101,7 +101,7 @@ namespace hpx
 
         static void interrupt(id, bool flag = true);
 
-        lcos::unique_future<void> get_future(error_code& ec = throws);
+        lcos::future<void> get_future(error_code& ec = throws);
 
 #if HPX_THREAD_MAINTAIN_THREAD_DATA
         std::size_t get_thread_data() const;

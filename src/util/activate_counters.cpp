@@ -100,7 +100,7 @@ namespace hpx { namespace util
         find_counters();
 
         // Query the performance counters.
-        std::vector<unique_future<bool> > started;
+        std::vector<future<bool> > started;
 
         started.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -123,7 +123,7 @@ namespace hpx { namespace util
 
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
-        std::vector<unique_future<bool> > stopped;
+        std::vector<future<bool> > stopped;
 
         stopped.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -147,7 +147,7 @@ namespace hpx { namespace util
 
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
-        std::vector<unique_future<void> > reset;
+        std::vector<future<void> > reset;
 
         reset.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -157,7 +157,7 @@ namespace hpx { namespace util
         wait_all(reset, ec);
     }
 
-    std::vector<unique_future<performance_counters::counter_value> >
+    std::vector<future<performance_counters::counter_value> >
     activate_counters::evaluate_counters_async(bool reset, error_code& ec)
     {
         if (ids_.empty())
@@ -166,11 +166,11 @@ namespace hpx { namespace util
             HPX_THROWS_IF(ec, invalid_status,
                 "activate_counters::evaluate_counters_async",
                 "The counters to be evaluated have not been initialized yet");
-            std::vector<unique_future<performance_counters::counter_value> > tmp;
+            std::vector<future<performance_counters::counter_value> > tmp;
             return tmp;
         }
 
-        std::vector<unique_future<performance_counters::counter_value> > values;
+        std::vector<future<performance_counters::counter_value> > values;
 
         values.reserve(ids_.size());
         using hpx::performance_counters::stubs::performance_counter;
@@ -183,7 +183,7 @@ namespace hpx { namespace util
     std::vector<performance_counters::counter_value>
     activate_counters::evaluate_counters_sync(bool reset, error_code& ec)
     {
-        std::vector<unique_future<performance_counters::counter_value> >
+        std::vector<future<performance_counters::counter_value> >
             futures = evaluate_counters_async(reset, ec);
 
         return util::unwrapped(futures);

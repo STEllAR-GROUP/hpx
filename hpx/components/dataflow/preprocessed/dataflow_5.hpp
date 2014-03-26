@@ -9,7 +9,7 @@
 
 
         template <typename A0>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0
           , boost::mpl::false_
@@ -30,7 +30,7 @@
                 );
         }
         template <typename A0>
-        static inline lcos::unique_future<naming::id_type>
+        static inline lcos::future<naming::id_type>
         create_component(naming::id_type const & target
           , A0 && a0
           , boost::mpl::true_

@@ -70,7 +70,7 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE(buffer_allocator_type,
 void receive(hpx::naming::id_type dest, char* send_buffer,
         std::size_t size, std::size_t window_size)
 {
-    std::vector<hpx::unique_future<buffer_allocator_type> > recv_buffers;
+    std::vector<hpx::future<buffer_allocator_type> > recv_buffers;
     recv_buffers.reserve(window_size);
 
     allocator_message_action msg;

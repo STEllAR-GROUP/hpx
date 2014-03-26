@@ -38,8 +38,8 @@ namespace hpx { namespace lcos
             typedef Future result_type;
 
             template <typename R>
-            BOOST_FORCEINLINE hpx::unique_future<R>
-            operator()(hpx::unique_future<R>& future) const
+            BOOST_FORCEINLINE hpx::future<R>
+            operator()(hpx::future<R>& future) const
             {
                 return std::move(future);
             }

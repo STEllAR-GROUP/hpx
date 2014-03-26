@@ -139,7 +139,7 @@ namespace hpx { namespace lcos
     ///             The inputs can be any arbitrary number of future objects.
 
     template <typename Future>
-    lcos::unique_future<std::vector<Future> >
+    lcos::future<std::vector<Future> >
     when_any(std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
@@ -152,7 +152,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future>
-    lcos::unique_future<std::vector<Future> > //-V659
+    lcos::future<std::vector<Future> > //-V659
     when_any(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
@@ -160,7 +160,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    lcos::unique_future<std::vector<
+    lcos::future<std::vector<
         typename lcos::detail::future_iterator_traits<Iterator>::type
     > >
     when_any(Iterator begin, Iterator end, error_code& ec = throws)
@@ -168,7 +168,7 @@ namespace hpx { namespace lcos
         return lcos::when_n(1, begin, end, ec);
     }
 
-    inline lcos::unique_future<HPX_STD_TUPLE<> > //-V524
+    inline lcos::future<HPX_STD_TUPLE<> > //-V524
     when_any(error_code& /*ec*/ = throws)
     {
         typedef HPX_STD_TUPLE<> result_type;
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos
     ///           element in the list.
 
     template <typename Future>
-    lcos::unique_future<std::vector<Future> >
+    lcos::future<std::vector<Future> >
     when_any_swapped(std::vector<Future>& lazy_values,
         error_code& ec = throws)
     {
@@ -219,7 +219,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future>
-    lcos::unique_future<std::vector<Future> > //-V659
+    lcos::future<std::vector<Future> > //-V659
     when_any_swapped(std::vector<Future> && lazy_values,
         error_code& ec = throws)
     {
@@ -227,7 +227,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    lcos::unique_future<std::vector<
+    lcos::future<std::vector<
         typename lcos::detail::future_iterator_traits<Iterator>::type
     > >
     when_any_swapped(Iterator begin, Iterator end,
@@ -285,7 +285,7 @@ namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    lcos::unique_future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> >
+    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> >
     when_any(HPX_ENUM_FWD_ARGS(N, T, f), error_code& ec = throws)
     {
         return lcos::when_n(1, HPX_ENUM_FORWARD_ARGS(N, T, f), ec);

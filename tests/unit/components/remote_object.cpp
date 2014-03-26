@@ -80,7 +80,7 @@ int hpx_main(variables_map &)
 {
     {
         typedef hpx::components::object<foo> object_type;
-        typedef hpx::lcos::unique_future<object_type> object_promise_type;
+        typedef hpx::lcos::future<object_type> object_promise_type;
         typedef std::vector<object_promise_type> object_promises_type;
         typedef std::vector<object_type> objects_type;
 

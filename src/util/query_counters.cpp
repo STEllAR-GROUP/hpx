@@ -173,7 +173,7 @@ namespace hpx { namespace util
 
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
-        std::vector<unique_future<bool> > started;
+        std::vector<future<bool> > started;
 
         started.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -202,7 +202,7 @@ namespace hpx { namespace util
 
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
-        std::vector<unique_future<bool> > stopped;
+        std::vector<future<bool> > stopped;
 
         stopped.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -231,7 +231,7 @@ namespace hpx { namespace util
 
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
-        std::vector<unique_future<void> > reset;
+        std::vector<future<void> > reset;
 
         reset.reserve(ids_.size());
         for (std::size_t i = 0; i != ids_.size(); ++i)
@@ -279,7 +279,7 @@ namespace hpx { namespace util
 
         // Query the performance counters.
         using performance_counters::stubs::performance_counter;
-        std::vector<unique_future<performance_counters::counter_value> > values;
+        std::vector<future<performance_counters::counter_value> > values;
 
         values.reserve(ids.size());
         for (std::size_t i = 0; i != ids.size(); ++i)

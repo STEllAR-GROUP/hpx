@@ -31,7 +31,7 @@ using hpx::actions::plain_result_action0;
 using hpx::util::unwrapped;
 using hpx::util::unwrapped2;
 using hpx::async;
-using hpx::lcos::unique_future;
+using hpx::lcos::future;
 
 using hpx::find_here;
 
@@ -140,7 +140,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Sync wait, vector of futures, void return.
         {
-            std::vector<unique_future<void> > futures;
+            std::vector<future<void> > futures;
             futures.reserve(64);
 
             for (std::size_t i = 0; i < 64; ++i)
@@ -156,7 +156,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Sync wait, vector of futures, non-void return.
         {
-            std::vector<unique_future<bool> > futures;
+            std::vector<future<bool> > futures;
             futures.reserve(64);
 
             std::vector<bool> values;
@@ -178,7 +178,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Sync wait, vector of futures, non-void return ignored.
         {
-            std::vector<unique_future<bool> > futures;
+            std::vector<future<bool> > futures;
             futures.reserve(64);
 
             for (std::size_t i = 0; i < 64; ++i)
@@ -194,7 +194,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Functional wrapper, single future
         {
-            unique_future<int> future = hpx::make_ready_future(42);
+            future<int> future = hpx::make_ready_future(42);
 
             HPX_TEST_EQ(unwrapped(&increment)(future), 42 + 1);
         }
@@ -202,7 +202,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Functional wrapper, vector of future
         {
-            std::vector<unique_future<int> > futures;
+            std::vector<future<int> > futures;
             futures.reserve(64);
 
             for (std::size_t i = 0; i < 64; ++i)
@@ -214,7 +214,7 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Functional wrapper, tuple of future
         {
-            hpx::util::tuple<unique_future<int>, unique_future<int> > tuple =
+            hpx::util::tuple<future<int>, future<int> > tuple =
                 hpx::util::forward_as_tuple(
                     hpx::make_ready_future(42), hpx::make_ready_future(42));
 
@@ -224,8 +224,8 @@ int hpx_main(
         ///////////////////////////////////////////////////////////////////////
         // Functional wrapper, future of tuple of future
         {
-            hpx::unique_future<
-                hpx::util::tuple<unique_future<int>, unique_future<int> >
+            hpx::future<
+                hpx::util::tuple<future<int>, future<int> >
             > tuple_future =
                 hpx::make_ready_future(hpx::util::make_tuple(
                     hpx::make_ready_future(42), hpx::make_ready_future(42)));

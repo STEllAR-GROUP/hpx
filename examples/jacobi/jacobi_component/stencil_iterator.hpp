@@ -22,18 +22,18 @@ namespace jacobi
 
         ~stencil_iterator() { /*HPX_ASSERT(id);*/ }
 
-        hpx::lcos::unique_future<void> init(
+        hpx::lcos::future<void> init(
             jacobi::row const & r
           , std::size_t y_
           , std::size_t nx_
           , std::size_t ny_
           , std::size_t l
         );
-        hpx::lcos::unique_future<void> setup_boundary(stencil_iterator const & top, stencil_iterator const & bottom);
+        hpx::lcos::future<void> setup_boundary(stencil_iterator const & top, stencil_iterator const & bottom);
 
-        hpx::lcos::unique_future<void> step();
+        hpx::lcos::future<void> step();
 
-        hpx::lcos::unique_future<jacobi::row> get(std::size_t idx) const;
+        hpx::lcos::future<jacobi::row> get(std::size_t idx) const;
 
         template <typename Archive>
         void serialize(Archive & ar, unsigned)

@@ -44,7 +44,7 @@ int hpx_main()
     std::vector<hpx::id_type> const localities =
         hpx::find_all_localities(foo::get_component_type());
 
-    std::vector<hpx::unique_future<hpx::id_type> > components;
+    std::vector<hpx::future<hpx::id_type> > components;
     for (int i = 0; i != NUM_INSTANCES; ++i)
     {
         for (std::size_t j = 0; j != localities.size(); ++j)

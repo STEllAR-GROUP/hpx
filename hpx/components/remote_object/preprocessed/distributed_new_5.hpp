@@ -10,7 +10,7 @@
 
 namespace hpx { namespace components {
     template <typename T>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count)
     {
         hpx::components::component_type type
@@ -19,7 +19,7 @@ namespace hpx { namespace components {
         std::vector<naming::id_type>::size_type objs_per_loc = count / prefixes.size();
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
-        std::vector<lcos::unique_future<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
         res.reserve(count);
         BOOST_FOREACH(naming::id_type const & prefix, prefixes)
         {
@@ -46,7 +46,7 @@ namespace hpx { namespace components {
 }}
 namespace hpx { namespace components {
     template <typename T, typename A0>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count, A0 && a0)
     {
         hpx::components::component_type type
@@ -55,7 +55,7 @@ namespace hpx { namespace components {
         std::vector<naming::id_type>::size_type objs_per_loc = count / prefixes.size();
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
-        std::vector<lcos::unique_future<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
         res.reserve(count);
         BOOST_FOREACH(naming::id_type const & prefix, prefixes)
         {
@@ -82,7 +82,7 @@ namespace hpx { namespace components {
 }}
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count, A0 && a0 , A1 && a1)
     {
         hpx::components::component_type type
@@ -91,7 +91,7 @@ namespace hpx { namespace components {
         std::vector<naming::id_type>::size_type objs_per_loc = count / prefixes.size();
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
-        std::vector<lcos::unique_future<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
         res.reserve(count);
         BOOST_FOREACH(naming::id_type const & prefix, prefixes)
         {
@@ -118,7 +118,7 @@ namespace hpx { namespace components {
 }}
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2)
     {
         hpx::components::component_type type
@@ -127,7 +127,7 @@ namespace hpx { namespace components {
         std::vector<naming::id_type>::size_type objs_per_loc = count / prefixes.size();
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
-        std::vector<lcos::unique_future<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
         res.reserve(count);
         BOOST_FOREACH(naming::id_type const & prefix, prefixes)
         {
@@ -154,7 +154,7 @@ namespace hpx { namespace components {
 }}
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3)
     {
         hpx::components::component_type type
@@ -163,7 +163,7 @@ namespace hpx { namespace components {
         std::vector<naming::id_type>::size_type objs_per_loc = count / prefixes.size();
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
-        std::vector<lcos::unique_future<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
         res.reserve(count);
         BOOST_FOREACH(naming::id_type const & prefix, prefixes)
         {
@@ -190,7 +190,7 @@ namespace hpx { namespace components {
 }}
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4)
     {
         hpx::components::component_type type
@@ -199,7 +199,7 @@ namespace hpx { namespace components {
         std::vector<naming::id_type>::size_type objs_per_loc = count / prefixes.size();
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
-        std::vector<lcos::unique_future<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
         res.reserve(count);
         BOOST_FOREACH(naming::id_type const & prefix, prefixes)
         {
@@ -226,7 +226,7 @@ namespace hpx { namespace components {
 }}
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5)
     {
         hpx::components::component_type type
@@ -235,7 +235,7 @@ namespace hpx { namespace components {
         std::vector<naming::id_type>::size_type objs_per_loc = count / prefixes.size();
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
-        std::vector<lcos::unique_future<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
         res.reserve(count);
         BOOST_FOREACH(naming::id_type const & prefix, prefixes)
         {
@@ -262,7 +262,7 @@ namespace hpx { namespace components {
 }}
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6)
     {
         hpx::components::component_type type
@@ -271,7 +271,7 @@ namespace hpx { namespace components {
         std::vector<naming::id_type>::size_type objs_per_loc = count / prefixes.size();
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
-        std::vector<lcos::unique_future<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
         res.reserve(count);
         BOOST_FOREACH(naming::id_type const & prefix, prefixes)
         {
@@ -298,7 +298,7 @@ namespace hpx { namespace components {
 }}
 namespace hpx { namespace components {
     template <typename T, typename A0 , typename A1 , typename A2 , typename A3 , typename A4 , typename A5 , typename A6 , typename A7>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count, A0 && a0 , A1 && a1 , A2 && a2 , A3 && a3 , A4 && a4 , A5 && a5 , A6 && a6 , A7 && a7)
     {
         hpx::components::component_type type
@@ -307,7 +307,7 @@ namespace hpx { namespace components {
         std::vector<naming::id_type>::size_type objs_per_loc = count / prefixes.size();
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
-        std::vector<lcos::unique_future<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
         res.reserve(count);
         BOOST_FOREACH(naming::id_type const & prefix, prefixes)
         {

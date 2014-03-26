@@ -33,7 +33,7 @@ namespace hpx { namespace lcos
     ///                  of the overall reduction operation.
     ///
     template <typename Action, typename ReduceOp, typename ArgN, ...>
-    hpx::unique_future<decltype(Action(hpx::id_type, ArgN, ...))>
+    hpx::future<decltype(Action(hpx::id_type, ArgN, ...))>
     reduce(
         std::vector<hpx::id_type> const & ids
       , ReduceOp&& reduce_op
@@ -66,7 +66,7 @@ namespace hpx { namespace lcos
     ///                  of the overall reduction operation.
     ///
     template <typename Action, typename ReduceOp, typename ArgN, ...>
-    hpx::unique_future<decltype(Action(hpx::id_type, ArgN, ..., std::size_t))>
+    hpx::future<decltype(Action(hpx::id_type, ArgN, ..., std::size_t))>
     reduce_with_index(
         std::vector<hpx::id_type> const & ids
       , ReduceOp&& reduce_op
@@ -151,9 +151,9 @@ namespace hpx { namespace lcos
             {}
 
             Result operator()(
-                hpx::unique_future<std::vector<hpx::unique_future<Result> > > r) const
+                hpx::future<std::vector<hpx::future<Result> > > r) const
             {
-                std::vector<hpx::unique_future<Result> > fres = std::move(r.get());
+                std::vector<hpx::future<Result> > fres = std::move(r.get());
 
                 HPX_ASSERT(!fres.empty());
 
@@ -381,7 +381,7 @@ namespace hpx { namespace lcos
 
             if(ids.empty()) return result_type();
 
-            std::vector<hpx::unique_future<result_type> > reduce_futures;
+            std::vector<hpx::future<result_type> > reduce_futures;
             reduce_futures.reserve(3);
 
             id_type id_first = ids[0];
@@ -448,7 +448,7 @@ namespace hpx { namespace lcos
         >
         struct BOOST_PP_CAT(reduce_invoker, N)
         {
-            //static hpx::unique_future<typename reduce_result<Action>::type>
+            //static hpx::future<typename reduce_result<Action>::type>
             static typename reduce_result<Action>::type
             call(
                 Action const & act
@@ -507,7 +507,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce(
@@ -543,7 +543,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce(
@@ -566,7 +566,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Action>::type
     >
     reduce_with_index(
@@ -589,7 +589,7 @@ namespace hpx { namespace lcos
       , typename ReduceOp
       BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
     >
-    hpx::unique_future<
+    hpx::future<
         typename detail::reduce_result<Derived>::type
     >
     reduce_with_index(

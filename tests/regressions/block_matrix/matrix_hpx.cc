@@ -48,7 +48,7 @@ void vector_t_server::scal(double alpha)
   ::scal(alpha, *data);
 }
 
-hpx::unique_future<void>
+hpx::future<void>
 vector_t_client::gemv(bool trans, double alpha, const matrix_t_client& a,
                       const vector_t_client& x,
                       double beta)

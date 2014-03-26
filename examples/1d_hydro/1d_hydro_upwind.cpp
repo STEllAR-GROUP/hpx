@@ -24,7 +24,7 @@
 using hpx::naming::id_type;
 using hpx::naming::invalid_id;
 
-using hpx::lcos::unique_future;
+using hpx::lcos::future;
 using hpx::lcos::wait;
 using hpx::async;
 
@@ -225,7 +225,7 @@ double get_pressure(cell input);
 // Wrapping in plain_action
 HPX_PLAIN_ACTION(compute);
 
-typedef hpx::lcos::unique_future<cell> compute_future;
+typedef hpx::lcos::future<cell> compute_future;
 
 // this will return the timestep size.  The timestep index will refer to the
 // timestep where it will be USED rather than the timestep where it was
@@ -371,11 +371,11 @@ cell compute(boost::uint64_t timestep, boost::uint64_t location)
   compute_future nright = async<compute_action>(here,timestep-1,location+1);
 
   // OR is this the correct way to do it?
-  //unique_future<cell> left;
+  //future<cell> left;
   //left = async<compute_action>(here,timestep-1,location-1);
-  //unique_future<cell> middle;
+  //future<cell> middle;
   //middle = async<compute_action>(here,timestep-1,location);
-  //unique_future<cell> right;
+  //future<cell> right;
   //right = async<compute_action>(here,timestep-1,location+1);
 
   cell now;

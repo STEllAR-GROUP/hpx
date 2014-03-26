@@ -79,7 +79,7 @@ namespace hpx { namespace lcos { namespace local
 
     public:
         /// \brief get a future allowing to wait for the gate to fire
-        unique_future<void> get_future(std::size_t count,
+        future<void> get_future(std::size_t count,
             std::size_t* generation_value = 0, error_code& ec = hpx::throws)
         {
             typename mutex_type::scoped_lock l(mtx_);
@@ -95,7 +95,7 @@ namespace hpx { namespace lcos { namespace local
                     return promise_.get_future(ec);
                 }
             }
-            return hpx::unique_future<void>();
+            return hpx::future<void>();
         }
 
         /// \brief Set the data which has to go into the segment \a which.
@@ -156,7 +156,7 @@ namespace hpx { namespace lcos { namespace local
                 this_.conditions_.erase(it_);
             }
 
-            unique_future<void> get_future(HPX_STD_FUNCTION<bool()> const& func,
+            future<void> get_future(HPX_STD_FUNCTION<bool()> const& func,
                 error_code& ec = hpx::throws)
             {
                 return (*it_)->get_future(func, ec);
@@ -198,7 +198,7 @@ namespace hpx { namespace lcos { namespace local
                 conditional_trigger c;
                 manage_condition cond(*this, c);
 
-                unique_future<void> f = cond.get_future(util::bind(
+                future<void> f = cond.get_future(util::bind(
                         &base_and_gate::test_condition, this, generation_value));
 
                 {

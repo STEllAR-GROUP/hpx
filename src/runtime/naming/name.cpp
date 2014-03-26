@@ -269,12 +269,12 @@ namespace hpx { namespace naming
                         naming::detail::fill_credit_for_gid(gid);
 
                     naming::gid_type unlocked_gid = gid;
-                    hpx::unique_future<boost::int64_t> f1 =
+                    hpx::future<boost::int64_t> f1 =
                         agas::incref_async(unlocked_gid, added_credit);
 
                     boost::int64_t added_new_credit =
                         naming::detail::fill_credit_for_gid(new_gid);
-                    hpx::unique_future<boost::int64_t> f2 =
+                    hpx::future<boost::int64_t> f2 =
                         agas::incref_async(new_gid, added_new_credit);
 
                     hpx::wait_all(f1, f2);
@@ -449,7 +449,7 @@ namespace hpx
         return agas::get_colocation_id_sync(id, ec);
     }
 
-    lcos::unique_future<naming::id_type> get_colocation_id(naming::id_type const& id)
+    lcos::future<naming::id_type> get_colocation_id(naming::id_type const& id)
     {
         return agas::get_colocation_id(id);
     }

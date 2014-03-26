@@ -571,18 +571,18 @@ namespace hpx { namespace lcos
         virtual ~promise()
         {}
 
-        lcos::unique_future<Result> get_future(error_code& ec = throws)
+        lcos::future<Result> get_future(error_code& ec = throws)
         {
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<Result>::get_future",
                     "future already has been retrieved from this packaged_action");
-                return lcos::unique_future<Result>();
+                return lcos::future<Result>();
             }
 
             using lcos::detail::future_access;
             future_obtained_ = true;
-            return future_access::create<unique_future<Result> >(impl_->get());
+            return future_access::create<future<Result> >(impl_->get());
         }
 
         ///
@@ -674,18 +674,18 @@ namespace hpx { namespace lcos
         ~promise()
         {}
 
-        lcos::unique_future<void> get_future(error_code& ec = throws)
+        lcos::future<void> get_future(error_code& ec = throws)
         {
             if (future_obtained_) {
                 HPX_THROWS_IF(ec, future_already_retrieved,
                     "promise<void>::get_future",
                     "future already has been retrieved from this packaged_action");
-                return lcos::unique_future<void>();
+                return lcos::future<void>();
             }
 
             using lcos::detail::future_access;
             future_obtained_ = true;
-            return future_access::create<unique_future<void> >(impl_->get());
+            return future_access::create<future<void> >(impl_->get());
         }
 
         void set_value()

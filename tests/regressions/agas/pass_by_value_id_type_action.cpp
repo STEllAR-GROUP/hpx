@@ -27,7 +27,7 @@ int hpx_main(boost::program_options::variables_map&)
             hpx::naming::id_type a = id;
 
             test_action act;
-            hpx::lcos::unique_future<void> f = hpx::async(act, id, a);
+            hpx::lcos::future<void> f = hpx::async(act, id, a);
             f.get();
 
             HPX_TEST_EQ(id, a);
@@ -45,7 +45,7 @@ int hpx_main(boost::program_options::variables_map&)
         {
 
             test_return_action act;
-            hpx::lcos::unique_future<hpx::naming::id_type> f = hpx::async(act, id);
+            hpx::lcos::future<hpx::naming::id_type> f = hpx::async(act, id);
 
             HPX_TEST_EQ(id, f.get());
         }

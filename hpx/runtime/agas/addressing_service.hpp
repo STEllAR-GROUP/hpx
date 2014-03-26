@@ -210,7 +210,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     void* get_bootstrap_symbol_ns_ptr() const;
 
     boost::int64_t synchronize_with_async_incref(
-        hpx::unique_future<boost::int64_t> fut
+        hpx::future<boost::int64_t> fut
       , naming::id_type const& id
       , boost::int64_t compensated_credit
         );
@@ -224,11 +224,11 @@ protected:
     void launch_hosted();
 
     naming::address resolve_full_postproc(
-        unique_future<response> f
+        future<response> f
       , naming::gid_type const& id
         );
     bool bind_postproc(
-        unique_future<response> f
+        future<response> f
       , naming::gid_type const& id
       , gva const& g
     );
@@ -247,7 +247,7 @@ private:
         );
 
     /// Assumes that \a refcnt_requests_mtx_ is locked.
-    std::vector<hpx::unique_future<std::vector<response> > >
+    std::vector<hpx::future<std::vector<response> > >
     send_refcnt_requests_async(
         mutex_type::scoped_lock& l
         );
@@ -371,7 +371,7 @@ public:
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
     ///
-    lcos::unique_future<std::vector<naming::locality> > get_resolved_localities_async();
+    lcos::future<std::vector<naming::locality> > get_resolved_localities_async();
 
     std::vector<naming::locality> get_resolved_localities(
         error_code& ec = throws
@@ -400,7 +400,7 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    lcos::unique_future<boost::uint32_t> get_num_localities_async(
+    lcos::future<boost::uint32_t> get_num_localities_async(
         components::component_type type = components::component_invalid
         );
 
@@ -414,13 +414,13 @@ public:
         return get_num_localities(components::component_invalid, ec);
     }
 
-    lcos::unique_future<boost::uint32_t> get_num_overall_threads_async();
+    lcos::future<boost::uint32_t> get_num_overall_threads_async();
 
     boost::uint32_t get_num_overall_threads(
         error_code& ec = throws
         );
 
-    lcos::unique_future<std::vector<boost::uint32_t> > get_num_threads_async();
+    lcos::future<std::vector<boost::uint32_t> > get_num_threads_async();
 
     std::vector<boost::uint32_t> get_num_threads(
         error_code& ec = throws
@@ -600,7 +600,7 @@ public:
         return bind_range_local(id, 1, addr, 0, ec);
     }
 
-    hpx::unique_future<bool> bind_async(
+    hpx::future<bool> bind_async(
         naming::gid_type const& id
       , naming::address const& addr
       , boost::uint32_t locality_id
@@ -650,7 +650,7 @@ public:
       , error_code& ec = throws
         );
 
-    hpx::unique_future<bool> bind_range_async(
+    hpx::future<bool> bind_range_async(
         naming::gid_type const& lower_id
       , boost::uint64_t count
       , naming::address const& baseaddr
@@ -969,11 +969,11 @@ public:
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::unique_future<naming::address> resolve_async(
+    hpx::future<naming::address> resolve_async(
         naming::gid_type const& id
         );
 
-    hpx::unique_future<naming::address> resolve_async(
+    hpx::future<naming::address> resolve_async(
         naming::id_type const& id
         )
     {
@@ -981,7 +981,7 @@ public:
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::unique_future<naming::id_type> get_colocation_id_async(
+    hpx::future<naming::id_type> get_colocation_id_async(
         naming::id_type const& id
         );
 
@@ -1021,11 +1021,11 @@ public:
         return addr;
     }
 
-    hpx::unique_future<naming::address> resolve_full_async(
+    hpx::future<naming::address> resolve_full_async(
         naming::gid_type const& id
         );
 
-    hpx::unique_future<naming::address> resolve_full_async(
+    hpx::future<naming::address> resolve_full_async(
         naming::id_type const& id
         )
     {
@@ -1122,7 +1122,7 @@ public:
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    lcos::unique_future<boost::int64_t> incref_async(
+    lcos::future<boost::int64_t> incref_async(
         naming::gid_type const& gid
       , boost::int64_t credits = 1
       , naming::id_type const& keep_alive = naming::invalid_id
@@ -1337,7 +1337,7 @@ public:
       , error_code& ec = throws
         );
 
-    lcos::unique_future<bool> register_name_async(
+    lcos::future<bool> register_name_async(
         std::string const& name
       , naming::id_type const& id
         );
@@ -1379,7 +1379,7 @@ public:
       , error_code& ec = throws
         );
 
-    lcos::unique_future<naming::id_type> unregister_name_async(
+    lcos::future<naming::id_type> unregister_name_async(
         std::string const& name
         );
 
@@ -1422,7 +1422,7 @@ public:
       , error_code& ec = throws
         );
 
-    lcos::unique_future<naming::id_type> resolve_name_async(
+    lcos::future<naming::id_type> resolve_name_async(
         std::string const& name
         );
 

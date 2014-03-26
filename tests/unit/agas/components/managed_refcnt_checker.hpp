@@ -58,7 +58,7 @@ struct managed_refcnt_monitor
         this->base_type::create(locality_, flag_.get_gid());
     }
 
-    lcos::unique_future<void> take_reference_async(
+    lcos::future<void> take_reference_async(
         naming::id_type const& gid
         )
     {

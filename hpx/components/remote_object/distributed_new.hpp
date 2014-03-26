@@ -46,11 +46,11 @@
 namespace hpx { namespace components {
 #if N == 0
     template <typename T>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count)
 #else
     template <typename T, BOOST_PP_ENUM_PARAMS(N, typename A)>
-    std::vector<lcos::unique_future<object<T> > >
+    std::vector<lcos::future<object<T> > >
     distributed_new(std::size_t count, HPX_ENUM_FWD_ARGS(N, A, a))
 #endif
     {
@@ -64,7 +64,7 @@ namespace hpx { namespace components {
         std::size_t created_count = 0;
         std::size_t excess = count - objs_per_loc*prefixes.size();
 
-        std::vector<lcos::unique_future<object<T> > > res;
+        std::vector<lcos::future<object<T> > > res;
 
         res.reserve(count);
 

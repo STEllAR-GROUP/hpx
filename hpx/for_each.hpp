@@ -26,7 +26,7 @@ namespace hpx {
             {}
 
             template <typename R>
-            result_type operator()(lcos::unique_future<R> f)
+            result_type operator()(lcos::future<R> f)
             {
                 R futures = f.get();
 
@@ -37,7 +37,7 @@ namespace hpx {
 
     template <typename Range, typename F>
     inline std::vector<
-        lcos::unique_future<
+        lcos::future<
             typename util::result_of<
                 F(typename boost::range_value<Range>::type)
             >::type
@@ -47,7 +47,7 @@ namespace hpx {
     {
         typedef typename boost::range_value<Range>::type value_type;
         typedef typename util::result_of<F(value_type)>::type result_type;
-        typedef lcos::unique_future<result_type> future_type;
+        typedef lcos::future<result_type> future_type;
         typedef std::vector<future_type> futures_type;
         typedef typename boost::range_iterator<Range const>::type iterator_type;
 
@@ -72,14 +72,14 @@ namespace hpx {
 
         futures_type (*for_each_impl)(boost::iterator_range<iterator_type> const&, F) = for_each;
 
-        lcos::unique_future<futures_type> left_future =
+        lcos::future<futures_type> left_future =
             hpx::async(
                   for_each_impl
                 , boost::make_iterator_range(begin, mid)
                 , HPX_STD_PROTECT(f)
             );
 
-        lcos::unique_future<futures_type> right_future =
+        lcos::future<futures_type> right_future =
             hpx::async(
                   for_each_impl
                 , boost::make_iterator_range(mid, end)

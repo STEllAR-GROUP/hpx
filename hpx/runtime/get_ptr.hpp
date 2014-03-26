@@ -68,7 +68,7 @@ namespace hpx
         ///////////////////////////////////////////////////////////////////////
         template <typename Component, typename Deleter>
         boost::shared_ptr<Component>
-        get_ptr_postproc(hpx::unique_future<naming::address> f,
+        get_ptr_postproc(hpx::future<naming::address> f,
             naming::id_type const& id)
         {
             naming::address addr = f.get();
@@ -100,11 +100,11 @@ namespace hpx
         // This is similar to get_ptr<> below, except that the shared_ptr will
         // delete the local instance when it goes out of scope.
         template <typename Component>
-        hpx::unique_future<boost::shared_ptr<Component> >
+        hpx::future<boost::shared_ptr<Component> >
         get_ptr_for_migration(naming::id_type const& id)
         {
             using util::placeholders::_1;
-            hpx::unique_future<naming::address> f = agas::resolve(id);
+            hpx::future<naming::address> f = agas::resolve(id);
             return f.then(util::bind(
                 &get_ptr_postproc<Component, get_ptr_for_migration_deleter>,
                 _1, id));
@@ -133,11 +133,11 @@ namespace hpx
     ///            error.
     ///
     template <typename Component>
-    hpx::unique_future<boost::shared_ptr<Component> >
+    hpx::future<boost::shared_ptr<Component> >
     get_ptr(naming::id_type const& id)
     {
         using util::placeholders::_1;
-        hpx::unique_future<naming::address> f = agas::resolve(id);
+        hpx::future<naming::address> f = agas::resolve(id);
         return f.then(util::bind(
             &detail::get_ptr_postproc<Component, detail::get_ptr_deleter>,
             _1, id));
@@ -174,7 +174,7 @@ namespace hpx
     boost::shared_ptr<Component>
     get_ptr_sync(naming::id_type const& id, error_code& ec = throws)
     {
-        hpx::unique_future<boost::shared_ptr<Component> > ptr =
+        hpx::future<boost::shared_ptr<Component> > ptr =
             get_ptr<Component>(id);
         return ptr.get(ec);
     }

@@ -37,7 +37,7 @@ bool register_name_sync(
     return agas_.register_name(name, id);
 }
 
-lcos::unique_future<bool> register_name(
+lcos::future<bool> register_name(
     std::string const& name
   , naming::id_type const& id
     )
@@ -78,7 +78,7 @@ naming::id_type unregister_name_sync(
     return agas_.unregister_name(name);
 }
 
-lcos::unique_future<naming::id_type> unregister_name(
+lcos::future<naming::id_type> unregister_name(
     std::string const& name
     )
 {
@@ -124,7 +124,7 @@ bool resolve_name_sync(
     return false;
 }
 
-lcos::unique_future<naming::id_type> resolve_name(
+lcos::future<naming::id_type> resolve_name(
     std::string const& name
     )
 {
@@ -142,7 +142,7 @@ naming::id_type resolve_name_sync(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// lcos::unique_future<std::vector<naming::id_type> > get_localities(
+// lcos::future<std::vector<naming::id_type> > get_localities(
 //     components::component_type type
 //     )
 // {
@@ -159,7 +159,7 @@ naming::id_type resolve_name_sync(
 //     return agas_.get_localities(type, ec);
 // }
 
-lcos::unique_future<boost::uint32_t> get_num_localities(
+lcos::future<boost::uint32_t> get_num_localities(
     components::component_type type
     )
 {
@@ -176,7 +176,7 @@ boost::uint32_t get_num_localities_sync(
     return agas_.get_num_localities(type, ec);
 }
 
-lcos::unique_future<std::vector<boost::uint32_t> > get_num_threads()
+lcos::future<std::vector<boost::uint32_t> > get_num_threads()
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_threads_async();
@@ -190,7 +190,7 @@ std::vector<boost::uint32_t> get_num_threads_sync(
     return agas_.get_num_threads(ec);
 }
 
-lcos::unique_future<boost::uint32_t> get_num_overall_threads()
+lcos::future<boost::uint32_t> get_num_overall_threads()
 {
     naming::resolver_client& agas_ = naming::get_agas_client();
     return agas_.get_num_overall_threads_async();
@@ -270,7 +270,7 @@ bool is_local_lva_encoded_address(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::unique_future<naming::address> resolve(
+hpx::future<naming::address> resolve(
     naming::id_type const& id
     )
 {
@@ -287,7 +287,7 @@ naming::address resolve_sync(
     return agas_.resolve_async(id).get(ec);
 }
 
-hpx::unique_future<bool> bind(
+hpx::future<bool> bind(
     naming::gid_type const& id
   , naming::address const& addr
   , boost::uint32_t locality_id
@@ -411,7 +411,7 @@ void decref(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::unique_future<boost::int64_t> incref_async(
+hpx::future<boost::int64_t> incref_async(
     naming::gid_type const& gid
   , boost::int64_t credits
   , naming::id_type const& keep_alive_
@@ -447,7 +447,7 @@ boost::int64_t incref(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::unique_future<naming::id_type> get_colocation_id(
+hpx::future<naming::id_type> get_colocation_id(
     naming::id_type const& id)
 {
     naming::resolver_client& resolver = naming::get_agas_client();

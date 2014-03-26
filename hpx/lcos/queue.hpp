@@ -35,14 +35,14 @@ namespace hpx { namespace lcos
         ///////////////////////////////////////////////////////////////////////
         // exposed functionality of this component
 
-        lcos::unique_future<ValueType>
+        lcos::future<ValueType>
         get_value_async()
         {
             HPX_ASSERT(this->get_gid());
             return this->base_type::get_value_async(this->get_gid());
         }
 
-        lcos::unique_future<void>
+        lcos::future<void>
         set_value_async(RemoteType const& val)
         {
             HPX_ASSERT(this->get_gid());
@@ -50,7 +50,7 @@ namespace hpx { namespace lcos
             return this->base_type::set_value_async(this->get_gid(), std::move(tmp));
         }
 
-        lcos::unique_future<void>
+        lcos::future<void>
         abort_pending_async(boost::exception_ptr const& e)
         {
             HPX_ASSERT(this->get_gid());

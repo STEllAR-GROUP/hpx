@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace detail
     {};
 
     template <typename R>
-    struct future_traits<lcos::unique_future<R> >
+    struct future_traits<lcos::future<R> >
     {
         typedef R type;
     };
@@ -89,7 +89,7 @@ namespace hpx { namespace lcos { namespace detail
     {};
 
     template <typename R>
-    struct shared_state_ptr_for<unique_future<R> >
+    struct shared_state_ptr_for<future<R> >
       : shared_state_ptr<R>
     {};
 
@@ -125,7 +125,7 @@ namespace hpx { namespace lcos { namespace detail
         template <typename R>
         BOOST_FORCEINLINE static
         typename shared_state_ptr<R>::type const&
-        get_shared_state(unique_future<R> const& f)
+        get_shared_state(future<R> const& f)
         {
             return f.shared_state_;
         }
@@ -167,7 +167,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename util::result_of<F(Future)>::type result;
 
-        typedef lcos::unique_future<
+        typedef lcos::future<
             typename boost::mpl::eval_if<
                 traits::is_future<result>
               , future_traits<result>
@@ -181,7 +181,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         typedef typename future_traits<Future>::type outer_result;
 
-        typedef lcos::unique_future<
+        typedef lcos::future<
             typename boost::mpl::eval_if<
                 traits::is_future<outer_result>
               , future_traits<outer_result>
@@ -201,7 +201,7 @@ namespace hpx { namespace lcos { namespace detail
     };
 
     template <typename T>
-    struct future_iterator_traits<unique_future<T> >
+    struct future_iterator_traits<future<T> >
     {};
 
     template <typename T>
@@ -447,7 +447,7 @@ namespace hpx { namespace lcos { namespace detail
             shared_state_ptr p =
                 detail::make_continuation<result>(*static_cast<Derived*>(this),
                     policy, std::forward<F>(f));
-            return future_access::create<unique_future<result> >(std::move(p));
+            return future_access::create<future<result> >(std::move(p));
         }
 
         template <typename F>
@@ -472,7 +472,7 @@ namespace hpx { namespace lcos { namespace detail
             shared_state_ptr p =
                 detail::make_continuation<result>(*static_cast<Derived*>(this),
                     sched, std::forward<F>(f));
-            return future_access::create<unique_future<result> >(std::move(p));
+            return future_access::create<future<result> >(std::move(p));
         }
 
         // Notes:
@@ -621,11 +621,11 @@ namespace hpx { namespace lcos
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename R>
-    class unique_future : public detail::future_base<unique_future<R>, R>
+    class future : public detail::future_base<future<R>, R>
     {
-        HPX_MOVABLE_BUT_NOT_COPYABLE(unique_future);
+        HPX_MOVABLE_BUT_NOT_COPYABLE(future);
 
-        typedef detail::future_base<unique_future<R>, R> base_type;
+        typedef detail::future_base<future<R>, R> base_type;
 
     public:
         typedef R result_type;
@@ -634,7 +634,7 @@ namespace hpx { namespace lcos
     private:
         struct invalidate
         {
-            explicit invalidate(unique_future& f)
+            explicit invalidate(future& f)
               : f_(f)
             {}
 
@@ -643,25 +643,25 @@ namespace hpx { namespace lcos
                 f_.shared_state_ = 0;
             }
 
-            unique_future& f_;
+            future& f_;
         };
 
     private:
         friend struct detail::future_access;
 
         // Effects: constructs a future object from an shared state
-        explicit unique_future(
+        explicit future(
             boost::intrusive_ptr<shared_state_type> const& state
         ) : base_type(state)
         {}
 
-        explicit unique_future(
+        explicit future(
             boost::intrusive_ptr<shared_state_type> && state
         ) : base_type(std::move(state))
         {}
 
         template <typename SharedState>
-        explicit unique_future(boost::intrusive_ptr<SharedState> const& state)
+        explicit future(boost::intrusive_ptr<SharedState> const& state)
           : base_type(boost::static_pointer_cast<shared_state_type>(state))
         {}
 
@@ -669,7 +669,7 @@ namespace hpx { namespace lcos
         // Effects: constructs an empty future object that does not refer to
         //          an shared state.
         // Postcondition: valid() == false.
-        unique_future() BOOST_NOEXCEPT
+        future() BOOST_NOEXCEPT
           : base_type()
         {}
 
@@ -679,7 +679,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        unique_future(unique_future && other) BOOST_NOEXCEPT
+        future(future && other) BOOST_NOEXCEPT
           : base_type(std::move(other))
         {}
 
@@ -689,21 +689,21 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     constructor invocation.
         //   - other.valid() == false.
-        unique_future(unique_future<unique_future> && other) BOOST_NOEXCEPT
+        future(future<future> && other) BOOST_NOEXCEPT
           : base_type(std::move(other.unwrap()))
         {}
 
         // Effects:
         //   - releases any shared state (30.6.4);
         //   - destroys *this.
-        ~unique_future()
+        ~future()
         {}
 
         // [N3722, 4.1] asks for this...
         typedef lcos::local::promise<R> promise_type;
 #ifdef BOOST_NO_CXX11_EXPLICIT_CONVERSION_OPERATORS
         // defined at promise.hpp
-        explicit unique_future(promise_type& promise);
+        explicit future(promise_type& promise);
 #endif
 
         // Effects:
@@ -713,7 +713,7 @@ namespace hpx { namespace lcos
         //   - valid() returns the same value as other.valid() prior to the
         //     assignment.
         //   - other.valid() == false.
-        unique_future& operator=(unique_future && other) BOOST_NOEXCEPT
+        future& operator=(future && other) BOOST_NOEXCEPT
         {
             base_type::operator=(std::move(other));
             return *this;
@@ -742,7 +742,7 @@ namespace hpx { namespace lcos
             if (!this->shared_state_)
             {
                 HPX_THROW_EXCEPTION(no_state,
-                    "unique_future<R>::get",
+                    "future<R>::get",
                     "this future has no valid shared state");
             }
 
@@ -759,7 +759,7 @@ namespace hpx { namespace lcos
             if (!this->shared_state_)
             {
                 HPX_THROWS_IF(ec, no_state,
-                    "unique_future<R>::get",
+                    "future<R>::get",
                     "this future has no valid shared state");
                 return detail::future_value<R>::get_default();
             }
@@ -781,7 +781,7 @@ namespace hpx { namespace lcos
         using base_type::get_status;
 
         template <typename F>
-        typename detail::future_then_result<unique_future, F>::type
+        typename detail::future_then_result<future, F>::type
         then(F && f)
         {
             invalidate on_exit(*this);
@@ -789,7 +789,7 @@ namespace hpx { namespace lcos
         }
 
         template <typename F>
-        typename detail::future_then_result<unique_future, F>::type
+        typename detail::future_then_result<future, F>::type
         then(BOOST_SCOPED_ENUM(launch) policy, F && f)
         {
             invalidate on_exit(*this);
@@ -797,14 +797,14 @@ namespace hpx { namespace lcos
         }
 
         template <typename F>
-        typename detail::future_then_result<unique_future, F>::type
+        typename detail::future_then_result<future, F>::type
         then(threads::executor& sched, F && f)
         {
             invalidate on_exit(*this);
             return base_type::then(sched, std::forward<F>(f));
         }
 
-        typename detail::future_unwrap_result<unique_future>::type
+        typename detail::future_unwrap_result<future>::type
         unwrap(error_code& ec = throws)
         {
             invalidate on_exit(*this);
@@ -818,8 +818,8 @@ namespace hpx { namespace lcos
 }}
 
 HPX_REGISTER_TYPED_CONTINUATION_DECLARATION(
-    hpx::lcos::unique_future<void>,
-    hpx_lcos_unique_future_void_typed_continuation)
+    hpx::lcos::future<void>,
+    hpx_lcos_future_void_typed_continuation)
 
 namespace hpx { namespace lcos
 {
@@ -877,10 +877,10 @@ namespace hpx { namespace lcos
           : base_type(std::move(other))
         {}
 
-        shared_future(unique_future<R> && other) BOOST_NOEXCEPT
+        shared_future(future<R> && other) BOOST_NOEXCEPT
           : base_type(detail::future_access::get_shared_state(other))
         {
-            other = unique_future<R>();
+            other = future<R>();
         }
 
         // Effects:
@@ -1002,7 +1002,7 @@ namespace hpx { namespace lcos
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object
     template <typename Result>
-    unique_future<typename util::detail::decay_unwrap<Result>::type>
+    future<typename util::detail::decay_unwrap<Result>::type>
     make_ready_future(Result && init)
     {
         typedef typename util::detail::decay_unwrap<Result>::type result_type;
@@ -1012,14 +1012,14 @@ namespace hpx { namespace lcos
         p->set_result(std::forward<Result>(init));
 
         using lcos::detail::future_access;
-        return future_access::create<unique_future<result_type> >(
+        return future_access::create<future<result_type> >(
             std::move(p));
     }
 
     // extension: create a pre-initialized future object which holds the
     // given error
     template <typename Result>
-    unique_future<typename util::detail::decay_unwrap<Result>::type>
+    future<typename util::detail::decay_unwrap<Result>::type>
     make_error_future(boost::exception_ptr const& e)
     {
         typedef typename util::detail::decay_unwrap<Result>::type result_type;
@@ -1029,14 +1029,14 @@ namespace hpx { namespace lcos
         p->set_exception(e);
 
         using lcos::detail::future_access;
-        return future_access::create<unique_future<result_type> >(
+        return future_access::create<future<result_type> >(
             std::move(p));
     }
 
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
     template <typename Result>
-    unique_future<typename util::detail::decay_unwrap<Result>::type>
+    future<typename util::detail::decay_unwrap<Result>::type>
     make_ready_future_at(boost::posix_time::ptime const& at,
         Result && init)
     {
@@ -1044,12 +1044,12 @@ namespace hpx { namespace lcos
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
         using lcos::detail::future_access;
-        return future_access::create<unique_future<result_type> >(
+        return future_access::create<future<result_type> >(
             new shared_state(at, std::forward<Result>(init)));
     }
 
     template <typename Clock, typename Duration, typename Result>
-    unique_future<typename util::detail::decay_unwrap<Result>::type>
+    future<typename util::detail::decay_unwrap<Result>::type>
     make_ready_future_at(boost::chrono::time_point<Clock, Duration> const& at,
         Result && init)
     {
@@ -1058,7 +1058,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Result>
-    unique_future<typename util::detail::decay_unwrap<Result>::type>
+    future<typename util::detail::decay_unwrap<Result>::type>
     make_ready_future_after(boost::posix_time::time_duration const& d,
         Result && init)
     {
@@ -1066,12 +1066,12 @@ namespace hpx { namespace lcos
         typedef lcos::detail::timed_future_data<result_type> shared_state;
 
         using lcos::detail::future_access;
-        return future_access::create<unique_future<result_type> >(
+        return future_access::create<future<result_type> >(
             new shared_state(d, std::forward<Result>(init)));
     }
 
     template <typename Rep, typename Period, typename Result>
-    unique_future<typename util::detail::decay_unwrap<Result>::type>
+    future<typename util::detail::decay_unwrap<Result>::type>
     make_ready_future_after(boost::chrono::duration<Rep, Period> const& d,
         Result && init)
     {
@@ -1080,7 +1080,7 @@ namespace hpx { namespace lcos
     }
 
     // extension: create a pre-initialized future object
-    inline unique_future<void> make_ready_future()
+    inline future<void> make_ready_future()
     {
         typedef lcos::detail::future_data<void> shared_state;
 
@@ -1088,40 +1088,40 @@ namespace hpx { namespace lcos
         p->set_result(util::unused);
 
         using lcos::detail::future_access;
-        return future_access::create<unique_future<void> >(std::move(p));
+        return future_access::create<future<void> >(std::move(p));
     }
 
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
-    inline unique_future<void> make_ready_future_at(
+    inline future<void> make_ready_future_at(
         boost::posix_time::ptime const& at)
     {
         typedef lcos::detail::timed_future_data<void> shared_state;
 
         using lcos::detail::future_access;
-        return future_access::create<unique_future<void> >(
+        return future_access::create<future<void> >(
             new shared_state(at, util::unused));
     }
 
     template <typename Clock, typename Duration>
-    inline unique_future<void> make_ready_future_at(
+    inline future<void> make_ready_future_at(
         boost::chrono::time_point<Clock, Duration> const& at)
     {
         return make_ready_future_at(util::to_ptime(at));
     }
 
-    inline unique_future<void> make_ready_future_after(
+    inline future<void> make_ready_future_after(
         boost::posix_time::time_duration const& d)
     {
         typedef lcos::detail::timed_future_data<void> shared_state;
 
         using lcos::detail::future_access;
-        return future_access::create<unique_future<void> >(
+        return future_access::create<future<void> >(
             new shared_state(d, util::unused));
     }
 
     template <typename Rep, typename Period>
-    inline unique_future<void> make_ready_future_at(
+    inline future<void> make_ready_future_at(
         boost::chrono::duration<Rep, Period> const& d)
     {
         return make_ready_future_after(util::to_time_duration(d));
@@ -1133,7 +1133,7 @@ namespace hpx { namespace actions
 {
     // special handling of actions returning a future
     template <typename R>
-    struct typed_continuation<lcos::unique_future<R> > : continuation
+    struct typed_continuation<lcos::future<R> > : continuation
     {
         typed_continuation()
         {}
@@ -1166,12 +1166,12 @@ namespace hpx { namespace actions
             init_registration<typed_continuation>::g.register_continuation();
         }
 
-        void deferred_trigger(lcos::unique_future<R> result) const
+        void deferred_trigger(lcos::future<R> result) const
         {
             if (f_.empty()) {
                 if (!this->get_gid()) {
                     HPX_THROW_EXCEPTION(invalid_status,
-                        "typed_continuation<lcos::unique_future<R> >::trigger_value",
+                        "typed_continuation<lcos::future<R> >::trigger_value",
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
@@ -1182,10 +1182,10 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(lcos::unique_future<R> && result) const
+        void trigger_value(lcos::future<R> && result) const
         {
             LLCO_(info)
-                << "typed_continuation<lcos::unique_future<R> >::trigger("
+                << "typed_continuation<lcos::future<R> >::trigger("
                 << this->get_gid() << ")";
 
             // if the future is ready, send the result back immediately
@@ -1239,7 +1239,7 @@ namespace hpx { namespace actions
     };
 
     template <>
-    struct typed_continuation<lcos::unique_future<void> > : continuation
+    struct typed_continuation<lcos::future<void> > : continuation
     {
         typed_continuation()
         {}
@@ -1272,12 +1272,12 @@ namespace hpx { namespace actions
             init_registration<typed_continuation>::g.register_continuation();
         }
 
-        void deferred_trigger(lcos::unique_future<void> result) const
+        void deferred_trigger(lcos::future<void> result) const
         {
             if (f_.empty()) {
                 if (!this->get_gid()) {
                     HPX_THROW_EXCEPTION(invalid_status,
-                        "typed_continuation<lcos::unique_future<void> >::trigger_value",
+                        "typed_continuation<lcos::future<void> >::trigger_value",
                         "attempt to trigger invalid LCO (the id is invalid)");
                     return;
                 }
@@ -1290,10 +1290,10 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(lcos::unique_future<void> && result) const
+        void trigger_value(lcos::future<void> && result) const
         {
             LLCO_(info)
-                << "typed_continuation<lcos::unique_future<void> >::trigger("
+                << "typed_continuation<lcos::future<void> >::trigger("
                 << this->get_gid() << ")";
 
             // if the future is ready, send the result back immediately

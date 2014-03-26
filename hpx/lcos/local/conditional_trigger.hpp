@@ -41,12 +41,12 @@ namespace hpx { namespace lcos { namespace local
         }
 
         /// \brief get a future allowing to wait for the trigger to fire
-        unique_future<void> get_future(HPX_STD_FUNCTION<bool()> const& func,
+        future<void> get_future(HPX_STD_FUNCTION<bool()> const& func,
             error_code& ec = hpx::throws)
         {
             cond_ = func;
 
-            unique_future<void> f = promise_.get_future(ec);
+            future<void> f = promise_.get_future(ec);
 
             set(ec);      // trigger as soon as possible
 

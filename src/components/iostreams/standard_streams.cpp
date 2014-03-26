@@ -77,7 +77,7 @@ namespace hpx { namespace iostreams
 
                 // use async version to force the current thread to be suspended,
                 // which avoids deadlocks if executed with one OS-thread
-                lcos::unique_future<bool> f = agas::register_name(cout_name, cout_id);
+                lcos::future<bool> f = agas::register_name(cout_name, cout_id);
                 f.get();
 
                 client.reset(new lazy_ostream(cout_id));
@@ -89,7 +89,7 @@ namespace hpx { namespace iostreams
 
                 // use async version to force the current thread to be suspended,
                 // which avoids deadlocks if executed with one OS-thread
-                lcos::unique_future<naming::id_type> f = agas::resolve_name(cout_name);
+                lcos::future<naming::id_type> f = agas::resolve_name(cout_name);
                 naming::id_type gid = f.get();
 
                 if (!gid)

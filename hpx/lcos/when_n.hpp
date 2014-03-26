@@ -48,8 +48,8 @@ namespace hpx { namespace lcos
             typedef Future result_type;
 
             template <typename R>
-            BOOST_FORCEINLINE hpx::unique_future<R>
-            operator()(hpx::unique_future<R>& future) const
+            BOOST_FORCEINLINE hpx::future<R>
+            operator()(hpx::future<R>& future) const
             {
                 return std::move(future);
             }
@@ -203,7 +203,7 @@ namespace hpx { namespace lcos
     ///             The inputs can be any arbitrary number of future objects.
 
     template <typename Future>
-    lcos::unique_future<std::vector<Future> >
+    lcos::future<std::vector<Future> >
     when_n(std::size_t n,
         std::vector<Future>& lazy_values,
         error_code& ec = throws)
@@ -244,7 +244,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Future>
-    lcos::unique_future<std::vector<Future> > //-V659
+    lcos::future<std::vector<Future> > //-V659
     when_n(std::size_t n,
         std::vector<Future> && lazy_values,
         error_code& ec = throws)
@@ -253,7 +253,7 @@ namespace hpx { namespace lcos
     }
 
     template <typename Iterator>
-    lcos::unique_future<std::vector<
+    lcos::future<std::vector<
         typename lcos::detail::future_iterator_traits<Iterator>::type
     > >
     when_n(std::size_t n, Iterator begin, Iterator end,
@@ -270,7 +270,7 @@ namespace hpx { namespace lcos
         return lcos::when_n(n, lazy_values_, ec);
     }
 
-    inline lcos::unique_future<HPX_STD_TUPLE<> >
+    inline lcos::future<HPX_STD_TUPLE<> >
     when_n(std::size_t n, error_code& ec = throws)
     {
         typedef HPX_STD_TUPLE<> result_type;
@@ -334,7 +334,7 @@ namespace hpx { namespace lcos
 {
     ///////////////////////////////////////////////////////////////////////////
     template <BOOST_PP_ENUM_PARAMS(N, typename T)>
-    lcos::unique_future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> >
+    lcos::future<HPX_STD_TUPLE<BOOST_PP_ENUM(N, HPX_WHEN_N_DECAY_FUTURE, _)> >
     when_n(std::size_t n, HPX_ENUM_FWD_ARGS(N, T, f),
         error_code& ec = throws)
     {

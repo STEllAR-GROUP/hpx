@@ -29,7 +29,7 @@ namespace examples { namespace stubs
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         //[simple_central_tuplespace_stubs_write_async
-        static hpx::lcos::unique_future<int> write_async(hpx::naming::id_type const& gid, tuple_type const& tuple)
+        static hpx::lcos::future<int> write_async(hpx::naming::id_type const& gid, tuple_type const& tuple)
         {
             typedef server::simple_central_tuplespace::write_action action_type;
             return hpx::async<action_type>(gid, tuple);
@@ -51,7 +51,7 @@ namespace examples { namespace stubs
         /// \note This function has fire-and-forget semantics. It will not wait
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
-        static hpx::lcos::unique_future<tuple_type>
+        static hpx::lcos::future<tuple_type>
         read_async(hpx::naming::id_type const& gid, const tuple_type& tp, long const timeout)
         {
             typedef server::simple_central_tuplespace::read_action action_type;
@@ -79,7 +79,7 @@ namespace examples { namespace stubs
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
         //[simple_central_tuplespace_stubs_take_async
-        static hpx::lcos::unique_future<tuple_type>
+        static hpx::lcos::future<tuple_type>
         take_async(hpx::naming::id_type const& gid, const tuple_type& tp, long const timeout)
         {
             typedef server::simple_central_tuplespace::take_action action_type;

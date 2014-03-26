@@ -719,7 +719,7 @@ bool addressing_service::get_localities(
     }
 } // }}}
 
-lcos::unique_future<std::vector<naming::locality> >
+lcos::future<std::vector<naming::locality> >
     addressing_service::get_resolved_localities_async()
 { // {{{ get_resolved_localities_async implementation
     naming::id_type const target = bootstrap_locality_namespace_id();
@@ -770,7 +770,7 @@ boost::uint32_t addressing_service::get_num_localities(
     return boost::uint32_t(-1);
 } // }}}
 
-lcos::unique_future<boost::uint32_t> addressing_service::get_num_localities_async(
+lcos::future<boost::uint32_t> addressing_service::get_num_localities_async(
     components::component_type type
     )
 { // {{{ get_num_localities implementation
@@ -811,7 +811,7 @@ boost::uint32_t addressing_service::get_num_overall_threads(
     return boost::uint32_t(0);
 } // }}}
 
-lcos::unique_future<boost::uint32_t> addressing_service::get_num_overall_threads_async()
+lcos::future<boost::uint32_t> addressing_service::get_num_overall_threads_async()
 { // {{{
     naming::id_type const target = bootstrap_locality_namespace_id();
     request req(locality_ns_num_threads);
@@ -842,7 +842,7 @@ std::vector<boost::uint32_t> addressing_service::get_num_threads(
     return std::vector<boost::uint32_t>();
 } // }}}
 
-lcos::unique_future<std::vector<boost::uint32_t> > addressing_service::get_num_threads_async()
+lcos::future<std::vector<boost::uint32_t> > addressing_service::get_num_threads_async()
 { // {{{
     naming::id_type const target = bootstrap_locality_namespace_id();
     request req(locality_ns_num_threads);
@@ -1032,7 +1032,7 @@ bool addressing_service::bind_range_local(
 } // }}}
 
 bool addressing_service::bind_postproc(
-    unique_future<response> f, naming::gid_type const& lower_id, gva const& g
+    future<response> f, naming::gid_type const& lower_id, gva const& g
     )
 {
     response rep = f.get();
@@ -1057,7 +1057,7 @@ bool addressing_service::bind_postproc(
     return true;
 }
 
-hpx::unique_future<bool> addressing_service::bind_range_async(
+hpx::future<bool> addressing_service::bind_range_async(
     naming::gid_type const& lower_id
   , boost::uint64_t count
   , naming::address const& baseaddr
@@ -1080,7 +1080,7 @@ hpx::unique_future<bool> addressing_service::bind_range_async(
     response rep;
 
     using util::placeholders::_1;
-    unique_future<response> f =
+    future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
     return f.then(
         util::bind(&addressing_service::bind_postproc, this, _1, lower_id, g)
@@ -1412,7 +1412,7 @@ bool addressing_service::resolve_cached(
     return false;
 } // }}}
 
-hpx::unique_future<naming::address> addressing_service::resolve_async(
+hpx::future<naming::address> addressing_service::resolve_async(
     naming::gid_type const& gid
     )
 {
@@ -1443,7 +1443,7 @@ hpx::unique_future<naming::address> addressing_service::resolve_async(
     return resolve_full_async(gid);
 }
 
-hpx::unique_future<naming::id_type> addressing_service::get_colocation_id_async(
+hpx::future<naming::id_type> addressing_service::get_colocation_id_async(
     naming::id_type const& id
     )
 {
@@ -1466,7 +1466,7 @@ hpx::unique_future<naming::id_type> addressing_service::get_colocation_id_async(
 
 ///////////////////////////////////////////////////////////////////////////////
 naming::address addressing_service::resolve_full_postproc(
-    unique_future<response> f, naming::gid_type const& id
+    future<response> f, naming::gid_type const& id
     )
 {
     naming::address addr;
@@ -1504,7 +1504,7 @@ naming::address addressing_service::resolve_full_postproc(
     return addr;
 }
 
-hpx::unique_future<naming::address> addressing_service::resolve_full_async(
+hpx::future<naming::address> addressing_service::resolve_full_async(
     naming::gid_type const& gid
     )
 {
@@ -1528,7 +1528,7 @@ hpx::unique_future<naming::address> addressing_service::resolve_full_async(
       , naming::id_type::unmanaged);
 
     using util::placeholders::_1;
-    unique_future<response> f =
+    future<response> f =
         stubs::primary_namespace::service_async<response>(target, req);
     return f.then(
         util::bind(&addressing_service::resolve_full_postproc, this, _1, gid)
@@ -1730,7 +1730,7 @@ void addressing_service::route(
 // if there was a pending decref request at the point when the incref was sent.
 // The pending decref was subtracted from the amount of credits to incref.
 boost::int64_t addressing_service::synchronize_with_async_incref(
-    hpx::unique_future<boost::int64_t> fut
+    hpx::future<boost::int64_t> fut
   , naming::id_type const& id
   , boost::int64_t compensated_credit
     )
@@ -1738,7 +1738,7 @@ boost::int64_t addressing_service::synchronize_with_async_incref(
     return fut.get() + compensated_credit;
 }
 
-lcos::unique_future<boost::int64_t> addressing_service::incref_async(
+lcos::future<boost::int64_t> addressing_service::incref_async(
     naming::gid_type const& gid
   , boost::int64_t credit
   , naming::id_type const& keep_alive
@@ -1747,7 +1747,7 @@ lcos::unique_future<boost::int64_t> addressing_service::incref_async(
     if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
     {
         // reschedule this call as an HPX thread
-        lcos::unique_future<boost::int64_t> (
+        lcos::future<boost::int64_t> (
                 addressing_service::*incref_async_ptr)(
             naming::gid_type const&
           , boost::int64_t
@@ -1762,7 +1762,7 @@ lcos::unique_future<boost::int64_t> addressing_service::incref_async(
         HPX_THROW_EXCEPTION(bad_parameter
           , "addressing_service::incref_async"
           , boost::str(boost::format("invalid credit count of %1%") % credit));
-        return lcos::unique_future<boost::int64_t>();
+        return lcos::future<boost::int64_t>();
     }
 
     HPX_ASSERT(keep_alive != naming::invalid_id);
@@ -1852,7 +1852,7 @@ lcos::unique_future<boost::int64_t> addressing_service::incref_async(
         stubs::primary_namespace::get_service_instance(e_lower)
       , naming::id_type::unmanaged);
 
-    lcos::unique_future<boost::int64_t> f =
+    lcos::future<boost::int64_t> f =
         stubs::primary_namespace::service_async<boost::int64_t>(target, req);
 
     // pass the amount of compensated decrefs to the callback
@@ -1929,7 +1929,7 @@ bool addressing_service::register_name(
     }
 } // }}}
 
-static bool correct_credit_on_failure(unique_future<bool> f, naming::id_type id,
+static bool correct_credit_on_failure(future<bool> f, naming::id_type id,
     boost::int64_t mutable_gid_credit, boost::int64_t new_gid_credit)
 {
     // Return the credit to the GID if the operation failed
@@ -1941,7 +1941,7 @@ static bool correct_credit_on_failure(unique_future<bool> f, naming::id_type id,
     return true;
 }
 
-lcos::unique_future<bool> addressing_service::register_name_async(
+lcos::future<bool> addressing_service::register_name_async(
     std::string const& name
   , naming::id_type const& id
     )
@@ -1952,7 +1952,7 @@ lcos::unique_future<bool> addressing_service::register_name_async(
 
     request req(symbol_ns_bind, name, new_gid);
 
-    unique_future<bool> f = stubs::symbol_namespace::service_async<bool>(
+    future<bool> f = stubs::symbol_namespace::service_async<bool>(
         name, req, action_priority_);
 
     boost::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
@@ -1998,7 +1998,7 @@ bool addressing_service::unregister_name(
     }
 } // }}}
 
-lcos::unique_future<naming::id_type> addressing_service::unregister_name_async(
+lcos::future<naming::id_type> addressing_service::unregister_name_async(
     std::string const& name
     )
 { // {{{
@@ -2039,7 +2039,7 @@ bool addressing_service::resolve_name(
     }
 } // }}}
 
-lcos::unique_future<naming::id_type> addressing_service::resolve_name_async(
+lcos::future<naming::id_type> addressing_service::resolve_name_async(
     std::string const& name
     )
 { // {{{
@@ -2678,7 +2678,7 @@ void addressing_service::send_refcnt_requests_non_blocking(
     }
 }
 
-std::vector<hpx::unique_future<std::vector<response> > >
+std::vector<hpx::future<std::vector<response> > >
 addressing_service::send_refcnt_requests_async(
     addressing_service::mutex_type::scoped_lock& l
     )
@@ -2686,7 +2686,7 @@ addressing_service::send_refcnt_requests_async(
     if (refcnt_requests_->empty())
     {
         l.unlock();
-        return std::vector<hpx::unique_future<std::vector<response> > >();
+        return std::vector<hpx::future<std::vector<response> > >();
     }
 
     boost::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
@@ -2711,7 +2711,7 @@ addressing_service::send_refcnt_requests_async(
     typedef std::map<naming::id_type, std::vector<request> > requests_type;
     requests_type requests;
 
-    std::vector<hpx::unique_future<std::vector<response> > > lazy_results;
+    std::vector<hpx::future<std::vector<response> > > lazy_results;
     BOOST_FOREACH(refcnt_requests_type::const_reference e, *p)
     {
         HPX_ASSERT(e.data() < 0);
@@ -2746,12 +2746,12 @@ void addressing_service::send_refcnt_requests_sync(
   , error_code& ec
     )
 {
-    std::vector<hpx::unique_future<std::vector<response> > > lazy_results =
+    std::vector<hpx::future<std::vector<response> > > lazy_results =
         send_refcnt_requests_async(l);
 
     wait_all(lazy_results);
 
-    BOOST_FOREACH(hpx::unique_future<std::vector<response> > & f, lazy_results)
+    BOOST_FOREACH(hpx::future<std::vector<response> > & f, lazy_results)
     {
         std::vector<response> const& reps = f.get();
         BOOST_FOREACH(response const& rep, reps)

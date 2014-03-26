@@ -22,7 +22,7 @@ namespace hpx { namespace components { namespace server
     {
         template <typename Component>
         naming::id_type copy_component_postproc(
-            unique_future<boost::shared_ptr<Component> > f,
+            future<boost::shared_ptr<Component> > f,
             naming::id_type const& target_locality)
         {
             using stubs::runtime_support;
@@ -44,10 +44,10 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    unique_future<naming::id_type> copy_component(naming::id_type const& to_copy,
+    future<naming::id_type> copy_component(naming::id_type const& to_copy,
         naming::id_type const& target_locality)
     {
-        unique_future<boost::shared_ptr<Component> > f =
+        future<boost::shared_ptr<Component> > f =
             get_ptr<Component>(to_copy);
         return f.then(util::bind(&detail::copy_component_postproc<Component>,
             util::placeholders::_1, target_locality));
@@ -56,7 +56,7 @@ namespace hpx { namespace components { namespace server
     template <typename Component>
     struct copy_component_action
       : ::hpx::actions::plain_result_action2<
-            unique_future<naming::id_type>,
+            future<naming::id_type>,
             naming::id_type const&, naming::id_type const&
           , &copy_component<Component>
           , copy_component_action<Component> >

@@ -7,8 +7,8 @@
 #include <hpx/lcos/future.hpp>
 
 HPX_REGISTER_TYPED_CONTINUATION(
-    hpx::lcos::unique_future<void>,
-    hpx_lcos_unique_future_void_typed_continuation)
+    hpx::lcos::future<void>,
+    hpx_lcos_future_void_typed_continuation)
 
 HPX_REGISTER_TYPED_CONTINUATION(
     hpx::lcos::shared_future<void>,

@@ -31,7 +31,7 @@ namespace ag { namespace server
     void allgather::compute(std::vector<hpx::naming::id_type> const& point_components)
     {
      // hpx::util::spinlock::scoped_lock l(mtx_);
-      typedef std::vector<hpx::lcos::unique_future< double > > lazy_results_type;
+      typedef std::vector<hpx::lcos::future< double > > lazy_results_type;
       lazy_results_type lazy_results;
 
       server::allgather::get_item_action get_item_;
