@@ -68,183 +68,134 @@ void test_tss()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// bool tss_cleanup_called=false;
-// 
-// struct Dummy
-// {};
-// 
-// void tss_custom_cleanup(Dummy* d)
-// {
-//     delete d;
-//     tss_cleanup_called=true;
-// }
-// 
-// boost::thread_specific_ptr<Dummy> tss_with_cleanup(tss_custom_cleanup);
-// 
-// void tss_thread_with_custom_cleanup()
-// {
-//     tss_with_cleanup.reset(new Dummy);
-// }
-// 
-// void do_test_tss_with_custom_cleanup()
-// {
-//     boost::thread t(tss_thread_with_custom_cleanup);
-//     try
-//     {
-//         t.join();
-//     }
-//     catch(...)
-//     {
-//         t.interrupt();
-//         t.join();
-//         throw;
-//     }
-// 
-//     BOOST_CHECK(tss_cleanup_called);
-// }
-// 
-// 
-// void test_tss_with_custom_cleanup()
-// {
-//     timed_test(&do_test_tss_with_custom_cleanup, 2);
-// }
-// 
-// Dummy* tss_object=new Dummy;
-// 
-// void tss_thread_with_custom_cleanup_and_release()
-// {
-//     tss_with_cleanup.reset(tss_object);
-//     tss_with_cleanup.release();
-// }
-// 
-// void do_test_tss_does_no_cleanup_after_release()
-// {
-//     tss_cleanup_called=false;
-//     boost::thread t(tss_thread_with_custom_cleanup_and_release);
-//     try
-//     {
-//         t.join();
-//     }
-//     catch(...)
-//     {
-//         t.interrupt();
-//         t.join();
-//         throw;
-//     }
-// 
-//     BOOST_CHECK(!tss_cleanup_called);
-//     if(!tss_cleanup_called)
-//     {
-//         delete tss_object;
-//     }
-// }
-// 
-// struct dummy_class_tracks_deletions
-// {
-//     static unsigned deletions;
-// 
-//     ~dummy_class_tracks_deletions()
-//     {
-//         ++deletions;
-//     }
-// 
-// };
-// 
-// unsigned dummy_class_tracks_deletions::deletions=0;
-// 
-// boost::thread_specific_ptr<dummy_class_tracks_deletions> tss_with_null_cleanup(NULL);
-// 
-// void tss_thread_with_null_cleanup(dummy_class_tracks_deletions* delete_tracker)
-// {
-//     tss_with_null_cleanup.reset(delete_tracker);
-// }
-// 
-// void do_test_tss_does_no_cleanup_with_null_cleanup_function()
-// {
-//     dummy_class_tracks_deletions* delete_tracker=new dummy_class_tracks_deletions;
-//     boost::thread t(tss_thread_with_null_cleanup,delete_tracker);
-//     try
-//     {
-//         t.join();
-//     }
-//     catch(...)
-//     {
-//         t.interrupt();
-//         t.join();
-//         throw;
-//     }
-// 
-//     BOOST_CHECK(!dummy_class_tracks_deletions::deletions);
-//     if(!dummy_class_tracks_deletions::deletions)
-//     {
-//         delete delete_tracker;
-//     }
-// }
-// 
-// void test_tss_does_no_cleanup_after_release()
-// {
-//     timed_test(&do_test_tss_does_no_cleanup_after_release, 2);
-// }
-// 
-// void test_tss_does_no_cleanup_with_null_cleanup_function()
-// {
-//     timed_test(&do_test_tss_does_no_cleanup_with_null_cleanup_function, 2);
-// }
-// 
-// void thread_with_local_tss_ptr()
-// {
-//     {
-//         boost::thread_specific_ptr<Dummy> local_tss(tss_custom_cleanup);
-// 
-//         local_tss.reset(new Dummy);
-//     }
-//     BOOST_CHECK(tss_cleanup_called);
-//     tss_cleanup_called=false;
-// }
-// 
-// 
-// void test_tss_does_not_call_cleanup_after_ptr_destroyed()
-// {
-//     boost::thread t(thread_with_local_tss_ptr);
-//     t.join();
-//     BOOST_CHECK(!tss_cleanup_called);
-// }
-// 
-// void test_tss_cleanup_not_called_for_null_pointer()
-// {
-//     boost::thread_specific_ptr<Dummy> local_tss(tss_custom_cleanup);
-//     local_tss.reset(new Dummy);
-//     tss_cleanup_called=false;
-//     local_tss.reset(0);
-//     BOOST_CHECK(tss_cleanup_called);
-//     tss_cleanup_called=false;
-//     local_tss.reset(new Dummy);
-//     BOOST_CHECK(!tss_cleanup_called);
-// }
-// 
-// void test_tss_at_the_same_adress()
-// {
-//   for(int i=0; i<2; i++)
-//   {
-//     boost::thread_specific_ptr<Dummy> local_tss(tss_custom_cleanup);
-//     local_tss.reset(new Dummy);
-//     tss_cleanup_called=false;
-//     BOOST_CHECK(tss_cleanup_called);
-//     tss_cleanup_called=false;
-//     BOOST_CHECK(!tss_cleanup_called);
-//   }
-// }
+bool tss_cleanup_called = false;
 
+struct Dummy {};
+
+void tss_custom_cleanup(Dummy* d)
+{
+    delete d;
+    tss_cleanup_called = true;
+}
+
+hpx::threads::thread_specific_ptr<Dummy> tss_with_cleanup(&tss_custom_cleanup);
+
+void tss_thread_with_custom_cleanup()
+{
+    tss_with_cleanup.reset(new Dummy);
+}
+
+void test_tss_with_custom_cleanup()
+{
+    hpx::thread t(&tss_thread_with_custom_cleanup);
+    t.join();
+
+    HPX_TEST(tss_cleanup_called);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+Dummy* tss_object = new Dummy;
+
+void tss_thread_with_custom_cleanup_and_release()
+{
+    tss_with_cleanup.reset(tss_object);
+    tss_with_cleanup.release();
+}
+
+void test_tss_does_no_cleanup_after_release()
+{
+    tss_cleanup_called = false;
+
+    hpx::thread t(&tss_thread_with_custom_cleanup_and_release);
+    t.join();
+
+    HPX_TEST(!tss_cleanup_called);
+    if (!tss_cleanup_called)
+    {
+        delete tss_object;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+struct dummy_class_tracks_deletions
+{
+    static unsigned deletions;
+
+    ~dummy_class_tracks_deletions()
+    {
+        ++deletions;
+    }
+};
+
+unsigned dummy_class_tracks_deletions::deletions = 0;
+
+hpx::threads::thread_specific_ptr<dummy_class_tracks_deletions> 
+    tss_with_null_cleanup(0);
+
+void tss_thread_with_null_cleanup(dummy_class_tracks_deletions* delete_tracker)
+{
+    tss_with_null_cleanup.reset(delete_tracker);
+}
+
+void test_tss_does_no_cleanup_with_null_cleanup_function()
+{
+    dummy_class_tracks_deletions* delete_tracker = 
+        new dummy_class_tracks_deletions;
+    hpx::thread t(&tss_thread_with_null_cleanup, delete_tracker);
+    t.join();
+
+    HPX_TEST(!dummy_class_tracks_deletions::deletions);
+    if (!dummy_class_tracks_deletions::deletions)
+    {
+        delete delete_tracker;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void thread_with_local_tss_ptr()
+{
+    tss_cleanup_called = false;
+
+    {
+        hpx::threads::thread_specific_ptr<Dummy> local_tss(tss_custom_cleanup);
+        local_tss.reset(new Dummy);
+    }
+
+    HPX_TEST(tss_cleanup_called);
+    tss_cleanup_called = false;
+}
+
+void test_tss_does_not_call_cleanup_after_ptr_destroyed()
+{
+    hpx::thread t(&thread_with_local_tss_ptr);
+    t.join();
+
+    HPX_TEST(!tss_cleanup_called);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+void test_tss_cleanup_not_called_for_null_pointer()
+{
+    hpx::threads::thread_specific_ptr<Dummy> local_tss(tss_custom_cleanup);
+    local_tss.reset(new Dummy);
+
+    tss_cleanup_called = false;
+    local_tss.reset(0);
+    HPX_TEST(tss_cleanup_called);
+
+    tss_cleanup_called = false;
+    local_tss.reset(new Dummy);
+    HPX_TEST(!tss_cleanup_called);
+}
 
 int main(int argc, char**argv)
 {
     test_tss();
-//     test->add(BOOST_TEST_CASE(test_tss));
-//     test->add(BOOST_TEST_CASE(test_tss_with_custom_cleanup));
-//     test->add(BOOST_TEST_CASE(test_tss_does_no_cleanup_after_release));
-//     test->add(BOOST_TEST_CASE(test_tss_does_no_cleanup_with_null_cleanup_function));
-//     test->add(BOOST_TEST_CASE(test_tss_does_not_call_cleanup_after_ptr_destroyed));
-//     test->add(BOOST_TEST_CASE(test_tss_cleanup_not_called_for_null_pointer));
+    test_tss_with_custom_cleanup();
+    test_tss_does_no_cleanup_after_release();
+    test_tss_does_no_cleanup_with_null_cleanup_function();
+    test_tss_does_not_call_cleanup_after_ptr_destroyed();
+    test_tss_cleanup_not_called_for_null_pointer();
 
     return hpx::util::report_errors();
 }

@@ -468,9 +468,9 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         return set_tss_thread_data(m_thread_data, data);
     }
 
-    tss_storage* get_thread_tss_data() const
+    tss_storage* get_thread_tss_data(bool create_if_needed) const
     {
-        if (!m_thread_data)
+        if (!m_thread_data && create_if_needed)
             m_thread_data = create_tss_storage();
         return m_thread_data;
     }

@@ -40,8 +40,6 @@ namespace hpx { namespace threads
         struct run_custom_cleanup_function
           : util::coroutines::detail::tss_cleanup_function
         {
-            void (*cleanup_function)(T*);
-
             explicit run_custom_cleanup_function(void (*cleanup_function_)(T*)):
                 cleanup_function(cleanup_function_)
             {}
@@ -50,6 +48,8 @@ namespace hpx { namespace threads
             {
                 cleanup_function(static_cast<T*>(data));
             }
+
+            void (*cleanup_function)(T*);
         };
 
         boost::shared_ptr<cleanup_function> cleanup_;
@@ -69,8 +69,9 @@ namespace hpx { namespace threads
 
         ~thread_specific_ptr()
         {
-            util::coroutines::detail::set_tss_data(
-                this, boost::shared_ptr<cleanup_function>());
+            // clean up data if this type is used locally for one thread
+            if (get_self_ptr())
+                util::coroutines::detail::erase_tss_node(this, true);
         }
 
         T* get() const
@@ -92,7 +93,7 @@ namespace hpx { namespace threads
         {
             T* const temp = get();
             util::coroutines::detail::set_tss_data(
-                this, boost::shared_ptr<cleanup_function>(), 0, false);
+                this, boost::shared_ptr<cleanup_function>());
             return temp;
         }
         void reset(T* new_value = 0)

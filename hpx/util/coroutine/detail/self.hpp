@@ -210,7 +210,13 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     tss_storage* get_thread_tss_data()
     {
         HPX_ASSERT(m_pimpl);
-        return m_pimpl->get_thread_tss_data();
+        return m_pimpl->get_thread_tss_data(false);
+    }
+
+    tss_storage* get_or_create_thread_tss_data()
+    {
+        HPX_ASSERT(m_pimpl);
+        return m_pimpl->get_thread_tss_data(true);
     }
 #endif
 

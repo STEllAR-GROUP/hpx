@@ -21,10 +21,12 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     void tss_data_node::cleanup(bool cleanup_existing)
     {
-        if(cleanup_existing && func_ && (value_ != 0))
+        if (cleanup_existing && func_ && (value_ != 0))
         {
             (*func_)(value_);
         }
+        func_.reset();
+        value_ = 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -80,9 +82,15 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
             data_.insert(std::make_pair(key, tss_data_node(func, tss_data)));
         }
 
-        void erase(void const* key)
+        void erase(void const* key, bool cleanup_existing)
         {
-            data_.erase(key);
+            tss_data_node* node = find(key);
+            if (node)
+            {
+                if (!cleanup_existing)
+                    node->cleanup(false);
+                data_.erase(key);
+            }
         }
 
     private:
@@ -121,7 +129,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         }
 
         detail::tss_storage* tss_map = self->get_thread_tss_data();
-        HPX_ASSERT(NULL != tss_map);
+        if (NULL == tss_map)
+            return 0;
 
         return tss_map->find(key);
     }
@@ -143,13 +152,13 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
             return;
         }
 
-        detail::tss_storage* tss_map = self->get_thread_tss_data();
+        detail::tss_storage* tss_map = self->get_or_create_thread_tss_data();
         HPX_ASSERT(NULL != tss_map);
 
         tss_map->insert(key, func, tss_data);
     }
 
-    void erase_tss_node(void const* key)
+    void erase_tss_node(void const* key, bool cleanup_existing)
     {
         hpx::threads::thread_self* self = hpx::threads::get_self_ptr();
         if (NULL == self)
@@ -159,9 +168,8 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
         }
 
         detail::tss_storage* tss_map = self->get_thread_tss_data();
-        HPX_ASSERT(NULL != tss_map);
-
-        tss_map->erase(key);
+        if (NULL != tss_map)
+            tss_map->erase(key, cleanup_existing);
     }
 
     void set_tss_data(void const* key,
@@ -173,7 +181,7 @@ namespace hpx { namespace util { namespace coroutines { namespace detail
             if (func || (tss_data != 0))
                 current_node->reinit(func, tss_data, cleanup_existing);
             else
-                erase_tss_node(key);
+                erase_tss_node(key, cleanup_existing);
         }
         else if(func || (tss_data != 0))
         {
