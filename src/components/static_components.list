@@ -13,5 +13,6 @@ binpacking_factory,binpacking_factory
 dataflow,dataflow,dataflow_trigger
 distributing_factory,distributing_factory
 iostreams,output_stream_factory
+memory,<none>
 remote_object,remote_object
 #security,root_certificate_authority,subordinate_certificate_authority

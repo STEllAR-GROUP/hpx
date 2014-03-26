@@ -42,23 +42,28 @@ else()
     hpx_debug("hpx_static_componentlist"
         "create_static_module_data_dir: ${create_static_module_data_dir}")
 
+    set(create_static_module_input
+      ${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in)
+    set(create_static_module_output
+      ${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp)
+
     add_custom_command(
-      OUTPUT ${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp
+      OUTPUT ${create_static_module_output}
       COMMAND
           "${create_static_module_data_dir}/create_static_module_data_exe"
-          "${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in"
-          "${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp"
+          "${create_static_module_input}"
+          "${create_static_module_output}"
           "${component_list_files}"
       COMMENT "Generating static component list."
       DEPENDS create_static_module_data_exe ${static_component_data_dependencies})
 
     set(static_component_data_files
-      ${hpx_SOURCE_DIR}/cmake/templates/static_component_data.hpp.in
+      ${create_static_module_input}
       ${hpx_SOURCE_DIR}/src/components/static_components.list
-      ${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp)
+      ${create_static_module_output})
 
     add_custom_target(static_component_data_hpp
-      DEPENDS ${hpx_SOURCE_DIR}/hpx/components/static_component_data.hpp
+      DEPENDS ${create_static_module_output}
       SOURCES ${static_component_data_files})
 
     # add files to created project file
