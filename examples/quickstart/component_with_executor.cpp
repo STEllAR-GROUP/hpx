@@ -15,7 +15,7 @@ struct hello_world_server
   : hpx::components::managed_component_base<hello_world_server>
 {
     hello_world_server()
-      : sched_(2)           // run on 2 threads
+      : sched_(hpx::get_num_worker_threads())   // run on all available cores
     {}
 
     void print() const
