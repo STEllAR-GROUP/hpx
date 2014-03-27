@@ -31,9 +31,12 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
+
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
 #include <hpx/lcos/broadcast.hpp>
+#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/reduce.hpp>
+#endif
 #endif
 
 #include <hpx/util/assert.hpp>
@@ -517,7 +520,7 @@ namespace hpx { namespace components { namespace server
     }
 }}}
 
-#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
@@ -525,6 +528,8 @@ typedef hpx::components::server::runtime_support::call_shutdown_functions_action
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(call_shutdown_functions_action)
 HPX_REGISTER_BROADCAST_ACTION(call_shutdown_functions_action)
+
+#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef std::logical_or<bool> std_logical_or_type;
@@ -536,6 +541,7 @@ HPX_REGISTER_REDUCE_ACTION_DECLARATION(dijkstra_termination_action, std_logical_
 HPX_REGISTER_REDUCE_ACTION(dijkstra_termination_action, std_logical_or_type)
 
 #endif
+#endif
 
 namespace hpx { namespace components { namespace server
 {
@@ -544,7 +550,7 @@ namespace hpx { namespace components { namespace server
     void invoke_shutdown_functions(
         std::vector<naming::id_type> const& prefixes, bool pre_shutdown)
     {
-#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
+#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
         call_shutdown_functions_action act;
         lcos::broadcast(act, prefixes, pre_shutdown).get();
 #else
@@ -572,7 +578,7 @@ namespace hpx { namespace components { namespace server
     }
 
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
-    // This new code does not work, currently as the return actions generated
+    // This new code does not work, currently, as the return actions generated
     // by the futures used by hpx::reduce make the sender black. This causes
     // an infinite loop while waiting for the Dijkstra termination detection
     // to return.

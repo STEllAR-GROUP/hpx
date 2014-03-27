@@ -9,6 +9,7 @@
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/config/warnings_prefix.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/safe_bool.hpp>
 
 #include <boost/serialization/split_member.hpp>
 #include <boost/intrusive_ptr.hpp>

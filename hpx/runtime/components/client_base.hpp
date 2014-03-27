@@ -14,6 +14,7 @@
 #include <hpx/runtime/components/stubs/stub_base.hpp>
 #include <hpx/util/always_void.hpp>
 #include <hpx/util/move.hpp>
+#include <hpx/util/safe_bool.hpp>
 #include <hpx/lcos/future.hpp>
 
 #include <utility>
@@ -125,6 +126,11 @@ namespace hpx { namespace components
             if (this != &rhs)
                 gid_ = std::move(rhs.gid_);
             return *this;
+        }
+
+        operator typename util::safe_bool<client_base>::result_type() const
+        {
+            return util::safe_bool<client_base>()(gid_.valid());
         }
 
         ///////////////////////////////////////////////////////////////////////
