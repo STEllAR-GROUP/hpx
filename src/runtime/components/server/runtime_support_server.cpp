@@ -544,7 +544,6 @@ namespace hpx { namespace components { namespace server
     void invoke_shutdown_functions(
         std::vector<naming::id_type> const& prefixes, bool pre_shutdown)
     {
-        std::vector<lcos::future<void> > lazy_actions;
 #if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
         call_shutdown_functions_action act;
         lcos::broadcast(act, prefixes, pre_shutdown).get();
