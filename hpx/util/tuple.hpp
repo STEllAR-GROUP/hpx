@@ -21,6 +21,7 @@
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <utility>
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/size_t.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -976,15 +977,22 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR explicit tuple(
             BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_FWD_REF_PARAM, _)
           , typename boost::enable_if_c<
+#       if N == 1
+                boost::mpl::eval_if_c<
+                    boost::is_base_of<
+                        tuple, typename boost::remove_reference<U0>::type
+                    >::value || detail::are_tuples_compatible<tuple, U0&&>::value
+                  , boost::mpl::false_
+                  , detail::are_tuples_compatible<
+                        tuple
+                      , tuple<BOOST_PP_ENUM_PARAMS(N, U)>&&
+                    >
+                >::type::value
+#       else
                 detail::are_tuples_compatible<
                     tuple
                   , tuple<BOOST_PP_ENUM_PARAMS(N, U)>&&
                 >::value
-#       if N == 1
-             && !boost::is_base_of<
-                    tuple, typename boost::remove_reference<U0>::type
-                 >::value
-             && !detail::are_tuples_compatible<tuple, U0&&>::value
 #       endif
             >::type* = 0
         ) : BOOST_PP_ENUM(N, HPX_UTIL_TUPLE_FORWARD_CONSTRUCT, _)

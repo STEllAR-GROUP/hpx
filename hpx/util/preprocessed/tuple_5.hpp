@@ -64,14 +64,16 @@ namespace hpx { namespace util
         BOOST_CONSTEXPR explicit tuple(
             U0 && u0
           , typename boost::enable_if_c<
-                detail::are_tuples_compatible<
-                    tuple
-                  , tuple<U0>&&
-                >::value
-             && !boost::is_base_of<
-                    tuple, typename boost::remove_reference<U0>::type
-                 >::value
-             && !detail::are_tuples_compatible<tuple, U0&&>::value
+                boost::mpl::eval_if_c<
+                    boost::is_base_of<
+                        tuple, typename boost::remove_reference<U0>::type
+                    >::value || detail::are_tuples_compatible<tuple, U0&&>::value
+                  , boost::mpl::false_
+                  , detail::are_tuples_compatible<
+                        tuple
+                      , tuple<U0>&&
+                    >
+                >::type::value
             >::type* = 0
         ) : _m0 (std::forward<U0>(u0))
         {}
