@@ -35,9 +35,10 @@ namespace hpx { namespace util
 
         static void no_deleter(T*) {}
 
-        static void deleter(T* p, Allocator alloc, std::size_t size)
+        template <typename Deallocator>
+        static void deleter(T* p, Deallocator dealloc, std::size_t size)
         {
-            alloc.deallocate(p, size);
+            dealloc.deallocate(p, size);
         }
 
     public:
@@ -50,13 +51,13 @@ namespace hpx { namespace util
                             // ownership and manages the lifetime of it
         };
 
-        explicit serialize_buffer(allocator_type const& alloc = Allocator())
+        explicit serialize_buffer(allocator_type const& alloc = allocator_type())
           : size_(0)
           , alloc_(alloc)
         {}
 
         serialize_buffer (T const* data, std::size_t size,
-                allocator_type const& alloc = Allocator())
+                allocator_type const& alloc = allocator_type())
           : data_()
           , size_(size)
           , alloc_(alloc)
@@ -64,13 +65,14 @@ namespace hpx { namespace util
             // create from const data implies 'copy' mode
             using util::placeholders::_1;
             data_.reset(alloc_.allocate(size),
-                util::bind(&serialize_buffer::deleter, _1, alloc_, size_));
+                util::bind(&serialize_buffer::deleter<allocator_type>, _1,
+                    alloc_, size_));
             if (size != 0)
                 std::copy(data, data + size, data_.get());
         }
 
         serialize_buffer (T* data, std::size_t size, init_mode mode,
-                allocator_type const& alloc = Allocator())
+                allocator_type const& alloc = allocator_type())
           : data_()
           , size_(size)
           , alloc_(alloc)
@@ -78,7 +80,8 @@ namespace hpx { namespace util
             if (mode == copy) {
                 using util::placeholders::_1;
                 data_.reset(alloc_.allocate(size),
-                    util::bind(&serialize_buffer::deleter, _1, alloc_, size_));
+                    util::bind(&serialize_buffer::deleter<allocator_type>, _1,
+                        alloc_, size_));
                 if (size != 0)
                     std::copy(data, data + size, data_.get());
             }
@@ -90,14 +93,44 @@ namespace hpx { namespace util
                 // take ownership
                 using util::placeholders::_1;
                 data_ = boost::shared_array<T>(data,
-                    util::bind(&serialize_buffer::deleter, _1, alloc_, size_));
+                    util::bind(&serialize_buffer::deleter<allocator_type>, _1,
+                        alloc_, size_));
+            }
+        }
+
+        template <typename Deallocator>
+        serialize_buffer (T* data, std::size_t size, init_mode mode,
+                allocator_type const& alloc, Deallocator const& dealloc)
+          : data_()
+          , size_(size)
+          , alloc_(alloc)
+        {
+            if (mode == copy) {
+                using util::placeholders::_1;
+                data_.reset(alloc_.allocate(size),
+                    util::bind(&serialize_buffer::deleter<allocator_type>, _1,
+                        alloc, size_));
+                if (size != 0)
+                    std::copy(data, data + size, data_.get());
+            }
+            else if (mode == reference) {
+                data_ = boost::shared_array<T>(data,
+                    &serialize_buffer::no_deleter);
+            }
+            else {
+                // take ownership
+                using util::placeholders::_1;
+                data_ = boost::shared_array<T>(data,
+                    util::bind(&serialize_buffer::deleter<Deallocator>, _1,
+                        dealloc, size_));
             }
         }
 
         T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
+
         boost::shared_array<T> data_array() const { return data_; }
- 
+
         std::size_t size() const { return size_; }
 
     private:
@@ -145,7 +178,8 @@ namespace hpx { namespace util
             ar >> size_ >> alloc_;
 
             data_.reset(alloc_.allocate(size_),
-                util::bind(&serialize_buffer::deleter, _1, alloc_, size_));
+                util::bind(&serialize_buffer::deleter<allocator_type>, _1,
+                    alloc_, size_));
 
             typedef typename
                 boost::serialization::use_array_optimization<Archive>::template apply<
@@ -239,8 +273,9 @@ namespace hpx { namespace util
 
         T* data() { return data_.get(); }
         T const* data() const { return data_.get(); }
+
         boost::shared_array<T> data_array() const { return data_; }
- 
+
         std::size_t size() const { return size_; }
 
     private:
