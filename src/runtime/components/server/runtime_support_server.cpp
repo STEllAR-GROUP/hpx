@@ -31,7 +31,7 @@
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/applier/apply.hpp>
 #include <hpx/lcos/wait_all.hpp>
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 #include <hpx/lcos/broadcast.hpp>
 #include <hpx/lcos/reduce.hpp>
 #endif
@@ -517,7 +517,7 @@ namespace hpx { namespace components { namespace server
     }
 }}}
 
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::server::runtime_support::call_shutdown_functions_action
@@ -544,12 +544,12 @@ namespace hpx { namespace components { namespace server
     void invoke_shutdown_functions(
         std::vector<naming::id_type> const& prefixes, bool pre_shutdown)
     {
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
         call_shutdown_functions_action act;
         lcos::broadcast(act, prefixes, pre_shutdown).get();
 #else
         std::vector<lcos::unique_future<void> > lazy_actions;
-        BOOST_FOREACH(naming::id_type const& gid, prefixes)
+        BOOST_FOREACH(naming::id_type const& id, prefixes)
         {
             using components::stubs::runtime_support;
             lazy_actions.push_back(
@@ -571,7 +571,12 @@ namespace hpx { namespace components { namespace server
         dijkstra_color_ = true;
     }
 
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION > 40400)
+#if defined(HPX_USE_FAST_DIJKSTRA_TERMINATION_DETECTION)
+    // This new code does not work, currently as the return actions generated
+    // by the futures used by hpx::reduce make the sender black. This causes
+    // an infinite loop while waiting for the Dijkstra termination detection
+    // to return.
+
     // invoked during termination detection
     bool runtime_support::dijkstra_termination()
     {
@@ -680,7 +685,7 @@ namespace hpx { namespace components { namespace server
     }
 
     // invoked during termination detection
-    bool runtime_support::dijkstra_termination(
+    void runtime_support::dijkstra_termination(
         boost::uint32_t initiating_locality_id, boost::uint32_t num_localities,
         bool dijkstra_token)
     {
@@ -700,7 +705,7 @@ namespace hpx { namespace components { namespace server
             }
 
             dijkstra_cond_.notify_one();
-            return true;
+            return;
         }
 
         if (0 == locality_id)
@@ -708,7 +713,6 @@ namespace hpx { namespace components { namespace server
 
         send_dijkstra_termination_token(locality_id - 1,
             initiating_locality_id, num_localities, dijkstra_token);
-        return false;
     }
 
     // kick off termination detection
