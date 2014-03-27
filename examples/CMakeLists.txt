@@ -17,6 +17,7 @@ set(subdirs
     interpolate1d
     jacobi
     jacobi_smp
+    network_storage
     nqueen
     performance_counters
     quickstart
