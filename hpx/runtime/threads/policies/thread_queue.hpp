@@ -524,12 +524,14 @@ namespace hpx { namespace threads { namespace policies
             add_new_time_(0),
             cleanup_terminated_time_(0),
 #endif
+#if HPX_THREAD_MAINTAIN_STEALING_COUNTS
             pending_misses_(0),
             pending_accesses_(0),
             stolen_from_pending_(0),
             stolen_from_staged_(0),
             stolen_to_pending_(0),
             stolen_to_staged_(0),
+#endif
             add_new_logger_("thread_queue::add_new")
         {}
 
