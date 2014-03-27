@@ -295,15 +295,24 @@ namespace hpx { namespace actions
         virtual void load(hpx::util::portable_binary_iarchive & ar) = 0;
         virtual void save(hpx::util::portable_binary_oarchive & ar) const = 0;
 
-        /// Return all data needed for thread initialization
-        virtual threads::thread_init_data&
-        get_thread_init_data(naming::id_type const& target,
-            naming::address::address_type lva, threads::thread_init_data& data) = 0;
+//         /// Return all data needed for thread initialization
+//         virtual threads::thread_init_data&
+//         get_thread_init_data(naming::id_type const& target,
+//             naming::address::address_type lva, threads::thread_init_data& data) = 0;
+// 
+//         virtual threads::thread_init_data&
+//         get_thread_init_data(continuation_type& cont,
+//             naming::id_type const& target, naming::address::address_type lva,
+//             threads::thread_init_data& data) = 0;
 
-        virtual threads::thread_init_data&
-        get_thread_init_data(continuation_type& cont,
+        /// Return all data needed for thread initialization
+        virtual void schedule_thread(naming::id_type const& target,
+            naming::address::address_type lva,
+            threads::thread_state_enum initial_state) = 0;
+
+        virtual void schedule_thread(continuation_type& cont,
             naming::id_type const& target, naming::address::address_type lva,
-            threads::thread_init_data& data) = 0;
+            threads::thread_state_enum initial_state) = 0;
 
         /// Return a pointer to the filter to be used while serializing an
         /// instance of this action type.
@@ -460,7 +469,7 @@ namespace hpx { namespace actions
         /// retrieve component type
         static int get_static_component_type()
         {
-            return Action::get_component_type();
+            return derived_type::get_component_type();
         }
 
     private:
@@ -468,7 +477,7 @@ namespace hpx { namespace actions
         /// of the component this action belongs to.
         int get_component_type() const
         {
-            return Action::get_component_type();
+            return derived_type::get_component_type();
         }
 
         /// The function \a get_action_name returns the name of this action
@@ -482,7 +491,7 @@ namespace hpx { namespace actions
         /// to be executed in a new thread or directly.
         action_type get_action_type() const
         {
-            return Action::get_action_type();
+            return derived_type::get_action_type();
         }
 
         /// The \a get_thread_function constructs a proper thread function for
@@ -501,7 +510,7 @@ namespace hpx { namespace actions
         HPX_STD_FUNCTION<threads::thread_function_type>
         get_thread_function(naming::address::address_type lva)
         {
-            return Action::construct_thread_function(lva,
+            return derived_type::construct_thread_function(lva,
                 std::move(arguments_));
         }
 
@@ -524,7 +533,7 @@ namespace hpx { namespace actions
         get_thread_function(continuation_type& cont,
             naming::address::address_type lva)
         {
-            return Action::construct_thread_function(cont, lva,
+            return derived_type::construct_thread_function(cont, lva,
                 std::move(arguments_));
         }
 
@@ -587,13 +596,13 @@ namespace hpx { namespace actions
         /// Return whether the embedded action may require id-splitting
         bool may_require_id_splitting() const
         {
-            return traits::action_may_require_id_splitting<Action>::call(arguments_);
+            return traits::action_may_require_id_splitting<derived_type>::call(arguments_);
         }
 
         /// Return whether the embedded action is part of termination detection
         bool does_termination_detection() const
         {
-            return traits::action_does_termination_detection<Action>::call();
+            return traits::action_does_termination_detection<derived_type>::call();
         }
 
         /// Return all data needed for thread initialization
@@ -639,6 +648,25 @@ namespace hpx { namespace actions
 
             data.target = target;
             return data;
+        }
+
+        // schedule a new thread
+        void schedule_thread(naming::id_type const& target,
+            naming::address::address_type lva,
+            threads::thread_state_enum initial_state)
+        {
+            threads::thread_init_data data;
+            derived_type::schedule_thread(lva,
+                get_thread_init_data(target, lva, data), initial_state);
+        }
+
+        void schedule_thread(continuation_type& cont,
+            naming::id_type const& target, naming::address::address_type lva,
+            threads::thread_state_enum initial_state)
+        {
+            threads::thread_init_data data;
+            derived_type::schedule_thread(lva,
+                get_thread_init_data(cont, target, lva, data), initial_state);
         }
 
         /// Return a pointer to the filter to be used while serializing an
@@ -854,10 +882,22 @@ namespace hpx { namespace actions
         /// This allows to hook into the execution of all actions for a particular
         /// component type.
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        decorate_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
-            naming::address::address_type lva)
+        decorate_action(naming::address::address_type lva,
+            HPX_STD_FUNCTION<threads::thread_function_type> f)
         {
-            return Component::wrap_action(std::move(f), lva);
+            return Component::wrap_action(lva, std::move(f));
+        }
+
+        // Enable hooking into the creation of a new thread. Give an action a
+        // possibility to customize the way threads are scheduled.
+        ///
+        /// This allows to hook into the creation of threads for all actions
+        /// for a particular component type.
+        static void schedule_thread(naming::address::address_type lva,
+            threads::thread_init_data& data,
+            threads::thread_state_enum initial_state)
+        {
+            Component::schedule_thread(lva, data, initial_state);
         }
 
     private:

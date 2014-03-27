@@ -90,9 +90,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args))));
         }
         
         
@@ -103,9 +103,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -263,9 +263,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args))));
         }
         
         
@@ -276,9 +276,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -487,9 +487,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args))));
         }
         
         
@@ -500,9 +500,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -660,9 +660,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args))));
         }
         
         
@@ -673,9 +673,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -884,9 +884,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args))));
         }
         
         
@@ -897,9 +897,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -1057,9 +1057,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args))));
         }
         
         
@@ -1070,9 +1070,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -1281,9 +1281,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args))));
         }
         
         
@@ -1294,9 +1294,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -1454,9 +1454,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args))));
         }
         
         
@@ -1467,9 +1467,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -1678,9 +1678,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args))));
         }
         
         
@@ -1691,9 +1691,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -1851,9 +1851,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args))));
         }
         
         
@@ -1864,9 +1864,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -2075,9 +2075,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args))));
         }
         
         
@@ -2088,9 +2088,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -2248,9 +2248,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args))));
         }
         
         
@@ -2261,9 +2261,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -2472,9 +2472,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args))));
         }
         
         
@@ -2485,9 +2485,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -2645,9 +2645,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args))));
         }
         
         
@@ -2658,9 +2658,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -2869,9 +2869,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args))));
         }
         
         
@@ -2882,9 +2882,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -3042,9 +3042,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args))));
         }
         
         
@@ -3055,9 +3055,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -3266,9 +3266,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args))));
         }
         
         
@@ -3279,9 +3279,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -3439,9 +3439,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args))));
         }
         
         
@@ -3452,9 +3452,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -3663,9 +3663,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args))));
         }
         
         
@@ -3676,9 +3676,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>
@@ -3836,9 +3836,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args))), lva);
+                    util::get< 0>(std::forward<Arguments>( args)) , util::get< 1>(std::forward<Arguments>( args)) , util::get< 2>(std::forward<Arguments>( args)) , util::get< 3>(std::forward<Arguments>( args)) , util::get< 4>(std::forward<Arguments>( args)) , util::get< 5>(std::forward<Arguments>( args)) , util::get< 6>(std::forward<Arguments>( args)) , util::get< 7>(std::forward<Arguments>( args)) , util::get< 8>(std::forward<Arguments>( args)) , util::get< 9>(std::forward<Arguments>( args))));
         }
         
         
@@ -3849,9 +3849,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
         
         template <typename Arguments>

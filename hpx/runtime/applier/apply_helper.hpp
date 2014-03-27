@@ -41,13 +41,23 @@ namespace hpx { namespace applier { namespace detail
         call (naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Arguments && args)
         {
-            hpx::applier::register_work_plain(
-                std::move(Action::construct_thread_function(
-                    lva, std::forward<Arguments>(args))),
-                target, actions::detail::get_action_name<Action>(), lva,
-                threads::pending, fix_priority<Action>(priority), std::size_t(-1),
+            threads::thread_init_data data;
+
+            data.func = Action::construct_thread_function(lva,
+                std::forward<Arguments>(args));
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+            data.lva = lva;
+#endif
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
+            data.description = actions::detail::get_action_name<Action>();
+#endif
+            data.priority = fix_priority<Action>(priority);
+            data.stacksize = threads::get_stack_size(
                 static_cast<threads::thread_stacksize>(
                     traits::action_stacksize<Action>::value));
+            data.target = target;
+
+            Action::schedule_thread(lva, data, threads::pending);
         }
 
         template <typename Arguments>
@@ -56,13 +66,23 @@ namespace hpx { namespace applier { namespace detail
             naming::address::address_type lva, threads::thread_priority priority,
             Arguments && args)
         {
-            hpx::applier::register_work_plain(
-                std::move(Action::construct_thread_function(c, lva,
-                    std::forward<Arguments>(args))),
-                target, actions::detail::get_action_name<Action>(), lva,
-                threads::pending, fix_priority<Action>(priority), std::size_t(-1),
+            threads::thread_init_data data;
+
+            data.func = Action::construct_thread_function(c, lva,
+                std::forward<Arguments>(args));
+#if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
+            data.lva = lva;
+#endif
+#if HPX_THREAD_MAINTAIN_DESCRIPTION
+            data.description = actions::detail::get_action_name<Action>();
+#endif
+            data.priority = fix_priority<Action>(priority);
+            data.stacksize = threads::get_stack_size(
                 static_cast<threads::thread_stacksize>(
                     traits::action_stacksize<Action>::value));
+            data.target = target;
+
+            Action::schedule_thread(lva, data, threads::pending);
         }
     };
 

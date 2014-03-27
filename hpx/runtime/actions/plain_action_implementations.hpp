@@ -146,9 +146,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)), lva);
+                    BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)));
         }
 
         // This static construct_thread_function allows to construct
@@ -160,9 +160,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
 
         // direct execution
@@ -339,9 +339,9 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()),
-                    BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)), lva);
+                    BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)));
         }
 
         // This static construct_thread_function allows to construct
@@ -353,9 +353,9 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(
+            return Derived::decorate_action(lva,
                 base_type::construct_continuation_thread_function_void(
-                    cont, F, std::forward<Arguments>(args)), lva);
+                    cont, F, std::forward<Arguments>(args)));
         }
 
         //  direct execution

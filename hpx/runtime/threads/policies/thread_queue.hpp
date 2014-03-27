@@ -134,20 +134,51 @@ namespace hpx { namespace threads { namespace policies
             std::list<thread_id_type>* heap = 0;
 
             if (stacksize == get_stack_size(thread_stacksize_small))
+            {
                 heap = &thread_heap_small_;
-
+            }
             else if (stacksize == get_stack_size(thread_stacksize_medium))
+            {
                 heap = &thread_heap_medium_;
-
+            }
             else if (stacksize == get_stack_size(thread_stacksize_large))
+            {
                 heap = &thread_heap_large_;
-
+            }
             else if (stacksize == get_stack_size(thread_stacksize_huge))
+            {
                 heap = &thread_heap_huge_;
-
+            }
             else if (stacksize == get_stack_size(thread_stacksize_nostack))
+            {
                 heap = &thread_heap_nostack_;
+            }
+            else {
+                switch(stacksize) {
+                case thread_stacksize_small:
+                    heap = &thread_heap_small_;
+                    break;
 
+                case thread_stacksize_medium:
+                    heap = &thread_heap_medium_;
+                    break;
+
+                case thread_stacksize_large:
+                    heap = &thread_heap_large_;
+                    break;
+
+                case thread_stacksize_huge:
+                    heap = &thread_heap_huge_;
+                    break;
+
+                case thread_stacksize_nostack:
+                    heap = &thread_heap_nostack_;
+                    break;
+
+                default:
+                    break;
+                }
+            }
             HPX_ASSERT(heap);
 
             // Check for an unused thread object.
@@ -322,30 +353,49 @@ namespace hpx { namespace threads { namespace policies
             {
                 thread_heap_small_.push_front(thrd);
             }
-
             else if (stacksize == get_stack_size(thread_stacksize_medium))
             {
                 thread_heap_medium_.push_front(thrd);
             }
-
             else if (stacksize == get_stack_size(thread_stacksize_large))
             {
                 thread_heap_large_.push_front(thrd);
             }
-
             else if (stacksize == get_stack_size(thread_stacksize_huge))
             {
                 thread_heap_huge_.push_front(thrd);
             }
-
             else if (stacksize == get_stack_size(thread_stacksize_nostack))
             {
                 thread_heap_nostack_.push_front(thrd);
             }
-
             else
             {
-                HPX_ASSERT(false);
+                switch(stacksize) {
+                case thread_stacksize_small:
+                    thread_heap_small_.push_front(thrd);
+                    break;
+
+                case thread_stacksize_medium:
+                    thread_heap_medium_.push_front(thrd);
+                    break;
+
+                case thread_stacksize_large:
+                    thread_heap_large_.push_front(thrd);
+                    break;
+
+                case thread_stacksize_huge:
+                    thread_heap_huge_.push_front(thrd);
+                    break;
+
+                case thread_stacksize_nostack:
+                    thread_heap_nostack_.push_front(thrd);
+                    break;
+
+                default:
+                    HPX_ASSERT(false);
+                    break;
+                }
             }
         }
 

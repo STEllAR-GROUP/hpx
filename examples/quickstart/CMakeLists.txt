@@ -9,6 +9,7 @@ set(example_programs
     component_in_executable
     component_inheritance
     component_inheritance_simple
+    component_with_executor
     composable_guard
     data_actions
     error_handling
@@ -57,6 +58,7 @@ endif()
 
 set(component_in_executable_FLAGS DEPENDENCIES iostreams_component)
 set(component_ctors_FLAGS DEPENDENCIES iostreams_component)
+set(component_with_executor_FLAGS DEPENDENCIES iostreams_component)
 set(event_synchronization_FLAGS DEPENDENCIES iostreams_component)
 
 set(error_handling_FLAGS DEPENDENCIES iostreams_component)

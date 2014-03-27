@@ -24,10 +24,19 @@ struct plain_data
     /// This is the default hook implementation for decorate_action which
     /// does no hooking at all.
     static HPX_STD_FUNCTION<hpx::threads::thread_function_type>
-    wrap_action(HPX_STD_FUNCTION<hpx::threads::thread_function_type> f,
-        hpx::naming::address::address_type)
+    wrap_action(hpx::naming::address::address_type,
+        HPX_STD_FUNCTION<hpx::threads::thread_function_type> f)
     {
         return std::move(f);
+    }
+
+    /// This is the default hook implementation for schedule_thread which
+    /// forwards to the default scheduler.
+    static void schedule_thread(hpx::naming::address::address_type,
+        hpx::threads::thread_init_data& data,
+        hpx::threads::thread_state_enum initial_state)
+    {
+        hpx::threads::register_work_plain(data, initial_state);
     }
 };
 
@@ -91,8 +100,8 @@ public:
     construct_thread_function(hpx::naming::address::address_type lva,
         Arguments && /*args*/)
     {
-        return derived_type::decorate_action(
-            &data_get_action::thread_function, lva);
+        return derived_type::decorate_action(lva,
+            &data_get_action::thread_function);
     }
 
     /// \brief This static \a construct_thread_function allows to construct
@@ -104,10 +113,10 @@ public:
     construct_thread_function(hpx::actions::continuation_type& cont,
         hpx::naming::address::address_type lva, Arguments && args)
     {
-        return derived_type::decorate_action(
+        return derived_type::decorate_action(lva,
             base_type::construct_continuation_thread_function(
                 cont, &derived_type::get_value_function,
-                std::forward<Arguments>(args)), lva);
+                std::forward<Arguments>(args)));
     }
 
     // direct execution
@@ -174,10 +183,10 @@ public:
     construct_thread_function(hpx::naming::address::address_type lva,
         Arguments && args)
     {
-        return derived_type::decorate_action(
+        return derived_type::decorate_action(lva,
             hpx::util::bind(
                 hpx::util::one_shot(typename derived_type::thread_function()),
-                hpx::util::get<0>(std::forward<Arguments>(args))), lva);
+                hpx::util::get<0>(std::forward<Arguments>(args))));
     }
 
     /// \brief This static \a construct_thread_function allows to construct
@@ -189,10 +198,10 @@ public:
     construct_thread_function(hpx::actions::continuation_type& cont,
         hpx::naming::address::address_type lva, Arguments && args)
     {
-        return derived_type::decorate_action(
+        return derived_type::decorate_action(lva,
             base_type::construct_continuation_thread_function_void(
                 cont, &derived_type::set_value_function,
-                std::forward<Arguments>(args)), lva);
+                std::forward<Arguments>(args)));
     }
 
     // direct execution

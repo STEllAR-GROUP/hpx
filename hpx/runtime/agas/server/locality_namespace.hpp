@@ -263,15 +263,6 @@ struct HPX_EXPORT locality_namespace
 
     HPX_DEFINE_COMPONENT_ACTION(locality_namespace, remote_service, service_action);
     HPX_DEFINE_COMPONENT_ACTION(locality_namespace, remote_bulk_service, bulk_service_action);
-
-    /// This is the default hook implementation for decorate_action which
-    /// does no hooking at all.
-    static HPX_STD_FUNCTION<threads::thread_function_type>
-    wrap_action(HPX_STD_FUNCTION<threads::thread_function_type> f,
-        naming::address::address_type)
-    {
-        return std::move(f);
-    }
 };
 
 }}}
