@@ -67,7 +67,7 @@ double receive(
 
     hpx::util::high_resolution_timer t;
 
-    std::vector<hpx::unique_future<buffer_type> > recv_buffers;
+    std::vector<hpx::future<buffer_type> > recv_buffers;
     recv_buffers.resize(window_size);
 
     message_action msg;

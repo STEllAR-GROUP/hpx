@@ -43,7 +43,7 @@ namespace hpx { namespace lcos
         {
             return a0;
         }
-        
+
         template <typename A0>
         A0 when_dst()
         {
@@ -51,7 +51,8 @@ namespace hpx { namespace lcos
         }
 
         template <typename A0>
-        hpx::unique_future<A0> operator()(std::vector<hpx::id_type> const & ids, std::size_t src, A0 const & a0)
+        hpx::future<A0> operator()(std::vector<hpx::id_type> const & ids,
+            std::size_t src, A0 const & a0)
         {
             hpx::wait_all(bcast_future);
             if(ids[src] == this_id)
@@ -63,7 +64,7 @@ namespace hpx { namespace lcos
                     if(id == this_id) continue;
                     bcast_ids.push_back(id);
                 }
-                
+
                 if(bcast_ids.size() > 0)
                 {
                     hpx::id_type locality = hpx::naming::get_locality_from_id(bcast_ids[0]);
@@ -103,7 +104,7 @@ namespace hpx { namespace lcos
                 ready_future = ready_promise.get_future();
             }
         }
-        
+
         typedef hpx::lcos::local::spinlock mutex_type;
         mutex_type mtx;
 
@@ -112,17 +113,18 @@ namespace hpx { namespace lcos
 
         hpx::lcos::local::and_gate bcast_gate;
         hpx::lcos::local::promise<void> ready_promise;
-        hpx::unique_future<void> ready_future;
+        hpx::future<void> ready_future;
         hpx::util::any recv_value;
-        hpx::unique_future<void> bcast_future;
+        hpx::future<void> bcast_future;
     };
 
     namespace detail
     {
-        void broadcast_impl(std::vector<hpx::id_type> ids, hpx::util::function<void(hpx::id_type)> fun, std::size_t fan_out)
+        void broadcast_impl(std::vector<hpx::id_type> ids,
+            hpx::util::function<void(hpx::id_type)> fun, std::size_t fan_out)
         {
             // Call some action for the fan_out first ids here ...
-            std::vector<hpx::unique_future<void> > broadcast_futures;
+            std::vector<hpx::future<void> > broadcast_futures;
             broadcast_futures.reserve((std::min)(ids.size(), fan_out));
             for(std::size_t i = 0; i < (std::min)(fan_out, ids.size()); ++i)
             {
@@ -140,7 +142,8 @@ namespace hpx { namespace lcos
                 {
                     std::size_t next_dist = (ids.size() - fan_out)/fan_out + 1;
                     iterator end
-                        = ((i == fan_out-1) || ((std::distance(ids.cbegin() + fan_out, begin) + next_dist) >= ids.size()))
+                        = ((i == fan_out-1) || ((std::distance(ids.cbegin() + 
+                            fan_out, begin) + next_dist) >= ids.size()))
                         ? ids.cend()
                         : begin + next_dist;
 

@@ -79,7 +79,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
             t.restart();
 
         typedef hpx::util::serialize_buffer<char> buffer_type;
-        std::vector<hpx::unique_future<buffer_type> > send_futures;
+        std::vector<hpx::future<buffer_type> > send_futures;
         send_futures.reserve(window_size);
         for(std::size_t j = 0; j < window_size; ++j)
         {
@@ -113,7 +113,7 @@ void run_benchmark(boost::program_options::variables_map & vm)
 
     for (std::size_t size = 1; size <= MAX_MSG_SIZE; size *= 2)
     {
-        std::vector<hpx::unique_future<double> > benchmarks;
+        std::vector<hpx::future<double> > benchmarks;
 
         for (boost::uint32_t locality_id = 0; locality_id != localities.size(); ++locality_id) 
         {
@@ -132,7 +132,7 @@ void run_benchmark(boost::program_options::variables_map & vm)
         double total_latency = 0;
 
         hpx::wait_all(benchmarks);
-        BOOST_FOREACH(hpx::unique_future<double> & f, benchmarks)
+        BOOST_FOREACH(hpx::future<double> & f, benchmarks)
         {
             total_latency += f.get();
         }

@@ -88,7 +88,7 @@ void run_benchmark(params const & p)
     }
 
     {
-        std::vector<hpx::unique_future<void> > init_futures;
+        std::vector<hpx::future<void> > init_futures;
         init_futures.reserve(ids.size());
         BOOST_FOREACH(hpx::id_type const & id, ids)
         {
@@ -107,7 +107,7 @@ void run_benchmark(params const & p)
             iterations = ITERATIONS_LARGE;
         }
 
-        std::vector<hpx::unique_future<double> > run_futures;
+        std::vector<hpx::future<double> > run_futures;
         run_futures.reserve(ids.size());
         BOOST_FOREACH(hpx::id_type const & id, ids)
         {
@@ -119,7 +119,7 @@ void run_benchmark(params const & p)
 
         std::vector<double> times; times.reserve(ids.size());
         hpx::wait_all(run_futures);
-        BOOST_FOREACH(hpx::unique_future<double> & f, run_futures)
+        BOOST_FOREACH(hpx::future<double> & f, run_futures)
         {
             times.push_back(f.get());
         }

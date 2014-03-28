@@ -39,6 +39,7 @@ unsigned long getpagesize()
 #define LARGE_MESSAGE_SIZE  8192
 
 #define MAX_MSG_SIZE (1<<22)
+#define MAX_ALIGNMENT 65536
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,7 +66,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
 
     hpx::util::high_resolution_timer t;
 
-    std::vector<hpx::unique_future<void> > lazy_results;
+    std::vector<hpx::future<void> > lazy_results;
     lazy_results.resize(window_size);
     isend_action send;
     for (std::size_t i = 0; i != loop + skip; ++i) {
