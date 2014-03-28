@@ -42,12 +42,15 @@ the lines as they are completed to avoid confusion.
     changed, and correct any typos. Pay special attention to:
 
     *   ``$HPX_SOURCE/README.rst`` 
-     *   Update grant information
+    *   Update grant information
     *   ``docs/whats_new.qbk``
     *   ``docs/people.qbk``
-     *   Update collaborators
-     *   Update grant information
-     
+    *   Update collaborators
+    *   Update grant information
+
+#.  If there have been any commits to the release branch since the last release
+    create a tag from the old release branch before deleting the old release
+    branch in the next step.
 
 #.  Delete the old release branch, and create a new one by branching a stable
     point from master. 
