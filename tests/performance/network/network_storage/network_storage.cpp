@@ -8,17 +8,15 @@
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/atomic.hpp>
+#include <boost/array.hpp>
 
 #include <algorithm>
 #include <iostream>
-#include <iterator>
-#include <chrono>
-#include <thread>
+#include <vector>
 #include <memory>
 #include <cstdio>
 #include <random>
-#include <atomic>
-#include <array>
 
 //
 // This is a test program which reads and writes chunks of memory to storage
@@ -60,8 +58,8 @@
 //
 std::vector<std::vector<hpx::future<int>>> ActiveFutures;
 hpx::lcos::local::spinlock                 FuturesMutex;
-std::atomic<bool>                          FuturesActive;
-std::array<std::atomic<int>, 64>           FuturesWaiting;
+boost::atomic<bool>                        FuturesActive;
+boost::array<boost::atomic<int>, 64>       FuturesWaiting;
 
 //----------------------------------------------------------------------------
 // Used at start and end of each loop for synchronization

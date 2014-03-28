@@ -8,8 +8,8 @@
 add_hpx_executable(
     network_storage
     AUTOGLOB
-    FOLDER "Examples/NetworkStorage")
+    FOLDER "Benchmarks/Network/network_storage")
 
 # add pseudo-target dependencies
-add_hpx_pseudo_dependencies(examples.network_storage network_storage_exe)
+add_hpx_pseudo_dependencies(tests.performance.network.network_storage network_storage_exe)
 

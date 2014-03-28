@@ -4,13 +4,13 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    local
-    network
+    network_storage
+    osu
    )
 
 foreach(subdir ${subdirs})
-  add_hpx_pseudo_target(tests.performance.${subdir})
+  add_hpx_pseudo_target(tests.performance.network.${subdir})
   add_subdirectory(${subdir})
-  add_hpx_pseudo_dependencies(tests.performance tests.performance.${subdir})
+  add_hpx_pseudo_dependencies(tests.performance.network tests.performance.network.${subdir})
 endforeach()
 
