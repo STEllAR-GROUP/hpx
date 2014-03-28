@@ -793,7 +793,6 @@ namespace hpx
     using lcos::future;
     using lcos::shared_future;
 #if defined(HPX_UNIQUE_FUTURE_ALIAS)
-    template <typename R>
     using lcos::unique_future;
 #endif
     using lcos::promise;
