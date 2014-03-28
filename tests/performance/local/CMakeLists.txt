@@ -121,11 +121,6 @@ if(HPX_HAVE_CXX11_LAMBDAS)
   set(spinlock_overhead2_FLAGS DEPENDENCIES iostreams_component)
 endif()
 
-if(OPENMP_FOUND)
-  set_target_properties(openmp_homogeneous_timed_task_spawn_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-  set_target_properties(openmp_homogeneous_timed_task_spawn_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
-endif()
-
 
 foreach(benchmark ${benchmarks})
   set(sources
@@ -151,3 +146,7 @@ foreach(benchmark ${benchmarks})
                               ${benchmark}_exe)
 endforeach()
 
+if(OPENMP_FOUND)
+  set_target_properties(openmp_homogeneous_timed_task_spawn_exe PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+  set_target_properties(openmp_homogeneous_timed_task_spawn_exe PROPERTIES LINK_FLAGS ${OpenMP_CXX_FLAGS})
+endif()
