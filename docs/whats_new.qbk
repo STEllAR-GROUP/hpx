@@ -12,10 +12,23 @@
 
 [heading General Changes]
 
+* We completed the transition from the older (non-conforming) implementation
+  of `hpx::future` to the new and fully conforming version by removing the
+  old code and by renaming the type `hpx::unique_future` to `hpx::future`. In
+  order to maintain backwards compatibility with existing code which uses the
+  type `hpx::unique_future` we support the configuration variable
+  `HPX_UNIQUE_FUTURE_ALIAS`. If this variable is set to `ON` while running
+  cmake it will additionally define a template alias for this type.
+
 [heading Bug Fixes (Closed Tickets)]
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1092] - Rename unique_future<> back to future<>
+* [issue 1091] - Inconsistent error message
+* [issue 1090] - On windows 8.1 the examples crashed if using more than one os
+                 thread
+* [issue 1089] - Components should be allowed to have their own executor
 * [issue 1082] - Implement proper termination detection during shutdown
 
 [endsect]
