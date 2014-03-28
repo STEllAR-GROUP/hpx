@@ -73,7 +73,7 @@ hpx::lcos::barrier unique_barrier;
 //
 char *local_storage = NULL;
 //
-const int         iterations = 100;
+const int         iterations = 20;
 const int local_storage_size = (256 * 1024 * 1024);
 const int      transfer_size = (16 * 1024 * 1024);
 
@@ -573,6 +573,12 @@ int hpx_main(int argc, char* argv[])
 
     //
     delete_local_storage();
+
+    // release barrier object
+    unique_barrier = hpx::invalid_id;
+    if (0 == rank)
+        hpx::agas::unregister_name_sync("/DSM_barrier");
+
     return hpx::finalize();
 }
 

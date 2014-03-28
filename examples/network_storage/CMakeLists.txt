@@ -8,8 +8,7 @@
 add_hpx_executable(
     network_storage
     AUTOGLOB
-    FOLDER "Examples/NetworkStorage"
-    DEPENDENCIES iostreams_component)
+    FOLDER "Examples/NetworkStorage")
 
 # add pseudo-target dependencies
 add_hpx_pseudo_dependencies(examples.network_storage network_storage_exe)
