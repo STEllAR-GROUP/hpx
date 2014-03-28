@@ -479,13 +479,16 @@ namespace hpx { namespace this_thread
     threads::thread_state_ex_enum suspend(threads::thread_state_enum state,
         char const* description, error_code& ec)
     {
-        // handle interruption, if needed
-        this_thread::interruption_point();
-
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
         threads::thread_id_type id = threads::get_self_id();
+
+        // handle interruption, if needed
+        threads::interruption_point(id, ec);
+        if (ec) return threads::wait_unknown;
+
         threads::thread_state_ex_enum statex = threads::wait_unknown;
+
         {
             // verify that there are no more registered locks for this OS-thread
 #if HPX_HAVE_VERIFY_LOCKS
@@ -503,7 +506,8 @@ namespace hpx { namespace this_thread
         }
 
         // handle interruption, if needed
-        this_thread::interruption_point();
+        threads::interruption_point(id, ec);
+        if (ec) return threads::wait_unknown;
 
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
@@ -524,15 +528,17 @@ namespace hpx { namespace this_thread
     threads::thread_state_ex_enum suspend(boost::posix_time::ptime const& at_time,
         char const* description, error_code& ec)
     {
-        // handle interruption, if needed
-        this_thread::interruption_point();
-
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
         threads::thread_id_type id = threads::get_self_id();
 
+        // handle interruption, if needed
+        threads::interruption_point(id, ec);
+        if (ec) return threads::wait_unknown;
+
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = threads::wait_unknown;
+
         {
 #if HPX_HAVE_VERIFY_LOCKS
             // verify that there are no more registered locks for this OS-thread
@@ -554,7 +560,8 @@ namespace hpx { namespace this_thread
         }
 
         // handle interruption, if needed
-        this_thread::interruption_point();
+        threads::interruption_point(id, ec);
+        if (ec) return threads::wait_unknown;
 
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
@@ -576,15 +583,17 @@ namespace hpx { namespace this_thread
         boost::posix_time::time_duration const& after_duration,
         char const* description, error_code& ec)
     {
-        // handle interruption, if needed
-        this_thread::interruption_point();
-
         // schedule a thread waking us up after_duration
         threads::thread_self& self = threads::get_self();
         threads::thread_id_type id = threads::get_self_id();
 
+        // handle interruption, if needed
+        threads::interruption_point(id, ec);
+        if (ec) return threads::wait_unknown;
+
         // let the thread manager do other things while waiting
         threads::thread_state_ex_enum statex = threads::wait_unknown;
+
         {
 #if HPX_HAVE_VERIFY_LOCKS
             // verify that there are no more registered locks for this OS-thread
@@ -606,7 +615,8 @@ namespace hpx { namespace this_thread
         }
 
         // handle interruption, if needed
-        this_thread::interruption_point();
+        threads::interruption_point(id);
+        if (ec) return threads::wait_unknown;
 
         // handle interrupt and abort
         if (statex == threads::wait_abort) {
