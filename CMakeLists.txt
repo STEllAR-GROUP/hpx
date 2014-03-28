@@ -988,7 +988,7 @@ if(MSVC)
     set(CMAKE_${language}_FLAGS_MINSIZEREL
         "${CMAKE_${language}_FLAGS_MINSIZEREL} -O1 -MD")
     set(CMAKE_${language}_FLAGS_RELEASE
-        "${CMAKE_${language}_FLAGS_RELEASE} -Ox -MD -GL")
+        "${CMAKE_${language}_FLAGS_RELEASE} -Ox -MD")
   endforeach()
 
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -RTC1")
