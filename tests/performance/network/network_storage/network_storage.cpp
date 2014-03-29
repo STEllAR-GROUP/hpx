@@ -87,6 +87,7 @@ typedef struct {
   boost::uint64_t local_storage_MB;
   boost::uint64_t global_storage_MB;
   boost::uint64_t transfer_size_B;
+  boost::uint64_t threads;
 } test_options;
 
 //----------------------------------------------------------------------------
@@ -353,6 +354,35 @@ hpx::lcos::barrier create_barrier(std::size_t num_localities, char const* symnam
 }
 
 //----------------------------------------------------------------------------
+void barrier_wait()
+{
+    hpx::id_type here = hpx::find_here();
+    uint64_t rank = hpx::naming::get_locality_id_from_id(here);
+
+    hpx::id_type id = hpx::invalid_id;
+    for (std::size_t i = 0; i != HPX_MAX_NETWORK_RETRIES; ++i)
+    {
+        hpx::error_code ec;
+        id = hpx::agas::resolve_name_sync("/DSM_barrier", ec);
+        if (!ec) {
+            DEBUG_OUTPUT(2,
+              if (id==hpx::invalid_id) std::cout << "1 Invalid Barrier on rank " << rank << std::endl;
+              else std::cout << "1 Barrier resolved on rank " << rank << std::endl;
+            );
+            break;
+        }
+        boost::thread::sleep( boost::get_system_time() +
+                      boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+    }
+    DEBUG_OUTPUT(2,
+        if (id==hpx::invalid_id) std::cout << "2 Invalid Barrier on rank " << rank << std::endl;
+        else std::cout << "2 Barrier resolved on rank " << rank << std::endl;
+    );
+    unique_barrier = hpx::lcos::barrier(id);
+    unique_barrier.wait();
+}
+
+//----------------------------------------------------------------------------
 // Test speed of write/put
 void test_write(
     uint64_t rank, uint64_t nranks, uint64_t num_transfer_slots,
@@ -362,12 +392,23 @@ void test_write(
     )
 {
     CopyToStorage_action actWrite;
-
     //
-    unique_barrier.wait();
+    DEBUG_OUTPUT(1,
+        std::cout << "Entering Barrier at start of write on rank " << rank << std::endl;
+    );
+    //
+    barrier_wait();
+    //
+    DEBUG_OUTPUT(1,
+        std::cout << "Passed Barrier at start of write on rank " << rank << std::endl;
+    );
+    //
     hpx::util::high_resolution_timer timerWrite;
     //
     for(int i = 0; i < options.iterations; i++) {
+        DEBUG_OUTPUT(1,
+            std::cout << "Starting iteration " << i << " on rank " << rank << std::endl;
+        );
         //
         // start a thread which will clear any completed futures from our list.
         //
@@ -392,6 +433,9 @@ void test_write(
             // Do not copy any data. Protect this with a mutex to ensure the
             // background thread removing completed futures doesn't collide
             {
+                DEBUG_OUTPUT(5,
+                    std::cout << "Put from rank " << rank << " on rank " << send_rank << std::endl;
+                );
                 ++FuturesWaiting[send_rank];
                 hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
                 ActiveFutures[send_rank].push_back(
@@ -427,15 +471,23 @@ void test_write(
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
     }
-    unique_barrier.wait();
+    barrier_wait();
     //
-    double writeMB = nranks*options.local_storage_MB*options.iterations;
+    double writeMB   = nranks*options.local_storage_MB*options.iterations;
     double writeTime = timerWrite.elapsed();
-    double writeBW = writeMB / writeTime;
+    double writeBW   = writeMB / writeTime;
+    double IOPS      = options.iterations*num_transfer_slots;
+    double IOPs_s    = IOPS/writeTime;
     if(rank == 0) {
         std::cout << "Total time         : " << writeTime << "\n";
-        std::cout << "Memory Transferred : " << writeMB << "MB \n";
-        std::cout << "Aggregate BW Write : " << writeBW << "MB/s" << std::endl;
+        std::cout << "Memory Transferred : " << writeMB   << "MB\n";
+        std::cout << "Number of IOPs     : " << IOPS      << "\n";
+        std::cout << "IOPs/s             : " << IOPs_s    << "\n";
+        std::cout << "Aggregate BW Write : " << writeBW   << "MB/s" << std::endl;
+        // a complete set of results that our python matplotlib script will ingest
+        char const* msg = "CSVData, write, ranks, %1%, threads, %2%, Memory, %3%, IOPsize, %4%, IOPS/s, %5%, BW, %6%, ";
+        std::cout << (boost::format(msg) % nranks % options.threads % writeMB % options.transfer_size_B 
+          % IOPs_s % writeBW ) << std::endl;
     }
 }
 
@@ -449,7 +501,17 @@ void test_read(
     )
 {
     CopyFromStorage_action actRead;
-
+    //
+    DEBUG_OUTPUT(1,
+        std::cout << "Entering Barrier at start of read on rank " << rank << std::endl;
+    );
+    //
+    barrier_wait();
+    //
+    DEBUG_OUTPUT(1,
+        std::cout << "Passed Barrier at start of read on rank " << rank << std::endl;
+    );
+    //
     // this is mostly the same as the put loop, except that the received future is not
     // an int, but a transfer buffer which we have to copy out of.
     //
@@ -516,15 +578,23 @@ void test_read(
         hpx::future<int> result = when_all(final_list).then(hpx::launch::sync, reduce);
         result.get();
     }
-    unique_barrier.wait();
+    barrier_wait();
     //
     double readMB = nranks*options.local_storage_MB*options.iterations;
     double readTime = timerRead.elapsed();
     double readBW = readMB / readTime;
+    double IOPS      = options.iterations*num_transfer_slots;
+    double IOPs_s    = IOPS/readTime;
     if(rank == 0) {
         std::cout << "Total time         : " << readTime << "\n";
         std::cout << "Memory Transferred : " << readMB << "MB \n";
+        std::cout << "Number of IOPs     : " << IOPS      << "\n";
+        std::cout << "IOPs/s             : " << IOPs_s    << "\n";
         std::cout << "Aggregate BW Read  : " << readBW << "MB/s" << std::endl;
+        // a complete set of results that our python matplotlib script will ingest
+        char const* msg = "CSVData, read, ranks, %1%, threads, %2%, Memory, %3%, IOPsize, %4%, IOPS/s, %5%, BW, %6%, ";
+        std::cout << (boost::format(msg) % nranks % options.threads % readMB % options.transfer_size_B 
+          % IOPs_s % readBW ) << std::endl;
     }
 }
 
@@ -541,14 +611,32 @@ void create_barrier_startup()
     }
 }
 
+//----------------------------------------------------------------------------
 void find_barrier_startup()
 {
     hpx::id_type here = hpx::find_here();
     uint64_t rank = hpx::naming::get_locality_id_from_id(here);
 
-    if (0 != rank) {
-        // Find a registered barrier object from its symbolic name.
-        unique_barrier = hpx::agas::resolve_name_sync("/DSM_barrier");
+    if (rank!=0) {
+        hpx::id_type id = hpx::invalid_id;
+        for (std::size_t i = 0; i != HPX_MAX_NETWORK_RETRIES; ++i)
+        {
+            hpx::error_code ec;
+            id = hpx::agas::resolve_name_sync("/DSM_barrier", ec);
+            if (!ec) {
+                DEBUG_OUTPUT(2,
+                    std::cout << "Barrier resolved on rank " << rank << std::endl;
+                );
+                break;
+            }
+            boost::thread::sleep( boost::get_system_time() +
+                         boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+        }
+        DEBUG_OUTPUT(2,
+            std::cout << (id==hpx::invalid_id ?
+                "Barrier ok on rank " : "Invalid Barier on rank ") << rank << std::endl;
+        );
+        unique_barrier = hpx::lcos::barrier(id);
     }
 }
 
@@ -581,6 +669,8 @@ int hpx_main(boost::program_options::variables_map& vm)
     options.local_storage_MB  = vm["localMB"].as<boost::uint64_t>();
     options.global_storage_MB = vm["globalMB"].as<boost::uint64_t>();
     options.iterations        = vm["iterations"].as<boost::uint64_t>();
+    options.threads           = boost::lexical_cast<boost::uint64_t>(vm["hpx:threads"].as<std::string>());
+
     //
     if (options.global_storage_MB>0) {
       options.local_storage_MB = options.global_storage_MB/nranks;
@@ -599,21 +689,25 @@ int hpx_main(boost::program_options::variables_map& vm)
         FuturesWaiting[i] = 0;
     }
 
-    char const* msg2 = "hello world from OS-thread %1% on locality %2% rank %3% hostname %4%";
-    std::cout << (boost::format(msg2) % current % hpx::get_locality_id() % rank % name.c_str()) << std::endl;
-
     test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
     test_read (rank, nranks, num_transfer_slots, gen, random_rank, random_slot, options);
-
     //
     delete_local_storage();
 
     // release barrier object
     unique_barrier = hpx::invalid_id;
+    DEBUG_OUTPUT(2,
+        std::cout << "Unregistering Barrier " << rank << std::endl;
+    );
     if (0 == rank)
         hpx::agas::unregister_name_sync("/DSM_barrier");
 
-    return hpx::finalize();
+    DEBUG_OUTPUT(2,
+        std::cout << "Calling finalize" << rank << std::endl;
+    );
+    if (rank==0)
+      return hpx::finalize();
+    else return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -661,7 +755,13 @@ int main(int argc, char* argv[])
         ;
 */  
     // make sure our barrier was already created before hpx_main runs
+    DEBUG_OUTPUT(2,
+        std::cout << "Registering create_barrier startup function " << std::endl;
+    );
     hpx::register_pre_startup_function(&create_barrier_startup);
+    DEBUG_OUTPUT(2,
+        std::cout << "Registering find_barrier startup function " << std::endl;
+    );
     hpx::register_startup_function(&find_barrier_startup);
 
     // Initialize and run HPX

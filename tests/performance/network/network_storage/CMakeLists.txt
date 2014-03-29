@@ -13,6 +13,15 @@ add_hpx_executable(
 # add pseudo-target dependencies
 add_hpx_pseudo_dependencies(tests.performance.network.network_storage network_storage_exe)
 
+# our windows batch script needs to know the lib path for boost/hpx
+# and the executable path of the network_storage test
+if (WIN32)
+  file(TO_NATIVE_PATH "${HPX_BUILD_PREFIX}/bin/network_storage.exe" EXE_PATH)
+  file(TO_NATIVE_PATH "${BOOST_LIBRARY_DIR};${HPX_BUILD_PREFIX}/lib/hpx" LIB_PATH)
+
+  # generate a simple batch file for convenience
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/network_storage.bat.in ${HPX_BENCHMARK_SCRIPTS_PATH}/network_storage.bat @ONLY)
+endif()
 
 #-------------------------------------------------------
 # Slurm script generator for network_storage benchmark

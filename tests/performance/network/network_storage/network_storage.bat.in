@@ -6,7 +6,7 @@ rem # All tasks are spawned on the local machine, this should not be used
 rem # for benchmarking, only testing.
 rem #
 
-rem Path=D:\build\hpx\Debug\lib\hpx;C:\Boost\lib;c:\Program Files\HDF5_1_8_cmake-vs11\bin
+rem Path=@LIB_PATH@
 rem cd /d d:\build\hpx
 
 rem Get N-1 from argument
@@ -16,8 +16,8 @@ rem use "start /B" to suppress new window per task
 
 echo "Starting %1 instances as part of HPX job"
 FOR /l %%x IN (0, 1, %N%) DO (
-  echo start /B @EXE_PATH@ -l%1 -%%x --hpx:run-hpx-main -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.async_serialization=1 --hpx:threads=4 -Ihpx.agas.max_pending_refcnt_requests=0 --localMB=512 --transferKB=1024 --iterations=5  
-  start         @EXE_PATH@ -l%1 -%%x --hpx:run-hpx-main -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.async_serialization=1 --hpx:threads=4 -Ihpx.agas.max_pending_refcnt_requests=0 --localMB=512 --transferKB=1024 --iterations=1
+  echo start /B @EXE_PATH@ -l%1 -%%x --hpx:run-hpx-main -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.async_serialization=1 --hpx:threads=4 -Ihpx.agas.max_pending_refcnt_requests=0 --localMB=512 --transferKB=1024 --iterations=2  
+       start /B @EXE_PATH@ -l%1 -%%x --hpx:run-hpx-main -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.async_serialization=1 --hpx:threads=4 -Ihpx.agas.max_pending_refcnt_requests=0 --localMB=512 --transferKB=1024 --iterations=2
 )
  
 rem 2097152 65536

@@ -6,9 +6,9 @@
 
 function write_script
 {
-JOB_NAME=$(printf 'hpx-N%04d-s%02d-c%02d' ${NODES} ${SERVERS_PERNODE} ${CLIENTS_PERNODE})
-DIR_NAME=$(printf 'hpx-N%04d-s%02d-c%02d' ${NODES} ${SERVERS_PERNODE} ${CLIENTS_PERNODE})
-TASKS_PER_NODE=$[$SERVERS_PERNODE + $CLIENTS_PERNODE]
+JOB_NAME=$(printf 'hpx-N%04d-T%05d-t%02d-%s' ${NODES} ${TRANSFERSIZE} ${THREADS_PERTASK} ${PARCELTYPE})
+DIR_NAME=$(printf 'hpx-N%04d-T%05d-t%02d-%s' ${NODES} ${TRANSFERSIZE} ${THREADS_PERTASK} ${PARCELTYPE})
+TASKS_PER_NODE=1
 
 echo "Creating job $DIR_NAME"
 
@@ -24,7 +24,7 @@ cat << _EOF_ > ${DIR_NAME}/submit-job.bash
 #SBATCH --nodes=${NODES}
 #SBATCH --time=${TIME}
 #SBATCH --dependency=singleton
-#SBATCH --cpus-per-task=1
+## #SBATCH --cpus-per-task=1
 #SBATCH --exclusive 
 #SBATCH --distribution=cyclic
 
@@ -66,12 +66,13 @@ echo "#!/bin/bash" > run_jobs.bash
 echo "BASEDIR=$BASEDIR" >> run_jobs.bash
 echo "cd $BASEDIR" >> run_jobs.bash
 chmod 775 run_jobs.bash
+echo "Use find . -name \*.out -exec grep CSVData {} \;"
 
 #
 # 
 #
 MPIEXEC="@MPIEXEC@"
-QUEUE=debug
+QUEUE=nvp0
 EXECUTABLE1=@EXE_PATH@
 LIB_PATH="@LIB_PATH@"
 JOB_OPTIONS1="@JOB_OPTIONS1@"
@@ -81,12 +82,19 @@ CLIENTS_PERNODE=0
 SERVERS_PERNODE=1
 
 # Loop through all the parameter combinations generating jobs for each
-for NODES in 1 2 4 8 16 32 64
+# "tcp" "mpi" "ibverbs"
+for NODES in 1 2 4 8 16
 do
-  for THREADS_PERTASK in 2 4 8 16 32 50
+  for PARCELTYPE in "tcp"
   do
-    DSM_SIZE=$[SERVERS_PERNODE * $NODES * 128]
-    PROGRAM_PARAMS="--hpx:run-hpx-main -Ihpx.parcel.tcp.enable=1 -Ihpx.parcel.async_serialization=1 --hpx:threads=4 -Ihpx.agas.max_pending_refcnt_requests=0"
-    write_script
+    for TRANSFERSIZE in 8 16 32 64 128 256 512 1024 2048 4096 8192 16384
+    do
+      for THREADS_PERTASK in 2 4 8 16 32 50
+      do
+        LOCAL_SIZE=512
+        PROGRAM_PARAMS="--hpx:run-hpx-main -Ihpx.parcel.${PARCELTYPE}.enable=1 -Ihpx.parcel.async_serialization=1 --hpx:threads=${THREADS_PERTASK} --hpx:bind=balanced -Ihpx.parcel.bootstrap=tcpip --localMB=${LOCAL_SIZE} --transferKB=${TRANSFERSIZE}"
+        write_script
+      done
+    done
   done
 done
