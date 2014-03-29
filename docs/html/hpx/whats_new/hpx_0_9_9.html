@@ -24,6 +24,17 @@
         <span class="phrase"><a name="hpx.whats_new.hpx_0_9_9.general_changes"></a></span><a class="link" href="hpx_0_9_9.html#hpx.whats_new.hpx_0_9_9.general_changes">General
         Changes</a>
       </h5>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+            We completed the transition from the older (non-conforming) implementation
+            of <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span></code> to the new and fully conforming
+            version by removing the old code and by renaming the type <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">unique_future</span></code> to <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">future</span></code>.
+            In order to maintain backwards compatibility with existing code which
+            uses the type <code class="computeroutput"><span class="identifier">hpx</span><span class="special">::</span><span class="identifier">unique_future</span></code> we support the configuration
+            variable <code class="computeroutput"><span class="identifier">HPX_UNIQUE_FUTURE_ALIAS</span></code>.
+            If this variable is set to <code class="computeroutput"><span class="identifier">ON</span></code>
+            while running cmake it will additionally define a template alias for
+            this type.
+          </li></ul></div>
 <h5>
 <a name="hpx.whats_new.hpx_0_9_9.h1"></a>
         <span class="phrase"><a name="hpx.whats_new.hpx_0_9_9.bug_fixes_closed_tickets"></a></span><a class="link" href="hpx_0_9_9.html#hpx.whats_new.hpx_0_9_9.bug_fixes_closed_tickets">Bug
@@ -32,9 +43,24 @@
 <p>
         Here is a list of the important tickets we closed for this release.
       </p>
-<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem">
+            <a href="http://github.com/STEllAR-GROUP/hpx/issues/1092" target="_top">#1092</a> - Rename unique_future&lt;&gt; back to future&lt;&gt;
+          </li>
+<li class="listitem">
+            <a href="http://github.com/STEllAR-GROUP/hpx/issues/1091" target="_top">#1091</a> - Inconsistent error message
+          </li>
+<li class="listitem">
+            <a href="http://github.com/STEllAR-GROUP/hpx/issues/1090" target="_top">#1090</a> - On windows 8.1 the examples crashed if using more than one
+            os thread
+          </li>
+<li class="listitem">
+            <a href="http://github.com/STEllAR-GROUP/hpx/issues/1089" target="_top">#1089</a> - Components should be allowed to have their own executor
+          </li>
+<li class="listitem">
             <a href="http://github.com/STEllAR-GROUP/hpx/issues/1082" target="_top">#1082</a> - Implement proper termination detection during shutdown
-          </li></ul></div>
+          </li>
+</ul></div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
