@@ -71,21 +71,23 @@ void print_results(
         // performance counters below (e.g. the last_index part).
         std::cout <<
             "## 0:ITER:Iterations per OS-thread - Independent Variable\n"
-            "## 1:OSTHRDS:OS-thread - Independent Variable\n"
-            "## 2:WTIME_CTL_PUSH:Total Walltime/Push for "
+            "## 1:BSIZE:Maximum Queue Depth - Independent Variable\n"
+            "## 2:OSTHRDS:OS-thread - Independent Variable\n"
+            "## 3:WTIME_CTL_PUSH:Total Walltime/Push for "
                 "std::vector [nanoseconds]\n"
-            "## 3:WTIME_CTL_POP:Total Walltime/Pop for "
+            "## 4:WTIME_CTL_POP:Total Walltime/Pop for "
                 "std::vector [nanoseconds]\n"
-            "## 4:WTIME_LF_PUSH:Total Walltime/Push for "
+            "## 5:WTIME_LF_PUSH:Total Walltime/Push for "
                 "boost::lockfree::queue [nanoseconds]\n"
-            "## 5:WTIME_LF_POP:Total Walltime/Pop for "
+            "## 6:WTIME_LF_POP:Total Walltime/Pop for "
                 "boost::lockfree::queue [nanoseconds]\n"
                 ;
     }
 
     if (iterations != 0)
-        std::cout << ( boost::format("%lu %lu %.14g %.14g %.14g %.14g\n")
+        std::cout << ( boost::format("%lu %lu %lu %.14g %.14g %.14g %.14g\n")
                 % iterations
+                % blocksize
                 % threads
                 % ((elapsed_lockfree.first / (threads*iterations)) * 1e9)
                 % ((elapsed_lockfree.second / (threads*iterations)) * 1e9)
@@ -93,8 +95,9 @@ void print_results(
                 % ((elapsed_control.second / (threads*iterations)) * 1e9)
                 );
     else
-        std::cout << ( boost::format("%lu %lu %.14g %.14g %.14g %.14g\n")
+        std::cout << ( boost::format("%lu %lu %lu %.14g %.14g %.14g %.14g\n")
                 % iterations
+                % blocksize
                 % threads
                 % (elapsed_lockfree.first * 1e9)
                 % (elapsed_lockfree.second * 1e9)

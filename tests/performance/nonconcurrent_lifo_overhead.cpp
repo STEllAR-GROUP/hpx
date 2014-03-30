@@ -37,7 +37,6 @@ using hpx::util::high_resolution_timer;
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::uint64_t threads = 1;
-//boost::uint64_t delay = 5;
 boost::uint64_t blocksize = 10000;
 boost::uint64_t iterations = 2000000;
 bool header = true;
@@ -56,7 +55,7 @@ std::string format_build_date(std::string timestamp)
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
     variables_map& vm
-//  , std::pair<double, double> elapsed_stl
+  , std::pair<double, double> elapsed_control
   , std::pair<double, double> elapsed_lockfree 
     )
 {
@@ -71,83 +70,65 @@ void print_results(
         // change the constant that we add when printing out the field # for
         // performance counters below (e.g. the last_index part).
         std::cout <<
-//            "## 0:DELAY:Delay [micro-seconds] - Independent Variable\n"
             "## 0:ITER:Iterations per OS-thread - Independent Variable\n"
-            "## 1:OSTHRDS:OS-thread - Independent Variable\n"
-//            "## 3:WTIME_STL_PUSH:Total Walltime/Push for "
-//                "std::deque [nanoseconds]\n"
-//            "## 4:WTIME_STL_POP:Total Walltime/Pop for "
-//                "std::deque [nanoseconds]\n"
-            "## 2:WTIME_LF_PUSH:Total Walltime/Push for "
+            "## 1:BSIZE:Maximum Queue Depth - Independent Variable\n"
+            "## 2:OSTHRDS:OS-thread - Independent Variable\n"
+            "## 3:WTIME_CTL_PUSH:Total Walltime/Push for "
+                "std::vector [nanoseconds]\n"
+            "## 4:WTIME_CTL_POP:Total Walltime/Pop for "
+                "std::vector [nanoseconds]\n"
+            "## 5:WTIME_LF_PUSH:Total Walltime/Push for "
                 "boost::lockfree::stack [nanoseconds]\n"
-            "## 3:WTIME_LF_POP:Total Walltime/Pop for "
+            "## 6:WTIME_LF_POP:Total Walltime/Pop for "
                 "boost::lockfree::stack [nanoseconds]\n"
                 ;
     }
 
     if (iterations != 0)
-        std::cout << ( boost::format("%lu %lu %.14g %.14g\n")
-//                % delay
+        std::cout << ( boost::format("%lu %lu %lu %.14g %.14g %.14g %.14g\n")
                 % iterations
+                % blocksize
                 % threads
                 % ((elapsed_lockfree.first / (threads*iterations)) * 1e9)
                 % ((elapsed_lockfree.second / (threads*iterations)) * 1e9)
+                % ((elapsed_control.first / (threads*iterations)) * 1e9)
+                % ((elapsed_control.second / (threads*iterations)) * 1e9)
                 );
     else
-        std::cout << ( boost::format("%lu %lu %.14g %.14g\n")
-//                % delay
+        std::cout << ( boost::format("%lu %lu %lu %.14g %.14g %.14g %.14g\n")
                 % iterations
+                % blocksize
                 % threads
                 % (elapsed_lockfree.first * 1e9)
                 % (elapsed_lockfree.second * 1e9)
+                % (elapsed_control.first * 1e9)
+                % (elapsed_control.second * 1e9)
                 );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/*
 template <typename T>
-struct control_case
+void push(std::vector<T>& lifo, T& seed)
 {
-    typedef T value_type;
-};
-
-template <typename T>
-void push(control_case<T>& lifo, T& seed)
-{
+    lifo.push_back(seed);
 }
 
-template <typename T>
-void push(std::deque<T>& lifo, T& seed)
+template <typename Lifo, typename T>
+void push(Lifo& lifo, T& seed)
 {
-    seed ^= 0xAAAA;
-    lifo.push_front(seed);
-}
-*/
-
-template <typename T>
-void push(boost::lockfree::stack<T>& lifo, T& seed)
-{
-//    seed ^= 0xAAAA;
     lifo.push(seed);
 }
 
-/*
 template <typename T>
-void pop(control_case<T>& lifo)
-{
-}
-
-template <typename T>
-void pop(std::deque<T>& lifo)
+void pop(std::vector<T>& lifo)
 {
     lifo.pop_back();
 }
-*/
 
-template <typename T>
-void pop(boost::lockfree::stack<T>& lifo)
+template <typename Lifo>
+void pop(Lifo& lifo)
 {
-    T t;
+    typename Lifo::value_type t;
     lifo.pop(t);
 }
 
@@ -178,7 +159,7 @@ bench_lifo(Lifo& lifo, boost::uint64_t local_iterations)
     
         elapsed.first += t.elapsed();
     
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
         // Pop.
     
         // Restart the clock.
@@ -198,20 +179,22 @@ bench_lifo(Lifo& lifo, boost::uint64_t local_iterations)
 ///////////////////////////////////////////////////////////////////////////////
 void perform_iterations(
     boost::barrier& b
-//  , std::pair<double, double>& elapsed_stl
+  , std::pair<double, double>& elapsed_control
   , std::pair<double, double>& elapsed_lockfree
     )
 {
     {
-//        std::deque<boost::uint64_t> lifo;
-//        lifo.reserve(iterations);
-//        control_case<boost::uint64_t> control;
-//        elapsed_stl = bench_lifo(control);
+        std::vector<boost::uint64_t> lifo;
+        lifo.reserve(blocksize);
+
+        // Warmup.
+        bench_lifo(lifo, blocksize);
+
+        elapsed_control = bench_lifo(lifo, blocksize);
     }
 
     {
-        boost::lockfree::stack<boost::uint64_t> lifo(1);
-        lifo.reserve(iterations);
+        boost::lockfree::stack<boost::uint64_t> lifo(blocksize); 
 
         // Warmup.
         bench_lifo(lifo, blocksize);
@@ -225,11 +208,8 @@ int app_main(
     variables_map& vm
     )
 {
-//    if (0 == iterations)
-//        throw std::invalid_argument("error: count of 0 iterations specified\n");
-
     std::vector<std::pair<double, double> >
-        elapsed_stl(threads, std::pair<double, double>(0.0, 0.0));
+        elapsed_control(threads, std::pair<double, double>(0.0, 0.0));
     std::vector<std::pair<double, double> >
         elapsed_lockfree(threads, std::pair<double, double>(0.0, 0.0));
     boost::thread_group workers;
@@ -239,27 +219,26 @@ int app_main(
         workers.add_thread(new boost::thread(
             perform_iterations,
             boost::ref(b),
-//            boost::ref(elapsed_stl[i]),
+            boost::ref(elapsed_control[i]),
             boost::ref(elapsed_lockfree[i])
             ));
 
     workers.join_all();
 
-//    std::pair<double, double> total_elapsed_stl(0.0, 0.0);
+    std::pair<double, double> total_elapsed_control(0.0, 0.0);
     std::pair<double, double> total_elapsed_lockfree(0.0, 0.0);
 
-    for (boost::uint64_t i = 0; i < elapsed_stl.size(); ++i)
+    for (boost::uint64_t i = 0; i < elapsed_control.size(); ++i)
     {
-//        total_elapsed_stl.first  += elapsed_stl[i].first;
-//        total_elapsed_stl.second += elapsed_stl[i].second;
+        total_elapsed_control.first  += elapsed_control[i].first;
+        total_elapsed_control.second += elapsed_control[i].second;
 
         total_elapsed_lockfree.first  += elapsed_lockfree[i].first;
         total_elapsed_lockfree.second += elapsed_lockfree[i].second;
     }
 
     // Print out the results.
-//    print_results(vm, total_elapsed_stl, total_elapsed_lockfree);
-    print_results(vm, total_elapsed_lockfree);
+    print_results(vm, total_elapsed_control, total_elapsed_lockfree);
 
     return 0;
 }
@@ -291,10 +270,6 @@ int main(
         ( "blocksize"
         , value<boost::uint64_t>(&blocksize)->default_value(10000)
         , "size of each block")
-
-//        ( "delay"
-//        , value<boost::uint64_t>(&delay)->default_value(5)
-//        , "duration of delay in microseconds")
 
         ( "no-header"
         , "do not print out the header")
