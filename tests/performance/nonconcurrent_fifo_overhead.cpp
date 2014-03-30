@@ -176,14 +176,13 @@ bench_fifo(Fifo& fifo, boost::uint64_t local_iterations)
 ///////////////////////////////////////////////////////////////////////////////
 void perform_iterations(
     boost::barrier& b
-  , boost::uint64_t idx
   , std::pair<double, double>& elapsed_control
   , std::pair<double, double>& elapsed_lockfree
     )
 {
     {
         std::vector<boost::uint64_t> fifo;
-        fifo.reserve(iterations);
+        fifo.reserve(blocksize);
 
         // Warmup.
         bench_fifo(fifo, blocksize);
@@ -192,12 +191,12 @@ void perform_iterations(
     }
 
     {
-        boost::lockfree::queue<boost::uint64_t> fifo; 
+        boost::lockfree::queue<boost::uint64_t> fifo(blocksize); 
 
         // Warmup.
-        bench_fifo(fifos[idx], blocksize);
+        bench_fifo(fifo, blocksize);
 
-        elapsed_lockfree = bench_fifo(fifos[idx], iterations);
+        elapsed_lockfree = bench_fifo(fifo, iterations);
     }
 }
 
@@ -217,7 +216,6 @@ int app_main(
         workers.add_thread(new boost::thread(
             perform_iterations,
             boost::ref(b),
-            i,
             boost::ref(elapsed_control[i]),
             boost::ref(elapsed_lockfree[i])
             ));
