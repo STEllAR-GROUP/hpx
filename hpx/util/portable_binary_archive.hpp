@@ -20,6 +20,8 @@
 
 #include <algorithm>
 #include <climits>
+#include <cstring>
+
 #if CHAR_BIT != 8
 #  error This code assumes an eight-bit byte.
 #endif
@@ -67,7 +69,7 @@ namespace hpx { namespace util
         ~serialization_chunk()
         {
             if (type_ == chunk_type_owns_pointer)
-                delete data_.pos_;
+                delete [] reinterpret_cast<char*>(data_.pos_);
         }
 
         chunk_data data_;       // index or pointer
