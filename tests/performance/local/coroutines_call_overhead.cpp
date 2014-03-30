@@ -45,15 +45,15 @@ std::string format_build_date(std::string timestamp)
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_results(
-    double walltime
-  , std::vector<std::string> const& counter_shortnames
-  , boost::shared_ptr<hpx::util::activate_counters> ac 
+    double w_M
+//  , std::vector<std::string> const& counter_shortnames
+//  , boost::shared_ptr<hpx::util::activate_counters> ac 
     )
 {
-    std::vector<hpx::performance_counters::counter_value> counter_values;
+//    std::vector<hpx::performance_counters::counter_value> counter_values;
 
-    if (ac)
-        counter_values = ac->evaluate_counters_sync();
+//    if (ac)
+//        counter_values = ac->evaluate_counters_sync();
 
     if (header)
     {
@@ -76,6 +76,7 @@ void print_results(
 
         boost::uint64_t const last_index = 4;
 
+/*
         for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
         {
             cout << "## "
@@ -88,22 +89,40 @@ void print_results(
 
             cout << "\n";            
         }
+*/
     }
+
+    boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
+
+    double w_T = iterations*payload*os_thread_count*1e-6;
+    double E = w_T/w_M;       
+    double O = w_M-w_T;
+
+/*
+    cout << "w_T " << w_T   << "\n"
+         << "w_M " << w_M   << "\n"
+         << "E   " << E     << "\n"
+         << "O   " << O     << "\n"
+        ;
+*/
 
     cout << ( boost::format("%lu %lu %lu %lu %.14g")
             % payload 
             % contexts 
             % iterations
             % seed
-            % ((walltime/(2*iterations))*1e9)
+            % (((O/(2*iterations*os_thread_count))*1e9))
+//            % (((walltime/(2*iterations*os_thread_count))*1e9)
             );
 
+/*
     if (ac)
     {   
         for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
             cout << ( boost::format(" %.14g")
                     % counter_values[i].get_value<double>());
     }
+*/
 
     cout << "\n";
 }
@@ -115,12 +134,55 @@ struct kernel
     {
         worker_timed(payload);
 
-        return terminated;
+        return pending;
     }
 
     bool operator!() const { return true; }
     void clear() {}
 };
+
+double perform_2n_iterations()
+{
+    std::vector<coroutine_type*> coroutines;
+    std::vector<boost::uint64_t> indices;
+
+    coroutines.reserve(contexts);
+    indices.reserve(iterations);
+
+    boost::random::mt19937_64 prng(seed);
+    boost::random::uniform_int_distribution<boost::uint64_t>
+        dist(0, contexts - 1);
+
+    kernel k;
+
+    for (boost::uint64_t i = 0; i < contexts; ++i)
+    {
+        coroutine_type* c = new coroutine_type(k, hpx::find_here());
+        coroutines.push_back(c);
+    }
+
+    for (boost::uint64_t i = 0; i < iterations; ++i)
+        indices.push_back(dist(prng));
+
+    ///////////////////////////////////////////////////////////////////////
+    hpx::util::high_resolution_timer t;
+
+    for (boost::uint64_t i = 0; i < iterations; ++i)
+    {
+        (*coroutines[indices[i]])(wait_signaled);
+    }
+
+    double elapsed = t.elapsed();
+
+    for (boost::uint64_t i = 0; i < contexts; ++i)
+    {
+        delete coroutines[i];
+    }
+
+    coroutines.clear();
+
+    return elapsed;
+}
 
 int hpx_main(
     variables_map& vm
@@ -132,29 +194,29 @@ int hpx_main(
 
         if (!seed)
             seed = boost::uint64_t(std::time(0));
-   
-        std::vector<coroutine_type*> coroutines;
-        std::vector<boost::uint64_t> indices;
 
-        coroutines.reserve(contexts);
-        indices.reserve(iterations);
+        boost::uint64_t const os_thread_count = hpx::get_os_thread_count();
 
-        boost::random::mt19937_64 prng(seed);
-        boost::random::uniform_int_distribution<boost::uint64_t>
-            dist(0, contexts - 1);
+        std::vector<hpx::shared_future<double> > futures;
 
-        kernel k;
+        boost::uint64_t num_thread = hpx::get_worker_thread_num();
 
-        for (boost::uint64_t i = 0; i < contexts; ++i)
+        for (boost::uint64_t i = 0; i < os_thread_count; ++i)
         {
-            coroutine_type* c = new coroutine_type(k, hpx::find_here());
-            coroutines.push_back(c);
+            if (num_thread == i) continue;
+
+            futures.push_back(hpx::async(&perform_2n_iterations)); 
         }
 
-        for (boost::uint64_t i = 0; i < iterations; ++i)
-            indices.push_back(dist(prng));
+        double total_elapsed = perform_2n_iterations();
+
+        for (boost::uint64_t i = 0; i < futures.size(); ++i)
+            total_elapsed += futures[i].get();
+
+        print_results(total_elapsed);
 
         ///////////////////////////////////////////////////////////////////////
+/*
         std::vector<std::string> counter_shortnames;
         std::vector<std::string> counters;
         if (vm.count("counter"))
@@ -179,25 +241,7 @@ int hpx_main(
         boost::shared_ptr<hpx::util::activate_counters> ac;
         if (!counters.empty())
             ac.reset(new hpx::util::activate_counters(counters));
-
-        ///////////////////////////////////////////////////////////////////////
-        hpx::util::high_resolution_timer t;
-
-        for (boost::uint64_t i = 0; i < iterations; ++i)
-        {
-            (*coroutines[indices[i]])(wait_signaled);
-        }
-
-        double elapsed = t.elapsed();
-
-        print_results(elapsed, counter_shortnames, ac);
-
-        for (boost::uint64_t i = 0; i < contexts; ++i)
-        {
-            delete coroutines[i];
-        }
-
-        coroutines.clear();
+*/
     }
 
     return hpx::finalize();
@@ -214,7 +258,7 @@ int main(
 
     cmdline.add_options()
         ( "payload"
-        , value<boost::uint64_t>(&payload)->default_value(5)
+        , value<boost::uint64_t>(&payload)->default_value(0)
         , "artificial delay of each coroutine")
 
         ( "contexts"
@@ -231,9 +275,11 @@ int main(
         , "seed for the pseudo random number generator (if 0, a seed is "
           "choosen based on the current system time)")
 
+/*
         ( "counter"
         , value<std::vector<std::string> >()->composing()
         , "activate and report the specified performance counter")
+*/
 
         ( "no-header"
         , "do not print out the header")
