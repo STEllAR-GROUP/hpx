@@ -117,6 +117,22 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
             arg_size = archive.bytes_written();
         }
 
+        // The chunked blocks are not reallocated since since we don't actually
+        // send/receive the parcel. This leads to memory corruption as buffers
+        // are deleted twice. We reallocate the chunked buffer here to simulate
+        // the real world.
+        if (chunks && chunks->size() == 3)
+        {
+            // we know that our buffer is at index '1' of the chunks array
+            HPX_ASSERT((*chunks)[1].type_ == hpx::util::chunk_type_pointer);
+
+            char* copied_chunk = new char [(*chunks)[1].size_];
+            std::memcpy(copied_chunk, (*chunks)[1].data_.cpos_, (*chunks)[1].size_);
+
+            (*chunks)[1].data_.pos_ = copied_chunk;
+        }
+
+        // read the data
         hpx::parcelset::parcel inp;
 
         {
@@ -130,6 +146,9 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         if (chunks)
             chunks->clear();
     }
+
+    if (chunks)
+        delete chunks;
 
     return t.elapsed();
 }

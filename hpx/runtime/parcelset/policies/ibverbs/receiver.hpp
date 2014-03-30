@@ -30,7 +30,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     class connection_handler;
 
     class receiver
-      : public parcelport_connection<receiver, data_buffer, std::vector<char> >
+      : public parcelport_connection<receiver, data_buffer, util::managed_chunk>
     {
         typedef bool(receiver::*next_function_type)();
     public:

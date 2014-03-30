@@ -90,6 +90,18 @@ namespace hpx { namespace util
             size_ += count;
         }
 
+        bool load_binary_chunk_opt(void** address, std::size_t count)
+        {
+            if (0 == count)
+                return true;    // nothing to do
+
+            bool result = buffer_->load_binary_chunk_opt(address, count);
+            if (result)
+                size_ += count;
+
+            return result;
+        }
+
 #ifndef BOOST_NO_MEMBER_TEMPLATE_FRIENDS
         friend class load_access;
     protected:
@@ -169,7 +181,7 @@ namespace hpx { namespace util
 
         template <typename Container>
         basic_binary_iprimitive(Container const& buffer,
-                std::vector<serialization_chunk> const* chunks,
+                std::vector<serialization_chunk>* chunks,
                 boost::uint64_t inbound_data_size)
           : flags_(0),
             size_(0),
@@ -223,6 +235,13 @@ namespace hpx { namespace util
                 load_binary(a.address(), a.count()*sizeof(T));
             else
                 load_binary_chunk(a.address(), a.count()*sizeof(T));
+        }
+
+        template <typename T>
+        bool load_array(T** data, std::size_t size)
+        {
+            HPX_ASSERT(!(flags() & disable_data_chunking));
+            return load_binary_chunk_opt((void**)data, size*sizeof(T));
         }
 
         void set_filter(util::binary_filter* filter)

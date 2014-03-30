@@ -21,6 +21,7 @@ namespace hpx { namespace util { namespace detail
         virtual void set_filter(binary_filter* filter) = 0;
         virtual void load_binary(void* address, std::size_t count) = 0;
         virtual void load_binary_chunk(void* address, std::size_t count) = 0;
+        virtual bool load_binary_chunk_opt(void** address, std::size_t count) = 0;
     };
 
     template <typename Container>
@@ -37,7 +38,12 @@ namespace hpx { namespace util { namespace detail
             return (*chunks_)[chunk].type_;
         }
 
-        chunk_data get_chunk_data(std::size_t chunk) const
+        chunk_data& get_chunk_data(std::size_t chunk)
+        {
+            return (*chunks_)[chunk].data_;
+        }
+
+        chunk_data const& get_chunk_data(std::size_t chunk) const
         {
             return (*chunks_)[chunk].data_;
         }
@@ -55,7 +61,7 @@ namespace hpx { namespace util { namespace detail
         {}
 
         icontainer_type(Container const& cont,
-                std::vector<serialization_chunk> const* chunks,
+                std::vector<serialization_chunk>* chunks,
                 std::size_t inbound_data_size)
           : cont_(cont), current_(0), filter_(),
             decompressed_size_(inbound_data_size),
@@ -158,12 +164,38 @@ namespace hpx { namespace util { namespace detail
             }
         }
 
+        bool load_binary_chunk_opt(void** address, std::size_t count)
+        {
+            if (filter_.get() || chunks_ == 0 || count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
+                return false;
+
+            HPX_ASSERT(current_chunk_ != std::size_t(-1));
+            HPX_ASSERT(get_chunk_type(current_chunk_) == chunk_type_pointer);
+
+            if (get_chunk_size(current_chunk_) != count)
+            {
+                BOOST_THROW_EXCEPTION(
+                    boost::archive::archive_exception(
+                        boost::archive::archive_exception::input_stream_error,
+                        "archive data bstream data chunk size mismatch"));
+                return false;
+            }
+
+            chunk_data& c = get_chunk_data(current_chunk_);
+            *address = c.pos_;
+            c.pos_ = 0;            // take ownership of data
+
+            ++current_chunk_;
+
+            return true;
+        }
+
         Container const& cont_;
         std::size_t current_;
         HPX_STD_UNIQUE_PTR<binary_filter> filter_;
         std::size_t decompressed_size_;
 
-        std::vector<serialization_chunk> const* chunks_;
+        std::vector<serialization_chunk>* chunks_;
         std::size_t current_chunk_;
         std::size_t current_chunk_size_;
     };

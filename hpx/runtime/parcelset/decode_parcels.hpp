@@ -85,7 +85,7 @@ namespace hpx { namespace parcelset {
     template <typename Parcelport, typename Buffer>
     void decode_message(Parcelport & pp,
         boost::shared_ptr<Buffer> buffer,
-        std::vector<util::serialization_chunk> const *chunks,
+        std::vector<util::serialization_chunk> *chunks,
         bool first_message = false)
     {
         unsigned archive_flags = boost::archive::no_header;
@@ -251,8 +251,8 @@ namespace hpx { namespace parcelset {
 
                 HPX_ASSERT(buffer->chunks_[i].size() == second);
 
-                (*chunks)[first] = util::create_pointer_chunk(
-                        buffer->chunks_[i].data(), second);
+                (*chunks)[first] = util::create_owning_pointer_chunk(
+                        buffer->chunks_[i].release(), second);
             }
 
             std::size_t index = 0;

@@ -320,7 +320,6 @@ namespace hpx { namespace util
         void load(Archive& ar, const unsigned int version)
         {
             ar >> size_;
-            data_.reset(new T[size_]);
 
             typedef typename
                 boost::serialization::use_array_optimization<Archive>::template apply<
@@ -333,6 +332,8 @@ namespace hpx { namespace util
         template <typename Archive>
         void load_optimized(Archive& ar, const unsigned int, boost::mpl::false_)
         {
+            data_.reset(new T[size_]);
+
             std::size_t c = size_;
             T* t = data_.get();
             while(c-- > 0)
@@ -344,8 +345,21 @@ namespace hpx { namespace util
         {
             if (size_ != 0)
             {
-                boost::serialization::array<T> arr(data_.get(), size_);
-                ar.load_array(arr, version);
+                if (!(ar.flags() & disable_data_chunking))
+                {
+                    T* data = 0;
+                    if (ar.load_array(&data, size_, version))
+                    {
+                        data_.reset(data);
+                    }
+                }
+
+                if (data_.get() == 0)
+                {
+                    data_.reset(new T[size_]);
+                    boost::serialization::array<T> arr(data_.get(), size_);
+                    ar.load_array(arr, version);
+                }
             }
         }
 

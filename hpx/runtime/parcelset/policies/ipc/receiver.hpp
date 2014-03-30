@@ -25,7 +25,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
     class connection_handler;
 
     class receiver
-      : public parcelport_connection<receiver, data_buffer, std::vector<char> >
+      : public parcelport_connection<receiver, data_buffer, util::managed_chunk>
     {
     public:
         /// Construct a listening receiver with the given io_service.
