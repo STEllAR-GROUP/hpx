@@ -143,7 +143,7 @@ namespace hpx { namespace actions
         construct_thread_function(naming::address::address_type lva,
             Arguments && args)
         {
-            return Derived::decorate_action(lva,
+            return traits::action_decorate_function<Derived>::call(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()), lva,
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)));
         }
@@ -157,10 +157,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(lva,
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component>::call(lva),
-                        std::forward<Arguments>(args)));
+            return traits::action_decorate_function<Derived>::call(lva,
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component>::call(lva),
+                    std::forward<Arguments>(args)));
         }
 
         template <typename Arguments>
@@ -369,7 +369,7 @@ namespace hpx { namespace actions
         {
             // we need to assign the address of the thread function to a
             // variable to  help the compiler to deduce the function type
-            return Derived::decorate_action(lva,
+            return traits::action_decorate_function<Derived>::call(lva,
                 util::bind(util::one_shot(typename Derived::thread_function()), lva,
                     BOOST_PP_REPEAT(N, HPX_ACTION_DIRECT_ARGUMENT, args)));
         }
@@ -383,10 +383,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(lva,
-                    base_type::construct_continuation_thread_object_function_void(
-                        cont, F, get_lva<Component>::call(lva),
-                        std::forward<Arguments>(args)));
+            return traits::action_decorate_function<Derived>::call(lva,
+                base_type::construct_continuation_thread_object_function_void(
+                    cont, F, get_lva<Component>::call(lva),
+                    std::forward<Arguments>(args)));
         }
 
         template <typename Arguments>

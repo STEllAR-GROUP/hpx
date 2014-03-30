@@ -90,7 +90,8 @@ namespace hpx { namespace actions
             threads::thread_state_enum (*f)(naming::address::address_type) =
                 &Derived::template thread_function<naming::address::address_type>;
 
-            return Derived::decorate_action(lva, HPX_STD_BIND(f, lva));
+            return traits::action_decorate_function<Derived>::call(
+                lva, HPX_STD_BIND(f, lva));
         }
 
         /// \brief This static \a construct_thread_function allows to construct
@@ -102,10 +103,10 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(lva,
-                    base_type::construct_continuation_thread_object_function(
-                        cont, F, get_lva<Component>::call(lva),
-                        std::forward<Arguments>(args)));
+            return traits::action_decorate_function<Derived>::call(lva,
+                base_type::construct_continuation_thread_object_function(
+                    cont, F, get_lva<Component>::call(lva),
+                    std::forward<Arguments>(args)));
         }
 
         template <typename Arguments>
@@ -279,7 +280,8 @@ namespace hpx { namespace actions
             threads::thread_state_enum (*f)(naming::address::address_type) =
                 &Derived::template thread_function<naming::address::address_type>;
 
-            return Derived::decorate_action(lva, HPX_STD_BIND(f, lva));
+            return traits::action_decorate_function<Derived>::call(
+                lva, HPX_STD_BIND(f, lva));
         }
 
         /// \brief This static \a construct_thread_function allows to construct
@@ -291,7 +293,7 @@ namespace hpx { namespace actions
         construct_thread_function(continuation_type& cont,
             naming::address::address_type lva, Arguments && args)
         {
-            return Derived::decorate_action(lva,
+            return traits::action_decorate_function<Derived>::call(lva,
                     base_type::construct_continuation_thread_object_function_void(
                         cont, F, get_lva<Component>::call(lva),
                         std::forward<Arguments>(args)));

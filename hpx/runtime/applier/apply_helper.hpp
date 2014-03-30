@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2014 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/traits/action_schedule_thread.hpp>
 
 namespace hpx { namespace applier { namespace detail
 {
@@ -24,7 +25,8 @@ namespace hpx { namespace applier { namespace detail
         fix_priority(threads::thread_priority priority)
     {
         return hpx::actions::detail::thread_priority<
-            static_cast<threads::thread_priority>(traits::action_priority<Action>::value)
+            static_cast<threads::thread_priority>(
+                traits::action_priority<Action>::value)
         >::call(priority);
     }
 
@@ -57,7 +59,8 @@ namespace hpx { namespace applier { namespace detail
                     traits::action_stacksize<Action>::value));
             data.target = target;
 
-            Action::schedule_thread(lva, data, threads::pending);
+            traits::action_schedule_thread<Action>::call(
+                lva, data, threads::pending);
         }
 
         template <typename Arguments>
@@ -82,7 +85,8 @@ namespace hpx { namespace applier { namespace detail
                     traits::action_stacksize<Action>::value));
             data.target = target;
 
-            Action::schedule_thread(lva, data, threads::pending);
+            traits::action_schedule_thread<Action>::call(
+                lva, data, threads::pending);
         }
     };
 

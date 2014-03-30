@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/util/static.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
@@ -71,7 +72,7 @@ hpx::lcos::barrier unique_barrier;
 //
 char *local_storage = NULL;
 //
-const int         iterations = 20;
+const int         iterations = 10;
 const int local_storage_size = (256 * 1024 * 1024);
 const int      transfer_size = (16 * 1024 * 1024);
 
@@ -192,12 +193,14 @@ private:
 // A simple Buffer for sending data, it does not need any special allocator
 // user data may be sent to another locality using zero copy by wrapping
 // it in one of these buffers
-typedef hpx::util::serialize_buffer<char, std::allocator<char>> TransferBuffer;
+typedef hpx::util::serialize_buffer<char> TransferBuffer;
 //
 // When receiving data, we receive a hpx::serialize_buffer, we try to minimize
 // copying of data by providing a receive buffer with a fixed data pointer
 // so that data is placed directly into it.
-// It doesn't produce any speedup, but is here to provide a basis for experimentation
+//
+// It doesn't produce any speedup, but is here to provide a basis for
+// experimentation
 typedef AllocatorPointer<char>                              PointerAllocator;
 typedef hpx::util::serialize_buffer<char, PointerAllocator> SerializeToPointer;
 
@@ -223,24 +226,30 @@ public:
 //
 // Two actions which are called from remote or local localities
 //
-// Copy to storage, just invokes the local copy function and returns the future from it
+// Copy to storage, just invokes the local copy function and returns the future
+// from it
 //
-// Copy from storage allocates a buffer for the return memory and then wraps it into
-// a serialize buffer which is returned and passed into the local process.
+// Copy from storage allocates a buffer for the return memory and then wraps
+// it into a serialize buffer which is returned and passed into the local
+// process.
+//
 // This unfortunately means memory is copied from the storage, into a buffer
 // and not zero copied as we would like.
 // I have not been successful in removing this copy.
 namespace Storage {
-    //----------------------------------------------------------------------------
-    // A PUT into memory on this locality from a requester sending a TransferBuffer
-    hpx::future<int> CopyToStorage(TransferBuffer const& srcbuffer, uint32_t address, int length)
+    //------------------------------------------------------------------------
+    // A PUT into memory on this locality from a requester sending a
+    // TransferBuffer
+    hpx::future<int> CopyToStorage(TransferBuffer const& srcbuffer,
+        uint32_t address, int length)
     {
         boost::shared_array<char> src = srcbuffer.data_array();
         return copy_to_local_storage(src.get(), address, length);
     }
 
-    //----------------------------------------------------------------------------
-    // A GET from memory on this locality is returned to the requester in the TransferBuffer
+    //------------------------------------------------------------------------
+    // A GET from memory on this locality is returned to the requester in the
+    // TransferBuffer
     hpx::future<TransferBufferReceive> CopyFromStorage(
         uint32_t address, int length, std::size_t remote_buffer)
     {
@@ -273,6 +282,7 @@ HPX_REGISTER_PLAIN_ACTION_DECLARATION(CopyToStorage_action);
 
 HPX_DEFINE_PLAIN_ACTION(Storage::CopyFromStorage, CopyFromStorage_action);
 HPX_REGISTER_PLAIN_ACTION_DECLARATION(CopyFromStorage_action);
+HPX_ACTION_INVOKE_NO_MORE_THAN(CopyFromStorage_action, 5);
 
 // and these in a cpp
 HPX_REGISTER_PLAIN_ACTION(CopyToStorage_action);
@@ -380,7 +390,8 @@ void test_write(
                 hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
                 ActiveFutures[send_rank].push_back(
                     hpx::async(actWrite, locality,
-                        TransferBuffer(static_cast<char*>(buffer), transfer_size, TransferBuffer::reference),
+                        TransferBuffer(static_cast<char*>(buffer),
+                            transfer_size, TransferBuffer::reference),
                         memory_offset, transfer_size
                     ).then(
                         hpx::launch::sync,
@@ -404,7 +415,8 @@ void test_write(
         for(uint64_t i = 0; i < nranks; i++) {
             // move the contents of intermediate vector into final list
             final_list.reserve(final_list.size() + ActiveFutures[i].size());
-            std::move(ActiveFutures[i].begin(), ActiveFutures[i].end(), std::back_inserter(final_list));
+            std::move(ActiveFutures[i].begin(), ActiveFutures[i].end(),
+                std::back_inserter(final_list));
             ActiveFutures[i].clear();
         }
 
@@ -432,8 +444,8 @@ void test_read(
 {
     CopyFromStorage_action actRead;
 
-    // this is mostly the same as the put loop, except that the received future is not
-    // an int, but a transfer buffer which we have to copy out of.
+    // this is mostly the same as the put loop, except that the received future
+    // is not an int, but a transfer buffer which we have to copy out of.
     //
     hpx::util::high_resolution_timer timerRead;
     //
@@ -471,8 +483,10 @@ void test_read(
                     ).then(
                         hpx::launch::sync,
                         [=](hpx::future<TransferBufferReceive> fut) -> int {
-                            // Retrieve the serialized data buffer that was returned from the action
-                            // try to minimize copies by receiving into our custom buffer
+                            // Retrieve the serialized data buffer that was
+                            // returned from the action
+                            // try to minimize copies by receiving into our
+                            // custom buffer
                             fut.get();
                             --FuturesWaiting[send_rank];
                             return TEST_SUCCESS;
@@ -482,7 +496,8 @@ void test_read(
         }
         // tell the cleaning thread it's time to stop
         FuturesActive = false;
-        // wait for cleanup thread to terminate before we reduce any remaining futures
+        // wait for cleanup thread to terminate before we reduce any remaining
+        // futures
         int removed = cleaner.get();
         DEBUG_OUTPUT(2,
             std::cout << "Cleaning thread removed " << removed << std::endl;
@@ -492,7 +507,8 @@ void test_read(
         for(uint64_t i = 0; i < nranks; i++) {
             // move the contents of intermediate vector into final list
             final_list.reserve(final_list.size() + ActiveFutures[i].size());
-            std::move(ActiveFutures[i].begin(), ActiveFutures[i].end(), std::back_inserter(final_list));
+            std::move(ActiveFutures[i].begin(), ActiveFutures[i].end(),
+                std::back_inserter(final_list));
             ActiveFutures[i].clear();
         }
 
@@ -517,7 +533,8 @@ void create_barrier_startup()
     hpx::id_type here = hpx::find_here();
     uint64_t rank = hpx::naming::get_locality_id_from_id(here);
 
-    // create a barrier we will use at the start and end of each run to synchronize
+    // create a barrier we will use at the start and end of each run to
+    // synchronize
     if(0 == rank) {
         uint64_t nranks = hpx::get_num_localities().get();
         unique_barrier = create_barrier(nranks, "/DSM_barrier");
@@ -536,9 +553,9 @@ void find_barrier_startup()
 }
 
 //----------------------------------------------------------------------------
-// Main test loop which randomly sends packets of data from one locality to another
-// looping over the entire buffer address space and timing the total transmit/receive time
-// to see how well we're doing.
+// Main test loop which randomly sends packets of data from one locality to
+// another looping over the entire buffer address space and timing the total
+// transmit/receive time to see how well we're doing.
 int hpx_main(int argc, char* argv[])
 {
     hpx::id_type                    here = hpx::find_here();

@@ -24,7 +24,7 @@ struct plain_data
     /// This is the default hook implementation for decorate_action which
     /// does no hooking at all.
     static HPX_STD_FUNCTION<hpx::threads::thread_function_type>
-    wrap_action(hpx::naming::address::address_type,
+    decorate_action(hpx::naming::address::address_type,
         HPX_STD_FUNCTION<hpx::threads::thread_function_type> f)
     {
         return std::move(f);

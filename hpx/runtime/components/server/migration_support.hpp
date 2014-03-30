@@ -71,14 +71,14 @@ namespace hpx { namespace components
         /// This is the hook implementation for decorate_action which makes
         /// sure that the object becomes pinned during the execution of an
         /// action.
+        template <typename F>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        wrap_action(naming::address::address_type lva,
-            HPX_STD_FUNCTION<threads::thread_function_type> f)
+        decorate_action(naming::address::address_type lva, F && f)
         {
             using util::placeholders::_1;
             return util::bind(&migration_support::thread_function,
                 get_lva<this_component_type>::call(lva),
-                _1, base_type::wrap_action(lva, std::move(f)));
+                _1, base_type::decorate_action(lva, std::forward<F>(f)));
         }
 
     protected:

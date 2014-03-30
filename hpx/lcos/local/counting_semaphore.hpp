@@ -40,8 +40,8 @@ namespace hpx { namespace lcos { namespace local
     /// this semaphore.
     namespace detail
     {
-        template <typename Mutex = lcos::local::spinlock>
-        class HPX_EXPORT counting_semaphore
+        template <typename Mutex = lcos::local::spinlock, boost::int64_t N = 0>
+        class counting_semaphore
         {
         private:
             typedef Mutex mutex_type;
@@ -55,8 +55,9 @@ namespace hpx { namespace lcos { namespace local
             ///                 are equivalent to the same number of signals pre-
             ///                 set, and negative values are equivalent to the
             ///                 same number of waits pre-set.
-            counting_semaphore(boost::int64_t value = 0)
-              : value_(value) {}
+            counting_semaphore(boost::int64_t value = N)
+              : value_(value)
+            {}
 
             /// \brief Wait for the semaphore to be signaled
             ///

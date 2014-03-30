@@ -42,7 +42,7 @@ struct B : A, hpx::components::abstract_managed_component_base<B>
 {
     typedef hpx::components::abstract_managed_component_base<B>::wrapping_type
         wrapping_type;
-    using hpx::components::abstract_managed_component_base<B>::wrap_action;
+    using hpx::components::abstract_managed_component_base<B>::decorate_action;
     using hpx::components::abstract_managed_component_base<B>::schedule_thread;
 
     typedef B type_holder;
@@ -70,7 +70,7 @@ struct C : B, hpx::components::managed_component_base<C>
 {
     typedef hpx::components::managed_component_base<C>::wrapping_type
         wrapping_type;
-    using hpx::components::managed_component_base<C>::wrap_action;
+    using hpx::components::managed_component_base<C>::decorate_action;
     using hpx::components::managed_component_base<C>::schedule_thread;
 
     typedef C type_holder;

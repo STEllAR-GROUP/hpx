@@ -88,6 +88,12 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable = void>
     struct action_does_termination_detection;
 
+    template <typename Action, typename Enable = void>
+    struct action_decorate_function;
+
+    template <typename Action, typename Enable = void>
+    struct action_schedule_thread;
+
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for type_size
     template <typename T, typename Enable = void>
