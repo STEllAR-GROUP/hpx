@@ -4,9 +4,15 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(subdirs
-    network_storage
     osu
    )
+
+if(HPX_HAVE_CXX11_LAMBDAS)
+  set(subdirs
+    ${subdirs}
+    network_storage
+   )
+endif()
 
 foreach(subdir ${subdirs})
   add_hpx_pseudo_target(tests.performance.network.${subdir})
