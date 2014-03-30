@@ -68,13 +68,14 @@ void print_results(
         // performance counters below (e.g. the last_index part).
         cout <<
                 "## 0:PLOAD:Payload [micro-seconds] - Independent Variable\n"
-                "## 1:CTXS:# of Contexts - Independent Variable\n"
-                "## 2:ITER:# of Iterations - Independent Variable\n"
-                "## 3:SEED:PRNG seed - Independent Variable\n"
-                "## 4:WTIME_CS:Walltime/Context Switch [nano-seconds]\n"
+                "## 1:OSTHRDS:OS-Threads - Independent Variable\n"
+                "## 2:CTXS:# of Contexts - Independent Variable\n"
+                "## 3:ITER:# of Iterations - Independent Variable\n"
+                "## 4:SEED:PRNG seed - Independent Variable\n"
+                "## 5:WTIME_CS:Walltime/Context Switch [nano-seconds]\n"
                 ;
 
-        boost::uint64_t const last_index = 4;
+        boost::uint64_t const last_index = 5;
 
 /*
         for (boost::uint64_t i = 0; i < counter_shortnames.size(); ++i)
@@ -106,8 +107,9 @@ void print_results(
         ;
 */
 
-    cout << ( boost::format("%lu %lu %lu %lu %.14g")
-            % payload 
+    cout << ( boost::format("%lu %lu %lu %lu %lu %.14g")
+            % payload
+            % os_thread_count 
             % contexts 
             % iterations
             % seed
@@ -165,6 +167,12 @@ double perform_2n_iterations()
         indices.push_back(dist(prng));
 
     ///////////////////////////////////////////////////////////////////////
+    // Warmup
+    for (boost::uint64_t i = 0; i < iterations; ++i)
+    {
+        (*coroutines[indices[i]])(wait_signaled);
+    }
+
     hpx::util::high_resolution_timer t;
 
     for (boost::uint64_t i = 0; i < iterations; ++i)
