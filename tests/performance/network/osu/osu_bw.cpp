@@ -74,7 +74,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
         if (i == skip)
             t.restart();
 
-        for (int j = 0; j < window_size; ++j)
+        for (std::size_t j = 0; j < window_size; ++j)
         {
             typedef hpx::util::serialize_buffer<char> buffer_type;
 

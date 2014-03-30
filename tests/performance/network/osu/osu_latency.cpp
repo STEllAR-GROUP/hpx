@@ -71,7 +71,7 @@ double receive(
     recv_buffers.resize(window_size);
 
     message_action msg;
-    for (int i = 0; i != loop + skip; ++i) {
+    for (std::size_t i = 0; i != loop + skip; ++i) {
         // do not measure warm up phase
         if (i == skip)
             t.restart();

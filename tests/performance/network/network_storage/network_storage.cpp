@@ -287,8 +287,8 @@ int RemoveCompletions()
 {
     int num_removed = 0;
     //
-    while(FuturesActive) {
-        int last_removed = num_removed;
+    while(FuturesActive)
+    {
         {
             hpx::lcos::local::spinlock::scoped_lock lk(FuturesMutex);
             for(std::vector<hpx::future<int>> &futvec : ActiveFutures) {
@@ -360,7 +360,7 @@ void test_write(
         //
         // Start main message sending loop
         //
-        for(int i = 0; i < num_transfer_slots; i++) {
+        for(uint64_t i = 0; i < num_transfer_slots; i++) {
             // pick a random locality to send to
             int send_rank = random_rank(gen);
             // get the pointer to the current packet send buffer
@@ -401,7 +401,7 @@ void test_write(
         );
         //
         std::vector<hpx::future<int>> final_list;
-        for(int i = 0; i < nranks; i++) {
+        for(uint64_t i = 0; i < nranks; i++) {
             // move the contents of intermediate vector into final list
             final_list.reserve(final_list.size() + ActiveFutures[i].size());
             std::move(ActiveFutures[i].begin(), ActiveFutures[i].end(), std::back_inserter(final_list));
@@ -446,7 +446,7 @@ void test_read(
         //
         // Start main message sending loop
         //
-        for(int i = 0; i < num_transfer_slots; i++) {
+        for(uint64_t i = 0; i < num_transfer_slots; i++) {
             // pick a random locality to send to
             int send_rank = random_rank(gen);
             // get the pointer to the current packet send buffer
@@ -489,7 +489,7 @@ void test_read(
         );
         //
         std::vector<hpx::future<int>> final_list;
-        for(int i = 0; i < nranks; i++) {
+        for(uint64_t i = 0; i < nranks; i++) {
             // move the contents of intermediate vector into final list
             final_list.reserve(final_list.size() + ActiveFutures[i].size());
             std::move(ActiveFutures[i].begin(), ActiveFutures[i].end(), std::back_inserter(final_list));
@@ -562,8 +562,8 @@ int hpx_main(int argc, char* argv[])
     std::uniform_int_distribution<> random_slot(0, (int)num_transfer_slots - 1);
     //
     ActiveFutures.resize(nranks);
-    for(int i = 0; i < nranks; i++) {
-        FuturesWaiting[i] = 0;
+    for(uint64_t i = 0; i < nranks; i++) {
+        FuturesWaiting[i].store(0);
     }
 
     test_write(rank, nranks, num_transfer_slots, gen, random_rank, random_slot);
