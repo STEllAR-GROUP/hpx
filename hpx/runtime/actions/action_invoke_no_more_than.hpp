@@ -171,7 +171,7 @@ namespace hpx { namespace actions { namespace detail
             result.then(
                 util::bind(&wrapped_continuation::deferred_trigger,
                     boost::static_pointer_cast<wrapped_continuation const>(
-                        shared_from_this()),
+                        this->shared_from_this()),
                     util::placeholders::_1));
         }
 
