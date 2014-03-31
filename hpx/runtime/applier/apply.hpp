@@ -459,7 +459,7 @@ namespace hpx
         > /*act*/, naming::id_type const& contgid, naming::id_type const& gid)
     {
         typedef
-            typename hpx::actions::extract_action<Derived>::result_type
+            typename hpx::actions::extract_action<Derived>::remote_result_type
             result_type;
 
         return apply_p<Derived>(

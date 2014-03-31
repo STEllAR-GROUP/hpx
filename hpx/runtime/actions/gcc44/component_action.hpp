@@ -26,6 +26,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;
@@ -211,11 +213,11 @@ namespace hpx { namespace actions
     //  zero parameter version, no result value
     template <typename Component, void (Component::*F)(), typename Derived>
     class base_action0
-      : public action<Component, util::unused_type,
-            hpx::util::tuple<>, Derived>
+      : public action<Component, void, hpx::util::tuple<>, Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
             base_type;

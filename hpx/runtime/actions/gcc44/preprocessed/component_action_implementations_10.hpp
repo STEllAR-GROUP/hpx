@@ -24,6 +24,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
@@ -233,12 +235,13 @@ namespace hpx { namespace actions
         void (Component::*F)(T0), typename Derived>
     class base_action1
       : public action<
-            Component, util::unused_type,
+            Component, void,
             hpx::util::tuple<typename util::decay<T0>::type>,
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
@@ -453,6 +456,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
@@ -662,12 +667,13 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1), typename Derived>
     class base_action2
       : public action<
-            Component, util::unused_type,
+            Component, void,
             hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type>,
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
@@ -882,6 +888,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
@@ -1091,12 +1099,13 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2), typename Derived>
     class base_action3
       : public action<
-            Component, util::unused_type,
+            Component, void,
             hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type>,
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
@@ -1311,6 +1320,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
@@ -1520,12 +1531,13 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3), typename Derived>
     class base_action4
       : public action<
-            Component, util::unused_type,
+            Component, void,
             hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type>,
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
@@ -1740,6 +1752,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
@@ -1949,12 +1963,13 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4), typename Derived>
     class base_action5
       : public action<
-            Component, util::unused_type,
+            Component, void,
             hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type>,
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
@@ -2169,6 +2184,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
@@ -2378,12 +2395,13 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5), typename Derived>
     class base_action6
       : public action<
-            Component, util::unused_type,
+            Component, void,
             hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type>,
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
@@ -2598,6 +2616,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
@@ -2807,12 +2827,13 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6), typename Derived>
     class base_action7
       : public action<
-            Component, util::unused_type,
+            Component, void,
             hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type>,
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
@@ -3027,6 +3048,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
@@ -3236,12 +3259,13 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7), typename Derived>
     class base_action8
       : public action<
-            Component, util::unused_type,
+            Component, void,
             hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type>,
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
@@ -3456,6 +3480,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
@@ -3665,12 +3691,13 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8), typename Derived>
     class base_action9
       : public action<
-            Component, util::unused_type,
+            Component, void,
             hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type>,
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 
@@ -3885,6 +3912,8 @@ namespace hpx { namespace actions
     {
     public:
         typedef Result result_type;
+        typedef typename detail::remote_action_result<Result>::type
+            remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived>
@@ -4094,12 +4123,13 @@ namespace hpx { namespace actions
         void (Component::*F)(T0 , T1 , T2 , T3 , T4 , T5 , T6 , T7 , T8 , T9), typename Derived>
     class base_action10
       : public action<
-            Component, util::unused_type,
+            Component, void,
             hpx::util::tuple<typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type>,
             Derived>
     {
     public:
-        typedef util::unused_type result_type;
+        typedef void result_type;
+        typedef util::unused_type remote_result_type;
         typedef hpx::util::tuple<
             typename util::decay<T0>::type , typename util::decay<T1>::type , typename util::decay<T2>::type , typename util::decay<T3>::type , typename util::decay<T4>::type , typename util::decay<T5>::type , typename util::decay<T6>::type , typename util::decay<T7>::type , typename util::decay<T8>::type , typename util::decay<T9>::type> arguments_type;
         typedef action<Component, result_type, arguments_type, Derived> 

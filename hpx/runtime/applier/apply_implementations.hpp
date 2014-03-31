@@ -456,7 +456,7 @@ namespace hpx
         HPX_ENUM_FWD_ARGS(N, Arg, arg))
     {
         typedef
-            typename hpx::actions::extract_action<Derived>::result_type
+            typename hpx::actions::extract_action<Derived>::remote_result_type
             result_type;
 
         return apply_p<Derived>(
