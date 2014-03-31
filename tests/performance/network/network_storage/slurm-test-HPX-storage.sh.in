@@ -91,7 +91,8 @@ do
     do
       for THREADS_PERTASK in 2 4 8 16 32 50
       do
-        LOCAL_SIZE=512
+        LOCAL_SIZE=$(printf "%.0f" $( bc <<< "scale=6;(128 * $TRANSFERSIZE * $THREADS_PERTASK)/1024" ))
+        LOCAL_SIZE=$(echo $((LOCAL_SIZE>512?512:LOCAL_SIZE)))
         PROGRAM_PARAMS="--hpx:run-hpx-main -Ihpx.parcel.${PARCELTYPE}.enable=1 -Ihpx.parcel.async_serialization=1 --hpx:threads=${THREADS_PERTASK} --hpx:bind=balanced -Ihpx.parcel.bootstrap=tcpip --localMB=${LOCAL_SIZE} --transferKB=${TRANSFERSIZE}"
         write_script
       done
