@@ -24,12 +24,23 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1097] - data_actions quickstart example calls missing function
+                 decorate_action of data_get_action
+* [issue 1096] - MPI parcelport broken with new zero copy optimization
+* [issue 1095] - Warning C4005: _WIN32_WINNT: Macro redefinition
+* [issue 1094] - Syntax error for -DHPX_UNIQUE_FUTURE_ALIAS in master
+* [issue 1094] - Syntax error for -DHPX_UNIQUE_FUTURE_ALIAS
 * [issue 1092] - Rename unique_future<> back to future<>
 * [issue 1091] - Inconsistent error message
 * [issue 1090] - On windows 8.1 the examples crashed if using more than one os
                  thread
 * [issue 1089] - Components should be allowed to have their own executor
+* [issue 1088] - Add possibility to select a network interface for the
+                 ibverbs parcelport
+* [issue 1087] - ibverbs and ipc parcelport uses zero copy optimization
+* [issue 1083] - Make shell examples copyable in docs
 * [issue 1082] - Implement proper termination detection during shutdown
+* [issue 1081] - Implement thread_specific_ptr for hpx::threads
 
 [endsect]
 
