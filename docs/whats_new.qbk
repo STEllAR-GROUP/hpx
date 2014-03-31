@@ -24,6 +24,7 @@
 
 Here is a list of the important tickets we closed for this release.
 
+* [issue 1099] - Error returning futures from component actions
 * [issue 1097] - data_actions quickstart example calls missing function
                  decorate_action of data_get_action
 * [issue 1096] - MPI parcelport broken with new zero copy optimization
