@@ -36,7 +36,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         using namespace boost::assign;
         lines +=
             "data_buffer_cache_size = ${HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE:512}",
-            "zero_copy_optimization = 0"
+            "zero_copy_optimization = 0",
+            "async_serialization = 0"
             ;
 
         return lines;

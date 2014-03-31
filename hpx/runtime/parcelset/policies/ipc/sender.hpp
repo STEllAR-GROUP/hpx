@@ -59,7 +59,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         {
             // generate the name for this data_buffer
             std::string data_buffer_name(p.get_parcel_id().to_string());
-            if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
+            if(!buffer_)
             {
                 // clear and preallocate out_buffer_ (or fetch from cache)
                 buffer_ = boost::make_shared<parcel_buffer_type>(

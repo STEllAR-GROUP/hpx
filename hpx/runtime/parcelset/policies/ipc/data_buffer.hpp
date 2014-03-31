@@ -227,6 +227,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         typedef boost::interprocess::vector<
             char, ipc_allocator_type> data_buffer_type;
 
+        // dummy allocator for parcel buffer
+        typedef std::allocator<char> allocator_type;
+
     private:
         struct data : public data_buffer_base
         {
