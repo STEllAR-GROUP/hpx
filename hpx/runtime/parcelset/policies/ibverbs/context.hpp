@@ -170,9 +170,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
           , cq_(0)
           , comp_channel_(0)
           , connection_()
-          , executing_operation_(0)
-          , aborted_(false)
-          , close_operation_(false)
         {}
 
         ~context_impl()
@@ -257,15 +254,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 HPX_IBVERBS_RESET_EC(ec);
                 return;
             }
-
-            close_operation_.store(true);
-            BOOST_SCOPE_EXIT_TPL(&close_operation_) {
-                close_operation_.store(false);
-            } BOOST_SCOPE_EXIT_END
-
-            // wait for pending operations to exit
-            while (executing_operation_.load())
-                ;
 
             connection_.close();
 
@@ -612,11 +600,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         Connection connection_;
 
         template <bool, int> friend struct next_wc;
-
-        boost::atomic<boost::uint16_t> executing_operation_;
-        boost::atomic<bool> aborted_;
-        boost::atomic<bool> close_operation_;
-
     };
 
     ///////////////////////////////////////////////////////////////////////////

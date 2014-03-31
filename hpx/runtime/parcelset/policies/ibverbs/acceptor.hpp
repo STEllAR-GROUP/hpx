@@ -36,10 +36,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     public:
         acceptor()
           : event_channel_(0),
-            listener_(0),
-            executing_operation_(0),
-            aborted_(false),
-            close_operation_(false)
+            listener_(0)
         {}
 
         ~acceptor()
@@ -140,18 +137,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 HPX_IBVERBS_RESET_EC(ec);
                 return;
             }
-
-            close_operation_.store(true);
-
-            BOOST_SCOPE_EXIT(&close_operation_) {
-                close_operation_.store(false);
-            } BOOST_SCOPE_EXIT_END
-
-
-            // wait for pending operations to return
-            while (executing_operation_.load())
-                ;
-
             if(event_channel_)
             {
                 rdma_destroy_event_channel(event_channel_);
@@ -172,34 +157,10 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         void destroy()
         {
-            aborted_.store(true);
-            BOOST_SCOPE_EXIT(&aborted_) {
-                aborted_.store(false);
-            } BOOST_SCOPE_EXIT_END
-
-            // cancel operation
-            while (executing_operation_.load())
-                ;
         }
 
         bool get_next_rdma_event(rdma_cm_event & event, boost::system::error_code &ec)
         {
-            ++executing_operation_;
-            BOOST_SCOPE_EXIT(&executing_operation_) {
-                --executing_operation_;
-            } BOOST_SCOPE_EXIT_END
-
-            if (close_operation_.load() || !event_channel_) {
-                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
-                return false;
-            }
-
-            if (aborted_.load()) {
-                aborted_.store(false);
-                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::connection_aborted);
-                return false;
-            }
-
             return get_next_event(event_channel_, event, this, ec);
         }
 
@@ -208,13 +169,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
             Parcelport & parcelport, memory_pool & pool, boost::system::error_code &ec)
         {
             boost::shared_ptr<receiver> rcv;
-            if (close_operation_.load() || !event_channel_) {
-                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::not_connected);
-                return rcv;
-            }
-
             rdma_cm_event event;
-            if(!get_next_rdma_event(event, ec))
+            if(!get_next_event(event_channel_, event, this, ec))
             {
                 return rcv;
             }
@@ -277,10 +233,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     private:
         rdma_event_channel *event_channel_;
         rdma_cm_id *listener_;
-
-        boost::atomic<boost::uint16_t> executing_operation_;
-        boost::atomic<bool> aborted_;
-        boost::atomic<bool> close_operation_;
 
         typedef
             std::list<std::pair<rdma_cm_event, boost::shared_ptr<receiver> > >

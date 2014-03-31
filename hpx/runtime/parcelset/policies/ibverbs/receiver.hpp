@@ -91,16 +91,23 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         bool done(connection_handler & pp, boost::system::error_code & ec)
         {
-            HPX_ASSERT(next_ != 0);
-            if(((*this).*next_)(ec))
+            next_function_type f = 0;
             {
-                // take measurement of overall receive time
-                buffer_->data_point_.time_ = timer_.elapsed_nanoseconds() -
-                    buffer_->data_point_.time_;
+                hpx::lcos::local::spinlock::scoped_lock l(mtx_);
+                f = next_;
+            }
+            if(f != 0)
+            {
+                if(((*this).*f)(ec))
+                {
+                    // take measurement of overall receive time
+                    buffer_->data_point_.time_ = timer_.elapsed_nanoseconds() -
+                        buffer_->data_point_.time_;
 
-                // decode the received parcels.
-                decode_parcels(pp, shared_from_this(), buffer_);
-                return true;
+                    // decode the received parcels.
+                    decode_parcels(pp, shared_from_this(), buffer_);
+                    return true;
+                }
             }
             return false;
         }
@@ -170,12 +177,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
         bool next(next_function_type f)
         {
+            hpx::lcos::local::spinlock::scoped_lock l(mtx_);
             next_ = f;
             return false;
         }
 
         /// Data window for the receiver.
         server_context context_;
+        hpx::lcos::local::spinlock mtx_;
         next_function_type next_;
 
         /// The handler used to process the incoming request.

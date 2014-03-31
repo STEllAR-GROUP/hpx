@@ -43,7 +43,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
             if(event_copy.event == RDMA_CM_EVENT_DISCONNECTED)
             {
                 c->on_disconnect(event_copy.id);
-                return false;//get_next_event(event_channel, event_copy, c, ec);
+                return get_next_event(event_channel, event_copy, c, ec);
             }
 
             return true;

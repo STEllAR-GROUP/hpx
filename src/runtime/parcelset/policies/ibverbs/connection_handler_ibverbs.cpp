@@ -249,7 +249,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 sender_connection.reset();
 
                 HPX_THROWS_IF(ec, network_error,
-                    "ibverbs::parcelport::get_connection", e.what());
+                    "ibverbs::parcelport::create_connection", e.what());
                 return sender_connection;
             }
         }
@@ -263,7 +263,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                   << l << ")";
 
             HPX_THROWS_IF(ec, network_error,
-                "ibverbs::parcelport::get_connection",
+                "ibverbs::parcelport::create_connection",
                 hpx::util::osstream_get_string(strm));
             return sender_connection;
         }
@@ -485,22 +485,20 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     void connection_handler::handle_accepts()
     {
         detail::handling_messages hm(handling_accepts_);       // reset on exit
-        bool bootstrapping = hpx::is_starting();
         std::size_t k = 64;
-        while(bootstrapping || !stopped_)
+        while(!stopped_)
         {
             hpx::util::high_resolution_timer t;
             boost::shared_ptr<receiver> rcv = acceptor_.accept(*this, memory_pool_, boost::system::throws);
             if(rcv)
             {
-                hpx::lcos::local::spinlock::scoped_lock l(receivers_mtx_);
                 rcv->async_read(boost::system::throws);
-                receivers_.push_back(rcv);
+                {
+                    hpx::lcos::local::spinlock::scoped_lock l(receivers_mtx_);
+                    receivers_.push_back(rcv);
+                }
             }
             time_acct += t.elapsed();
-
-            if (bootstrapping)
-                bootstrapping = hpx::is_starting();
 
             hpx::lcos::local::spinlock::yield(k);
         }
