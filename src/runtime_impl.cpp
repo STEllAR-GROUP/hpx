@@ -51,34 +51,34 @@ namespace hpx {
     std::list<HPX_STD_FUNCTION<void()> > global_shutdown_functions;
 
     ///////////////////////////////////////////////////////////////////////////
-    void register_startup_function(startup_function_type const& f)
-    {
-        runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
-            if (rt->get_state() >= runtime::state_startup) {
-                HPX_THROW_EXCEPTION(invalid_status,
-                    "register_startup_function",
-                    "Too late to register a new startup function.");
-                return;
-            }
-            rt->add_startup_function(f);
-        }
-        else {
-            global_pre_startup_functions.push_back(f);
-        }
-    }
-
     void register_pre_startup_function(startup_function_type const& f)
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() >= runtime::state_pre_startup) {
+            if (rt->get_state() > runtime::state_pre_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_startup_function",
                     "Too late to register a new pre-startup function.");
                 return;
             }
             rt->add_pre_startup_function(f);
+        }
+        else {
+            global_pre_startup_functions.push_back(f);
+        }
+    }
+
+    void register_startup_function(startup_function_type const& f)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (NULL != rt) {
+            if (rt->get_state() > runtime::state_startup) {
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "register_startup_function",
+                    "Too late to register a new startup function.");
+                return;
+            }
+            rt->add_startup_function(f);
         }
         else {
             global_startup_functions.push_back(f);
@@ -89,7 +89,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() >= runtime::state_pre_shutdown) {
+            if (rt->get_state() > runtime::state_pre_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_shutdown_function",
                     "Too late to register a new pre-shutdown function.");
@@ -106,7 +106,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (NULL != rt) {
-            if (rt->get_state() >= runtime::state_shutdown) {
+            if (rt->get_state() > runtime::state_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_shutdown_function",
                     "Too late to register a new shutdown function.");
