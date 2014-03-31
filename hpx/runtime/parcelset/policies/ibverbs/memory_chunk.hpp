@@ -219,7 +219,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                                 current_ -= new_size;
                                 allocated_ -= new_size;
                             }
-                            check_invariants();
+                            check_invariants_locked();
                             return;
                         }
                         free_list_.insert(std::make_pair(new_size, chunk_begin));

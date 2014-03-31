@@ -398,19 +398,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 cm_params.rnr_retry_count = 7; /* infinite retry */
 
                 rdma_cm_event event;
-                int k = 0;
+                std::size_t k = 0;
                 while(!get_next_event(event_channel_, event, this, ec))
                 {
                     if(ec)
                     {
                         close(ec);
                     }
-                    if(k > 4096)
-                    {
-                        close(ec);
-                        HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::try_again);
-                        return;
-                    }
+                    hpx::lcos::local::spinlock::yield(k);
                     ++k;
                 }
 
@@ -446,12 +441,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                             close(ec);
                             return;
                         }
-                        if(k > 4096)
-                        {
-                            close(ec);
-                            HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::try_again);
-                            return;
-                        }
+                        hpx::lcos::local::spinlock::yield(k);
                         ++k;
                     }
                     if(event.event == RDMA_CM_EVENT_ROUTE_RESOLVED)
@@ -478,12 +468,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                                 close(ec);
                                 return;
                             }
-                            if(k > 4096)
-                            {
-                                close(ec);
-                                HPX_IBVERBS_THROWS_IF(ec, boost::asio::error::try_again);
-                                return;
-                            }
+                            hpx::lcos::local::spinlock::yield(k);
                             ++k;
                         }
 

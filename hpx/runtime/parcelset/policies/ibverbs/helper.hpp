@@ -34,25 +34,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
 
         rdma_cm_event * event = NULL;
 
-        pollfd pfd;
-        pfd.fd = event_channel->fd;
-        pfd.events = POLLIN;
-        pfd.revents = 0;
-
-        int ret = 0;
-        ret = poll(&pfd, 1, 1);
-        if(ret == 0) return false;
-        if(ret < 0)
-        {
-            int verrno = errno;
-            boost::system::error_code err(verrno, boost::system::system_category());
-            HPX_IBVERBS_THROWS_IF(
-                ec
-              , err
-            );
-            return false;
-        }
-
         if(rdma_get_cm_event(event_channel, &event) == 0)
         {
             std::memcpy(&event_copy, event, sizeof(rdma_cm_event));

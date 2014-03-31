@@ -94,10 +94,10 @@ namespace hpx { namespace parcelset {
 
         private:
             // helper functions for receiving parcels
-            void handle_sends();
+            void handle_messages();
             bool do_sends();
-            void handle_receives();
             bool do_receives();
+            void handle_accepts();
 
             memory_pool memory_pool_;
 
@@ -129,9 +129,13 @@ namespace hpx { namespace parcelset {
             typedef std::list<boost::shared_ptr<sender> > senders_type;
             senders_type senders_;
 
+            double time_send;
+            double time_recv;
+            double time_acct;
+
             boost::atomic<bool> stopped_;
-            boost::atomic<bool> handling_sends_;
-            boost::atomic<bool> handling_receives_;
+            boost::atomic<bool> handling_messages_;
+            boost::atomic<bool> handling_accepts_;
 
             bool use_io_pool_;
         };

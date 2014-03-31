@@ -49,16 +49,13 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
     std::size_t connection_handler::memory_chunk_size(util::runtime_configuration const& ini)
     {
-
         std::string memory_chunk_size =
             ini.get_entry("hpx.parcel.ibverbs.memory_chunk_size", HPX_PARCELPORT_IBVERBS_MEMORY_CHUNK_SIZE);
-        std::size_t size = boost::lexical_cast<std::size_t>(memory_chunk_size);
-        return size * max_connections_per_loc(ini);
+        return boost::lexical_cast<std::size_t>(memory_chunk_size);
     }
 
     std::size_t connection_handler::max_memory_chunks(util::runtime_configuration const& ini)
     {
-
         std::string max_memory_chunks =
             ini.get_entry("hpx.parcel.ibverbs.max_memory_chunks", HPX_PARCELPORT_IBVERBS_MAX_MEMORY_CHUNKS);
         return boost::lexical_cast<std::size_t>(max_memory_chunks);
@@ -70,8 +67,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
       : base_type(ini, on_start_thread, on_stop_thread)
       , memory_pool_(memory_chunk_size(ini), max_memory_chunks(ini))
       , stopped_(false)
-      , handling_sends_(false)
-      , handling_receives_(false)
+      , handling_messages_(false)
+      , handling_accepts_(false)
       , use_io_pool_(true)
     {
         // we never do zero copy optimization for this parcelport
@@ -139,6 +136,14 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 "ibverbs::connection_handler::run", errors.get_message());
             return false;
         }
+        time_send = 0;
+        time_recv = 0;
+        time_acct = 0;
+
+        handling_accepts_ = true;
+        boost::asio::io_service& io_service = io_service_pool_.get_io_service(1);
+        io_service.post(HPX_STD_BIND(&connection_handler::handle_accepts, this));
+
         background_work();
         return true;
     }
@@ -149,22 +154,25 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         stopped_ = true;
         // Wait until message handler returns
         std::size_t k = 0;
+        while(handling_messages_)
+        {
+            hpx::lcos::local::spinlock::yield(k);
+            ++k;
+        }
+        k = 0;
+        while(handling_accepts_)
+        {
+            hpx::lcos::local::spinlock::yield(k);
+            ++k;
+        }
+
+        std::cout << "Time for accepting: " << time_acct << "\n";
+        std::cout << "Time for sending: " << time_send << "\n";
+        std::cout << "Time for receiving: " << time_recv << "\n";
 
         // cancel all pending accept operations
         boost::system::error_code ec;
         acceptor_.close(ec);
-
-        while(handling_sends_)
-        {
-            hpx::lcos::local::spinlock::yield(k);
-            ++k;
-        }
-
-        while(handling_receives_)
-        {
-            hpx::lcos::local::spinlock::yield(k);
-            ++k;
-        }
     }
 
     // Make sure all pending requests are handled
@@ -173,44 +181,23 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         if (stopped_)
             return;
 
-        {
-            // Atomically set handling_sends_ to true, if another work item hasn't
-            // started executing before us.
-            bool false_ = false;
-            if (!handling_sends_.compare_exchange_strong(false_, true))
-                return;
+        // Atomically set handling_messages_ to true, if another work item hasn't
+        // started executing before us.
+        bool false_ = false;
+        if (!handling_messages_.compare_exchange_strong(false_, true))
+            return;
 
-            if(!hpx::is_starting() && !use_io_pool_)
-            {
-                hpx::applier::register_thread_nullary(
-                    HPX_STD_BIND(&connection_handler::handle_sends, this),
-                    "ibverbs::connection_handler::handle_messages",
-                    threads::pending, true, threads::thread_priority_critical);
-            }
-            else
-            {
-                boost::asio::io_service& io_service = io_service_pool_.get_io_service(0);
-                io_service.post(HPX_STD_BIND(&connection_handler::handle_sends, this));
-            }
+        if(!hpx::is_starting() && !use_io_pool_)
+        {
+            hpx::applier::register_thread_nullary(
+                HPX_STD_BIND(&connection_handler::handle_messages, this),
+                "ibverbs::connection_handler::handle_messages",
+                threads::pending, true, threads::thread_priority_critical);
         }
-
+        else
         {
-            bool false_ = false;
-            if (!handling_receives_.compare_exchange_strong(false_, true))
-                return;
-
-            if(!hpx::is_starting() && !use_io_pool_)
-            {
-                hpx::applier::register_thread_nullary(
-                    HPX_STD_BIND(&connection_handler::handle_receives, this),
-                    "ibverbs::connection_handler::handle_messages",
-                    threads::pending, true, threads::thread_priority_critical);
-            }
-            else
-            {
-                boost::asio::io_service& io_service = io_service_pool_.get_io_service(1);
-                io_service.post(HPX_STD_BIND(&connection_handler::handle_receives, this));
-            }
+            boost::asio::io_service& io_service = io_service_pool_.get_io_service(0);
+            io_service.post(HPX_STD_BIND(&connection_handler::handle_messages, this));
         }
     }
 
@@ -222,7 +209,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
     boost::shared_ptr<sender> connection_handler::create_connection(
         naming::locality const& l, error_code& ec)
     {
-        boost::asio::io_service& io_service = io_service_pool_.get_io_service();
+        boost::asio::io_service& io_service = io_service_pool_.get_io_service(0);
         boost::shared_ptr<sender> sender_connection(new sender(*this, memory_pool_, l, parcels_sent_));
 
         // Connect to the target locality, retry if needed
@@ -402,9 +389,9 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         };
     }
 
-    void connection_handler::handle_sends()
+    void connection_handler::handle_messages()
     {
-        detail::handling_messages hm(handling_sends_);       // reset on exit
+        detail::handling_messages hm(handling_messages_);       // reset on exit
 
         bool bootstrapping = hpx::is_starting();
         bool has_work = true;
@@ -417,13 +404,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         {
             // handle all sends ...
             has_work = do_sends();
-            /*
-            if(!has_work)
+            // handle all receives ...
+            if(do_receives())
             {
-                // If we don't have any senders pending ... try to receive some
-                has_work = do_receives();
+                has_work = true;
             }
-            */
 
             if (bootstrapping)
                 bootstrapping = hpx::is_starting();
@@ -446,103 +431,34 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
 
     bool connection_handler::do_sends()
     {
-        bool has_work = true;
-        std::list<boost::shared_ptr<sender> > senders;
-        {
-            hpx::lcos::local::spinlock::scoped_lock l(senders_mtx_);
-            std::swap(senders_, senders);
-        }
+        hpx::util::high_resolution_timer t;
+        hpx::lcos::local::spinlock::scoped_lock l(senders_mtx_);
         for(
-            senders_type::iterator it = senders.begin();
-            !stopped_ && enable_parcel_handling_ && it != senders.end();
+            senders_type::iterator it = senders_.begin();
+            !stopped_ && enable_parcel_handling_ && it != senders_.end();
             /**/)
         {
             if((*it)->done())
             {
-                it = senders.erase(it);
+                it = senders_.erase(it);
             }
             else
             {
                 ++it;
             }
         }
-        {
-            hpx::lcos::local::spinlock::scoped_lock l(senders_mtx_);
-            if(senders_.empty())
-            {
-                std::swap(senders, senders_);
-            }
-            else
-            {
-                senders_.insert(senders_.end(), senders.begin(), senders.end());
-            }
-            has_work = !senders_.empty();
-        }
-        return has_work;
-    }
-
-    void connection_handler::handle_receives()
-    {
-        detail::handling_messages hm(handling_receives_);       // reset on exit
-
-        bool bootstrapping = hpx::is_starting();
-        bool has_work = true;
-        std::size_t k = 0;
-
-        hpx::util::high_resolution_timer t;
-        // We let the message handling loop spin for another 2 seconds to avoid the
-        // costs involved with posting it to asio
-        while(bootstrapping || (!stopped_ && has_work) || (!has_work && t.elapsed() < 2.0))
-        {
-            // handle all accepts ...
-            boost::shared_ptr<receiver> rcv = acceptor_.accept(*this, memory_pool_, boost::system::throws);
-            if(rcv)
-            {
-                hpx::lcos::local::spinlock::scoped_lock l(receivers_mtx_);
-                rcv->async_read(boost::system::throws);
-                receivers_.push_back(rcv);
-            }
-
-            // handle all receives ...
-            has_work = do_receives();
-            /*
-            if(!has_work)
-            {
-                // If we don't have work, try to send some ...
-                has_work = do_sends();
-            }
-            */
-
-            if (bootstrapping)
-                bootstrapping = hpx::is_starting();
-
-            if(has_work)
-            {
-                t.restart();
-                k = 0;
-            }
-            else
-            {
-                if(enable_parcel_handling_)
-                {
-                    hpx::lcos::local::spinlock::yield(k);
-                    ++k;
-                }
-            }
-        }
+        time_send += t.elapsed();
+        return !senders_.empty();
     }
 
     bool connection_handler::do_receives()
     {
-        bool has_work = true;
-        std::list<boost::shared_ptr<receiver> > receivers;
-        {
-            hpx::lcos::local::spinlock::scoped_lock l(receivers_mtx_);
-            std::swap(receivers_, receivers);
-        }
+        hpx::util::high_resolution_timer t;
+        hpx::lcos::local::spinlock::scoped_try_lock l(receivers_mtx_);
+
         for(
-            receivers_type::iterator it = receivers.begin();
-            !stopped_ && enable_parcel_handling_ && it != receivers.end();
+            receivers_type::iterator it = receivers_.begin();
+            !stopped_ && enable_parcel_handling_ && it != receivers_.end();
             /**/)
         {
                 boost::system::error_code ec;
@@ -557,24 +473,37 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
                 if(ec == boost::asio::error::eof
                 || ec == boost::asio::error::operation_aborted)
                 {
-                    it = receivers.erase(it);
+                    it = receivers_.erase(it);
                     continue;
                 }
                 ++it;
         }
+        time_recv += t.elapsed();
+        return !receivers_.empty();
+    }
+
+    void connection_handler::handle_accepts()
+    {
+        detail::handling_messages hm(handling_accepts_);       // reset on exit
+        bool bootstrapping = hpx::is_starting();
+        std::size_t k = 64;
+        while(bootstrapping || !stopped_)
         {
-            hpx::lcos::local::spinlock::scoped_lock l(receivers_mtx_);
-            if(receivers_.empty())
+            hpx::util::high_resolution_timer t;
+            boost::shared_ptr<receiver> rcv = acceptor_.accept(*this, memory_pool_, boost::system::throws);
+            if(rcv)
             {
-                std::swap(receivers, receivers_);
+                hpx::lcos::local::spinlock::scoped_lock l(receivers_mtx_);
+                rcv->async_read(boost::system::throws);
+                receivers_.push_back(rcv);
             }
-            else
-            {
-                receivers_.insert(receivers_.end(), receivers.begin(), receivers.end());
-            }
-            has_work = !receivers_.empty();
+            time_acct += t.elapsed();
+
+            if (bootstrapping)
+                bootstrapping = hpx::is_starting();
+
+            hpx::lcos::local::spinlock::yield(k);
         }
-        return has_work;
     }
 }}}}
 
