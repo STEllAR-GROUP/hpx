@@ -32,23 +32,23 @@ struct test_server
         HPX_TEST_EQ(count_active_call_void.load(), 0);
     }
 
-//     hpx::future<void> call_future_void()
-//     {
-//         ++count_call_future_void;
-//
-//         // make sure this function is not concurrently invoked
-//         HPX_TEST_EQ(count_active_call_future_void.fetch_add(1) + 1, 1);
-//
-//         hpx::this_thread::suspend(boost::posix_time::microsec(100));
-//
-//         --count_active_call_future_void;
-//         HPX_TEST_EQ(count_active_call_future_void.load(), 0);
-//
-//         return hpx::make_ready_future();
-//     }
+    hpx::future<void> call_future_void()
+    {
+        ++count_call_future_void;
+
+        // make sure this function is not concurrently invoked
+        HPX_TEST_EQ(count_active_call_future_void.fetch_add(1) + 1, 1);
+
+        hpx::this_thread::suspend(boost::posix_time::microsec(100));
+
+        --count_active_call_future_void;
+        HPX_TEST_EQ(count_active_call_future_void.load(), 0);
+
+        return hpx::make_ready_future();
+    }
 
     HPX_DEFINE_COMPONENT_ACTION(test_server, call_void, call_void_action);
-//     HPX_DEFINE_COMPONENT_ACTION(test_server, call_future_void, call_future_void_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call_future_void, call_future_void_action);
 };
 
 typedef hpx::components::simple_component<test_server> server_type;
@@ -59,10 +59,10 @@ HPX_REGISTER_ACTION_DECLARATION(call_void_action);
 HPX_ACTION_INVOKE_NO_MORE_THAN(call_void_action, 1);  // limit to max one
 HPX_REGISTER_ACTION(call_void_action);
 
-// typedef test_server::call_future_void_action call_future_void_action;
-// HPX_REGISTER_ACTION_DECLARATION(call_future_void_action);
-// HPX_ACTION_INVOKE_NO_MORE_THAN(call_future_void_action, 1); // limit to max one
-// HPX_REGISTER_ACTION(call_future_void_action);
+typedef test_server::call_future_void_action call_future_void_action;
+HPX_REGISTER_ACTION_DECLARATION(call_future_void_action);
+HPX_ACTION_INVOKE_NO_MORE_THAN(call_future_void_action, 1); // limit to max one
+HPX_REGISTER_ACTION(call_future_void_action);
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_component_call_void()
@@ -84,24 +84,24 @@ void test_component_call_void()
     hpx::wait_all(calls);
 }
 
-// void test_component_call_future_void()
-// {
-//     hpx::id_type id = hpx::new_<test_server>(hpx::find_here()).get();
-//
-//     // test apply
-//     for (std::size_t i = 0; i != 100; ++i)
-//     {
-//         hpx::apply<call_future_void_action>(id);
-//     }
-//
-//     // test async
-//     std::vector<hpx::future<void> > calls;
-//     for (std::size_t i = 0; i != 100; ++i)
-//     {
-//         calls.push_back(hpx::async<call_future_void_action>(id));
-//     }
-//     hpx::wait_all(calls);
-// }
+void test_component_call_future_void()
+{
+    hpx::id_type id = hpx::new_<test_server>(hpx::find_here()).get();
+
+    // test apply
+    for (std::size_t i = 0; i != 100; ++i)
+    {
+        hpx::apply<call_future_void_action>(id);
+    }
+
+    // test async
+    std::vector<hpx::future<void> > calls;
+    for (std::size_t i = 0; i != 100; ++i)
+    {
+        calls.push_back(hpx::async<call_future_void_action>(id));
+    }
+    hpx::wait_all(calls);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 boost::atomic<int> count_plain_void(0);
@@ -190,7 +190,7 @@ void test_plain_call_future_void()
 int main()
 {
     test_component_call_void();
-//     test_component_call_future_void();
+    test_component_call_future_void();
 
     test_plain_call_void();
     test_plain_call_future_void();
