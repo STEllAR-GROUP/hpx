@@ -84,13 +84,13 @@ namespace hpx { namespace actions { namespace detail
 
         template <typename F>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        call(naming::address::address_type lva, F&& f, boost::mpl::false_)
+        call(naming::address::address_type lva, F const& f, boost::mpl::false_)
         {
             typedef typename Action::component_type component_type;
             return util::bind(
                 &action_decorate_function::thread_function,
                 util::placeholders::_1,
-                component_type::decorate_action(lva, std::forward<F>(f))
+                component_type::decorate_action(lva, f)
             );
         }
 
@@ -107,13 +107,13 @@ namespace hpx { namespace actions { namespace detail
 
         template <typename F>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        call(naming::address::address_type lva, F&& f, boost::mpl::true_)
+        call(naming::address::address_type lva, F const& f, boost::mpl::true_)
         {
             typedef typename Action::component_type component_type;
             return util::bind(
                 &action_decorate_function::thread_function_future,
                 util::placeholders::_1,
-                component_type::decorate_action(lva, std::forward<F>(f))
+                component_type::decorate_action(lva, f)
             );
         }
 
@@ -131,11 +131,12 @@ namespace hpx { namespace actions { namespace detail
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, int N>
     class wrapped_continuation
-      : public hpx::actions::typed_continuation<typename Action::remote_result_type>
+      : public typed_continuation<typename Action::result_type>
     {
         typedef action_decorate_function_semaphore<Action, N>
             construct_semaphore_type;
-        typedef typename Action::remote_result_type result_type;
+        typedef typename Action::result_type result_type;
+        typedef typed_continuation<result_type> base_type;
 
     public:
         wrapped_continuation(continuation_type& cont)
@@ -148,10 +149,30 @@ namespace hpx { namespace actions { namespace detail
             construct_semaphore_type::get_sem().signal();
         }
 
-        void trigger_value(result_type && val) const
+        void deferred_trigger(result_type&& result) const
         {
-            if (cont_) cont_->trigger(std::move(val));
+            if (cont_) {
+                boost::static_pointer_cast<base_type const>(cont_)->
+                    deferred_trigger(std::move(result));
+            }
             construct_semaphore_type::get_sem().signal();
+        }
+
+        void trigger_value(result_type && result) const
+        {
+            // if the future is ready, send the result back immediately
+            if (result.is_ready()) {
+                deferred_trigger(std::move(result));
+                return;
+            }
+
+            // attach continuation to this future which will send the result back
+            // once its ready
+            result.then(
+                util::bind(&wrapped_continuation::deferred_trigger,
+                    boost::static_pointer_cast<wrapped_continuation const>(
+                        shared_from_this()),
+                    util::placeholders::_1));
         }
 
         void trigger_error(boost::exception_ptr const& e) const
@@ -184,22 +205,24 @@ namespace hpx { namespace actions { namespace detail
         // If the action returns something which is not a future, we do nothing
         // special.
         template <typename Continuation>
-        static void call(Continuation& cont, boost::mpl::false_)
+        static bool call(Continuation& cont, boost::mpl::false_)
         {
+            return false;
         }
 
         // If the action returns a future we wrap the given continuation to
         // be able to signal the semaphore after the wrapped action has
         // returned.
         template <typename Continuation>
-        static void call(Continuation& c, boost::mpl::true_)
+        static bool call(Continuation& c, boost::mpl::true_)
         {
             Continuation cont(new wrapped_continuation<Action, N>(c));
             c = cont;
+            return true;
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static void call(hpx::actions::continuation_type& cont)
+        static bool call(hpx::actions::continuation_type& cont)
         {
             typedef typename Action::result_type result_type;
             typedef typename traits::is_future<result_type>::type is_future;

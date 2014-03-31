@@ -43,10 +43,19 @@ namespace hpx { namespace applier { namespace detail
         call (naming::id_type const& target, naming::address::address_type lva,
             threads::thread_priority priority, Arguments && args)
         {
+            actions::continuation_type cont;
             threads::thread_init_data data;
+            if (traits::action_decorate_continuation<Action>::call(cont))
+            {
+                data.func = Action::construct_thread_function(cont, lva,
+                    std::forward<Arguments>(args));
+            }
+            else
+            {
+                data.func = Action::construct_thread_function(lva,
+                    std::forward<Arguments>(args));
+            }
 
-            data.func = Action::construct_thread_function(lva,
-                std::forward<Arguments>(args));
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
             data.lva = lva;
 #endif

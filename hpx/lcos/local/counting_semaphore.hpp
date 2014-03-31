@@ -126,11 +126,10 @@ namespace hpx { namespace lcos { namespace local
             void signal_locked(boost::int64_t count, Lock& l)
             {
                 value_ += count;
-                if (value_ >= 0)
+                while (value_ >= 0)
                 {
-                    // release all threads, they will figure out between themselves
-                    // which one gets released from wait above
-                    cond_.notify_all(l);
+                    if (!cond_.notify_one(l))
+                        break;
                 }
             }
 

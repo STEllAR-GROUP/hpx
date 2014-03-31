@@ -163,10 +163,9 @@ public:
     /// does no hooking at all.
     template <typename F>
     static HPX_STD_FUNCTION<threads::thread_function_type>
-    decorate_action(naming::address::address_type, F && f)
+    decorate_action(naming::address::address_type, F const& f)
     {
-        return HPX_STD_FUNCTION<threads::thread_function_type>(
-            std::forward<F>(f));
+        return HPX_STD_FUNCTION<threads::thread_function_type>(f);
     }
 
     /// This is the default hook implementation for schedule_thread which

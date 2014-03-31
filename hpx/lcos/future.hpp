@@ -1182,7 +1182,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(lcos::future<R> && result) const
+        virtual void trigger_value(lcos::future<R> && result) const
         {
             LLCO_(info)
                 << "typed_continuation<lcos::future<R> >::trigger("
@@ -1290,7 +1290,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(lcos::future<void> && result) const
+        virtual void trigger_value(lcos::future<void> && result) const
         {
             LLCO_(info)
                 << "typed_continuation<lcos::future<void> >::trigger("

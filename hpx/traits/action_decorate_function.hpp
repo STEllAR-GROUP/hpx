@@ -18,11 +18,11 @@ namespace hpx { namespace traits
     {
         template <typename F>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        call(naming::address::address_type lva, F && f)
+        call(naming::address::address_type lva, F const& f)
         {
             // by default we forward this to the component type
             typedef typename Action::component_type component_type;
-            return component_type::decorate_action(lva, std::forward<F>(f));
+            return component_type::decorate_action(lva, f);
         }
     };
 

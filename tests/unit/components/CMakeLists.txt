@@ -4,17 +4,25 @@
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    action_invoke_no_more_than
+    copy_component
+    get_gid
+    get_ptr
     inheritance_2_classes_abstract
     inheritance_2_classes_concrete
     inheritance_3_classes_1_abstract
     inheritance_3_classes_2_abstract
     inheritance_3_classes_concrete
-    copy_component
-    get_gid
-    get_ptr
     migrate_component
     remote_object
    )
+
+
+set(action_invoke_no_more_than_PARAMETERS
+    LOCALITIES 2
+    THREADS_PER_LOCALITY 4)
+set(action_invoke_no_more_than_FLAGS
+    DEPENDENCIES iostreams_component)
 
 set(copy_component_PARAMETERS
     LOCALITIES 2

@@ -99,7 +99,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail
         }
 
         template <typename Lock>
-        void notify_one(Lock& lock, error_code& ec = throws) // leaves the lock unlocked
+        bool notify_one(Lock& lock, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
@@ -111,17 +111,19 @@ namespace hpx { namespace lcos { namespace local { namespace detail
                     HPX_THROWS_IF(ec, null_thread_id,
                         "condition_variable::notify_one",
                         "NULL thread id encountered");
-                    return;
+                    return false;
                 }
                 queue_.front().id_ = threads::invalid_thread_id;
                 queue_.pop_front();
 
-                lock.unlock();
+                util::scoped_unlock<Lock> unlock(lock);
 
                 threads::set_thread_state(id, threads::pending,
                     threads::wait_timeout, threads::thread_priority_default, ec);
-                if (ec) return;
+                if (!ec) return true;
             }
+
+            return false;
         }
 
         template <typename Lock>

@@ -658,9 +658,18 @@ namespace hpx { namespace actions
             naming::address::address_type lva,
             threads::thread_state_enum initial_state)
         {
+            continuation_type cont;
             threads::thread_init_data data;
-            traits::action_schedule_thread<derived_type>::call(lva,
-                get_thread_init_data(target, lva, data), initial_state);
+            if (traits::action_decorate_continuation<derived_type>::call(cont))
+            {
+                traits::action_schedule_thread<derived_type>::call(lva,
+                    get_thread_init_data(cont, target, lva, data), initial_state);
+            }
+            else
+            {
+                traits::action_schedule_thread<derived_type>::call(lva,
+                    get_thread_init_data(target, lva, data), initial_state);
+            }
         }
 
         void schedule_thread(continuation_type& cont,

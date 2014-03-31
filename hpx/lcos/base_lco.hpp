@@ -113,11 +113,11 @@ namespace hpx { namespace lcos
 
         /// This is the default hook implementation for decorate_action which
         /// does no hooking at all.
+        template <typename F>
         static HPX_STD_FUNCTION<threads::thread_function_type>
-        decorate_action(naming::address::address_type,
-            HPX_STD_FUNCTION<threads::thread_function_type> f)
+        decorate_action(naming::address::address_type, F const& f)
         {
-            return std::move(f);
+            return HPX_STD_FUNCTION<threads::thread_function_type>(f);
         }
 
         /// This is the default hook implementation for schedule_thread which

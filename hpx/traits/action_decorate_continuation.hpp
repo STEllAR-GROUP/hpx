@@ -15,9 +15,10 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable>
     struct action_decorate_continuation
     {
-        static void call(hpx::actions::continuation_type& cont)
+        static bool call(hpx::actions::continuation_type& cont)
         {
             // by default we do nothing
+            return false; // continuation has not been modified
         }
     };
 
