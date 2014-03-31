@@ -13,7 +13,7 @@
 namespace hpx { namespace lcos
 {
     template <typename Result> class future;
-    
+
     template <typename R> class future;
     template <typename R> class shared_future;
 }}

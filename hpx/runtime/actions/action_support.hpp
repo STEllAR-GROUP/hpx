@@ -25,6 +25,7 @@
 #include <hpx/traits/action_does_termination_detection.hpp>
 #include <hpx/traits/action_is_target_valid.hpp>
 #include <hpx/traits/action_decorate_function.hpp>
+#include <hpx/traits/action_decorate_continuation.hpp>
 #include <hpx/traits/action_schedule_thread.hpp>
 #include <hpx/traits/type_size.hpp>
 #include <hpx/traits/is_future.hpp>
@@ -301,7 +302,7 @@ namespace hpx { namespace actions
 //         virtual threads::thread_init_data&
 //         get_thread_init_data(naming::id_type const& target,
 //             naming::address::address_type lva, threads::thread_init_data& data) = 0;
-// 
+//
 //         virtual threads::thread_init_data&
 //         get_thread_init_data(continuation_type& cont,
 //             naming::id_type const& target, naming::address::address_type lva,
@@ -666,6 +667,10 @@ namespace hpx { namespace actions
             naming::id_type const& target, naming::address::address_type lva,
             threads::thread_state_enum initial_state)
         {
+            // first decorate the continuation
+            traits::action_decorate_continuation<derived_type>::call(cont);
+
+            // now, schedule the thread
             threads::thread_init_data data;
             traits::action_schedule_thread<derived_type>::call(lva,
                 get_thread_init_data(cont, target, lva, data), initial_state);
@@ -1210,57 +1215,6 @@ namespace hpx { namespace actions
 /**/
 #define HPX_ACTION_HAS_CRITICAL_PRIORITY(action)                              \
     HPX_ACTION_HAS_PRIORITY(action, threads::thread_priority_critical)        \
-/**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_ACTION_INVOKE_NO_MORE_THAN(action, maxnum)                        \
-    namespace hpx { namespace traits                                          \
-    {                                                                         \
-        template <>                                                           \
-        struct action_decorate_function<action>                               \
-        {                                                                     \
-            typedef hpx::lcos::local::detail::counting_semaphore<             \
-                hpx::lcos::local::spinlock, maxnum                            \
-            > semaphore_type;                                                 \
-                                                                              \
-            struct tag {};                                                    \
-                                                                              \
-            static semaphore_type& get_sem()                                  \
-            {                                                                 \
-                hpx::util::static_<semaphore_type, tag> sem;                  \
-                return sem.get();                                             \
-            }                                                                 \
-                                                                              \
-            struct signal_on_exit                                             \
-            {                                                                 \
-                signal_on_exit(semaphore_type& sem)                           \
-                  : sem_(sem) { sem_.wait(); }                                \
-                ~signal_on_exit() { sem_.signal(); }                          \
-                semaphore_type& sem_;                                         \
-            };                                                                \
-                                                                              \
-            static threads::thread_state_enum thread_function(                \
-                threads::thread_state_ex_enum state,                          \
-                HPX_STD_FUNCTION<threads::thread_function_type> f)            \
-            {                                                                 \
-                signal_on_exit on_exit(get_sem());                            \
-                return f(state);                                              \
-            }                                                                 \
-                                                                              \
-            template <typename F>                                             \
-            static HPX_STD_FUNCTION<threads::thread_function_type>            \
-            call(naming::address::address_type lva, F && f)                   \
-            {                                                                 \
-                typedef typename CopyToStorage_action::component_type         \
-                    component_type;                                           \
-                return util::bind(                                            \
-                    &action_decorate_function::thread_function,               \
-                    util::placeholders::_1,                                   \
-                    component_type::decorate_action(lva, std::forward<F>(f))  \
-                );                                                            \
-            }                                                                 \
-        };                                                                    \
-    }}                                                                        \
 /**/
 
 /// \endcond

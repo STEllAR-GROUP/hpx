@@ -92,6 +92,9 @@ namespace hpx { namespace traits
     struct action_decorate_function;
 
     template <typename Action, typename Enable = void>
+    struct action_decorate_continuation;
+
+    template <typename Action, typename Enable = void>
     struct action_schedule_thread;
 
     ///////////////////////////////////////////////////////////////////////////

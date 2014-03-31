@@ -8,6 +8,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
+#include <hpx/runtime/actions/continuation.hpp>
 
 namespace hpx { namespace traits
 {
@@ -16,9 +17,8 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable>
     struct action_schedule_thread
     {
-        // return the required capabilities to invoke the given action
-        static void call(naming::address::address_type lva,
-            threads::thread_init_data& data,
+        static void
+        call(naming::address::address_type lva, threads::thread_init_data& data,
             threads::thread_state_enum initial_state)
         {
             // by default we forward this to the component type

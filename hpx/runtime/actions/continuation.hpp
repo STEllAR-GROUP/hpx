@@ -378,7 +378,7 @@ namespace hpx { namespace actions
             init_registration<typed_continuation>::g.register_continuation();
         }
 
-        void trigger_value(Result && result) const
+        virtual void trigger_value(Result && result) const
         {
             LLCO_(info)
                 << "typed_continuation<Result>::trigger_value("
@@ -508,7 +508,7 @@ namespace hpx { namespace actions
             }
         }
 
-        void trigger_value(util::unused_type &&) const
+        virtual void trigger_value(util::unused_type &&) const
         {
             this->trigger();
         }

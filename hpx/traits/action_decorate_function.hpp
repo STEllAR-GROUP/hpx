@@ -16,7 +16,6 @@ namespace hpx { namespace traits
     template <typename Action, typename Enable>
     struct action_decorate_function
     {
-        // return the required capabilities to invoke the given action
         template <typename F>
         static HPX_STD_FUNCTION<threads::thread_function_type>
         call(naming::address::address_type lva, F && f)

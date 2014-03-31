@@ -5,7 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/runtime/actions/action_invoke_no_more_than.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>

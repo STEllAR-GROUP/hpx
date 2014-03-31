@@ -69,8 +69,11 @@ namespace hpx { namespace applier { namespace detail
             naming::address::address_type lva, threads::thread_priority priority,
             Arguments && args)
         {
-            threads::thread_init_data data;
+            // first decorate the continuation
+            traits::action_decorate_continuation<Action>::call(c);
 
+            // now, schedule the thread
+            threads::thread_init_data data;
             data.func = Action::construct_thread_function(c, lva,
                 std::forward<Arguments>(args));
 #if HPX_THREAD_MAINTAIN_TARGET_ADDRESS
