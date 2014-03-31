@@ -23,11 +23,11 @@ struct plain_data
 
     /// This is the default hook implementation for decorate_action which
     /// does no hooking at all.
+    template <typename F>
     static HPX_STD_FUNCTION<hpx::threads::thread_function_type>
-    decorate_action(hpx::naming::address::address_type,
-        HPX_STD_FUNCTION<hpx::threads::thread_function_type> f)
+    decorate_action(hpx::naming::address::address_type, F const& f)
     {
-        return std::move(f);
+        return HPX_STD_FUNCTION<hpx::threads::thread_function_type>(f);
     }
 
     /// This is the default hook implementation for schedule_thread which
@@ -100,7 +100,7 @@ public:
     construct_thread_function(hpx::naming::address::address_type lva,
         Arguments && /*args*/)
     {
-        return derived_type::decorate_action(lva,
+        return hpx::traits::action_decorate_function<derived_type>::call(lva,
             &data_get_action::thread_function);
     }
 
@@ -113,7 +113,7 @@ public:
     construct_thread_function(hpx::actions::continuation_type& cont,
         hpx::naming::address::address_type lva, Arguments && args)
     {
-        return derived_type::decorate_action(lva,
+        return hpx::traits::action_decorate_function<derived_type>::call(lva,
             base_type::construct_continuation_thread_function(
                 cont, &derived_type::get_value_function,
                 std::forward<Arguments>(args)));
@@ -183,7 +183,7 @@ public:
     construct_thread_function(hpx::naming::address::address_type lva,
         Arguments && args)
     {
-        return derived_type::decorate_action(lva,
+        return hpx::traits::action_decorate_function<derived_type>::call(lva,
             hpx::util::bind(
                 hpx::util::one_shot(typename derived_type::thread_function()),
                 hpx::util::get<0>(std::forward<Arguments>(args))));
@@ -198,7 +198,7 @@ public:
     construct_thread_function(hpx::actions::continuation_type& cont,
         hpx::naming::address::address_type lva, Arguments && args)
     {
-        return derived_type::decorate_action(lva,
+        return hpx::traits::action_decorate_function<derived_type>::call(lva,
             base_type::construct_continuation_thread_function_void(
                 cont, &derived_type::set_value_function,
                 std::forward<Arguments>(args)));
