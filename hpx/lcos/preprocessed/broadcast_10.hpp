@@ -288,7 +288,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
        )
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -296,8 +295,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
                
@@ -646,7 +645,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0)
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -654,8 +652,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
               , a0
@@ -1004,7 +1002,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1)
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -1012,8 +1009,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
               , a0 , a1
@@ -1362,7 +1359,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2)
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -1370,8 +1366,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
               , a0 , a1 , a2
@@ -1720,7 +1716,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3)
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -1728,8 +1723,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
               , a0 , a1 , a2 , a3
@@ -2078,7 +2073,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4)
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -2086,8 +2080,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
               , a0 , a1 , a2 , a3 , a4
@@ -2436,7 +2430,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5)
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -2444,8 +2437,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
               , a0 , a1 , a2 , a3 , a4 , a5
@@ -2794,7 +2787,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6)
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -2802,8 +2794,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6
@@ -3152,7 +3144,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7)
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -3160,8 +3151,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7
@@ -3510,7 +3501,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8)
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -3518,8 +3508,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8
@@ -3868,7 +3858,6 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const & ids
       , A0 const & a0 , A1 const & a1 , A2 const & a2 , A3 const & a3 , A4 const & a4 , A5 const & a5 , A6 const & a6 , A7 const & a7 , A8 const & a8 , A9 const & a9)
     {
-        hpx::id_type dest = hpx::get_colocation_id_sync(ids[0]);
         typedef
             typename detail::make_broadcast_action<Action>::type
             broadcast_impl_action;
@@ -3876,8 +3865,8 @@ namespace hpx { namespace lcos {
             typename detail::broadcast_result<Action>::action_result
             action_result;
         return
-            hpx::async<broadcast_impl_action>(
-                dest
+            hpx::async_colocated<broadcast_impl_action>(
+                ids[0]
               , Action()
               , ids
               , a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9
