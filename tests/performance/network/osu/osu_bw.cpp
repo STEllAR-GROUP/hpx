@@ -67,7 +67,7 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
     hpx::util::high_resolution_timer t;
 
     std::vector<hpx::future<void> > lazy_results;
-    lazy_results.resize(window_size);
+    lazy_results.reserve(window_size);
     isend_action send;
     for (std::size_t i = 0; i != loop + skip; ++i) {
         // do not measure warm up phase
@@ -80,10 +80,11 @@ double ireceive(hpx::naming::id_type dest, std::size_t size, std::size_t window_
 
             // Note: The original benchmark uses MPI_Isend which does not
             //       create a copy of the passed buffer.
-            lazy_results[j] = hpx::async(send, dest,
-                buffer_type(send_buffer, size, buffer_type::reference));
+            lazy_results.push_back(hpx::async(send, dest,
+                buffer_type(send_buffer, size, buffer_type::reference)));
         }
         hpx::wait_all(lazy_results);
+        lazy_results.clear();
     }
 
     double elapsed = t.elapsed();
